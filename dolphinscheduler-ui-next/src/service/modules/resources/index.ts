@@ -45,6 +45,17 @@ export function queryResourceListPaging(
   })
 }
 
+export function queryResourceById(
+  params: ResourceTypeReq & FullNameReq & IdReq,
+  id: number
+): any {
+  return axios({
+    url: `/resources/${id}`,
+    method: 'get',
+    params
+  })
+}
+
 export function createResource(
   data: CreateReq & FileNameReq & NameReq & ResourceTypeReq
 ): any {
