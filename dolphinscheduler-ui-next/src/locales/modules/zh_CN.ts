@@ -321,11 +321,25 @@ const security = {
     alarm_group_description: '告警组描述',
     create_time: '创建时间',
     update_time: '更新时间',
-    actions: '操作',
     operation: '操作',
     delete_confirm: '确定删除吗?',
     edit: '编辑',
     delete: '删除'
+  },
+  worker_group: {
+    create_worker_group: '创建Worker分组',
+    edit_worker_group: '编辑Worker分组',
+    search_tips: '请输入关键词',
+    operation: '操作',
+    delete_confirm: '确定删除吗?',
+    edit: '编辑',
+    delete: '删除',
+    group_name: '分组名称',
+    group_name_tips: '请输入分组名称',
+    worker_addresses: 'Worker地址',
+    worker_addresses_tips: '请选择Worker地址',
+    create_time: '创建时间',
+    update_time: '更新时间'
   },
   yarn_queue: {
     create_queue: '创建队列',

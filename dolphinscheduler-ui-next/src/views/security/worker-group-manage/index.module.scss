@@ -15,38 +15,29 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+.search-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 300px;
+
+    button {
+      margin-left: 10px;
+    }
+  }
 }
 
-interface WorkerGroupReq {
-  addrList: string
-  name: string
-  id?: number
-}
+.table-card {
+  margin-top: 8px;
 
-interface IdReq {
-  id: number
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }
-
-interface WorkerGroupItem {
-  id: number
-  name: string
-  addrList: string
-  createTime: string
-  updateTime: string
-  systemDefault: boolean
-}
-
-interface WorkerGroupRes {
-  totalList: WorkerGroupItem[]
-  total: number
-  totalPage: number
-  pageSize: number
-  currentPage: number
-  start: number
-}
-
-export { ListReq, WorkerGroupReq, IdReq, WorkerGroupItem, WorkerGroupRes }

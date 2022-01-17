@@ -50,7 +50,8 @@ export function queryWorkerAddressList(): any {
 
 export function deleteById(id: IdReq): any {
   return axios({
-    url: `/worker-groups/${id}`,
-    method: 'delete'
+    url: `/worker-groups/${id.id}`,
+    method: 'delete',
+    params: id
   })
 }

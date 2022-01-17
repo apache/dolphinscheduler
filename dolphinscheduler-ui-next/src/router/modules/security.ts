@@ -54,6 +54,14 @@ export default {
       }
     },
     {
+      path: '/security/worker-group-manage',
+      name: 'worker-group-manage',
+      component: components['worker-group-manage'],
+      meta: {
+        title: 'Worker分组管理'
+      }
+    },
+    {
       path: '/security/yarn-queue-manage',
       name: 'yarn-queue-manage',
       component: components['yarn-queue-manage'],
