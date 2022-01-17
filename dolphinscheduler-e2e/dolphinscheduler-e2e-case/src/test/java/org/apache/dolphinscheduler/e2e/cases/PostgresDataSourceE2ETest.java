@@ -90,9 +90,14 @@ public class PostgresDataSourceE2ETest {
 
         page.delete(dataSourceName);
 
-        await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
-            .as("DataSource list should contain newly-created database")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(dataSourceName)));
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                    page.dataSourceItemsList()
+            ).noneMatch(
+                    it -> it.getText().contains(dataSourceName)
+            );
+        });
     }
 }
