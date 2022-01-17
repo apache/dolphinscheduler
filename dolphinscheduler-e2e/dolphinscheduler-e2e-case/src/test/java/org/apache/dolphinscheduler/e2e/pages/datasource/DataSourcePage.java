@@ -62,9 +62,9 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
-        createDataSourceForm.btnDataSourceTypeDropdown().click();
+        createDataSourceForm().btnDataSourceTypeDropdown().click();
 
-        createDataSourceForm.selectDataSourceType()
+        createDataSourceForm().selectDataSourceType()
             .stream()
             .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
             .findFirst()
