@@ -64,16 +64,17 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
-        createDataSourceForm.selectDataSourceType()
+        createDataSourceForm().selectDataSourceType()
             .stream()
             .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in data source type list", dataSourceType.toLowerCase())))
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in data source type list", dataSourceType.toUpperCase())))
             .click();
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
         createDataSourceForm().inputIP().sendKeys(ip);
+        createDataSourceForm().inputPort().clear();
         createDataSourceForm().inputPort().sendKeys(port);
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
