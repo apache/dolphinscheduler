@@ -38,11 +38,12 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class AlertPluginManager {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(AlertPluginManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final PluginDao pluginDao;
 
@@ -59,7 +60,7 @@ public final class AlertPluginManager {
         ServiceLoader.load(AlertChannelFactory.class).forEach(factory -> {
             final String name = factory.name();
 
-            log.info("Registering alert plugin: {}", name);
+            logger.info("Registering alert plugin: {}", name);
 
             if (!names.add(name)) {
                 throw new IllegalStateException(format("Duplicate alert plugins named '%s'", name));
@@ -67,7 +68,7 @@ public final class AlertPluginManager {
 
             final AlertChannel alertChannel = factory.create();
 
-            log.info("Registered alert plugin: {}", name);
+            logger.info("Registered alert plugin: {}", name);
 
             final List<PluginParams> params = factory.params();
             final String paramsJson = PluginParamsTransfer.transferParamsToJson(params);

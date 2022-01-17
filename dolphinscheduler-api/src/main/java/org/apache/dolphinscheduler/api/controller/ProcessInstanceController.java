@@ -177,13 +177,13 @@ public class ProcessInstanceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "taskRelationJson", value = "TASK_RELATION_JSON", type = "String"),
         @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", type = "String"),
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
-        @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, type = "Boolean"),
-        @ApiImplicitParam(name = "globalParams", value = "PROCESS_GLOBAL_PARAMS", type = "String"),
+        @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, type = "Boolean", example = "false"),
+        @ApiImplicitParam(name = "globalParams", value = "PROCESS_GLOBAL_PARAMS", type = "String", example = "[]"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
-        @ApiImplicitParam(name = "timeout", value = "PROCESS_TIMEOUT", type = "String"),
-        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "Int", example = "0")
+        @ApiImplicitParam(name = "timeout", value = "PROCESS_TIMEOUT", type = "Int", example = "0"),
+        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "String", example = "default")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -199,8 +199,7 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                         @RequestParam(value = "locations", required = false) String locations,
                                         @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                        @RequestParam(value = "tenantCode", required = true) String tenantCode,
-                                        @RequestParam(value = "flag", required = false) Flag flag) {
+                                        @RequestParam(value = "tenantCode", required = true) String tenantCode) {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
             taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout, tenantCode);
         return returnDataList(result);
@@ -344,8 +343,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
     @AccessLogAnnotation
     public Result viewVariables(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                 @PathVariable("id") Integer id) {
-        Map<String, Object> result = processInstanceService.viewVariables(id);
+        Map<String, Object> result = processInstanceService.viewVariables(projectCode, id);
         return returnDataList(result);
     }
 
@@ -368,7 +368,7 @@ public class ProcessInstanceController extends BaseController {
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("id") Integer id) throws Exception {
-        Map<String, Object> result = processInstanceService.viewGantt(id);
+        Map<String, Object> result = processInstanceService.viewGantt(projectCode, id);
         return returnDataList(result);
     }
 

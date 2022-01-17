@@ -38,8 +38,7 @@ import org.springframework.util.MultiValueMap;
  * login controller test
  */
 public class LoginControllerTest extends AbstractControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
     @Test
     public void testLogin() throws Exception {
@@ -50,7 +49,7 @@ public class LoginControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/login")
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -66,7 +65,7 @@ public class LoginControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

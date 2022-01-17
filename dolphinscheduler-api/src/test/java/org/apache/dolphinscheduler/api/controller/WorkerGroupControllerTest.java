@@ -51,16 +51,15 @@ import org.springframework.util.MultiValueMap;
  * worker group controller test
  */
 public class WorkerGroupControllerTest extends AbstractControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
-    private static Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
-
-    @MockBean
+    @MockBean(name = "workerGroupMapper")
     private WorkerGroupMapper workerGroupMapper;
 
-    @MockBean
+    @MockBean(name = "processInstanceMapper")
     private ProcessInstanceMapper processInstanceMapper;
 
-    @MockBean
+    @MockBean(name = "registryClient")
     private RegistryClient registryClient;
 
     @Test
@@ -77,7 +76,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -94,7 +93,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -108,7 +107,19 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertTrue(result != null && result.isSuccess());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void queryWorkerAddressList() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
+                        .header("sessionId", sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -128,7 +139,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
                 .header("sessionId", sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());

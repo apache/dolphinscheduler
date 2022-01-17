@@ -22,10 +22,6 @@ import static java.util.Objects.requireNonNull;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,16 +40,6 @@ public class PluginDao {
     }
 
     /**
-     * add pluginDefine
-     *
-     * @param pluginDefine plugin define entiy
-     * @return plugin define id
-     */
-    public int addPluginDefine(PluginDefine pluginDefine) {
-        return pluginDefineMapper.insert(pluginDefine);
-    }
-
-    /**
      * add or update plugin define
      *
      * @param pluginDefine new pluginDefine
@@ -63,14 +49,13 @@ public class PluginDao {
         requireNonNull(pluginDefine.getPluginName(), "pluginName is null");
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
-        List<PluginDefine> pluginDefineList = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
-        if (CollectionUtils.isEmpty(pluginDefineList)) {
+        PluginDefine currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+        if (currPluginDefine == null) {
             if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() > 0) {
                 return pluginDefine.getId();
             }
             throw new IllegalStateException("Failed to insert plugin definition");
         }
-        PluginDefine currPluginDefine = pluginDefineList.get(0);
         if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
             currPluginDefine.setUpdateTime(pluginDefine.getUpdateTime());
             currPluginDefine.setPluginParams(pluginDefine.getPluginParams());
@@ -87,13 +72,5 @@ public class PluginDao {
      */
     public PluginDefine getPluginDefineById(int pluginDefineId) {
         return pluginDefineMapper.selectById(pluginDefineId);
-    }
-
-    public PluginDefineMapper getPluginDefineMapper() {
-        return pluginDefineMapper;
-    }
-
-    public void setPluginDefineMapper(PluginDefineMapper pluginDefineMapper) {
-        this.pluginDefineMapper = pluginDefineMapper;
     }
 }

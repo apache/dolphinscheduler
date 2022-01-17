@@ -188,14 +188,20 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public Result queryPluginPage(int pageIndex, int pageSize) {
-        IPage<AlertPluginInstance> pluginInstanceIPage = new Page<>(pageIndex, pageSize);
-        pluginInstanceIPage = alertPluginInstanceMapper.selectPage(pluginInstanceIPage, null);
+    public Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize) {
 
-        PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageIndex, pageSize);
-        pageInfo.setTotal((int) pluginInstanceIPage.getTotal());
-        pageInfo.setTotalList(buildPluginInstanceVOList(pluginInstanceIPage.getRecords()));
         Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        Page<AlertPluginInstance> page = new Page<>(pageNo, pageSize);
+        IPage<AlertPluginInstance> alertPluginInstanceIPage = alertPluginInstanceMapper.queryByInstanceNamePage(page, searchVal);
+
+        PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) alertPluginInstanceIPage.getTotal());
+        pageInfo.setTotalList(buildPluginInstanceVOList(alertPluginInstanceIPage.getRecords()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

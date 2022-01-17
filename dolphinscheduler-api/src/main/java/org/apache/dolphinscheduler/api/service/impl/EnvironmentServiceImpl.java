@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -115,9 +115,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setUpdateTime(new Date());
         long code = 0L;
         try {
-            code = SnowFlakeUtils.getInstance().nextId();
+            code = CodeGenerateUtils.getInstance().genCode();
             env.setCode(code);
-        } catch (SnowFlakeException e) {
+        } catch (CodeGenerateException e) {
             logger.error("Environment code get error, ", e);
         }
         if (code == 0L) {
@@ -367,17 +367,18 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setOperator(loginUser.getId());
         env.setUpdateTime(new Date());
 
-        int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode,code));
+        int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode, code));
         if (update > 0) {
             deleteWorkerGroupSet.stream().forEach(key -> {
-                if (!StringUtils.isEmpty(key)) {
+                if (StringUtils.isNotEmpty(key)) {
                     relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
                             .lambda()
-                            .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode,code));
+                            .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode, code)
+                            .eq(EnvironmentWorkerGroupRelation::getWorkerGroup, key));
                 }
             });
             addWorkerGroupSet.stream().forEach(key -> {
-                if (!StringUtils.isEmpty(key)) {
+                if (StringUtils.isNotEmpty(key)) {
                     EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                     relation.setEnvironmentCode(code);
                     relation.setWorkerGroup(key);

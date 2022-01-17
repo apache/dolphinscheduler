@@ -19,15 +19,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper">
 
+    <sql id="baseSql">
+        id, plugin_define_id, plugin_instance_params, create_time, update_time, instance_name
+    </sql>
+
+
     <select id="queryAllAlertPluginInstanceList"
             resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_alert_plugin_instance
-        where 1 = 1
+        where 1 = 1 order by update_time desc
     </select>
 
     <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_alert_plugin_instance
         where id in
         <foreach item="item" index="index" collection="ids"
@@ -36,11 +43,14 @@
         </foreach>
     </select>
 
-    <select id="queryByInstanceName" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+    <select id="queryByInstanceNamePage" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
         select
-        *
+        <include refid="baseSql"/>
         from t_ds_alert_plugin_instance
-        where instance_name = #{instanceName}
+        where 1 = 1
+        <if test="instanceName != null and instanceName != ''">
+            and instance_name like concat('%', #{instanceName}, '%')
+        </if>
     </select>
 
     <select id="existInstanceName" resultType="java.lang.Boolean">

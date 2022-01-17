@@ -108,6 +108,7 @@ public class ProcessAlertManager {
                     .projectName(projectUser.getProjectName())
                     .owner(projectUser.getUserName())
                     .processId(processInstance.getId())
+                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
                     .processType(processInstance.getCommandType())
                     .processState(processInstance.getState())
@@ -131,8 +132,9 @@ public class ProcessAlertManager {
                         .projectName(projectUser.getProjectName())
                         .owner(projectUser.getUserName())
                         .processId(processInstance.getId())
+                        .processDefinitionCode(processInstance.getProcessDefinitionCode())
                         .processName(processInstance.getName())
-                        .taskId(task.getId())
+                        .taskCode(task.getTaskCode())
                         .taskName(task.getName())
                         .taskType(task.getTaskType())
                         .taskState(task.getState())
@@ -162,7 +164,10 @@ public class ProcessAlertManager {
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                    .processId(processInstance.getId())
+                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
+                    .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
                     .retryTimes(taskInstance.getRetryTimes())
@@ -205,32 +210,10 @@ public class ProcessAlertManager {
                                          List<TaskInstance> taskInstances,
                                          ProjectUser projectUser) {
 
-        if (Flag.YES == processInstance.getIsSubProcess()) {
+        if (!isNeedToSendWarning(processInstance)) {
             return;
         }
-        boolean sendWarnning = false;
-        WarningType warningType = processInstance.getWarningType();
-        switch (warningType) {
-            case ALL:
-                if (processInstance.getState().typeIsFinished()) {
-                    sendWarnning = true;
-                }
-                break;
-            case SUCCESS:
-                if (processInstance.getState().typeIsSuccess()) {
-                    sendWarnning = true;
-                }
-                break;
-            case FAILURE:
-                if (processInstance.getState().typeIsFailure()) {
-                    sendWarnning = true;
-                }
-                break;
-            default:
-        }
-        if (!sendWarnning) {
-            return;
-        }
+
         Alert alert = new Alert();
 
         String cmdName = getCommandCnName(processInstance.getCommandType());
@@ -245,6 +228,39 @@ public class ProcessAlertManager {
     }
 
     /**
+     * check if need to be send warning
+     *
+     * @param processInstance
+     * @return
+     */
+    public boolean isNeedToSendWarning(ProcessInstance processInstance) {
+        if (Flag.YES == processInstance.getIsSubProcess()) {
+            return false;
+        }
+        boolean sendWarning = false;
+        WarningType warningType = processInstance.getWarningType();
+        switch (warningType) {
+            case ALL:
+                if (processInstance.getState().typeIsFinished()) {
+                    sendWarning = true;
+                }
+                break;
+            case SUCCESS:
+                if (processInstance.getState().typeIsSuccess()) {
+                    sendWarning = true;
+                }
+                break;
+            case FAILURE:
+                if (processInstance.getState().typeIsFailure()) {
+                    sendWarning = true;
+                }
+                break;
+            default:
+        }
+        return sendWarning;
+    }
+
+    /**
      * send process timeout alert
      *
      * @param processInstance process instance
@@ -255,7 +271,6 @@ public class ProcessAlertManager {
     }
 
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
-        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(),processInstance.getName(),
-                taskInstance.getId(), taskInstance.getName());
+        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
     }
 }

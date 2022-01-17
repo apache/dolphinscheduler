@@ -24,6 +24,8 @@ import static org.testcontainers.containers.VncRecordingContainer.VncRecordingFo
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,8 +62,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 final class DolphinSchedulerExtension
-        implements BeforeAllCallback, AfterAllCallback,
-        BeforeEachCallback {
+    implements BeforeAllCallback, AfterAllCallback,
+    BeforeEachCallback {
     private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
 
     private RemoteWebDriver driver;
@@ -71,8 +73,8 @@ final class DolphinSchedulerExtension
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
-        Awaitility.setDefaultTimeout(Duration.ofSeconds(5));
-        Awaitility.setDefaultPollInterval(Duration.ofSeconds(1));
+        Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
+        Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
 
         Network network = null;
         HostAndPort address = null;
@@ -115,8 +117,8 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
         browser = new BrowserWebDriverContainer<>()
-                .withCapabilities(new ChromeOptions())
-                .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
+            .withCapabilities(new ChromeOptions())
+            .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
         }
@@ -127,6 +129,8 @@ final class DolphinSchedulerExtension
         driver.manage().timeouts()
               .implicitlyWait(5, TimeUnit.SECONDS)
               .pageLoadTimeout(5, TimeUnit.SECONDS);
+        driver.manage().window()
+              .maximize();
         if (address == null) {
             try {
                 address = HostAndPort.fromParts(browser.getTestHostIpAddress(), 8888);
@@ -142,6 +146,12 @@ final class DolphinSchedulerExtension
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
         browser.beforeTest(new TestDescription(context));
+
+        final Class<?> clazz = context.getRequiredTestClass();
+        Stream.of(clazz.getDeclaredFields())
+              .filter(it -> Modifier.isStatic(it.getModifiers()))
+              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+              .forEach(it -> setDriver(clazz, it));
     }
 
     @Override
@@ -158,14 +168,16 @@ final class DolphinSchedulerExtension
         final Object instance = context.getRequiredTestInstance();
         Stream.of(instance.getClass().getDeclaredFields())
               .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-              .forEach(it -> {
-                  try {
-                      it.setAccessible(true);
-                      it.set(instance, driver);
-                  } catch (IllegalAccessException e) {
-                      LOGGER.error("Failed to inject web driver to field: {}", it.getName(), e);
-                  }
-              });
+              .forEach(it -> setDriver(instance, it));
+    }
+
+    private void setDriver(Object object, Field field) {
+        try {
+            field.setAccessible(true);
+            field.set(object, driver);
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Failed to inject web driver to field: {}", field.getName(), e);
+        }
     }
 
     private DockerComposeContainer<?> createDockerCompose(ExtensionContext context) {
@@ -178,9 +190,10 @@ final class DolphinSchedulerExtension
                                        .map(File::new)
                                        .collect(Collectors.toList());
         compose = new DockerComposeContainer<>(files)
-                .withPull(true)
-                .withTailChildContainers(true)
-                .waitingFor("dolphinscheduler_1", Wait.forHealthcheck());
+            .withPull(true)
+            .withTailChildContainers(true)
+            .withLogConsumer("dolphinscheduler_1", outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+            .waitingFor("dolphinscheduler_1", Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(180)));
 
         return compose;
     }

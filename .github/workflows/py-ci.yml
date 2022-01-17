@@ -50,6 +50,8 @@ jobs:
           python-version: 3.7
       - name: Install Development Dependences
         run: pip install -r requirements_dev.txt
+      - name: Run Isort Checking
+        run: isort --check .
       - name: Run Black Checking
         run: black --check .
       - name: Run Flake8 Checking
@@ -78,3 +80,20 @@ jobs:
       - name: Run tests
         run: |
           pytest
+  coverage:
+    name: Tests coverage
+    needs:
+      - pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Development Dependences
+        run: |
+          pip install -r requirements_dev.txt
+          pip install -e .
+      - name: Run Tests && Check coverage
+        run: coverage run && coverage report

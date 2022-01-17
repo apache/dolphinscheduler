@@ -16,7 +16,6 @@
 */
 
 ALTER TABLE "t_ds_process_definition" DROP CONSTRAINT "t_ds_process_definition_pkey";
-ALTER TABLE "t_ds_process_definition" ADD CONSTRAINT "t_ds_process_definition_pkey" PRIMARY KEY ("id","code");
 ALTER TABLE "t_ds_process_definition" DROP CONSTRAINT "process_definition_unique";
 DROP INDEX "process_definition_index";
 ALTER TABLE "t_ds_process_definition" DROP "process_definition_json";

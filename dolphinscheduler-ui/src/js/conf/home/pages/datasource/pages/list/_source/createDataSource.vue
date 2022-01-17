@@ -56,7 +56,7 @@
             <el-input
                     type="input"
                     v-model="host"
-                    maxlength="60"
+                    maxlength="255"
                     size="small"
                     :placeholder="$t('Please enter IP')">
             </el-input>

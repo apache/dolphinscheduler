@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <el-button size="mini" @click="_create('')">{{ $t('Create Project') }}</el-button>
+          <el-button size="mini" @click="_create('')" id="btnCreateProject">{{ $t('Create Project') }}</el-button>
           <el-dialog
             :title="item ? $t('Edit') : $t('Create Project')"
             v-if="createProjectDialog"
@@ -114,7 +114,7 @@
         this.isLoading = !flag
         this.getProjectsList(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo - 1
+            this.searchParams.pageNo = 1
           } else {
             this.projectsList = []
             this.projectsList = res.totalList

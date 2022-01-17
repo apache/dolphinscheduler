@@ -31,11 +31,10 @@ BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
-source ${BIN_DIR}/../conf/config/install_config.conf
-source ${BIN_DIR}/../conf/env/dolphinscheduler_env.sh
+source ${workDir}/env/install_env.sh
+source ${workDir}/dolphinscheduler_env.sh
 
 export JAVA_HOME=$JAVA_HOME
-
 
 export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
 export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*

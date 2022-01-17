@@ -70,10 +70,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return create result code
      * @throws Exception exception
      */
@@ -116,6 +116,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             createTenantDirIfNotExists(tenantCode);
         }
 
+        result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -135,7 +136,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -154,11 +155,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser  login user
-     * @param id         tenant id
+     * @param loginUser login user
+     * @param id tenant id
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return update result code
      * @throws Exception exception
      */
@@ -271,6 +272,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         tenantMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }

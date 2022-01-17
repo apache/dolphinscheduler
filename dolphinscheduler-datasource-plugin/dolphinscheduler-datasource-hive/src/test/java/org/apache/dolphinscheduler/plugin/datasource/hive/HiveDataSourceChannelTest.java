@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class HiveDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         HiveDataSourceChannel sourceChannel = PowerMockito.mock(HiveDataSourceChannel.class);
         HiveDataSourceClient dataSourceClient = PowerMockito.mock(HiveDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new HiveConnectionParam()));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new HiveConnectionParam(), DbType.HIVE));
     }
 }

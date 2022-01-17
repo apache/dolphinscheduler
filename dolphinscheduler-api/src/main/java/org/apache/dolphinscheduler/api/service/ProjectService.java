@@ -120,6 +120,15 @@ public interface ProjectService {
     Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId);
 
     /**
+     * query authorized user
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return users        who have permission for the specified project
+     */
+    Map<String, Object> queryAuthorizedUser(User loginUser, Long projectCode);
+
+    /**
      * query authorized project
      *
      * @param loginUser login user

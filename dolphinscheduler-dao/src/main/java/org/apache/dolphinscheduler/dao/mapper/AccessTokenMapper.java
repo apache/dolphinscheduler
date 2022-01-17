@@ -25,6 +25,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.List;
+
 /**
  * accesstoken mapper interface
  */
@@ -43,6 +45,14 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
                                              @Param("userName") String userName,
                                              @Param("userId") int userId
     );
+
+    /**
+     * Query access token for specified user
+     *
+     * @param userId userId
+     * @return access token for specified user
+     */
+    List<AccessToken> queryAccessTokenByUser(@Param("userId") int userId);
 
     /**
      * delete by userId

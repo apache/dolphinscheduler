@@ -19,8 +19,8 @@
 
 from typing import Optional
 
-from pydolphinscheduler.core.base_side import BaseSide
 from pydolphinscheduler.constants import ProcessDefinitionDefault
+from pydolphinscheduler.core.base_side import BaseSide
 from pydolphinscheduler.java_gateway import launch_gateway
 
 

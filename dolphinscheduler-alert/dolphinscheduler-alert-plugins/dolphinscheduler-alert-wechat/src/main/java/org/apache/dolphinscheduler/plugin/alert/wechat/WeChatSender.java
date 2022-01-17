@@ -46,9 +46,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class WeChatSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(WeChatSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(WeChatSender.class);
     private static final String MUST_NOT_NULL = " must not null";
     private static final String ALERT_STATUS = "false";
     private static final String AGENT_ID_REG_EXP = "{agentId}";
@@ -62,6 +63,7 @@ public final class WeChatSender {
     private final String weChatUserSendMsg;
     private final String weChatTokenUrlReplace;
     private final String weChatToken;
+    private final String sendType;
     private final String showType;
 
     WeChatSender(Map<String, String> config) {
@@ -71,6 +73,7 @@ public final class WeChatSender {
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
+        sendType = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SEND_TYPE);
         showType = config.get(AlertConstants.NAME_SHOW_TYPE);
         requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
@@ -92,7 +95,7 @@ public final class WeChatSender {
             } finally {
                 response.close();
             }
-            log.info("Enterprise WeChat send [{}], param:{}, resp:{}",
+            logger.info("Enterprise WeChat send [{}], param:{}, resp:{}",
                 url, data, resp);
             return resp;
         }
@@ -108,7 +111,7 @@ public final class WeChatSender {
     private static String markdownTable(String title, String content) {
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         if (null == mapItemsList || mapItemsList.isEmpty()) {
-            log.error("itemsList is null");
+            logger.error("itemsList is null");
             throw new RuntimeException("itemsList is null");
         }
         StringBuilder contents = new StringBuilder(200);
@@ -141,7 +144,7 @@ public final class WeChatSender {
         if (StringUtils.isNotEmpty(content)) {
             List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
             if (null == mapItemsList || mapItemsList.isEmpty()) {
-                log.error("itemsList is null");
+                logger.error("itemsList is null");
                 throw new RuntimeException("itemsList is null");
             }
 
@@ -206,13 +209,13 @@ public final class WeChatSender {
 
         if (null == result) {
             alertResult.setMessage("we chat send fail");
-            log.info("send we chat msg error,resp is null");
+            logger.info("send we chat msg error,resp is null");
             return alertResult;
         }
         WeChatSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, WeChatSendMsgResponse.class);
         if (null == sendMsgResponse) {
             alertResult.setMessage("we chat send fail");
-            log.info("send we chat msg error,resp error");
+            logger.info("send we chat msg error,resp error");
             return alertResult;
         }
         if (sendMsgResponse.errcode == 0) {
@@ -256,12 +259,17 @@ public final class WeChatSender {
             alertResult.setStatus(ALERT_STATUS);
             return alertResult;
         }
-        String enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+        String enterpriseWeChatPushUrlReplace = "";
+        if (sendType.equals(WeChatType.APP.getDescp())) {
+            enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+        } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
+            enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+        }
 
         try {
             return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));
         } catch (Exception e) {
-            log.info("send we chat alert msg  exception : {}", e.getMessage());
+            logger.info("send we chat alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
             alertResult.setMessage("send we chat alert fail");
             alertResult.setStatus(ALERT_STATUS);
@@ -289,7 +297,7 @@ public final class WeChatSender {
         try {
             return get(weChatTokenUrlReplace);
         } catch (IOException e) {
-            log.info("we chat alert get token error{}", e.getMessage());
+            logger.info("we chat alert get token error{}", e.getMessage());
         }
         return null;
     }

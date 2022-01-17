@@ -23,7 +23,8 @@
         command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_process, executor_id, history_cmd,
-        process_instance_priority, worker_group,environment_code, timeout, tenant_id, var_pool, dry_run,next_process_instance_id
+        process_instance_priority, worker_group,environment_code, timeout, tenant_id, var_pool,
+        dry_run, next_process_instance_id, restart_time
     </sql>
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
@@ -45,12 +46,23 @@
         </foreach>
         order by id asc
     </select>
+    <select id="queryNeedFailoverProcessInstanceHost" resultType="String">
+        select distinct host
+        from t_ds_process_instance
+        where state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </select>
 
     <select id="queryTopNProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
         where state = #{status}
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
         and start_time between
         #{startTime} and #{endTime}
         order by end_time-start_time desc
@@ -90,7 +102,8 @@
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select instance.id, instance.command_type, instance.executor_id, instance.process_definition_version,
         instance.process_definition_code, instance.name, instance.state, instance.schedule_time, instance.start_time,
-        instance.end_time, instance.run_times, instance.recovery, instance.host, instance.dry_run ,instance.next_process_instance_id
+        instance.end_time, instance.run_times, instance.recovery, instance.host, instance.dry_run ,instance.next_process_instance_id,
+        restart_time
         from t_ds_process_instance instance
         join t_ds_process_definition define ON instance.process_definition_code = define.code
         where instance.is_sub_process=0
@@ -144,7 +157,7 @@
         where worker_group = #{originWorkerGroupName}
     </update>
 
-    <select id="countInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
+    <select id="countInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select t.state, count(0) as count
         from t_ds_process_instance t
         join t_ds_process_definition d on d.code=t.process_definition_code

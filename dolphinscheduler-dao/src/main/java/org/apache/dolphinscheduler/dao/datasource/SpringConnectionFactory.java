@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 
@@ -27,7 +26,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -42,32 +40,17 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 @Configuration
 public class SpringConnectionFactory {
-    /**
-     * pagination interceptor
-     *
-     * @return pagination interceptor
-     */
+
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
     }
 
-    /**
-     * * get transaction manager
-     *
-     * @return DataSourceTransactionManager
-     */
     @Bean
     public DataSourceTransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
-    /**
-     * * get sql session factory
-     *
-     * @return sqlSessionFactory
-     * @throws Exception sqlSessionFactory exception
-     */
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         MybatisConfiguration configuration = new MybatisConfiguration();
@@ -76,13 +59,15 @@ public class SpringConnectionFactory {
         configuration.setCallSettersOnNulls(true);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.addInterceptor(paginationInterceptor());
+
+        configuration.setGlobalConfig(new GlobalConfig().setBanner(false));
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
         sqlSessionFactoryBean.setDataSource(dataSource);
 
         GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
         dbConfig.setIdType(IdType.AUTO);
-        GlobalConfig globalConfig = new GlobalConfig();
+        GlobalConfig globalConfig = new GlobalConfig().setBanner(false);
         globalConfig.setDbConfig(dbConfig);
         sqlSessionFactoryBean.setGlobalConfig(globalConfig);
         sqlSessionFactoryBean.setTypeAliasesPackage("org.apache.dolphinscheduler.dao.entity");
@@ -91,16 +76,6 @@ public class SpringConnectionFactory {
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
         sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         return sqlSessionFactoryBean.getObject();
-    }
-
-    /**
-     * get sql session
-     *
-     * @return SqlSession
-     */
-    @Bean
-    public SqlSession sqlSession(SqlSessionFactory sqlSessionFactory) {
-        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
@@ -113,5 +88,4 @@ public class SpringConnectionFactory {
         databaseIdProvider.setProperties(properties);
         return databaseIdProvider;
     }
-
 }

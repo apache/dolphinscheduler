@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
@@ -52,7 +52,7 @@ public class DataSourceClientProvider {
 
     public Connection getConnection(DbType dbType, ConnectionParam connectionParam) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
-        String datasourceUniqueId = DatasourceUtil.getDatasourceUniqueId(baseConnectionParam, dbType);
+        String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
 
         DataSourceClient dataSourceClient = uniqueId2dataSourceClientMap.computeIfAbsent(datasourceUniqueId, $ -> {
@@ -61,7 +61,7 @@ public class DataSourceClientProvider {
             if (null == dataSourceChannel) {
                 throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
             }
-            return dataSourceChannel.createDataSourceClient(baseConnectionParam);
+            return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
         });
         return dataSourceClient.getConnection();
     }

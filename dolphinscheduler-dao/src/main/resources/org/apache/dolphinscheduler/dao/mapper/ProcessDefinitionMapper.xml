@@ -84,7 +84,7 @@
         <if test=" userId != 0">
             and td.user_id = #{userId}
         </if>
-        order by sc.schedule_release_state desc,td.update_time desc
+        order by sc.schedule_release_state desc,td.update_time desc,td.id asc
     </select>
 
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
@@ -109,7 +109,7 @@
             #{i}
         </foreach>
     </select>
-    <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+    <select id="countDefinitionByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
         SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
         FROM t_ds_process_definition td
         JOIN t_ds_user tu on tu.id=td.user_id

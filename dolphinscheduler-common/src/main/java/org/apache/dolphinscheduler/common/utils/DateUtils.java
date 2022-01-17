@@ -92,7 +92,7 @@ public final class DateUtils {
     /**
      * get the formatted date string
      *
-     * @param date date
+     * @param date   date
      * @param format e.g. yyyy-MM-dd HH:mm:ss
      * @return date string
      */
@@ -104,7 +104,7 @@ public final class DateUtils {
      * get the formatted date string
      *
      * @param localDateTime local data time
-     * @param format yyyy-MM-dd HH:mm:ss
+     * @param format        yyyy-MM-dd HH:mm:ss
      * @return date string
      */
     public static String format(LocalDateTime localDateTime, String format) {
@@ -124,7 +124,7 @@ public final class DateUtils {
     /**
      * convert string to date and time
      *
-     * @param date date
+     * @param date   date
      * @param format format
      * @return date
      */
@@ -177,7 +177,7 @@ public final class DateUtils {
      * get the date of the specified date in the days before and after
      *
      * @param date date
-     * @param day day
+     * @param day  day
      * @return the date of the specified date in the days before and after
      */
     public static Date getSomeDay(Date date, int day) {
@@ -203,7 +203,7 @@ public final class DateUtils {
      * compare two dates
      *
      * @param future future date
-     * @param old old date
+     * @param old    old date
      * @return true if future time greater than old time
      */
     public static boolean compare(Date future, Date old) {
@@ -329,7 +329,7 @@ public final class DateUtils {
     /**
      * get some hour of day
      *
-     * @param date date
+     * @param date       date
      * @param offsetHour hours
      * @return some hour of day
      */
@@ -432,15 +432,15 @@ public final class DateUtils {
      */
     public static Date getCurrentDate() {
         return DateUtils.parse(DateUtils.getCurrentTime(),
-                Constants.YYYY_MM_DD_HH_MM_SS);
+            Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
     /**
      * get date
      *
-     * @param date date
+     * @param date          date
      * @param calendarField calendarField
-     * @param amount amount
+     * @param amount        amount
      * @return date
      */
     public static Date add(final Date date, final int calendarField, final int amount) {
@@ -457,7 +457,7 @@ public final class DateUtils {
      * starting from the current time, get how many seconds are left before the target time.
      * targetTime = baseTime + intervalSeconds
      *
-     * @param baseTime base time
+     * @param baseTime        base time
      * @param intervalSeconds a period of time
      * @return the number of seconds
      */

@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -213,12 +214,14 @@ public class AlertPluginInstanceController extends BaseController {
      * paging query alert plugin instance group list
      *
      * @param loginUser login user
+     * @param searchVal search value
      * @param pageNo page number
      * @param pageSize page size
      * @return alert plugin instance list page
      */
     @ApiOperation(value = "queryAlertPluginInstanceListPaging", notes = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
@@ -227,13 +230,15 @@ public class AlertPluginInstanceController extends BaseController {
     @ApiException(LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @RequestParam(value = "searchVal", required = false) String searchVal,
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
-        return alertPluginInstanceService.queryPluginPage(pageNo, pageSize);
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        return alertPluginInstanceService.listPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
 }

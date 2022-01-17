@@ -15,75 +15,42 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""DolphinScheduler ObjectJsonBase, TaskParams and Task object."""
+"""DolphinScheduler Task and TaskRelation object."""
 
-from typing import Optional, List, Dict, Set, Union, Sequence, Tuple
+import logging
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
-    TaskPriority,
+    Delimiter,
     ProcessDefinitionDefault,
     TaskFlag,
+    TaskPriority,
     TaskTimeoutFlag,
 )
 from pydolphinscheduler.core.base import Base
-from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.process_definition import ProcessDefinitionContext
+from pydolphinscheduler.core.process_definition import (
+    ProcessDefinition,
+    ProcessDefinitionContext,
+)
 from pydolphinscheduler.java_gateway import launch_gateway
-from pydolphinscheduler.utils.string import snake2camel, class_name2camel
 
 
-class ObjectJsonBase:
-    """Task base class, define `__str__` and `to_dict` function would be use in other task related class."""
-
-    DEFAULT_ATTR = {}
-
-    def __int__(self, *args, **kwargs):
-        pass
-
-    def __str__(self) -> str:
-        content = []
-        for attribute, value in self.__dict__.items():
-            content.append(f'"{snake2camel(attribute)}": {value}')
-        content = ",".join(content)
-        return f'"{class_name2camel(type(self).__name__)}":{{{content}}}'
-
-    # TODO check how Redash do
-    # TODO DRY
-    def to_dict(self) -> Dict:
-        """Get object key attribute dict which determine by attribute `DEFAULT_ATTR`."""
-        content = {snake2camel(attr): value for attr, value in self.__dict__.items()}
-        content.update(self.DEFAULT_ATTR)
-        return content
-
-
-class TaskParams(ObjectJsonBase):
-    """TaskParams object, describe the key parameter of a single task."""
-
-    DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
-
-    def __init__(
-        self,
-        raw_script: str,
-        local_params: Optional[List] = None,
-        resource_list: Optional[List] = None,
-        dependence: Optional[Dict] = None,
-        wait_start_timeout: Optional[Dict] = None,
-        condition_result: Optional[Dict] = None,
-    ):
-        super().__init__()
-        self.raw_script = raw_script
-        self.local_params = local_params or []
-        self.resource_list = resource_list or []
-        self.dependence = dependence or {}
-        self.wait_start_timeout = wait_start_timeout or {}
-        # TODO need better way to handle it, this code just for POC
-        self.condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
-
-
-class TaskRelation(ObjectJsonBase):
+class TaskRelation(Base):
     """TaskRelation object, describe the relation of exactly two tasks."""
 
-    DEFAULT_ATTR = {
+    # Add attr `_KEY_ATTR` to overwrite :func:`__eq__`, it is make set
+    # `Task.process_definition._task_relations` work correctly.
+    _KEY_ATTR = {
+        "pre_task_code",
+        "post_task_code",
+    }
+
+    _DEFINE_ATTR = {
+        "pre_task_code",
+        "post_task_code",
+    }
+
+    _DEFAULT_ATTR = {
         "name": "",
         "preTaskVersion": 1,
         "postTaskVersion": 1,
@@ -95,31 +62,45 @@ class TaskRelation(ObjectJsonBase):
         self,
         pre_task_code: int,
         post_task_code: int,
+        name: Optional[str] = None,
     ):
-        super().__init__()
+        super().__init__(name)
         self.pre_task_code = pre_task_code
         self.post_task_code = post_task_code
 
     def __hash__(self):
-        return hash(f"{self.post_task_code}, {self.post_task_code}")
+        return hash(f"{self.pre_task_code} {Delimiter.DIRECTION} {self.post_task_code}")
 
 
 class Task(Base):
     """Task object, parent class for all exactly task type."""
 
-    DEFAULT_DEPS_ATTR = {
-        "name": "",
-        "preTaskVersion": 1,
-        "postTaskVersion": 1,
-        "conditionType": 0,
-        "conditionParams": {},
+    _DEFINE_ATTR = {
+        "name",
+        "code",
+        "version",
+        "task_type",
+        "task_params",
+        "description",
+        "flag",
+        "task_priority",
+        "worker_group",
+        "delay_time",
+        "fail_retry_times",
+        "fail_retry_interval",
+        "timeout_flag",
+        "timeout_notify_strategy",
+        "timeout",
     }
+
+    _task_custom_attr: set = set()
+
+    DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
 
     def __init__(
         self,
         name: str,
         task_type: str,
-        task_params: TaskParams,
         description: Optional[str] = None,
         flag: Optional[str] = TaskFlag.YES,
         task_priority: Optional[str] = TaskPriority.MEDIUM,
@@ -131,11 +112,15 @@ class Task(Base):
         timeout_notify_strategy: Optional = None,
         timeout: Optional[int] = 0,
         process_definition: Optional[ProcessDefinition] = None,
+        local_params: Optional[List] = None,
+        resource_list: Optional[List] = None,
+        dependence: Optional[Dict] = None,
+        wait_start_timeout: Optional[Dict] = None,
+        condition_result: Optional[Dict] = None,
     ):
 
         super().__init__(name, description)
         self.task_type = task_type
-        self.task_params = task_params
         self.flag = flag
         self.task_priority = task_priority
         self.worker_group = worker_group
@@ -160,6 +145,18 @@ class Task(Base):
             and self.code not in self.process_definition.tasks
         ):
             self.process_definition.add_task(self)
+        else:
+            logging.warning(
+                "Task code %d already in process definition, prohibit re-add task.",
+                self.code,
+            )
+
+        # Attribute for task param
+        self.local_params = local_params or []
+        self.resource_list = resource_list or []
+        self.dependence = dependence or {}
+        self.wait_start_timeout = wait_start_timeout or {}
+        self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:
@@ -170,6 +167,32 @@ class Task(Base):
     def process_definition(self, process_definition: Optional[ProcessDefinition]):
         """Set attribute process_definition."""
         self._process_definition = process_definition
+
+    @property
+    def condition_result(self) -> Dict:
+        """Get attribute condition_result."""
+        return self._condition_result
+
+    @condition_result.setter
+    def condition_result(self, condition_result: Optional[Dict]):
+        """Set attribute condition_result."""
+        self._condition_result = condition_result
+
+    @property
+    def task_params(self) -> Optional[Dict]:
+        """Get task parameter object.
+
+        Will get result to combine _task_custom_attr and custom_attr.
+        """
+        custom_attr = {
+            "local_params",
+            "resource_list",
+            "dependence",
+            "wait_start_timeout",
+            "condition_result",
+        }
+        custom_attr |= self._task_custom_attr
+        return self.get_define_custom(custom_attr=custom_attr)
 
     def __hash__(self):
         return hash(self.code)
@@ -214,6 +237,7 @@ class Task(Base):
                     task_relation = TaskRelation(
                         pre_task_code=task.code,
                         post_task_code=self.code,
+                        name=f"{task.name} {Delimiter.DIRECTION} {self.name}",
                     )
                     self.process_definition._task_relations.add(task_relation)
             else:
@@ -224,6 +248,7 @@ class Task(Base):
                     task_relation = TaskRelation(
                         pre_task_code=self.code,
                         post_task_code=task.code,
+                        name=f"{self.name} {Delimiter.DIRECTION} {task.name}",
                     )
                     self.process_definition._task_relations.add(task_relation)
 
@@ -251,16 +276,3 @@ class Task(Base):
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")
-
-    def to_dict(self, camel_attr=True) -> Dict:
-        """Task `to_dict` function which will return key attribute for Task object."""
-        content = {}
-        for attr, value in self.__dict__.items():
-            # Don't publish private variables
-            if attr.startswith("_"):
-                continue
-            elif isinstance(value, TaskParams):
-                content[snake2camel(attr)] = value.to_dict()
-            else:
-                content[snake2camel(attr)] = value
-        return content

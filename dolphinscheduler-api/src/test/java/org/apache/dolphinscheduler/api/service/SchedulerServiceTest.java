@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -58,6 +59,9 @@ public class SchedulerServiceTest {
 
     @InjectMocks
     private SchedulerServiceImpl schedulerService;
+
+    @Mock
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Mock
     private MonitorService monitorService;
@@ -103,6 +107,7 @@ public class SchedulerServiceTest {
         Project project = getProject(projectName, projectCode);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectCode(projectCode);
 
         Schedule schedule = new Schedule();
         schedule.setId(1);
@@ -137,23 +142,21 @@ public class SchedulerServiceTest {
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
         schedule.setProcessDefinitionCode(1);
 
-        // PROCESS_DEFINE_NOT_RELEASE
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_RELEASE, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
 
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
 
-        //MASTER_NOT_EXISTS
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.MASTER_NOT_EXISTS, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
 
         //set master
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(masterServers);
 
         //SUCCESS
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
     }
 
     private Project getProject(String name, long code) {

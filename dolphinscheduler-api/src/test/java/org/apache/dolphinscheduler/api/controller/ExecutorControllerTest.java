@@ -17,108 +17,253 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Ignore;
+import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 /**
  * executor controller test
  */
 public class ExecutorControllerTest extends AbstractControllerTest {
+    final Gson gson = new Gson();
+    final long projectCode = 1L;
+    final long processDefinitionCode = 2L;
+    final String scheduleTime = "scheduleTime";
+    final FailureStrategy failureStrategy = FailureStrategy.END;
+    final String startNodeList = "startNodeList";
+    final TaskDependType taskDependType = TaskDependType.TASK_ONLY;
+    final CommandType execType = CommandType.PAUSE;
+    final WarningType warningType = WarningType.NONE;
+    final int warningGroupId = 3;
+    final RunMode runMode = RunMode.RUN_MODE_SERIAL;
+    final Priority processInstancePriority = Priority.HIGH;
+    final String workerGroup = "workerGroup";
+    final Long environmentCode = 4L;
+    final Integer timeout = 5;
+    final ImmutableMap<String, String> startParams = ImmutableMap.of("start", "params");
+    final Integer expectedParallelismNumber = 6;
+    final int dryRun = 7;
 
-    private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
+    final JsonObject expectResponseContent = gson
+            .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
+                    , JsonObject.class);
 
-    @MockBean
+    final ImmutableMap<String, Object> executeServiceResult =
+            ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
+
+    @MockBean(name = "executorServiceImpl")
     private ExecutorService executorService;
 
-    @Ignore
     @Test
-    public void testStartProcessInstance() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", "40");
-        paramsMap.add("scheduleTime", "");
-        paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
-        paramsMap.add("startNodeList", "");
-        paramsMap.add("taskDependType", "");
-        paramsMap.add("execType", "");
-        paramsMap.add("warningType", String.valueOf(WarningType.NONE));
-        paramsMap.add("warningGroupId", "");
-        paramsMap.add("receivers", "");
-        paramsMap.add("receiversCc", "");
-        paramsMap.add("runMode", "");
-        paramsMap.add("processInstancePriority", "");
-        paramsMap.add("workerGroupId", "");
-        paramsMap.add("timeout", "");
+    public void testStartProcessInstanceWithFullParams() throws Exception {
+        //Given
+        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("scheduleTime", scheduleTime);
+        paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
+        paramsMap.add("startNodeList", startNodeList);
+        paramsMap.add("taskDependType", String.valueOf(taskDependType));
+        paramsMap.add("execType", String.valueOf(execType));
+        paramsMap.add("warningType", String.valueOf(warningType));
+        paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
+        paramsMap.add("runMode", String.valueOf(runMode));
+        paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
+        paramsMap.add("workerGroup", workerGroup);
+        paramsMap.add("environmentCode", String.valueOf(environmentCode));
+        paramsMap.add("timeout", String.valueOf(timeout));
+        paramsMap.add("startParams", gson.toJson(startParams));
+        paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
+        paramsMap.add("dryRun", String.valueOf(dryRun));
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-process-instance", "cxc_1113")
-            .header("sessionId", sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
+
+        when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
+                eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+                eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun)))
+                .thenReturn(executeServiceResult);
+
+        //When
+        final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //Then
+        final JsonObject actualResponseContent =
+                gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
     }
 
-    @Ignore
     @Test
-    public void testExecute() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceId", "40");
-        paramsMap.add("executeType", String.valueOf(ExecuteType.NONE));
+    public void testStartProcessInstanceWithoutTimeout() throws Exception {
+        //Given
+        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("scheduleTime", scheduleTime);
+        paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
+        paramsMap.add("startNodeList", startNodeList);
+        paramsMap.add("taskDependType", String.valueOf(taskDependType));
+        paramsMap.add("execType", String.valueOf(execType));
+        paramsMap.add("warningType", String.valueOf(warningType));
+        paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
+        paramsMap.add("runMode", String.valueOf(runMode));
+        paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
+        paramsMap.add("workerGroup", workerGroup);
+        paramsMap.add("environmentCode", String.valueOf(environmentCode));
+        paramsMap.add("startParams", gson.toJson(startParams));
+        paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
+        paramsMap.add("dryRun", String.valueOf(dryRun));
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute", "cxc_1113")
-            .header("sessionId", sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
+                eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+                eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun))).thenReturn(executeServiceResult);
+
+        //When
+        final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //Then
+        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+    }
+
+    @Test
+    public void testStartProcessInstanceWithoutStartParams() throws Exception {
+        //Given
+        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("scheduleTime", scheduleTime);
+        paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
+        paramsMap.add("startNodeList", startNodeList);
+        paramsMap.add("taskDependType", String.valueOf(taskDependType));
+        paramsMap.add("execType", String.valueOf(execType));
+        paramsMap.add("warningType", String.valueOf(warningType));
+        paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
+        paramsMap.add("runMode", String.valueOf(runMode));
+        paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
+        paramsMap.add("workerGroup", workerGroup);
+        paramsMap.add("environmentCode", String.valueOf(environmentCode));
+        paramsMap.add("timeout", String.valueOf(timeout));
+        paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
+        paramsMap.add("dryRun", String.valueOf(dryRun));
+
+        when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
+                eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+                eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun))).thenReturn(executeServiceResult);
+
+        //When
+        final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //Then
+        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+    }
+
+    @Test
+    public void testStartProcessInstanceWithRequiredParams() throws Exception {
+        //Given
+        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
+        paramsMap.add("warningType", String.valueOf(warningType));
+
+        when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
+				eq(null), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
+                eq(0), eq(null), eq(null), eq("default"), eq(-1L),
+                eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0))).thenReturn(executeServiceResult);
+
+		//When
+        final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //Then
+        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+    }
+
+    @Test
+    public void testExecuteWithSuccessStatus() throws Exception {
+        //Given
+        final ExecuteType executeType = ExecuteType.NONE;
+        final int processInstanceId = 40;
+        final long projectCode = 1113;
+        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processInstanceId", Integer.toString(processInstanceId));
+        paramsMap.add("executeType", String.valueOf(executeType));
+        final Map<String, Object> executeServiceResult = new HashMap<>();
+        executeServiceResult.put(Constants.STATUS, Status.SUCCESS);
+        executeServiceResult.put(Constants.DATA_LIST, "Test Data");
+
+        final JsonObject expectResponseContent = gson
+                .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
+                        , JsonObject.class);
+
+        when(executorService.execute(any(User.class), eq(projectCode), eq(processInstanceId), eq(ExecuteType.NONE)))
+                .thenReturn(executeServiceResult);
+
+        //When
+        final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/execute", projectCode)
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //Then
+        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
     }
 
     @Test
     public void testStartCheckProcessDefinition() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(executorService.startCheckByProcessDefinedCode(Mockito.anyLong())).thenReturn(mockResult);
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/1/executors/start-check")
-            .header(SESSION_ID, sessionId)
-            .param("processDefinitionCode", "40"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        //Given
+        when(executorService.startCheckByProcessDefinedCode(processDefinitionCode))
+                .thenReturn(executeServiceResult);
+        //When
+        final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-check", projectCode)
+                        .header(SESSION_ID, sessionId)
+                        .param("processDefinitionCode", String.valueOf(processDefinitionCode)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //Then
+        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
     }
 
 }

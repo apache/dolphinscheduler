@@ -68,6 +68,17 @@ class TaskType(str):
     """Constants for task type, it will also show you which kind we support up to now."""
 
     SHELL = "SHELL"
+    HTTP = "HTTP"
+    PYTHON = "PYTHON"
+    SQL = "SQL"
+    SUB_PROCESS = "SUB_PROCESS"
+    PROCEDURE = "PROCEDURE"
+    DATAX = "DATAX"
+    DEPENDENT = "DEPENDENT"
+    CONDITIONS = "CONDITIONS"
+    SWITCH = "SWITCH"
+    FLINK = "FLINK"
+    SPARK = "SPARK"
 
 
 class DefaultTaskCodeNum(str):
@@ -94,6 +105,8 @@ class Delimiter(str):
     BAR = "-"
     DASH = "/"
     COLON = ":"
+    UNDERSCORE = "_"
+    DIRECTION = "->"
 
 
 class Time(str):

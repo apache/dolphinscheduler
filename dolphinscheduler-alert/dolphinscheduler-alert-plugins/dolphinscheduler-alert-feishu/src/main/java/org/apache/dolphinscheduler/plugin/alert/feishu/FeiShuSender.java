@@ -36,11 +36,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class FeiShuSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(FeiShuSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(FeiShuSender.class);
     private final String url;
     private final Boolean enableProxy;
 
@@ -81,14 +82,14 @@ public final class FeiShuSender {
 
         if (org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(result)) {
             alertResult.setMessage("send fei shu msg error");
-            log.info("send fei shu msg error,fei shu server resp is null");
+            logger.info("send fei shu msg error,fei shu server resp is null");
             return alertResult;
         }
         FeiShuSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, FeiShuSendMsgResponse.class);
 
         if (null == sendMsgResponse) {
             alertResult.setMessage("send fei shu msg fail");
-            log.info("send fei shu msg error,resp error");
+            logger.info("send fei shu msg error,resp error");
             return alertResult;
         }
         if (sendMsgResponse.statusCode == 0) {
@@ -97,7 +98,7 @@ public final class FeiShuSender {
             return alertResult;
         }
         alertResult.setMessage(String.format("alert send fei shu msg error : %s", sendMsgResponse.getStatusMessage()));
-        log.info("alert send fei shu msg error : {} ,Extra : {} ", sendMsgResponse.getStatusMessage(), sendMsgResponse.getExtra());
+        logger.info("alert send fei shu msg error : {} ,Extra : {} ", sendMsgResponse.getStatusMessage(), sendMsgResponse.getExtra());
         return alertResult;
     }
 
@@ -130,7 +131,7 @@ public final class FeiShuSender {
             String resp = sendMsg(alertData);
             return checkSendFeiShuSendMsgResult(resp);
         } catch (Exception e) {
-            log.info("send fei shu alert msg  exception : {}", e.getMessage());
+            logger.info("send fei shu alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
             alertResult.setStatus("false");
             alertResult.setMessage("send fei shu alert fail.");
@@ -153,7 +154,7 @@ public final class FeiShuSender {
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
-                log.error("send feishu message error, return http status code: {} ", statusCode);
+                logger.error("send feishu message error, return http status code: {} ", statusCode);
             }
             String resp;
             try {
@@ -163,7 +164,7 @@ public final class FeiShuSender {
             } finally {
                 response.close();
             }
-            log.info("Fei Shu send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
+            logger.info("Fei Shu send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
             return resp;
         } finally {
             httpClient.close();

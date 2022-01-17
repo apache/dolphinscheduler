@@ -19,29 +19,42 @@
 
 package org.apache.dolphinscheduler.e2e.pages;
 
+import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 @Getter
-public final class LoginPage {
-    private final RemoteWebDriver driver;
-
-    @FindBy(id = "input-username")
+public final class LoginPage extends NavBarPage {
+    @FindBy(id = "inputUsername")
     private WebElement inputUsername;
 
-    @FindBy(id = "input-password")
+    @FindBy(id = "inputPassword")
     private WebElement inputPassword;
 
-    @FindBy(id = "button-login")
+    @FindBy(id = "btnLogin")
     private WebElement buttonLogin;
 
     public LoginPage(RemoteWebDriver driver) {
-        this.driver = driver;
+        super(driver);
+    }
 
-        PageFactory.initElements(driver, this);
+    @SneakyThrows
+    public TenantPage login(String username, String password) {
+        inputUsername().sendKeys(username);
+        inputPassword().sendKeys(password);
+        buttonLogin().click();
+
+        new WebDriverWait(driver, 10)
+            .until(ExpectedConditions.urlContains("/#/security"));
+
+        return new TenantPage(driver);
     }
 }

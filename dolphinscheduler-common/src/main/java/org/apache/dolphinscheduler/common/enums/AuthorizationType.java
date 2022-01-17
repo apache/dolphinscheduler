@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -35,7 +36,7 @@ public enum AuthorizationType {
     DATASOURCE(3, "data source"),
     UDF(4, "udf function");
 
-    AuthorizationType(int code, String descp){
+    AuthorizationType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

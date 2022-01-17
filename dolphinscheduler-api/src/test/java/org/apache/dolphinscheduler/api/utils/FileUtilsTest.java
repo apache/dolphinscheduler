@@ -73,10 +73,10 @@ public class FileUtilsTest {
 
         //Use Mockito to mock MultipartFile
         MultipartFile file = Mockito.mock(MultipartFile.class, Mockito.RETURNS_DEEP_STUBS);
-        Mockito.when(file.getResource().getFile()).thenReturn(new File(src));
+        Mockito.when(file.getInputStream()).thenReturn(new FileInputStream(src));
 
         //Invoke copyFile
-        FileUtils.copyFile(file,destFilename);
+        FileUtils.copyInputStreamToFile(file,destFilename);
 
         //Test file exists
         File destFile = new File(destFilename);

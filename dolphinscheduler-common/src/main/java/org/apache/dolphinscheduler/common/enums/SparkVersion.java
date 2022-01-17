@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -27,7 +28,7 @@ public enum SparkVersion {
     SPARK1(0, "SPARK1"),
     SPARK2(1, "SPARK2");
 
-    SparkVersion(int code, String descp){
+    SparkVersion(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

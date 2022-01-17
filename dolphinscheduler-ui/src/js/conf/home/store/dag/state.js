@@ -122,5 +122,6 @@ export default {
   // Operating state
   isDetails: false,
   startup: {},
-  taskInstances: []
+  taskInstances: [],
+  dependResult: {}
 }

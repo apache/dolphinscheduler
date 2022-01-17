@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
 import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.RegistryProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.curator.test.TestingServer;
@@ -25,9 +26,7 @@ import org.apache.curator.test.TestingServer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
@@ -43,14 +42,16 @@ public class ZookeeperRegistryTest {
 
     TestingServer server;
 
-    ZookeeperRegistry registry = new ZookeeperRegistry();
+    ZookeeperRegistry registry;
 
     @Before
     public void before() throws Exception {
         server = new TestingServer(true);
-        Map<String, String> registryConfig = new HashMap<>();
-        registryConfig.put(ZookeeperConfiguration.SERVERS.getName(), server.getConnectString());
-        registry.start(registryConfig);
+
+        RegistryProperties p = new RegistryProperties();
+        p.getZookeeper().setConnectString(server.getConnectString());
+        registry = new ZookeeperRegistry(p);
+        registry.start();
         registry.put("/sub", "", false);
     }
 

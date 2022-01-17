@@ -39,11 +39,6 @@ public final class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     /**
-     * alter properties
-     */
-    public static final int ALERT_RPC_PORT = 50052;
-
-    /**
      * registry properties
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
@@ -184,6 +179,10 @@ public final class Constants {
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * date format of yyyyMMdd
+     */
+    public static final String YYYYMMDD = "yyyyMMdd";
 
     /**
      * date format of yyyyMMddHHmmss
@@ -209,6 +208,11 @@ public final class Constants {
      * httpclient soceket time out
      */
     public static final int SOCKET_TIMEOUT = 60 * 1000;
+
+    /**
+     * registry session timeout
+     */
+    public static final int REGISTRY_SESSION_TIMEOUT = 10 * 1000;
 
     /**
      * http header
@@ -262,6 +266,11 @@ public final class Constants {
      */
     public static final int DEFAULT_ADMIN_PERMISSION = 7;
 
+    /**
+     * default hash map size
+     */
+    public static final int DEFAULT_HASH_MAP_SIZE = 16;
+
 
     /**
      * all permissions
@@ -287,7 +296,7 @@ public final class Constants {
      *
      * rpc port
      */
-    public static final int RPC_PORT = 50051;
+    public static final String RPC_PORT = "rpc.port";
 
     /**
      * forbid running task
@@ -346,7 +355,15 @@ public final class Constants {
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
 
+    /**
+     * sleep 1000ms
+     */
     public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * short sleep 100ms
+     */
+    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
 
     /**
      * one second mils
@@ -432,6 +449,10 @@ public final class Constants {
      * SUCCEEDED
      */
     public static final String SUCCEEDED = "SUCCEEDED";
+    /**
+     * ENDED
+     */
+    public static final String ENDED = "ENDED";
     /**
      * NEW
      */
@@ -762,4 +783,8 @@ public final class Constants {
      * dry run flag
      */
     public static final int DRY_RUN_FLAG_NO = 0;
+    public static final int DRY_RUN_FLAG_YES = 1;
+
+    public static final String CACHE_KEY_VALUE_ALL = "'all'";
+
 }

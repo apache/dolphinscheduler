@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="conditions-model">
+  <div class="switch-task">
     <m-list-box>
       <div slot="text">{{$t('condition')}}</div>
       <div slot="content">
@@ -181,8 +181,8 @@
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-  .conditions-model {
+<style lang="scss" rel="stylesheet/scss" scoped>
+  .switch-task {
     margin-top: -10px;
     .dep-opt {
       margin-bottom: 10px;

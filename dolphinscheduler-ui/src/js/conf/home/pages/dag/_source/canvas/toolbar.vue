@@ -23,61 +23,80 @@
       :content="$t('Copy name')"
       placement="bottom"
     >
-      <i class="el-icon-copy-document" @click="copyName"></i>
+      <em class="el-icon-copy-document" @click="copyName"></em>
     </el-tooltip>
     <textarea ref="textarea" cols="30" rows="10" class="transparent"></textarea>
     <div class="toolbar-left">
+      <el-tag
+        class="process-online-tag"
+        size="small"
+        v-if="dagChart.type === 'definition' && releaseState === 'ONLINE'"
+        >{{ $t("processOnline") }}</el-tag
+      >
       <el-tooltip
         :content="$t('View variables')"
         placement="bottom"
         class="toolbar-operation"
       >
-        <i
+        <em
           class="custom-ico view-variables"
           v-if="$route.name === 'projects-instance-details'"
           @click="toggleVariableView"
-        ></i>
+        ></em>
       </el-tooltip>
       <el-tooltip
         :content="$t('Startup parameter')"
         placement="bottom"
         class="toolbar-operation"
       >
-        <i
+        <em
           class="custom-ico startup-parameters"
           v-if="$route.name === 'projects-instance-details'"
           @click="toggleParamView"
-        ></i>
+        ></em>
       </el-tooltip>
     </div>
     <div class="toolbar-right">
+      <el-tooltip
+        class="toolbar-operation"
+        :content="$t('searchNode')"
+        placement="bottom"
+        v-if="!searchInputVisible"
+      >
+        <em
+          class="el-icon-search"
+          @click="showSearchInput"
+        ></em>
+      </el-tooltip>
+      <div
+        :class="{
+          'search-box': true,
+          'visible': searchInputVisible
+        }"
+      >
+        <el-select v-if="searchInputVisible" ref="searchInput" v-model="searchText" size="mini" clearable prefix-icon="el-icon-search" @change="onSearch" @keyup.enter.native="onSearch" filterable :placeholder="$t('Please select task name')">
+          <el-option
+            v-for="item in getTaskNodeOptions()"
+            :key="item.id"
+            :label="item.data.taskName"
+            :value="item.data.taskName">
+          </el-option>
+        </el-select>
+      </div>
       <el-tooltip
         class="toolbar-operation"
         :content="$t('Delete selected lines or nodes')"
         placement="bottom"
         v-if="!isDetails"
       >
-        <i class="el-icon-delete" @click="removeCells"></i>
+        <em class="el-icon-delete" @click="removeCells"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation"
         :content="$t('Download')"
         placement="bottom"
       >
-        <i class="el-icon-download" @click="downloadPNG"></i>
-      </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation"
-        :content="$t('Full Screen')"
-        placement="bottom"
-      >
-        <i
-          :class="[
-            'custom-ico',
-            dagChart.fullScreen ? 'full-screen-close' : 'full-screen-open',
-          ]"
-          @click="toggleFullScreen"
-        ></i>
+        <em class="el-icon-download" @click="downloadPNG"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation"
@@ -85,14 +104,28 @@
         placement="bottom"
         v-if="dagChart.type === 'instance'"
       >
-        <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
+        <em class="el-icon-refresh" @click="refreshTaskStatus"></em>
+      </el-tooltip>
+      <el-tooltip
+        class="toolbar-operation"
+        :content="$t('Format DAG')"
+        placement="bottom"
+        v-if="!isDetails"
+      >
+        <em class="custom-ico graph-format" @click="chartFormat"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation last"
-        :content="$t('Format DAG')"
+        :content="$t('Full Screen')"
         placement="bottom"
       >
-        <i class="custom-ico graph-format" @click="chartFormat"></i>
+        <em
+          :class="[
+            'custom-ico',
+            dagChart.fullScreen ? 'full-screen-close' : 'full-screen-open',
+          ]"
+          @click="toggleFullScreen"
+        ></em>
       </el-tooltip>
       <el-button
         class="toolbar-el-btn"
@@ -101,13 +134,14 @@
         v-if="dagChart.type === 'definition'"
         @click="showVersions"
         icon="el-icon-info"
-        >{{$t('Version Info')}}</el-button
+        >{{ $t("Version Info") }}</el-button
       >
       <el-button
         class="toolbar-el-btn"
         type="primary"
         size="mini"
         @click="saveProcess"
+        id="btnSave"
         >{{ $t("Save") }}</el-button
       >
       <el-button
@@ -125,7 +159,6 @@
         type="primary"
         icon="el-icon-switch-button"
         size="mini"
-        v-if="type === 'instance' || 'definition'"
         @click="returnToListPage"
       >
         {{ $t("Close") }}
@@ -143,15 +176,26 @@
     inject: ['dagChart'],
     data () {
       return {
-        canvasRef: null
+        canvasRef: null,
+        searchText: '',
+        searchInputVisible: false
       }
     },
     computed: {
-      ...mapState('dag', [
-        'isDetails'
-      ])
+      ...mapState('dag', ['isDetails', 'releaseState'])
     },
     methods: {
+      onSearch () {
+        const canvas = this.getDagCanvasRef()
+        canvas.navigateTo(this.searchText)
+      },
+      getTaskNodeOptions () {
+        const canvas = this.getDagCanvasRef()
+        return canvas.getNodes()
+      },
+      showSearchInput () {
+        this.searchInputVisible = true
+      },
       getDagCanvasRef () {
         if (this.canvasRef) {
           return this.canvasRef
@@ -200,7 +244,7 @@
       },
       chartFormat () {
         const canvas = this.getDagCanvasRef()
-        canvas.format()
+        canvas.showLayoutModal()
       },
       refreshTaskStatus () {
         this.dagChart.refreshTaskStatus()

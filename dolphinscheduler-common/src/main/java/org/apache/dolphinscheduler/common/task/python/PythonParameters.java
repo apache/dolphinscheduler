@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.task.python;
 
+package org.apache.dolphinscheduler.common.task.python;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -23,39 +23,39 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import java.util.List;
 
 public class PythonParameters extends AbstractParameters {
-  /**
-   * origin python script
-   */
-  private String rawScript;
+    /**
+     * origin python script
+     */
+    private String rawScript;
 
-  /**
-   * resource list
-   */
-  private List<ResourceInfo> resourceList;
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
-  public String getRawScript() {
-    return rawScript;
-  }
+    public String getRawScript() {
+        return rawScript;
+    }
 
-  public void setRawScript(String rawScript) {
-    this.rawScript = rawScript;
-  }
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
+    }
 
-  public List<ResourceInfo> getResourceList() {
-    return resourceList;
-  }
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
 
-  public void setResourceList(List<ResourceInfo> resourceList) {
-    this.resourceList = resourceList;
-  }
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
 
-  @Override
-  public boolean checkParameters() {
-    return rawScript != null && !rawScript.isEmpty();
-  }
+    @Override
+    public boolean checkParameters() {
+        return rawScript != null && !rawScript.isEmpty();
+    }
 
-  @Override
-  public List<ResourceInfo> getResourceFilesList() {
-    return this.resourceList;
-  }
+    @Override
+    public List<ResourceInfo> getResourceFilesList() {
+        return this.resourceList;
+    }
 }

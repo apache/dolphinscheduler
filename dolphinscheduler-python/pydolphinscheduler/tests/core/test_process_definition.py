@@ -18,21 +18,25 @@
 """Test process definition."""
 
 from datetime import datetime
-from pydolphinscheduler.utils.date import conv_to_schedule
+from typing import Any
+from unittest.mock import patch
 
 import pytest
+from freezegun import freeze_time
 
 from pydolphinscheduler.constants import (
     ProcessDefinitionDefault,
     ProcessDefinitionReleaseState,
 )
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.task import TaskParams
-from pydolphinscheduler.side import Tenant, Project, User
+from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
+from pydolphinscheduler.utils.date import conv_to_schedule
 from tests.testing.task import Task
-from freezegun import freeze_time
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
+TEST_TASK_TYPE = "test-task-type"
 
 
 @pytest.mark.parametrize("func", ["run", "submit", "start"])
@@ -135,8 +139,97 @@ def test__parse_datetime(val, expect):
         ), f"Function _parse_datetime with unexpect value by {val}."
 
 
-def test_process_definition_to_dict_without_task():
-    """Test process definition function to_dict without task."""
+@pytest.mark.parametrize(
+    "val",
+    [
+        20210101,
+        (2021, 1, 1),
+        {"year": "2021", "month": "1", "day": 1},
+    ],
+)
+def test__parse_datetime_not_support_type(val: Any):
+    """Test process definition function _parse_datetime not support type error."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        with pytest.raises(PyDSParamException, match="Do not support value type.*?"):
+            pd._parse_datetime(val)
+
+
+@pytest.mark.parametrize(
+    "param, expect",
+    [
+        (
+            None,
+            [],
+        ),
+        (
+            {},
+            [],
+        ),
+        (
+            {"key1": "val1"},
+            [
+                {
+                    "prop": "key1",
+                    "direct": "IN",
+                    "type": "VARCHAR",
+                    "value": "val1",
+                }
+            ],
+        ),
+        (
+            {
+                "key1": "val1",
+                "key2": "val2",
+            },
+            [
+                {
+                    "prop": "key1",
+                    "direct": "IN",
+                    "type": "VARCHAR",
+                    "value": "val1",
+                },
+                {
+                    "prop": "key2",
+                    "direct": "IN",
+                    "type": "VARCHAR",
+                    "value": "val2",
+                },
+            ],
+        ),
+    ],
+)
+def test_property_param_json(param, expect):
+    """Test ProcessDefinition's property param_json."""
+    pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, param=param)
+    assert pd.param_json == expect
+
+
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test__pre_submit_check_switch_without_param(mock_code_version):
+    """Test :func:`_pre_submit_check` if process definition with switch but without attribute param."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        parent = Task(name="parent", task_type=TEST_TASK_TYPE)
+        switch_child_1 = Task(name="switch_child_1", task_type=TEST_TASK_TYPE)
+        switch_child_2 = Task(name="switch_child_2", task_type=TEST_TASK_TYPE)
+        switch_condition = SwitchCondition(
+            Branch(condition="${var} > 1", task=switch_child_1),
+            Default(task=switch_child_2),
+        )
+
+        switch = Switch(name="switch", condition=switch_condition)
+        parent >> switch
+        with pytest.raises(
+            PyDSParamException,
+            match="Parameter param must be provider if task Switch in process definition.",
+        ):
+            pd._pre_submit_check()
+
+
+def test_process_definition_get_define_without_task():
+    """Test process definition function get_define without task."""
     expect = {
         "name": TEST_PROCESS_DEFINITION_NAME,
         "description": None,
@@ -151,18 +244,15 @@ def test_process_definition_to_dict_without_task():
         "taskRelationJson": [{}],
     }
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
-        assert pd.to_dict() == expect
+        assert pd.get_define() == expect
 
 
-def test_process_definition_simple():
-    """Test process definition simple create workflow, including process definition, task, relation define."""
+def test_process_definition_simple_context_manager():
+    """Test simple create workflow in process definition context manager mode."""
     expect_tasks_num = 5
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         for i in range(expect_tasks_num):
-            task_params = TaskParams(raw_script=f"test-raw-script-{i}")
-            curr_task = Task(
-                name=f"task-{i}", task_type=f"type-{i}", task_params=task_params
-            )
+            curr_task = Task(name=f"task-{i}", task_type=f"type-{i}")
             # Set deps task i as i-1 parent
             if i > 0:
                 pre_task = pd.get_one_task_by_name(f"task-{i - 1}")
@@ -193,6 +283,28 @@ def test_process_definition_simple():
                 assert task._downstream_task_codes == {
                     pd.get_one_task_by_name(f"task-{i + 1}").code
                 }
+
+
+def test_process_definition_simple_separate():
+    """Test process definition simple create workflow in separate mode.
+
+    This test just test basic information, cause most of test case is duplicate to
+    test_process_definition_simple_context_manager.
+    """
+    expect_tasks_num = 5
+    pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME)
+    for i in range(expect_tasks_num):
+        curr_task = Task(
+            name=f"task-{i}",
+            task_type=f"type-{i}",
+            process_definition=pd,
+        )
+        # Set deps task i as i-1 parent
+        if i > 0:
+            pre_task = pd.get_one_task_by_name(f"task-{i - 1}")
+            curr_task.set_upstream(pre_task)
+    assert len(pd.tasks) == expect_tasks_num
+    assert all(["task-" in task.name for task in pd.task_list])
 
 
 @pytest.mark.parametrize(

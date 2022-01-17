@@ -21,7 +21,7 @@ from typing import Optional
 
 from pydolphinscheduler.constants import ProcessDefinitionDefault
 from pydolphinscheduler.core.base_side import BaseSide
-from pydolphinscheduler.java_gateway import launch_gateway, gateway_result_checker
+from pydolphinscheduler.java_gateway import gateway_result_checker, launch_gateway
 
 
 class Queue(BaseSide):

@@ -36,10 +36,12 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -101,6 +103,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Autowired
     private Scheduler scheduler;
 
+    @Autowired
+    private ProcessTaskRelationMapper processTaskRelationMapper;
+
     /**
      * save schedule
      *
@@ -141,7 +146,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        result = executorService.checkProcessDefinitionValid(processDefinition, processDefineCode);
+        result = executorService.checkProcessDefinitionValid(projectCode,processDefinition, processDefineCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -242,62 +247,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
-        if (processDefinition == null) {
+        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, schedule.getProcessDefinitionCode());
             return result;
         }
 
-        /**
-         * scheduling on-line status forbid modification
-         */
-        if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE, Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
-            return result;
-        }
-
-        Date now = new Date();
-
-        // updateProcessInstance param
-        if (!StringUtils.isEmpty(scheduleExpression)) {
-            ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleExpression, ScheduleParam.class);
-            if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
-                logger.warn("The start time must not be the same as the end");
-                putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
-                return result;
-            }
-            schedule.setStartTime(scheduleParam.getStartTime());
-            schedule.setEndTime(scheduleParam.getEndTime());
-            if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
-                putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
-                return result;
-            }
-            schedule.setCrontab(scheduleParam.getCrontab());
-            schedule.setTimezoneId(scheduleParam.getTimezoneId());
-        }
-
-        if (warningType != null) {
-            schedule.setWarningType(warningType);
-        }
-
-        schedule.setWarningGroupId(warningGroupId);
-
-        if (failureStrategy != null) {
-            schedule.setFailureStrategy(failureStrategy);
-        }
-
-        schedule.setWorkerGroup(workerGroup);
-        schedule.setEnvironmentCode(environmentCode);
-        schedule.setUpdateTime(now);
-        schedule.setProcessInstancePriority(processInstancePriority);
-        scheduleMapper.updateById(schedule);
-
-        /**
-         * updateProcessInstance recipients and cc by process definition ID
-         */
-        processDefinition.setWarningGroupId(warningGroupId);
-
-        processDefinitionMapper.updateById(processDefinition);
-
-        putMsg(result, Status.SUCCESS);
+        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
         return result;
     }
 
@@ -341,11 +296,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
-        if (processDefinition == null) {
+        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, scheduleObj.getProcessDefinitionCode());
             return result;
         }
-
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
+        if (processTaskRelations.isEmpty()) {
+            putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
+            return result;
+        }
         if (scheduleStatus == ReleaseState.ONLINE) {
             // check process definition release state
             if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
@@ -437,7 +396,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        if (processDefinition == null) {
+        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
             return result;
         }
@@ -633,6 +592,87 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                      Priority processInstancePriority,
                                                                      String workerGroup,
                                                                      long environmentCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        // check schedule exists
+        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
+        if (schedule == null) {
+            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, processDefinitionCode);
+            return result;
+        }
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            return result;
+        }
+
+        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
+        return result;
+    }
+
+    private void updateSchedule(Map<String, Object> result,
+                                Schedule schedule,
+                                ProcessDefinition processDefinition,
+                                String scheduleExpression,
+                                WarningType warningType,
+                                int warningGroupId,
+                                FailureStrategy failureStrategy,
+                                Priority processInstancePriority,
+                                String workerGroup,
+                                long environmentCode) {
+        if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE, Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
+            return;
+        }
+
+        Date now = new Date();
+
+        // updateProcessInstance param
+        if (!StringUtils.isEmpty(scheduleExpression)) {
+            ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleExpression, ScheduleParam.class);
+            if (scheduleParam == null) {
+                putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
+                return;
+            }
+            if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
+                logger.warn("The start time must not be the same as the end");
+                putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
+                return;
+            }
+            schedule.setStartTime(scheduleParam.getStartTime());
+            schedule.setEndTime(scheduleParam.getEndTime());
+            if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+                putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
+                return;
+            }
+            schedule.setCrontab(scheduleParam.getCrontab());
+            schedule.setTimezoneId(scheduleParam.getTimezoneId());
+        }
+
+        if (warningType != null) {
+            schedule.setWarningType(warningType);
+        }
+
+        schedule.setWarningGroupId(warningGroupId);
+
+        if (failureStrategy != null) {
+            schedule.setFailureStrategy(failureStrategy);
+        }
+
+        schedule.setWorkerGroup(workerGroup);
+        schedule.setEnvironmentCode(environmentCode);
+        schedule.setUpdateTime(now);
+        schedule.setProcessInstancePriority(processInstancePriority);
+        scheduleMapper.updateById(schedule);
+
+        processDefinition.setWarningGroupId(warningGroupId);
+
+        processDefinitionMapper.updateById(processDefinition);
+
+        putMsg(result, Status.SUCCESS);
     }
 }
