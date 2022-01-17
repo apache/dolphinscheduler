@@ -27,8 +27,9 @@ interface TaskGroupIdReq {
 
 interface TaskGroupReq {
   name: string
-  projectCode: string
+  projectCode: number
   groupSize: number
+  status: number
   description: string
 }
 

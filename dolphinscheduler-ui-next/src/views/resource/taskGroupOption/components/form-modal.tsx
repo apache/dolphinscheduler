@@ -15,12 +15,21 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted, ref, toRaw } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  onMounted,
+  ref,
+  toRaw,
+  Ref
+} from 'vue'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createTaskGroup, updateTaskGroup } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
+import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 
 const props = {
   show: {
@@ -42,12 +51,13 @@ const FormModal = defineComponent({
   emits: ['confirm', 'cancel'],
   setup(props, { emit }) {
     const { state, t } = useForm()
-    const projectOptions = ref([])
+    const projectOptions: Ref<Array<SelectMixedOption>> = ref([])
 
     onMounted(() => {
-      queryAllProjectList().then((res: any) => {
+      queryAllProjectList().then((res: any[]) => {
         res.map((item) => {
-          projectOptions.value.push({ label: item.name, value: item.code })
+          let option: SelectMixedOption = { label: item.name, value: item.code }
+          projectOptions.value.push(option)
         })
       })
       if (props.status === 1) {
@@ -110,7 +120,7 @@ const FormModal = defineComponent({
           >
             <NSelect
               options={projectOptions}
-              v-model={[this.formData.projectCode, 'value']}
+              v-model:value={this.formData.projectCode}
               placeholder={t(
                 'resource.task_group_option.please_select_project'
               )}
@@ -121,7 +131,7 @@ const FormModal = defineComponent({
             path='groupSize'
           >
             <NInput
-              v-model={[this.formData.groupSize, 'value']}
+              v-model:value={this.formData.groupSize}
               placeholder={t(
                 'resource.task_group_option.please_enter_resource_pool_size'
               )}
