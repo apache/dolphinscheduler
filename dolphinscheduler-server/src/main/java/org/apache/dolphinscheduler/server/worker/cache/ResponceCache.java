@@ -38,6 +38,7 @@ public class ResponceCache {
 
     private Map<Integer,Command> ackCache = new ConcurrentHashMap<>();
     private Map<Integer,Command> responseCache = new ConcurrentHashMap<>();
+    private final Map<Integer,Command> killResponseCache = new ConcurrentHashMap<>();
 
 
     /**
@@ -54,6 +55,9 @@ public class ResponceCache {
             case RESULT:
                 responseCache.put(taskInstanceId,command);
                 break;
+            case ACTION_STOP:
+                killResponseCache.put(taskInstanceId,command);
+                break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
@@ -66,6 +70,19 @@ public class ResponceCache {
      */
     public void removeAckCache(Integer taskInstanceId){
         ackCache.remove(taskInstanceId);
+    }
+
+    /**
+     * remove kill response cache
+     *
+     * @param taskInstanceId taskInstanceId
+     */
+    public void removeKillResponseCache(Integer taskInstanceId) {
+        killResponseCache.remove(taskInstanceId);
+    }
+
+    public Map<Integer, Command> getKillResponseCache() {
+        return killResponseCache;
     }
 
     /**

@@ -88,6 +88,14 @@ public class RetryReportTaskStatusThread implements Runnable {
                         taskCallbackService.sendResult(taskInstanceId,responseCommand);
                     }
                 }
+                if (!responceCache.getKillResponseCache().isEmpty()) {
+                    Map<Integer, Command> killResponseCache = responceCache.getKillResponseCache();
+                    for (Map.Entry<Integer, Command> entry : killResponseCache.entrySet()) {
+                        Integer taskInstanceId = entry.getKey();
+                        Command killResponseCommand = entry.getValue();
+                        taskCallbackService.sendResult(taskInstanceId, killResponseCommand);
+                    }
+                }
             }catch (Exception e){
                 logger.warn("retry report task status error", e);
             }
