@@ -62,7 +62,15 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
-        new Select(createDataSourceForm().selectDataSourceType()).selectByVisibleText(dataSourceType.toUpperCase());
+        createDataSourceForm().btnDataSourceTypeDropdown().click();
+
+        createDataSourceForm().selectDataSourceType()
+            .stream()
+            .filter(it -> it.getText().contains(dataSourceType.toLowerCase()))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in data source type list", dataSourceType.toLowerCase())))
+            .click();
+
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
         createDataSourceForm().inputIP().sendKeys(ip);
@@ -106,8 +114,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(className = "el-select")
-        private WebElement selectDataSourceType;
+        @FindBy(id = "OptionsDataSourceType")
+        private List<WebElement> selectDataSourceType;
+
+        @FindBy(xpath = "/html/body/div[9]/div/div[2]/div/div[1]/div/div[1]/div[2]/div/div/span/span/i")
+        private WebElement btnDataSourceTypeDropdown;
 
         @FindBy(id = "inputDataSourceName")
         private WebElement inputDataSourceName;
