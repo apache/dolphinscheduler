@@ -92,27 +92,30 @@ export function useTable(
   })
 
   const getTableData = (params: any) => {
-    Promise.all([
-      queryTaskGroupListPaging(params),
-      queryAllProjectList()
-    ]).then((values: any[]) => {
-      variables.totalPage = values[0].totalPage
-      variables.tableData = values[0].totalList.map((item: any, index: number) => {
-        item.projectName = _.find(values[1], { code: item.projectCode }).name
-        item.createTime = format(
-            new Date(item.createTime),
-            'yyyy-MM-dd HH:mm:ss'
+    Promise.all([queryTaskGroupListPaging(params), queryAllProjectList()]).then(
+      (values: any[]) => {
+        variables.totalPage = values[0].totalPage
+        variables.tableData = values[0].totalList.map(
+          (item: any, index: number) => {
+            item.projectName = _.find(values[1], {
+              code: item.projectCode
+            }).name
+            item.createTime = format(
+              new Date(item.createTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
+            item.updateTime = format(
+              new Date(item.updateTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
+            return {
+              index: index + 1,
+              ...item
+            }
+          }
         )
-        item.updateTime = format(
-            new Date(item.updateTime),
-            'yyyy-MM-dd HH:mm:ss'
-        )
-        return {
-          index: index + 1,
-          ...item
-        }
-      })
-    })
+      }
+    )
   }
 
   return { getTableData, variables, columns }

@@ -18,7 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import type { FormRules } from 'naive-ui'
-import type { TaskGroupUpdateReq } from "@/service/modules/task-group/types";
+import type { TaskGroupUpdateReq } from '@/service/modules/task-group/types'
 
 export function useForm() {
   const { t } = useI18n()

@@ -43,7 +43,8 @@
       tr {
         height: 40px;
         font-size: 12px;
-        th,td{
+        th,
+        td {
           &:nth-child(1) {
             width: 50px;
             text-align: center;
@@ -54,7 +55,7 @@
             width: 60px;
             text-align: center;
           }
-          >span {
+          > span {
             font-size: 12px;
             color: #555;
           }
@@ -76,6 +77,5 @@
     &:hover {
       text-decoration: underline;
     }
-  }  
+  }
 }
-

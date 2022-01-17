@@ -15,13 +15,21 @@
  * limitations under the License.
  */
 
-import {defineComponent, PropType, toRefs, onMounted, ref, toRaw, Ref} from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  onMounted,
+  ref,
+  toRaw,
+  Ref
+} from 'vue'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createTaskGroup, updateTaskGroup } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
-import {SelectMixedOption} from "naive-ui/lib/select/src/interface"
+import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 
 const props = {
   show: {
