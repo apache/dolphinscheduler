@@ -86,7 +86,7 @@ jobs:
           - name: FileManage
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
           - name: MysqlDataSource
-              class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
