@@ -44,8 +44,24 @@ export function queryAccessTokenByUser(params: UserReq): any {
 
 export function updateToken(data: UpdateTokenReq): any {
   return axios({
-    url: '/access-tokens',
+    url: `/access-tokens/${data.id}`,
     method: 'put',
+    data
+  })
+}
+
+export function deleteToken(id: number): any {
+  return axios({
+    url: `/access-tokens/${id}`,
+    method: 'delete',
+    params: { id }
+  })
+}
+
+export function generateToken(data: TokenReq): any {
+  return axios({
+    url: `/access-tokens/generate`,
+    method: 'post',
     data
   })
 }

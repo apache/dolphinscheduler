@@ -35,7 +35,7 @@ const envConfigPlaceholder =
   'export HADOOP_CLASSPATH=`hadoop classpath`\n'
 
 const EnvironmentModal = defineComponent({
-  name: 'YarnQueueModal',
+  name: 'EnvironmentModal',
   props: {
     showModalRef: {
       type: Boolean as PropType<boolean>,

@@ -372,6 +372,23 @@ const security = {
     environment_config_tips: '请输入环境配置',
     environment_description_tips: '请输入环境描述',
     worker_group_tips: '请选择Worker分组'
+  },
+  token: {
+    create_token: '创建令牌',
+    edit_token: '编辑令牌',
+    search_tips: '请输入关键词',
+    user: '用户',
+    user_tips: '请选择用户',
+    token: '令牌',
+    token_tips: '请输入令牌',
+    expiration_time: '失效时间',
+    expiration_time_tips: '请选择失效时间',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    delete_confirm: '确定删除吗?'
   }
 }
 
