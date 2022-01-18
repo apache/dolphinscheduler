@@ -372,6 +372,23 @@ const security = {
     environment_config_tips: 'Please enter your environment config',
     environment_description_tips: 'Please enter your environment description',
     worker_group_tips: 'Please select worker group'
+  },
+  token: {
+    create_token: 'Create Token',
+    edit_token: 'Edit Token',
+    search_tips: 'Please enter keywords',
+    user: 'User',
+    user_tips: 'Please select user',
+    token: 'Token',
+    token_tips: 'Please enter your token',
+    expiration_time: 'Expiration Time',
+    expiration_time_tips: 'Please select expiration time',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?'
   }
 }
 
