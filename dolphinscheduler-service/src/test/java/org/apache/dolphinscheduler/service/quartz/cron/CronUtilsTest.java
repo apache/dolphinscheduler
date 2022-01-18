@@ -95,6 +95,20 @@ public class CronUtilsTest {
 
         CycleEnum cycleEnum3 = CronUtils.getMiniCycle(CronUtils.parse2Cron("0 * * * * ? *"));
         Assert.assertEquals("MINUTE", cycleEnum3.name());
+    
+        CycleEnum cycleEnum4 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1 ? *"));
+        Assert.assertEquals("YEAR", cycleEnum4.name());
+        cycleEnum4 = CronUtils.getMiniCycle(CronUtils.parse2Cron("0 0 7 * 1 ? *"));
+        Assert.assertEquals("DAY", cycleEnum4.name());
+    
+        CycleEnum cycleEnum5 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1/1 ? *"));
+        Assert.assertEquals("MONTH", cycleEnum5.name());
+    
+        CycleEnum cycleEnum6 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1-2 ? *"));
+        Assert.assertEquals("YEAR", cycleEnum6.name());
+    
+        CycleEnum cycleEnum7 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1,2 ? *"));
+        Assert.assertEquals("YEAR", cycleEnum7.name());
     }
 
     /**
@@ -113,7 +127,7 @@ public class CronUtilsTest {
                 .instance();
         // minute cycle
         String[] cronArayy = new String[]{"* * * * * ? *","* 0 * * * ? *",
-                "* 5 * * 3/5 ? *","0 0 * * * ? *"};
+                "* 5 * * 3/5 ? *","0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *" , "0 0 7 * 1,2 ? *"};
         for(String minCrontab:cronArayy){
             if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
                 throw new RuntimeException(minCrontab+" verify failure, cron expression not valid");
@@ -155,6 +169,14 @@ public class CronUtilsTest {
             logger.info("dayOfWeekField instanceof On:"+(dayOfWeekField.getExpression() instanceof On));
             logger.info("dayOfWeekField instanceof And:"+(dayOfWeekField.getExpression() instanceof And));
             logger.info("dayOfWeekField instanceof QuestionMark:"+(dayOfWeekField.getExpression() instanceof QuestionMark));
+    
+            CronField yearField = cron.retrieve(CronFieldName.YEAR);
+            logger.info("yearField instanceof Between:"+(yearField.getExpression() instanceof Between));
+            logger.info("yearField instanceof Always:"+(yearField.getExpression() instanceof Always));
+            logger.info("yearField instanceof Every:"+(yearField.getExpression() instanceof Every));
+            logger.info("yearField instanceof On:"+(yearField.getExpression() instanceof On));
+            logger.info("yearField instanceof And:"+(yearField.getExpression() instanceof And));
+            logger.info("yearField instanceof QuestionMark:"+(yearField.getExpression() instanceof QuestionMark));
 
             CycleEnum cycleEnum = CronUtils.getMaxCycle(minCrontab);
             if(cycleEnum !=null){
