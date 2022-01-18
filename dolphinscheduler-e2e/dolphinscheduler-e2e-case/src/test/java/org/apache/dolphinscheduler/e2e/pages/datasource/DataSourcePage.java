@@ -32,7 +32,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 @Getter
@@ -64,6 +66,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new By.ById("dialogCreateDataSource")));
+        
         createDataSourceForm().selectDataSourceType()
             .stream()
             .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
