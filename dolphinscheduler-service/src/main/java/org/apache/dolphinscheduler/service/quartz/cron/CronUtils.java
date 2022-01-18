@@ -17,8 +17,14 @@
 
 package org.apache.dolphinscheduler.service.quartz.cron;
 
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.year;
+
 import static com.cronutils.model.CronType.QUARTZ;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.*;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
@@ -181,7 +187,7 @@ public class CronUtils {
      */
     public static List<Date> getSelfFireDateList(final Date startTime, final Date endTime, final List<Schedule> schedules) {
         List<Date> result = new ArrayList<>();
-        if(startTime.equals(endTime)){
+        if (startTime.equals(endTime)) {
             result.add(startTime);
             return result;
         }
