@@ -36,8 +36,8 @@ const list = defineComponent({
   name: 'list',
   setup() {
     const { t } = useI18n()
-    let showDetailModal = ref(false)
-    let selectId = ref()
+    const showDetailModal = ref(false)
+    const selectId = ref()
 
     const { columnsRef } = useColumns((id: number, type: 'edit' | 'delete') => {
       if (type === 'edit') {

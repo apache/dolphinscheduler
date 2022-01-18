@@ -15,38 +15,24 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
+export interface IUdfResourceParam {
+  id: number
   pageSize: number
-  searchVal?: string
+  pageNo: number
+  searchVal: string | undefined
 }
 
-interface WorkerGroupReq {
-  addrList: string
-  name: string
-  id?: number
-}
-
-interface IdReq {
+export interface IUdf {
   id: number
-}
-
-interface WorkerGroupItem {
-  id: number
-  name: string
-  addrList: string
+  pid: number
+  userId: number
+  fileName: string
+  fullName: string
+  alias: string
+  directory: boolean
+  size: number
+  type: 'UDF'
+  description: string
   createTime: string
   updateTime: string
-  systemDefault: boolean
 }
-
-interface WorkerGroupRes {
-  totalList: WorkerGroupItem[]
-  total: number
-  totalPage: number
-  pageSize: number
-  currentPage: number
-  start: number
-}
-
-export { ListReq, WorkerGroupReq, IdReq, WorkerGroupItem, WorkerGroupRes }

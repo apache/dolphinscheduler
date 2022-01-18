@@ -15,45 +15,59 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
-import type { TaskGroupUpdateReq } from '@/service/modules/task-group/types'
 
-export function useForm() {
+export const useForm = () => {
   const { t } = useI18n()
 
-  const state = reactive({
-    formRef: ref(),
-    formData: {
-      id: 0,
+  const folderState = reactive({
+    folderFormRef: ref(),
+    folderForm: {
+      pid: -1,
+      type: 'UDF',
       name: '',
-      projectCode: 0,
-      groupSize: 0,
-      status: 1,
-      description: ''
-    } as TaskGroupUpdateReq,
+      description: '',
+      currentDir: '/'
+    },
     rules: {
       name: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.formData.name === '') {
-            return new Error(t('resource.task_group_option.please_enter_name'))
-          }
-        }
-      },
-      description: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.formData.description === '') {
-            return new Error(t('resource.task_group_option.please_enter_desc'))
+          if (folderState.folderForm.name === '') {
+            return new Error(t('resource.udf.enter_name_tips'))
           }
         }
       }
     } as FormRules
   })
 
-  return { state, t }
+  const uploadState = reactive({
+    uploadFormRef: ref(),
+    uploadForm: {
+      name: '',
+      file: '',
+      description: '',
+      pid: -1,
+      currentDir: '/'
+    },
+    rules: {
+      name: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (uploadState.uploadForm.name === '') {
+            return new Error(t('resource.udf.enter_name_tips'))
+          }
+        }
+      }
+    } as FormRules
+  })
+
+  return {
+    folderState,
+    uploadState
+  }
 }
