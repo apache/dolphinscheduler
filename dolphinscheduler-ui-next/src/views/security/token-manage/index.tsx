@@ -28,11 +28,11 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
-import AlarmGroupModal from './components/alarm-group-modal'
+import TokenModal from './components/token-modal'
 import styles from './index.module.scss'
 
-const alarmGroupManage = defineComponent({
-  name: 'alarm-group-manage',
+const tokenManage = defineComponent({
+  name: 'token-manage',
   setup() {
     const { t } = useI18n()
     const { variables, getTableData, createColumns } = useTable()
@@ -106,7 +106,7 @@ const alarmGroupManage = defineComponent({
           <div class={styles['search-card']}>
             <div>
               <NButton size='small' type='primary' onClick={handleModalChange}>
-                {t('security.alarm_group.create_alarm_group')}
+                {t('security.token.create_token')}
               </NButton>
             </div>
             <div class={styles.box}>
@@ -114,7 +114,7 @@ const alarmGroupManage = defineComponent({
                 size='small'
                 clearable
                 v-model={[this.searchVal, 'value']}
-                placeholder={t('security.alarm_group.search_tips')}
+                placeholder={t('security.token.search_tips')}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 {{
@@ -143,7 +143,7 @@ const alarmGroupManage = defineComponent({
             />
           </div>
         </Card>
-        <AlarmGroupModal
+        <TokenModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
           row={this.row}
@@ -155,4 +155,4 @@ const alarmGroupManage = defineComponent({
   }
 })
 
-export default alarmGroupManage
+export default tokenManage
