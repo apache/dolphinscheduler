@@ -128,16 +128,10 @@
         <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS'">
           <div slot="text">{{ $t("Number of failed retries") }}</div>
           <div slot="content">
-            <m-select-input
-              v-model="maxRetryTimes"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="maxRetryTimes" size="small" style="width: 150px;" />
             <span>({{ $t("Times") }})</span>
             <span class="text-b">{{ $t("Failed retry interval") }}</span>
-            <m-select-input
-              v-model="retryInterval"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="retryInterval" size="small" style="width: 150px;" />
             <span>({{ $t("Minute") }})</span>
           </div>
         </m-list-box>
@@ -153,10 +147,7 @@
         >
           <div slot="text">{{ $t("Delay execution time") }}</div>
           <div slot="content">
-            <m-select-input
-              v-model="delayTime"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="delayTime" size="small" style="width: 150px;" />
             <span>({{ $t("Minute") }})</span>
           </div>
         </m-list-box>
@@ -442,7 +433,7 @@
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
-  import mSelectInput from './_source/selectInput'
+  // import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
@@ -986,7 +977,7 @@
       mSqoop,
       mConditions,
       mSwitch,
-      mSelectInput,
+      /// mSelectInput,
       mTimeoutAlarm,
       mDependentTimeout,
       mPriority,
