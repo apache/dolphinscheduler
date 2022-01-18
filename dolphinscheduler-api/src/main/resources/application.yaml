@@ -101,9 +101,10 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
-# Override by profile
 audit:
   enabled: false
+
+# Override by profile
 
 ---
 spring:
