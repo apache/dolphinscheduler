@@ -31,11 +31,11 @@ const Logo = defineComponent({
       <div
         class={[
           styles.logo,
-          styles[`logo-${this.themeStore.darkTheme ? 'dark' : 'light'}`],
+          styles[`logo-${this.themeStore.darkTheme ? 'dark' : 'light'}`]
         ]}
       />
     )
-  },
+  }
 })
 
 export default Logo

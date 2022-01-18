@@ -15,53 +15,90 @@
  * limitations under the License.
  */
 
-import { ref } from 'vue'
-import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
+import { defineComponent, onMounted, watch, toRefs } from 'vue'
+import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
-import { useLanguageStore } from '@/store/language/language'
+import { useMenuStore } from '@/store/menu/menu'
+import { useLocalesStore } from '@/store/locales/locales'
+import { useI18n } from 'vue-i18n'
 
-const Content = () => {
-  const { state, getHeaderMenuOptions } = useDataList()
+const Content = defineComponent({
+  name: 'Content',
+  setup() {
+    window.$message = useMessage()
 
-  const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)
+    const menuStore = useMenuStore()
+    const { locale } = useI18n()
+    const localesStore = useLocalesStore()
+    const {
+      state,
+      changeMenuOption,
+      changeHeaderMenuOptions,
+      changeUserDropdown
+    } = useDataList()
 
-  const sideMenuOptions = ref()
-  const languageStore = useLanguageStore()
+    locale.value = localesStore.getLocales
 
-  const getSideMenuOptions = (item: any) => {
-    // console.log('item', item)
-    languageStore.setMenuKey(item.key)
-    sideMenuOptions.value =
-      state.menuOptions.filter((menu) => menu.key === item.key)[0].children ||
-      []
-    state.isShowSide = sideMenuOptions.value.length !== 0
-    // console.log('sideMenuOptions.value', sideMenuOptions.value)
-    // console.log('state.isShowSide', state.isShowSide)
-  }
+    onMounted(() => {
+      changeMenuOption(state)
+      changeHeaderMenuOptions(state)
+      genSideMenu(state)
+      changeUserDropdown(state)
+    })
 
-  return (
-    <NLayout style='height: 100%;'>
-      <NLayoutHeader style='height: 65px;'>
-        <NavBar
-          onHandleMenuClick={getSideMenuOptions}
-          headerMenuOptions={headerMenuOptions}
-          languageOptions={state.languageOptions}
-          profileOptions={state.profileOptions}
-        />
-      </NLayoutHeader>
-      <NLayout has-sider position='absolute' style='top: 65px;'>
-        <SideBar
-          sideMenuOptions={sideMenuOptions.value}
-          isShowSide={state.isShowSide}
-        />
-        <NLayoutContent native-scrollbar={false} style='padding: 16px 22px;'>
-          <router-view />
-        </NLayoutContent>
+    watch(useI18n().locale, () => {
+      changeMenuOption(state)
+      changeHeaderMenuOptions(state)
+      genSideMenu(state)
+      changeUserDropdown(state)
+    })
+
+    const genSideMenu = (state: any) => {
+      const key = menuStore.getMenuKey
+      state.sideMenuOptions =
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
+          .children || []
+      state.isShowSide =
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
+          .isShowSide || false
+    }
+
+    const getSideMenuOptions = (item: any) => {
+      menuStore.setMenuKey(item.key)
+      genSideMenu(state)
+    }
+
+    return {
+      ...toRefs(state),
+      menuStore,
+      changeMenuOption,
+      getSideMenuOptions
+    }
+  },
+  render() {
+    return (
+      <NLayout style='height: 100%'>
+        <NLayoutHeader style='height: 65px'>
+          <NavBar
+            onHandleMenuClick={this.getSideMenuOptions}
+            headerMenuOptions={this.headerMenuOptions}
+            localesOptions={this.localesOptions}
+            userDropdownOptions={this.userDropdownOptions}
+          />
+        </NLayoutHeader>
+        <NLayout has-sider position='absolute' style='top: 65px'>
+          {this.isShowSide && (
+            <SideBar sideMenuOptions={this.sideMenuOptions} />
+          )}
+          <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
+            <router-view key={this.$route.fullPath} />
+          </NLayoutContent>
+        </NLayout>
       </NLayout>
-    </NLayout>
-  )
-}
+    )
+  }
+})
 
 export default Content

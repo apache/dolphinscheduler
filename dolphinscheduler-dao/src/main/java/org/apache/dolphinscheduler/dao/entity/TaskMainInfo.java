@@ -45,6 +45,11 @@ public class TaskMainInfo {
     private int taskVersion;
 
     /**
+     * task type
+     */
+    private String taskType;
+
+    /**
      * create time
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -113,6 +118,14 @@ public class TaskMainInfo {
 
     public void setTaskVersion(int taskVersion) {
         this.taskVersion = taskVersion;
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 
     public Date getTaskCreateTime() {

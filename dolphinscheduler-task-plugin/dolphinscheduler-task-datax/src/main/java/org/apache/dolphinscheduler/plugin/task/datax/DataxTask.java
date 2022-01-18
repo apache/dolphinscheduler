@@ -145,10 +145,6 @@ public class DataxTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         try {
-            // set the name of the current thread
-            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
-            Thread.currentThread().setName(threadLoggerInfoName);
-
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
             if (MapUtils.isEmpty(paramsMap)) {

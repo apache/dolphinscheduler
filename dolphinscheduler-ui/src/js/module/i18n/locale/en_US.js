@@ -678,7 +678,7 @@ export default {
   ms: 'ms',
   'Please Enter Url': 'Please Enter Url eg. 127.0.0.1:7077',
   Master: 'Master',
-  'Please select the waterdrop resources': 'Please select the waterdrop resources',
+  'Please select the seatunnel resources': 'Please select the seatunnel resources',
   zkDirectory: 'zkDirectory',
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
@@ -726,6 +726,7 @@ export default {
   WebHook: 'WebHook',
   webHook: 'WebHook',
   Keyword: 'Keyword',
+  Secret: 'Secret',
   Proxy: 'Proxy',
   receivers: 'Receivers',
   receiverCcs: 'ReceiverCcs',
@@ -808,5 +809,14 @@ export default {
   'Create Operation': 'create',
   'Update Operation': 'update',
   'Delete Operation': 'delete',
-  'Read Operation': 'read'
+  'Read Operation': 'read',
+  'Process State': 'Process State',
+  'Upstream Tasks': 'Upstream Tasks',
+  'and {n} more': '… and {n} more',
+  'Move task': 'Move task',
+  'Delete task {taskName} from process {processName}?': 'Delete task {taskName} from process {processName}?',
+  'Delete task completely': 'Delete task completely',
+  'Please select a process': 'Please select a process',
+  'Delete {taskName}?': 'Delete {taskName}?',
+  'Please select a process (required)': 'Please select a process (required)'
 }

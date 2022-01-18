@@ -22,7 +22,7 @@ import {
   PostTaskCodesReq,
   TaskCodeReq,
   SaveReq,
-  MoveReq,
+  MoveReq
 } from './types'
 import { axios } from '@/service/service'
 
@@ -30,7 +30,7 @@ export function save(data: SaveReq, projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/process-task-relation`,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -38,14 +38,14 @@ export function moveRelation(data: MoveReq, projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/process-task-relation/move`,
     method: 'post',
-    data,
+    data
   })
 }
 
 export function deleteEdge(data: SaveReq): any {
   return axios({
     url: `/projects/${data.projectCode}/process-task-relation/${data.processDefinitionCode}/${data.preTaskCode}/${data.postTaskCode}`,
-    method: 'delete',
+    method: 'delete'
   })
 }
 
@@ -57,7 +57,7 @@ export function deleteRelation(
   return axios({
     url: `/projects/${projectCode}/process-task-relation/${taskCode}`,
     method: 'delete',
-    data,
+    data
   })
 }
 
@@ -67,7 +67,7 @@ export function queryDownstreamRelation(
 ): any {
   return axios({
     url: `/projects/${projectCode}/process-task-relation/${taskCode}/downstream`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -79,7 +79,7 @@ export function deleteDownstreamRelation(
   return axios({
     url: `/projects/${projectCode}/process-task-relation/${taskCode}/downstream`,
     method: 'delete',
-    data,
+    data
   })
 }
 
@@ -89,7 +89,7 @@ export function queryUpstreamRelation(
 ): any {
   return axios({
     url: `/projects/${projectCode}/process-task-relation/${taskCode}/upstream`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -101,6 +101,6 @@ export function deleteUpstreamRelation(
   return axios({
     url: `/projects/${projectCode}/process-task-relation/${taskCode}/upstream`,
     method: 'delete',
-    data,
+    data
   })
 }

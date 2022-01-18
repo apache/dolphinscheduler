@@ -114,10 +114,6 @@ public class SqlTask extends AbstractTaskExecutor {
 
     @Override
     public void handle() throws Exception {
-        // set the name of the current thread
-        String threadLoggerInfoName = String.format(TaskConstants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
-        Thread.currentThread().setName(threadLoggerInfoName);
-
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),

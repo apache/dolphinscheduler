@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
@@ -26,8 +27,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-
-import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -1079,18 +1078,21 @@ public class ProcessService {
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams) {
 
-        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
-        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
-        subPropertyList = new ArrayList<>(subPropertyList);
-        
-        Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        // Since JSONUtils.toList return unmodified list, we need to creat a new List here.
+        List<Property> parentParams = Lists.newArrayList(JSONUtils.toList(parentGlobalParams, Property.class));
+        List<Property> subParams = JSONUtils.toList(subGlobalParams, Property.class);
 
-        for (Property parent : parentPropertyList) {
-            if (!subMap.containsKey(parent.getProp())) {
-                subPropertyList.add(parent);
-            }
-        }
-        return JSONUtils.toJsonString(subPropertyList);
+        Set<String> parentParamKeys = parentParams.stream().map(Property::getProp).collect(toSet());
+
+        // We will combine the params of parent workflow and sub workflow
+        // If the params are defined in both, we will use parent's params to override the sub workflow(ISSUE-7962)
+        // todo: Do we need to consider the other attribute of Property?
+        //      e.g. the subProp's type is not equals with parent, or subProp's direct is not equals with parent
+        //      It's suggested to add node name in property, this kind of problem can be solved.
+        List<Property> extraSubParams = subParams.stream()
+                .filter(subProp -> !parentParamKeys.contains(subProp.getProp())).collect(Collectors.toList());
+        parentParams.addAll(extraSubParams);
+        return JSONUtils.toJsonString(parentParams);
     }
 
     /**
@@ -1547,10 +1549,23 @@ public class ProcessService {
      * find task instance by id
      *
      * @param taskId task id
-     * @return task intance
+     * @return task instance
      */
     public TaskInstance findTaskInstanceById(Integer taskId) {
         return taskInstanceMapper.selectById(taskId);
+    }
+
+    /**
+     * find task instance list by id list
+     *
+     * @param idList task id list
+     * @return task instance list
+     */
+    public List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return new ArrayList<>();
+        }
+        return taskInstanceMapper.selectBatchIds(idList);
     }
 
     /**
@@ -2254,7 +2269,7 @@ public class ProcessService {
         return StringUtils.join(resourceIds, ",");
     }
 
-    public int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs) {
+    public int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine) {
         Date now = new Date();
         List<TaskDefinitionLog> newTaskDefinitionLogs = new ArrayList<>();
         List<TaskDefinitionLog> updateTaskDefinitionLogs = new ArrayList<>();
@@ -2299,13 +2314,21 @@ public class ProcessService {
                 newTaskDefinitionLogs.add(taskDefinitionToUpdate);
             } else {
                 insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-                taskDefinitionToUpdate.setId(task.getId());
-                updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+                if (Boolean.TRUE.equals(syncDefine)) {
+                    taskDefinitionToUpdate.setId(task.getId());
+                    updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+                } else {
+                    updateResult++;
+                }
             }
         }
         if (!newTaskDefinitionLogs.isEmpty()) {
-            updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
             insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
+            if (Boolean.TRUE.equals(syncDefine)) {
+                updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
+            } else {
+                updateResult += newTaskDefinitionLogs.size();
+            }
         }
         return (insertResult & updateResult) > 0 ? 1 : Constants.EXIT_CODE_SUCCESS;
     }
@@ -2313,7 +2336,7 @@ public class ProcessService {
     /**
      * save processDefinition (including create or update processDefinition)
      */
-    public int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean isFromProcessDefine) {
+    public int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean syncDefine, Boolean isFromProcessDefine) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
         int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
@@ -2322,12 +2345,14 @@ public class ProcessService {
         processDefinitionLog.setOperator(operator.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
         int insertLog = processDefineLogMapper.insert(processDefinitionLog);
-        int result;
-        if (0 == processDefinition.getId()) {
-            result = processDefineMapper.insert(processDefinitionLog);
-        } else {
-            processDefinitionLog.setId(processDefinition.getId());
-            result = processDefineMapper.updateById(processDefinitionLog);
+        int result = 1;
+        if (Boolean.TRUE.equals(syncDefine)) {
+            if (0 == processDefinition.getId()) {
+                result = processDefineMapper.insert(processDefinitionLog);
+            } else {
+                processDefinitionLog.setId(processDefinition.getId());
+                result = processDefineMapper.updateById(processDefinitionLog);
+            }
         }
         return (insertLog & result) > 0 ? insertVersion : 0;
     }
@@ -2336,7 +2361,8 @@ public class ProcessService {
      * save task relations
      */
     public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
-                                List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs) {
+                                List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,
+                                Boolean syncDefine) {
         if (taskRelationList.isEmpty()) {
             return Constants.EXIT_CODE_SUCCESS;
         }
@@ -2365,19 +2391,22 @@ public class ProcessService {
             processTaskRelationLog.setOperator(operator.getId());
             processTaskRelationLog.setOperateTime(now);
         }
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
-        if (!processTaskRelationList.isEmpty()) {
-            Set<Integer> processTaskRelationSet = processTaskRelationList.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
-            Set<Integer> taskRelationSet = taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
-            boolean result = CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet);
-            if (result) {
-                return Constants.EXIT_CODE_SUCCESS;
+        int insert = taskRelationList.size();
+        if (Boolean.TRUE.equals(syncDefine)) {
+            List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+            if (!processTaskRelationList.isEmpty()) {
+                Set<Integer> processTaskRelationSet = processTaskRelationList.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
+                Set<Integer> taskRelationSet = taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
+                boolean result = CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet);
+                if (result) {
+                    return Constants.EXIT_CODE_SUCCESS;
+                }
+                processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
             }
-            processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
+            insert = processTaskRelationMapper.batchInsert(taskRelationList);
         }
-        int result = processTaskRelationMapper.batchInsert(taskRelationList);
         int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
-        return (result & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
+        return (insert & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
     }
 
     public boolean isTaskOnline(long taskCode) {
@@ -2400,14 +2429,15 @@ public class ProcessService {
 
     /**
      * Generate the DAG Graph based on the process definition id
+     * Use temporarily before refactoring taskNode
      *
      * @param processDefinition process definition
      * @return dag graph
      */
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
-        List<TaskNode> taskNodeList = transformTask(processTaskRelations, Lists.newArrayList());
-        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, new ArrayList<>(processTaskRelations));
+        List<ProcessTaskRelation> taskRelations = this.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskNode> taskNodeList = transformTask(taskRelations, Lists.newArrayList());
+        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, new ArrayList<>(taskRelations));
         // Generate concrete Dag to be executed
         return DagHelper.buildDagGraph(processDag);
     }
@@ -2416,12 +2446,10 @@ public class ProcessService {
      * generate DagData
      */
     public DagData genDagData(ProcessDefinition processDefinition) {
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
-        List<TaskDefinitionLog> taskDefinitionLogList = genTaskDefineList(processTaskRelations);
-        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream()
-                .map(taskDefinitionLog -> JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinitionLog), TaskDefinition.class))
-                .collect(Collectors.toList());
-        return new DagData(processDefinition, processTaskRelations, taskDefinitions);
+        List<ProcessTaskRelation> taskRelations = this.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskDefinitionLog> taskDefinitionLogList = genTaskDefineList(taskRelations);
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream().map(t -> (TaskDefinition) t).collect(Collectors.toList());
+        return new DagData(processDefinition, taskRelations, taskDefinitions);
     }
 
     public List<TaskDefinitionLog> genTaskDefineList(List<ProcessTaskRelation> processTaskRelations) {
@@ -2465,10 +2493,11 @@ public class ProcessService {
     }
 
     /**
-     * find process task relation list by projectCode and processDefinitionCode
+     * find process task relation list by process
      */
-    public List<ProcessTaskRelation> findRelationByCode(long projectCode, long processDefinitionCode) {
-        return processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+    public List<ProcessTaskRelation> findRelationByCode(long processDefinitionCode, int processDefinitionVersion) {
+        List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinitionCode, processDefinitionVersion);
+        return processTaskRelationLogList.stream().map(r -> (ProcessTaskRelation) r).collect(Collectors.toList());
     }
 
     /**

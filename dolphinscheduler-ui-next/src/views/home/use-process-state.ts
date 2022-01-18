@@ -16,3 +16,41 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
+import { countProcessInstanceState } from '@/service/modules/projects-analysis'
+import { format } from 'date-fns'
+import { TaskStateRes } from '@/service/modules/projects-analysis/types'
+import { StateData } from './types'
+
+export function useProcessState() {
+  const getProcessState = (date: Array<number>) => {
+    const { state } = useAsyncState(
+      countProcessInstanceState({
+        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        projectCode: 0
+      }).then((res: TaskStateRes): StateData => {
+        const table = res.taskCountDtos.map((item, index) => {
+          return {
+            index: index + 1,
+            state: item.taskStateType,
+            number: item.count
+          }
+        })
+
+        const chart = res.taskCountDtos.map((item) => {
+          return {
+            value: item.count,
+            name: item.taskStateType
+          }
+        })
+
+        return { table, chart }
+      }),
+      { table: [], chart: [] }
+    )
+
+    return state
+  }
+
+  return { getProcessState }
+}

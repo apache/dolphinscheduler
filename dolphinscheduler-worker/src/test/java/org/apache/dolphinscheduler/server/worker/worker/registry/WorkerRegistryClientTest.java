@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.mockito.BDDMockito.given;
 
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
@@ -63,6 +65,9 @@ public class WorkerRegistryClientTest {
     @Mock
     private ScheduledExecutorService heartBeatExecutor;
 
+    @Mock
+    private WorkerManagerThread workerManagerThread;
+    
     //private static final Set<String> workerGroups;
 
     static {
@@ -80,11 +85,17 @@ public class WorkerRegistryClientTest {
 
     @Test
     public void testRegistry() {
-        //workerRegistryClient.initWorkRegistry();
-        //Set<String> workerGroups = Sets.newHashSet("127.0.0.1");
-        //workerRegistryClient.registry();
-       // workerRegistryClient.handleDeadServer();
-
+        workerRegistryClient.initWorkRegistry();
+    
+        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(1);
+    
+        given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(NodeType.class))).willReturn(true);
+    
+        given(workerConfig.getHeartbeatInterval()).willReturn(1);
+    
+        workerRegistryClient.registry();
+    
+        Mockito.verify(registryClient, Mockito.times(1)).handleDeadServer(Mockito.anyCollection(), Mockito.any(NodeType.class), Mockito.anyString());
     }
 
     @Test

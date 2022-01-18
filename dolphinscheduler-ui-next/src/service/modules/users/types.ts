@@ -88,6 +88,15 @@ interface RegisterUserReq {
   userPassword: string
 }
 
+interface UserInfoRes extends UserReq, IdReq {
+  userType: string
+  tenantCode?: any
+  queueName?: any
+  alertGroup?: any
+  createTime: string
+  updateTime: string
+}
+
 export {
   UserNameReq,
   UserNamesReq,
@@ -103,4 +112,5 @@ export {
   ListAllReq,
   ListReq,
   RegisterUserReq,
+  UserInfoRes
 }

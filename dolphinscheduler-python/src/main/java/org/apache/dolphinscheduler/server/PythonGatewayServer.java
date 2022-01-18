@@ -392,12 +392,12 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     public Map<String, Object> getDatasourceInfo(String datasourceName) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
-        if (dataSourceList.size() > 1) {
-            String msg = String.format("Get more than one datasource by name %s", datasourceName);
+        if (dataSourceList == null || dataSourceList.isEmpty()) {
+            String msg = String.format("Can not find any datasource by name %s", datasourceName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
-        } else if (dataSourceList.size() == 0) {
-            String msg = String.format("Can not find any datasource by name %s", datasourceName);
+        } else if (dataSourceList.size() > 1) {
+            String msg = String.format("Get more than one datasource by name %s", datasourceName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         } else {
@@ -477,7 +477,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     /**
      * Get resource by given program type and full name. It return map contain resource id, name.
-     * Useful in Python API create flink task which need processDefinition information.
+     * Useful in Python API create flink or spark task which need processDefinition information.
      *
      * @param programType program type one of SCALA, JAVA and PYTHON
      * @param fullName    full name of the resource
@@ -503,7 +503,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     public void run() {
         GatewayServer server = new GatewayServer(this);
         GatewayServer.turnLoggingOn();
-        // Start server to accept python client RPC
+        // Start server to accept python client socket
         server.start();
     }
 

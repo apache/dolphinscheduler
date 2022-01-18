@@ -16,9 +16,11 @@
  */
 
 import mapping from './mapping'
+import regex from './regex'
 
 const utils = {
   mapping,
+  regex
 }
 
 export default utils

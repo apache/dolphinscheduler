@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -117,4 +118,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
                                               @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
                                               @Param("taskType") String taskType);
+
+    /**
+     * query task definition by code list
+     *
+     * @param codes taskDefinitionCode list
+     * @return task definition list
+     */
+    List<TaskDefinition> queryByCodeList(@Param("codes") Collection<Long> codes);
 }

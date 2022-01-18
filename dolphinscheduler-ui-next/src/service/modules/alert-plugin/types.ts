@@ -41,10 +41,21 @@ interface UpdatePluginInstanceReq {
   pluginInstanceParams: string
 }
 
+interface AlertPluginItem {
+  id: number
+  pluginDefineId: number
+  instanceName: string
+  pluginInstanceParams: string
+  createTime: string
+  updateTime: string
+  alertPluginName: string
+}
+
 export {
   ListReq,
   PluginInstanceReq,
   InstanceNameReq,
   IdReq,
   UpdatePluginInstanceReq,
+  AlertPluginItem
 }

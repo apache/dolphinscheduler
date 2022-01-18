@@ -156,7 +156,7 @@ class Task(Base):
         self.resource_list = resource_list or []
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
-        self.condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
+        self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:
@@ -167,6 +167,16 @@ class Task(Base):
     def process_definition(self, process_definition: Optional[ProcessDefinition]):
         """Set attribute process_definition."""
         self._process_definition = process_definition
+
+    @property
+    def condition_result(self) -> Dict:
+        """Get attribute condition_result."""
+        return self._condition_result
+
+    @condition_result.setter
+    def condition_result(self, condition_result: Optional[Dict]):
+        """Set attribute condition_result."""
+        self._condition_result = condition_result
 
     @property
     def task_params(self) -> Optional[Dict]:

@@ -20,13 +20,11 @@ import {
   ProjectCodeReq,
   IdReq,
   CodeReq,
-  ListReq,
-  ProcessDefinitionCodeReq,
   ScheduleReq,
   WorkerGroupIdReq,
   ScheduleListReq,
   CreateScheduleReq,
-  DeleteScheduleReq,
+  DeleteScheduleReq
 } from './types'
 
 export function queryScheduleListPaging(
@@ -36,7 +34,7 @@ export function queryScheduleListPaging(
   return axios({
     url: `/projects/${projectCode}/schedules`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -47,14 +45,14 @@ export function createSchedule(
   return axios({
     url: `/projects/${projectCode}/schedules`,
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryScheduleList(projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/schedules/list`,
-    method: 'post',
+    method: 'post'
   })
 }
 
@@ -65,7 +63,7 @@ export function previewSchedule(
   return axios({
     url: `/projects/${projectCode}/schedules/preview`,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -77,7 +75,7 @@ export function updateScheduleByProcessDefinitionCode(
   return axios({
     url: `/projects/${projectCode}/schedules/update/${code}`,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -89,7 +87,7 @@ export function updateSchedule(
   return axios({
     url: `/projects/${projectCode}/schedules/${id}`,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -100,20 +98,20 @@ export function deleteScheduleById(
   return axios({
     url: `/projects/${projectCode}/schedules/${data.id}`,
     method: 'delete',
-    data,
+    data
   })
 }
 
 export function offline(projectCode: ProjectCodeReq, id: IdReq): any {
   return axios({
     url: `/projects/${projectCode}/schedules/${id}/offline`,
-    method: 'post',
+    method: 'post'
   })
 }
 
 export function online(projectCode: ProjectCodeReq, id: IdReq): any {
   return axios({
     url: `/projects/${projectCode}/schedules/${id}/online`,
-    method: 'post',
+    method: 'post'
   })
 }

@@ -24,10 +24,10 @@ import { useDropDown } from './use-dropdown'
 const User = defineComponent({
   name: 'User',
   props: {
-    profileOptions: {
+    userDropdownOptions: {
       type: Array as PropType<any>,
-      default: [],
-    },
+      default: []
+    }
   },
   setup() {
     const { handleSelect } = useDropDown()
@@ -38,7 +38,7 @@ const User = defineComponent({
       <NDropdown
         trigger='hover'
         show-arrow
-        options={this.profileOptions}
+        options={this.userDropdownOptions}
         on-select={this.handleSelect}
       >
         <NButton text>
@@ -52,7 +52,7 @@ const User = defineComponent({
         </NButton>
       </NDropdown>
     )
-  },
+  }
 })
 
 export default User

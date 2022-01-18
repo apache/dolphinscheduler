@@ -98,4 +98,17 @@
             </foreach>
         </if>
     </select>
+
+    <select id="queryDataSourceByNameAndUserId" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
+        select
+        ds.id as id,
+        ds.name as name,
+        ds.type as type
+        from t_ds_datasource ds
+        join t_ds_relation_datasource_user rel
+        on ds.id = rel.datasource_id
+        where ds.name = #{name,jdbcType=VARCHAR}
+        and rel.user_id = #{userId}
+    </select>
+
 </mapper>

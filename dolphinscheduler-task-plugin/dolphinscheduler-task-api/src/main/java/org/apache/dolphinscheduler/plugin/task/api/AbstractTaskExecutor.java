@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.Map;
@@ -36,7 +37,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
 
     public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 
-    protected Logger logger;
+    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
     /**
@@ -46,7 +47,6 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
      */
     protected AbstractTaskExecutor(TaskRequest taskRequest) {
         super(taskRequest);
-        logger = LoggerFactory.getLogger(taskRequest.getTaskLogName());
     }
 
     /**

@@ -22,7 +22,7 @@ export function queryLog(params: LogReq): any {
   return axios({
     url: '/log/detail',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -30,6 +30,6 @@ export function downloadTaskLog(params: IdReq): any {
   return axios({
     url: '/log/download-log',
     method: 'get',
-    params,
+    params
   })
 }

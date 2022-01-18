@@ -26,24 +26,56 @@ export default {
   path: '/security',
   name: 'security',
   meta: { title: '安全中心' },
-  redirect: { name: 'tenement-manage' },
+  redirect: { name: 'tenant-manage' },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/security/tenant',
-      name: 'tenement-manage',
-      component: components['home'],
+      path: '/security/tenant-manage',
+      name: 'tenant-manage',
+      component: components['tenant-manage'],
       meta: {
-        title: '租户管理',
-      },
+        title: '租户管理'
+      }
     },
     {
       path: '/security/users',
       name: 'users-manage',
       component: components['home'],
       meta: {
-        title: '用户管理',
-      },
+        title: '用户管理'
+      }
     },
-  ],
+    {
+      path: '/security/alarm-group-manage',
+      name: 'alarm-group-manage',
+      component: components['alarm-group-manage'],
+      meta: {
+        title: '告警组管理'
+      }
+    },
+    {
+      path: '/security/worker-group-manage',
+      name: 'worker-group-manage',
+      component: components['worker-group-manage'],
+      meta: {
+        title: 'Worker分组管理'
+      }
+    },
+    {
+      path: '/security/yarn-queue-manage',
+      name: 'yarn-queue-manage',
+      component: components['yarn-queue-manage'],
+      meta: {
+        title: 'Yarn队列管理'
+      }
+    },
+    {
+      path: '/security/environment-manage',
+      name: 'environment-manage',
+      component: components['environment-manage'],
+      meta: {
+        title: '环境管理'
+      }
+    }
+  ]
 }

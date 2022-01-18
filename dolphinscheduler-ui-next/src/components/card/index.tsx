@@ -19,15 +19,17 @@ import { defineComponent, PropType } from 'vue'
 import { NCard } from 'naive-ui'
 
 const headerStyle = {
-  borderBottom: '1px solid var(--border-color)',
+  borderBottom: '1px solid var(--n-border-color)'
 }
 
 const contentStyle = {
-  padding: '8px 10px',
+  padding: '8px 10px'
 }
 
 const props = {
-  title: String as PropType<string>,
+  title: {
+    type: String as PropType<string>
+  }
 }
 
 const Card = defineComponent({
@@ -45,7 +47,7 @@ const Card = defineComponent({
         {$slots}
       </NCard>
     )
-  },
+  }
 })
 
 export default Card

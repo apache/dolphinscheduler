@@ -18,20 +18,26 @@
 import { defineComponent, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
 import { NInput, NButton, NSwitch, NForm, NFormItem } from 'naive-ui'
-import { useValidate } from './use-validate'
+import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
+import { useLocalesStore } from '@/store/locales/locales'
+import { useThemeStore } from '@/store/theme/theme'
 
 const login = defineComponent({
   name: 'login',
   setup() {
-    const { state, t, locale } = useValidate()
-
+    const { state, t, locale } = useForm()
     const { handleChange } = useTranslate(locale)
-
     const { handleLogin } = useLogin(state)
+    const localesStore = useLocalesStore()
+    const themeStore = useThemeStore()
 
-    return { t, handleChange, handleLogin, ...toRefs(state) }
+    if (themeStore.getTheme) {
+      themeStore.setDarkTheme()
+    }
+
+    return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },
   render() {
     return (
@@ -39,12 +45,13 @@ const login = defineComponent({
         <div class={styles['language-switch']}>
           <NSwitch
             onUpdateValue={this.handleChange}
+            default-value={this.localesStore.getLocales}
             checked-value='en_US'
             unchecked-value='zh_CN'
           >
             {{
               checked: () => 'en_US',
-              unchecked: () => 'zh_CN',
+              unchecked: () => 'zh_CN'
             }}
           </NSwitch>
         </div>
@@ -85,6 +92,9 @@ const login = defineComponent({
             <NButton
               round
               type='info'
+              disabled={
+                !this.loginForm.userName || !this.loginForm.userPassword
+              }
               style={{ width: '100%' }}
               onClick={this.handleLogin}
             >
@@ -94,7 +104,7 @@ const login = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default login
