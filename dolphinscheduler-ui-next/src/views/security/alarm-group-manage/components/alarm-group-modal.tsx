@@ -21,8 +21,8 @@ import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
 import { useI18n } from 'vue-i18n'
 
-const AlertGroupModal = defineComponent({
-  name: 'YarnQueueModal',
+const AlarmGroupModal = defineComponent({
+  name: 'AlarmGroupModal',
   props: {
     showModalRef: {
       type: Boolean as PropType<boolean>,
@@ -163,4 +163,4 @@ const AlertGroupModal = defineComponent({
   }
 })
 
-export default AlertGroupModal
+export default AlarmGroupModal

@@ -76,6 +76,14 @@ export default {
       meta: {
         title: '环境管理'
       }
+    },
+    {
+      path: '/security/token-manage',
+      name: 'token-manage',
+      component: components['token-manage'],
+      meta: {
+        title: '令牌管理管理'
+      }
     }
   ]
 }
