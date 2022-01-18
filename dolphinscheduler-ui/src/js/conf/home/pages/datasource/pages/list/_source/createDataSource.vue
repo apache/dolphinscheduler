@@ -23,7 +23,7 @@
           <template slot="content" size="small">
               <el-select id="btnDataSourceTypeDropDown" style="width: 100%;" v-model="type" :disabled="this.item.id">
                 <el-option
-                      id="OptionsDataSourceType"
+                      class="OptionsDataSourceType"
                       v-for="item in datasourceTypeList"
                       :key="item.value"
                       :value="item.value"

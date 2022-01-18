@@ -89,8 +89,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
           - name: ClickhouseDataSource
             class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
-          - name: ClickhouseDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
+          - name: PostgresDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

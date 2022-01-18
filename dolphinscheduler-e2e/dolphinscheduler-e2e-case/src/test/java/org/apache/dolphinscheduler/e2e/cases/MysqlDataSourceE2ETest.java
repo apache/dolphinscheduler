@@ -60,7 +60,7 @@ public class MysqlDataSourceE2ETest {
 
     private static final String database = "mysql";
 
-    private static final String jdbcParams = "";
+    private static final String jdbcParams = "{\"useSSL\": false}";
 
 
     @BeforeAll
@@ -90,9 +90,14 @@ public class MysqlDataSourceE2ETest {
 
         page.delete(dataSourceName);
 
-        await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
-            .as("DataSource list should contain newly-created database")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(dataSourceName)));
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                    page.dataSourceItemsList()
+            ).noneMatch(
+                    it -> it.getText().contains(dataSourceName)
+            );
+        });
     }
 }

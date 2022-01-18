@@ -74,6 +74,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
         createDataSourceForm().inputIP().sendKeys(ip);
+        createDataSourceForm().inputPort().clear();
         createDataSourceForm().inputPort().sendKeys(port);
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
@@ -114,7 +115,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "OptionsDataSourceType")
+        @FindBy(className = "OptionsDataSourceType")
         private List<WebElement> selectDataSourceType;
 
         @FindBy(id = "btnDataSourceTypeDropDown")
