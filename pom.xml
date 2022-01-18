@@ -88,6 +88,7 @@
         <commons.io.version>2.4</commons.io.version>
         <oshi.core.version>3.9.1</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
+        <oracle.jdbc.version>21.1.0.0</oracle.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
@@ -772,6 +773,12 @@
                 <version>${clickhouse.jdbc.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${oracle.jdbc.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>mssql-jdbc</artifactId>
