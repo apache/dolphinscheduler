@@ -34,7 +34,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 
-@DolphinScheduler(composeFiles = "docker/datasource-clickhouse/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/datasource-sqlserver/docker-compose.yaml")
 public class SqlServerDataSourceE2ETest {
     private static RemoteWebDriver browser;
 
