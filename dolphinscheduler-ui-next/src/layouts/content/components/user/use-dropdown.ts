@@ -29,9 +29,9 @@ export function useDropDown() {
     if (key === 'logout') {
       useLogout()
     } else if (key === 'password') {
-      router.push({ path: 'password' })
+      router.push({ path: '/password' })
     } else if (key === 'profile') {
-      router.push({ path: 'profile' })
+      router.push({ path: '/profile' })
     }
   }
 
@@ -39,7 +39,7 @@ export function useDropDown() {
     logout().then(() => {
       userStore.setSessionId('')
       userStore.setUserInfo({})
-      router.push({ path: 'login' })
+      router.push({ path: '/login' })
     })
   }
 
