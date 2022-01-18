@@ -94,6 +94,14 @@ export default {
       }
     },
     {
+      path: '/resource/function-manage',
+      name: 'function-manage',
+      component: components['function'],
+      meta: {
+        title: '函数管理'
+      }
+    },
+    {
       path: '/resource/task-group',
       name: 'task-group-manage',
       component: components['taskGroupOption'],

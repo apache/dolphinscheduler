@@ -215,6 +215,32 @@ const resource = {
     enter_name_tips: 'Please enter name',
     enter_description_tips: 'Please enter description'
   },
+  function: {
+    udf_function: 'UDF Function',
+    create_udf_function: 'Create UDF Function',
+    edit_udf_function: 'Create UDF Function',
+    id: '#',
+    udf_function_name: 'UDF Function Name',
+    class_name: 'Class Name',
+    type: 'Type',
+    description: 'Description',
+    jar_package: 'Jar Package',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    rename: 'Rename',
+    edit: 'Edit',
+    delete: 'Delete',
+    package_name: 'Package Name',
+    udf_resources: 'UDF Resources',
+    instructions: 'Instructions',
+    upload_resources: 'Upload Resources',
+    enter_keyword_tips: 'Please enter keyword',
+    enter_udf_unction_name_tips: 'Please enter a UDF function name',
+    enter_package_name_tips: 'Please enter a Package name',
+    enter_select_udf_resources_directory_tips:
+      'Please select UDF resources directory',
+    enter_instructions_tips: 'Please enter a instructions'
+  },
   task_group_option: {
     id: 'No.',
     manage: 'Task group manage',
