@@ -91,7 +91,7 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
           - name: PostgresDataSource
             class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
-          - name: PostgresDataSource
+          - name: SqlServerDataSource
             class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
