@@ -67,7 +67,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new By.ById("dialogCreateDataSource")));
-        
+
         createDataSourceForm().selectDataSourceType()
             .stream()
             .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
