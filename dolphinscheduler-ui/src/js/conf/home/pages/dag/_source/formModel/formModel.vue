@@ -128,16 +128,10 @@
         <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS'">
           <div slot="text">{{ $t("Number of failed retries") }}</div>
           <div slot="content">
-            <m-select-input
-              v-model="maxRetryTimes"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="maxRetryTimes" size="small" style="width: 150px;" />
             <span>({{ $t("Times") }})</span>
             <span class="text-b">{{ $t("Failed retry interval") }}</span>
-            <m-select-input
-              v-model="retryInterval"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="retryInterval" size="small" style="width: 150px;" />
             <span>({{ $t("Minute") }})</span>
           </div>
         </m-list-box>
