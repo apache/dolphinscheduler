@@ -63,7 +63,7 @@ public class AuditPublishService {
      */
     public void publish(AuditMessage message) {
         if (auditConfiguration.getEnabled() && !auditMessageQueue.offer(message)) {
-            logger.error("add audit message failed {}", message.toString());
+            logger.error("add audit message failed {0}", message);
         }
     }
 

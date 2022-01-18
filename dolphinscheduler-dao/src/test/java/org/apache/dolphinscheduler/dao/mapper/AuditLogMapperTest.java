@@ -65,6 +65,6 @@ public class AuditLogMapperTest extends BaseDaoTest {
     @Test
     public void testQueryResourceNameByType() {
         String resourceName = logMapper.queryResourceNameByType("USER", 1);
-        Assert.assertEquals(resourceName, "admin");
+        Assert.assertEquals("admin", resourceName);
     }
 }
