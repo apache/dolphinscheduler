@@ -45,6 +45,11 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(className = "tab-warning-instance-manage")
     private WebElement menWarningInstanceManage;
 
+    @FindBy(className = "tab-queue-manage")
+    private WebElement menuQueueManage;
+
+    @FindBy(className = "tab-environment-manage")
+    private WebElement menuEnvironmentManage;
 
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
