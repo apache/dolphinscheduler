@@ -91,6 +91,7 @@ export default defineComponent({
     watch(
       () => props.row,
       () => {
+        variables.uploadShow = false
         state.functionForm.type = props.row.type
         state.functionForm.funcName = props.row.funcName
         state.functionForm.className = props.row.className
