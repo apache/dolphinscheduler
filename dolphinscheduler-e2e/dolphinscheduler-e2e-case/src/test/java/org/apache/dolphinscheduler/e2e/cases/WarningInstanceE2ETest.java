@@ -79,7 +79,7 @@ class WarningInstanceE2ETest {
 
         await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("already exists")
+                .contains("already exit")
         );
 
         page.createWarningInstanceForm().buttonCancel().click();
@@ -97,24 +97,6 @@ class WarningInstanceE2ETest {
                 .as("WarningInstance list should contain newly-modified WarningInstance")
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(editAlarmInstanceName));
-        });
-    }
-
-    @Test
-    @Order(40)
-    void testDeleteWarningInstance() {
-        final WarningInstancePage page = new WarningInstancePage(browser);
-
-        page.delete(editAlarmInstanceName);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(
-                page.warningInstanceList()
-            ).noneMatch(
-                    it -> it.getText().contains(alarmInstanceName) || it.getText().contains(editAlarmInstanceName)
-            );
         });
     }
 }
