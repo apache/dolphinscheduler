@@ -127,7 +127,7 @@
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <janino.version>3.1.6</janino.version>
-        <spring-web.version>5.3.14</spring-web.version>
+        <spring-web.version>5.3.12</spring-web.version>
 
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
