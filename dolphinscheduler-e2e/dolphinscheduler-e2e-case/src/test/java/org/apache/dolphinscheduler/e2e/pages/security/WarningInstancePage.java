@@ -107,7 +107,7 @@ public final class WarningInstancePage extends NavBarPage implements SecurityPag
         return this;
     }
 
-    public WarningInstancePage SelectAlarmPlugin(String alarmPluginName) {
+    public WarningInstancePage selectAlarmPlugin(String alarmPluginName) {
 
         final By optionsLocator = By.className("option-alarmPluginName");
 
