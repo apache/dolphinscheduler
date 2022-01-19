@@ -286,6 +286,17 @@ const project = {
     confirm: 'Confirm',
     cancel: 'Cancel',
     delete_confirm: 'Delete?'
+  },
+  dag: {
+    createWorkflow: "Create Workflow",
+    search: 'Search',
+    download_png: 'Download PNG',
+    fullscreen_open: 'Open Fullscreen',
+    fullscreen_close: 'Close Fullscreen',
+    workflow_version: 'Workflow Version Info',
+    save: 'Save',
+    close: 'Close',
+    format: 'Format'
   }
 }
 

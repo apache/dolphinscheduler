@@ -15,53 +15,26 @@
  * limitations under the License.
  */
 
-interface PageReq {
-  pageNo: number
-  pageSize: number
+import { ref, onMounted, Ref, onUnmounted } from 'vue'
+
+interface Options {
+  // readonly: Ref<boolean>;
+  // canvas: Ref<HTMLElement | undefined>;
 }
 
-interface ListReq extends PageReq {
-  searchVal?: string
-}
+/**
+ * Canvas Init
+ * 1. Bind the graph to the dom
+ * 2. Redraw when the page is resized
+ * 3. Register custom graphics
+ */
+export function useCanvasInit(options: Options) {
 
-interface ProjectCodeReq {
-  projectCode: number
-}
+  // Whether the graph can be operated
+  const { } = options;
 
-interface TaskDefinitionListReq extends ListReq {
-  taskType?: string
-  userId?: number
-}
 
-interface TaskDefinitionJsonReq {
-  taskDefinitionJson: string
-}
+  return {
 
-interface CodeReq {
-  code: number
-}
-
-interface TaskDefinitionJsonObjReq {
-  taskDefinitionJsonObj: string
-}
-
-interface ReleaseStateReq {
-  releaseState: 'OFFLINE' | 'ONLINE'
-}
-
-interface VersionReq {
-  version: number
-}
-
-export {
-  PageReq,
-  ListReq,
-  ProjectCodeReq,
-  TaskDefinitionListReq,
-  TaskDefinitionJsonReq,
-  GenNumReq,
-  CodeReq,
-  TaskDefinitionJsonObjReq,
-  ReleaseStateReq,
-  VersionReq
+  }
 }

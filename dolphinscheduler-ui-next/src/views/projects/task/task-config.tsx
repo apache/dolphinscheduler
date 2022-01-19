@@ -15,53 +15,13 @@
  * limitations under the License.
  */
 
-interface PageReq {
-  pageNo: number
-  pageSize: number
-}
+import { defineComponent } from 'vue'
 
-interface ListReq extends PageReq {
-  searchVal?: string
-}
-
-interface ProjectCodeReq {
-  projectCode: number
-}
-
-interface TaskDefinitionListReq extends ListReq {
-  taskType?: string
-  userId?: number
-}
-
-interface TaskDefinitionJsonReq {
-  taskDefinitionJson: string
-}
-
-interface CodeReq {
-  code: number
-}
-
-interface TaskDefinitionJsonObjReq {
-  taskDefinitionJsonObj: string
-}
-
-interface ReleaseStateReq {
-  releaseState: 'OFFLINE' | 'ONLINE'
-}
-
-interface VersionReq {
-  version: number
-}
-
-export {
-  PageReq,
-  ListReq,
-  ProjectCodeReq,
-  TaskDefinitionListReq,
-  TaskDefinitionJsonReq,
-  GenNumReq,
-  CodeReq,
-  TaskDefinitionJsonObjReq,
-  ReleaseStateReq,
-  VersionReq
-}
+export default defineComponent({
+  name: "TaskConfigModal",
+  setup() {
+    return () => (
+      <div>TaskConfigModal</div>
+    )
+  }
+})

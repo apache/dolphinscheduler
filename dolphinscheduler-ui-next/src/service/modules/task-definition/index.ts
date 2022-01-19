@@ -21,7 +21,6 @@ import {
   ProjectCodeReq,
   TaskDefinitionListReq,
   TaskDefinitionJsonReq,
-  GenNumReq,
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
@@ -51,13 +50,15 @@ export function save(
 }
 
 export function genTaskCodeList(
-  params: GenNumReq,
-  projectCode: ProjectCodeReq
-): any {
-  return axios({
+  num: number,
+  projectCode: number
+) {
+  return axios.request<unknown, number[]>({
     url: `/projects/${projectCode}/task-definition/gen-task-codes`,
     method: 'get',
-    params
+    params: {
+      genNum: num
+    }
   })
 }
 

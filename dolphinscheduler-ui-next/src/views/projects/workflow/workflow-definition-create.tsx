@@ -15,53 +15,24 @@
  * limitations under the License.
  */
 
-interface PageReq {
-  pageNo: number
-  pageSize: number
-}
+import { defineComponent } from 'vue'
+import Dag from './dag';
+import { NCard } from 'naive-ui';
+import styles from './workflow-definition-create.module.scss';
 
-interface ListReq extends PageReq {
-  searchVal?: string
-}
+export default defineComponent({
+  name: "WorkflowDefinitionCreate",
+  setup() {
 
-interface ProjectCodeReq {
-  projectCode: number
-}
+    const slots = {
+      toolbarLeft: () => <span>left-operations</span>,
+      toolbarRight: () => <span>right-operations</span>
+    };
 
-interface TaskDefinitionListReq extends ListReq {
-  taskType?: string
-  userId?: number
-}
-
-interface TaskDefinitionJsonReq {
-  taskDefinitionJson: string
-}
-
-interface CodeReq {
-  code: number
-}
-
-interface TaskDefinitionJsonObjReq {
-  taskDefinitionJsonObj: string
-}
-
-interface ReleaseStateReq {
-  releaseState: 'OFFLINE' | 'ONLINE'
-}
-
-interface VersionReq {
-  version: number
-}
-
-export {
-  PageReq,
-  ListReq,
-  ProjectCodeReq,
-  TaskDefinitionListReq,
-  TaskDefinitionJsonReq,
-  GenNumReq,
-  CodeReq,
-  TaskDefinitionJsonObjReq,
-  ReleaseStateReq,
-  VersionReq
-}
+    return () => (
+      <NCard class={styles.container}>
+        <Dag v-slots={slots} />
+      </NCard>
+    )
+  }
+})

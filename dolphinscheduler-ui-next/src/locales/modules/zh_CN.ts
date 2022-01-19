@@ -286,6 +286,17 @@ const project = {
     confirm: '确定',
     cancel: '取消',
     delete_confirm: '确定删除吗?'
+  },
+  dag: {
+    createWorkflow: "创建工作流",
+    search: '搜索',
+    download_png: '下载工作流图片',
+    fullscreen_open: '全屏',
+    fullscreen_close: '退出全屏',
+    workflow_version: '工作流版本信息',
+    save: '保存',
+    close: '关闭',
+    format: '格式化'
   }
 }
 

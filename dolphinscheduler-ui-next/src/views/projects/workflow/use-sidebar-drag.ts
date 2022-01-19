@@ -15,53 +15,34 @@
  * limitations under the License.
  */
 
-interface PageReq {
-  pageNo: number
-  pageSize: number
+import type { Ref } from 'vue';
+import type { Dragged } from './dag';
+
+interface Options {
+  readonly: Ref<boolean>;
+  dragged: Ref<Dragged>;
 }
 
-interface ListReq extends PageReq {
-  searchVal?: string
-}
+/**
+ * Sidebar drag
+ */
+export function useSidebarDrag(options: Options) {
 
-interface ProjectCodeReq {
-  projectCode: number
-}
+  const { readonly, dragged } = options;
 
-interface TaskDefinitionListReq extends ListReq {
-  taskType?: string
-  userId?: number
-}
+  const onDragStart = (e: DragEvent, type: string) => {
+    if (readonly.value) {
+      e.preventDefault()
+      return
+    }
+    dragged.value = {
+      x: e.offsetX,
+      y: e.offsetY,
+      type: type
+    }
+  }
 
-interface TaskDefinitionJsonReq {
-  taskDefinitionJson: string
-}
-
-interface CodeReq {
-  code: number
-}
-
-interface TaskDefinitionJsonObjReq {
-  taskDefinitionJsonObj: string
-}
-
-interface ReleaseStateReq {
-  releaseState: 'OFFLINE' | 'ONLINE'
-}
-
-interface VersionReq {
-  version: number
-}
-
-export {
-  PageReq,
-  ListReq,
-  ProjectCodeReq,
-  TaskDefinitionListReq,
-  TaskDefinitionJsonReq,
-  GenNumReq,
-  CodeReq,
-  TaskDefinitionJsonObjReq,
-  ReleaseStateReq,
-  VersionReq
+  return {
+    onDragStart
+  }
 }
