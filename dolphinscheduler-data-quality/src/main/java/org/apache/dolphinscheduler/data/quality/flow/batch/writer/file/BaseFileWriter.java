@@ -63,7 +63,7 @@ public abstract class BaseFileWriter implements BatchWriter {
 
         defaultConfig.put(PARTITION_BY, Collections.emptyList());
         defaultConfig.put(SAVE_MODE,"error");
-        defaultConfig.put(SERIALIZER,"json");
+        defaultConfig.put(SERIALIZER,"csv");
 
         config.merge(defaultConfig);
     }
