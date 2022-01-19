@@ -52,7 +52,7 @@ export default {
       name: 'workflow-relation',
       component: components['workflow-relation'],
       meta: {
-        title: '工作流定义'
+        title: '工作流关系'
       }
     },
     {
