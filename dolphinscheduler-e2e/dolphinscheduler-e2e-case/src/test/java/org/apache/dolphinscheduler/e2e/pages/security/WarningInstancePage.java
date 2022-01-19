@@ -61,7 +61,7 @@ public final class WarningInstancePage extends NavBarPage implements SecurityPag
 
         createWarningInstanceForm().inputAlarmInstanceName().sendKeys(alarmInstanceName);
         createWarningInstanceForm().selectAlarmPlugin().click();
-        SelectAlarmPlugin(alarmPluginName);
+        selectAlarmPlugin(alarmPluginName);
         createWarningInstanceForm().inputWebhook().sendKeys(inputPluginContent);
         createWarningInstanceForm().inputKeyword().sendKeys(keyword);
         createWarningInstanceForm().radioNoEnableProxy().click();
