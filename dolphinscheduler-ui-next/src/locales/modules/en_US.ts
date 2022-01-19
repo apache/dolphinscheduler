@@ -230,16 +230,22 @@ const resource = {
     rename: 'Rename',
     edit: 'Edit',
     delete: 'Delete',
+    success: 'Success',
     package_name: 'Package Name',
     udf_resources: 'UDF Resources',
     instructions: 'Instructions',
     upload_resources: 'Upload Resources',
+    udf_resources_directory: 'UDF resources directory',
+    delete_confirm: 'Delete?',
     enter_keyword_tips: 'Please enter keyword',
     enter_udf_unction_name_tips: 'Please enter a UDF function name',
     enter_package_name_tips: 'Please enter a Package name',
+    enter_select_udf_resources_tips: 'Please select UDF resources',
     enter_select_udf_resources_directory_tips:
       'Please select UDF resources directory',
-    enter_instructions_tips: 'Please enter a instructions'
+    enter_instructions_tips: 'Please enter a instructions',
+    enter_name_tips: 'Please enter name',
+    enter_description_tips: 'Please enter description'
   },
   task_group_option: {
     id: 'No.',

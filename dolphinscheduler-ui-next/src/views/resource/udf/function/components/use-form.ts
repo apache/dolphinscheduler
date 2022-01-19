@@ -38,7 +38,7 @@ export const useForm = () => {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.functionForm.type === '') {
+          if (!state.functionForm.type) {
             return new Error(t('resource.function.enter_name_tips'))
           }
         }
@@ -47,7 +47,7 @@ export const useForm = () => {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.functionForm.funcName === '') {
+          if (!state.functionForm.funcName) {
             return new Error(t('resource.function.enter_name_tips'))
           }
         }
@@ -56,7 +56,7 @@ export const useForm = () => {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.functionForm.className === '') {
+          if (!state.functionForm.className) {
             return new Error(t('resource.function.enter_name_tips'))
           }
         }
@@ -73,7 +73,30 @@ export const useForm = () => {
     } as FormRules
   })
 
+  const uploadState = reactive({
+    uploadFormRef: ref(),
+    uploadForm: {
+      name: '',
+      file: '',
+      description: '',
+      pid: -1,
+      currentDir: '/'
+    },
+    uploadRules: {
+      pid: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (uploadState.uploadForm.pid === -1) {
+            return new Error(t('resource.function.enter_name_tips'))
+          }
+        }
+      }
+    } as FormRules
+  })
+
   return {
-    state
+    state,
+    uploadState
   }
 }

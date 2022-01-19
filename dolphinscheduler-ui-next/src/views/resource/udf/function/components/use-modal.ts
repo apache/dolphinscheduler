@@ -16,9 +16,10 @@
  */
 
 import _ from 'lodash'
-import { reactive, SetupContext } from 'vue'
+import { ref, reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
+  createResource,
   createUdfFunc,
   queryResourceList,
   updateUdfFunc
@@ -27,6 +28,7 @@ import { useAsyncState } from '@vueuse/core'
 
 export function useModal(
   state: any,
+  uploadState: any,
   ctx: SetupContext<('update:show' | 'updateList')[]>
 ) {
   const { t } = useI18n()
@@ -72,6 +74,7 @@ export function useModal(
   }
 
   const variables = reactive({
+    uploadShow: ref(false),
     udfResourceList: [],
     udfResourceDirList: []
   })
@@ -79,6 +82,9 @@ export function useModal(
   const filterEmptyDirectory = (list: any) => {
     for (const item of list) {
       if (item.children) {
+        if (!/\.jar$/.test(item.name)) {
+          item.disabled = true
+        }
         filterEmptyDirectory(item.children)
       }
     }
@@ -99,8 +105,8 @@ export function useModal(
     return array.filter((n: any) => !/\.jar$/.test(n.name))
   }
 
-  // diGuiTree
-  const diGuiTree = (item: any) => {
+  // recursiveTree
+  const recursiveTree = (item: any) => {
     // Recursive convenience tree structure
     item.forEach((item: any) => {
       item.children === '' ||
@@ -108,7 +114,7 @@ export function useModal(
       item.children === null ||
       item.children.length === 0
         ? delete item.children
-        : diGuiTree(item.children)
+        : recursiveTree(item.children)
     })
   }
 
@@ -116,14 +122,14 @@ export function useModal(
     const { state } = useAsyncState(
       queryResourceList({ type: 'UDF' }).then((res: any) => {
         let item = res
+        let item1 = _.cloneDeep(res)
+
         filterEmptyDirectory(item)
         item = filterEmptyDirectory(item)
-        let item1 = _.cloneDeep(res)
-        diGuiTree(item)
-
-        diGuiTree(filterJarFile(item1))
+        recursiveTree(item)
+        recursiveTree(filterJarFile(item1))
         item1 = item1.filter((item: any) => {
-          if (item.directory) {
+          if (item.dirctory) {
             return item
           }
         })
@@ -135,10 +141,44 @@ export function useModal(
     return state
   }
 
+  const resetUploadForm = () => {
+    uploadState.uploadForm.name = ''
+    uploadState.uploadForm.file = ''
+    uploadState.uploadForm.pid = -1
+    uploadState.uploadForm.currentDir = '/'
+    uploadState.uploadForm.description = ''
+  }
+
+  const handleUploadFile = () => {
+    uploadState.uploadFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        const formData = new FormData()
+        formData.append('file', uploadState.uploadForm.file)
+        formData.append('type', 'UDF')
+        formData.append('name', uploadState.uploadForm.name)
+        formData.append('pid', uploadState.uploadForm.pid)
+        formData.append('currentDir', uploadState.uploadForm.currentDir)
+        formData.append('description', uploadState.uploadForm.description)
+
+        try {
+          const res = await createResource(formData as any)
+          window.$message.success(t('resource.function.success'))
+          variables.uploadShow = false
+          resetUploadForm()
+          getUdfList()
+          state.functionForm.resourceId = res.id
+        } catch (error: any) {
+          window.$message.error(error.message)
+        }
+      }
+    })
+  }
+
   return {
     variables,
     getUdfList,
     handleCreateFunc,
-    handleRenameFunc
+    handleRenameFunc,
+    handleUploadFile
   }
 }
