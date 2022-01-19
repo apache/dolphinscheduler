@@ -15,53 +15,53 @@
  * limitations under the License.
  */
 
-interface PageReq {
-  pageNo: number
-  pageSize: number
-}
-
-interface ListReq extends PageReq {
-  searchVal?: string
-}
-
-interface ProjectCodeReq {
-  projectCode: number
-}
-
-interface TaskDefinitionListReq extends ListReq {
-  taskType?: string
-  userId?: number
-}
-
-interface TaskDefinitionJsonReq {
-  taskDefinitionJson: string
-}
-
-interface CodeReq {
-  code: number
-}
-
-interface TaskDefinitionJsonObjReq {
-  taskDefinitionJsonObj: string
-}
-
-interface ReleaseStateReq {
-  releaseState: 'OFFLINE' | 'ONLINE'
-}
-
-interface VersionReq {
-  version: number
-}
-
-export {
-  PageReq,
-  ListReq,
-  ProjectCodeReq,
-  TaskDefinitionListReq,
-  TaskDefinitionJsonReq,
-  GenNumReq,
-  CodeReq,
-  TaskDefinitionJsonObjReq,
-  ReleaseStateReq,
-  VersionReq
-}
+export const ALL_TASK_TYPES:any = {
+  SHELL: {
+    alias: 'SHELL',
+  },
+  SUB_PROCESS: {
+    alias: 'SUB_PROCESS',
+  },
+  PROCEDURE: {
+    alias: 'PROCEDURE',
+  },
+  SQL: {
+    alias: 'SQL',
+  },
+  SPARK: {
+    alias: 'SPARK',
+  },
+  FLINK: {
+    alias: 'FLINK',
+  },
+  MR: {
+    alias: 'MapReduce',
+  },
+  PYTHON: {
+    alias: 'PYTHON',
+  },
+  DEPENDENT: {
+    alias: 'DEPENDENT',
+  },
+  HTTP: {
+    alias: 'HTTP',
+  },
+  DATAX: {
+    alias: 'DataX',
+  },
+  PIGEON: {
+    alias: 'PIGEON',
+  },
+  SQOOP: {
+    alias: 'SQOOP',
+  },
+  CONDITIONS: {
+    alias: 'CONDITIONS',
+  },
+  SWITCH: {
+    alias: 'SWITCH',
+  },
+  SEATUNNEL: {
+    alias: 'WATERDROP',
+  }
+};
