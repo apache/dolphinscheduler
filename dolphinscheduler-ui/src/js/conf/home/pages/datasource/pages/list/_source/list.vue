@@ -17,7 +17,7 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%" row-class-name="dataSourceItems">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="data-source-items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="name" :label="$t('Datasource Name')"></el-table-column>
         <el-table-column prop="userName" :label="$t('Datasource userName')"></el-table-column>

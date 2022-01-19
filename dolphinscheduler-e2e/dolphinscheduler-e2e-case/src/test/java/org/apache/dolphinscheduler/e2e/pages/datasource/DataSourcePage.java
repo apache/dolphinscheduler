@@ -43,7 +43,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     @FindBy(id = "btnCreateDataSource")
     private WebElement buttonCreateDataSource;
 
-    @FindBy(className = "dataSourceItems")
+    @FindBy(className = "data-source-items")
     private List<WebElement> dataSourceItemsList;
 
     @FindBys({
