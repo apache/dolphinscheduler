@@ -118,9 +118,7 @@ export function onlineCreateResource(
   })
 }
 
-export function queryResourceByProgramType(
-  params: ResourceTypeReq & ProgramTypeReq
-): any {
+export function queryResourceByProgramType(params: ResourceTypeReq): any {
   return axios({
     url: '/resources/query-by-type',
     method: 'get',
@@ -136,7 +134,7 @@ export function queryUdfFuncListPaging(params: ListReq): any {
   })
 }
 
-export function queryUdfFuncList(params: UdfTypeReq): any {
+export function queryUdfFuncList(params: IdReq & ListReq): any {
   return axios({
     url: '/resources/udf-func/list',
     method: 'get',
@@ -152,7 +150,7 @@ export function verifyUdfFuncName(params: NameReq): any {
   })
 }
 
-export function deleteUdfFunc(id: IdReq): any {
+export function deleteUdfFunc(id: number): any {
   return axios({
     url: `/resources/udf-func/${id}`,
     method: 'delete'
@@ -245,7 +243,7 @@ export function createUdfFunc(
 export function updateUdfFunc(
   data: UdfFuncReq,
   resourceId: ResourceIdReq,
-  id: IdReq
+  id: number
 ): any {
   return axios({
     url: `/resources/${resourceId}/udf-func/${id}`,
