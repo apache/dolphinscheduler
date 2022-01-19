@@ -30,20 +30,40 @@ export default {
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/monitor/servers/master',
+      path: '/monitor/master',
       name: 'servers-master',
-      component: components['home'],
+      component: components['master'],
       meta: {
         title: '服务管理-Master',
-      },
+        showSide: true
+      }
     },
     {
-      path: '/monitor/servers/worker',
+      path: '/monitor/worker',
       name: 'servers-worker',
-      component: components['home'],
+      component: components['worker'],
       meta: {
         title: '服务管理-Worker',
-      },
+        showSide: true
+      }
     },
-  ],
+    {
+      path: '/monitor/db',
+      name: 'servers-db',
+      component: components['db'],
+      meta: {
+        title: '服务管理-DB',
+        showSide: true
+      }
+    },
+    {
+      path: '/monitor/statistics',
+      name: 'statistics-statistics',
+      component: components['statistics'],
+      meta: {
+        title: '统计管理-Statistics',
+        showSide: true
+      }
+    }
+  ]
 }

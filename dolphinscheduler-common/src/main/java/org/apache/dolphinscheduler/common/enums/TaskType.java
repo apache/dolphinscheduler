@@ -37,7 +37,7 @@ public enum TaskType {
      * 10 DATAX
      * 11 CONDITIONS
      * 12 SQOOP
-     * 13 WATERDROP
+     * 13 SEATUNNEL
      * 14 SWITCH
      * 15 PIGEON
      * 16 DATA_QUALITY
@@ -55,7 +55,7 @@ public enum TaskType {
     DATAX(10, "DATAX"),
     CONDITIONS(11, "CONDITIONS"),
     SQOOP(12, "SQOOP"),
-    WATERDROP(13, "WATERDROP"),
+    SEATUNNEL(13, "SEATUNNEL"),
     SWITCH(14, "SWITCH"),
     PIGEON(15, "PIGEON"),
     DATA_QUALITY(16, "data_quality");

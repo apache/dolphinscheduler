@@ -75,11 +75,6 @@ public class AlertServer implements Closeable {
         checkTable();
         startServer();
 
-        if (alertPluginManager.size() == 0) {
-            logger.warn("No alert plugin, alert sender will exit.");
-            return;
-        }
-
         Executors.newScheduledThreadPool(1)
                  .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
     }

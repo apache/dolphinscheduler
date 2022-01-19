@@ -27,13 +27,8 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,10 +37,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.auto.service.AutoService;
 
 /**
  * dependent task processor
  */
+@AutoService(ITaskProcessor.class)
 public class DependentTaskProcessor extends BaseTaskProcessor {
 
     private DependentParameters dependentParameters;
@@ -69,30 +66,21 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     DependResult result;
 
-    TaskDefinition taskDefinition;
-
-    private MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);;
-
     boolean allDependentItemFinished;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
-        this.processInstance = processInstance;
-        this.taskInstance = task;
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-        taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
-        );
+        this.setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
-        setTaskExecutionLogger(isTaskLogger);
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -107,7 +95,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
         }
@@ -115,12 +103,17 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             getTaskDependResult();
             endTask();
         }
+        return true;
+    }
+
+    @Override
+    protected boolean dispatchTask() {
+        return true;
     }
 
     @Override
     protected boolean taskTimeout() {
-        TaskTimeoutStrategy taskTimeoutStrategy =
-                taskDefinition.getTimeoutNotifyStrategy();
+        TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;

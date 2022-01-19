@@ -135,7 +135,27 @@ public class TaskConstants {
     /**
      * task log info format
      */
-    public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
+    public static final String TASK_LOG_LOGGER_NAME = "TaskLogLogger";
+
+    /**
+     * task log logger name format
+     */
+    public static final String TASK_LOG_LOGGER_NAME_FORMAT = TASK_LOG_LOGGER_NAME + "-%s";
+
+    /**
+     * Task Logger's prefix
+     */
+    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
+
+    /**
+     * Task Logger Thread's name
+     */
+    public static final String TASK_APPID_LOG_FORMAT = "taskAppId";
+
+    /**
+     * get output log service
+     */
+    public static final String GET_OUTPUT_LOG_SERVICE = "-getOutputLogService";
 
     /**
      * date format of yyyyMMdd
@@ -335,6 +355,12 @@ public class TaskConstants {
     public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
+     * hdfs/s3 configuration
+     * resource.upload.path
+     */
+    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+
+    /**
      * data.quality.jar.name
      */
     public static final String DATA_QUALITY_JAR_NAME = "data-quality.jar.name";
@@ -343,11 +369,4 @@ public class TaskConstants {
      * data.quality.error.output.path
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
-
-    /**
-     * hdfs/s3 configuration
-     * resource.upload.path
-     */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
-
 }

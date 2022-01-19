@@ -147,7 +147,10 @@ BEGIN
                      AND TABLE_SCHEMA=(SELECT DATABASE())
                      AND COLUMN_NAME ='code')
     THEN
-           alter table t_ds_project add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `name`;
+        alter table t_ds_project add `code` bigint(20) COMMENT 'encoding' AFTER `name`;
+        -- update default value for not null
+        UPDATE t_ds_project SET code = id;
+        alter table t_ds_project modify `code` bigint(20) NOT NULL;
     END IF;
 END;
 
@@ -413,7 +416,10 @@ alter table t_ds_schedules add timezone_id varchar(40) DEFAULT NULL COMMENT 'tim
 alter table t_ds_schedules add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
 
 -- t_ds_process_definition
-alter table t_ds_process_definition add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `id`;
+alter table t_ds_process_definition add `code` bigint(20) COMMENT 'encoding' AFTER `id`;
+-- update default value for not null
+UPDATE t_ds_process_definition SET code = id;
+alter table t_ds_process_definition modify `code` bigint(20) NOT NULL;
 alter table t_ds_process_definition change project_id project_code bigint(20) NOT NULL COMMENT 'project code' AFTER `description`;
 alter table t_ds_process_definition add `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `locations`;
 alter table t_ds_process_definition add UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;

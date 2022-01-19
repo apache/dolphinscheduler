@@ -24,7 +24,7 @@ const convertLocations = (locationStr) => {
   if (!locationStr) return locations
   try {
     locations = JSON.parse(locationStr)
-  } catch (error) {}
+  } catch (error) { }
   return Array.isArray(locations) ? locations : null
 }
 
@@ -924,7 +924,7 @@ export default {
    */
   deleteTaskDefinition ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/task-definition/${payload.code}`, payload, res => {
+      io.delete(`projects/${state.projectCode}/task-definition/${payload.taskCode}`, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -945,11 +945,139 @@ export default {
       })
     })
   },
-  updateTaskDefinition ({ state }, taskDefinition) {
+  /**
+   * Save Task Definition with upstreams
+   * @param {Object} taskDefinition
+   * @param {number[]} prevTasks
+   * @param {number} processDefinitionCode
+   */
+  saveTaskDefinitionWithUpstreams ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.put(`projects/${state.projectCode}/task-definition/${taskDefinition.code}`, {
-        taskDefinitionJsonObj: JSON.stringify(taskDefinition)
+      io.post(`projects/${state.projectCode}/task-definition/save-single`, {
+        taskDefinitionJsonObj: JSON.stringify(payload.taskDefinition),
+        upstreamCodes: payload.prevTasks.join(','),
+        processDefinitionCode: payload.processDefinitionCode
       }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   *
+   * @param {Object} taskDefinition
+   * @param {number[]} taskDefinition
+   * @returns
+   */
+  updateTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.put(`projects/${state.projectCode}/task-definition/${payload.taskDefinition.code}/with-upstream`, {
+        taskDefinitionJsonObj: JSON.stringify(payload.taskDefinition),
+        upstreamCodes: payload.prevTasks.join(',')
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Query taskDefinition by code
+   * @param {*} param0
+   */
+  getTaskDefinition ({ state }, taskDefinitionCode) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition/${taskDefinitionCode}`, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Get process definition detail
+   * @param {numbetr} code
+   */
+  getProcessDefinition ({ state }, code) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/process-definition/${code}`, res => {
+        resolve(res.data)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
+   * Move task
+   */
+  moveTaskToProcess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectCode}/process-task-relation/move`, {
+        processDefinitionCode: payload.processDefinitionCode,
+        targetProcessDefinitionCode: payload.targetProcessDefinitionCode,
+        taskCode: payload.taskCode
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete relation
+   */
+  deleteRelation ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.delete(`projects/${state.projectCode}/process-task-relation/${payload.taskCode}`, {
+        processDefinitionCode: payload.processDefinitionCode
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Query task versions
+   * @param {number} taskCode
+   * @param {number} pageNo
+   * @param {number} pageSize
+   */
+  getTaskVersions ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition/${payload.taskCode}/versions`, {
+        pageNo: payload.pageNo,
+        pageSize: payload.pageSize
+      }, res => {
+        resolve(res.data)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
+   * Switch task version
+   * @param {number} taskCode
+   * @param {number} version
+   */
+  switchTaskVersion ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition/${payload.taskCode}/versions/${payload.version}`, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
+   * Delete task version
+   * @param {number} taskCode
+   * @param {number} version
+   */
+  deleteTaskVersion ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.delete(`projects/${state.projectCode}/task-definition/${payload.taskCode}/versions/${payload.version}`, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

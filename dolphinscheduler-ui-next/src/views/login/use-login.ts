@@ -17,26 +17,31 @@
 
 import { useRouter } from 'vue-router'
 import { login } from '@/service/modules/login'
+import { getUserInfo } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
-import { SessionIdRes } from '@/service/modules/login/types'
 import type { Router } from 'vue-router'
+import type { SessionIdRes } from '@/service/modules/login/types'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
 
   const handleLogin = () => {
-    state.loginFormRef.validate((valid: any) => {
+    state.loginFormRef.validate(async (valid: any) => {
       if (!valid) {
-        login({ ...state.loginForm }).then((res: SessionIdRes) => {
-          userStore.setSessionId(res.sessionId)
-          router.push({ path: 'home' })
-        })
+        const loginRes: SessionIdRes = await login({ ...state.loginForm })
+        await userStore.setSessionId(loginRes.sessionId)
+
+        const userInfoRes: UserInfoRes = await getUserInfo()
+        await userStore.setUserInfo(userInfoRes)
+
+        router.push({ path: 'home' })
       }
     })
   }
 
   return {
-    handleLogin,
+    handleLogin
   }
 }

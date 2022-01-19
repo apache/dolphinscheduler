@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler;
 
-import org.apache.dolphinscheduler.server.log.LoggerServer;
-
 import org.apache.curator.test.TestingServer;
 
 import org.springframework.boot.SpringApplication;
@@ -29,7 +27,6 @@ public class StandaloneServer {
     public static void main(String[] args) throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
-        new LoggerServer().start();
         SpringApplication.run(StandaloneServer.class, args);
     }
 }

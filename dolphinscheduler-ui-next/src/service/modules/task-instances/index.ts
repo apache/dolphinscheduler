@@ -25,13 +25,13 @@ export function queryTaskListPaging(
   return axios({
     url: `/projects/${projectCode}/task-instances`,
     method: 'get',
-    params,
+    params
   })
 }
 
 export function forceSuccess(id: IdReq, projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/task-instances/${id}/force-success`,
-    method: 'post',
+    method: 'post'
   })
 }

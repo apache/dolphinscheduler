@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-type DataBase =
+type IDataBase =
   | 'MYSQL'
   | 'POSTGRESQL'
   | 'HIVE'
@@ -25,19 +25,23 @@ type DataBase =
   | 'SQLSERVER'
   | 'DB2'
   | 'PRESTO'
-  | 'H2'
 
-interface DataSource {
-  database?: string
-  host?: string
+interface IDataSource {
   id?: number
+  type?: IDataBase
   name?: string
   note?: string
-  other?: object
-  password?: string
+  host?: string
   port?: number
-  type?: DataBase
+  principal?: string
+  javaSecurityKrb5Conf?: string
+  loginUserKeytabUsername?: string
+  loginUserKeytabPath?: string
   userName?: string
+  password?: string
+  database?: string
+  connectType?: string
+  other?: object
 }
 
 interface ListReq {
@@ -46,24 +50,18 @@ interface ListReq {
   searchVal?: string
 }
 
-interface DataSourceReq {
-  dataSourceParam: DataSource
-}
-
 interface UserIdReq {
   userId: number
 }
 
 interface TypeReq {
-  type: DataBase
+  type: IDataBase
 }
 
 interface NameReq {
   name: string
 }
 
-interface IdReq {
-  id: number
-}
+type IdReq = number
 
-export { ListReq, DataSourceReq, UserIdReq, TypeReq, NameReq, IdReq }
+export { ListReq, IDataBase, IDataSource, UserIdReq, TypeReq, NameReq, IdReq }

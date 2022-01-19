@@ -26,10 +26,10 @@ export function useMenuClick(ctx: SetupContext<'handleMenuClick'[]>) {
   const handleMenuClick = (key: string, item: MenuOption) => {
     // console.log(key, item)
     ctx.emit('handleMenuClick', item)
-    // router.push({ path: 'home' })
+    router.push({ path: `/${key}` })
   }
 
   return {
-    handleMenuClick,
+    handleMenuClick
   }
 }

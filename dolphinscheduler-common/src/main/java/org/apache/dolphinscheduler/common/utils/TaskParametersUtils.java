@@ -61,7 +61,7 @@ public class TaskParametersUtils {
             case "SUB_PROCESS":
                 return JSONUtils.parseObject(parameter, SubProcessParameters.class);
             case "SHELL":
-            case "WATERDROP":
+            case "SEATUNNEL":
                 return JSONUtils.parseObject(parameter, ShellParameters.class);
             case "PROCEDURE":
                 return JSONUtils.parseObject(parameter, ProcedureParameters.class);

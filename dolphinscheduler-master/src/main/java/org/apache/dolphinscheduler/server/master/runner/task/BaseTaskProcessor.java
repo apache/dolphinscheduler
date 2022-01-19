@@ -62,11 +62,13 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.dq.enums.ConnectorType;
 import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
@@ -99,7 +101,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     protected boolean killed = false;
 
@@ -111,7 +113,29 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstance processInstance;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);;
+    protected int maxRetryTimes;
+
+    protected int commitInterval;
+
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
+    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+
+    protected String threadLoggerInfoName;
+
+    @Override
+    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
+        if (processService == null) {
+            processService = SpringApplicationContext.getBean(ProcessService.class);
+        }
+        if (masterConfig == null) {
+            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        }
+        this.taskInstance = taskInstance;
+        this.processInstance = processInstance;
+        this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
+        this.commitInterval = masterConfig.getTaskCommitInterval();
+    }
 
     protected javax.sql.DataSource defaultDataSource =
                         SpringApplicationContext.getBean(javax.sql.DataSource.class);
@@ -131,13 +155,27 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected abstract boolean taskTimeout();
 
-    @Override
-    public void run() {
-    }
+    /**
+     * submit task
+     */
+    protected abstract boolean submitTask();
+
+    /**
+     * run task
+     */
+    protected abstract boolean runTask();
+
+    /**
+     * dispatch task
+     */
+    protected abstract boolean dispatchTask();
 
     @Override
     public boolean action(TaskAction taskAction) {
-
+        String threadName = Thread.currentThread().getName();
+        if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
+            Thread.currentThread().setName(threadLoggerInfoName);
+        }
         switch (taskAction) {
             case STOP:
                 return stop();
@@ -145,11 +183,30 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return pause();
             case TIMEOUT:
                 return timeout();
+            case SUBMIT:
+                return submit();
+            case RUN:
+                return run();
+            case DISPATCH:
+                return dispatch();
             default:
                 logger.error("unknown task action: {}", taskAction);
-
         }
+        // reset thread name
+        Thread.currentThread().setName(threadName);
         return false;
+    }
+
+    protected boolean submit() {
+        return submitTask();
+    }
+
+    protected boolean run() {
+        return runTask();
+    }
+
+    protected boolean dispatch() {
+        return dispatchTask();
     }
 
     protected boolean timeout() {
@@ -160,9 +217,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return timeout;
     }
 
-    /**
-     *
-     */
     protected boolean pause() {
         if (paused) {
             return true;
@@ -184,9 +238,20 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return null;
     }
 
-    @Override
-    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
+    public ExecutionStatus taskState() {
+        return this.taskInstance.getState();
+    }
 
+    /**
+     * set master task running logger.
+     */
+    public void setTaskExecutionLogger() {
+        threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId());
+        Thread.currentThread().setName(threadLoggerInfoName);
     }
 
     /**
@@ -254,21 +319,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
                 .buildDataQualityTaskRelatedInfo(dataQualityTaskExecutionContext)
                 .create();
-    }
-
-    /**
-     * set master task running logger.
-     */
-    public void setTaskExecutionLogger(boolean isTaskLogger) {
-        if (!isTaskLogger) {
-            return;
-        }
-        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskInstance.getFirstSubmitTime(),
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
     }
 
     /**

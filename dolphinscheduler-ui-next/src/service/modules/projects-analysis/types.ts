@@ -24,4 +24,43 @@ interface StateReq extends CodeReq {
   startDate?: string
 }
 
-export { CodeReq, StateReq }
+interface UserList {
+  userName: string
+  userId: number
+  count: number
+}
+
+interface TaskCountDto {
+  count: number
+  taskStateType: string
+}
+
+interface ProcessDefinitionRes {
+  count: number
+  userList: UserList[]
+}
+
+interface TaskStateRes {
+  totalCount: number
+  taskCountDtos: TaskCountDto[]
+}
+
+interface TaskQueueRes {
+  taskKill: number
+  taskQueue: number
+}
+
+interface CommandStateRes {
+  errorCount: number
+  normalCount: number
+  commandState: string
+}
+
+export {
+  CodeReq,
+  StateReq,
+  ProcessDefinitionRes,
+  TaskStateRes,
+  TaskQueueRes,
+  CommandStateRes
+}

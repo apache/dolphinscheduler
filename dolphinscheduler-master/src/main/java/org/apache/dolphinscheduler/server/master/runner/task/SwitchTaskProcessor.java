@@ -25,13 +25,9 @@ import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,16 +40,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.auto.service.AutoService;
+
 /**
  * switch task processor
  */
+@AutoService(ITaskProcessor.class)
 public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
-
-    TaskDefinition taskDefinition;
-
-    private MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);;
 
     /**
      * switch result
@@ -61,21 +56,17 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     private DependResult conditionResult;
 
     @Override
-    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
-        this.processInstance = processInstance;
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-        taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
-        );
+        this.setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
-        setTaskExecutionLogger(isTaskLogger);
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -84,7 +75,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
         try {
             if (!this.taskState().typeIsFinished() && setSwitchResult()) {
                 endTaskState();
@@ -95,6 +86,12 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                     this.taskInstance.getId(),
                     e);
         }
+        return true;
+    }
+
+    @Override
+    protected boolean dispatchTask() {
+        return true;
     }
 
     @Override

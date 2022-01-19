@@ -33,6 +33,8 @@ function initChart<Opt extends ECBasicOption>(
   const globalProperties =
     getCurrentInstance()?.appContext.config.globalProperties
 
+  option['backgroundColor'] = ''
+
   const init = () => {
     chart = globalProperties?.echarts.init(
       domRef.value,
@@ -58,6 +60,17 @@ function initChart<Opt extends ECBasicOption>(
     () => {
       chart?.dispose()
       init()
+    }
+  )
+
+  watch(
+    () => option,
+    () => {
+      chart?.dispose()
+      init()
+    },
+    {
+      deep: true
     }
   )
 

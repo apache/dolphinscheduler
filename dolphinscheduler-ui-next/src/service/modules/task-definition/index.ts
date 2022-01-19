@@ -18,15 +18,13 @@
 import { axios } from '@/service/service'
 import {
   PageReq,
-  ListReq,
   ProjectCodeReq,
   TaskDefinitionListReq,
   TaskDefinitionJsonReq,
-  GenNumReq,
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
-  VersionReq,
+  VersionReq
 } from './types'
 
 export function queryTaskDefinitionListPaging(
@@ -36,7 +34,7 @@ export function queryTaskDefinitionListPaging(
   return axios({
     url: `/projects/${projectCode}/task-definition`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -47,18 +45,20 @@ export function save(
   return axios({
     url: `/projects/${projectCode}/task-definition`,
     method: 'post',
-    data,
+    data
   })
 }
 
 export function genTaskCodeList(
-  params: GenNumReq,
-  projectCode: ProjectCodeReq
-): any {
-  return axios({
+  num: number,
+  projectCode: number
+) {
+  return axios.request<unknown, number[]>({
     url: `/projects/${projectCode}/task-definition/gen-task-codes`,
     method: 'get',
-    params,
+    params: {
+      genNum: num
+    }
   })
 }
 
@@ -68,7 +68,7 @@ export function queryTaskDefinitionByCode(
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -80,7 +80,7 @@ export function update(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -92,7 +92,7 @@ export function deleteTaskDefinition(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -104,7 +104,7 @@ export function releaseTaskDefinition(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/release`,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -116,7 +116,7 @@ export function queryVersions(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/versions`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -127,7 +127,7 @@ export function switchVersion(
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/versions/${version}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -138,6 +138,6 @@ export function deleteVersion(
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/versions/${version}`,
-    method: 'delete',
+    method: 'delete'
   })
 }

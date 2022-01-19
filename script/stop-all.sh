@@ -44,7 +44,6 @@ for worker in ${!workersGroupMap[*]}
 do
   echo "$worker worker server is stopping"
   ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop worker-server;"
-  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop logger-server;"
 done
 
 ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop alert-server;"
@@ -54,4 +53,11 @@ for apiServer in ${apiServersHost[@]}
 do
   echo "$apiServer api server is stopping"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
+done
+
+pythonGatewayHost=(${pythonGatewayServers//,/ })
+for pythonGatewayServer in "${pythonGatewayHost[@]}"
+do
+  echo "$pythonGatewayServer python gateway server is stopping"
+  ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop python-gateway-server;"
 done

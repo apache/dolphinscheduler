@@ -37,10 +37,6 @@ interface TaskDefinitionJsonReq {
   taskDefinitionJson: string
 }
 
-interface GenNumReq {
-  genNum: number
-}
-
 interface CodeReq {
   code: number
 }
@@ -67,5 +63,5 @@ export {
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
-  VersionReq,
+  VersionReq
 }

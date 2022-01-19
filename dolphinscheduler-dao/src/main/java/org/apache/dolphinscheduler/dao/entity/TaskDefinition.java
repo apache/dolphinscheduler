@@ -459,24 +459,25 @@ public class TaskDefinition {
         }
         TaskDefinition that = (TaskDefinition) o;
         return failRetryTimes == that.failRetryTimes
-                && failRetryInterval == that.failRetryInterval
-                && timeout == that.timeout
-                && delayTime == that.delayTime
-                && Objects.equals(name, that.name)
-                && Objects.equals(description, that.description)
-                && Objects.equals(taskType, that.taskType)
-                && Objects.equals(taskParams, that.taskParams)
-                && flag == that.flag
-                && taskPriority == that.taskPriority
-                && Objects.equals(workerGroup, that.workerGroup)
-                && timeoutFlag == that.timeoutFlag
-                && timeoutNotifyStrategy == that.timeoutNotifyStrategy
-                && Objects.equals(resourceIds, that.resourceIds)
-                && environmentCode == that.environmentCode
-                && taskGroupId == that.taskGroupId
-                && taskGroupPriority == that.taskGroupPriority;
+            && failRetryInterval == that.failRetryInterval
+            && timeout == that.timeout
+            && delayTime == that.delayTime
+            && Objects.equals(name, that.name)
+            && Objects.equals(description, that.description)
+            && Objects.equals(taskType, that.taskType)
+            && Objects.equals(taskParams, that.taskParams)
+            && flag == that.flag
+            && taskPriority == that.taskPriority
+            && Objects.equals(workerGroup, that.workerGroup)
+            && timeoutFlag == that.timeoutFlag
+            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+            && (Objects.equals(resourceIds, that.resourceIds)
+            || (StringUtils.EMPTY.equals(resourceIds) && that.resourceIds == null)
+            || (StringUtils.EMPTY.equals(that.resourceIds) && resourceIds == null))
+            && environmentCode == that.environmentCode
+            && taskGroupId == that.taskGroupId
+            && taskGroupPriority == that.taskGroupPriority;
     }
-
     @Override
     public String toString() {
         return "TaskDefinition{"

@@ -87,5 +87,12 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      */
     <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId,@Param("dataSourceIds")T[] dataSourceIds);
 
-
+    /**
+     * query datasource by name and user id
+     *
+     * @param userId userId
+     * @param name   datasource name
+     * @return If the name does not exist or the user does not have permission, it will return null
+     */
+    DataSource queryDataSourceByNameAndUserId(@Param("userId") int userId, @Param("name") String name);
 }

@@ -43,14 +43,14 @@
       </div>
       <div class="clearfix list">
         <div class="nav-links">
-          <router-link :to="{ path: '/resource'}" tag="a" active-class="active">
+          <router-link :to="{ path: '/resource'}" tag="a" active-class="active" id="tabResource">
             <span><em class="ansiconfont el-icon-folder"></em>{{$t('Resources manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
-          <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
+          <router-link :to="{ path: '/datasource'}" tag="a" active-class="active" id="tabDataSource">
             <span><em class="ansfont ri-database-2-line"></em>{{$t('Datasource manage')}}</span><strong></strong>
           </router-link>
         </div>

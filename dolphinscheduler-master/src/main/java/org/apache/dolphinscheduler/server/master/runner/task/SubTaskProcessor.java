@@ -21,43 +21,46 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.google.auto.service.AutoService;
+
 /**
  * subtask processor
  */
+@AutoService(ITaskProcessor.class)
 public class SubTaskProcessor extends BaseTaskProcessor {
 
     private ProcessInstance subProcessInstance = null;
-    private TaskDefinition taskDefinition;
 
     /**
      * run lock
      */
     private final Lock runLock = new ReentrantLock();
 
-    private StateEventCallbackService stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);;
+    private StateEventCallbackService stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
-        this.processInstance = processInstance;
-        taskDefinition = processService.findTaskDefinition(
-                task.getTaskCode(), task.getTaskDefinitionVersion()
-        );
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-        setTaskExecutionLogger(isTaskLogger);
+        this.setTaskExecutionLogger();
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
+
         return true;
     }
 
@@ -67,7 +70,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
         try {
             this.runLock.lock();
             if (setSubWorkFlow()) {
@@ -81,12 +84,17 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         } finally {
             this.runLock.unlock();
         }
+        return true;
+    }
+
+    @Override
+    protected boolean dispatchTask() {
+        return true;
     }
 
     @Override
     protected boolean taskTimeout() {
-        TaskTimeoutStrategy taskTimeoutStrategy =
-                taskDefinition.getTimeoutNotifyStrategy();
+        TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;

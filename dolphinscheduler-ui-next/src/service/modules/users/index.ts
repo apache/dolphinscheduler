@@ -30,14 +30,14 @@ import {
   GrantUDFReq,
   ListAllReq,
   ListReq,
-  RegisterUserReq,
+  RegisterUserReq
 } from './types'
 
 export function activateUser(data: UserNameReq): any {
   return axios({
     url: '/users/activate',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -45,7 +45,7 @@ export function authorizedUser(params: AlertGroupIdReq): any {
   return axios({
     url: '/users/authed-user',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -53,7 +53,7 @@ export function batchActivateUser(data: UserNamesReq): any {
   return axios({
     url: '/users/batch/activate',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -61,7 +61,7 @@ export function createUser(data: UserReq): any {
   return axios({
     url: '/users/create',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -69,14 +69,14 @@ export function delUserById(data: IdReq): any {
   return axios({
     url: '/users/delete',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function getUserInfo(): any {
   return axios({
     url: '/users/get-user-info',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -84,7 +84,7 @@ export function grantDataSource(data: GrantDataSourceReq): any {
   return axios({
     url: '/users/grant-datasource',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -92,7 +92,7 @@ export function grantResource(data: GrantResourceReq): any {
   return axios({
     url: '/users/grant-file',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -100,7 +100,7 @@ export function grantProject(data: GrantProject): any {
   return axios({
     url: '/users/grant-project',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -108,7 +108,7 @@ export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   return axios({
     url: '/users/grant-project-by-code',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -116,22 +116,22 @@ export function grantUDFFunc(data: GrantUDFReq & UserIdReq): any {
   return axios({
     url: '/users/grant-udf-func',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function listUser(): any {
   return axios({
     url: '/users/list',
-    method: 'get',
+    method: 'get'
   })
 }
 
-export function listAll(params: ListAllReq): any {
+export function listAll(params?: ListAllReq): any {
   return axios({
     url: '/users/list-all',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -139,7 +139,7 @@ export function queryUserList(params: ListReq): any {
   return axios({
     url: '/users/list-paging',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -147,7 +147,7 @@ export function registerUser(data: RegisterUserReq): any {
   return axios({
     url: '/users/register',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -155,7 +155,7 @@ export function revokeProject(data: ProjectCodeReq & UserIdReq): any {
   return axios({
     url: '/users/revoke-project',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -163,7 +163,7 @@ export function unauthorizedUser(params: AlertGroupIdReq): any {
   return axios({
     url: '/users/unauth-user',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -171,7 +171,7 @@ export function updateUser(data: IdReq & UserReq): any {
   return axios({
     url: '/users/update',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -179,6 +179,6 @@ export function verifyUserName(params: UserNameReq): any {
   return axios({
     url: '/users/verify-user-name',
     method: 'get',
-    params,
+    params
   })
 }

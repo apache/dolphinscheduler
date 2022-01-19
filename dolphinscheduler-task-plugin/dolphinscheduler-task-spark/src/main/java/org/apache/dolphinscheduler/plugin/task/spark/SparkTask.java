@@ -35,18 +35,6 @@ import java.util.Map;
 public class SparkTask extends AbstractYarnTask {
 
     /**
-     * spark1 command
-     * usage: spark-submit [options] <app jar | python file> [app arguments]
-     */
-    private static final String SPARK1_COMMAND = "${SPARK_HOME1}/bin/spark-submit";
-
-    /**
-     * spark2 command
-     * usage: spark-submit [options] <app jar | python file> [app arguments]
-     */
-    private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark-submit";
-
-    /**
      * spark parameters
      */
     private SparkParameters sparkParameters;
@@ -90,10 +78,10 @@ public class SparkTask extends AbstractYarnTask {
         List<String> args = new ArrayList<>();
 
         // spark version
-        String sparkCommand = SPARK2_COMMAND;
+        String sparkCommand = SparkVersion.SPARK2.getCommand();
 
         if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
-            sparkCommand = SPARK1_COMMAND;
+            sparkCommand = SparkVersion.SPARK1.getCommand();
         }
 
         args.add(sparkCommand);

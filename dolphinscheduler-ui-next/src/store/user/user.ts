@@ -16,22 +16,30 @@
  */
 
 import { defineStore } from 'pinia'
-import UserState from '@/store/user/types'
+import type { UserState } from '@/store/user/types'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 export const useUserStore = defineStore({
   id: 'user',
   state: (): UserState => ({
     sessionId: '',
+    userInfo: {}
   }),
   persist: true,
   getters: {
     getSessionId(): string {
       return this.sessionId
     },
+    getUserInfo(): UserInfoRes | {} {
+      return this.userInfo
+    }
   },
   actions: {
     setSessionId(sessionId: string): void {
       this.sessionId = sessionId
     },
-  },
+    setUserInfo(userInfo: UserInfoRes | {}): void {
+      this.userInfo = userInfo
+    }
+  }
 })
