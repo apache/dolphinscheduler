@@ -599,7 +599,8 @@ public class TaskInstance implements Serializable {
     }
 
     /**
-     * determine if you can try again
+     * determine if a task instance can retry
+     * if subProcess,
      *
      * @return can try result
      */
@@ -609,10 +610,8 @@ public class TaskInstance implements Serializable {
         }
         if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        } else {
-            return (this.getState().typeIsFailure()
-                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+        return this.getState() == ExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
     }
 
     /**

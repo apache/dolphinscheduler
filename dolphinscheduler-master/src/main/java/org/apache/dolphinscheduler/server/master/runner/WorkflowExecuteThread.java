@@ -72,6 +72,7 @@ import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -420,46 +421,62 @@ public class WorkflowExecuteThread {
         return true;
     }
 
-    private void taskFinished(TaskInstance task) {
+    private void taskFinished(TaskInstance taskInstance) {
         logger.info("work flow {} task {} state:{} ",
             processInstance.getId(),
-            task.getId(),
-            task.getState());
-        if (task.taskCanRetry()) {
-            addTaskToStandByList(task);
-            if (!task.retryTaskIntervalOverTime()) {
+                taskInstance.getId(),
+                taskInstance.getState());
+        if (taskInstance.taskCanRetry()) {
+            // failure task set invalid
+            taskInstance.setFlag(Flag.NO);
+            processService.updateTaskInstance(taskInstance);
+            // crate new task instance
+            taskInstance =  SerializationUtils.clone(taskInstance);
+            if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
+                taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
+            }
+            taskInstance.setSubmitTime(null);
+            taskInstance.setLogPath(null);
+            taskInstance.setExecutePath(null);
+            taskInstance.setStartTime(null);
+            taskInstance.setEndTime(null);
+            taskInstance.setFlag(Flag.YES);
+            taskInstance.setHost(null);
+            taskInstance.setId(0);
+            addTaskToStandByList(taskInstance);
+            if (!taskInstance.retryTaskIntervalOverTime()) {
                 logger.info("failure task will be submitted: process id: {}, task instance id: {} state:{} retry times:{} / {}, interval:{}",
                     processInstance.getId(),
-                    task.getId(),
-                    task.getState(),
-                    task.getRetryTimes(),
-                    task.getMaxRetryTimes(),
-                    task.getRetryInterval());
-                stateWheelExecuteThread.addTask4TimeoutCheck(task);
-                stateWheelExecuteThread.addTask4RetryCheck(task);
+                        taskInstance.getId(),
+                        taskInstance.getState(),
+                        taskInstance.getRetryTimes(),
+                        taskInstance.getMaxRetryTimes(),
+                        taskInstance.getRetryInterval());
+                stateWheelExecuteThread.addTask4TimeoutCheck(taskInstance);
+                stateWheelExecuteThread.addTask4RetryCheck(taskInstance);
             } else {
                 submitStandByTask();
-                stateWheelExecuteThread.removeTask4TimeoutCheck(task);
-                stateWheelExecuteThread.removeTask4RetryCheck(task);
+                stateWheelExecuteThread.removeTask4TimeoutCheck(taskInstance);
+                stateWheelExecuteThread.removeTask4RetryCheck(taskInstance);
             }
             return;
         }
 
-        completeTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
-        activeTaskProcessorMaps.remove(task.getId());
-        stateWheelExecuteThread.removeTask4TimeoutCheck(task);
-        stateWheelExecuteThread.removeTask4RetryCheck(task);
+        completeTaskMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance.getId());
+        activeTaskProcessorMaps.remove(taskInstance.getId());
+        stateWheelExecuteThread.removeTask4TimeoutCheck(taskInstance);
+        stateWheelExecuteThread.removeTask4RetryCheck(taskInstance);
 
-        if (task.getState().typeIsSuccess()) {
-            processInstance.setVarPool(task.getVarPool());
+        if (taskInstance.getState().typeIsSuccess()) {
+            processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
-            submitPostNode(Long.toString(task.getTaskCode()));
-        } else if (task.getState().typeIsFailure()) {
-            if (task.isConditionsTask()
-                || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
-                submitPostNode(Long.toString(task.getTaskCode()));
+            submitPostNode(Long.toString(taskInstance.getTaskCode()));
+        } else if (taskInstance.getState().typeIsFailure()) {
+            if (taskInstance.isConditionsTask()
+                || DagHelper.haveConditionsAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
+                submitPostNode(Long.toString(taskInstance.getTaskCode()));
             } else {
-                errorTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
+                errorTaskMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance.getId());
                 if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                     killAllTasks();
                 }
