@@ -20,6 +20,18 @@
       <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="groupName" :label="$t('Group Name')" class-name="name"></el-table-column>
+        <el-table-column :label="$t('Alarm plugin instance')">
+          <template slot-scope="scope">
+            <el-tag
+              style="margin: 0 2px 0 0"
+              v-for="item in scope.row.instanceNames"
+              :key="item"
+              size="mini"
+              effect="light">
+              {{ item }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="description" :label="$t('Remarks')" width="200">
           <template slot-scope="scope">
             <span>{{scope.row.description | filterNull}}</span>
@@ -49,7 +61,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" class="delete"></el-button>
+                <el-button v-if="scope.row.id !== 1" type="danger" size="mini" icon="el-icon-delete" circle slot="reference" class="delete"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
