@@ -22,8 +22,11 @@ package org.apache.dolphinscheduler.e2e.cases;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
+import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.WarningGroupPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WarningInstancePage;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -42,6 +45,10 @@ class WarningGroupE2ETest {
     private static final String editAlarmGroupName = "test_WarningGroup_edit";
     private static final String editAlarmGroupDescription = "test_WarningGroup_Description_edit";
 
+    private static final String alarmInstanceName = "test_warningInstance_1";
+    private static final String alarmPluginName = "DingTalk";
+    private static final String webHookContent = "adsadfsdsd12assa111klfgd1";
+    private static final String keyword = "Aghjgj789ggjhhcbm1";
 
     private static RemoteWebDriver browser;
 
@@ -50,7 +57,18 @@ class WarningGroupE2ETest {
         new LoginPage(browser)
             .login("admin", "dolphinscheduler123")
             .goToNav(SecurityPage.class)
+            .goToTab(WarningInstancePage.class)
+            .create(alarmInstanceName, alarmPluginName, webHookContent, keyword)
+            .goToNav(SecurityPage.class)
             .goToTab(WarningGroupPage.class);
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        new NavBarPage(browser)
+            .goToNav(SecurityPage.class)
+            .goToTab(WarningInstancePage.class)
+            .delete(alarmInstanceName);
     }
 
     @Test
@@ -64,9 +82,9 @@ class WarningGroupE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.alarmGroupList())
-                .as("WarningGroup list should contain newly-created WarningGroupName")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(alarmGroupName));
+                    .as("WarningGroup list should contain newly-created WarningGroupName")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(alarmGroupName));
         });
     }
 
@@ -78,8 +96,8 @@ class WarningGroupE2ETest {
         page.create(alarmGroupName, alarmGroupDescription);
 
         await().untilAsserted(() ->
-            assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("already exists")
+                assertThat(browser.findElement(By.tagName("body")).getText())
+                        .contains("already exists")
         );
 
         page.createWarningGroupForm().buttonCancel().click();
@@ -94,9 +112,9 @@ class WarningGroupE2ETest {
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.alarmGroupList())
-                .as("WarningGroup list should contain newly-modified editAlarmGroupName")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(editAlarmGroupName));
+                    .as("WarningGroup list should contain newly-modified editAlarmGroupName")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(editAlarmGroupName));
         });
     }
 
@@ -111,7 +129,7 @@ class WarningGroupE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                page.alarmGroupList()
+                    page.alarmGroupList()
             ).noneMatch(
                     it -> it.getText().contains(alarmGroupName) || it.getText().contains(editAlarmGroupName)            );
         });
