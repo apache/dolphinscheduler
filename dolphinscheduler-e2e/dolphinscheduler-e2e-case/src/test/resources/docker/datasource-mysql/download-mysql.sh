@@ -15,40 +15,13 @@
 # limitations under the License.
 #
 
-version: "2.1"
+set -ex
 
-services:
-  dolphinscheduler:
-    image: apache/dolphinscheduler-standalone-server:ci
-    environment:
-      MASTER_MAX_CPU_LOAD_AVG: 100
-      WORKER_TENANT_AUTO_CREATE: 'true'
-    expose:
-      - 12345
-    networks:
-      - e2e
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
-      interval: 5s
-      timeout: 60s
-      retries: 120
-    depends_on:
-      postgres:
-        condition: service_healthy
-  postgres:
-    image: postgres:14.1
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: postgres
-    networks:
-      - e2e
-    expose:
-      - 5432
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 60s
-      retries: 120
+DS_HOME=/opt/dolphinscheduler/libs
+MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.13/mysql-connector-java-8.0.16.jar"
+MYSQL_DRIVER="mysql-connector-java-8.0.16.jar"
 
-networks:
-  e2e:
+if ! curl -Lo "${DS_HOME}/${MYSQL_DRIVER}" ${MYSQL_URL}; then
+    echo "Fail to download ${MYSQL_DRIVER}."
+    exit 1
+fi

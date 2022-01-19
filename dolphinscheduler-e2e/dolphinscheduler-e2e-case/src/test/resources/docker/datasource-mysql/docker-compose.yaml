@@ -28,7 +28,8 @@ services:
     networks:
       - e2e
     volumes:
-      - ./mysql-connector-java-8.0.16.jar:/opt/dolphinscheduler/libs/mysql-connector-java-8.0.16.jar
+      - ./download-mysql.sh:/tmp/download-mysql.sh
+    entrypoint: ['sh', '-c', '/tmp/download-mysql.sh && ./bin/start.sh']
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
