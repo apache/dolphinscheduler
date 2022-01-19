@@ -15,31 +15,29 @@
  * limitations under the License.
  */
 
-import type { Graph } from '@antv/x6';
+import type { Graph } from '@antv/x6'
 import { defineComponent, ref, provide } from 'vue'
-import DagToolbar from './dag-toolbar';
-import DagCanvas from './dag-canvas';
-import DagSidebar from './dag-sidebar';
-import Styles from './dag.module.scss';
-import "./x6-style.scss";
-
+import DagToolbar from './dag-toolbar'
+import DagCanvas from './dag-canvas'
+import DagSidebar from './dag-sidebar'
+import Styles from './dag.module.scss'
+import './x6-style.scss'
 
 export interface Dragged {
-  x: number;
-  y: number;
-  type: string;
+  x: number
+  y: number
+  type: string
 }
 
 export default defineComponent({
-  name: "workflow-dag",
+  name: 'workflow-dag',
   setup(props, context) {
-
     // Whether the graph can be operated
-    const readonly = ref(false);
-    provide('readonly', readonly);
+    const readonly = ref(false)
+    provide('readonly', readonly)
 
-    const graph = ref<Graph>();
-    provide('graph', graph);
+    const graph = ref<Graph>()
+    provide('graph', graph)
 
     // The sidebar slots
     const toolbarSlots = {
@@ -52,7 +50,7 @@ export default defineComponent({
       x: 0,
       y: 0,
       type: ''
-    });
+    })
 
     return () => (
       <div class={Styles.dag}>

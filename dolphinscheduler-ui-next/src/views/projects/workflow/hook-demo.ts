@@ -29,12 +29,8 @@ interface Options {
  * 3. Register custom graphics
  */
 export function useCanvasInit(options: Options) {
-
   // Whether the graph can be operated
-  const { } = options;
+  const {} = options
 
-
-  return {
-
-  }
+  return {}
 }

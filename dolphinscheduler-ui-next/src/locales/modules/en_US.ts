@@ -48,7 +48,7 @@ const menu = {
   monitor: 'Monitor',
   security: 'Security',
   workflow_monitoring: 'Workflow Monitoring',
-  workflow_relationships: 'Workflow Relationships',
+  workflow_relation: 'Workflow Relation',
   workflow: 'Workflow',
   workflow_definition: 'Workflow Definition',
   workflow_instance: 'Workflow Instance',
@@ -287,8 +287,11 @@ const project = {
     cancel: 'Cancel',
     delete_confirm: 'Delete?'
   },
+  workflow_relation: {
+    workflow_relation: 'Workflow Relation'
+  },
   dag: {
-    createWorkflow: "Create Workflow",
+    createWorkflow: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',

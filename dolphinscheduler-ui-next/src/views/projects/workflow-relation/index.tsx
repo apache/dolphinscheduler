@@ -16,10 +16,39 @@
  */
 
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { NSelect, NButton, NIcon } from 'naive-ui'
+import { ReloadOutlined, EyeOutlined } from '@vicons/antd'
+import Card from '@/components/card'
 
-export default defineComponent({
-  name: 'WorkflowInstanceDetails',
+const workflowRelation = defineComponent({
+  name: 'workflow-relation',
   setup() {
-    return () => <div>WorkflowInstanceDetails</div>
+    const { t } = useI18n()
+
+    return { t }
+  },
+  render() {
+    const { t } = this
+
+    return (
+      <Card title={t('project.workflow_relation.workflow_relation')}>
+        <div>
+          <NSelect />
+          <NButton strong secondary circle type='info'>
+            <NIcon>
+              <ReloadOutlined />
+            </NIcon>
+          </NButton>
+          <NButton strong secondary circle type='info'>
+            <NIcon>
+              <EyeOutlined />
+            </NIcon>
+          </NButton>
+        </div>
+      </Card>
+    )
   }
 })
+
+export default workflowRelation

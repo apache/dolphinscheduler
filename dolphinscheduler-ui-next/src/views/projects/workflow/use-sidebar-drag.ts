@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue';
-import type { Dragged } from './dag';
+import type { Ref } from 'vue'
+import type { Dragged } from './dag'
 
 interface Options {
-  readonly: Ref<boolean>;
-  dragged: Ref<Dragged>;
+  readonly: Ref<boolean>
+  dragged: Ref<Dragged>
 }
 
 /**
  * Sidebar drag
  */
 export function useSidebarDrag(options: Options) {
-
-  const { readonly, dragged } = options;
+  const { readonly, dragged } = options
 
   const onDragStart = (e: DragEvent, type: string) => {
     if (readonly.value) {

@@ -50,7 +50,7 @@ router.beforeEach(
   ) => {
     NProgress.start()
     const menuStore = useMenuStore()
-    const metaData:metaData = to.meta
+    const metaData: metaData = to.meta
     menuStore.setShowSideStatus(metaData.showSide || false)
     next()
     NProgress.done()

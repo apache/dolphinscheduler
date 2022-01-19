@@ -18,10 +18,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: "TaskConfigModal",
+  name: 'TaskConfigModal',
   setup() {
-    return () => (
-      <div>TaskConfigModal</div>
-    )
+    return () => <div>TaskConfigModal</div>
   }
 })

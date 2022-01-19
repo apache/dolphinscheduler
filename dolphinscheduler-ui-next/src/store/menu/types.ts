@@ -16,8 +16,8 @@
  */
 
 interface MenuState {
-  menuKey: string,
-  isShowSide: boolean,
+  menuKey: string
+  isShowSide: boolean
   sideMenuKey: string
 }
 

@@ -16,18 +16,17 @@
  */
 
 import { defineComponent } from 'vue'
-import Dag from './dag';
-import { NCard } from 'naive-ui';
-import styles from './workflow-definition-create.module.scss';
+import Dag from './dag'
+import { NCard } from 'naive-ui'
+import styles from './workflow-definition-create.module.scss'
 
 export default defineComponent({
-  name: "WorkflowDefinitionCreate",
+  name: 'WorkflowDefinitionCreate',
   setup() {
-
     const slots = {
       toolbarLeft: () => <span>left-operations</span>,
       toolbarRight: () => <span>right-operations</span>
-    };
+    }
 
     return () => (
       <NCard class={styles.container}>

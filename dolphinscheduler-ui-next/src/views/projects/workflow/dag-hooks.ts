@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-import { useCanvasInit } from './use-canvas-init';
-import { useGraphOperations } from './use-graph-operations';
-import { useCellActive } from './use-cell-active';
-import { useSidebarDrag } from './use-sidebar-drag';
-import { useCanvasDrop } from './use-canvas-drop';
-import { useNodeSearch } from './use-node-search';
+import { useCanvasInit } from './use-canvas-init'
+import { useGraphOperations } from './use-graph-operations'
+import { useCellActive } from './use-cell-active'
+import { useSidebarDrag } from './use-sidebar-drag'
+import { useCanvasDrop } from './use-canvas-drop'
+import { useNodeSearch } from './use-node-search'
 
 export {
   useCanvasInit,
@@ -28,5 +28,5 @@ export {
   useCellActive,
   useSidebarDrag,
   useCanvasDrop,
-  useNodeSearch,
+  useNodeSearch
 }
