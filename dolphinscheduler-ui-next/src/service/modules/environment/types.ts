@@ -40,10 +40,33 @@ interface CodeReq {
   code: number
 }
 
+interface EnvironmentItem {
+  id: number
+  code: any
+  name: string
+  config: string
+  description: string
+  workerGroups: string[]
+  operator: number
+  createTime: string
+  updateTime: string
+}
+
+interface EnvironmentRes {
+  totalList: EnvironmentItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
 export {
   EnvironmentReq,
   EnvironmentCodeReq,
   EnvironmentNameReq,
   ListReq,
   CodeReq,
+  EnvironmentItem,
+  EnvironmentRes
 }

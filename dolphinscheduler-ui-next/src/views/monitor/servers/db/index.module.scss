@@ -20,7 +20,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 160px;
+  min-height: 240px;
 }
 
 .health {
@@ -39,5 +39,3 @@
   @include base;
   color: dodgerblue;
 }
-
-

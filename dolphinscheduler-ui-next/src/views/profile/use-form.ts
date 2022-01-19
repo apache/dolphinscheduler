@@ -31,8 +31,7 @@ export function useForm() {
     profileForm: {
       username: userInfo.userName,
       email: userInfo.email,
-      phone: userInfo.phone,
-      state: userInfo.state,
+      phone: userInfo.phone
     },
     rules: {
       username: {
@@ -42,7 +41,7 @@ export function useForm() {
           if (state.profileForm.username === '') {
             return new Error(t('profile.username_tips'))
           }
-        },
+        }
       },
       email: {
         trigger: ['input', 'blur'],
@@ -53,23 +52,22 @@ export function useForm() {
           } else if (!utils.regex.email.test(state.profileForm.email)) {
             return new Error(t('profile.email_correct_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   watch(userInfo, () => {
     state.profileForm = {
       username: userInfo.userName,
       email: userInfo.email,
-      phone: userInfo.phone,
-      state: userInfo.state,
+      phone: userInfo.phone
     }
   })
 
   return {
     state,
     t,
-    locale,
+    locale
   }
 }

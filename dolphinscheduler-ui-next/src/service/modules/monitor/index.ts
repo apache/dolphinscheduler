@@ -20,20 +20,20 @@ import { axios } from '@/service/service'
 export function queryDatabaseState(): any {
   return axios({
     url: '/monitor/databases',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function listMaster(): any {
   return axios({
     url: '/monitor/masters',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function listWorker(): any {
   return axios({
     url: '/monitor/workers',
-    method: 'get',
+    method: 'get'
   })
 }

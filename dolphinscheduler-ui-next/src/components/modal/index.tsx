@@ -16,29 +16,37 @@
  */
 
 import { defineComponent, PropType, renderSlot } from 'vue'
-import { NModal, NCard, NButton } from 'naive-ui'
+import { NModal, NCard, NButton, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   title: {
     type: String as PropType<string>,
-    required: true,
+    required: true
   },
   cancelText: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
+  },
+  cancelShow: {
+    type: Boolean as PropType<boolean>,
+    default: true
   },
   confirmText: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
   },
   confirmDisabled: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
+  confirmLoading: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  }
 }
 
 const Modal = defineComponent({
@@ -59,7 +67,8 @@ const Modal = defineComponent({
     return { t, onCancel, onConfirm }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm, confirmDisabled } = this
+    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading } =
+      this
 
     return (
       <NModal
@@ -71,25 +80,30 @@ const Modal = defineComponent({
           {{
             default: () => renderSlot($slots, 'default'),
             footer: () => (
-              <div class={styles['btn-box']}>
-                <NButton quaternary size='small' onClick={onCancel}>
-                  {this.cancelText || t('modal.cancel')}
-                </NButton>
+              <NSpace justify='end'>
+                {this.cancelShow && (
+                  <NButton quaternary size='small' onClick={onCancel}>
+                    {this.cancelText || t('modal.cancel')}
+                  </NButton>
+                )}
+                {/* TODO: Add left and right slots later */}
+                {renderSlot($slots, 'btn-middle')}
                 <NButton
                   type='info'
                   size='small'
                   onClick={onConfirm}
                   disabled={confirmDisabled}
+                  loading={confirmLoading}
                 >
                   {this.confirmText || t('modal.confirm')}
                 </NButton>
-              </div>
-            ),
+              </NSpace>
+            )
           }}
         </NCard>
       </NModal>
     )
-  },
+  }
 })
 
 export default Modal

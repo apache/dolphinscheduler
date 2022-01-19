@@ -16,10 +16,10 @@
  */
 
 import { useRouter } from 'vue-router'
-import { DropdownOption } from 'naive-ui'
 import { logout } from '@/service/modules/logout'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
+import { DropdownOption } from 'naive-ui'
 
 export function useDropDown() {
   const router: Router = useRouter()
@@ -29,9 +29,9 @@ export function useDropDown() {
     if (key === 'logout') {
       useLogout()
     } else if (key === 'password') {
-      router.push({ path: 'password' })
+      router.push({ path: '/password' })
     } else if (key === 'profile') {
-      router.push({ path: 'profile' })
+      router.push({ path: '/profile' })
     }
   }
 
@@ -39,11 +39,11 @@ export function useDropDown() {
     logout().then(() => {
       userStore.setSessionId('')
       userStore.setUserInfo({})
-      router.push({ path: 'login' })
+      router.push({ path: '/login' })
     })
   }
 
   return {
-    handleSelect,
+    handleSelect
   }
 }

@@ -27,20 +27,20 @@ export function useTaskState() {
       countTaskState({
         startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
         endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
-        projectCode: 0,
+        projectCode: 0
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item, index) => {
           return {
-            id: index + 1,
+            index: index + 1,
             state: item.taskStateType,
-            number: item.count,
+            number: item.count
           }
         })
 
         const chart = res.taskCountDtos.map((item) => {
           return {
             value: item.count,
-            name: item.taskStateType,
+            name: item.taskStateType
           }
         })
 

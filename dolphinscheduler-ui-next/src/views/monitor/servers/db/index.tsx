@@ -38,7 +38,7 @@ const db = defineComponent({
     const { t, databaseRef } = this
 
     return (
-      <NGrid x-gap='12' y-gap='8' cols='2 xl:4' responsive='screen'>
+      <NGrid x-gap='12' y-gap='8' cols='2 2xl:4' responsive='screen'>
         <NGi>
           <Card title={t('monitor.db.health_state')}>
             <div class={styles.health}>
@@ -94,7 +94,7 @@ const db = defineComponent({
         </NGi>
       </NGrid>
     )
-  },
+  }
 })
 
 export default db

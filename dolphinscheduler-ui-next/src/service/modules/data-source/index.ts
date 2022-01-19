@@ -18,26 +18,30 @@
 import { axios } from '@/service/service'
 import {
   ListReq,
-  DataSourceReq,
+  IDataSource,
   UserIdReq,
   TypeReq,
   NameReq,
-  IdReq,
+  IdReq
 } from './types'
 
 export function queryDataSourceListPaging(params: ListReq): any {
   return axios({
     url: '/datasources',
     method: 'get',
-    params,
+    params
   })
 }
 
-export function createDataSource(data: DataSourceReq): any {
+export function createDataSource(data: IDataSource): any {
   return axios({
     url: '/datasources',
     method: 'post',
     data,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }
 
@@ -45,22 +49,26 @@ export function authedDatasource(params: UserIdReq): any {
   return axios({
     url: '/datasources/authed-datasource',
     method: 'get',
-    params,
+    params
   })
 }
 
-export function connectDataSource(data: DataSourceReq): any {
+export function connectDataSource(data: IDataSource): any {
   return axios({
     url: '/datasources/connect',
     method: 'post',
     data,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }
 
 export function getKerberosStartupState(): any {
   return axios({
     url: '/datasources/kerberos-startup-state',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -68,7 +76,7 @@ export function queryDataSourceList(params: TypeReq): any {
   return axios({
     url: '/datasources/list',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -76,7 +84,7 @@ export function unAuthDatasource(params: UserIdReq): any {
   return axios({
     url: '/datasources/unauth-datasource',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -84,35 +92,39 @@ export function verifyDataSourceName(params: NameReq): any {
   return axios({
     url: '/datasources/verify-name',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function queryDataSource(id: IdReq): any {
   return axios({
     url: `/datasources/${id}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
-export function updateDataSource(data: DataSourceReq, id: IdReq): any {
+export function updateDataSource(data: IDataSource, id: IdReq): any {
   return axios({
     url: `/datasources/${id}`,
     method: 'put',
     data,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }
 
 export function deleteDataSource(id: IdReq): any {
   return axios({
     url: `/datasources/${id}`,
-    method: 'delete',
+    method: 'delete'
   })
 }
 
 export function connectionTest(id: IdReq): any {
   return axios({
     url: `/datasources/${id}/connect-test`,
-    method: 'get',
+    method: 'get'
   })
 }
