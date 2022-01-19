@@ -72,6 +72,7 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
+  import _ from 'lodash'
 
   export default {
     name: 'user-list',
@@ -79,7 +80,8 @@
       return {
         list: [],
         transferDialog: false,
-        item: {}
+        item: {},
+        allAlertPluginInstance: []
       }
     },
     props: {
@@ -88,7 +90,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization']),
+      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization', 'queryAllAlertPluginInstance']),
       _delete (item, i) {
         this.deleteAlertgrou({
           id: item.id
@@ -128,12 +130,48 @@
       alertgroupList (a) {
         this.list = []
         setTimeout(() => {
-          this.list = a
+          this.queryAllAlertPluginInstance().then(res => {
+            const alertPluginInstanceMapping = {}
+            res.forEach(instance => {
+              alertPluginInstanceMapping[instance.id] = instance.instanceName
+            })
+            if (a) {
+              a.forEach(item => {
+                let alertInstanceArray = _.split(item.alertInstanceIds, ',')
+                let instanceNames = []
+                alertInstanceArray.forEach(id => {
+                  instanceNames.push(alertPluginInstanceMapping[id])
+                })
+                item.instanceNames = instanceNames
+              })
+            }
+            this.list = a
+          }).catch(e => {
+            this.$message.error(e.msg)
+          })
         })
       }
     },
     created () {
-      this.list = this.alertgroupList
+      this.queryAllAlertPluginInstance().then(res => {
+        const alertPluginInstanceMapping = {}
+        res.forEach(instance => {
+          alertPluginInstanceMapping[instance.id] = instance.instanceName
+        })
+        if (this.alertgroupList) {
+          this.alertgroupList.forEach(item => {
+            let alertInstanceArray = _.split(item.alertInstanceIds, ',')
+            let instanceNames = []
+            alertInstanceArray.forEach(id => {
+              instanceNames.push(alertPluginInstanceMapping[id])
+            })
+            item.instanceNames = instanceNames
+          })
+        }
+        this.list = this.alertgroupList
+      }).catch(e => {
+        this.$message.error(e.msg)
+      })
     },
     mounted () {
     },
