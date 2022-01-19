@@ -23,6 +23,8 @@ import {
 } from 'vue-router'
 import routes from './routes'
 
+import { useMenuStore } from '@/store/menu/menu'
+
 // NProgress
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -31,6 +33,11 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+interface metaData {
+  title?: string
+  showSide?: boolean
+}
 
 /**
  * Routing to intercept
@@ -42,6 +49,9 @@ router.beforeEach(
     next: NavigationGuardNext
   ) => {
     NProgress.start()
+    const menuStore = useMenuStore()
+    const metaData:metaData = to.meta
+    menuStore.setShowSideStatus(metaData.showSide || false)
     next()
     NProgress.done()
   }

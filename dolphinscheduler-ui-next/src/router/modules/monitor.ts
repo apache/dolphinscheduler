@@ -34,7 +34,8 @@ export default {
       name: 'servers-master',
       component: components['master'],
       meta: {
-        title: '服务管理-Master'
+        title: '服务管理-Master',
+        showSide: true
       }
     },
     {
@@ -42,7 +43,8 @@ export default {
       name: 'servers-worker',
       component: components['worker'],
       meta: {
-        title: '服务管理-Worker'
+        title: '服务管理-Worker',
+        showSide: true
       }
     },
     {
@@ -50,7 +52,8 @@ export default {
       name: 'servers-db',
       component: components['db'],
       meta: {
-        title: '服务管理-DB'
+        title: '服务管理-DB',
+        showSide: true
       }
     },
     {
@@ -58,7 +61,8 @@ export default {
       name: 'statistics-statistics',
       component: components['statistics'],
       meta: {
-        title: '统计管理-Statistics'
+        title: '统计管理-Statistics',
+        showSide: true
       }
     }
   ]

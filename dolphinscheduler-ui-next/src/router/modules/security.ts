@@ -34,7 +34,8 @@ export default {
       name: 'tenant-manage',
       component: components['tenant-manage'],
       meta: {
-        title: '租户管理'
+        title: '租户管理',
+        showSide: true
       }
     },
     {
@@ -42,7 +43,8 @@ export default {
       name: 'users-manage',
       component: components['home'],
       meta: {
-        title: '用户管理'
+        title: '用户管理',
+        showSide: true
       }
     },
     {
@@ -50,7 +52,8 @@ export default {
       name: 'alarm-group-manage',
       component: components['alarm-group-manage'],
       meta: {
-        title: '告警组管理'
+        title: '告警组管理',
+        showSide: true
       }
     },
     {
@@ -58,7 +61,8 @@ export default {
       name: 'worker-group-manage',
       component: components['worker-group-manage'],
       meta: {
-        title: 'Worker分组管理'
+        title: 'Worker分组管理',
+        showSide: true
       }
     },
     {
@@ -66,7 +70,8 @@ export default {
       name: 'yarn-queue-manage',
       component: components['yarn-queue-manage'],
       meta: {
-        title: 'Yarn队列管理'
+        title: 'Yarn队列管理',
+        showSide: true
       }
     },
     {
@@ -74,7 +79,8 @@ export default {
       name: 'environment-manage',
       component: components['environment-manage'],
       meta: {
-        title: '环境管理'
+        title: '环境管理',
+        showSide: true
       }
     },
     {
@@ -82,7 +88,8 @@ export default {
       name: 'token-manage',
       component: components['token-manage'],
       meta: {
-        title: '令牌管理管理'
+        title: '令牌管理管理',
+        showSide: true
       }
     }
   ]

@@ -26,6 +26,7 @@ export function useMenuClick() {
 
   const handleMenuClick = (key: string, item: MenuOption) => {
     // console.log(key, item)
+    menuStore.setSideMenuKey(key)
     router.push({ path: `/${menuStore.getMenuKey}/${key}` })
   }
 

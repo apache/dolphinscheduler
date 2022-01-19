@@ -53,7 +53,7 @@ const Navbar = defineComponent({
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            default-value={this.menuStore.getMenuKey}
+            value={this.menuStore.getMenuKey}
             mode='horizontal'
             options={this.headerMenuOptions}
             onUpdateValue={this.handleMenuClick}
