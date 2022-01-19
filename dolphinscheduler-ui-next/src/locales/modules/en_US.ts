@@ -435,6 +435,38 @@ const security = {
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?'
+  },
+  user: {
+    user_manage: 'User Manage',
+    create_user: 'Create User',
+    update_user: 'Update User',
+    delete_user: 'Delete User',
+    delete_confirm: 'Are you sure to delete?',
+    delete_confirm_tip:
+      'Deleting user is a dangerous operation，please be careful',
+    index: 'Index',
+    username: 'Username',
+    username_exists: 'The username already exists',
+    username_rule_msg: 'Please enter username',
+    user_password: 'Please enter password',
+    user_password_rule_msg:
+      'Please enter a password containing letters and numbers with a length between 6 and 20',
+    user_type: 'User Type',
+    tenant_code: 'Tenant',
+    tenant_id_rule_msg: 'Please select tenant',
+    queue: 'Queue',
+    email: 'Email',
+    email_rule_msg: 'Please enter valid email',
+    phone: 'Phone',
+    phone_rule_msg: 'Please enter valid phone number',
+    state: 'State',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    save_error_msg: 'Failed to save, please retry',
+    delete_error_msg: 'Failed to delete, please retry'
   }
 }
 
