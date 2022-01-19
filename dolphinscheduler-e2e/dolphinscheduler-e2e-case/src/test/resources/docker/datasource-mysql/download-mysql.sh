@@ -18,7 +18,7 @@
 set -ex
 
 DS_HOME=/opt/dolphinscheduler/libs
-MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.13/mysql-connector-java-8.0.16.jar"
+MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
 MYSQL_DRIVER="mysql-connector-java-8.0.16.jar"
 
 if ! curl -Lo "${DS_HOME}/${MYSQL_DRIVER}" ${MYSQL_URL}; then
