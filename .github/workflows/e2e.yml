@@ -74,9 +74,9 @@ jobs:
           - name: User
             class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
           - name: WarningGroup
-              class: org.apache.dolphinscheduler.e2e.cases.WarningGroupE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.WarningGroupE2ETest
           - name: WarningInstance
-              class: org.apache.dolphinscheduler.e2e.cases.WarningInstanceE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.WarningInstanceE2ETest
           - name: WorkerGroup
             class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
           - name: Project
