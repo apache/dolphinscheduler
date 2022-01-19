@@ -49,10 +49,7 @@ export function save(
   })
 }
 
-export function genTaskCodeList(
-  num: number,
-  projectCode: number
-) {
+export function genTaskCodeList(num: number, projectCode: number) {
   return axios.request<unknown, number[]>({
     url: `/projects/${projectCode}/task-definition/gen-task-codes`,
     method: 'get',

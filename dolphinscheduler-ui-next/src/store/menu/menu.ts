@@ -46,6 +46,6 @@ export const useMenuStore = defineStore({
     },
     setSideMenuKey(sideMenuKey: string): void {
       this.sideMenuKey = sideMenuKey
-    },
+    }
   }
 })
