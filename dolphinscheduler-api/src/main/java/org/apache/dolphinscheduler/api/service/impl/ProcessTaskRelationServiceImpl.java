@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -88,6 +89,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+    @Autowired
+    private ProcessService processService;
+
     /**
      * create process task relation
      *
@@ -135,6 +139,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 }
             }
         }
+        updateProcessDefiniteVersion(loginUser, result, processDefinition);
         Date now = new Date();
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         if (preTaskCode != 0L) {
@@ -268,6 +273,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 return result;
             }
         }
+        updateProcessDefiniteVersion(loginUser, result, processDefinition);
         Date now = new Date();
         ProcessTaskRelation processTaskRelation = upstreamList.get(0);
         ProcessTaskRelationLog processTaskRelationLog = processTaskRelationLogMapper.queryRelationLogByRelation(processTaskRelation);
@@ -288,6 +294,15 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    private void updateProcessDefiniteVersion(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition) {
+        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+        if (insertVersion <= 0) {
+            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+        }
+        processDefinition.setVersion(insertVersion);
     }
 
     /**
@@ -331,7 +346,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(postTaskCodes, ","));
             return result;
         }
-
+        updateProcessDefiniteVersion(loginUser, result, processDefinition);
         ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
         processTaskRelationLog.setProjectCode(projectCode);
         processTaskRelationLog.setPostTaskCode(taskCode);
@@ -379,7 +394,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
             return result;
         }
-        Status status = deleteUpstreamRelation(loginUser.getId(), projectCode,
+        Status status = deleteUpstreamRelation(loginUser, projectCode,
             Lists.newArrayList(preTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).distinct().toArray(Long[]::new), taskCode);
         if (status != Status.SUCCESS) {
             putMsg(result, status);
@@ -417,11 +432,23 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Set<Long> postTaskCodesSet = Lists.newArrayList(postTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
         int delete = 0;
         int deleteLog = 0;
+        Set<Long> processCodeSet = new HashSet<>();
         for (long postTaskCode : postTaskCodesSet) {
             ProcessTaskRelationLog processTaskRelationLog = taskRelationLogMap.get(postTaskCode);
             if (processTaskRelationLog != null) {
                 delete += processTaskRelationMapper.deleteRelation(processTaskRelationLog);
                 deleteLog += processTaskRelationLogMapper.deleteRelation(processTaskRelationLog);
+                processCodeSet.add(processTaskRelationLog.getProcessDefinitionCode());
+            }
+        }
+        for (long code : processCodeSet) {
+            ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
+            if (processDefinition == null) {
+                throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST);
+            }
+            int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+            if (insertVersion <= 0) {
+                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
         }
         if ((delete & deleteLog) == 0) {
@@ -514,12 +541,18 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param postTaskCode          post task code
      * @return delete result code
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
             return result;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode);
@@ -546,11 +579,22 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             }
             return result;
         }
+        updateProcessDefiniteVersion(loginUser, result, processDefinition);
+        processTaskRelation.setProcessDefinitionVersion(processDefinition.getVersion());
         processTaskRelation.setPreTaskVersion(0);
         processTaskRelation.setPreTaskCode(0L);
+        Date now = new Date();
+        processTaskRelation.setUpdateTime(now);
         int update = processTaskRelationMapper.updateById(processTaskRelation);
-        if (update == 0) {
+        processTaskRelation.setId(0);
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+        processTaskRelationLog.setCreateTime(now);
+        processTaskRelationLog.setOperator(loginUser.getId());
+        processTaskRelationLog.setOperateTime(now);
+        int insert = processTaskRelationLogMapper.insert(processTaskRelationLog);
+        if ((update & insert) == 0) {
             putMsg(result, Status.DELETE_EDGE_ERROR);
+            throw new ServiceException(Status.DELETE_EDGE_ERROR);
         }
         return result;
     }
@@ -592,7 +636,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param taskCode     pre task code
      * @return status
      */
-    private Status deleteUpstreamRelation(int userId, long projectCode, Long[] preTaskCodes, long taskCode) {
+    private Status deleteUpstreamRelation(User loginUser, long projectCode, Long[] preTaskCodes, long taskCode) {
         List<ProcessTaskRelation> upstreamList = processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, preTaskCodes);
         if (CollectionUtils.isEmpty(upstreamList)) {
             return Status.SUCCESS;
@@ -601,7 +645,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Date now = new Date();
         for (ProcessTaskRelation processTaskRelation : upstreamList) {
             ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
-            processTaskRelationLog.setOperator(userId);
+            processTaskRelationLog.setOperator(loginUser.getId());
             processTaskRelationLog.setOperateTime(now);
             processTaskRelationLog.setUpdateTime(now);
             upstreamLogList.add(processTaskRelationLog);
@@ -617,14 +661,23 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         for (Map<String, Long> codeCountMap : countListGroupByProcessDefinitionCode) {
             long processDefinitionCode = codeCountMap.get("processDefinitionCode");
             long countValue = codeCountMap.get("countValue");
+            ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+            if (processDefinition == null) {
+                return Status.PROCESS_DEFINE_NOT_EXIST;
+            }
+            int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+            if (insertVersion <= 0) {
+                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            }
             List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationListGroupByProcessDefinitionCode.get(processDefinitionCode);
             if (countValue <= processTaskRelationLogList.size()) {
                 ProcessTaskRelationLog processTaskRelationLog = processTaskRelationLogList.remove(0);
                 if (processTaskRelationLog.getPreTaskCode() != 0) {
                     processTaskRelationLog.setPreTaskCode(0);
                     processTaskRelationLog.setPreTaskVersion(0);
-                    updates.add(processTaskRelationLog);
                 }
+                processTaskRelationLog.setProcessDefinitionVersion(insertVersion);
+                updates.add(processTaskRelationLog);
             }
             if (!processTaskRelationLogList.isEmpty()) {
                 deletes.addAll(processTaskRelationLogList);
