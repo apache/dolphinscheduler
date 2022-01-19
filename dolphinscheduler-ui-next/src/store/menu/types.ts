@@ -16,7 +16,9 @@
  */
 
 interface MenuState {
-  menuKey: string
+  menuKey: string,
+  isShowSide: boolean,
+  sideMenuKey: string
 }
 
 export default MenuState
