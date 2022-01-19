@@ -15,34 +15,32 @@
  * limitations under the License.
  */
 
-import type { Graph } from '@antv/x6';
+import type { Graph } from '@antv/x6'
 import { ref, Ref } from 'vue'
-import { useGraphOperations } from './dag-hooks';
-
+import { useGraphOperations } from './dag-hooks'
 
 interface Options {
-  graph: Ref<Graph | undefined>;
+  graph: Ref<Graph | undefined>
 }
 
 /**
  * Node search and navigate
  */
 export function useNodeSearch(options: Options) {
+  const { graph } = options
 
-  const { graph } = options;
-
-  const searchInputVisible = ref(false);
-  const allNodes = ref<any>([]);
+  const searchInputVisible = ref(false)
+  const allNodes = ref<any>([])
   const toggleSearchInput = () => {
-    searchInputVisible.value = !searchInputVisible.value;
+    searchInputVisible.value = !searchInputVisible.value
   }
-  const { getNodes, navigateTo } = useGraphOperations({ graph });
+  const { getNodes, navigateTo } = useGraphOperations({ graph })
   const searchNode = (val: string) => {
     navigateTo(val)
   }
   const getAllNodes = () => {
-    const nodes = getNodes();
-    allNodes.value = nodes.map(node => {
+    const nodes = getNodes()
+    allNodes.value = nodes.map((node) => {
       return {
         label: node.name,
         value: node.code
@@ -55,6 +53,6 @@ export function useNodeSearch(options: Options) {
     getAllNodes,
     allNodes,
     toggleSearchInput,
-    searchInputVisible,
+    searchInputVisible
   }
 }

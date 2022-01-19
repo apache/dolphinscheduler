@@ -15,20 +15,15 @@
  * limitations under the License.
  */
 
-import type { Node } from '@antv/x6';
+import type { Node } from '@antv/x6'
 import { ref, onMounted, Ref, onUnmounted } from 'vue'
 import { Graph } from '@antv/x6'
-import {
-  NODE,
-  EDGE,
-  X6_NODE_NAME,
-  X6_EDGE_NAME,
-} from './dag-config'
-import { debounce } from 'lodash';
+import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
+import { debounce } from 'lodash'
 
 interface Options {
-  readonly: Ref<boolean>;
-  graph: Ref<Graph | undefined>;
+  readonly: Ref<boolean>
+  graph: Ref<Graph | undefined>
 }
 
 /**
@@ -38,13 +33,12 @@ interface Options {
  * 3. Register custom graphics
  */
 export function useCanvasInit(options: Options) {
-
   // Whether the graph can be operated
-  const { readonly, graph } = options;
+  const { readonly, graph } = options
 
-  const paper = ref<HTMLElement>(); // The graph mount HTMLElement
-  const minimap = ref<HTMLElement>(); // The minimap mount HTMLElement
-  const container = ref<HTMLElement>(); // The container of paper and minimap
+  const paper = ref<HTMLElement>() // The graph mount HTMLElement
+  const minimap = ref<HTMLElement>() // The minimap mount HTMLElement
+  const container = ref<HTMLElement>() // The container of paper and minimap
 
   /**
    * Graph Init, bind graph to the dom
@@ -129,7 +123,7 @@ export function useCanvasInit(options: Options) {
   }
 
   onMounted(() => {
-    graph.value = graphInit();
+    graph.value = graphInit()
     // Make sure the edge starts with node, not port
     graph.value.on('edge:connected', ({ isNew, edge }) => {
       if (isNew) {
@@ -143,10 +137,10 @@ export function useCanvasInit(options: Options) {
    * Redraw when the page is resized
    */
   const paperResize = debounce(() => {
-    if (!container.value) return;
+    if (!container.value) return
     const w = container.value.offsetWidth
     const h = container.value.offsetHeight
-    graph.value?.resize(w, h);
+    graph.value?.resize(w, h)
   }, 200)
   onMounted(() => {
     window.addEventListener('resize', paperResize)
