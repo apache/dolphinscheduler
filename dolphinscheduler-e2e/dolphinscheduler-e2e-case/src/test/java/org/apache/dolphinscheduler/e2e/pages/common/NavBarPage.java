@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.common;
 
+import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
@@ -46,6 +47,9 @@ public class NavBarPage {
     @FindBy(id = "tabResource")
     private WebElement resourceTab;
 
+    @FindBy(id = "tabDataSource")
+    private WebElement dataSourceTab;
+
     public NavBarPage(RemoteWebDriver driver) {
         this.driver = driver;
 
@@ -72,6 +76,13 @@ public class NavBarPage {
                 .until(ExpectedConditions.elementToBeClickable(resourceTab));
             ((JavascriptExecutor)driver).executeScript("arguments[0].click();", resourceTabElement);
             return nav.cast(new ResourcePage(driver));
+        }
+
+        if (nav == DataSourcePage.class) {
+            WebElement dataSourceTabElement = new WebDriverWait(driver, 60)
+                .until(ExpectedConditions.elementToBeClickable(dataSourceTab));
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", dataSourceTabElement);
+            return nav.cast(new DataSourcePage(driver));
         }
 
         throw new UnsupportedOperationException("Unknown nav bar");
