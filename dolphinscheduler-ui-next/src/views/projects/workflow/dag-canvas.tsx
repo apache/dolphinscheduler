@@ -19,7 +19,12 @@ import { defineComponent, ref, inject } from 'vue'
 import Styles from './dag.module.scss'
 import type { PropType, Ref } from 'vue'
 import type { Dragged } from './dag'
-import { useCanvasInit, useGraphOperations, useCellActive, useCanvasDrop } from './dag-hooks';
+import {
+  useCanvasInit,
+  useGraphOperations,
+  useCellActive,
+  useCanvasDrop
+} from './dag-hooks'
 import { useRoute } from 'vue-router'
 
 const props = {
@@ -29,32 +34,45 @@ const props = {
       x: 0,
       y: 0,
       type: ''
-    }),
+    })
   }
 }
 
 export default defineComponent({
-  name: "workflow-dag-canvas",
+  name: 'workflow-dag-canvas',
   props,
   setup(props, context) {
-    const readonly = inject('readonly', ref(false));
-    const graph = inject('graph', ref());
-    const route = useRoute();
-    const projectCode = route.params.projectCode as string;
+    const readonly = inject('readonly', ref(false))
+    const graph = inject('graph', ref())
+    const route = useRoute()
+    const projectCode = route.params.projectCode as string
 
-    const { paper, minimap, container } = useCanvasInit({ readonly, graph });
+    const { paper, minimap, container } = useCanvasInit({ readonly, graph })
 
     // Change the style on cell hover and select
-    useCellActive({ graph });
+    useCellActive({ graph })
 
     // Drop sidebar item in canvas
-    const { onDrop, onDragenter, onDragover, onDragleave } = useCanvasDrop({ readonly, dragged: props.dragged, graph, container, projectCode });
+    const { onDrop, onDragenter, onDragover, onDragleave } = useCanvasDrop({
+      readonly,
+      dragged: props.dragged,
+      graph,
+      container,
+      projectCode
+    })
 
     return () => (
-      <div ref={container} class={Styles.canvas} onDrop={onDrop} onDragenter={onDragenter} onDragover={onDragover} onDragleave={onDragleave}>
+      <div
+        ref={container}
+        class={Styles.canvas}
+        onDrop={onDrop}
+        onDragenter={onDragenter}
+        onDragover={onDragover}
+        onDragleave={onDragleave}
+      >
         <div ref={paper} class={Styles.paper}></div>
         <div ref={minimap} class={Styles.minimap}></div>
       </div>
-    );
+    )
   }
 })

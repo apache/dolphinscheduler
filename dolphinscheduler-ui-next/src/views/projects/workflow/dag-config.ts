@@ -119,21 +119,25 @@ export const PORT_SELECTED = {
   }
 }
 
-export const NODE_STATUS_MARKUP = [{
-  tagName: 'foreignObject',
-  selector: 'fo',
-  children: [
-    {
-      tagName: 'body',
-      selector: 'fo-body',
-      ns: 'http://www.w3.org/1999/xhtml',
-      children: [{
-        tagName: 'div',
-        selector: 'status'
-      }]
-    }
-  ]
-}]
+export const NODE_STATUS_MARKUP = [
+  {
+    tagName: 'foreignObject',
+    selector: 'fo',
+    children: [
+      {
+        tagName: 'body',
+        selector: 'fo-body',
+        ns: 'http://www.w3.org/1999/xhtml',
+        children: [
+          {
+            tagName: 'div',
+            selector: 'status'
+          }
+        ]
+      }
+    ]
+  }
+]
 
 export const NODE = {
   width: 220,

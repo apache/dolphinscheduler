@@ -18,10 +18,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: "WorkflowInstanceList",
+  name: 'WorkflowInstanceList',
   setup() {
-    return () => (
-      <div>WorkflowInstanceList</div>
-    )
+    return () => <div>WorkflowInstanceList</div>
   }
 })

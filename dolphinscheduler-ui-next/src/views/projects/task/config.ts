@@ -15,53 +15,53 @@
  * limitations under the License.
  */
 
-export const ALL_TASK_TYPES:any = {
+export const ALL_TASK_TYPES: any = {
   SHELL: {
-    alias: 'SHELL',
+    alias: 'SHELL'
   },
   SUB_PROCESS: {
-    alias: 'SUB_PROCESS',
+    alias: 'SUB_PROCESS'
   },
   PROCEDURE: {
-    alias: 'PROCEDURE',
+    alias: 'PROCEDURE'
   },
   SQL: {
-    alias: 'SQL',
+    alias: 'SQL'
   },
   SPARK: {
-    alias: 'SPARK',
+    alias: 'SPARK'
   },
   FLINK: {
-    alias: 'FLINK',
+    alias: 'FLINK'
   },
   MR: {
-    alias: 'MapReduce',
+    alias: 'MapReduce'
   },
   PYTHON: {
-    alias: 'PYTHON',
+    alias: 'PYTHON'
   },
   DEPENDENT: {
-    alias: 'DEPENDENT',
+    alias: 'DEPENDENT'
   },
   HTTP: {
-    alias: 'HTTP',
+    alias: 'HTTP'
   },
   DATAX: {
-    alias: 'DataX',
+    alias: 'DataX'
   },
   PIGEON: {
-    alias: 'PIGEON',
+    alias: 'PIGEON'
   },
   SQOOP: {
-    alias: 'SQOOP',
+    alias: 'SQOOP'
   },
   CONDITIONS: {
-    alias: 'CONDITIONS',
+    alias: 'CONDITIONS'
   },
   SWITCH: {
-    alias: 'SWITCH',
+    alias: 'SWITCH'
   },
   SEATUNNEL: {
-    alias: 'WATERDROP',
+    alias: 'WATERDROP'
   }
-};
+}

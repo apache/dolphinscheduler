@@ -15,56 +15,54 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue';
+import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
 import type { Dragged } from './dag'
-import { genTaskCodeList } from '@/service/modules/task-definition';
-import { useGraphOperations } from './dag-hooks';
+import { genTaskCodeList } from '@/service/modules/task-definition'
+import { useGraphOperations } from './dag-hooks'
 
 interface Options {
-  readonly: Ref<boolean>;
-  graph: Ref<Graph | undefined>;
-  container: Ref<HTMLElement | undefined>;
-  dragged: Ref<Dragged>;
-  projectCode: string;
+  readonly: Ref<boolean>
+  graph: Ref<Graph | undefined>
+  container: Ref<HTMLElement | undefined>
+  dragged: Ref<Dragged>
+  projectCode: string
 }
 
 /**
  * Drop sidebar item in canvas
  */
 export function useCanvasDrop(options: Options) {
+  const { readonly, graph, container, dragged, projectCode } = options
 
-  const { readonly, graph, container, dragged, projectCode } = options;
-
-  const { addNode } = useGraphOperations({ graph });
+  const { addNode } = useGraphOperations({ graph })
 
   const onDrop = (e: DragEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+    e.stopPropagation()
+    e.preventDefault()
     if (readonly.value) {
-      return;
+      return
     }
     if (dragged.value && graph.value && container.value && projectCode) {
-      const { type, x: eX, y: eY } = dragged.value;
-      const { x, y } = graph.value.clientToLocal(e.clientX, e.clientY);
-      const genNums = 1;
-      genTaskCodeList(genNums, Number(projectCode))
-        .then((res) => {
-          const [code] = res
-          addNode(code + '', type, { x: x - eX, y: y - eY })
-          // openTaskConfigModel(code, type)
-        })
+      const { type, x: eX, y: eY } = dragged.value
+      const { x, y } = graph.value.clientToLocal(e.clientX, e.clientY)
+      const genNums = 1
+      genTaskCodeList(genNums, Number(projectCode)).then((res) => {
+        const [code] = res
+        addNode(code + '', type, { x: x - eX, y: y - eY })
+        // openTaskConfigModel(code, type)
+      })
     }
   }
 
   const preventDefault = (e: DragEvent) => {
-    e.preventDefault();
+    e.preventDefault()
   }
 
   return {
     onDrop,
     onDragenter: preventDefault,
     onDragover: preventDefault,
-    onDragleave: preventDefault,
+    onDragleave: preventDefault
   }
 }
