@@ -10,6 +10,7 @@
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\""
   },
   "dependencies": {
+    "@antv/x6": "^1.29.5",
     "@vueuse/core": "^7.5.3",
     "axios": "^0.24.0",
     "date-fns": "^2.27.0",

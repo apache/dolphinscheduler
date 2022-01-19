@@ -46,6 +46,22 @@ export default {
         title: '工作流监控',
         showSide: true
       }
+    },
+    {
+      path: '/projects/:projectCode/workflow/definitions/create',
+      name: 'workflow-definition-create',
+      component: components['workflow-definition-create'],
+      meta: {
+        title: '创建工作流定义',
+      },
+    },
+    {
+      path: '/projects/:projectCode/workflow/definitions/:code',
+      name: 'workflow-definition-details',
+      component: components['workflow-definition-details'],
+      meta: {
+        title: '工作流定义详情',
+      },
     }
   ]
 }
