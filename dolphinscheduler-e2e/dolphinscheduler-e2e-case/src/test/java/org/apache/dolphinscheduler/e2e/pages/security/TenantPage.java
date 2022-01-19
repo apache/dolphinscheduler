@@ -74,7 +74,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
             .flatMap(it -> it.findElements(By.className("delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("No delete button in user list"))
+            .orElseThrow(() -> new RuntimeException("No delete button in tenant list"))
             .click();
 
         buttonConfirm().click();

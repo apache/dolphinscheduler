@@ -116,7 +116,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-warning',
-      children: []
+      children: [],
+      classNames: 'tab-warning-group-manage'
     },
     {
       name: `${i18n.$t('Warning instance manage')}`,
@@ -125,7 +126,9 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-warning-outline',
-      children: []
+      children: [],
+      classNames: 'tab-warning-instance-manage'
+
     },
     {
       name: `${i18n.$t('Worker group manage')}`,

@@ -16,6 +16,8 @@
  */
 <template>
   <m-popover
+          okId="btnSubmit"
+          cancelId="btnCancel"
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           @ok="_ok"
@@ -26,6 +28,7 @@
           <template slot="name"><strong>*</strong>{{$t('Alarm instance name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputAlarmInstanceName"
                     type="input"
                     v-model="instanceName"
                     maxlength="60"
@@ -45,8 +48,9 @@
                       :label="items.pluginName">
               </el-option>
             </el-select>
-            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" v-else>
+            <el-select id="selectAlarmPlugin" v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" v-else>
               <el-option
+                      class="option-alarmPluginName"
                       v-for="items in pluginInstance"
                       :key="items.id"
                       :value="items.id"

@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create('')">{{$t('Create Alarm Instance')}}</el-button>
+          <el-button id="btnCreateAlarmInstance" size="mini" @click="_create('')">{{$t('Create Alarm Instance')}}</el-button>
           <el-dialog
             :title="item ? $t('Edit Alarm Instance') : $t('Create Alarm Instance')"
             v-if="createWarningDialog"

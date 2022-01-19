@@ -20,17 +20,10 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
-import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
-import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
-
-import org.junit.jupiter.api.AfterAll;
+import org.apache.dolphinscheduler.e2e.pages.security.WarningInstancePage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,18 +31,17 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
-class UserE2ETest {
-    private static final String tenant = System.getProperty("user.name");
-    private static final String user = "test_user";
-    private static final String password = "test_user123";
-    private static final String email = "test_user@gmail.com";
-    private static final String phone = "15800000000";
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
-    private static final String editUser = "edit_test_user";
-    private static final String editPassword = "edit_test_user123";
-    private static final String editEmail = "edit_test_user@gmail.com";
-    private static final String editPhone = "15800000001";
+@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+class WarningInstanceE2ETest {
+    private static final String alarmInstanceName = "test_warningInstance";
+    private static final String alarmPluginName = "DingTalk";
+    private static final String webHookContent = "adsadfsdsd12assa111klfgd";
+    private static final String keyword = "Aghjgj789ggjhhcbm";
+
+    private static final String editAlarmInstanceName = "test_edit_warningInstance";
 
     private static RemoteWebDriver browser;
 
@@ -58,81 +50,70 @@ class UserE2ETest {
         new LoginPage(browser)
             .login("admin", "dolphinscheduler123")
             .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .create(tenant)
-            .goToNav(SecurityPage.class)
-            .goToTab(UserPage.class);
-    }
-
-    @AfterAll
-    public static void cleanup() {
-        new NavBarPage(browser)
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .delete(tenant);
+            .goToTab(WarningInstancePage.class);
     }
 
     @Test
     @Order(1)
-    void testCreateUser() {
-        final UserPage page = new UserPage(browser);
+    void testCreateWarningInstance() {
+        final WarningInstancePage page = new WarningInstancePage(browser);
 
-        page.create(user, password, email, phone);
+        page.create(alarmInstanceName, alarmPluginName, webHookContent, keyword);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
-            assertThat(page.userList())
-                .as("User list should contain newly-created user")
+            assertThat(page.warningInstanceList())
+                .as("AlarmInstance list should contain newly-created alarmInstanceName")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(user));
+                .anyMatch(it -> it.contains(alarmInstanceName));
         });
     }
 
     @Test
     @Order(20)
-    void testCreateDuplicateUser() {
-        final UserPage page = new UserPage(browser);
+    void testCreateDuplicateWarningInstance() {
+        final WarningInstancePage page = new WarningInstancePage(browser);
 
-        page.create(user, password, email, phone);
+        page.create(alarmInstanceName, alarmPluginName, webHookContent, keyword);
 
         await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
                 .contains("already exists")
         );
 
-        page.createUserForm().buttonCancel().click();
+        page.createWarningInstanceForm().buttonCancel().click();
     }
 
     @Test
     @Order(30)
-    void testEditUser() {
-        final UserPage page = new UserPage(browser);
-        page.update(user, editUser, editPassword, editEmail, editPhone);
+    void testEditWarningInstance() {
+        final WarningInstancePage page = new WarningInstancePage(browser);
+        page.update(alarmInstanceName, editAlarmInstanceName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
-            assertThat(page.userList())
-                .as("User list should contain newly-modified User")
+            assertThat(page.warningInstanceList())
+                .as("WarningInstance list should contain newly-modified WarningInstance")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(editUser));
+                .anyMatch(it -> it.contains(editAlarmInstanceName));
         });
     }
 
     @Test
     @Order(40)
-    void testDeleteUser() {
-        final UserPage page = new UserPage(browser);
+    void testDeleteWarningInstance() {
+        final WarningInstancePage page = new WarningInstancePage(browser);
 
-        page.delete(editUser);
+        page.delete(editAlarmInstanceName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(
-                page.userList()
+                page.warningInstanceList()
             ).noneMatch(
-                it -> it.getText().contains(user) || it.getText().contains(editUser)
+                    it -> it.getText().contains(alarmInstanceName) || it.getText().contains(editAlarmInstanceName)
             );
         });
     }

@@ -16,6 +16,8 @@
  */
 <template>
   <m-popover
+          okId="btnSubmit"
+          cancelId="btnCancel"
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           @ok="_ok"
@@ -26,6 +28,7 @@
           <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputAlarmGroupName"
                     type="input"
                     v-model="groupName"
                     maxlength="60"
@@ -37,8 +40,9 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Alarm plugin instance')}}</template>
           <template slot="content">
-            <el-select v-model="alertInstanceIds" size="small" style="width: 100%" multiple>
+            <el-select id="selectAlarmInstance" v-model="alertInstanceIds" size="small" style="width: 100%" multiple>
               <el-option
+                      id="optionAlarmInstance"
                       v-for="items in allAlertPluginInstance"
                       :key="items.id"
                       :value="items.id"
@@ -51,6 +55,7 @@
           <template slot="name">{{$t('Remarks')}}</template>
           <template slot="content">
             <el-input
+                id="inputAlarmDescription"
                 type="textarea"
                 v-model="description"
                 size="small"

@@ -39,6 +39,12 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(className = "tab-worker-group-manage")
     private WebElement menWorkerGroupManage;
 
+    @FindBy(className = "tab-warning-group-manage")
+    private WebElement menWarningGroupManage;
+
+    @FindBy(className = "tab-warning-instance-manage")
+    private WebElement menWarningInstanceManage;
+
 
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
@@ -52,6 +58,14 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
         if (tab == UserPage.class) {
             menUserManage().click();
             return tab.cast(new UserPage(driver));
+        }
+        if (tab == WarningGroupPage.class) {
+            menWarningGroupManage().click();
+            return tab.cast(new WarningGroupPage(driver));
+        }
+        if (tab == WarningInstancePage.class) {
+            menWarningInstanceManage().click();
+            return tab.cast(new WarningInstancePage(driver));
         }
         if (tab == WorkerGroupPage.class) {
             menWorkerGroupManage().click();
