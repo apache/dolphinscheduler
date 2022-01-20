@@ -84,15 +84,15 @@ public final class DingTalkSender {
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
         secret = config.get(DingTalkParamsConstants.NAME_DING_TALK_SECRET);
 
-        atMobiles = config.get(DingTalkParamsConstants.DING_TALK_AT_MOBILES);
-        atUserIds = config.get(DingTalkParamsConstants.DING_TALK_AT_USERIDS);
-        atAll = Boolean.valueOf(config.get(DingTalkParamsConstants.DING_TALK_AT_ALL));
+        atMobiles = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES);
+        atUserIds = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS);
+        atAll = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_ALL));
 
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
             proxy = config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY);
-            user = config.get(DingTalkParamsConstants.DING_TALK_USER);
+            user = config.get(DingTalkParamsConstants.NAME_DING_TALK_USER);
             password = config.get(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD);
         }
     }

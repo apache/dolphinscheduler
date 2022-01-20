@@ -120,7 +120,7 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                 .setPlaceholder("if enable use authentication, you need input password")
                 .build();
 
-        return Arrays.asList(webHookParam, keywordParam, secretParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam, atMobilesParam, atUserIdsParam, isAtAll);
+        return Arrays.asList(webHookParam, keywordParam, secretParam, atMobilesParam, atUserIdsParam, isAtAll, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
 
     @Override
