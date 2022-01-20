@@ -15,13 +15,53 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: "WorkflowDefinitionList",
-  setup() {
-    return () => (
-      <div>WorkflowDefinitionList</div>
-    )
+export const ALL_TASK_TYPES: any = {
+  SHELL: {
+    alias: 'SHELL'
+  },
+  SUB_PROCESS: {
+    alias: 'SUB_PROCESS'
+  },
+  PROCEDURE: {
+    alias: 'PROCEDURE'
+  },
+  SQL: {
+    alias: 'SQL'
+  },
+  SPARK: {
+    alias: 'SPARK'
+  },
+  FLINK: {
+    alias: 'FLINK'
+  },
+  MR: {
+    alias: 'MapReduce'
+  },
+  PYTHON: {
+    alias: 'PYTHON'
+  },
+  DEPENDENT: {
+    alias: 'DEPENDENT'
+  },
+  HTTP: {
+    alias: 'HTTP'
+  },
+  DATAX: {
+    alias: 'DataX'
+  },
+  PIGEON: {
+    alias: 'PIGEON'
+  },
+  SQOOP: {
+    alias: 'SQOOP'
+  },
+  CONDITIONS: {
+    alias: 'CONDITIONS'
+  },
+  SWITCH: {
+    alias: 'SWITCH'
+  },
+  SEATUNNEL: {
+    alias: 'WATERDROP'
   }
-})
+}

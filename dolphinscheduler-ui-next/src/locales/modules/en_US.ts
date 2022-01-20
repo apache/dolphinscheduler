@@ -48,7 +48,7 @@ const menu = {
   monitor: 'Monitor',
   security: 'Security',
   workflow_monitoring: 'Workflow Monitoring',
-  workflow_relationships: 'Workflow Relationships',
+  workflow_relation: 'Workflow Relation',
   workflow: 'Workflow',
   workflow_definition: 'Workflow Definition',
   workflow_instance: 'Workflow Instance',
@@ -215,6 +215,38 @@ const resource = {
     enter_name_tips: 'Please enter name',
     enter_description_tips: 'Please enter description'
   },
+  function: {
+    udf_function: 'UDF Function',
+    create_udf_function: 'Create UDF Function',
+    edit_udf_function: 'Create UDF Function',
+    id: '#',
+    udf_function_name: 'UDF Function Name',
+    class_name: 'Class Name',
+    type: 'Type',
+    description: 'Description',
+    jar_package: 'Jar Package',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    rename: 'Rename',
+    edit: 'Edit',
+    delete: 'Delete',
+    success: 'Success',
+    package_name: 'Package Name',
+    udf_resources: 'UDF Resources',
+    instructions: 'Instructions',
+    upload_resources: 'Upload Resources',
+    udf_resources_directory: 'UDF resources directory',
+    delete_confirm: 'Delete?',
+    enter_keyword_tips: 'Please enter keyword',
+    enter_udf_unction_name_tips: 'Please enter a UDF function name',
+    enter_package_name_tips: 'Please enter a Package name',
+    enter_select_udf_resources_tips: 'Please select UDF resources',
+    enter_select_udf_resources_directory_tips:
+      'Please select UDF resources directory',
+    enter_instructions_tips: 'Please enter a instructions',
+    enter_name_tips: 'Please enter name',
+    enter_description_tips: 'Please enter description'
+  },
   task_group_option: {
     id: 'No.',
     manage: 'Task group manage',
@@ -287,8 +319,11 @@ const project = {
     cancel: 'Cancel',
     delete_confirm: 'Delete?'
   },
+  workflow_relation: {
+    workflow_relation: 'Workflow Relation'
+  },
   dag: {
-    createWorkflow: "Create Workflow",
+    createWorkflow: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',

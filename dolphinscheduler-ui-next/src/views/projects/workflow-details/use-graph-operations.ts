@@ -17,27 +17,22 @@
 
 import type { Ref } from 'vue'
 import type { Node, Graph, Edge } from '@antv/x6'
-import {
-  X6_NODE_NAME,
-  X6_EDGE_NAME,
-} from './dag-config'
-import { ALL_TASK_TYPES } from '../task/config';
-import utils from '@/utils';
+import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
+import { ALL_TASK_TYPES } from '../task-details/config'
+import utils from '@/utils'
 
 interface Options {
   graph: Ref<Graph | undefined>
 }
 
-type Coordinate = { x: number; y: number; }
+type Coordinate = { x: number; y: number }
 
 /**
  * Expose some graph operation methods
  * @param {Options} options
  */
 export function useGraphOperations(options: Options) {
-
-  const { graph } = options;
-
+  const { graph } = options
 
   /**
    * Build edge metadata
@@ -45,7 +40,11 @@ export function useGraphOperations(options: Options) {
    * @param {string} targetId
    * @param {string} label
    */
-  function buildEdgeMetadata(sourceId: string, targetId: string, label: string = ''): Edge.Metadata {
+  function buildEdgeMetadata(
+    sourceId: string,
+    targetId: string,
+    label: string = ''
+  ): Edge.Metadata {
     return {
       shape: X6_EDGE_NAME,
       source: {
@@ -64,8 +63,13 @@ export function useGraphOperations(options: Options) {
    * @param {string} taskType
    * @param {Coordinate} coordinate Default is { x: 100, y: 100 }
    */
-  function buildNodeMetadata(id: string, type: string, taskName: string, coordinate: Coordinate = { x: 100, y: 100 }): Node.Metadata {
-    const truncation = taskName ? utils.truncateText(taskName, 18) : id;
+  function buildNodeMetadata(
+    id: string,
+    type: string,
+    taskName: string,
+    coordinate: Coordinate = { x: 100, y: 100 }
+  ): Node.Metadata {
+    const truncation = taskName ? utils.truncateText(taskName, 18) : id
     return {
       id: id,
       shape: X6_NODE_NAME,
@@ -93,7 +97,11 @@ export function useGraphOperations(options: Options) {
    * @param {string} taskType
    * @param {Coordinate} coordinate Default is { x: 100, y: 100 }
    */
-  function addNode(id: string, type: string, coordinate: Coordinate = { x: 100, y: 100 }) {
+  function addNode(
+    id: string,
+    type: string,
+    coordinate: Coordinate = { x: 100, y: 100 }
+  ) {
     if (!ALL_TASK_TYPES[type]) {
       console.warn(`taskType:${type} is invalid!`)
       return
@@ -139,12 +147,12 @@ export function useGraphOperations(options: Options) {
    * @param {string} code
    */
   function navigateTo(code: string) {
-    if (!graph.value) return;
+    if (!graph.value) return
     const cell = graph.value.getCellById(code)
     graph.value.scrollToCell(cell, { animation: { duration: 600 } })
     graph.value.cleanSelection()
     graph.value.select(cell)
-  };
+  }
 
   return {
     buildEdgeMetadata,
@@ -152,6 +160,6 @@ export function useGraphOperations(options: Options) {
     addNode,
     setNodeName,
     getNodes,
-    navigateTo,
+    navigateTo
   }
 }

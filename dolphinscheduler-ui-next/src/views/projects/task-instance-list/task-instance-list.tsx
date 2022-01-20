@@ -15,34 +15,11 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue';
-import type { Dragged } from './dag';
+import { defineComponent } from 'vue'
 
-interface Options {
-  readonly: Ref<boolean>;
-  dragged: Ref<Dragged>;
-}
-
-/**
- * Sidebar drag
- */
-export function useSidebarDrag(options: Options) {
-
-  const { readonly, dragged } = options;
-
-  const onDragStart = (e: DragEvent, type: string) => {
-    if (readonly.value) {
-      e.preventDefault()
-      return
-    }
-    dragged.value = {
-      x: e.offsetX,
-      y: e.offsetY,
-      type: type
-    }
+export default defineComponent({
+  name: 'TaskInstanceList',
+  setup() {
+    return () => <div>TaskInstanceList</div>
   }
-
-  return {
-    onDragStart
-  }
-}
+})

@@ -15,26 +15,23 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, Ref, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
+import Dag from './dag'
+import { NCard } from 'naive-ui'
+import styles from './workflow-definition-create.module.scss'
 
-interface Options {
-  // readonly: Ref<boolean>;
-  // canvas: Ref<HTMLElement | undefined>;
-}
+export default defineComponent({
+  name: 'WorkflowDefinitionCreate',
+  setup() {
+    const slots = {
+      toolbarLeft: () => <span>left-operations</span>,
+      toolbarRight: () => <span>right-operations</span>
+    }
 
-/**
- * Canvas Init
- * 1. Bind the graph to the dom
- * 2. Redraw when the page is resized
- * 3. Register custom graphics
- */
-export function useCanvasInit(options: Options) {
-
-  // Whether the graph can be operated
-  const { } = options;
-
-
-  return {
-
+    return () => (
+      <NCard class={styles.container}>
+        <Dag v-slots={slots} />
+      </NCard>
+    )
   }
-}
+})

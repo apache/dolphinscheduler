@@ -16,9 +16,9 @@
  */
 
 import type { Ref } from 'vue'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue'
 import type { Node, Graph, Edge, Cell } from '@antv/x6'
-import _ from 'lodash';
+import _ from 'lodash'
 import {
   X6_PORT_OUT_NAME,
   PORT_HOVER,
@@ -30,7 +30,7 @@ import {
   EDGE,
   EDGE_SELECTED,
   EDGE_HOVER
-} from './dag-config';
+} from './dag-config'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -40,17 +40,19 @@ interface Options {
  * Change the style on cell hover and select
  */
 export function useCellActive(options: Options) {
-
-  const { graph } = options;
-  const hoverCell = ref();
+  const { graph } = options
+  const hoverCell = ref()
 
   const isStatusIcon = (tagName: string) => {
-    if (!tagName) return false;
-    return tagName.toLocaleLowerCase() === 'em' || tagName.toLocaleLowerCase() === 'body'
+    if (!tagName) return false
+    return (
+      tagName.toLocaleLowerCase() === 'em' ||
+      tagName.toLocaleLowerCase() === 'body'
+    )
   }
 
   function setEdgeStyle(edge: Edge) {
-    const isHover = edge === hoverCell.value;
+    const isHover = edge === hoverCell.value
     const isSelected = graph.value?.isSelected(edge)
     // TODO
     // const labelName = this.getEdgeLabelName ? this.getEdgeLabelName(edge) : ''
@@ -70,7 +72,7 @@ export function useCellActive(options: Options) {
         ..._.merge(
           {
             attrs: _.cloneDeep(edgeProps.defaultLabel.attrs)
-          },
+          }
           // {
           //   attrs: { label: { text: labelName } }
           // }
@@ -83,7 +85,9 @@ export function useCellActive(options: Options) {
     const isHover = node === hoverCell.value
     const isSelected = graph.value?.isSelected(node)
     const portHover = _.cloneDeep(PORT_HOVER.groups[X6_PORT_OUT_NAME].attrs)
-    const portSelected = _.cloneDeep(PORT_SELECTED.groups[X6_PORT_OUT_NAME].attrs)
+    const portSelected = _.cloneDeep(
+      PORT_SELECTED.groups[X6_PORT_OUT_NAME].attrs
+    )
     const portDefault = _.cloneDeep(PORT.groups[X6_PORT_OUT_NAME].attrs)
     const nodeHover = _.merge(_.cloneDeep(NODE.attrs), NODE_HOVER.attrs)
     const nodeSelected = _.merge(_.cloneDeep(NODE.attrs), NODE_SELECTED.attrs)
@@ -108,11 +112,7 @@ export function useCellActive(options: Options) {
     }
     node.setAttrByPath('image/xlink:href', img)
     node.setAttrs(nodeAttrs)
-    node.setPortProp(
-      X6_PORT_OUT_NAME,
-      'attrs',
-      portAttrs
-    )
+    node.setPortProp(X6_PORT_OUT_NAME, 'attrs', portAttrs)
   }
 
   function updateCellStyle(cell: Cell) {

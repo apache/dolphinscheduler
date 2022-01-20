@@ -92,8 +92,8 @@ export function useDataList() {
             icon: renderIcon(FundProjectionScreenOutlined)
           },
           {
-            label: t('menu.workflow_relationships'),
-            key: 'workflow-relationships',
+            label: t('menu.workflow_relation'),
+            key: 'workflow-relation',
             icon: renderIcon(PartitionOutlined)
           },
           {

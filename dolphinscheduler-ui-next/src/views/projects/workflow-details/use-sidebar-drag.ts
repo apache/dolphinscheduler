@@ -15,53 +15,33 @@
  * limitations under the License.
  */
 
-export const ALL_TASK_TYPES:any = {
-  SHELL: {
-    alias: 'SHELL',
-  },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS',
-  },
-  PROCEDURE: {
-    alias: 'PROCEDURE',
-  },
-  SQL: {
-    alias: 'SQL',
-  },
-  SPARK: {
-    alias: 'SPARK',
-  },
-  FLINK: {
-    alias: 'FLINK',
-  },
-  MR: {
-    alias: 'MapReduce',
-  },
-  PYTHON: {
-    alias: 'PYTHON',
-  },
-  DEPENDENT: {
-    alias: 'DEPENDENT',
-  },
-  HTTP: {
-    alias: 'HTTP',
-  },
-  DATAX: {
-    alias: 'DataX',
-  },
-  PIGEON: {
-    alias: 'PIGEON',
-  },
-  SQOOP: {
-    alias: 'SQOOP',
-  },
-  CONDITIONS: {
-    alias: 'CONDITIONS',
-  },
-  SWITCH: {
-    alias: 'SWITCH',
-  },
-  SEATUNNEL: {
-    alias: 'WATERDROP',
+import type { Ref } from 'vue'
+import type { Dragged } from './dag'
+
+interface Options {
+  readonly: Ref<boolean>
+  dragged: Ref<Dragged>
+}
+
+/**
+ * Sidebar drag
+ */
+export function useSidebarDrag(options: Options) {
+  const { readonly, dragged } = options
+
+  const onDragStart = (e: DragEvent, type: string) => {
+    if (readonly.value) {
+      e.preventDefault()
+      return
+    }
+    dragged.value = {
+      x: e.offsetX,
+      y: e.offsetY,
+      type: type
+    }
   }
-};
+
+  return {
+    onDragStart
+  }
+}

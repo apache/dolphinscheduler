@@ -15,13 +15,24 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+export interface IUdfFunctionParam {
+  id: number
+  pageSize: number
+  pageNo: number
+  searchVal: string | undefined
+}
 
-export default defineComponent({
-  name: "WorkflowInstanceDetails",
-  setup() {
-    return () => (
-      <div>WorkflowInstanceDetails</div>
-    )
-  }
-})
+export interface IUdf {
+  id: number
+  userId: number
+  type: 'HIVE'
+  funcName: string
+  className: string
+  resourceId: number
+  resourceName: string
+  argTypes: string
+  database: string
+  description: string
+  createTime: string
+  updateTime: string
+}

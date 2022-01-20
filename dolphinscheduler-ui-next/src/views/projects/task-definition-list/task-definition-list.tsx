@@ -18,10 +18,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: "WorkflowDefinitionDetails",
+  name: 'TaskDefinitionList',
   setup() {
-    return () => (
-      <div>WorkflowDefinitionDetails</div>
-    )
+    return () => <div>TaskDefinitionList</div>
   }
 })

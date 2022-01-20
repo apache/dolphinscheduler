@@ -15,12 +15,17 @@
  * limitations under the License.
  */
 
-import type { PropType, Ref } from 'vue';
-import type { Dragged } from './dag';
 import { defineComponent, ref, inject } from 'vue'
-import { ALL_TASK_TYPES } from '../task/config';
-import { useSidebarDrag } from './dag-hooks';
-import Styles from './dag.module.scss';
+import Styles from './dag.module.scss'
+import type { PropType, Ref } from 'vue'
+import type { Dragged } from './dag'
+import {
+  useCanvasInit,
+  useGraphOperations,
+  useCellActive,
+  useCanvasDrop
+} from './dag-hooks'
+import { useRoute } from 'vue-router'
 
 const props = {
   dragged: {
@@ -29,39 +34,44 @@ const props = {
       x: 0,
       y: 0,
       type: ''
-    }),
-  },
+    })
+  }
 }
 
 export default defineComponent({
-  name: "workflow-dag-sidebar",
+  name: 'workflow-dag-canvas',
   props,
-  setup(props) {
+  setup(props, context) {
     const readonly = inject('readonly', ref(false))
-    const dragged = props.dragged;
-    const { onDragStart } = useSidebarDrag({
+    const graph = inject('graph', ref())
+    const route = useRoute()
+    const projectCode = route.params.projectCode as string
+
+    const { paper, minimap, container } = useCanvasInit({ readonly, graph })
+
+    // Change the style on cell hover and select
+    useCellActive({ graph })
+
+    // Drop sidebar item in canvas
+    const { onDrop, onDragenter, onDragover, onDragleave } = useCanvasDrop({
       readonly,
-      dragged
-    });
-    const allTaskTypes = Object.keys(ALL_TASK_TYPES).map(type => ({
-      type,
-      ...ALL_TASK_TYPES[type]
-    }));
+      dragged: props.dragged,
+      graph,
+      container,
+      projectCode
+    })
 
     return () => (
-      <div class={Styles.sidebar}>
-        {
-          allTaskTypes.map(task => (
-            <div
-              class={Styles.draggable}
-              draggable="true"
-              onDragstart={(e) => onDragStart(e, task.type)}
-            >
-              <em class={`${Styles['sidebar-icon']} ${Styles['icon-' + task.type.toLocaleLowerCase()]}`}></em>
-              <span>{task.alias}</span>
-            </div>
-          ))
-        }
+      <div
+        ref={container}
+        class={Styles.canvas}
+        onDrop={onDrop}
+        onDragenter={onDragenter}
+        onDragover={onDragover}
+        onDragleave={onDragleave}
+      >
+        <div ref={paper} class={Styles.paper}></div>
+        <div ref={minimap} class={Styles.minimap}></div>
       </div>
     )
   }

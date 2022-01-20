@@ -15,37 +15,18 @@
  * limitations under the License.
  */
 
-import { defineStore } from 'pinia'
-import MenuState from './types'
+import { useCanvasInit } from './use-canvas-init'
+import { useGraphOperations } from './use-graph-operations'
+import { useCellActive } from './use-cell-active'
+import { useSidebarDrag } from './use-sidebar-drag'
+import { useCanvasDrop } from './use-canvas-drop'
+import { useNodeSearch } from './use-node-search'
 
-export const useMenuStore = defineStore({
-  id: 'menu',
-  state: (): MenuState => ({
-    menuKey: 'home',
-    isShowSide: false,
-    sideMenuKey: ''
-  }),
-  persist: true,
-  getters: {
-    getMenuKey(): string {
-      return this.menuKey || 'home'
-    },
-    getShowSideStatus(): boolean {
-      return this.isShowSide || false
-    },
-    getSideMenuKey(): string {
-      return this.sideMenuKey || ''
-    }
-  },
-  actions: {
-    setMenuKey(menuKey: string): void {
-      this.menuKey = menuKey
-    },
-    setShowSideStatus(isShowSide: boolean): void {
-      this.isShowSide = isShowSide
-    },
-    setSideMenuKey(sideMenuKey: string): void {
-      this.sideMenuKey = sideMenuKey
-    }
-  }
-})
+export {
+  useCanvasInit,
+  useGraphOperations,
+  useCellActive,
+  useSidebarDrag,
+  useCanvasDrop,
+  useNodeSearch
+}
