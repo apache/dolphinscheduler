@@ -201,7 +201,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
-        if (taskDefinition.getFlag() == Flag.YES) {
+        if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
             putMsg(result, Status.TASK_DEFINE_STATE_ONLINE, taskCode);
             return result;
         }
@@ -577,7 +577,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     }
                 }
                 taskDefinition.setFlag(Flag.YES);
-                taskDefinitionLog.setFlag(Flag.NO);
+                taskDefinitionLog.setFlag(Flag.YES);
                 break;
             default:
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
