@@ -15,22 +15,11 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, Ref, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
 
-interface Options {
-  // readonly: Ref<boolean>;
-  // canvas: Ref<HTMLElement | undefined>;
-}
-
-/**
- * Canvas Init
- * 1. Bind the graph to the dom
- * 2. Redraw when the page is resized
- * 3. Register custom graphics
- */
-export function useCanvasInit(options: Options) {
-  // Whether the graph can be operated
-  const {} = options
-
-  return {}
-}
+export default defineComponent({
+  name: 'TaskInstanceList',
+  setup() {
+    return () => <div>TaskInstanceList</div>
+  }
+})
