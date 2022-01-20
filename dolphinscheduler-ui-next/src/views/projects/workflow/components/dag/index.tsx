@@ -21,6 +21,7 @@ import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
 import Styles from './dag.module.scss'
+import DagFormatModal from './dag-format-modal'
 import './x6-style.scss'
 
 export interface Dragged {
@@ -52,6 +53,16 @@ export default defineComponent({
       type: ''
     })
 
+    // Dag format modal visible
+    const formatModalVisible = ref<boolean>(false)
+    const openFormatModal = (bool: boolean) => {
+      formatModalVisible.value = bool
+    }
+    provide('formatModal', {
+      openFormatModal,
+      formatModalVisible
+    })
+
     return () => (
       <div class={Styles.dag}>
         <DagToolbar v-slots={toolbarSlots} />
@@ -59,6 +70,7 @@ export default defineComponent({
           <DagSidebar dragged={dragged} />
           <DagCanvas dragged={dragged} />
         </div>
+        <DagFormatModal show={formatModalVisible.value} />
       </div>
     )
   }

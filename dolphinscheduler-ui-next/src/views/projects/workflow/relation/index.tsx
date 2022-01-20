@@ -32,7 +32,7 @@ const workflowRelation = defineComponent({
     const { t } = this
 
     return (
-      <Card title={t('project.workflow_relation.workflow_relation')}>
+      <Card title={t('project.workflow.workflow_relation')}>
         <div>
           <NSelect />
           <NButton strong secondary circle type='info'>

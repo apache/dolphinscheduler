@@ -16,9 +16,9 @@
  */
 
 import { defineComponent } from 'vue'
-import Dag from './dag'
+import Dag from '../../components/dag'
 import { NCard } from 'naive-ui'
-import styles from './workflow-definition-create.module.scss'
+import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'WorkflowDefinitionCreate',
