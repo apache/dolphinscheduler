@@ -44,9 +44,11 @@ import {
   SafetyOutlined,
   GroupOutlined
 } from '@vicons/antd'
+import { useMenuStore } from '@/store/menu/menu'
 
 export function useDataList() {
   const { t } = useI18n()
+  const menuStore = useMenuStore()
 
   const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
@@ -268,13 +270,11 @@ export function useDataList() {
         label: string
         key: string
         icon: any
-        isShowSide: boolean
       }) => {
         return {
           label: item.label,
           key: item.key,
           icon: item.icon,
-          isShowSide: item.isShowSide
         }
       }
     )
