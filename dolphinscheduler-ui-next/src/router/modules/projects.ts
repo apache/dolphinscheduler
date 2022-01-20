@@ -56,7 +56,15 @@ export default {
       }
     },
     {
-      path: '/projects/:projectCode/workflow/definitions/create',
+      path: '/projects/:projectCode/workflow-definitions',
+      name: 'workflow-definition-list',
+      component: components['workflow-definition-list'],
+      meta: {
+        title: '工作流定义'
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-definitions/create',
       name: 'workflow-definition-create',
       component: components['workflow-definition-create'],
       meta: {
@@ -64,11 +72,43 @@ export default {
       }
     },
     {
-      path: '/projects/:projectCode/workflow/definitions/:code',
+      path: '/projects/:projectCode/workflow-definitions/:code',
       name: 'workflow-definition-details',
       component: components['workflow-definition-details'],
       meta: {
         title: '工作流定义详情'
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-instances',
+      name: 'workflow-instance-list',
+      component: components['workflow-instance-list'],
+      meta: {
+        title: '工作流实例'
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-instances/:id',
+      name: 'workflow-instance-details',
+      component: components['workflow-instance-details'],
+      meta: {
+        title: '工作流实例详情'
+      }
+    },
+    {
+      path: '/projects/:projectCode/task-instances',
+      name: 'task-instance-list',
+      component: components['task-instance-list'],
+      meta: {
+        title: '任务实例'
+      }
+    },
+    {
+      path: '/projects/:projectCode/task-definitions',
+      name: 'task-definition-list',
+      component: components['task-definition-list'],
+      meta: {
+        title: '任务定义'
       }
     }
   ]

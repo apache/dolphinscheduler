@@ -18,7 +18,7 @@
 import type { PropType, Ref } from 'vue'
 import type { Dragged } from './dag'
 import { defineComponent, ref, inject } from 'vue'
-import { ALL_TASK_TYPES } from '../task/config'
+import { ALL_TASK_TYPES } from '../task-details/config'
 import { useSidebarDrag } from './dag-hooks'
 import Styles from './dag.module.scss'
 
