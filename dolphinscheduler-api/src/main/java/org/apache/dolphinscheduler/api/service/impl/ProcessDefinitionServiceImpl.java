@@ -709,8 +709,41 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (deleteRelation == 0) {
             logger.warn("The process definition has not relation, it will be delete successfully");
         }
+
+        try {
+            syncDeleteWorkflowInstanceByCode(processDefinition.getCode());
+        } catch (Exception e) {
+            logger.error("delete workflow instance error", e);
+        }
+
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * delete workflow instance by processDefinitionCode
+     * 1.delete processInstances
+     * 2.delete subWorkProcesses
+     * 3.delete processMap
+     * 4.delete taskInstances
+     *
+     * todo delete syncly may take a long time when many processInstance
+     * @param processDefinitionCode
+     */
+    private void syncDeleteWorkflowInstanceByCode(long processDefinitionCode) {
+        int pageSize = 100;
+        while (true) {
+            List<ProcessInstance> deleteProcessInstances = processInstanceService.queryByProcessDefineCode(processDefinitionCode, pageSize);
+            if (CollectionUtils.isEmpty(deleteProcessInstances)) {
+                break;
+            }
+            for (ProcessInstance deleteProcessInstance : deleteProcessInstances) {
+                processService.deleteWorkProcessInstanceById(deleteProcessInstance.getId());
+                processService.deleteAllSubWorkProcessByParentId(deleteProcessInstance.getId());
+                processService.deleteWorkProcessMapByParentId(deleteProcessInstance.getId());
+                processService.deleteWorkTaskInstanceByProcessInstanceId(deleteProcessInstance.getId());
+            }
+        }
     }
 
     /**
