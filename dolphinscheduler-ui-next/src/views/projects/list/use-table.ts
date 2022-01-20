@@ -26,6 +26,7 @@ import styles from './index.module.scss'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
+import { useMenuStore } from '@/store/menu/menu'
 
 export function useTable(
   updateProjectItem = (
@@ -37,6 +38,7 @@ export function useTable(
 ) {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const menuStore = useMenuStore()
 
   const columns: TableColumns<any> = [
     { title: '#', key: 'index' },
@@ -48,7 +50,10 @@ export function useTable(
           'a',
           {
             class: styles.links,
-            onClick: () => router.push({ path: `/projects/${row.code}` })
+            onClick: () => {
+              menuStore.setProjectCode(row.code)
+              router.push({ path: `/projects/${row.code}` })
+            }
           },
           {
             default: () => {
