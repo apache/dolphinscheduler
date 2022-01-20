@@ -51,6 +51,7 @@ public class DataSourceUtilsTest {
         other.put("serverTimezone", "Asia/Shanghai");
         other.put("queryTimeout", "-1");
         other.put("characterEncoding", "utf8");
+        other.put("principal", "hadoop/_HOST@localhost");
         mysqlDatasourceParamDTO.setOther(other);
         DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
         Assert.assertTrue(true);
