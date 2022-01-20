@@ -653,8 +653,4 @@ public class ProcessInstanceServiceTest {
             result.put(Constants.MSG, status.getMsg());
         }
     }
-
-    public static void main(String[] args) {
-        new ProcessInstanceServiceTest().testUpdateProcessInstance();
-    }
 }
