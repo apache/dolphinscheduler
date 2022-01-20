@@ -428,34 +428,29 @@ public class WorkflowExecuteThread {
                 taskInstance.getState());
         if (taskInstance.taskCanRetry()) {
             // failure task set invalid
-            taskInstance.setFlag(Flag.NO);
-            processService.updateTaskInstance(taskInstance);
-            // crate new task instance
-            taskInstance =  SerializationUtils.clone(taskInstance);
-            if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
+            // todo
+//            taskInstance.setFlag(Flag.NO);
+//            processService.updateTaskInstance(taskInstance);
+            // crate new task instance, different objects from the original
+            TaskInstance newTaskInstance =  taskInstance.cloneAndReset();
+            if (newTaskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
+                newTaskInstance.setRetryTimes(newTaskInstance.getRetryTimes() + 1);
             }
-            taskInstance.setSubmitTime(null);
-            taskInstance.setLogPath(null);
-            taskInstance.setExecutePath(null);
-            taskInstance.setStartTime(null);
-            taskInstance.setEndTime(null);
-            taskInstance.setFlag(Flag.YES);
-            taskInstance.setHost(null);
-            taskInstance.setId(0);
-            addTaskToStandByList(taskInstance);
-            if (!taskInstance.retryTaskIntervalOverTime()) {
-                logger.info("failure task will be submitted: process id: {}, task instance id: {} state:{} retry times:{} / {}, interval:{}",
+            addTaskToStandByList(newTaskInstance);
+            if (!newTaskInstance.retryTaskIntervalOverTime()) {
+                logger.info("failure task will be submitted: process id: {}, task instance code: {} state:{} retry times:{} / {}, interval:{}",
                     processInstance.getId(),
-                        taskInstance.getId(),
-                        taskInstance.getState(),
-                        taskInstance.getRetryTimes(),
-                        taskInstance.getMaxRetryTimes(),
-                        taskInstance.getRetryInterval());
-                stateWheelExecuteThread.addTask4TimeoutCheck(taskInstance);
-                stateWheelExecuteThread.addTask4RetryCheck(taskInstance);
+                        newTaskInstance.getTaskCode(),
+                        newTaskInstance.getState(),
+                        newTaskInstance.getRetryTimes(),
+                        newTaskInstance.getMaxRetryTimes(),
+                        newTaskInstance.getRetryInterval());
+                stateWheelExecuteThread.addTask4TimeoutCheck(newTaskInstance);
+                stateWheelExecuteThread.addTask4RetryCheck(newTaskInstance);
             } else {
                 submitStandByTask();
+                completeTaskMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance.getId());
+                activeTaskProcessorMaps.remove(taskInstance.getId());
                 stateWheelExecuteThread.removeTask4TimeoutCheck(taskInstance);
                 stateWheelExecuteThread.removeTask4RetryCheck(taskInstance);
             }

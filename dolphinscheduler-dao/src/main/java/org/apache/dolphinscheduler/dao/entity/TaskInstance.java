@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
@@ -749,4 +751,23 @@ public class TaskInstance implements Serializable {
     public void setTaskGroupPriority(int taskGroupPriority) {
         this.taskGroupPriority = taskGroupPriority;
     }
+
+    /**
+     * clone a new taskInstance and reset some logic fields
+     * @return
+     */
+    public TaskInstance cloneAndReset() {
+        TaskInstance newTaskInstance =  SerializationUtils.clone(this);
+        // clean id
+        newTaskInstance.setId(0);
+        newTaskInstance.setSubmitTime(null);
+        newTaskInstance.setLogPath(null);
+        newTaskInstance.setExecutePath(null);
+        newTaskInstance.setStartTime(null);
+        newTaskInstance.setEndTime(null);
+        newTaskInstance.setFlag(Flag.YES);
+        newTaskInstance.setHost(null);
+        return newTaskInstance;
+    }
+
 }
