@@ -15,28 +15,21 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
+import { defineComponent, PropType } from 'vue'
+import Modal from '@/components/modal'
+import './x6-style.scss'
 
-const mapping = (modules: any) => {
-  const components: { [key: string]: Component } = {}
-  // All TSX files under the views folder automatically generate mapping relationship
-  Object.keys(modules).forEach((key: string) => {
-    const nameMatch: string[] | null = key.match(/^\/src\/views\/(.+)\.tsx/)
-
-    if (!nameMatch) {
-      return
-    }
-
-    // If the page is named Index, the parent folder is used as the name
-    const indexMatch: string[] | null = nameMatch[1].match(/(.*)\/Index$/i)
-
-    let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
-
-    name = name.replaceAll('/', '-')
-
-    components[name] = modules[key]
-  })
-  return components
+const props = {
+  show: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  }
 }
 
-export default mapping
+export default defineComponent({
+  name: 'dag-format-modal',
+  props,
+  setup(props, context) {
+    return () => <Modal show={props.show}></Modal>
+  }
+})

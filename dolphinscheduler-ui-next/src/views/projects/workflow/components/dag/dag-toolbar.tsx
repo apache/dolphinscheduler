@@ -88,8 +88,16 @@ export default defineComponent({
     /**
      * Open DAG format modal
      */
-    const openDagFormatModal = () => {}
+    const { openFormatModal } = inject('formatModal', {
+      openFormatModal: (bool: boolean) => {}
+    })
+    const onFormat = () => {
+      openFormatModal(true)
+    }
 
+    /**
+     * Back to the entrance
+     */
     const onClose = () => {
       router.go(-1)
     }
@@ -97,7 +105,7 @@ export default defineComponent({
     return () => (
       <div class={Styles.toolbar}>
         <span class={Styles['workflow-name']}>
-          {t('project.dag.createWorkflow')}
+          {t('project.workflow.create_workflow')}
         </span>
         <div class={Styles['toolbar-right-part']}>
           {/* Search node */}
@@ -120,7 +128,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.dag.search')
+              default: () => t('project.workflow.search')
             }}
           ></NTooltip>
           <div
@@ -156,7 +164,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.dag.download_png')
+              default: () => t('project.workflow.download_png')
             }}
           ></NTooltip>
           {/* Toggle fullscreen */}
@@ -185,8 +193,8 @@ export default defineComponent({
               ),
               default: () =>
                 isFullscreen.value
-                  ? t('project.dag.fullscreen_close')
-                  : t('project.dag.fullscreen_open')
+                  ? t('project.workflow.fullscreen_close')
+                  : t('project.workflow.fullscreen_open')
             }}
           ></NTooltip>
           {/* DAG Format */}
@@ -199,7 +207,7 @@ export default defineComponent({
                   secondary
                   circle
                   type='info'
-                  onClick={openDagFormatModal}
+                  onClick={onFormat}
                   v-slots={{
                     icon: () => (
                       <NIcon>
@@ -209,7 +217,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.dag.format')
+              default: () => t('project.workflow.format')
             }}
           ></NTooltip>
           {/* Version info */}
@@ -232,7 +240,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.dag.workflow_version')
+              default: () => t('project.workflow.workflow_version')
             }}
           ></NTooltip>
           {/* Save workflow */}
@@ -242,11 +250,11 @@ export default defineComponent({
             secondary
             round
           >
-            {t('project.dag.save')}
+            {t('project.workflow.save')}
           </NButton>
           {/* Return to previous page */}
           <NButton secondary round onClick={onClose}>
-            {t('project.dag.close')}
+            {t('project.workflow.close')}
           </NButton>
         </div>
       </div>

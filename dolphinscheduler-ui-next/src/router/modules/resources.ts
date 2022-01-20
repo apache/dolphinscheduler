@@ -22,6 +22,8 @@ import utils from '@/utils'
 const modules = import.meta.glob('/src/views/**/**.tsx')
 const components: { [key: string]: Component } = utils.mapping(modules)
 
+console.log(components)
+
 export default {
   path: '/resource',
   name: 'resource',
@@ -32,7 +34,7 @@ export default {
     {
       path: '/resource/file-manage',
       name: 'file-manage',
-      component: components['file'],
+      component: components['resource-file'],
       meta: {
         title: '文件管理',
         showSide: true
@@ -59,7 +61,7 @@ export default {
     {
       path: '/resource/file/subdirectory/:id',
       name: 'resource-file-subdirectory',
-      component: components['file'],
+      component: components['resource-file'],
       meta: {
         title: '文件管理',
         showSide: true
@@ -104,7 +106,7 @@ export default {
     {
       path: '/resource/function-manage',
       name: 'function-manage',
-      component: components['function'],
+      component: components['resource-udf-function'],
       meta: {
         title: '函数管理'
       }
@@ -112,17 +114,17 @@ export default {
     {
       path: '/resource/task-group',
       name: 'task-group-manage',
-      component: components['taskGroupOption'],
+      component: components['resource-taskGroupOption'],
       children: [
         {
           path: '/resource/task-group-option',
           name: 'task-group-option',
-          component: components['taskGroupOption']
+          component: components['resource-taskGroupOption']
         },
         {
           path: '/resource/task-group-queue',
           name: 'task-group-queue',
-          component: components['taskGroupQueue']
+          component: components['resource-taskGroupQueue']
         }
       ]
     }
