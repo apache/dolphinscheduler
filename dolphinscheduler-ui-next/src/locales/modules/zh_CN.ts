@@ -47,11 +47,12 @@ const menu = {
   datasource: '数据源中心',
   monitor: '监控中心',
   security: '安全中心',
-  workflow_monitoring: '工作流监控',
+  project_overview: '项目概览',
   workflow_relation: '工作流关系',
   workflow: '工作流',
   workflow_definition: '工作流定义',
   workflow_instance: '工作流实例',
+  task: '任务',
   task_instance: '任务实例',
   task_definition: '任务定义',
   file_manage: '文件管理',
@@ -318,11 +319,9 @@ const project = {
     cancel: '取消',
     delete_confirm: '确定删除吗?'
   },
-  workflow_relation: {
-    workflow_relation: '工作流关系'
-  },
-  dag: {
-    createWorkflow: '创建工作流',
+  workflow: {
+    workflow_relation: '工作流关系',
+    create_workflow: '创建工作流',
     search: '搜索',
     download_png: '下载工作流图片',
     fullscreen_open: '全屏',

@@ -25,90 +25,100 @@ const components: { [key: string]: Component } = utils.mapping(modules)
 export default {
   path: '/projects',
   name: 'projects',
-  redirect: { name: 'projects-list' },
-  meta: { title: '项目管理' },
+  meta: {
+    title: '项目管理',
+    showSide: false
+  },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/projects/list',
+      path: '',
       name: 'projects-list',
-      component: components['list'],
+      component: components['projects-list'],
       meta: {
         title: '项目',
         showSide: false
       }
     },
     {
-      path: '/projects/:projectCode/workflow-monitor',
-      name: 'workflow-monitor',
-      component: components['workflow-monitor'],
+      path: '/projects/:projectCode',
+      name: 'projects-overview',
+      component: components['projects-overview'],
       meta: {
-        title: '工作流监控',
+        title: '项目概览',
         showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/workflow-relation',
+      path: '/projects/:projectCode/workflow/relation',
       name: 'workflow-relation',
-      component: components['workflow-relation'],
+      component: components['projects-workflow-relation'],
       meta: {
-        title: '工作流关系'
+        title: '工作流关系',
+        showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/workflow-definitions',
+      path: '/projects/:projectCode/workflow/definitions',
       name: 'workflow-definition-list',
-      component: components['workflow-definition-list'],
+      component: components['projects-workflow-definition'],
       meta: {
-        title: '工作流定义'
+        title: '工作流定义',
+        showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/workflow-definitions/create',
+      path: '/projects/:projectCode/workflow/definitions/create',
       name: 'workflow-definition-create',
-      component: components['workflow-definition-create'],
+      component: components['projects-workflow-definition-create'],
       meta: {
-        title: '创建工作流定义'
+        title: '创建工作流定义',
+        showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/workflow-definitions/:code',
-      name: 'workflow-definition-details',
-      component: components['workflow-definition-details'],
+      path: '/projects/:projectCode/workflow/definitions/:code',
+      name: 'workflow-definition-detail',
+      component: components['projects-workflow-definition-detail'],
       meta: {
-        title: '工作流定义详情'
+        title: '工作流定义详情',
+        showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/workflow-instances',
+      path: '/projects/:projectCode/workflow/instances',
       name: 'workflow-instance-list',
-      component: components['workflow-instance-list'],
+      component: components['projects-workflow-instance'],
       meta: {
-        title: '工作流实例'
+        title: '工作流实例',
+        showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/workflow-instances/:id',
-      name: 'workflow-instance-details',
-      component: components['workflow-instance-details'],
+      path: '/projects/:projectCode/workflow/instances/:id',
+      name: 'workflow-instance-detail',
+      component: components['projects-workflow-instance-detail'],
       meta: {
-        title: '工作流实例详情'
+        title: '工作流实例详情',
+        showSide: true
       }
     },
     {
-      path: '/projects/:projectCode/task-instances',
-      name: 'task-instance-list',
-      component: components['task-instance-list'],
-      meta: {
-        title: '任务实例'
-      }
-    },
-    {
-      path: '/projects/:projectCode/task-definitions',
+      path: '/projects/:projectCode/task/definitions',
       name: 'task-definition-list',
-      component: components['task-definition-list'],
+      component: components['projects-task-definition'],
       meta: {
-        title: '任务定义'
+        title: '任务定义',
+        showSide: true
+      }
+    },
+    {
+      path: '/projects/:projectCode/task/instances',
+      name: 'task-instance-list',
+      component: components['projects-task-instance'],
+      meta: {
+        title: '任务实例',
+        showSide: true
       }
     }
   ]

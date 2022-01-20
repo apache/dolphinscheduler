@@ -19,12 +19,7 @@ import { defineComponent, ref, inject } from 'vue'
 import Styles from './dag.module.scss'
 import type { PropType, Ref } from 'vue'
 import type { Dragged } from './dag'
-import {
-  useCanvasInit,
-  useGraphOperations,
-  useCellActive,
-  useCanvasDrop
-} from './dag-hooks'
+import { useCanvasInit, useCellActive, useCanvasDrop } from './dag-hooks'
 import { useRoute } from 'vue-router'
 
 const props = {

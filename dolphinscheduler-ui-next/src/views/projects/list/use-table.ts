@@ -48,8 +48,7 @@ export function useTable(
           'a',
           {
             class: styles.links,
-            onClick: () =>
-              router.push({ path: `/projects/${row.code}/workflow-monitor` })
+            onClick: () => router.push({ path: `/projects/${row.code}` })
           },
           {
             default: () => {

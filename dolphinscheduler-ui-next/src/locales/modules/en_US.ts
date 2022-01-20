@@ -47,11 +47,12 @@ const menu = {
   datasource: 'Datasource',
   monitor: 'Monitor',
   security: 'Security',
-  workflow_monitoring: 'Workflow Monitoring',
+  project_overview: 'Project Overview',
   workflow_relation: 'Workflow Relation',
   workflow: 'Workflow',
   workflow_definition: 'Workflow Definition',
   workflow_instance: 'Workflow Instance',
+  task: 'Task',
   task_instance: 'Task Instance',
   task_definition: 'Task Definition',
   file_manage: 'File Manage',
@@ -319,11 +320,9 @@ const project = {
     cancel: 'Cancel',
     delete_confirm: 'Delete?'
   },
-  workflow_relation: {
-    workflow_relation: 'Workflow Relation'
-  },
-  dag: {
-    createWorkflow: 'Create Workflow',
+  workflow: {
+    workflow_relation: 'Workflow Relation',
+    create_workflow: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',

@@ -25,12 +25,11 @@ const components: { [key: string]: Component } = utils.mapping(modules)
 export default {
   path: '/datasource',
   name: 'datasource',
-  redirect: { name: 'datasource-list' },
   meta: { title: '数据源中心' },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/datasource/list',
+      path: '',
       name: 'datasource-list',
       component: components['datasource-list'],
       meta: {
