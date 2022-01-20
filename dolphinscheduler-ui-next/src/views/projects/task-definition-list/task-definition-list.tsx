@@ -18,8 +18,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'Projects',
+  name: 'TaskDefinitionList',
   setup() {
-    return () => <div>Projects</div>
+    return () => <div>TaskDefinitionList</div>
   }
 })
