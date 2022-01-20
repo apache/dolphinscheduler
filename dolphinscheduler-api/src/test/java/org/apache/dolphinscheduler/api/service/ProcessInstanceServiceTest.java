@@ -131,7 +131,7 @@ public class ProcessInstanceServiceTest {
         + "\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"}]";
 
     private String taskRelationJson = "[{\"name\":\"\",\"preTaskCode\":4254865123776,\"preTaskVersion\":1,\"postTaskCode\":4254862762304,\"postTaskVersion\":1,\"conditionType\":0," +
-        "\"conditionParams\":{}},{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":4254865123776,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}}]"
+        "\"conditionParams\":{}},{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":4254865123776,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}}]";
 
     private String taskDefinitionJson = "[{\"code\":4254862762304,\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[]," +
         "\"localParams\":[],\"rawScript\":\"echo 1\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},\"switchResult\":{}},\"flag\":\"YES\"," +
@@ -443,7 +443,7 @@ public class ProcessInstanceServiceTest {
         when(processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs)).thenReturn(result);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "root");
+            taskRelationJson, taskDefinitionJson,"2020-02-21 00:00:00", true, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
@@ -452,7 +452,7 @@ public class ProcessInstanceServiceTest {
 
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE)).thenReturn(1);
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, taskJson,"2020-02-21 00:00:00", Boolean.FALSE, "", "", 0, "root");
+            taskRelationJson, taskDefinitionJson,"2020-02-21 00:00:00", Boolean.FALSE, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -654,4 +654,7 @@ public class ProcessInstanceServiceTest {
         }
     }
 
+    public static void main(String[] args) {
+        new ProcessInstanceServiceTest().testUpdateProcessInstance();
+    }
 }
