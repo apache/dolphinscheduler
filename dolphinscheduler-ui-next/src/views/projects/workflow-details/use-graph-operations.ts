@@ -18,7 +18,7 @@
 import type { Ref } from 'vue'
 import type { Node, Graph, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
-import { ALL_TASK_TYPES } from '../task/config'
+import { ALL_TASK_TYPES } from '../task-details/config'
 import utils from '@/utils'
 
 interface Options {
