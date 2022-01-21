@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
@@ -32,13 +33,19 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import java.io.File;
+import java.time.Duration;
+import java.util.function.Function;
+
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
@@ -304,6 +311,12 @@ public class FileManageE2ETest {
 
         String downloadFilePath = String.format("/home/%s/Downloads/%s", tenant, testUnder1GBFileName);
         File file = new File(downloadFilePath);
+
+        new FluentWait<WebDriver>(page.driver())
+                .withTimeout(Duration.ofSeconds(60))
+                .pollingEvery(Duration.ofSeconds(1))
+                .ignoring(NoSuchElementException.class)
+                .until(webDriver -> file.exists());
 
         if (!file.exists()) {
             throw new RuntimeException("download file failed");
