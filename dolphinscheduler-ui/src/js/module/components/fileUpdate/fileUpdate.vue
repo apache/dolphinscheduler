@@ -70,8 +70,8 @@
             <template slot="content">
               <div class="file-update-box">
                 <template v-if="progress === 0">
-                  <input ref="file" name="file" type="file" class="file-update" @change="_onChange">
-                  <el-button id="btnUpload" type="dashed" size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
+                  <input id="btnUpload" ref="file" name="file" type="file" class="file-update" @change="_onChange">
+                  <el-button type="dashed" size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
                   <m-progress-bar :value="progress" text-placement="left-right"></m-progress-bar>
