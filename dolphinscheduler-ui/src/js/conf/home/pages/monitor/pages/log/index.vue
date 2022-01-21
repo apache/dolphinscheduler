@@ -122,7 +122,7 @@
         })
       },
       _debounceGET: _.debounce(function (flag) {
-        if (sessionStorage.getItem('isLeft') === 0) {
+        if (Number(sessionStorage.getItem('isLeft')) === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
