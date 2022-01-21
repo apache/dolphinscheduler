@@ -787,4 +787,11 @@ public final class Constants {
 
     public static final String CACHE_KEY_VALUE_ALL = "'all'";
 
+    /**
+     * use for k8s
+     */
+    public static final String NAMESPACE = "namespace";
+    public static final String K8S = "k8s";
+    public static final String LIMITS_CPU = "limitsCpu";
+    public static final String LIMITS_MEMORY = "limitsMemory";
 }

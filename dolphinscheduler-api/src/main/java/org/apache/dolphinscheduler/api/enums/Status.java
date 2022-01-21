@@ -370,6 +370,13 @@ public enum Status {
     TASK_GROUP_STATUS_OPENED(130019,"The task group has been opened.","任务组已经被开启"),
     NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT(130020, "Not allow to disable your own account", "不能停用自己的账号"),
     NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP(130030, "Not allow to delete the default alarm group ", "不能删除默认告警组"),
+
+    LOGIN_USER_QUERY_NAMESPACE_LIST_PAGING_ERROR(1300001, "login user query k8s namespace list paging error", "分页查询k8s名称空间列表错误"),
+    K8S_NAMESPACE_EXIST(1300002, "k8s namespace {0} already exists", "k8s命名空间[{0}]已存在"),
+    CREATE_K8S_NAMESPACE_ERROR(1300003, "create k8s namespace error", "创建k8s命名空间错误"),
+    UPDATE_K8S_NAMESPACE_ERROR(1300004, "update k8s namespace error", "更新k8s命名空间信息错误"),
+    K8S_NAMESPACE_NOT_EXIST(1300005, "k8s namespace {0} already exists", "k8s命名空间[{0}]已存在"),
+    K8S_CLIENT_OPS_ERROR(1300005, "k8s error with exception {0}", "k8s操作报错[{0}]"),
     ;
 
     private final int code;

@@ -807,5 +807,18 @@ export default {
   'Delete task completely': 'Delete task completely',
   'Please select a process': 'Please select a process',
   'Delete {taskName}?': 'Delete {taskName}?',
-  'Please select a process (required)': 'Please select a process (required)'
+  'Please select a process (required)': 'Please select a process (required)',
+  // k8s
+  'Create namespace': 'Create namespace',
+  'Edit namespace': 'Edit namespace',
+  'Namespace manage': 'K8s namespace manage',
+  'K8s Namespace': 'k8s Namespace',
+  'Limits Cpu': 'Limit Cpu',
+  'Limits Memory': 'Limit Memory',
+  'K8s Cluster': 'k8s',
+  'Namespace Owner': 'Owner',
+  'Please enter k8s cluster': 'Please enter k8s cluster',
+  'Please enter namespace': 'Please enter namespace',
+  'Please enter owner': 'Please enter owner can null',
+  'K8s Tag': 'tag'
 }

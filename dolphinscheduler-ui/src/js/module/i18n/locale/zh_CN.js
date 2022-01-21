@@ -809,5 +809,19 @@ export default {
   'Delete task completely': '彻底删除任务',
   'Please select a process': '请选择工作流',
   'Delete {taskName}?': '确定删除 {taskName} ?',
-  'Please select a process (required)': '请选择工作流（必选）'
+  'Please select a process (required)': '请选择工作流（必选）',
+
+  // k8s
+  'Create namespace': '创建命名空间',
+  'Edit namespace': '编辑命名空间',
+  'Namespace manage': 'k8s命名空间 管理',
+  'K8s Namespace': 'k8s命名空间',
+  'Limits Cpu': '最大Cpu',
+  'Limits Memory': '最大内存',
+  'K8s Cluster': 'k8s集群',
+  'Namespace Owner': '负责人',
+  'Please enter k8s cluster': '请输入k8s集群值',
+  'Please enter namespace': '请输入命名空间',
+  'Please enter owner': '请输入owner可空',
+  'K8s Tag': '标签'
 }

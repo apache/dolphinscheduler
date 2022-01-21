@@ -165,6 +165,15 @@ const menu = {
       icon: 'el-icon-document',
       children: [],
       enabled: true
+    },
+    {
+      name: `${i18n.$t('K8s Namespace')}`,
+      id: 2,
+      path: 'namespace',
+      isOpen: true,
+      icon: 'el-icon-s-grid',
+      children: [],
+      enabled: true
     }
   ],
   resource: [

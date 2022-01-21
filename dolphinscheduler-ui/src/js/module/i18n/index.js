@@ -38,6 +38,9 @@ const $t = (str, data) => {
   /**
    * $t('等待查询aaa',{aaa:111})
    */
+  console.log('================')
+  console.log(str)
+  console.log(language[str])
   return template(language[str], data)
 }
 
