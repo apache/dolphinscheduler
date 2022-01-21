@@ -322,6 +322,20 @@ const project = {
   workflow: {
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
+    workflow_name: '工作流名称',
+    current_selection: '当前选择',
+    online: '已上线',
+    offline: '已下线',
+    workflow_offline: '工作流下线',
+    schedule_offline: '调度下线',
+    schedule_start_time: '定时开始时间',
+    schedule_end_time: '定时结束时间',
+    crontab_expression: 'Crontab',
+    workflow_publish_status: '工作流上线状态',
+    schedule_publish_status: '定时状态'
+  },
+  dag: {
+    createWorkflow: '创建工作流',
     search: '搜索',
     download_png: '下载工作流图片',
     fullscreen_open: '全屏',

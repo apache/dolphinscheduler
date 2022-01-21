@@ -15,37 +15,91 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NSelect, NButton, NIcon } from 'naive-ui'
+import { useRoute } from 'vue-router'
+import { NSelect, NButton, NIcon, NSpace } from 'naive-ui'
 import { ReloadOutlined, EyeOutlined } from '@vicons/antd'
+import { useRelation } from './use-relation'
 import Card from '@/components/card'
+import Graph from '@/views/projects/workflow/relation/components/Graph'
 
 const workflowRelation = defineComponent({
   name: 'workflow-relation',
   setup() {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
+    const route = useRoute()
+    const { variables, getWorkflowName, getOneWorkflow, getWorkflowList } =
+      useRelation()
 
-    return { t }
+    onMounted(() => {
+      getWorkflowList(Number(route.params.projectCode))
+      getWorkflowName(Number(route.params.projectCode))
+    })
+
+    const handleResetDate = () => {
+      variables.seriesData = []
+      variables.workflow && variables.workflow !== 0
+        ? getOneWorkflow(
+            Number(variables.workflow),
+            Number(route.params.projectCode)
+          )
+        : getWorkflowList(Number(route.params.projectCode))
+    }
+
+    watch(
+      () => [variables.workflow, variables.labelShow, locale.value],
+      () => {
+        handleResetDate()
+      }
+    )
+
+    return { t, handleResetDate, ...toRefs(variables) }
   },
   render() {
-    const { t } = this
+    const { t, handleResetDate } = this
 
     return (
       <Card title={t('project.workflow.workflow_relation')}>
-        <div>
-          <NSelect />
-          <NButton strong secondary circle type='info'>
-            <NIcon>
-              <ReloadOutlined />
-            </NIcon>
-          </NButton>
-          <NButton strong secondary circle type='info'>
-            <NIcon>
-              <EyeOutlined />
-            </NIcon>
-          </NButton>
-        </div>
+        {{
+          default: () =>
+            Object.keys(this.seriesData).length > 0 && (
+              <Graph seriesData={this.seriesData} labelShow={this.labelShow} />
+            ),
+          'header-extra': () => (
+            <NSpace>
+              <NSelect
+                clearable
+                style={{ width: '300px' }}
+                placeholder={t('project.workflow.workflow_name')}
+                options={this.workflowOptions}
+                v-model={[this.workflow, 'value']}
+              />
+              <NButton
+                strong
+                secondary
+                circle
+                type='info'
+                onClick={handleResetDate}
+              >
+                <NIcon>
+                  <ReloadOutlined />
+                </NIcon>
+              </NButton>
+              <NButton
+                strong
+                secondary
+                circle
+                type='info'
+                onClick={() => (this.labelShow = !this.labelShow)}
+              >
+                <NIcon>
+                  <EyeOutlined />
+                </NIcon>
+              </NButton>
+            </NSpace>
+          )
+        }}
       </Card>
     )
   }
