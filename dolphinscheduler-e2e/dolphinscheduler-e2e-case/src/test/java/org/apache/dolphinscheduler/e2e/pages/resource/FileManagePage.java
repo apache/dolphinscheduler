@@ -192,6 +192,19 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         return this;
     }
 
+    public FileManagePage downloadFile(String fileName) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(fileName))
+            .flatMap(it -> it.findElements(By.id("btnDownload")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No download button in file manage list"))
+            .click();
+
+        return this;
+    }
+
     @Getter
     public class CreateDirectoryBox {
         CreateDirectoryBox() {

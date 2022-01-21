@@ -38,6 +38,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import java.io.File;
+
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
     private static RemoteWebDriver browser;
@@ -65,6 +67,8 @@ public class FileManageE2ETest {
     private static final String testOver1GBFilePath = "/tmp/test_file_1.5G";
 
     private static final String testUnder1GBFilePath = "/tmp/test_file_0.01G";
+
+    private static final String testUnder1GBFileName = testUnder1GBFilePath.split("/")[1];
 
     @BeforeAll
     public static void setup() {
@@ -287,8 +291,23 @@ public class FileManageE2ETest {
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testUnder1GBFilePath));
+                .anyMatch(it -> it.contains(testUnder1GBFileName));
         });
+    }
+
+    @Test
+    @Order(70)
+    void testDownloadFile() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.downloadFile(testUnder1GBFileName);
+
+        String downloadFilePath = String.format("/home/%s/Downloads/%s", tenant, testUnder1GBFileName);
+        File file = new File(downloadFilePath);
+
+        if (!file.exists()) {
+            throw new RuntimeException("download file failed");
+        }
     }
 
 }
