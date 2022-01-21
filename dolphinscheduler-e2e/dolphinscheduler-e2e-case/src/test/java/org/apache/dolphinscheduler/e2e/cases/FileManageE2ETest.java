@@ -68,7 +68,7 @@ public class FileManageE2ETest {
 
     private static final String testUnder1GBFilePath = "/tmp/test_file_0.01G";
 
-    private static final String testUnder1GBFileName = testUnder1GBFilePath.split("/")[1];
+    private static final String testUnder1GBFileName = testUnder1GBFilePath.split("/")[2];
 
     @BeforeAll
     public static void setup() {
@@ -309,5 +309,4 @@ public class FileManageE2ETest {
             throw new RuntimeException("download file failed");
         }
     }
-
 }
