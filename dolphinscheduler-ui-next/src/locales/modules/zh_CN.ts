@@ -47,11 +47,12 @@ const menu = {
   datasource: '数据源中心',
   monitor: '监控中心',
   security: '安全中心',
-  workflow_monitoring: '工作流监控',
+  project_overview: '项目概览',
   workflow_relation: '工作流关系',
   workflow: '工作流',
   workflow_definition: '工作流定义',
   workflow_instance: '工作流实例',
+  task: '任务',
   task_instance: '任务实例',
   task_definition: '任务定义',
   file_manage: '文件管理',
@@ -318,8 +319,22 @@ const project = {
     cancel: '取消',
     delete_confirm: '确定删除吗?'
   },
-  workflow_relation: {
-    workflow_relation: '工作流关系'
+  workflow: {
+    workflow_relation: '工作流关系',
+    create_workflow: '创建工作流',
+    workflow_name: '工作流名称',
+    current_selection: '当前选择',
+    online: '已上线',
+    offline: '已下线',
+    refresh: '刷新',
+    show_hide_label: '显示 / 隐藏标签',
+    workflow_offline: '工作流下线',
+    schedule_offline: '调度下线',
+    schedule_start_time: '定时开始时间',
+    schedule_end_time: '定时结束时间',
+    crontab_expression: 'Crontab',
+    workflow_publish_status: '工作流上线状态',
+    schedule_publish_status: '定时状态'
   },
   dag: {
     createWorkflow: '创建工作流',
@@ -434,6 +449,36 @@ const security = {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?'
+  },
+  user: {
+    user_manage: '用户管理',
+    create_user: '创建用户',
+    update_user: '更新用户',
+    delete_user: '删除用户',
+    delete_confirm: '确定删除吗?',
+    delete_confirm_tip: '删除用户属于危险操作，请谨慎操作！',
+    index: '序号',
+    username: '用户名',
+    username_exists: '用户名已存在',
+    username_rule_msg: '请输入用户名',
+    user_password: '密码',
+    user_password_rule_msg: '请输入包含字母和数字，长度在6～20之间的密码',
+    user_type: '用户类型',
+    tenant_code: '租户',
+    tenant_id_rule_msg: '请选择租户',
+    queue: '队列',
+    email: '邮件',
+    email_rule_msg: '请输入正确的邮箱',
+    phone: '手机',
+    phone_rule_msg: '请输入正确的手机号',
+    state: '状态',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    save_error_msg: '保存失败，请重试',
+    delete_error_msg: '删除失败，请重试'
   }
 }
 

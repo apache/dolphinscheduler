@@ -44,9 +44,11 @@ import {
   SafetyOutlined,
   GroupOutlined
 } from '@vicons/antd'
+import { useMenuStore } from '@/store/menu/menu'
 
 export function useDataList() {
   const { t } = useI18n()
+  const menuStore = useMenuStore()
 
   const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
@@ -87,20 +89,19 @@ export function useDataList() {
         isShowSide: false,
         children: [
           {
-            label: t('menu.workflow_monitoring'),
-            key: 'workflow-monitoring',
+            label: t('menu.project_overview'),
+            key: 'projects-overview',
             icon: renderIcon(FundProjectionScreenOutlined)
-          },
-          {
-            label: t('menu.workflow_relation'),
-            key: 'workflow-relation',
-            icon: renderIcon(PartitionOutlined)
           },
           {
             label: t('menu.workflow'),
             key: 'workflow',
-            icon: renderIcon(SettingOutlined),
+            icon: renderIcon(PartitionOutlined),
             children: [
+              {
+                label: t('menu.workflow_relation'),
+                key: 'workflow-relation'
+              },
               {
                 label: t('menu.workflow_definition'),
                 key: 'workflow-definition'
@@ -108,14 +109,21 @@ export function useDataList() {
               {
                 label: t('menu.workflow_instance'),
                 key: 'workflow-instance'
+              }
+            ]
+          },
+          {
+            label: t('menu.task'),
+            key: 'workflow',
+            icon: renderIcon(SettingOutlined),
+            children: [
+              {
+                label: t('menu.task_definition'),
+                key: 'task-definition'
               },
               {
                 label: t('menu.task_instance'),
                 key: 'task-instance'
-              },
-              {
-                label: t('menu.task_definition'),
-                key: 'task-definition'
               }
             ]
           }
@@ -262,13 +270,11 @@ export function useDataList() {
         label: string
         key: string
         icon: any
-        isShowSide: boolean
       }) => {
         return {
           label: item.label,
           key: item.key,
           icon: item.icon,
-          isShowSide: item.isShowSide
         }
       }
     )
