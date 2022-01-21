@@ -729,7 +729,7 @@ export default {
   Secret: 'Secret',
   AtMobiles: '@Mobiles',
   AtUserIds: '@UserIds',
-  IsAtAll:  '@All',
+  IsAtAll: '@All',
   Proxy: 'Proxy',
   receivers: 'Receivers',
   receiverCcs: 'ReceiverCcs',

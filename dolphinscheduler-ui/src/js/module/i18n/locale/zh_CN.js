@@ -729,7 +729,7 @@ export default {
   Secret: '密钥',
   AtMobiles: '@手机号',
   AtUserIds: '@用户ID',
-  IsAtAll:  '@所有人',
+  IsAtAll: '@所有人',
   Proxy: '代理',
   receivers: '收件人',
   receiverCcs: '抄送人',
