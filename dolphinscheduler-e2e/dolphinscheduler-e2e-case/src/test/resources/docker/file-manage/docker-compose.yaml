@@ -27,6 +27,7 @@ services:
       - 12345
     networks:
       - e2e
+    command: fallocate -l 2G /tmp/test_file_2G && fallocate -l 1G /tmp/test_file_1G && tail -f /dev/null
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
