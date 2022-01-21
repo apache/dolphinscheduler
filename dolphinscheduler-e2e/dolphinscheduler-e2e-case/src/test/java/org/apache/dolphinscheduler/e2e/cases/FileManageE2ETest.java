@@ -284,8 +284,6 @@ public class FileManageE2ETest {
         page.uploadFile(testUnder1GBFilePath);
 
         await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
