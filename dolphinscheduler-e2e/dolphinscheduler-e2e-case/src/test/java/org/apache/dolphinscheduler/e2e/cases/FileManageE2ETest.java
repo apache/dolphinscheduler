@@ -58,6 +58,10 @@ public class FileManageE2ETest {
 
     private static final String testRenameDirectoryName = "test_rename_directory";
 
+    private static final String testFileName = "test_file";
+
+    private static final String testRenameFileName = "test_rename_file";
+
     @BeforeAll
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
@@ -134,7 +138,7 @@ public class FileManageE2ETest {
     void testRenameDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.renameDirectory(testSubDirectoryName, testRenameDirectoryName);
+        page.rename(testSubDirectoryName, testRenameDirectoryName);
 
         await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")
@@ -161,4 +165,64 @@ public class FileManageE2ETest {
             );
         });
     }
+
+    @Test
+    @Order(40)
+    void testCreateFile() {
+        final FileManagePage page = new FileManagePage(browser);
+        String scripts = "echo 123";
+
+        page.createFile(testFileName, scripts);
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testFileName)));
+    }
+
+    @Test
+    @Order(41)
+    void testRenameFile() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.rename(testFileName, testRenameFileName);
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testRenameFileName)));
+    }
+
+    @Test
+    @Order(42)
+    void testEditFile() {
+        final FileManagePage page = new FileManagePage(browser);
+        String scripts = "echo 456";
+
+        page.editFile(testRenameFileName, scripts);
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testRenameFileName)));
+    }
+
+    @Test
+    @Order(45)
+    void testDeleteFile() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.delete(testRenameFileName);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                page.fileList()
+            ).noneMatch(
+                it -> it.getText().contains(testRenameFileName)
+            );
+        });
+    }
+    
 }
