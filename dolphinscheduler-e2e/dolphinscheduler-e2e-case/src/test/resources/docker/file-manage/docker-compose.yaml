@@ -27,7 +27,7 @@ services:
       - 12345
     networks:
       - e2e
-    entrypoint: ['bash', '-c', 'fallocate -l 2G /tmp/test_file_2G && fallocate -l 1G /tmp/test_file_1G &&
+    entrypoint: ['bash', '-c', 'fallocate -l 0.5G /tmp/test_file_0.5G && fallocate -l 1.5G /tmp/test_file_1.5G &&
       /opt/dolphinscheduler/bin/start.sh && tail -f /dev/null']
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]

@@ -33,6 +33,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -52,6 +53,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     private final RenameDirectoryBox renameDirectoryBox;
 
     private final CreateFileBox createFileBox;
+
+    private final UploadFileBox uploadFileBox;
 
     @FindBy(className = "items")
     private List<WebElement> fileList;
@@ -73,6 +76,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         renameDirectoryBox = new RenameDirectoryBox();
 
         createFileBox = new CreateFileBox();
+
+        uploadFileBox = new UploadFileBox();
     }
 
     public FileManagePage createDirectory(String name, String description) {
@@ -176,6 +181,15 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         return this;
     }
 
+    public FileManagePage uploadFile(String filePath) {
+        buttonUploadFile().click();
+
+        uploadFileBox().buttonUpload().sendKeys(filePath);
+        uploadFileBox().buttonSubmit().click();
+
+        return this;
+    }
+
     @Getter
     public class CreateDirectoryBox {
         CreateDirectoryBox() {
@@ -224,6 +238,22 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         private WebElement inputFileName;
 
         private final CodeEditor codeEditor = new CodeEditor(driver);
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class UploadFileBox {
+        UploadFileBox() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(id = "btnUpload")
+        private WebElement buttonUpload;
 
         @FindBy(id = "btnSubmit")
         private WebElement buttonSubmit;

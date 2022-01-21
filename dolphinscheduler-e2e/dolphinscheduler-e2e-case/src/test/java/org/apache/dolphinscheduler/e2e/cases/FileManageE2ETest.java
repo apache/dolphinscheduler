@@ -62,6 +62,10 @@ public class FileManageE2ETest {
 
     private static final String testRenameFileName = "test_rename_file.sh";
 
+    private static final String testOver1GBFilePath = "/tmp/test_file_1.5G";
+
+    private static final String testUnder1GBFilePath = "/tmp/test_file_0.5G";
+
     @BeforeAll
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
@@ -231,6 +235,16 @@ public class FileManageE2ETest {
                 it -> it.getText().contains(testRenameFileName)
             );
         });
+    }
+
+    @Test
+    @Order(60)
+    void testUploadOver1GBFile() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.uploadFile(testOver1GBFilePath);
+
+
     }
 
 }
