@@ -64,7 +64,7 @@ public class FileManageE2ETest {
 
     private static final String testOver1GBFilePath = "/tmp/test_file_1.5G";
 
-    private static final String testUnder1GBFilePath = "/tmp/test_file_0.5G";
+    private static final String testUnder1GBFilePath = "/tmp/test_file_0.01G";
 
     @BeforeAll
     public static void setup() {
@@ -269,7 +269,7 @@ public class FileManageE2ETest {
 
         browser.navigate().refresh();
 
-        String command = String.format("fallocate -l 0.5G %s", testUnder1GBFilePath);
+        String command = String.format("fallocate -l 0.01G %s", testUnder1GBFilePath);
         try {
             Process pro = Runtime.getRuntime().exec(command);
             int status = pro.waitFor();
