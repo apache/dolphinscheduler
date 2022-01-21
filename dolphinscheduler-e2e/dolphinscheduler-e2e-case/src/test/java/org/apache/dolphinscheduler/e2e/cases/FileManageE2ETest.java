@@ -242,6 +242,18 @@ public class FileManageE2ETest {
     void testUploadOver1GBFile() {
         final FileManagePage page = new FileManagePage(browser);
 
+        String command = String.format("fallocate -l 1.5G %s", testOver1GBFilePath);
+        try {
+            Process pro = Runtime.getRuntime().exec(command);
+            int status = pro.waitFor();
+            if (status != 0)
+            {
+                System.out.println("Failed to call shell's command ");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
         page.uploadFile(testOver1GBFilePath);
 
 
