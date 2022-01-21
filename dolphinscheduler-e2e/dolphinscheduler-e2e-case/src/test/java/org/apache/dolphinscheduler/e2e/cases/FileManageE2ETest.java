@@ -54,6 +54,10 @@ public class FileManageE2ETest {
 
     private static final String testDiretoryName = "test_directory";
 
+    private static final String testSubDirectoryName = "test_sub_directory";
+
+    private static final String testRenameDirectoryName = "test_rename_directory";
+
     @BeforeAll
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
@@ -86,6 +90,19 @@ public class FileManageE2ETest {
     }
 
     @Test
+    @Order(11)
+    void testCancelCreateDirectory() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.cancelCreateDirectory(testDiretoryName, "test_desc");
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testDiretoryName)));
+    }
+
+    @Test
     @Order(20)
     void testCreateDuplicateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
@@ -100,11 +117,39 @@ public class FileManageE2ETest {
     }
 
     @Test
+    @Order(21)
+    void testCreateSubDirectory() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.createSubDirectory(testDiretoryName, testSubDirectoryName, "test_desc");
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testSubDirectoryName)));
+    }
+
+    @Test
+    @Order(22)
+    void testRenameDirectory() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.renameDirectory(testSubDirectoryName, testRenameDirectoryName);
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testRenameDirectoryName)));
+    }
+
+    @Test
     @Order(30)
     void testDeleteDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.delete(testDiretoryName);
+        page.goToNav(ResourcePage.class)
+            .goToTab(FileManagePage.class)
+            .delete(testDiretoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();

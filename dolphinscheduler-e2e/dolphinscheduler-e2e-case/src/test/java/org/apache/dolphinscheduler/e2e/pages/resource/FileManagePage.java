@@ -42,6 +42,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final CreateDirectoryBox createDirectoryBox;
 
+    private final RenameDirectoryBox renameDirectoryBox;
+
     @FindBy(className = "items")
     private List<WebElement> fileList;
 
@@ -58,12 +60,59 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         super(driver);
 
         createDirectoryBox = new CreateDirectoryBox();
+
+        renameDirectoryBox = new RenameDirectoryBox();
     }
 
     public FileManagePage createDirectory(String name, String description) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
+        createDirectoryBox().inputDescription().sendKeys(description);
+        createDirectoryBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage cancelCreateDirectory(String name, String description) {
+        buttonCreateDirectory().click();
+
+        createDirectoryBox().inputDirectoryName().sendKeys(name);
+        createDirectoryBox().inputDescription().sendKeys(description);
+        createDirectoryBox().buttonCancel().click();
+
+        return this;
+    }
+
+    public FileManagePage renameDirectory(String currentDirectoryName, String AfterDirectoryName) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(currentDirectoryName))
+            .flatMap(it -> it.findElements(By.id("btnRename")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No rename button in file manage list"))
+            .click();
+
+        renameDirectoryBox().inputName().clear();
+        renameDirectoryBox().inputName().sendKeys(AfterDirectoryName);
+        renameDirectoryBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage createSubDirectory(String directoryName, String subDirectoryName, String description) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(directoryName))
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in file manage list", directoryName)))
+            .click();
+
+        buttonCreateDirectory().click();
+
+        createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
         createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
@@ -98,6 +147,25 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBy(id = "inputDirectoryName")
         private WebElement inputDirectoryName;
+
+        @FindBy(id = "inputDescription")
+        private WebElement inputDescription;
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class RenameDirectoryBox {
+        RenameDirectoryBox() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(id = "inputName")
+        private WebElement inputName;
 
         @FindBy(id = "inputDescription")
         private WebElement inputDescription;

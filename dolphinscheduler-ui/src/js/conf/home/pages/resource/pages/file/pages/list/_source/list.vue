@@ -54,10 +54,10 @@
         <el-table-column :label="$t('Operation')" width="150">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
+              <span><el-button id="btnEdit" type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Rename')" placement="top">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
+              <span><el-button id="btnRename" type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Download')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
