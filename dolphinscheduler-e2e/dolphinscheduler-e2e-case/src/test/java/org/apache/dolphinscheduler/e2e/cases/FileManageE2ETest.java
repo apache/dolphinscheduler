@@ -140,10 +140,14 @@ public class FileManageE2ETest {
 
         page.rename(testSubDirectoryName, testRenameDirectoryName);
 
-        await().untilAsserted(() -> assertThat(page.fileList())
-            .as("File list should contain newly-created file")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(testRenameDirectoryName)));
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+            
+            assertThat(page.fileList())
+                .as("File list should contain newly-created file")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(testRenameDirectoryName))
+        });
     }
 
     @Test
@@ -187,10 +191,14 @@ public class FileManageE2ETest {
 
         page.rename(testFileName, testRenameFileName);
 
-        await().untilAsserted(() -> assertThat(page.fileList())
-            .as("File list should contain newly-created file")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(testRenameFileName)));
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(page.fileList())
+                .as("File list should contain newly-created file")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(testRenameFileName))
+        });
     }
 
     @Test
@@ -224,5 +232,5 @@ public class FileManageE2ETest {
             );
         });
     }
-    
+
 }
