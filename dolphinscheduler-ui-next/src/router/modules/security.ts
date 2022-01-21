@@ -40,8 +40,8 @@ export default {
     },
     {
       path: '/security/user-manage',
-      name: 'users-manage',
-      component: components['user-manage'],
+      name: 'user-manage',
+      component: components['security-user-manage'],
       meta: {
         title: '用户管理',
         showSide: true
