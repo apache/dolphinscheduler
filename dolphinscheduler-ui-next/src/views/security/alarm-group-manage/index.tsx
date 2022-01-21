@@ -28,7 +28,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
-import AlertGroupModal from './components/alert-group-modal'
+import AlarmGroupModal from './components/alarm-group-modal'
 import styles from './index.module.scss'
 
 const alarmGroupManage = defineComponent({
@@ -143,7 +143,7 @@ const alarmGroupManage = defineComponent({
             />
           </div>
         </Card>
-        <AlertGroupModal
+        <AlarmGroupModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
           row={this.row}

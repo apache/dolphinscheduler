@@ -32,9 +32,10 @@ export default {
     {
       path: '/security/tenant-manage',
       name: 'tenant-manage',
-      component: components['tenant-manage'],
+      component: components['security-tenant-manage'],
       meta: {
-        title: '租户管理'
+        title: '租户管理',
+        showSide: true
       }
     },
     {
@@ -42,39 +43,53 @@ export default {
       name: 'users-manage',
       component: components['home'],
       meta: {
-        title: '用户管理'
+        title: '用户管理',
+        showSide: true
       }
     },
     {
       path: '/security/alarm-group-manage',
       name: 'alarm-group-manage',
-      component: components['alarm-group-manage'],
+      component: components['security-alarm-group-manage'],
       meta: {
-        title: '告警组管理'
+        title: '告警组管理',
+        showSide: true
       }
     },
     {
       path: '/security/worker-group-manage',
       name: 'worker-group-manage',
-      component: components['worker-group-manage'],
+      component: components['security-worker-group-manage'],
       meta: {
-        title: 'Worker分组管理'
+        title: 'Worker分组管理',
+        showSide: true
       }
     },
     {
       path: '/security/yarn-queue-manage',
       name: 'yarn-queue-manage',
-      component: components['yarn-queue-manage'],
+      component: components['security-yarn-queue-manage'],
       meta: {
-        title: 'Yarn队列管理'
+        title: 'Yarn队列管理',
+        showSide: true
       }
     },
     {
       path: '/security/environment-manage',
       name: 'environment-manage',
-      component: components['environment-manage'],
+      component: components['security-environment-manage'],
       meta: {
-        title: '环境管理'
+        title: '环境管理',
+        showSide: true
+      }
+    },
+    {
+      path: '/security/token-manage',
+      name: 'token-manage',
+      component: components['security-token-manage'],
+      meta: {
+        title: '令牌管理管理',
+        showSide: true
       }
     }
   ]

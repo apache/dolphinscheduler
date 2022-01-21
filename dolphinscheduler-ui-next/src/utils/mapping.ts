@@ -32,7 +32,7 @@ const mapping = (modules: any) => {
 
     let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
 
-    ;[name] = name.split('/').splice(-1)
+    name = name.replaceAll('/', '-')
 
     components[name] = modules[key]
   })
