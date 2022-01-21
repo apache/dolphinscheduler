@@ -1135,7 +1135,7 @@ public class WorkflowExecuteThread {
         Map<String, TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
             for (String preTaskCode : preTask) {
-                Integer taskId = completeTaskMap.get(preTaskCode);
+                Integer taskId = completeTaskMap.get(Long.parseLong(preTaskCode));
                 if (taskId == null) {
                     continue;
                 }
@@ -1296,7 +1296,7 @@ public class WorkflowExecuteThread {
         TaskNode taskNode = dag.getNode(taskCode);
         List<String> depCodeList = taskNode.getDepList();
         for (String depsNode : depCodeList) {
-            if (forbiddenTaskMap.containsKey(depsNode)) {
+            if (forbiddenTaskMap.containsKey(Long.parseLong(depsNode))) {
                 setIndirectDepList(depsNode, indirectDepCodeList);
             } else {
                 indirectDepCodeList.add(depsNode);
