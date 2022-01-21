@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -260,7 +262,7 @@ public interface ProcessDefinitionService {
      * @param processTaskRelationJson process task relation json
      * @return check result code
      */
-    Map<String, Object> checkProcessNodeList(String processTaskRelationJson);
+    Map<String, Object> checkProcessNodeList(String processTaskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs);
 
     /**
      * get task node details based on process definition
