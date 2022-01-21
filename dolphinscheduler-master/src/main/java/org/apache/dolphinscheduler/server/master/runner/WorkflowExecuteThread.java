@@ -400,35 +400,27 @@ public class WorkflowExecuteThread {
             return true;
         }
 
-        if (task.getState().typeIsFinished() && !completeTaskMap.containsKey(task.getTaskCode())) {
+        if (task.getState().typeIsFinished()) {
+            if (completeTaskMap.containsKey(task.getTaskCode()) && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
+                return true;
+            }
             taskFinished(task);
             if (task.getTaskGroupId() > 0) {
-                //release task group
-                TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(task);
-                if (nextTaskInstance != null) {
-                    if (nextTaskInstance.getProcessInstanceId() == task.getProcessInstanceId()) {
-                        StateEvent nextEvent = new StateEvent();
-                        nextEvent.setProcessInstanceId(this.processInstance.getId());
-                        nextEvent.setTaskInstanceId(nextTaskInstance.getId());
-                        nextEvent.setType(StateEventType.WAIT_TASK_GROUP);
-                        this.stateEvents.add(nextEvent);
-                    } else {
-                        ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-                        this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
-                            org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
-                    }
-                }
+                releaseTaskGroup(task);
             }
-        } else if (activeTaskProcessorMaps.containsKey(task.getTaskCode())) {
+            return true;
+        }
+        if (activeTaskProcessorMaps.containsKey(task.getTaskCode())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(task.getTaskCode());
             iTaskProcessor.action(TaskAction.RUN);
 
             if (iTaskProcessor.taskInstance().getState().typeIsFinished()) {
                 taskFinished(task);
             }
-        } else {
-            logger.error("state handler error: {}", stateEvent);
+            return true;
         }
+        logger.error("state handler error: {}", stateEvent);
+
         return true;
     }
 
@@ -450,11 +442,6 @@ public class WorkflowExecuteThread {
             processService.saveProcessInstance(processInstance);
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
         } else if (taskInstance.taskCanRetry()) {
-            // when a task retry, it should be set invalid
-            taskInstance.setFlag(Flag.NO);
-            processService.updateTaskInstance(taskInstance);
-            validTaskMap.remove(taskInstance.getTaskCode());
-
             // retry task
             retryTaskInstance(taskInstance);
         } else if (taskInstance.getState().typeIsFailure()) {
@@ -469,6 +456,29 @@ public class WorkflowExecuteThread {
             }
         }
         this.updateProcessInstanceState();
+    }
+
+    /**
+     * release task group
+     * @param taskInstance
+     */
+    private void releaseTaskGroup(TaskInstance taskInstance) {
+        if (taskInstance.getTaskGroupId() > 0) {
+            TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
+            if (nextTaskInstance != null) {
+                if (nextTaskInstance.getProcessInstanceId() == taskInstance.getProcessInstanceId()) {
+                    StateEvent nextEvent = new StateEvent();
+                    nextEvent.setProcessInstanceId(this.processInstance.getId());
+                    nextEvent.setTaskInstanceId(nextTaskInstance.getId());
+                    nextEvent.setType(StateEventType.WAIT_TASK_GROUP);
+                    this.stateEvents.add(nextEvent);
+                } else {
+                    ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
+                    this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
+                            org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
+                }
+            }
+        }
     }
 
     /**
@@ -828,6 +838,17 @@ public class WorkflowExecuteThread {
         if (!isNewProcessInstance()) {
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance task : validTaskInstanceList) {
+                if (validTaskMap.containsKey(task.getTaskCode())) {
+                    int oldTaskInstanceId = validTaskMap.get(task.getTaskCode());
+                    TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
+                    if (!oldTaskInstance.getState().typeIsFinished() && task.getState().typeIsFinished()) {
+                        task.setFlag(Flag.NO);
+                        processService.updateTaskInstance(task);
+                        continue;
+                    }
+                    logger.warn("have same taskCode taskInstance when init task queue, taskCode:{}", task.getTaskCode());
+                }
+
                 validTaskMap.put(task.getTaskCode(), task.getId());
                 taskInstanceMap.put(task.getId(), task);
 
@@ -839,6 +860,13 @@ public class WorkflowExecuteThread {
                     continue;
                 }
                 if (task.taskCanRetry()) {
+                    if (task.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
+                        // tolerantTaskInstance add to standby list directly
+                        TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
+                        addTaskToStandByList(tolerantTaskInstance);
+                    } else {
+                        retryTaskInstance(task);
+                    }
                     continue;
                 }
                 if (task.getState().typeIsFailure()) {
@@ -897,6 +925,19 @@ public class WorkflowExecuteThread {
                     taskInstance.getId(), taskInstance.getName());
                 return null;
             }
+
+            // in a dag, only one taskInstance is valid per taskCode, so need to set the old taskInstance invalid
+            if (validTaskMap.containsKey(taskInstance.getTaskCode())) {
+                int oldTaskInstanceId = validTaskMap.get(taskInstance.getTaskCode());
+                if (taskInstance.getId() != oldTaskInstanceId) {
+                    TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
+                    oldTaskInstance.setFlag(Flag.NO);
+                    processService.updateTaskInstance(oldTaskInstance);
+                    validTaskMap.remove(taskInstance.getTaskCode());
+                    activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
+                }
+            }
+
             validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
@@ -971,7 +1012,7 @@ public class WorkflowExecuteThread {
     }
 
     /**
-     * clone a new taskInstance and reset some logic fields
+     * clone a new taskInstance for retry and reset some logic fields
      * @return
      */
     public TaskInstance cloneRetryTaskInstance(TaskInstance taskInstance) {
@@ -984,12 +1025,29 @@ public class WorkflowExecuteThread {
         newTaskInstance.setTaskDefine(taskInstance.getTaskDefine());
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
-        if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
-            newTaskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-        }
+        newTaskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
         // todo relative funtion: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
+        return newTaskInstance;
+    }
+
+    /**
+     * clone a new taskInstance for tolerant and reset some logic fields
+     * @return
+     */
+    public TaskInstance cloneTolerantTaskInstance(TaskInstance taskInstance) {
+        TaskNode taskNode = dag.getNode(Long.toString(taskInstance.getTaskCode()));
+        if (taskNode == null) {
+            logger.error("taskNode is null, code:{}", taskInstance.getTaskCode());
+            return null;
+        }
+        TaskInstance newTaskInstance =  newTaskInstance(processInstance, taskNode);
+        newTaskInstance.setTaskDefine(taskInstance.getTaskDefine());
+        newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
+        newTaskInstance.setProcessInstance(processInstance);
+        newTaskInstance.setRetryTimes(taskInstance.getRetryTimes());
+        newTaskInstance.setState(taskInstance.getState());
         return newTaskInstance;
     }
 

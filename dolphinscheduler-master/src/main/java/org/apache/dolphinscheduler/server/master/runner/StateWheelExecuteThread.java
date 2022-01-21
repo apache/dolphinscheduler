@@ -42,8 +42,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 1. timeout check wheel
- * 2. dependent task check wheel
+ * Check thread
+ * 1. timeout task check
+ * 2. dependent task state check
+ * 3. retry task check
+ * 4. timeout process check
  */
 @Component
 public class StateWheelExecuteThread extends Thread {
@@ -135,7 +138,7 @@ public class StateWheelExecuteThread extends Thread {
             logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
             return;
         }
-        logger.info("addTask4RetryCheck, taskCode:{}, processInstanceId:{}", taskInstance.getTaskCode(), taskInstance.getProcessInstanceId());
+        logger.debug("addTask4RetryCheck, taskCode:{}, processInstanceId:{}", taskInstance.getTaskCode(), taskInstance.getProcessInstanceId());
         taskInstanceRetryCheckList.put(taskInstance.getTaskCode(), taskInstance.getProcessInstanceId());
     }
 
