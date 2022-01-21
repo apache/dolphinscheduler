@@ -142,11 +142,11 @@ public class FileManageE2ETest {
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
-            
+
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameDirectoryName))
+                .anyMatch(it -> it.contains(testRenameDirectoryName));
         });
     }
 
@@ -197,7 +197,7 @@ public class FileManageE2ETest {
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameFileName))
+                .anyMatch(it -> it.contains(testRenameFileName));
         });
     }
 
