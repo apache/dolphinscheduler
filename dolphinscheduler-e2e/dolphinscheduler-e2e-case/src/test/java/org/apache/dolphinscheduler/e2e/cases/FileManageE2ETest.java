@@ -253,7 +253,7 @@ public class FileManageE2ETest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        
+
         page.uploadFile(testOver1GBFilePath);
 
 
