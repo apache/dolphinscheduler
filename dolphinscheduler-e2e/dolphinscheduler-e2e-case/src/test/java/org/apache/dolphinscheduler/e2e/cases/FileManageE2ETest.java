@@ -267,7 +267,7 @@ public class FileManageE2ETest {
     void testUploadUnder1GBFile() {
         final FileManagePage page = new FileManagePage(browser);
 
-//        browser.navigate().refresh();
+        browser.navigate().refresh();
 
         String command = String.format("fallocate -l 0.5G %s", testUnder1GBFilePath);
         try {
