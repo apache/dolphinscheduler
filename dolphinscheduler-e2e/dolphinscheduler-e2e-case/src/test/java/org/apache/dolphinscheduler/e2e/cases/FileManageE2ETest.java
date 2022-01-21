@@ -256,7 +256,41 @@ public class FileManageE2ETest {
 
         page.uploadFile(testOver1GBFilePath);
 
+        await().untilAsserted(() ->
+            assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("Upload File size cannot exceed 1g")
+        );
+    }
 
+    @Test
+    @Order(65)
+    void testUploadUnder1GBFile() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        browser.navigate().refresh();
+
+        String command = String.format("fallocate -l 0.5G %s", testUnder1GBFilePath);
+        try {
+            Process pro = Runtime.getRuntime().exec(command);
+            int status = pro.waitFor();
+            if (status != 0)
+            {
+                System.out.println("Failed to call shell's command ");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        page.uploadFile(testUnder1GBFilePath);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(page.fileList())
+                .as("File list should contain newly-created file")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(testRenameFileName));
+        });
     }
 
 }

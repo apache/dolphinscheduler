@@ -185,9 +185,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonUploadFile().click();
 
         driver.setFileDetector(new LocalFileDetector());
-//        File file = new File(filePath);
-//        String absoluteFilePath = file.getAbsolutePath();
-//        System.out.printf("file exists: %s", file.exists());
 
         uploadFileBox().buttonUpload().sendKeys(filePath);
         uploadFileBox().buttonSubmit().click();
