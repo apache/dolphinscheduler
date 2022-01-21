@@ -39,8 +39,12 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -61,6 +65,11 @@ public final class DingTalkSender {
     private final String url;
     private final String keyword;
     private final String secret;
+
+    private final String atMobiles;
+    private final String atUserIds;
+    private final Boolean atAll;
+
     private final Boolean enableProxy;
 
     private String proxy;
@@ -75,11 +84,16 @@ public final class DingTalkSender {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
         secret = config.get(DingTalkParamsConstants.NAME_DING_TALK_SECRET);
+
+        atMobiles = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES);
+        atUserIds = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS);
+        atAll = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_ALL));
+
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
             proxy = config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY);
-            user = config.get(DingTalkParamsConstants.DING_TALK_USER);
+            user = config.get(DingTalkParamsConstants.NAME_DING_TALK_USER);
             password = config.get(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD);
         }
     }
@@ -108,7 +122,7 @@ public final class DingTalkSender {
         return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
-    private static String textToJsonString(String text) {
+    private String textToJsonString(String text) {
         Map<String, Object> items = new HashMap<>();
         items.put("msgtype", "text");
         Map<String, String> textContent = new HashMap<>();
@@ -116,10 +130,26 @@ public final class DingTalkSender {
         String txt = StringUtils.newStringUtf8(byt);
         textContent.put("content", txt);
         items.put("text", textContent);
+
+        setMsgAt(items);
         return JSONUtils.toJsonString(items);
     }
 
-    private static AlertResult checkSendDingTalkSendMsgResult(String result) {
+    private void setMsgAt(Map<String, Object> items) {
+        Map<String, Object> at = new HashMap<>();
+
+        String[] atMobileArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",") : new String[0];
+        String[] atUserArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",") : new String[0];
+        boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
+
+        at.put("atMobiles", atMobileArray);
+        at.put("atUserIds", atUserArray);
+        at.put("isAtAll", isAtAll);
+
+        items.put("at", at);
+    }
+
+    private AlertResult checkSendDingTalkSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
 
