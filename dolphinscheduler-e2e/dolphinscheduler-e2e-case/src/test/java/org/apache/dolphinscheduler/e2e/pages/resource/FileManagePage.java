@@ -24,16 +24,15 @@ import lombok.Getter;
 
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
-import java.io.File;
 import java.util.List;
 
 
@@ -184,6 +183,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     public FileManagePage uploadFile(String filePath) {
         buttonUploadFile().click();
 
+        driver.setFileDetector(new LocalFileDetector());
         uploadFileBox().buttonUpload().sendKeys(filePath);
         uploadFileBox().buttonSubmit().click();
 
