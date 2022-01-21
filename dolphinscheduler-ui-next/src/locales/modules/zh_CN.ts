@@ -47,11 +47,12 @@ const menu = {
   datasource: '数据源中心',
   monitor: '监控中心',
   security: '安全中心',
-  workflow_monitoring: '工作流监控',
-  workflow_relationships: '工作流关系',
+  project_overview: '项目概览',
+  workflow_relation: '工作流关系',
   workflow: '工作流',
   workflow_definition: '工作流定义',
   workflow_instance: '工作流实例',
+  task: '任务',
   task_instance: '任务实例',
   task_definition: '任务定义',
   file_manage: '文件管理',
@@ -217,6 +218,37 @@ const resource = {
     enter_name_tips: '请输入名称',
     enter_description_tips: '请输入描述'
   },
+  function: {
+    udf_function: 'UDF函数',
+    create_udf_function: '创建UDF函数',
+    edit_udf_function: '编辑UDF函数',
+    id: '编号',
+    udf_function_name: 'UDF函数名称',
+    class_name: '类名',
+    type: '类型',
+    description: '描述',
+    jar_package: 'jar包',
+    update_time: '更新时间',
+    operation: '操作',
+    rename: '重命名',
+    edit: '编辑',
+    delete: '删除',
+    success: '成功',
+    package_name: '包名类名',
+    udf_resources: 'UDF资源',
+    instructions: '使用说明',
+    upload_resources: '上传资源',
+    udf_resources_directory: 'UDF资源目录',
+    delete_confirm: '确定删除吗?',
+    enter_keyword_tips: '请输入关键词',
+    enter_udf_unction_name_tips: '请输入UDF函数名称',
+    enter_package_name_tips: '请输入包名类名',
+    enter_select_udf_resources_tips: '请选择UDF资源',
+    enter_select_udf_resources_directory_tips: '请选择UDF资源目录',
+    enter_instructions_tips: '请输入使用说明',
+    enter_name_tips: '请输入名称',
+    enter_description_tips: '请输入描述'
+  },
   task_group_option: {
     id: '编号',
     manage: '任务组管理',
@@ -286,6 +318,18 @@ const project = {
     confirm: '确定',
     cancel: '取消',
     delete_confirm: '确定删除吗?'
+  },
+  workflow: {
+    workflow_relation: '工作流关系',
+    create_workflow: '创建工作流',
+    search: '搜索',
+    download_png: '下载工作流图片',
+    fullscreen_open: '全屏',
+    fullscreen_close: '退出全屏',
+    workflow_version: '工作流版本信息',
+    save: '保存',
+    close: '关闭',
+    format: '格式化'
   }
 }
 
@@ -321,11 +365,25 @@ const security = {
     alarm_group_description: '告警组描述',
     create_time: '创建时间',
     update_time: '更新时间',
-    actions: '操作',
     operation: '操作',
     delete_confirm: '确定删除吗?',
     edit: '编辑',
     delete: '删除'
+  },
+  worker_group: {
+    create_worker_group: '创建Worker分组',
+    edit_worker_group: '编辑Worker分组',
+    search_tips: '请输入关键词',
+    operation: '操作',
+    delete_confirm: '确定删除吗?',
+    edit: '编辑',
+    delete: '删除',
+    group_name: '分组名称',
+    group_name_tips: '请输入分组名称',
+    worker_addresses: 'Worker地址',
+    worker_addresses_tips: '请选择Worker地址',
+    create_time: '创建时间',
+    update_time: '更新时间'
   },
   yarn_queue: {
     create_queue: '创建队列',
@@ -358,6 +416,23 @@ const security = {
     environment_config_tips: '请输入环境配置',
     environment_description_tips: '请输入环境描述',
     worker_group_tips: '请选择Worker分组'
+  },
+  token: {
+    create_token: '创建令牌',
+    edit_token: '编辑令牌',
+    search_tips: '请输入关键词',
+    user: '用户',
+    user_tips: '请选择用户',
+    token: '令牌',
+    token_tips: '请输入令牌',
+    expiration_time: '失效时间',
+    expiration_time_tips: '请选择失效时间',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    delete_confirm: '确定删除吗?'
   }
 }
 

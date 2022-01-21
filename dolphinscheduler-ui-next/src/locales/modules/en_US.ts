@@ -47,11 +47,12 @@ const menu = {
   datasource: 'Datasource',
   monitor: 'Monitor',
   security: 'Security',
-  workflow_monitoring: 'Workflow Monitoring',
-  workflow_relationships: 'Workflow Relationships',
+  project_overview: 'Project Overview',
+  workflow_relation: 'Workflow Relation',
   workflow: 'Workflow',
   workflow_definition: 'Workflow Definition',
   workflow_instance: 'Workflow Instance',
+  task: 'Task',
   task_instance: 'Task Instance',
   task_definition: 'Task Definition',
   file_manage: 'File Manage',
@@ -215,6 +216,38 @@ const resource = {
     enter_name_tips: 'Please enter name',
     enter_description_tips: 'Please enter description'
   },
+  function: {
+    udf_function: 'UDF Function',
+    create_udf_function: 'Create UDF Function',
+    edit_udf_function: 'Create UDF Function',
+    id: '#',
+    udf_function_name: 'UDF Function Name',
+    class_name: 'Class Name',
+    type: 'Type',
+    description: 'Description',
+    jar_package: 'Jar Package',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    rename: 'Rename',
+    edit: 'Edit',
+    delete: 'Delete',
+    success: 'Success',
+    package_name: 'Package Name',
+    udf_resources: 'UDF Resources',
+    instructions: 'Instructions',
+    upload_resources: 'Upload Resources',
+    udf_resources_directory: 'UDF resources directory',
+    delete_confirm: 'Delete?',
+    enter_keyword_tips: 'Please enter keyword',
+    enter_udf_unction_name_tips: 'Please enter a UDF function name',
+    enter_package_name_tips: 'Please enter a Package name',
+    enter_select_udf_resources_tips: 'Please select UDF resources',
+    enter_select_udf_resources_directory_tips:
+      'Please select UDF resources directory',
+    enter_instructions_tips: 'Please enter a instructions',
+    enter_name_tips: 'Please enter name',
+    enter_description_tips: 'Please enter description'
+  },
   task_group_option: {
     id: 'No.',
     manage: 'Task group manage',
@@ -286,6 +319,18 @@ const project = {
     confirm: 'Confirm',
     cancel: 'Cancel',
     delete_confirm: 'Delete?'
+  },
+  workflow: {
+    workflow_relation: 'Workflow Relation',
+    create_workflow: 'Create Workflow',
+    search: 'Search',
+    download_png: 'Download PNG',
+    fullscreen_open: 'Open Fullscreen',
+    fullscreen_close: 'Close Fullscreen',
+    workflow_version: 'Workflow Version Info',
+    save: 'Save',
+    close: 'Close',
+    format: 'Format'
   }
 }
 
@@ -326,6 +371,21 @@ const security = {
     edit: 'Edit',
     delete: 'Delete'
   },
+  worker_group: {
+    create_worker_group: 'Create Worker Group',
+    edit_worker_group: 'Edit Worker Group',
+    search_tips: 'Please enter keywords',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    edit: 'Edit',
+    delete: 'Delete',
+    group_name: 'Group Name',
+    group_name_tips: 'Please enter your group name',
+    worker_addresses: 'Worker Addresses',
+    worker_addresses_tips: 'Please select worker addresses',
+    create_time: 'Create Time',
+    update_time: 'Update Time'
+  },
   yarn_queue: {
     create_queue: 'Create Queue',
     edit_queue: 'Edit Queue',
@@ -357,6 +417,23 @@ const security = {
     environment_config_tips: 'Please enter your environment config',
     environment_description_tips: 'Please enter your environment description',
     worker_group_tips: 'Please select worker group'
+  },
+  token: {
+    create_token: 'Create Token',
+    edit_token: 'Edit Token',
+    search_tips: 'Please enter keywords',
+    user: 'User',
+    user_tips: 'Please select user',
+    token: 'Token',
+    token_tips: 'Please enter your token',
+    expiration_time: 'Expiration Time',
+    expiration_time_tips: 'Please select expiration time',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?'
   }
 }
 

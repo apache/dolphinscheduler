@@ -21,8 +21,8 @@ import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
 import { useI18n } from 'vue-i18n'
 
-const AlertGroupModal = defineComponent({
-  name: 'YarnQueueModal',
+const WorkerGroupModal = defineComponent({
+  name: 'WorkerQueueModal',
   props: {
     showModalRef: {
       type: Boolean as PropType<boolean>,
@@ -44,9 +44,8 @@ const AlertGroupModal = defineComponent({
 
     const cancelModal = () => {
       if (props.statusRef === 0) {
-        variables.model.groupName = ''
-        variables.model.alertInstanceIds = []
-        variables.model.description = ''
+        variables.model.name = ''
+        variables.model.addrList = []
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -66,16 +65,12 @@ const AlertGroupModal = defineComponent({
       () => props.statusRef,
       () => {
         if (props.statusRef === 0) {
-          variables.model.groupName = ''
-          variables.model.alertInstanceIds = []
-          variables.model.description = ''
+          variables.model.name = ''
+          variables.model.addrList = []
         } else {
           variables.model.id = props.row.id
-          variables.model.groupName = props.row.groupName
-          variables.model.alertInstanceIds = props.row.alertInstanceIds
-            .split(',')
-            .map((item: string) => Number(item))
-          variables.model.description = props.row.description
+          variables.model.name = props.row.name
+          variables.model.addrList = props.row.addrList.split(',')
         }
       }
     )
@@ -84,11 +79,8 @@ const AlertGroupModal = defineComponent({
       () => props.row,
       () => {
         variables.model.id = props.row.id
-        variables.model.groupName = props.row.groupName
-        variables.model.alertInstanceIds = props.row.alertInstanceIds
-          .split(',')
-          .map((item: string) => Number(item))
-        variables.model.description = props.row.description
+        variables.model.name = props.row.name
+        variables.model.addrList = props.row.addrList.split(',')
       }
     )
 
@@ -101,57 +93,41 @@ const AlertGroupModal = defineComponent({
         <Modal
           title={
             this.statusRef === 0
-              ? t('security.alarm_group.create_alarm_group')
-              : t('security.alarm_group.edit_alarm_group')
+              ? t('security.worker_group.create_worker_group')
+              : t('security.worker_group.edit_worker_group')
           }
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
-          confirmDisabled={
-            !this.model.groupName || this.model.alertInstanceIds.length < 1
-          }
+          confirmDisabled={!this.model.name || this.model.addrList.length < 1}
         >
           {{
             default: () => (
               <NForm
                 model={this.model}
                 rules={this.rules}
-                ref='alertGroupFormRef'
+                ref='workerGroupFormRef'
               >
                 <NFormItem
-                  label={t('security.alarm_group.alert_group_name')}
-                  path='groupName'
+                  label={t('security.worker_group.group_name')}
+                  path='name'
                 >
                   <NInput
-                    placeholder={t(
-                      'security.alarm_group.alert_group_name_tips'
-                    )}
-                    v-model={[this.model.groupName, 'value']}
+                    placeholder={t('security.worker_group.group_name_tips')}
+                    v-model={[this.model.name, 'value']}
                   />
                 </NFormItem>
                 <NFormItem
-                  label={t('security.alarm_group.alarm_plugin_instance')}
-                  path='alertInstanceIds'
+                  label={t('security.worker_group.worker_addresses')}
+                  path='addrList'
                 >
                   <NSelect
                     multiple
                     placeholder={t(
-                      'security.alarm_group.alarm_plugin_instance_tips'
+                      'security.worker_group.worker_addresses_tips'
                     )}
                     options={this.model.generalOptions}
-                    v-model={[this.model.alertInstanceIds, 'value']}
-                  />
-                </NFormItem>
-                <NFormItem
-                  label={t('security.alarm_group.alarm_group_description')}
-                  path='description'
-                >
-                  <NInput
-                    type='textarea'
-                    placeholder={t(
-                      'security.alarm_group.alarm_group_description_tips'
-                    )}
-                    v-model={[this.model.description, 'value']}
+                    v-model={[this.model.addrList, 'value']}
                   />
                 </NFormItem>
               </NForm>
@@ -163,4 +139,4 @@ const AlertGroupModal = defineComponent({
   }
 })
 
-export default AlertGroupModal
+export default WorkerGroupModal

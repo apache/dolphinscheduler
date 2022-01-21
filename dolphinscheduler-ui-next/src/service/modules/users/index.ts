@@ -127,7 +127,7 @@ export function listUser(): any {
   })
 }
 
-export function listAll(params: ListAllReq): any {
+export function listAll(params?: ListAllReq): any {
   return axios({
     url: '/users/list-all',
     method: 'get',
