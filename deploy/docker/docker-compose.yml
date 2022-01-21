@@ -141,7 +141,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-python-gateway:
-    image: ${HUB}/dolphinscheduler-python-gateway:${TAG}
+    image: ${HUB}/dolphinscheduler-python:${TAG}
     ports:
       - "54321:54321"
       - "25333:25333"
