@@ -60,7 +60,7 @@ public class FileManageE2ETest {
 
     private static final String testFileName = "test_file";
 
-    private static final String testRenameFileName = "test_rename_file";
+    private static final String testRenameFileName = "test_rename_file.sh";
 
     @BeforeAll
     public static void setup() {
