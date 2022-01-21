@@ -33,6 +33,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -184,7 +185,10 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonUploadFile().click();
 
         driver.setFileDetector(new LocalFileDetector());
-        uploadFileBox().buttonUpload().sendKeys(filePath);
+        File file = new File(filePath);
+        String absoluteFilePath = file.getAbsolutePath();
+
+        uploadFileBox().buttonUpload().sendKeys(absoluteFilePath);
         uploadFileBox().buttonSubmit().click();
 
         return this;
