@@ -18,11 +18,11 @@
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { NSelect, NButton, NIcon, NSpace } from 'naive-ui'
-import { ReloadOutlined, EyeOutlined } from '@vicons/antd'
+import {NSelect, NButton, NIcon, NSpace, NTooltip} from 'naive-ui'
+import {ReloadOutlined, EyeOutlined, EditOutlined} from '@vicons/antd'
 import { useRelation } from './use-relation'
 import Card from '@/components/card'
-import Graph from '@/views/projects/workflow/relation/components/Graph'
+import Graph from './components/Graph'
 
 const workflowRelation = defineComponent({
   name: 'workflow-relation',
@@ -75,28 +75,42 @@ const workflowRelation = defineComponent({
                 options={this.workflowOptions}
                 v-model={[this.workflow, 'value']}
               />
-              <NButton
-                strong
-                secondary
-                circle
-                type='info'
-                onClick={handleResetDate}
-              >
-                <NIcon>
-                  <ReloadOutlined />
-                </NIcon>
-              </NButton>
-              <NButton
-                strong
-                secondary
-                circle
-                type='info'
-                onClick={() => (this.labelShow = !this.labelShow)}
-              >
-                <NIcon>
-                  <EyeOutlined />
-                </NIcon>
-              </NButton>
+              <NTooltip trigger={'hover'}>
+                {{
+                  default: () => t('project.workflow.refresh'),
+                  trigger: () => (
+                    <NButton
+                      strong
+                      secondary
+                      circle
+                      type='info'
+                      onClick={handleResetDate}
+                    >
+                      <NIcon>
+                        <ReloadOutlined />
+                      </NIcon>
+                    </NButton>
+                  )
+                }}
+              </NTooltip>
+              <NTooltip trigger={'hover'}>
+                {{
+                  default: () => t('project.workflow.show_hide_label'),
+                  trigger: () => (
+                    <NButton
+                      strong
+                      secondary
+                      circle
+                      type='info'
+                      onClick={() => (this.labelShow = !this.labelShow)}
+                    >
+                      <NIcon>
+                        <EyeOutlined />
+                      </NIcon>
+                    </NButton>
+                  )
+                }}
+              </NTooltip>
             </NSpace>
           )
         }}

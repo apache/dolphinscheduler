@@ -326,6 +326,8 @@ const project = {
     current_selection: '当前选择',
     online: '已上线',
     offline: '已下线',
+    refresh: '刷新',
+    show_hide_label: '显示 / 隐藏标签',
     workflow_offline: '工作流下线',
     schedule_offline: '调度下线',
     schedule_start_time: '定时开始时间',

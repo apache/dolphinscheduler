@@ -327,6 +327,8 @@ const project = {
     current_selection: 'Current Selection',
     online: 'Online',
     offline: 'Offline',
+    refresh: 'Refresh',
+    show_hide_label: 'Show / Hide Label',
     workflow_offline: 'Workflow Offline',
     schedule_offline: 'Schedule Offline',
     schedule_start_time: 'Schedule Start Time',
