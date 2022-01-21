@@ -64,6 +64,28 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                         .setRequired(false)
                         .build())
                 .build();
+        InputParam atMobilesParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES, DingTalkParamsConstants.DING_TALK_AT_MOBILES)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        InputParam atUserIdsParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS, DingTalkParamsConstants.DING_TALK_AT_USERIDS)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        RadioParam isAtAll = RadioParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_ALL, DingTalkParamsConstants.DING_TALK_AT_ALL)
+                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_FALSE)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+
         RadioParam isEnableProxy = RadioParam
                 .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.DING_TALK_PROXY_ENABLE)
                 .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
@@ -98,7 +120,7 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                 .setPlaceholder("if enable use authentication, you need input password")
                 .build();
 
-        return Arrays.asList(webHookParam, keywordParam, secretParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
+        return Arrays.asList(webHookParam, keywordParam, secretParam, atMobilesParam, atUserIdsParam, isAtAll, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
 
     @Override
