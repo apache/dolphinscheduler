@@ -309,7 +309,7 @@ public class FileManageE2ETest {
 
         page.downloadFile(testUnder1GBFileName);
 
-        String downloadFilePath = String.format("/tmp/dolphinscheduler/download/%s", testUnder1GBFileName);
+        String downloadFilePath = String.format("/home/%s/Downloads/%s", tenant, testUnder1GBFileName);
         File file = new File(downloadFilePath);
 
         new FluentWait<WebDriver>(page.driver())
