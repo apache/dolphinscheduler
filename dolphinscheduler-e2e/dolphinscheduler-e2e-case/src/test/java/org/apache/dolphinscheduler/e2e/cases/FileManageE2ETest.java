@@ -289,7 +289,7 @@ public class FileManageE2ETest {
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameFileName));
+                .anyMatch(it -> it.contains(testUnder1GBFilePath));
         });
     }
 
