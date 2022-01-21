@@ -19,8 +19,38 @@ interface ProjectCodeReq {
   projectCode: number
 }
 
+interface WorkflowCodeReq {
+  workFlowCode: number
+}
+
 interface WorkFlowNameReq {
   workFlowName: string
 }
 
-export { ProjectCodeReq, WorkFlowNameReq }
+interface WorkFlowListRes extends WorkflowCodeReq {
+  workFlowName: string
+  workFlowPublishStatus: string
+  scheduleStartTime?: any
+  scheduleEndTime?: any
+  crontab?: any
+  schedulePublishStatus: number
+  sourceWorkFlowCode: string
+}
+
+interface WorkFlowRelationList {
+  sourceWorkFlowCode: number
+  targetWorkFlowCode: number
+}
+
+interface WorkflowRes {
+  workFlowList: WorkFlowListRes[]
+  workFlowRelationList: WorkFlowRelationList[]
+}
+
+export {
+  ProjectCodeReq,
+  WorkflowCodeReq,
+  WorkFlowNameReq,
+  WorkflowRes,
+  WorkFlowListRes
+}
