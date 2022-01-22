@@ -21,54 +21,21 @@
         <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
       </div>
       <div class="list">
-        <el-date-picker
-          style="width: 310px"
-          v-model="dataTime"
-          size="mini"
-          @change="_onChangeStartStop"
-          type="datetimerange"
-          range-separator="-"
-          :start-placeholder="$t('startDate')"
-          :end-placeholder="$t('endDate')"
-          value-format="yyyy-MM-dd HH:mm:ss">
-        </el-date-picker>
-      </div>
-      <div class="list">
-        <el-select style="width: 140px;" @change="_onChangeRuleType" :value="searchParams.ruleType" :placeholder="$t('Rule Type')" size="mini">
-          <el-option
-                  v-for="city in ruleTypeList"
-                  :key="city.label"
-                  :value="city.code"
-                  :label="city.label">
-          </el-option>
-        </el-select>
-      </div>
-      <div class="list">
-        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Task Name')"></el-input>
+        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Rule Name')"></el-input>
       </div>
     </template>
   </m-conditions>
 </template>
 <script>
   import _ from 'lodash'
-  import { ruleType } from '../common'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
     name: 'rule-conditions',
     data () {
       return {
-        // ruleType(list)
-        ruleTypeList: ruleType,
-
         searchParams: {
-          // start date
-          startDate: '',
-          // end date
-          endDate: '',
           // search value
-          searchVal: '',
-          // host
-          ruleType: ''
+          searchVal: ''
         },
         dataTime: []
       }
@@ -77,24 +44,6 @@
     methods: {
       _ckQuery () {
         this.$emit('on-query', this.searchParams)
-      },
-      _onChangeStartStop (val) {
-        if (val === null) {
-          this.searchParams.startDate = ''
-          this.searchParams.endDate = ''
-          this.dataTime = []
-        } else {
-          this.searchParams.startDate = val[0]
-          this.searchParams.endDate = val[1]
-          this.dataTime[0] = val[0]
-          this.dataTime[1] = val[1]
-        }
-      },
-      /**
-       * change state
-       */
-      _onChangeRuleType (val) {
-        this.searchParams.ruleType = val
       }
     },
     watch: {

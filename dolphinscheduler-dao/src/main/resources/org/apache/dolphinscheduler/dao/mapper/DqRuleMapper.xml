@@ -29,7 +29,7 @@
                 and a.update_time > #{startTime} and a.update_time <![CDATA[ <=]]> #{endTime}
             </if>
             <if test=" ruleType != -1">
-                and a.rule_type = #{ruleType}
+                and a.type = #{ruleType}
             </if>
         </where>
         order by a.update_time desc
