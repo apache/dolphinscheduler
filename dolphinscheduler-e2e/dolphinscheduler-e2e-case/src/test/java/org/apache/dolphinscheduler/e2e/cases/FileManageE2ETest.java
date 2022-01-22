@@ -308,18 +308,6 @@ public class FileManageE2ETest {
         final FileManagePage page = new FileManagePage(browser);
 
         page.downloadFile(testUnder1GBFileName);
-
-//        String downloadFilePath = String.format("/home/%s/Downloads/%s", tenant, testUnder1GBFileName);
-//        File file = new File(downloadFilePath);
-//
-//        new FluentWait<WebDriver>(page.driver())
-//                .withTimeout(Duration.ofSeconds(60))
-//                .pollingEvery(Duration.ofSeconds(1))
-//                .ignoring(NoSuchElementException.class)
-//                .until(webDriver -> file.exists());
-//
-//        if (!file.exists()) {
-//            throw new RuntimeException("download file failed");
-//        }
+        
     }
 }
