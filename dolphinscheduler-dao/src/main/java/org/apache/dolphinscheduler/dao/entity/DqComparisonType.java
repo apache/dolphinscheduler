@@ -139,8 +139,7 @@ public class DqComparisonType implements Serializable {
     public String toString() {
         return "DqComparisonType{"
                 + "id=" + id
-                + ", type='"
-                + type + '\''
+                + ", type='" + type + '\''
                 + ", executeSql='" + executeSql + '\''
                 + ", outputTable='" + outputTable + '\''
                 + ", name='" + name + '\''
