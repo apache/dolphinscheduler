@@ -320,6 +320,6 @@ public class FileManageE2ETest {
 //
 //        if (!file.exists()) {
 //            throw new RuntimeException("download file failed");
-        }
+//        }
     }
 }
