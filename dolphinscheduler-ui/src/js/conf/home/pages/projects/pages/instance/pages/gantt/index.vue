@@ -29,7 +29,6 @@
             </a>
           </div>
         </div>
-
         <template v-if="!isNodata">
           <div class="gantt"></div>
         </template>
