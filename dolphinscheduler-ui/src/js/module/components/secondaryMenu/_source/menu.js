@@ -165,7 +165,7 @@ const menu = {
       enabled: true,
       icon: 'el-icon-document',
       children: [],
-      classNames: "tab-token-manage"
+      classNames: 'tab-token-manage'
     }
   ],
   resource: [
