@@ -189,15 +189,21 @@
     methods: {
 
       _handleRuleChange (o) {
-        this._getRuluInputEntryList(o)
+        this._getRuleInputEntryList(o)
       },
       /**
        * Get the rule input entry list
        */
-      _getRuluInputEntryList (ruleId) {
+      _getRuleInputEntryList (ruleId) {
         return new Promise((resolve, reject) => {
           this.store.dispatch('dag/getRuleInputEntryList', ruleId).then(res => {
-            this.rule = JSON.parse(res.data)
+            this.rule = JSON.parse(res.data).map(item => {
+              if (item.title.indexOf('$t') !== -1) {
+                item.title = this.$t(item.field)
+              }
+              item.props = item.props || {}
+              return item
+            })
             this.fApi.on('src_connector_type-change', this.srcConnectorTypeChange)
             this.fApi.on('target_connector_type-change', this.targetConnectorTypeChange)
             this.fApi.on('writer_connector_type-change', this.writerConnectorTypeChange)
@@ -219,7 +225,7 @@
       },
 
       getComparisonNameInput () {
-        return this.$formCreate.maker.input('固定值', 'comparison_name', this.inputEntryValueMap.comparison_name)
+        return this.$formCreate.maker.input($t('fix_value'), 'comparison_name', this.inputEntryValueMap.comparison_name)
       },
 
       srcConnectorTypeChange () {
@@ -324,15 +330,22 @@
             this.ruleNameList = []
             res.data.forEach((item, i) => {
               let obj = {}
-              obj.label = item.name
+              if (item.name.indexOf('$t') !== -1) {
+                if (item.name) {
+                  obj.label = this.$t((item.name).replace('$t(', '').replace(')', ''))
+                }
+              } else {
+                obj.label = item.name
+              }
+
               obj.value = item.id
               this.ruleNameList.push(obj)
             })
             if (this.ruleId === 0) {
               this.ruleId = this.ruleNameList[0].value
-              this._getRuluInputEntryList(this.ruleId)
+              this._getRuleInputEntryList(this.ruleId)
             } else {
-              this._getRuluInputEntryList(this.ruleId)
+              this._getRuleInputEntryList(this.ruleId)
               window.setTimeout(() => {
                 this._operateFields()
               }, 1000)
