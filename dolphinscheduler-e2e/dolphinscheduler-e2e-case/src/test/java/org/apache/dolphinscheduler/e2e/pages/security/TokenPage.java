@@ -34,7 +34,7 @@ import org.openqa.selenium.support.PageFactory;
 import lombok.Getter;
 
 @Getter
-public final class TokenPage extends NavBarPage implements Tab, CharSequence {
+public final class TokenPage extends NavBarPage implements Tab {
     @FindBy(id = "btnCreateToken")
     private WebElement buttonCreateToken;
 
@@ -96,21 +96,6 @@ public final class TokenPage extends NavBarPage implements Tab, CharSequence {
                 .click();
 
         return this;
-    }
-
-    @Override
-    public int length() {
-        return 0;
-    }
-
-    @Override
-    public char charAt(int i) {
-        return 0;
-    }
-
-    @Override
-    public CharSequence subSequence(int i, int i1) {
-        return null;
     }
 
     @Getter

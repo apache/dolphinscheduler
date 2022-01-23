@@ -37,7 +37,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class TokenE2ETest {
 
-    private static TokenPage token = null;
+    private static String token = "";
 
     private static final String editToken = "editToken";
 
@@ -56,7 +56,7 @@ public class TokenE2ETest {
     @Order(10)
     void testCreateToken() {
         final TokenPage page = new TokenPage(browser);
-        token = page.create();
+        token = page.create().toString();
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
