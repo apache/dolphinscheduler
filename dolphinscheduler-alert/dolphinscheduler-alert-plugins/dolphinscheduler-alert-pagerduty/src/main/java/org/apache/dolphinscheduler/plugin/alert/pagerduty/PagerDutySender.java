@@ -20,9 +20,15 @@ package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 import com.google.common.base.Preconditions;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public final class PagerDutySender {
@@ -38,31 +44,44 @@ public final class PagerDutySender {
     public AlertResult sendPagerDutyAlter(String title, String content){
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
+        alertResult.setMessage("send pager duty alert fail.");
 
-        return sendPagerDutyAlterV2(alertResult, title, content);
+        try {
+            sendPagerDutyAlterV2(alertResult, title, content);
+        } catch (Exception e) {
+            log.info("send pager duty alert exception : {}", e.getMessage());
+        }
+
+        return alertResult;
     }
 
-    private AlertResult sendPagerDutyAlterV2(AlertResult alertResult, String title, String content) {
+    private AlertResult sendPagerDutyAlterV2(AlertResult alertResult, String title, String content) throws IOException {
         String requestBody = textToJsonStringV2(title, content);
         return send(alertResult, PagerDutyParamsConstants.PAGER_DUTY_EVENT_API, requestBody);
     }
 
-    private AlertResult send(AlertResult alertResult, String url, String requestBody) {
-        try {
-            RestTemplate client = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+    private AlertResult send(AlertResult alertResult, String url, String requestBody) throws IOException {
+        HttpPost httpPost = constructHttpPost(url, requestBody);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
-            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = client.postForEntity(url, requestEntity, String.class);
-            if (response.getStatusCodeValue() == HttpStatus.OK.value() || response.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
-                alertResult.setStatus("true");
-                alertResult.setMessage("send pager duty alert success");
-                return alertResult;
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+            try {
+                if (statusCode == HttpStatus.OK.value() || statusCode == HttpStatus.ACCEPTED.value()) {
+                    alertResult.setStatus("true");
+                    alertResult.setMessage("send pager duty alert success");
+                }else {
+                    log.info("send pager duty alert fail, statusCode : {}", statusCode);
+                }
+            }finally {
+                response.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.info("send pager duty alert exception : {}", e.getMessage());
-            alertResult.setMessage("send pager duty alert fail.");
+        } finally {
+            httpClient.close();
         }
 
         return alertResult;
@@ -79,6 +98,14 @@ public final class PagerDutySender {
         payload.put("custom_details", formatContent(content));
         items.put("payload", payload);
         return JSONUtils.toJsonString(items);
+    }
+
+    private static HttpPost constructHttpPost(String url, String requestBody) {
+        HttpPost post = new HttpPost(url);
+        StringEntity entity = new StringEntity(requestBody, StandardCharsets.UTF_8);
+        post.setEntity(entity);
+        post.addHeader("Content-Type", "application/json; charset=utf-8");
+        return post;
     }
 
     public static String formatContent(String content) {
