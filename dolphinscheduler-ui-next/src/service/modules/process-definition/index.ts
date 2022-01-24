@@ -30,7 +30,7 @@ import {
   TargetCodeReq
 } from './types'
 
-export function queryListPaging(params: PageReq & ListReq, code: CodeReq): any {
+export function queryListPaging(params: PageReq & ListReq, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition`,
     method: 'get',
