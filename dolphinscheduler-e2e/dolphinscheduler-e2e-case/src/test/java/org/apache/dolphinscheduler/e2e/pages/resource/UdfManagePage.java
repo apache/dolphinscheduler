@@ -122,7 +122,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(name))
-            .flatMap(it -> it.findElements(By.id("delete")).stream())
+            .flatMap(it -> it.findElements(By.id("btnDelete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in udf manage list"))
