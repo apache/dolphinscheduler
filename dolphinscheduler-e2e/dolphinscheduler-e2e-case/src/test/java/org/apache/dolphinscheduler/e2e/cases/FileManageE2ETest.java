@@ -38,6 +38,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
     private static RemoteWebDriver browser;
@@ -241,19 +244,11 @@ public class FileManageE2ETest {
 
     @Test
     @Order(60)
-    void testUploadOver1GBFile() {
+    void testUploadOver1GBFile() throws IOException {
         final FileManagePage page = new FileManagePage(browser);
 
-        String command = String.format("fallocate -l 1.5G %s", testOver1GBFilePath);
-        try {
-            Process pro = Runtime.getRuntime().exec(command);
-            int status = pro.waitFor();
-            if (status != 0) {
-                throw new RuntimeException(String.format("Failed to call shell's command %s", command));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath, "rw");
+        file.setLength((long) (1.5 * 1024 * 1024 * 1024));
 
         page.uploadFile(testOver1GBFilePath);
 
@@ -265,21 +260,13 @@ public class FileManageE2ETest {
 
     @Test
     @Order(65)
-    void testUploadUnder1GBFile() {
+    void testUploadUnder1GBFile() throws IOException {
         final FileManagePage page = new FileManagePage(browser);
 
         browser.navigate().refresh();
 
-        String command = String.format("fallocate -l 0.01G %s", testUnder1GBFilePath);
-        try {
-            Process pro = Runtime.getRuntime().exec(command);
-            int status = pro.waitFor();
-            if (status != 0) {
-                throw new RuntimeException(String.format("Failed to call shell's command %s", command));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath, "rw");
+        file.setLength((long) (0.01 * 1024 * 1024 * 1024));
 
         page.uploadFile(testUnder1GBFilePath);
 
