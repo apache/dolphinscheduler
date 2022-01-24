@@ -314,7 +314,6 @@ public abstract class AbstractCommandExecutor {
         getOutputLogService.submit(() -> {
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
-                logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(")) {
                         varPool.append(line, "${setValue(".length(), line.length() - 2);
