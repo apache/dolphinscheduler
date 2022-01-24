@@ -30,6 +30,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,8 +75,10 @@ public final class ExcelUtils {
         for (Map.Entry<String, Object> en : headerMap.entrySet()) {
             headerList.add(en.getKey());
         }
-        try (SXSSFWorkbook wb = new SXSSFWorkbook(XLSX_WINDOW_ROW);
-             FileOutputStream fos = new FileOutputStream(String.format("%s/%s.xlsx", xlsFilePath, title))) {
+        FileOutputStream fos = null ;
+        try  {
+            SXSSFWorkbook wb = new SXSSFWorkbook(XLSX_WINDOW_ROW);
+            fos = new FileOutputStream(String.format("%s/%s.xlsx", xlsFilePath, title));
             // declare a workbook
             // generate a table
             Sheet sheet = wb.createSheet();
@@ -122,6 +125,14 @@ public final class ExcelUtils {
             wb.dispose();
         } catch (Exception e) {
             throw new AlertEmailException("generate excel error", e);
+        }finally {
+            if (fos!=null){
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    throw new AlertEmailException("close outputstream error when generating excel", e);
+                }
+            }
         }
     }
 
