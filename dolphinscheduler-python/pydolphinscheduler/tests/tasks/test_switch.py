@@ -21,7 +21,6 @@ from typing import Optional, Tuple
 from unittest.mock import patch
 
 import pytest
-from tests.testing.task import Task
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
@@ -32,6 +31,7 @@ from pydolphinscheduler.tasks.switch import (
     SwitchBranch,
     SwitchCondition,
 )
+from tests.testing.task import Task
 
 TEST_NAME = "test-task"
 TEST_TYPE = "test-type"
