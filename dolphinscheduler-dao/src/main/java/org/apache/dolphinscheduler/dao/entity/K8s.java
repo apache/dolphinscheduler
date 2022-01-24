@@ -15,12 +15,12 @@ public class K8s {
     @TableId(value="id", type= IdType.AUTO)
     private int id;
     /**
-     * queue name
+     * k8s name
      */
     @TableField(value = "k8s_name")
     private String k8sName;
     /**
-     * yarn queue name
+     * k8s client config(yaml or json)
      */
     @TableField(value = "k8s_config")
     private String k8sConfig;

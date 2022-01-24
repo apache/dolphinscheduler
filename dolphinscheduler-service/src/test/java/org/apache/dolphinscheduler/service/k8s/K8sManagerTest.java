@@ -53,8 +53,8 @@ public class K8sManagerTest {
     }
 
     private List<K8s> getK8sList() {
-        List<K8s> queueList = new ArrayList<>();
-        queueList.add(getK8s());
-        return queueList;
+        List<K8s> k8sList = new ArrayList<>();
+        k8sList.add(getK8s());
+        return k8sList;
     }
 }
