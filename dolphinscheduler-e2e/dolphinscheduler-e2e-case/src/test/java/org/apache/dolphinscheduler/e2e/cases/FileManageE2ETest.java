@@ -38,7 +38,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
     private static RemoteWebDriver browser;
@@ -249,9 +248,8 @@ public class FileManageE2ETest {
         try {
             Process pro = Runtime.getRuntime().exec(command);
             int status = pro.waitFor();
-            if (status != 0)
-            {
-                System.out.println("Failed to call shell's command ");
+            if (status != 0) {
+                throw new RuntimeException(String.format("Failed to call shell's command %s", command));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -276,9 +274,8 @@ public class FileManageE2ETest {
         try {
             Process pro = Runtime.getRuntime().exec(command);
             int status = pro.waitFor();
-            if (status != 0)
-            {
-                System.out.println("Failed to call shell's command ");
+            if (status != 0) {
+                throw new RuntimeException(String.format("Failed to call shell's command %s", command));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
