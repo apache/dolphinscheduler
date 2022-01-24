@@ -37,6 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.util.Objects;
+
 @DolphinScheduler(composeFiles = "docker/udf-manage/docker-compose.yaml")
 public class UdfManageE2ETest {
     private static RemoteWebDriver browser;
@@ -55,9 +57,9 @@ public class UdfManageE2ETest {
 
     private static final String testRenameDirectoryName = "test_rename_directory";
 
-    private static final String testUploadUdfFilePath = "/tmp/hive-jdbc-3.1.2.jar";
+    private final String testUploadUdfFilePath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("docker/udf-manage/hive-jdbc-3.1.2.jar")).getPath();
 
-    private static final String testUploadUdfFileName = testUploadUdfFilePath.split("/")[2];
+    private static final String testUploadUdfFileName = "hive-jdbc-3.1.2.jar";
 
     private static final String testUploadUdfRenameFileName = "hive-jdbc.jar";
 
