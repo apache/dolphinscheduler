@@ -265,7 +265,7 @@ public class FileManageE2ETest {
 
         browser.navigate().refresh();
 
-        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath, "rw");
+        RandomAccessFile file = new RandomAccessFile(testUnder1GBFilePath, "rw");
         file.setLength((long) (0.01 * 1024 * 1024 * 1024));
 
         page.uploadFile(testUnder1GBFilePath);
