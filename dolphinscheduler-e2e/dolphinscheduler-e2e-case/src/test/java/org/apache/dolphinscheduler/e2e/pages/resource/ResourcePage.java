@@ -33,7 +33,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 @Getter
 public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
     @FindBy(className = "tab-file-manage")
-    private WebElement fileMagageManage;
+    private WebElement fileManageTab;
+
+    @FindBy(className = "tab-udf-resource-manage")
+    private WebElement udfManageTab;
+
+    @FindBy(className = "tab-function-resource-manage")
+    private WebElement functionManageTab;
 
     public ResourcePage(RemoteWebDriver driver) {
         super(driver);
@@ -41,10 +47,23 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            WebElement fileMagageManageElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
-            fileMagageManageElement.click();
+            WebElement fileManageTabElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
+            fileManageTabElement.click();
             return tab.cast(new FileManagePage(driver));
         }
+
+        if (tab == UdfManagePage.class) {
+            WebElement udfManageTabElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(udfManageTab));
+            udfManageTabElement.click();
+            return tab.cast(new UdfManagePage(driver));
+        }
+
+        if (tab == FunctionManagePage.class) {
+            WebElement functionManageTabElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(functionManageTab));
+            functionManageTabElement.click();
+            return tab.cast(new FunctionManagePage(driver));
+        }
+
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
 
