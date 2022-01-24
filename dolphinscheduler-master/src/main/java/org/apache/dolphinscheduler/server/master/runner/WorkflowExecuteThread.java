@@ -431,13 +431,13 @@ public class WorkflowExecuteThread {
                 taskInstance.getTaskCode(),
                 taskInstance.getState());
 
-        completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
         activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
         stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
         stateWheelExecuteThread.removeTask4RetryCheck(processInstance, taskInstance);
         stateWheelExecuteThread.removeTask4StateCheck(processInstance, taskInstance);
 
         if (taskInstance.getState().typeIsSuccess()) {
+            completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
@@ -445,6 +445,7 @@ public class WorkflowExecuteThread {
             // retry task
             retryTaskInstance(taskInstance);
         } else if (taskInstance.getState().typeIsFailure()) {
+            completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             if (taskInstance.isConditionsTask()
                 || DagHelper.haveConditionsAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
                 submitPostNode(Long.toString(taskInstance.getTaskCode()));
