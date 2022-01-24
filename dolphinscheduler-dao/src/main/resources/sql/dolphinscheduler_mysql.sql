@@ -1063,3 +1063,16 @@ CREATE TABLE `t_ds_task_group` (
    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    PRIMARY KEY(`id`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_k8s
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_k8s`;
+CREATE TABLE `t_ds_k8s` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `k8s_name` varchar(100) DEFAULT NULL,
+  `k8s_config` text DEFAULT NULL,
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */
+) ENGINE=InnoDB AUTO_INCREMENT= 1 COLLATE= utf8;

@@ -1062,3 +1062,18 @@ CREATE TABLE t_ds_task_group (
    update_time timestamp DEFAULT NULL ,
    PRIMARY KEY(id)
 );
+
+
+--
+-- Table structure for table t_ds_k8s
+--
+
+DROP TABLE IF EXISTS t_ds_k8s;
+CREATE TABLE t_ds_k8s (
+   id serial NOT NULL,
+   k8s_name    VARCHAR(100) DEFAULT NULL ,
+   k8s_config  text ,
+   create_time timestamp DEFAULT NULL ,
+   update_time timestamp DEFAULT NULL ,
+   PRIMARY KEY (id)
+);

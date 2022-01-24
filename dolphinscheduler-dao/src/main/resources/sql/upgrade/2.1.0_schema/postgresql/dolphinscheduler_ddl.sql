@@ -38,6 +38,16 @@ EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_log_idx_project_code_p
 EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_code_version"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_code_version ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("code","version")';
 
+DROP TABLE IF EXISTS t_ds_k8s;
+CREATE TABLE t_ds_k8s (
+   id serial NOT NULL,
+   k8s_name    VARCHAR(100) DEFAULT NULL ,
+   k8s_config  text ,
+   create_time timestamp DEFAULT NULL ,
+   update_time timestamp DEFAULT NULL ,
+   PRIMARY KEY (id)
+);
+
 return 'Success!';
 exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;

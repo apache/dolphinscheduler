@@ -1078,3 +1078,14 @@ CREATE TABLE t_ds_task_group
    update_time datetime DEFAULT NULL ,
    PRIMARY KEY(id)
 );
+
+DROP TABLE IF EXISTS t_ds_k8s;
+CREATE TABLE t_ds_k8s
+(
+    id           int(11) NOT NULL AUTO_INCREMENT ,
+    k8s_name     varchar(100) DEFAULT NULL ,
+    k8s_config   text DEFAULT NULL,
+    create_time  datetime DEFAULT NULL ,
+    update_time  datetime DEFAULT NULL ,
+    PRIMARY KEY (id)
+);

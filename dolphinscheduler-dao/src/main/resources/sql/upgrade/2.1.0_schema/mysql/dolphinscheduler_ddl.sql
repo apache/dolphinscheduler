@@ -24,3 +24,13 @@ alter table t_ds_task_definition_log add `task_group_id` int(11) DEFAULT NULL CO
 alter table t_ds_task_definition_log add `task_group_priority` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `task_group_id`;
 alter table t_ds_task_definition add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
 alter table t_ds_task_definition add `task_group_priority` int(11) DEFAULT '0' COMMENT 'task group id' AFTER `task_group_id`;
+
+DROP TABLE IF EXISTS `t_ds_k8s`;
+CREATE TABLE `t_ds_k8s` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `k8s_name` varchar(100) DEFAULT NULL,
+  `k8s_config` text DEFAULT NULL,
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */
+) ENGINE=InnoDB AUTO_INCREMENT= 1 COLLATE= utf8;
