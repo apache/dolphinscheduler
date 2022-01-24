@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 import com.google.common.base.Preconditions;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
-import org.springframework.http.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -69,7 +69,7 @@ public final class PagerDutySender {
 
             int statusCode = response.getStatusLine().getStatusCode();
             try {
-                if (statusCode == HttpStatus.OK.value() || statusCode == HttpStatus.ACCEPTED.value()) {
+                if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_ACCEPTED) {
                     alertResult.setStatus("true");
                     alertResult.setMessage("send pager duty alert success");
                 }else {
