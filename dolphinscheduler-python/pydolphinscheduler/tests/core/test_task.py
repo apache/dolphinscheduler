@@ -20,9 +20,9 @@
 from unittest.mock import patch
 
 import pytest
+from tests.testing.task import Task as testTask
 
 from pydolphinscheduler.core.task import Task, TaskRelation
-from tests.testing.task import Task as testTask
 
 TEST_TASK_RELATION_SET = set()
 TEST_TASK_RELATION_SIZE = 0

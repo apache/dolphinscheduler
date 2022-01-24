@@ -15,15 +15,41 @@
    specific language governing permissions and limitations
    under the License.
 
-Api
+API
 ===
 
+Core
+----
 
-.. automodule:: pydolphinscheduler.core.task
+.. automodule:: pydolphinscheduler.core
   :members:
-  
-.. automodule:: pydolphinscheduler.tasks.shell
+  :inherited-members:
+  :member-order: groupwise
+
+Sides
+-----
+
+.. automodule:: pydolphinscheduler.side
+  :members:
+  :inherited-members:
+  :member-order: groupwise
+
+Tasks
+-----
+
+.. automodule:: pydolphinscheduler.tasks
+  :members:
+  :inherited-members:
+  :member-order: groupwise
+
+Constants
+---------
+
+.. automodule:: pydolphinscheduler.constants
   :members:
 
-.. automodule:: pydolphinscheduler.tasks.dependent
+Exceptions
+----------
+
+.. automodule:: pydolphinscheduler.exceptions
   :members:

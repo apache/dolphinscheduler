@@ -23,6 +23,7 @@ from unittest.mock import patch
 
 import pytest
 from freezegun import freeze_time
+from tests.testing.task import Task
 
 from pydolphinscheduler.constants import (
     ProcessDefinitionDefault,
@@ -33,7 +34,6 @@ from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 from pydolphinscheduler.utils.date import conv_to_schedule
-from tests.testing.task import Task
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 TEST_TASK_TYPE = "test-task-type"

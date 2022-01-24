@@ -21,7 +21,7 @@ Tutorial
 This tutorial show you the basic concept of *PyDolphinScheduler* and tell all
 things you should know before you submit or run your first workflow. If you
 still not install *PyDolphinScheduler* and start Apache DolphinScheduler, you
-could go and see :ref:`how to getting start PyDolphinScheduler <getting started>`
+could go and see :ref:`how to getting start PyDolphinScheduler <start:getting started>`
 
 Overview of Tutorial
 --------------------
@@ -57,15 +57,15 @@ the name of process definition, using `Python context manager`_ and it
 **the only required argument** for object process definition. Beside that we also
 declare three arguments named `schedule`, `start_time` which setting workflow schedule
 interval and schedule start_time, and argument `tenant` which changing workflow's
-task running user in the worker, :ref:`section tenant <concepts>` in *PyDolphinScheduler*
-:ref:`concepts` page have more detail information.
+task running user in the worker, :ref:`section tenant <concept:tenant>` in *PyDolphinScheduler*
+:doc:`concept` page have more detail information.
 
 .. literalinclude:: ../../examples/tutorial.py
    :start-after: [start workflow_declare]
    :end-before: [end workflow_declare]
 
 We could find more detail about process definition in
-:ref:`concept about process definition <process definition>` if you interested in it.
+:ref:`concept about process definition <concept:process definition>` if you interested in it.
 For all arguments of object process definition, you could find in the
 :class:`pydolphinscheduler.core.process_definition` api documentation.
 
@@ -83,7 +83,7 @@ only shell task, `name` is required for each type of task)*.
    :end-before: [end task_declare]
 
 Beside shell task, *PyDolphinScheduler* support multiple tasks and you could
-find in :ref:`tasks`.
+find in :ref:`tasks:tasks`.
 
 Setting Task Dependence
 -----------------------
@@ -107,13 +107,13 @@ task of both these two task.
 Please notice that we could grouping some tasks and set dependence if they have
 same downstream or upstream. We declare task `task_child_one` and `task_child_two`
 as a group here, named as `task_group` and set task `task_parent` as upstream of
-both of them. You could see more detail in :ref:`Tasks Dependence` section in concept
+both of them. You could see more detail in :ref:`concept:Tasks Dependence` section in concept
 documentation.
 
 Submit Or Run Workflow
 ----------------------
 
-So we just finish our workflow definition, with task and task dependence, but all
+Now we finish our workflow definition, with task and task dependence, but all
 these things are in local, we should let Apache DolphinScheduler daemon know what we
 define our workflow. So the last thing we have to do here is submit our workflow to
 Apache DolphinScheduler daemon.
@@ -130,10 +130,10 @@ Now, we could run the Python code like other Python script, for the basic usage 
    :end-before: [end submit_or_run]
 
 If you not start your Apache DolphinScheduler server, you could find the way in
-:ref:`start Python gateway server` and it would have more detail about related server
+:ref:`start:start Python gateway server` and it would have more detail about related server
 start. Beside attribute `run`, we have attribute `submit` for object `ProcessDefinition`
 and it just submit workflow to the daemon but not setting the schedule information. For
-more detail you could see :ref:`process definition`.
+more detail you could see :ref:`concept:process definition`.
 
 DAG Graph After Tutorial Run
 ----------------------------

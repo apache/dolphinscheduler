@@ -20,6 +20,7 @@ from typing import List, Tuple
 from unittest.mock import patch
 
 import pytest
+from tests.testing.task import Task
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
@@ -32,7 +33,6 @@ from pydolphinscheduler.tasks.condition import (
     Or,
     Status,
 )
-from tests.testing.task import Task
 
 TEST_NAME = "test-name"
 TEST_PROJECT = "test-project"

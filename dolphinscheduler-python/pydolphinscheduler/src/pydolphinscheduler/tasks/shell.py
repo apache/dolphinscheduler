@@ -24,10 +24,25 @@ from pydolphinscheduler.core.task import Task
 class Shell(Task):
     """Task shell object, declare behavior for shell task to dolphinscheduler.
 
-    TODO maybe we could use instance name to replace attribute `name`
-    which is simplify as `task_shell = Shell(command = "echo 1")` and
-    task.name assign to `task_shell`
+    :param name: A unique, meaningful string for the shell task.
+    :param command: One or more command would be run during task in running. It could be simply command::
+
+            Shell(name=..., command="echo task shell")
+
+        or maybe same commands trying to do complex task::
+
+            command = '''echo task shell step 1;
+            echo task shell step 2;
+            echo task shell step 3
+            '''
+
+            Shell(name=..., command=command)
+
     """
+
+    # TODO maybe we could use instance name to replace attribute `name`
+    #  which is simplify as `task_shell = Shell(command = "echo 1")` and
+    #  task.name assign to `task_shell`
 
     _task_custom_attr = {
         "raw_script",

@@ -21,15 +21,13 @@ PyDolphinScheduler
 **PyDolphinScheduler** is Python API for `Apache DolphinScheduler <https://dolphinscheduler.apache.org>`_,
 which allow you definition your workflow by Python code, aka workflow-as-codes.
 
-I could go and find how to :ref:`install <getting started>` the project. Or if you wish to
-see simply example then go and see :doc:`tutorial` for more detail.
-.. note::
+I could go and find how to :ref:`install <start:getting started>` the project. Or if you want to see simply example
+then go and see :doc:`tutorial` for more detail.
 
-   This project is under active development.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
+   :caption: Contents
 
    start
    tutorial
