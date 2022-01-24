@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTa
 
 import java.nio.charset.StandardCharsets;
 
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -68,6 +69,8 @@ public final class WorkflowForm {
                 return (T) new ShellTaskForm(this);
             case SUB_PROCESS:
                 return (T) new SubWorkflowTaskForm(this);
+            case SWITCH:
+                return (T) new SwitchTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -81,5 +84,6 @@ public final class WorkflowForm {
     public enum TaskType {
         SHELL,
         SUB_PROCESS,
+        SWITCH,
     }
 }

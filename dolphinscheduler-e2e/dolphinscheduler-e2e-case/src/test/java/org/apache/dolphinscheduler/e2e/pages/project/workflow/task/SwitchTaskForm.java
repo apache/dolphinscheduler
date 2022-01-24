@@ -19,22 +19,21 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
+import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
-import lombok.Getter;
-
 @Getter
-public final class ShellTaskForm extends TaskNodeForm {
+public final class SwitchTaskForm extends TaskNodeForm {
     private final CodeEditor codeEditor;
 
-    public ShellTaskForm(WorkflowForm parent) {
+    public SwitchTaskForm(WorkflowForm parent) {
         super(parent);
 
         this.codeEditor = new CodeEditor(parent.driver());
     }
 
-    public ShellTaskForm script(String script) {
+    public SwitchTaskForm script(String script) {
         codeEditor().content(script);
 
         return this;
