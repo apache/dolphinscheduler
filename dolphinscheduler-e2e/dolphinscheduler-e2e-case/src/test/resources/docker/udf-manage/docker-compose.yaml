@@ -34,8 +34,6 @@ services:
       retries: 120
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
-      - ./download-hive.sh:/tmp/download-hive.sh
-#    entrypoint: ['bash', '-c', '/bin/bash /tmp/download-hive.sh && /opt/dolphinscheduler/bin/start.sh && tail -f /dev/null']
     depends_on:
       s3:
         condition: service_healthy
