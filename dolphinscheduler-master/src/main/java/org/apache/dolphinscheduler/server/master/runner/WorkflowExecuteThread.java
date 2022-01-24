@@ -433,9 +433,9 @@ public class WorkflowExecuteThread {
 
         completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
         activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
-        stateWheelExecuteThread.removeTask4TimeoutCheck(taskInstance);
-        stateWheelExecuteThread.removeTask4RetryCheck(taskInstance);
-        stateWheelExecuteThread.removeTask4StateCheck(taskInstance);
+        stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
+        stateWheelExecuteThread.removeTask4RetryCheck(processInstance, taskInstance);
+        stateWheelExecuteThread.removeTask4StateCheck(processInstance, taskInstance);
 
         if (taskInstance.getState().typeIsSuccess()) {
             processInstance.setVarPool(taskInstance.getVarPool());
@@ -503,8 +503,8 @@ public class WorkflowExecuteThread {
                     newTaskInstance.getRetryTimes(),
                     newTaskInstance.getMaxRetryTimes(),
                     newTaskInstance.getRetryInterval());
-            stateWheelExecuteThread.addTask4TimeoutCheck(newTaskInstance);
-            stateWheelExecuteThread.addTask4RetryCheck(newTaskInstance);
+            stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, newTaskInstance);
+            stateWheelExecuteThread.addTask4RetryCheck(processInstance, newTaskInstance);
         } else {
             addTaskToStandByList(newTaskInstance);
             submitStandByTask();
@@ -943,8 +943,8 @@ public class WorkflowExecuteThread {
             activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
             taskProcessor.action(TaskAction.RUN);
 
-            stateWheelExecuteThread.addTask4TimeoutCheck(taskInstance);
-            stateWheelExecuteThread.addTask4StateCheck(taskInstance);
+            stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, taskInstance);
+            stateWheelExecuteThread.addTask4StateCheck(processInstance, taskInstance);
 
             if (taskProcessor.taskInstance().getState().typeIsFinished()) {
                 StateEvent stateEvent = new StateEvent();
