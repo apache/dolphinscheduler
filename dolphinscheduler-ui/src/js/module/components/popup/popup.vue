@@ -24,7 +24,7 @@
     </div>
     <div class="bottom-p">
       <el-button id="btnCancel" type="text" size="mini" round @click="close()" :disabled="disabled"> {{$t('Cancel')}} </el-button>
-      <el-button id="btnSubmit" type="primary" size="mini" round :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? $t('Loading...')
+      <el-button id="btnSubmit" type="primary" size="mini" round :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? $t('Loading...') : okText}} </el-button>
     </div>
   </div>
 </template>
