@@ -25,11 +25,14 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage.Tab;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
@@ -57,6 +60,7 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create() {
         buttonCreateToken().click();
         createTokenForm().buttonGenerateToken().click();
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
         createTokenForm().buttonSubmit().click();
         return this;
     }

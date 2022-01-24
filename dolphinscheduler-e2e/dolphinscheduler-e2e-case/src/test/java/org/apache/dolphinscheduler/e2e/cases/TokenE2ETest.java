@@ -30,9 +30,11 @@ import org.apache.dolphinscheduler.e2e.pages.security.TokenPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
+import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class TokenE2ETest {
@@ -58,6 +60,8 @@ public class TokenE2ETest {
         final TokenPage page = new TokenPage(browser);
         token = page.create().toString();
 
+        new WebDriverWait(page.driver(), 10).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
+
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
@@ -66,19 +70,6 @@ public class TokenE2ETest {
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains(token));
         });
-    }
-
-    @Test
-    @Order(20)
-    void testCreateDuplicateToken() {
-        final TokenPage page = new TokenPage(browser);
-        page.create();
-
-        await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists"));
-
-        page.createTokenForm().buttonCancel().click();
     }
 
     @Test
