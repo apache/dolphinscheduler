@@ -96,7 +96,7 @@ public class FileManageE2ETest {
 
     @AfterAll
     public static void cleanup() {
-        String[] command = {"/bin/bash", "-c", String.format("rm -f %s && rm -f %s && rm -rf %s", testUnder1GBFilePath, testOver1GBFilePath, Constants.HOST_CHROME_DOWNLOAD_PATH)};
+        String[] command = {"/bin/bash", "-c", String.format("sudo rm -f %s && sudo rm -f %s && sudo rm -rf %s", testUnder1GBFilePath, testOver1GBFilePath, Constants.HOST_CHROME_DOWNLOAD_PATH)};
 
         try {
             Process pro = Runtime.getRuntime().exec(command);
