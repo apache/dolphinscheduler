@@ -25,7 +25,9 @@ class Shell(Task):
     """Task shell object, declare behavior for shell task to dolphinscheduler.
 
     :param name: A unique, meaningful string for the shell task.
-    :param command: One or more command would be run during task in running. It could be simply command::
+    :param command: One or more command want to run in this task.
+
+        It could be simply command::
 
             Shell(name=..., command="echo task shell")
 

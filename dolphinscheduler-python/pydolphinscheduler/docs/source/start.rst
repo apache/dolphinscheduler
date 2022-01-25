@@ -106,7 +106,7 @@ What's More
 
 If you do not familiar with *PyDolphinScheduler*, you could go to :doc:`tutorial`
 and see how it work. But if you already know the inside of *PyDolphinScheduler*,
-maybe you could go and play with all :doc:`tasks` *PyDolphinScheduler* supports.
+maybe you could go and play with all :doc:`tasks/index` *PyDolphinScheduler* supports.
 
 .. _`instructions for all platforms here`: https://wiki.python.org/moin/BeginnersGuide/Download
 .. _`Apache DolphinScheduler`: https://dolphinscheduler.apache.org

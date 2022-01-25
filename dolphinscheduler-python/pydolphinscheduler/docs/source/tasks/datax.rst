@@ -15,12 +15,8 @@
    specific language governing permissions and limitations
    under the License.
 
-Tasks
+Datax
 =====
 
-This document include all task in 
-
-Shell
------
-
-
+.. automodule:: pydolphinscheduler.tasks.datax
+  :members:

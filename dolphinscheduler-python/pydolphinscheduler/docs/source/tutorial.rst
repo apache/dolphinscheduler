@@ -46,7 +46,7 @@ like other Python package. We just create a minimum demo here, so we just import
    :end-before: [end package_import]
 
 If you want to use other task type you could click and
-:doc:`see all tasks we support <tasks>`
+:doc:`see all tasks we support <tasks/index>`
 
 Process Definition Declaration
 ------------------------------
@@ -83,7 +83,7 @@ only shell task, `name` is required for each type of task)*.
    :end-before: [end task_declare]
 
 Beside shell task, *PyDolphinScheduler* support multiple tasks and you could
-find in :ref:`tasks:tasks`.
+find in :doc:`tasks/index`.
 
 Setting Task Dependence
 -----------------------

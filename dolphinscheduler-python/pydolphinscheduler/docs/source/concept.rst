@@ -104,7 +104,7 @@ Here we use :py:meth:`pydolphinscheduler.tasks.Shell` as example, parameter `nam
    # We named this task as "shell", and just run command `echo shell task`
    shell_task = Shell(name="shell", command="echo shell task")
 
-If you want to see all type of tasks, you could see :doc:`tasks`.
+If you want to see all type of tasks, you could see :doc:`tasks/index`.
 
 Tasks Dependence
 ~~~~~~~~~~~~~~~~
