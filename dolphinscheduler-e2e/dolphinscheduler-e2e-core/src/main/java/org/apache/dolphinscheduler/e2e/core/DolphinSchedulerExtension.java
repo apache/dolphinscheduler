@@ -35,6 +35,7 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -123,7 +124,7 @@ final class DolphinSchedulerExtension
         }
 
         // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
-        if ("Linux".equals(Constants.OS_NAME)) {
+        if (Constants.OS_NAME.toLowerCase().contains("linux")) {
             String command = String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH);
 
             try {
@@ -136,8 +137,6 @@ final class DolphinSchedulerExtension
                 throw new RuntimeException(e);
             }
         }
-
-        System.out.printf("Constants.OS_NAME: %s", Constants.OS_NAME);
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
