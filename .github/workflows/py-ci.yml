@@ -112,5 +112,5 @@ jobs:
           pip install -r requirements_dev.txt
           pip install -e .
       - name: Test Build Document
-        working-directory: ./docs
+        working-directory: dolphinscheduler-python/pydolphinscheduler/docs
         run: make clean && make html
