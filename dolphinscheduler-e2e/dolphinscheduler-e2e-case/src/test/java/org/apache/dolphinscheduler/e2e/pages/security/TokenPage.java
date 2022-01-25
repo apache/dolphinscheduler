@@ -60,7 +60,7 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create() {
         buttonCreateToken().click();
         createTokenForm().buttonGenerateToken().click();
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
         createTokenForm().buttonSubmit().click();
         return this;
     }
@@ -78,7 +78,7 @@ public final class TokenPage extends NavBarPage implements Tab {
         TokenForm editTokenForm = new TokenForm();
 
         editTokenForm.buttonGenerateToken().click();
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
         editTokenForm.buttonSubmit().click();
         return this;
     }
