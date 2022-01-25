@@ -136,23 +136,6 @@ final class DolphinSchedulerExtension
 
             Files.setAttribute(file.toPath(), "unix:uid", 1200);
             Files.setAttribute(file.toPath(), "unix:gid", 1201);
-
-//            String[] command = {"/bin/bash", "-c", String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH)};
-//
-//            try {
-//                Process pro = Runtime.getRuntime().exec(command);
-//                int status = pro.waitFor();
-//                InputStream inputStream = pro.getErrorStream();
-//                if (status != 0) {
-//                    for (int i = 0; i < inputStream.available(); ++i) {
-//                        System.out.println(inputStream.read());
-//                    }
-//
-//                    throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
-//                }
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
         }
 
         browser = new BrowserWebDriverContainer<>()

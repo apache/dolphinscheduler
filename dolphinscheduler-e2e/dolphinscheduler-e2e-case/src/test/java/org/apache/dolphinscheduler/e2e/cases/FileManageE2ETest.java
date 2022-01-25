@@ -102,20 +102,20 @@ public class FileManageE2ETest {
             .goToTab(FileManagePage.class);
     }
 
-//    @AfterAll
-//    public static void cleanup() {
-//        String[] command = {"/bin/bash", "-c", String.format("rm -f %s && rm -f %s && rm -rf %s", testUnder1GBFilePath, testOver1GBFilePath, Constants.HOST_CHROME_DOWNLOAD_PATH)};
-//
-//        try {
-//            Process pro = Runtime.getRuntime().exec(command);
-//            int status = pro.waitFor();
-//            if (status != 0) {
-//                throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @AfterAll
+    public static void cleanup() {
+        String[] command = {"/bin/bash", "-c", String.format("rm -f %s && rm -f %s && rm -rf %s", testUnder1GBFilePath, testOver1GBFilePath, Constants.HOST_CHROME_DOWNLOAD_PATH)};
+
+        try {
+            Process pro = Runtime.getRuntime().exec(command);
+            int status = pro.waitFor();
+            if (status != 0) {
+                throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     @Order(10)
