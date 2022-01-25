@@ -130,7 +130,7 @@ final class DolphinSchedulerExtension
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
-            .withFileSystemBind(Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath(), "/home/" + System.getProperty("user.name") + "/Downloads")
+            .withFileSystemBind(Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath(), "/Downloads")
             .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
