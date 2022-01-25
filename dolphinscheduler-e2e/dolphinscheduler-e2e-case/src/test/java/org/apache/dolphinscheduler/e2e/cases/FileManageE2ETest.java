@@ -45,6 +45,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Paths;
@@ -295,14 +296,11 @@ public class FileManageE2ETest {
 
         page.downloadFile(testUnder1GBFileName);
 
+        File file = new File(testUnder1GBFilePath);
+
         new FluentWait<WebDriver>(page.driver()).withTimeout(Duration.ofSeconds(30))
             .pollingEvery(Duration.ofSeconds(1))
             .ignoring(NoSuchElementException.class)
-            .until(new ExpectedCondition<Boolean>() {
-                @Override
-                public @Nullable Boolean apply(Object o) {
-                    return true;
-                }
-            });
+            .until((ExpectedCondition<Boolean>) webDriver -> file.exists());
     }
 }
