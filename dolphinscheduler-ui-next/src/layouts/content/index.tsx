@@ -23,12 +23,14 @@ import { useDataList } from './use-dataList'
 import { useMenuStore } from '@/store/menu/menu'
 import { useLocalesStore } from '@/store/locales/locales'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 const Content = defineComponent({
   name: 'Content',
   setup() {
     window.$message = useMessage()
 
+    const route = useRoute()
     const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
@@ -44,30 +46,36 @@ const Content = defineComponent({
     onMounted(() => {
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
-      genSideMenu(state)
+      getSideMenu(state)
       changeUserDropdown(state)
     })
 
     watch(useI18n().locale, () => {
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
-      genSideMenu(state)
+      getSideMenu(state)
       changeUserDropdown(state)
     })
 
-    const genSideMenu = (state: any) => {
+    watch(
+      () => route.path,
+      (path) => {
+        state.isShowSide = menuStore.getShowSideStatus
+        menuStore.setSideMenuKey(path)
+      }
+    )
+
+    const getSideMenu = (state: any) => {
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
           .children || []
-      state.isShowSide =
-        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
-          .isShowSide || false
+      state.isShowSide = menuStore.getShowSideStatus
     }
 
     const getSideMenuOptions = (item: any) => {
       menuStore.setMenuKey(item.key)
-      genSideMenu(state)
+      getSideMenu(state)
     }
 
     return {
@@ -93,7 +101,7 @@ const Content = defineComponent({
             <SideBar sideMenuOptions={this.sideMenuOptions} />
           )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
-            <router-view />
+            <router-view key={this.$route.fullPath} />
           </NLayoutContent>
         </NLayout>
       </NLayout>

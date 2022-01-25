@@ -34,4 +34,23 @@ interface GroupReq extends GroupNameReq {
   description?: string
 }
 
-export { ListReq, GroupNameReq, IdReq, GroupReq }
+interface AlarmGroupItem {
+  id: number
+  groupName: string
+  alertInstanceIds: string
+  description: string
+  createTime: string
+  updateTime: string
+  createUserId: number
+}
+
+interface AlarmGroupRes {
+  totalList: AlarmGroupItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { ListReq, GroupNameReq, IdReq, GroupReq, AlarmGroupItem, AlarmGroupRes }
