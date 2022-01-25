@@ -50,12 +50,8 @@ release = "0.0.1"
 extensions = [
     # Measures durations of Sphinx processing
     "sphinx.ext.duration",
-    # Use doctest test our document
-    "sphinx.ext.doctest",
     # Semi-automatic make docstrings to document
     "sphinx.ext.autodoc",
-    # Show coverage
-    "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
     "sphinx_rtd_theme",

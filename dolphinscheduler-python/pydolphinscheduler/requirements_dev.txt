@@ -27,5 +27,4 @@ flake8-black
 isort
 # Document
 sphinx
-sphinxcontrib-spelling
 sphinx_rtd_theme
