@@ -20,7 +20,9 @@
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
-SPHINXOPTS    ?=
+
+# Add opts `turn warnings into errors` strict sphinx-build behavior
+SPHINXOPTS    ?= -W
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build

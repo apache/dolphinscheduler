@@ -26,6 +26,8 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
+REM Add opts `turn warnings into errors` strict sphinx-build behavior
+set SPHINXOPTS=-W
 
 if "%1" == "" goto help
 
