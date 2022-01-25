@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import { MenuOption } from 'naive-ui'
-import { useMenuStore } from '@/store/menu/menu'
+package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
-export function useMenuClick() {
-  const router: Router = useRouter()
-  const menuStore = useMenuStore()
+public final class PagerDutyParamsConstants {
+    public static final String NAME_PAGER_DUTY_INTEGRATION_KEY_NAME = "IntegrationKey";
+    public static final String PAGER_DUTY_INTEGRATION_KEY = "integrationKey";
+    public static final String PAGER_DUTY_EVENT_ACTION_TRIGGER = "trigger";
+    public static final String PAGER_DUTY_EVENT_API = "https://events.pagerduty.com/v2/enqueue";
+    public static final String PAGER_DUTY_EVENT_SOURCE = "DolphinScheduler";
 
-  const handleMenuClick = (key: string, item: MenuOption) => {
-    console.log(key, item)
-    menuStore.setSideMenuKey(`${key}`)
-    router.push({ path: `${key}` })
-  }
-
-  return {
-    handleMenuClick
-  }
+    private PagerDutyParamsConstants() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 }
