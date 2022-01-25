@@ -20,6 +20,7 @@
       <div slot="text">{{ $t("Pre tasks") }}</div>
       <div slot="content">
         <el-select
+          id="selectPreTask"
           style="width: 100%"
           filterable
           multiple

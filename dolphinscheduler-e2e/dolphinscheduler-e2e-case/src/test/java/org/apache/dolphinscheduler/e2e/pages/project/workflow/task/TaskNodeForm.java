@@ -51,10 +51,7 @@ public abstract class TaskNodeForm {
     })
     private List<WebElement> inputParamVal;
 
-    @FindBys({
-            @FindBy(className = "pre_tasks-model"),
-            @FindBy(className = "el-input__inner")
-    })
+    @FindBy(id = "selectPreTask")
     private WebElement selectPreTasks;
 
     private final WorkflowForm parent;
