@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm.TaskType;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab.Row;
@@ -81,44 +82,49 @@ class WorkflowSwitchE2ETest {
 
     @Test
     @Order(1)
-    void testCreateWorkflow() {
+    void testCreateSwitchWorkflow() {
         final String workflow = "test-workflow-1";
+        final String ifBranchName = "key==1";
+        final String elseBranchName = "key!=1";
 
         final WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
 
-        workflowDefinitionPage
-            .createWorkflow()
+        WorkflowForm workflowForm = workflowDefinitionPage.createWorkflow();
 
-            .<ShellTaskForm> addTask(TaskType.SHELL)
+        workflowForm.<ShellTaskForm> addTask(TaskType.SHELL)
             .script("echo ${today}\necho ${global_param}\n")
-            .name("test-1")
-            .addParam("today", "${system.datetime}")
-            .submit()
+            .name("pre-task")
+            .submit();
 
-            .<SwitchTaskForm> addTask(TaskType.SWITCH)
-            .script("")
+        SwitchTaskForm switchTaskForm = workflowForm.addTask(TaskType.SWITCH);
+        switchTaskForm.preTask("pre-task")
             .name("switch")
-            .submit()
+            .submit();
 
-            .<ShellTaskForm>addTask(TaskType.SHELL)
-            .script("echo success")
-            .name("success")
-            .submit()
+        workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
+            .script("echo ${key}")
+            .preTask("switch")
+            .name(ifBranchName)
+            .submit();
 
-            .<ShellTaskForm>addTask(TaskType.SHELL)
-            .script("echo fail")
-            .name("fail")
-            .submit()
+        workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
+            .script("echo ${key}")
+            .preTask("switch")
+            .name(elseBranchName)
+            .submit();
 
-            .submit()
+        // add branch for switch task
+        switchTaskForm.addIfBranch("${key}==1", ifBranchName);
+        switchTaskForm.elseBranch(elseBranchName);
+
+        workflowForm.submit()
             .name(workflow)
             .tenant(tenant)
-            .addGlobalParam("global_param", "hello world")
-            .submit()
-        ;
+            .addGlobalParam("key", "1")
+            .submit();
 
         await().untilAsserted(() -> assertThat(
             workflowDefinitionPage.workflowList()
@@ -179,7 +185,7 @@ class WorkflowSwitchE2ETest {
                 .next();
 
             assertThat(row.isSuccess()).isTrue();
-            assertThat(row.executionTime()).isEqualTo(2);
+            assertThat(row.executionTime()).isEqualTo(1);
         });
     }
 }

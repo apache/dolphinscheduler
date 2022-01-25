@@ -22,20 +22,67 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.pagefactory.ByChained;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 public final class SwitchTaskForm extends TaskNodeForm {
-    private final CodeEditor codeEditor;
+
+    @FindBys({
+            @FindBy(className = "switch-task"),
+            @FindBy(className = "dep-opt"),
+            @FindBy(className = "add-dep")
+    })
+    private WebElement addBranchButton;
+
+    @FindBys({
+            @FindBy(className = "switch-task"),
+            @FindBy(className = "switch-list"),
+            @FindBy(className = "el-input")
+    })
+    private List<WebElement> ifBranches;
+
+    @FindBys({
+            @FindBy(className = "switch-task"),
+            @FindBy(className = "switch-list"),
+            @FindBy(className = "el-input__inner")
+    })
+    private List<CodeEditor> ifScriptList;
+
+    @FindBys({
+            @FindBy(className = "switch-task"),
+            @FindBy(className = "clearfix list"),
+            @FindBy(className = "el-input__inner")
+    })
+    private WebElement elseBranch;
 
     public SwitchTaskForm(WorkflowForm parent) {
         super(parent);
-
-        this.codeEditor = new CodeEditor(parent.driver());
     }
 
-    public SwitchTaskForm script(String script) {
-        codeEditor().content(script);
+    public SwitchTaskForm elseBranch(String elseBranchName) {
+        elseBranch().sendKeys(elseBranchName);
 
         return this;
     }
+
+    public SwitchTaskForm addIfBranch(String switchScript, String ifBranchName) {
+        final int len = ifBranches().size();
+
+        addBranchButton.click();
+
+        ifScriptList.add(new CodeEditor(this.parent().driver()).content(switchScript));
+        ifBranches().get(len).sendKeys(ifBranchName);
+
+        return this;
+    }
+
+
 }

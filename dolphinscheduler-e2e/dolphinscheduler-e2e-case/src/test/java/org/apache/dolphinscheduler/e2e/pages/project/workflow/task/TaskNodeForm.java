@@ -49,6 +49,12 @@ public abstract class TaskNodeForm {
     })
     private List<WebElement> inputParamVal;
 
+    @FindBys({
+            @FindBy(className = "pre_tasks-model"),
+            @FindBy(className = "el-input__inner")
+    })
+    private WebElement preTasks;
+
     private final WorkflowForm parent;
 
     TaskNodeForm(WorkflowForm parent) {
@@ -80,6 +86,12 @@ public abstract class TaskNodeForm {
 
         inputParamKey().get(len).sendKeys(key);
         inputParamVal().get(len).sendKeys(val);
+
+        return this;
+    }
+
+    public TaskNodeForm preTask(String preTaskName) {
+        preTasks.sendKeys(preTaskName);
 
         return this;
     }
