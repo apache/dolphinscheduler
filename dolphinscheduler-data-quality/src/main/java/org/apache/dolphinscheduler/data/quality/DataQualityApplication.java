@@ -32,7 +32,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 /**
- * DataQualityApplication
+ * DataQualityApplication is spark application.
+ * It mainly includes three components: reader, transformer and writer.
+ * These three components realize the functions of connecting data, executing intermediate SQL
+ * and writing execution results and error data to the specified storage engine
  */
 public class DataQualityApplication {
 
