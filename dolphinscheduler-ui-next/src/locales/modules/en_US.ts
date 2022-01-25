@@ -323,6 +323,22 @@ const project = {
   workflow: {
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
+    workflow_name: 'Workflow Name',
+    current_selection: 'Current Selection',
+    online: 'Online',
+    offline: 'Offline',
+    refresh: 'Refresh',
+    show_hide_label: 'Show / Hide Label',
+    workflow_offline: 'Workflow Offline',
+    schedule_offline: 'Schedule Offline',
+    schedule_start_time: 'Schedule Start Time',
+    schedule_end_time: 'Schedule End Time',
+    crontab_expression: 'Crontab',
+    workflow_publish_status: 'Workflow Publish Status',
+    schedule_publish_status: 'Schedule Publish Status'
+  },
+  dag: {
+    createWorkflow: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',
@@ -434,6 +450,38 @@ const security = {
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?'
+  },
+  user: {
+    user_manage: 'User Manage',
+    create_user: 'Create User',
+    update_user: 'Update User',
+    delete_user: 'Delete User',
+    delete_confirm: 'Are you sure to delete?',
+    delete_confirm_tip:
+      'Deleting user is a dangerous operation，please be careful',
+    index: 'Index',
+    username: 'Username',
+    username_exists: 'The username already exists',
+    username_rule_msg: 'Please enter username',
+    user_password: 'Please enter password',
+    user_password_rule_msg:
+      'Please enter a password containing letters and numbers with a length between 6 and 20',
+    user_type: 'User Type',
+    tenant_code: 'Tenant',
+    tenant_id_rule_msg: 'Please select tenant',
+    queue: 'Queue',
+    email: 'Email',
+    email_rule_msg: 'Please enter valid email',
+    phone: 'Phone',
+    phone_rule_msg: 'Please enter valid phone number',
+    state: 'State',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    save_error_msg: 'Failed to save, please retry',
+    delete_error_msg: 'Failed to delete, please retry'
   }
 }
 

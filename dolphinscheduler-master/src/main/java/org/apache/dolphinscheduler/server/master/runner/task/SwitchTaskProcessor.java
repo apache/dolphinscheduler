@@ -77,7 +77,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     @Override
     public boolean runTask() {
         try {
-            if (!this.taskState().typeIsFinished() && setSwitchResult()) {
+            if (!this.taskInstance().getState().typeIsFinished() && setSwitchResult()) {
                 endTaskState();
             }
         } catch (Exception e) {
@@ -118,11 +118,6 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     @Override
     public String getType() {
         return TaskType.SWITCH.getDesc();
-    }
-
-    @Override
-    public ExecutionStatus taskState() {
-        return this.taskInstance.getState();
     }
 
     private boolean setSwitchResult() {
