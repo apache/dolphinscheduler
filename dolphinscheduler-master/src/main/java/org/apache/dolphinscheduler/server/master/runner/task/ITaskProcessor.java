@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
@@ -32,6 +31,6 @@ public interface ITaskProcessor {
 
     String getType();
 
-    ExecutionStatus taskState();
+    TaskInstance taskInstance();
 
 }
