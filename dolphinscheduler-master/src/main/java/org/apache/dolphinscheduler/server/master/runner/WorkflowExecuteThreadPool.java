@@ -62,6 +62,9 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
 
+    @Autowired
+    private StateWheelExecuteThread stateWheelExecuteThread;
+
     /**
      * multi-thread filter, avoid handling workflow at the same time
      */
@@ -119,6 +122,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onSuccess(Object result) {
                 if (workflowExecuteThread.workFlowFinish()) {
+                    stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
                     processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                     notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                     logger.info("process instance {} finished.", processInstanceId);

@@ -90,11 +90,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public ExecutionStatus taskState() {
-        return this.taskInstance.getState();
-    }
-
-    @Override
     public boolean runTask() {
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();

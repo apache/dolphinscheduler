@@ -204,8 +204,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return null;
     }
 
-    public ExecutionStatus taskState() {
-        return this.taskInstance.getState();
+    public TaskInstance taskInstance() {
+        return this.taskInstance;
     }
 
     /**

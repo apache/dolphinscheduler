@@ -72,11 +72,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public ExecutionStatus taskState() {
-        return this.taskInstance.getState();
-    }
-
-    @Override
     public boolean runTask() {
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
