@@ -137,6 +137,8 @@ final class DolphinSchedulerExtension
             }
         }
 
+        System.out.printf("Constants.OS_NAME: %s", Constants.OS_NAME);
+
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
             .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)

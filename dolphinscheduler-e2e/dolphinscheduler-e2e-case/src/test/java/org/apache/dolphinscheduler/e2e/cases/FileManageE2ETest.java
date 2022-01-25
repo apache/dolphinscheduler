@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 
+import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -66,11 +68,11 @@ public class FileManageE2ETest {
 
     private static final String testRenameFileName = "test_rename_file.sh";
 
-    private static final String testOver1GBFilePath = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath() + "test_file_1.5G";
-
-    private static final String testUnder1GBFilePath = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath() + "test_file_0.01G";
-
     private static final String testUnder1GBFileName = "test_file_0.01G";
+
+    private static final String testOver1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + "test_file_1.5G";
+
+    private static final String testUnder1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + testUnder1GBFileName;
 
     @BeforeAll
     public static void setup() {
