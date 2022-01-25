@@ -78,9 +78,9 @@ public class FileManageE2ETest {
 
     private static final String testUnder1GBFileName = "test_file_0.01G";
 
-    private static final String testOver1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + "test_file_1.5G";
+    private static final String testOver1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + "/test_file_1.5G";
 
-    private static final String testUnder1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + testUnder1GBFileName;
+    private static final String testUnder1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + "/" + testUnder1GBFileName;
 
     @BeforeAll
     public static void setup() {
@@ -257,7 +257,7 @@ public class FileManageE2ETest {
     @Order(60)
     void testUploadOver1GBFile() throws IOException {
         final FileManagePage page = new FileManagePage(browser);
-
+        System.out.printf("testOver1GBFilePath: %s", testOver1GBFilePath);
         RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath, "rw");
         file.setLength((long) (1.5 * 1024 * 1024 * 1024));
 
@@ -298,9 +298,8 @@ public class FileManageE2ETest {
 
         File file = new File(testUnder1GBFilePath);
 
-        new FluentWait<WebDriver>(page.driver()).withTimeout(Duration.ofSeconds(30))
-            .pollingEvery(Duration.ofSeconds(1))
-            .ignoring(NoSuchElementException.class)
-            .until((ExpectedCondition<Boolean>) webDriver -> file.exists());
+        await().untilAsserted(() -> {
+            assert file.exists();
+        });
     }
 }

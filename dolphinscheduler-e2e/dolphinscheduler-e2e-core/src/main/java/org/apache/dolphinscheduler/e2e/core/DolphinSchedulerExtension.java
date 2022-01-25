@@ -123,10 +123,10 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
-        String osName = Constants.OS_NAME.toLowerCase();
+//        String osName = Constants.OS_NAME.toLowerCase();
 
         // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
-        if ("linux".equals(osName)) {
+        if ("linux".equalsIgnoreCase(Constants.OS_NAME)) {
             String command = String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH);
 
             try {
