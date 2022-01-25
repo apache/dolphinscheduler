@@ -60,7 +60,7 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create() {
         buttonCreateToken().click();
         createTokenForm().buttonGenerateToken().click();
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
         createTokenForm().buttonSubmit().click();
         return this;
     }
@@ -89,7 +89,7 @@ public final class TokenPage extends NavBarPage implements Tab {
                 .flatMap(it -> it.findElements(By.className("delete")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in user list"))
+                .orElseThrow(() -> new RuntimeException("No delete button in token list"))
                 .click();
 
         buttonConfirm()

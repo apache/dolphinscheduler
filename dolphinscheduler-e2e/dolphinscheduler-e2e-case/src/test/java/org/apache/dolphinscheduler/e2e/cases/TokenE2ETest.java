@@ -30,11 +30,8 @@ import org.apache.dolphinscheduler.e2e.pages.security.TokenPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class TokenE2ETest {
@@ -59,8 +56,6 @@ public class TokenE2ETest {
     void testCreateToken() {
         final TokenPage page = new TokenPage(browser);
         token = page.create().toString();
-
-        new WebDriverWait(page.driver(), 10).until(ExpectedConditions.visibilityOfElementLocated(new ById("dialogGenerateToken")));
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
