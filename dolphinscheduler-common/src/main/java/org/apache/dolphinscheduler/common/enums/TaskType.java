@@ -58,7 +58,7 @@ public enum TaskType {
     SEATUNNEL(13, "SEATUNNEL"),
     SWITCH(14, "SWITCH"),
     PIGEON(15, "PIGEON"),
-    DATA_QUALITY(16, "data_quality");
+    DATA_QUALITY(16, "DATA_QUALITY");
 
     TaskType(int code, String desc) {
         this.code = code;

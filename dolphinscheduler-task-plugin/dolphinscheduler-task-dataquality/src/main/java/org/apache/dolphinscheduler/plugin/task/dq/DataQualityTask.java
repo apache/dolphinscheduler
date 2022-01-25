@@ -180,7 +180,7 @@ public class DataQualityTask extends AbstractYarnTask {
     @Override
     protected void setMainJarName() {
         ResourceInfo mainJar = new ResourceInfo();
-        mainJar.setRes(System.getProperty("user.dir") + CommonUtils.getDataQualityJarName());
+        mainJar.setRes(CommonUtils.getDataQualityJarName());
         dataQualityParameters.getSparkParameters().setMainJar(mainJar);
     }
 

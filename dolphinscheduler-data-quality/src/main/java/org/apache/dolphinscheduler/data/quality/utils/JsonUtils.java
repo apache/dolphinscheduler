@@ -65,6 +65,7 @@ public class JsonUtils {
         } catch (Exception e) {
             logger.error("parse object exception!", e);
         }
+
         return null;
     }
 }

@@ -20,7 +20,10 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper">
 
     <select id="getRuleInputEntryList" resultType="org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry">
-        SELECT * , b.values_map, b.index FROM t_ds_dq_rule_input_entry a join ( SELECT *
+        SELECT * ,
+               b.values_map,
+               b.index
+        FROM t_ds_dq_rule_input_entry a join ( SELECT *
         FROM t_ds_relation_rule_input_entry where rule_id = #{ruleId} )  b
         on a.id = b.rule_input_entry_id order by b.index
     </select>

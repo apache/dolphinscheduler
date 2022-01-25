@@ -19,12 +19,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper">
     <select id="queryResultListPaging" resultType="org.apache.dolphinscheduler.dao.entity.DqExecuteResult">
-        SELECT a.id, a.process_definition_id, b.name as process_definition_name, b.code as process_definition_code, a.process_instance_id, e.name as process_instance_name,a.task_instance_id, c.name as task_name, a.rule_type, a.rule_name, a.statistics_value, a.comparison_value, a.check_type,
-        a.threshold , cp.type as comparison_type_name,
-        a.operator, a.failure_strategy, a.state, a.user_id, d.user_name, a.create_time, a.update_time
+        SELECT a.id,
+               a.process_definition_id,
+               b.name as process_definition_name,
+               b.code as process_definition_code,
+               a.process_instance_id,
+               e.name as process_instance_name,
+               a.task_instance_id,
+               c.name as task_name,
+               a.rule_type,
+               a.rule_name,
+               a.statistics_value,
+               a.comparison_value,
+               a.check_type,
+               a.threshold,
+               cp.type as comparison_type_name,
+               a.operator,
+               a.failure_strategy,
+               a.state,
+               a.user_id,
+               d.user_name,
+               a.create_time,
+               a.update_time
         FROM t_ds_dq_execute_result a
-        left join (select id,name,code from t_ds_process_definition) b on a.process_definition_id = b.id
-        left join (select id,name from t_ds_task_instance) c on a.task_instance_id = c.id
+        left join t_ds_process_definition b on a.process_definition_id = b.id
+        left join t_ds_task_instance c on a.task_instance_id = c.id
         left join t_ds_process_instance e on a.process_instance_id = e.id
         left join t_ds_user d on d.id = a.user_id
         left join t_ds_dq_comparison_type cp on cp.id = a.comparison_type
@@ -52,11 +71,15 @@
     </select>
 
     <select id="getExecuteResultById" resultType="org.apache.dolphinscheduler.dao.entity.DqExecuteResult">
-        SELECT a.*, b.name as process_definition_name, e.name as process_instance_name, c.name as task_name,
-        cp.type as comparison_type_name, d.user_name
+        SELECT a.*,
+               b.name as process_definition_name,
+               e.name as process_instance_name,
+               c.name as task_name,
+               cp.type as comparison_type_name,
+               d.user_name
         FROM t_ds_dq_execute_result a
-        left join (select id,name from t_ds_process_definition) b on a.process_definition_id = b.id
-        left join (select id,name from t_ds_task_instance) c on a.task_instance_id = c.id
+        left join t_ds_process_definition b on a.process_definition_id = b.id
+        left join t_ds_task_instance c on a.task_instance_id = c.id
         left join t_ds_process_instance e on a.process_instance_id = e.id
         left join t_ds_user d on d.id = a.user_id
         left join t_ds_dq_comparison_type cp on cp.id = a.comparison_type
