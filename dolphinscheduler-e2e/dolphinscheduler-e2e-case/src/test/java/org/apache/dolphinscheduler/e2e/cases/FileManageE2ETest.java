@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
 import org.assertj.core.api.Condition;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.function.Function;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
@@ -98,6 +100,21 @@ public class FileManageE2ETest {
             .update(user, user, password, email, phone)
             .goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class);
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        String[] command = {"/bin/bash", "-c", String.format("rm -f %s && rm -f %s && rm -rf %s", testUnder1GBFilePath, testOver1GBFilePath, Constants.HOST_CHROME_DOWNLOAD_PATH)};
+
+        try {
+            Process pro = Runtime.getRuntime().exec(command);
+            int status = pro.waitFor();
+            if (status != 0) {
+                throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -257,7 +274,7 @@ public class FileManageE2ETest {
     @Order(60)
     void testUploadOver1GBFile() throws IOException {
         final FileManagePage page = new FileManagePage(browser);
-        System.out.printf("testOver1GBFilePath: %s", testOver1GBFilePath);
+
         RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath, "rw");
         file.setLength((long) (1.5 * 1024 * 1024 * 1024));
 
