@@ -29,7 +29,7 @@ public final class Constants {
     }
 
     /**
-     * tmp directory
+     * tmp directory path
      */
     public static final String HOST_TMP_PATH = System.getProperty("java.io.tmpdir");
 

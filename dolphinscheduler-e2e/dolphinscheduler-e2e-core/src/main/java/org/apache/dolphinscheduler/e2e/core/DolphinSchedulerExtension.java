@@ -138,9 +138,7 @@ final class DolphinSchedulerExtension
             } catch (Exception e) {
                 throw new IOException(e);
             }
-
-//            Files.setAttribute(file.toPath(), "unix:uid", 1200);
-//            Files.setAttribute(file.toPath(), "unix:gid", 1201);
+            
         }
 
         browser = new BrowserWebDriverContainer<>()
