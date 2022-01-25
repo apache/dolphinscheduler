@@ -18,4 +18,17 @@
 Map Reduce
 ==========
 
+
+A Map Reduce task type's example and dive into information of **PyDolphinScheduler**.
+
+Example
+-------
+
+.. literalinclude:: ../../../examples/task_map_reduce_example.py
+   :start-after: [start workflow_declare]
+   :end-before: [end workflow_declare]
+
+Dive Into
+---------
+
 .. automodule:: pydolphinscheduler.tasks.map_reduce

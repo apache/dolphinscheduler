@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 r"""
 A example workflow for task dependent.
 
@@ -70,3 +71,4 @@ with ProcessDefinition(
         ),
     )
     pd.submit()
+# [end workflow_declare]

@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 r"""
 A example workflow for task condition.
 
@@ -55,3 +56,4 @@ with ProcessDefinition(name="task_conditions_example", tenant="tenant_exists") a
         failed_task=fail_branch,
     )
     pd.submit()
+# [end workflow_declare]
