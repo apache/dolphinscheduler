@@ -44,7 +44,6 @@ In this section
 
 
    spark
-   flink
    map_reduce
    procedure
 
