@@ -40,6 +40,7 @@ import static org.awaitility.Awaitility.await;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Paths;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
@@ -65,11 +66,11 @@ public class FileManageE2ETest {
 
     private static final String testRenameFileName = "test_rename_file.sh";
 
-    private static final String testOver1GBFilePath = "/tmp/test_file_1.5G";
+    private static final String testOver1GBFilePath = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath() + "test_file_1.5G";
 
-    private static final String testUnder1GBFilePath = "/tmp/test_file_0.01G";
+    private static final String testUnder1GBFilePath = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath() + "test_file_0.01G";
 
-    private static final String testUnder1GBFileName = testUnder1GBFilePath.split("/")[2];
+    private static final String testUnder1GBFileName = "test_file_0.01G";
 
     @BeforeAll
     public static void setup() {
