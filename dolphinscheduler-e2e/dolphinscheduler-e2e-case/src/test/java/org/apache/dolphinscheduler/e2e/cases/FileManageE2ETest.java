@@ -78,9 +78,9 @@ public class FileManageE2ETest {
 
     private static final String testUnder1GBFileName = "test_file_0.01G";
 
-    private static final String testOver1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + "/test_file_1.5G";
+    private static final String testOver1GBFilePath = Constants.HOST_TMP_PATH + "/test_file_1.5G";
 
-    private static final String testUnder1GBFilePath = Constants.HOST_CHROME_DOWNLOAD_PATH + "/" + testUnder1GBFileName;
+    private static final String testUnder1GBFilePath = Constants.HOST_TMP_PATH + "/" + testUnder1GBFileName;
 
     @BeforeAll
     public static void setup() {
@@ -296,7 +296,7 @@ public class FileManageE2ETest {
 
         page.downloadFile(testUnder1GBFileName);
 
-        File file = new File(testUnder1GBFilePath);
+        File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH, testUnder1GBFileName).toFile().getAbsolutePath());
 
         await().untilAsserted(() -> {
             assert file.exists();

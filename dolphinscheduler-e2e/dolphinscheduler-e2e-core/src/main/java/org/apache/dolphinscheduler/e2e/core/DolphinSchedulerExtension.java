@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -123,19 +124,16 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
-//        String osName = Constants.OS_NAME.toLowerCase();
-
         // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
         if ("linux".equalsIgnoreCase(Constants.OS_NAME)) {
-            String command = String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH);
+            String[] command = {"/bin/bash", "-c", String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH)};
 
             try {
                 Process pro = Runtime.getRuntime().exec(command);
                 int status = pro.waitFor();
                 if (status != 0) {
-                    throw new RuntimeException(String.format("Failed to call shell's command: %s", command));
+                    throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
                 }
-                System.out.printf("执行成功: %s", command);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

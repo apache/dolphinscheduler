@@ -31,6 +31,11 @@ public final class Constants {
     /**
      * chrome download path in host
      */
+    public static final String HOST_TMP_PATH = System.getProperty("java.io.tmpdir");
+
+    /**
+     * chrome download path in host
+     */
     public static final String HOST_CHROME_DOWNLOAD_PATH = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath();
 
     /**
