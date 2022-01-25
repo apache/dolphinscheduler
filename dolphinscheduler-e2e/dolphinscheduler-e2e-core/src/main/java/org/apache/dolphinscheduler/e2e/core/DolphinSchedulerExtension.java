@@ -28,8 +28,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFileAttributeView;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -120,17 +122,28 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
-        String downloadFilepath = "/tmp/download";
-        HashMap<String, Object> chromePrefs = new HashMap<>();
-        chromePrefs.put("download.default_directory", downloadFilepath);
-        chromePrefs.put("download.directory_upgrade", true);
-        chromePrefs.put("download.prompt_for_download", false);
-        ChromeOptions options = new ChromeOptions();
-        options.setExperimentalOption("prefs", chromePrefs);
+        String hostDownloadFilepath = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath();
+
+        String osName = System.getProperties().getProperty("os.name");
+
+        // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
+        if (osName.equals("Linux")) {
+            String command = String.format("mkdir %s && chown 1200:1201 %s", hostDownloadFilepath, hostDownloadFilepath);
+
+            try {
+                Process pro = Runtime.getRuntime().exec(command);
+                int status = pro.waitFor();
+                if (status != 0) {
+                    throw new RuntimeException(String.format("Failed to call shell's command: %s", command));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
-            .withFileSystemBind(Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath(), "/home/seluser/Downloads")
+            .withFileSystemBind(hostDownloadFilepath, "/home/seluser/Downloads")
             .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
