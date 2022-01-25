@@ -128,7 +128,7 @@ final class DolphinSchedulerExtension
         // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
         if ("linux".equalsIgnoreCase(Constants.OS_NAME)) {
             File file = new File(Constants.HOST_CHROME_DOWNLOAD_PATH);
-            boolean result = file.mkdirs();
+            boolean result = file.mkdir();
 
             if (!result) {
                 throw new IOException(String.format("mkdir %s error", Constants.HOST_CHROME_DOWNLOAD_PATH));
