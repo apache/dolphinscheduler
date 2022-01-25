@@ -39,9 +39,9 @@ export default {
       }
     },
     {
-      path: '/security/users',
-      name: 'users-manage',
-      component: components['home'],
+      path: '/security/user-manage',
+      name: 'user-manage',
+      component: components['security-user-manage'],
       meta: {
         title: '用户管理',
         showSide: true
