@@ -132,7 +132,7 @@ final class DolphinSchedulerExtension
                 Process pro = Runtime.getRuntime().exec(command);
                 int status = pro.waitFor();
                 if (status != 0) {
-                    throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
+                    throw new RuntimeException(String.format("Failed to call shell's command: %s | error: %s", Arrays.toString(command), pro.getErrorStream()));
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
