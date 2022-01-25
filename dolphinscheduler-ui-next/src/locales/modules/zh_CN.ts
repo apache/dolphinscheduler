@@ -278,6 +278,11 @@ const resource = {
     please_enter_keywords: '请输入搜索关键词'
   },
   task_group_queue: {
+    id: '编号',
+    actions: '操作',
+    task_group_name: '任务组名称',
+    process_name: '工作流名称',
+    process_instance_name: '工作流实例',
     queue: '任务组队列',
     priority: '组内优先级',
     priority_be_a_number: '优先级必须是大于等于0的数值',

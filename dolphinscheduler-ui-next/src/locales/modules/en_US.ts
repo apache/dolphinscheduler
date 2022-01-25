@@ -72,7 +72,10 @@ const menu = {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',
-  token_manage: 'Token Manage'
+  token_manage: 'Token Manage',
+  task_group_manage: 'Task Group Manage',
+  task_group_option: 'Task Group Option',
+  task_group_queue: 'Task Group Queue'
 }
 
 const home = {
@@ -279,6 +282,11 @@ const resource = {
     please_enter_keywords: 'Please enter keywords'
   },
   task_group_queue: {
+    id: 'No.',
+    actions: 'Actions',
+    task_group_name: 'Task group name',
+    process_name: 'Process name',
+    process_instance_name: 'Process instance',
     queue: 'Task group queue',
     priority: 'Priority',
     priority_be_a_number:

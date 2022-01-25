@@ -163,6 +163,10 @@ export function useDataList() {
               {
                 label: t('menu.task_group_option'),
                 key: 'task-group-option'
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: 'task-group-queue'
               }
             ]
           }
