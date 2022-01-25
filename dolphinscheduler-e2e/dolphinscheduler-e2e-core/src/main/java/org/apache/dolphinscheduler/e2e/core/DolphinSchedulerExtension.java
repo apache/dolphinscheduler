@@ -123,6 +123,7 @@ final class DolphinSchedulerExtension
         String downloadFilepath = "/tmp/download";
         HashMap<String, Object> chromePrefs = new HashMap<>();
         chromePrefs.put("download.default_directory", downloadFilepath);
+        chromePrefs.put("profile.default_content_settings.popups", 0);
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", chromePrefs);
 
