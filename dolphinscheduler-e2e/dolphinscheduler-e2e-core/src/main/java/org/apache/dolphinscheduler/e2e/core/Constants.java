@@ -29,7 +29,7 @@ public final class Constants {
     }
 
     /**
-     * chrome download path in host
+     * tmp directory
      */
     public static final String HOST_TMP_PATH = System.getProperty("java.io.tmpdir");
 
