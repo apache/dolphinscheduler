@@ -131,7 +131,7 @@ final class DolphinSchedulerExtension
             boolean result = file.mkdirs();
 
             if (!result) {
-                throw new RuntimeException(String.format("mkdir %s error", Constants.HOST_CHROME_DOWNLOAD_PATH));
+                throw new IOException(String.format("mkdir %s error", Constants.HOST_CHROME_DOWNLOAD_PATH));
             }
 
             Files.setAttribute(file.toPath(), "unix:uid", 1200);
