@@ -135,6 +135,7 @@ final class DolphinSchedulerExtension
                 if (status != 0) {
                     throw new RuntimeException(String.format("Failed to call shell's command: %s", command));
                 }
+                System.out.printf("执行成功: %s", command);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
