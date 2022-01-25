@@ -49,7 +49,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * test task execute processor
@@ -73,7 +72,6 @@ public class TaskExecuteProcessorTest {
     private Command ackCommand;
 
     private TaskExecuteRequestCommand taskRequestCommand;
-
 
     private AlertClientService alertClientService;
 

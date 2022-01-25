@@ -47,6 +47,7 @@ dolphinscheduler-ui/dist
 dolphinscheduler-ui/node
 dolphinscheduler-common/sql
 dolphinscheduler-common/test
+dolphinscheduler-worker/logs
 
 # ------------------
 # pydolphinscheduler
