@@ -24,6 +24,7 @@ import static org.testcontainers.containers.VncRecordingContainer.VncRecordingFo
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -131,8 +132,13 @@ final class DolphinSchedulerExtension
             try {
                 Process pro = Runtime.getRuntime().exec(command);
                 int status = pro.waitFor();
+                InputStream inputStream = pro.getErrorStream();
                 if (status != 0) {
-                    throw new RuntimeException(String.format("Failed to call shell's command: %s | error: %s", Arrays.toString(command), pro.getErrorStream()));
+                    for (int i = 0; i < inputStream.available(); ++i) {
+                        System.out.println(inputStream.read());
+                    }
+
+                    throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
