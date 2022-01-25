@@ -19,4 +19,3 @@ Dependent
 =========
 
 .. automodule:: pydolphinscheduler.tasks.dependent
-  :members:

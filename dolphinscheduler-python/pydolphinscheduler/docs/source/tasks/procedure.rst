@@ -19,4 +19,3 @@ Produce
 =======
 
 .. automodule:: pydolphinscheduler.tasks.procedure
-  :members:

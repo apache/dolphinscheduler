@@ -22,34 +22,26 @@ Core
 ----
 
 .. automodule:: pydolphinscheduler.core
-  :members:
   :inherited-members:
-  :member-order: groupwise
 
 Sides
 -----
 
 .. automodule:: pydolphinscheduler.side
-  :members:
   :inherited-members:
-  :member-order: groupwise
 
 Tasks
 -----
 
 .. automodule:: pydolphinscheduler.tasks
-  :members:
   :inherited-members:
-  :member-order: groupwise
 
 Constants
 ---------
 
 .. automodule:: pydolphinscheduler.constants
-  :members:
 
 Exceptions
 ----------
 
 .. automodule:: pydolphinscheduler.exceptions
-  :members:

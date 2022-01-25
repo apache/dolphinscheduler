@@ -149,7 +149,3 @@ decide workflow of task. You could set `process_definition` in both normal assig
        shell_task = Shell(name="shell", command="echo shell task",
 
 With both `Process Definition`_, `Tasks`_  and `Tasks Dependence`_, we could build a workflow with multiple tasks.
-
-DolphinScheduler daemon
------------------------
-

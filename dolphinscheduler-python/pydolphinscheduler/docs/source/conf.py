@@ -65,7 +65,13 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-# autodoc_class_signature = "separated"
+autodoc_default_options = {
+    "members": True,
+    "show-inheritance": True,
+    "private-members": True,
+    "undoc-members": True,
+    "member-order": "groupwise",
+}
 
 autosectionlabel_prefix_document = True
 

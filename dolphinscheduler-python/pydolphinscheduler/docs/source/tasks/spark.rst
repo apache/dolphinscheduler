@@ -19,4 +19,3 @@ Spark
 =====
 
 .. automodule:: pydolphinscheduler.tasks.spark
-  :members:

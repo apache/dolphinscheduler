@@ -19,4 +19,3 @@ Sub Process
 ===========
 
 .. automodule:: pydolphinscheduler.tasks.sub_process
-  :members:

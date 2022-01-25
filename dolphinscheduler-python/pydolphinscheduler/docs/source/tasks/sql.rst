@@ -19,4 +19,3 @@ SQL
 ===
 
 .. automodule:: pydolphinscheduler.tasks.sql
-  :members:

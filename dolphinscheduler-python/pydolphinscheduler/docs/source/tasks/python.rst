@@ -19,4 +19,3 @@ Python
 ======
 
 .. automodule:: pydolphinscheduler.tasks.python
-  :members:

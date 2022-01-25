@@ -19,4 +19,3 @@ Map Reduce
 ==========
 
 .. automodule:: pydolphinscheduler.tasks.map_reduce
-  :members:

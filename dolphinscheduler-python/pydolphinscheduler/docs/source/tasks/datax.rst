@@ -19,4 +19,3 @@ Datax
 =====
 
 .. automodule:: pydolphinscheduler.tasks.datax
-  :members:

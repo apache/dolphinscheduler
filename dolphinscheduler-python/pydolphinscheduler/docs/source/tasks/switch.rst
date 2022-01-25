@@ -19,4 +19,3 @@ Switch
 ======
 
 .. automodule:: pydolphinscheduler.tasks.switch
-  :members:

@@ -19,4 +19,3 @@ Shell
 =====
 
 .. automodule:: pydolphinscheduler.tasks.shell
-  :members:

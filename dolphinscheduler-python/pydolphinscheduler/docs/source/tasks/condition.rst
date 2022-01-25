@@ -19,4 +19,3 @@ Condition
 =========
 
 .. automodule:: pydolphinscheduler.tasks.condition
-  :members:

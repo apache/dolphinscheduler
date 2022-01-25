@@ -19,4 +19,3 @@ HTTP
 ====
 
 .. automodule:: pydolphinscheduler.tasks.http
-  :members:
