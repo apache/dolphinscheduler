@@ -47,5 +47,5 @@ public final class Constants {
      * host os name
      */
     public static final String OS_NAME = System.getProperties().getProperty("os.name");
-    
+
 }
