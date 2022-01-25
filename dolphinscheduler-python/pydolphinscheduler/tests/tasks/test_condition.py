@@ -27,8 +27,8 @@ from pydolphinscheduler.tasks.condition import (
     FAILURE,
     SUCCESS,
     And,
+    Condition,
     ConditionOperator,
-    Conditions,
     Or,
     Status,
 )
@@ -321,7 +321,7 @@ def test_condition_operator_set_define_attr_mix_operator(
     return_value=(12345, 1),
 )
 @patch(
-    "pydolphinscheduler.tasks.condition.Conditions.gen_code_and_version",
+    "pydolphinscheduler.tasks.condition.Condition.gen_code_and_version",
     return_value=(123, 1),
 )
 def test_condition_get_define(mock_condition_code_version, mock_task_code_version):
@@ -388,7 +388,7 @@ def test_condition_get_define(mock_condition_code_version, mock_task_code_versio
         "timeout": 0,
     }
 
-    task = Conditions(
+    task = Condition(
         name, condition=cond_operator, success_task=common_task, failed_task=common_task
     )
     assert task.get_define() == expect
@@ -414,7 +414,7 @@ def test_condition_set_dep_workflow(mock_task_code_version):
         success_branch = Task(name="success_branch", task_type=TEST_TYPE)
         fail_branch = Task(name="fail_branch", task_type=TEST_TYPE)
 
-        condition = Conditions(
+        condition = Condition(
             name="conditions",
             condition=cond_operator,
             success_task=success_branch,

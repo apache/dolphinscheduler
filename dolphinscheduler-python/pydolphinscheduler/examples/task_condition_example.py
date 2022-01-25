@@ -32,10 +32,10 @@ pre_task_3 ->                     -> fail_branch
 """
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.tasks.condition import FAILURE, SUCCESS, And, Conditions
+from pydolphinscheduler.tasks.condition import FAILURE, SUCCESS, And, Condition
 from pydolphinscheduler.tasks.shell import Shell
 
-with ProcessDefinition(name="task_conditions_example", tenant="tenant_exists") as pd:
+with ProcessDefinition(name="task_condition_example", tenant="tenant_exists") as pd:
     pre_task_1 = Shell(name="pre_task_1", command="echo pre_task_1")
     pre_task_2 = Shell(name="pre_task_2", command="echo pre_task_2")
     pre_task_3 = Shell(name="pre_task_3", command="echo pre_task_3")
@@ -49,8 +49,8 @@ with ProcessDefinition(name="task_conditions_example", tenant="tenant_exists") a
     success_branch = Shell(name="success_branch", command="echo success_branch")
     fail_branch = Shell(name="fail_branch", command="echo fail_branch")
 
-    condition = Conditions(
-        name="conditions",
+    condition = Condition(
+        name="condition",
         condition=cond_operator,
         success_task=success_branch,
         failed_task=fail_branch,
