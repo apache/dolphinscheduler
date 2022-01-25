@@ -25,6 +25,7 @@
                b.code as process_definition_code,
                a.process_instance_id,
                e.name as process_instance_name,
+               b.project_code,
                a.task_instance_id,
                c.name as task_name,
                a.rule_type,

@@ -59,6 +59,11 @@ public class DqExecuteResult implements Serializable {
     @TableField(exist = false)
     private String processInstanceName;
     /**
+     * project code
+     */
+    @TableField(exist = false)
+    private long projectCode;
+    /**
      * task instance id
      */
     @TableField(value = "task_instance_id")
@@ -189,6 +194,14 @@ public class DqExecuteResult implements Serializable {
 
     public void setProcessInstanceName(String processInstanceName) {
         this.processInstanceName = processInstanceName;
+    }
+
+    public long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(long projectCode) {
+        this.projectCode = projectCode;
     }
 
     public String getRuleName() {
@@ -352,6 +365,7 @@ public class DqExecuteResult implements Serializable {
                 + ", processDefinitionCode='" + processDefinitionCode + '\''
                 + ", processInstanceId=" + processInstanceId
                 + ", processInstanceName='" + processInstanceName + '\''
+                + ", projectCode='" + projectCode + '\''
                 + ", taskInstanceId=" + taskInstanceId
                 + ", taskName='" + taskName + '\''
                 + ", ruleType=" + ruleType
