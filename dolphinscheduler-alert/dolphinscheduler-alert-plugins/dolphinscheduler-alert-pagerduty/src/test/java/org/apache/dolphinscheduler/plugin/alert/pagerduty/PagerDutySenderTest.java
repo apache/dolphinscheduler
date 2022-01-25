@@ -15,34 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-public enum StateEventType {
+public class PagerDutySenderTest {
+    private static final Map<String, String> pagerDutyConfig = new HashMap<>();
 
-    PROCESS_STATE_CHANGE(0, "process statechange"),
-    TASK_STATE_CHANGE(1, "task state change"),
-    PROCESS_TIMEOUT(2, "process timeout"),
-    TASK_TIMEOUT(3, "task timeout"),
-    WAIT_TASK_GROUP(4, "wait task group"),
-    TASK_RETRY(5, "task retry")
-    ;
-
-    StateEventType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
+    @Before
+    public void initDingTalkConfig() {
+        pagerDutyConfig.put(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME, "test");
     }
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+    @Test
+    public void testSend() {
+        PagerDutySender pagerDutySender = new PagerDutySender(pagerDutyConfig);
+        AlertResult alertResult = pagerDutySender.sendPagerDutyAlter("pagerduty test title", "pagerduty test content");
+        Assert.assertEquals("false", alertResult.getStatus());
     }
 }

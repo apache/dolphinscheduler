@@ -46,14 +46,14 @@ const Content = defineComponent({
     onMounted(() => {
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
-      genSideMenu(state)
+      getSideMenu(state)
       changeUserDropdown(state)
     })
 
     watch(useI18n().locale, () => {
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
-      genSideMenu(state)
+      getSideMenu(state)
       changeUserDropdown(state)
     })
 
@@ -61,12 +61,11 @@ const Content = defineComponent({
       () => route.path,
       (path) => {
         state.isShowSide = menuStore.getShowSideStatus
-        const regex = new RegExp('[^/]+$', 'g')
-        menuStore.setSideMenuKey((path.match(regex) as RegExpMatchArray)[0])
+        menuStore.setSideMenuKey(path)
       }
     )
 
-    const genSideMenu = (state: any) => {
+    const getSideMenu = (state: any) => {
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
@@ -76,7 +75,7 @@ const Content = defineComponent({
 
     const getSideMenuOptions = (item: any) => {
       menuStore.setMenuKey(item.key)
-      genSideMenu(state)
+      getSideMenu(state)
     }
 
     return {

@@ -323,6 +323,22 @@ const project = {
   workflow: {
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
+    workflow_name: 'Workflow Name',
+    current_selection: 'Current Selection',
+    online: 'Online',
+    offline: 'Offline',
+    refresh: 'Refresh',
+    show_hide_label: 'Show / Hide Label',
+    workflow_offline: 'Workflow Offline',
+    schedule_offline: 'Schedule Offline',
+    schedule_start_time: 'Schedule Start Time',
+    schedule_end_time: 'Schedule End Time',
+    crontab_expression: 'Crontab',
+    workflow_publish_status: 'Workflow Publish Status',
+    schedule_publish_status: 'Schedule Publish Status'
+  },
+  dag: {
+    createWorkflow: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',
