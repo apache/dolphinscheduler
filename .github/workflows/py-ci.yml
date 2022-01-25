@@ -97,3 +97,20 @@ jobs:
           pip install -e .
       - name: Run Tests && Check coverage
         run: coverage run && coverage report
+  doc-build:
+    name: Document Build Test
+    needs: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Development Dependences
+        run: |
+          pip install -r requirements_dev.txt
+          pip install -e .
+      - name: Test Build Document
+        working-directory: ./docs
+        run: make clean && make html
