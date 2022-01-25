@@ -28,6 +28,8 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ByChained;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -53,7 +55,7 @@ public abstract class TaskNodeForm {
             @FindBy(className = "pre_tasks-model"),
             @FindBy(className = "el-input__inner")
     })
-    private WebElement preTasks;
+    private WebElement selectPreTasks;
 
     private final WorkflowForm parent;
 
@@ -91,7 +93,20 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm preTask(String preTaskName) {
-        preTasks.sendKeys(preTaskName);
+        selectPreTasks().click();
+
+        final By optionsLocator = By.className("option-pre-tasks");
+
+        new WebDriverWait(parent.driver(), 10)
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        parent.driver().findElements(optionsLocator)
+                .stream()
+                .filter(it -> it.getText().contains(preTaskName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
+                .click()
+        ;
 
         return this;
     }

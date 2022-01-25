@@ -29,6 +29,7 @@
         >
           <el-option
             v-for="task in options"
+            class="option-pre-tasks"
             :key="task.code"
             :value="task.code"
             :label="task.name"
