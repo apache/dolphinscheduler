@@ -20,7 +20,20 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper">
 
     <select id="getRuleInputEntryList" resultType="org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry">
-        SELECT * ,
+        SELECT a.id,
+               a.field,
+               a.`type`,
+               a.title,
+               a.value,
+               a.`options`,
+               a.placeholder,
+               a.option_source_type,
+               a.value_type,
+               a.input_type,
+               a.is_show,
+               a.can_edit,
+               a.is_emit,
+               a.is_validate,
                b.values_map,
                b.index
         FROM t_ds_dq_rule_input_entry a join ( SELECT *

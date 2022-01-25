@@ -19,14 +19,16 @@ import i18n from '@/module/i18n'
 
 const dataQualityTaskState = [
   {
+    code: '',
+    label: `${i18n.$t('All')}`
+  },
+  {
     code: 0,
     label: `${i18n.$t('Default')}`
-
   },
   {
     code: 1,
     label: `${i18n.$t('Success')}`
-
   },
   {
     code: 2,
@@ -63,24 +65,24 @@ const operator = [
 
 const ruleType = [
   {
+    code: -1,
+    label: `${i18n.$t('All')}`
+  },
+  {
     code: 0,
     label: `${i18n.$t('Single Table')}`
-
   },
   {
     code: 1,
     label: `${i18n.$t('Single Table Custom Sql')}`
-
   },
   {
     code: 2,
     label: `${i18n.$t('Multi Table Accuracy')}`
-
   },
   {
     code: 3,
     label: `${i18n.$t('Multi Table Comparison')}`
-
   }
 ]
 

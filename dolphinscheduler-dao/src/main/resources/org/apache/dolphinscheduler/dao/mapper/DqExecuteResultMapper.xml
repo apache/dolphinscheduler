@@ -72,7 +72,22 @@
     </select>
 
     <select id="getExecuteResultById" resultType="org.apache.dolphinscheduler.dao.entity.DqExecuteResult">
-        SELECT a.*,
+        SELECT a.id,
+               a.process_definition_id,
+               a.process_instance_id,
+               a.task_instance_id,
+               a.rule_type,
+               a.rule_name,
+               a.statistics_value,
+               a.comparison_value,
+               a.check_type,
+               a.threshold,
+               a.operator,
+               a.failure_strategy,
+               a.state,
+               a.user_id,
+               a.comparison_type,
+               a.error_output_path,
                b.name as process_definition_name,
                e.name as process_instance_name,
                c.name as task_name,

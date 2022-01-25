@@ -21,7 +21,7 @@
         <el-table-column width="50" type="expand">
             <template slot-scope="scope">
             <div>
-              <el-table :data="JSON.parse(scope.row.ruleJson).ruleInputEntryList" size="mini" style="width: 100%">
+              <el-table :data="getInputEntryList(scope.row.ruleJson)" size="mini" style="width: 100%">
                 <el-table-column prop="title" :label="$t('InputEntry Title')"></el-table-column>
                 <el-table-column prop="field" :label="$t('InputEntry Field')"></el-table-column>
                 <el-table-column prop="type" :label="$t('InputEntry Type')"></el-table-column>
@@ -30,7 +30,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="name" :label="$t('Name')"></el-table-column>
-        <el-table-column :label="$t('Rule Type')" width="120">
+        <el-table-column :label="$t('Rule Type')" width="200">
           <template slot-scope="scope">
             {{_rtRuleType(scope.row.type)}}
           </template>
@@ -68,7 +68,20 @@
     methods: {
       _rtRuleType (code) {
         return _.filter(ruleType, v => v.code === code)[0].label
+      },
+
+      getInputEntryList (ruleJson) {
+        let inputEntryList = []
+        JSON.parse(ruleJson).ruleInputEntryList.forEach((item, i) => {
+          if (item.title.indexOf('$t') !== -1) {
+            item.title = this.$t((item.field))
+          }
+
+          inputEntryList.push(item)
+        })
+        return inputEntryList
       }
+
     },
     watch: {
       ruleList (a) {

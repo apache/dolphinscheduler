@@ -112,7 +112,14 @@
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.resultList = []
-            this.resultList = res.totalList
+            res.totalList.forEach((item, i) => {
+              if (item.ruleName.indexOf('(') !== -1 && item.ruleName.indexOf(')') !== -1) {
+                if (item.ruleName) {
+                  item.ruleName = this.$t((item.ruleName).replace('(', '').replace(')', ''))
+                }
+              }
+              this.resultList.push(item)
+            })
             this.total = res.total
             this.isLoading = false
           }

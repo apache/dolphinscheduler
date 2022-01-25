@@ -82,7 +82,7 @@
           // search value
           searchVal: '',
           // host
-          ruleType: ''
+          ruleType: -1
         },
         dataTime: []
       }
