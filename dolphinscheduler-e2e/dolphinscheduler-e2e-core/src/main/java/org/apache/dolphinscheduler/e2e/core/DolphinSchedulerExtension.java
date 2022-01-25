@@ -122,13 +122,9 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
-        String hostDownloadFilepath = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath();
-
-        String osName = System.getProperties().getProperty("os.name");
-
         // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
-        if (osName.equals("Linux")) {
-            String command = String.format("mkdir %s && chown 1200:1201 %s", hostDownloadFilepath, hostDownloadFilepath);
+        if (Constants.OS_NAME.equals("Linux")) {
+            String command = String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH);
 
             try {
                 Process pro = Runtime.getRuntime().exec(command);
@@ -143,7 +139,7 @@ final class DolphinSchedulerExtension
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
-            .withFileSystemBind(hostDownloadFilepath, "/home/seluser/Downloads")
+            .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
             .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
