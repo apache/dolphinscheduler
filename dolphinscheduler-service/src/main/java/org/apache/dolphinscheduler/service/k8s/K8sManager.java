@@ -43,9 +43,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
  */
 @Component
 public class K8sManager {
-    /**
-     * logger of K8sManager
-     */
+
     private static final Logger logger = LoggerFactory.getLogger(K8sManager.class);
     /**
      * cache k8s client

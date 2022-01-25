@@ -24,6 +24,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * multi-data centre k8s temporary structure, waiting for new feature to complete will switch
+ */
 @TableName("t_ds_k8s")
 public class K8s {
     /**
