@@ -123,7 +123,7 @@ final class DolphinSchedulerExtension
         }
 
         // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
-        if (Constants.OS_NAME.equals("Linux")) {
+        if ("Linux".equals(Constants.OS_NAME)) {
             String command = String.format("mkdir -p %s && chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.HOST_CHROME_DOWNLOAD_PATH);
 
             try {
