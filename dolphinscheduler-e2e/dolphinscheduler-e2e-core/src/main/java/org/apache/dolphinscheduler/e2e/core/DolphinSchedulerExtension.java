@@ -118,30 +118,17 @@ final class DolphinSchedulerExtension
         }
 
         Map<String, Object> prefs = new HashMap<>();
-//        prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
-//        prefs.put("download.prompt_for_download", false);
-        prefs.put("profile.default_content_settings.popups", 0);
-        prefs.put("safebrowsing.enabled", "true");
-
-//        List<String> args = new ArrayList<>();
-//        args.add("--disable-extensions");
-//        args.add("--safebrowsing-disable-extension-blacklist");
-//        args.add("--safebrowsing-disable-download-protection");
-
+        prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
+        prefs.put("download.prompt_for_download", false);
+        prefs.put("download.extensions_to_open", "application/xml");
+        prefs.put("safebrowsing.enabled", true);
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--safebrowsing-disable-download-protection");
-//        options.addArguments("--safebrowsing-disable-extension-blacklist");
-//        options.addArguments("--disable-extensions");
-
         options.setExperimentalOption("prefs", prefs);
-//        options.setExperimentalOption("args", args);
-        DesiredCapabilities cap = new DesiredCapabilities();
-        cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        cap.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
-        cap.setCapability(ChromeOptions.CAPABILITY, options);
+        options.addArguments("--safebrowsing-disable-download-protection");
+        options.addArguments("safebrowsing-disable-extension-blacklist");
 
         browser = new BrowserWebDriverContainer<>()
-            .withCapabilities(cap)
+            .withCapabilities(options)
             .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
             .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
                                 Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
