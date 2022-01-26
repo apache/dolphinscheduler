@@ -121,8 +121,8 @@ final class DolphinSchedulerExtension
         }
 
         Map<String, Object> prefs = new HashMap<>();
-//        prefs.put("download.prompt_for_download", false);
-//        prefs.put("download.directory_upgrade", true);
+        prefs.put("download.prompt_for_download", false);
+        prefs.put("profile.default_content_setting_values.automatic_downloads", 10);
         prefs.put("safebrowsing.enabled", true);
 
         List<String> args = new ArrayList<>();
