@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { PluginTypeReq, IPluginId } from './types'
-
-export function queryUiPluginsByType(params: PluginTypeReq): any {
-  return axios({
-    url: '/ui-plugins/query-by-type',
-    method: 'get',
-    params
-  })
+.conditions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-export function queryUiPluginDetailById(id: IPluginId): any {
-  return axios({
-    url: `/ui-plugins/${id}`,
-    method: 'get'
-  })
+.conditions-search-input {
+  width: 250px;
+}
+.pagination {
+  margin-top: 20px;
+  justify-content: center;
+}
+.mt-8 {
+  margin-top: 8px;
 }

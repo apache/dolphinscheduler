@@ -15,20 +15,14 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { PluginTypeReq, IPluginId } from './types'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
-export function queryUiPluginsByType(params: PluginTypeReq): any {
-  return axios({
-    url: '/ui-plugins/query-by-type',
-    method: 'get',
-    params
-  })
-}
+export function useUserInfo() {
+  const userStore = useUserStore()
+  const userInfo = userStore.getUserInfo as UserInfoRes
 
-export function queryUiPluginDetailById(id: IPluginId): any {
-  return axios({
-    url: `/ui-plugins/${id}`,
-    method: 'get'
-  })
+  const IS_ADMIN = userInfo.userType === 'ADMIN_USER'
+
+  return { IS_ADMIN }
 }
