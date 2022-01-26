@@ -20,6 +20,7 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -40,8 +41,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
@@ -87,18 +91,12 @@ public class UdfManageE2ETest {
     }
 
     @AfterAll
+    @SneakyThrows
     public static void cleanup() {
-        String[] command = {"/bin/bash", "-c", String.format("sudo rm -rf %s", Constants.HOST_CHROME_DOWNLOAD_PATH)};
-
-        try {
-            Process pro = Runtime.getRuntime().exec(command);
-            int status = pro.waitFor();
-            if (status != 0) {
-                throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
     }
 
     @Test
@@ -171,7 +169,7 @@ public class UdfManageE2ETest {
 
         page.downloadFile(testUploadUdfFileName);
 
-        File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH, testUploadUdfFileName).toFile().getAbsolutePath());
+        File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(), testUploadUdfFileName).toFile().getAbsolutePath());
 
         await().untilAsserted(() -> {
             assert file.exists();
