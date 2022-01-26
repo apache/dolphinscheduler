@@ -15,19 +15,25 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# [start workflow_declare]
-"""A example workflow for task flink."""
+# Minimal makefile for Sphinx documentation
+#
 
-from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.tasks.flink import DeployMode, Flink, ProgramType
+# You can set these variables from the command line, and also
+# from the environment for the first two.
 
-with ProcessDefinition(name="task_flink_example", tenant="tenant_exists") as pd:
-    task = Flink(
-        name="task_flink",
-        main_class="org.apache.flink.streaming.examples.wordcount.WordCount",
-        main_package="WordCount.jar",
-        program_type=ProgramType.JAVA,
-        deploy_mode=DeployMode.LOCAL,
-    )
-    pd.run()
-# [end workflow_declare]
+# Add opts `turn warnings into errors` strict sphinx-build behavior
+SPHINXOPTS    ?= -W
+SPHINXBUILD   ?= sphinx-build
+SOURCEDIR     = source
+BUILDDIR      = build
+
+# Put it first so that "make" without argument is like "make help".
+help:
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+.PHONY: help Makefile
+
+# Catch-all target: route all unknown targets to Sphinx using the new
+# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+%: Makefile
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

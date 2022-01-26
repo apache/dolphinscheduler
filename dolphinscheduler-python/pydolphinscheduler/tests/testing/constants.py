@@ -15,19 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# [start workflow_declare]
-"""A example workflow for task flink."""
+"""Constants variables for test module."""
 
-from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.tasks.flink import DeployMode, Flink, ProgramType
-
-with ProcessDefinition(name="task_flink_example", tenant="tenant_exists") as pd:
-    task = Flink(
-        name="task_flink",
-        main_class="org.apache.flink.streaming.examples.wordcount.WordCount",
-        main_package="WordCount.jar",
-        program_type=ProgramType.JAVA,
-        deploy_mode=DeployMode.LOCAL,
-    )
-    pd.run()
-# [end workflow_declare]
+# Record some task without example in directory `example`. Some of them maybe can not write example,
+# but most of them just without adding by mistake, and we should add it later.
+task_without_example = {
+    "sql",
+    "http",
+    "sub_process",
+    "python",
+    "procedure",
+}
