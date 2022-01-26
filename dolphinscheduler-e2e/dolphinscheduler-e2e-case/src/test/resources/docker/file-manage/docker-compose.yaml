@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-version: "2.1"
+version: "3.8"
 
 services:
   dolphinscheduler:
@@ -38,7 +38,7 @@ services:
       s3:
         condition: service_healthy
       mc:
-        condition: service_healthy
+        condition: service_completed_successfully
   s3:
     image: minio/minio:latest
     hostname: s3
@@ -59,20 +59,12 @@ services:
       retries: 120
   mc:
     image: minio/mc:latest
-    entrypoint: ""
-    hostname: mc
-    tty: true
-    stdin_open: true
+    entrypoint: bash
     networks:
       - e2e
-    command: bash -c '
-      mc alias set s3 http://s3:9000 accessKey123 secretKey123
-      && mc mb s3/dolphinscheduler && tail -f /dev/null'
-    healthcheck:
-      test: [ "CMD", "echo", "1" ]
-      interval: 5s
-      timeout: 120s
-      retries: 120
+    command:
+      - -c
+      - mc alias set s3 http://s3:9000 accessKey123 secretKey123 && mc mb s3/dolphinscheduler
     depends_on:
       s3:
         condition: service_healthy

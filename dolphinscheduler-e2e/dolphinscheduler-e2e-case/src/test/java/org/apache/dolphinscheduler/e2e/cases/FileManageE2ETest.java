@@ -20,6 +20,9 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
@@ -29,6 +32,13 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -37,14 +47,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import lombok.SneakyThrows;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
@@ -72,9 +75,9 @@ public class FileManageE2ETest {
 
     private static final String testUnder1GBFileName = "test_file_0.01G";
 
-    private static final String testOver1GBFilePath = Constants.HOST_TMP_PATH + "/test_file_1.5G";
+    private static final Path testOver1GBFilePath = Constants.HOST_TMP_PATH.resolve("test_file_1.5G");
 
-    private static final String testUnder1GBFilePath = Constants.HOST_TMP_PATH + "/" + testUnder1GBFileName;
+    private static final Path testUnder1GBFilePath = Constants.HOST_TMP_PATH.resolve(testUnder1GBFileName);
 
     @BeforeAll
     public static void setup() {
@@ -95,18 +98,14 @@ public class FileManageE2ETest {
     }
 
     @AfterAll
+    @SneakyThrows
     public static void cleanup() {
-        String[] command = {"/bin/bash", "-c", String.format("sudo rm -f %s && sudo rm -f %s && sudo rm -rf %s", testUnder1GBFilePath, testOver1GBFilePath, Constants.HOST_CHROME_DOWNLOAD_PATH)};
-
-        try {
-            Process pro = Runtime.getRuntime().exec(command);
-            int status = pro.waitFor();
-            if (status != 0) {
-                throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Files.deleteIfExists(testUnder1GBFilePath);
+        Files.deleteIfExists(testOver1GBFilePath);
+        Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
+             .sorted(Comparator.reverseOrder())
+             .map(Path::toFile)
+             .forEach(File::delete);
     }
 
     @Test
@@ -267,10 +266,10 @@ public class FileManageE2ETest {
     void testUploadOver1GBFile() throws IOException {
         final FileManagePage page = new FileManagePage(browser);
 
-        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath, "rw");
+        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath.toFile(), "rw");
         file.setLength((long) (1.5 * 1024 * 1024 * 1024));
 
-        page.uploadFile(testOver1GBFilePath);
+        page.uploadFile(testOver1GBFilePath.toFile().getAbsolutePath());
 
         await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
@@ -285,10 +284,10 @@ public class FileManageE2ETest {
 
         browser.navigate().refresh();
 
-        RandomAccessFile file = new RandomAccessFile(testUnder1GBFilePath, "rw");
+        RandomAccessFile file = new RandomAccessFile(testUnder1GBFilePath.toFile(), "rw");
         file.setLength((long) (0.01 * 1024 * 1024 * 1024));
 
-        page.uploadFile(testUnder1GBFilePath);
+        page.uploadFile(testUnder1GBFilePath.toFile().getAbsolutePath());
 
         await().untilAsserted(() -> {
             assertThat(page.fileList())
@@ -305,7 +304,7 @@ public class FileManageE2ETest {
 
         page.downloadFile(testUnder1GBFileName);
 
-        File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH, testUnder1GBFileName).toFile().getAbsolutePath());
+        File file = Constants.HOST_CHROME_DOWNLOAD_PATH.resolve(testUnder1GBFileName).toFile();
 
         await().untilAsserted(() -> {
             assert file.exists();
