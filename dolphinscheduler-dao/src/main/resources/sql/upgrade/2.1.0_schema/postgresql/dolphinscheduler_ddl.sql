@@ -148,6 +148,13 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_relation
     CONSTRAINT t_ds_relation_rule_input_entry_pk PRIMARY KEY (id)
 )';
 
+EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_project_code"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_project_code ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("project_code")';
+
+EXECUTE 'DROP INDEX IF EXISTS "idx_task_instance_code_version"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_instance_code_version ON' || quote_ident(v_schema) ||'.t_ds_task_instance USING Btree("task_code","task_definition_version")';
+
+
 return 'Success!';
 exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
