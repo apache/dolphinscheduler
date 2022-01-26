@@ -242,7 +242,6 @@ CREATE TABLE `t_ds_process_definition_log` (
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
-  `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -369,6 +368,20 @@ CREATE TABLE `t_ds_worker_group` (
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `resource_type` int(11) NOT NULL COMMENT 'resource type',
+  `operation` int(11) NOT NULL COMMENT 'operation',
+  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
+
 -- t_ds_command
 alter table t_ds_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
 alter table t_ds_command add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
@@ -426,5 +439,3 @@ alter table t_ds_process_definition add UNIQUE KEY `process_unique` (`name`,`pro
 alter table t_ds_process_definition modify `description` text COMMENT 'description' after `version`;
 alter table t_ds_process_definition modify `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online' after `project_code`;
 alter table t_ds_process_definition modify `create_time` datetime DEFAULT NULL COMMENT 'create time' after `tenant_id`;
-alter table t_ds_process_definition add `execution_type` tinyint(4) DEFAULT 0 COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority' after `tenant_id`;
-alter table t_ds_process_instance add `next_process_instance_id` int(11) DEFAULT 0 COMMENT 'serial queue next processInstanceId' after 'dry_run'

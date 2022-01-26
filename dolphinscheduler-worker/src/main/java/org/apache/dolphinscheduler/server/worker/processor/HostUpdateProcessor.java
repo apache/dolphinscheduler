@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -36,6 +37,7 @@ import io.netty.channel.Channel;
  * update process host
  * this used when master failover
  */
+@Component
 public class HostUpdateProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(HostUpdateProcessor.class);
