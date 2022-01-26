@@ -121,7 +121,7 @@ final class DolphinSchedulerExtension
         prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
         prefs.put("download.prompt_for_download", false);
         prefs.put("download.extensions_to_open", "jar");
-        prefs.put("safebrowsing.enabled", true);
+        prefs.put("safebrowsing.enabled", false);
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", prefs);
         options.addArguments("--safebrowsing-disable-download-protection");
