@@ -35,7 +35,8 @@ prod = [
 ]
 
 doc = [
-    "sphinx>=4.3" "sphinx_rtd_theme>=1.0",
+    "sphinx>=4.3",
+    "sphinx_rtd_theme>=1.0",
 ]
 
 test = [
