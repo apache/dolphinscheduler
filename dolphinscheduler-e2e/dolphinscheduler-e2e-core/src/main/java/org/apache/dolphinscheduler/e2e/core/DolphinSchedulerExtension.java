@@ -122,7 +122,7 @@ final class DolphinSchedulerExtension
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.prompt_for_download", false);
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--disable-extensions");
+        options.addArguments("--safebrowsing-disable-download-protection");
         options.setExperimentalOption("prefs", prefs);
 
         browser = new BrowserWebDriverContainer<>()
