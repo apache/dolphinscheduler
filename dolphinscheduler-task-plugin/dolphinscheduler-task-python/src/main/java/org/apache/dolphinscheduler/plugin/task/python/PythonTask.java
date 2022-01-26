@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.base.Preconditions;
 
 /**
  * python task
@@ -56,6 +59,10 @@ public class PythonTask extends AbstractTaskExecutor {
     private ShellCommandExecutor shellCommandExecutor;
 
     private TaskRequest taskRequest;
+
+    private final String PYTHON_HOME = "PYTHON_HOME";
+
+    private final String DEFAULT_PYTHON_VERSION = "python";
 
     /**
      * constructor
@@ -103,7 +110,7 @@ public class PythonTask extends AbstractTaskExecutor {
 
             // create this file
             createPythonCommandFileIfNotExists(pythonScriptContent,pythonScriptFile);
-            String command = "python " + pythonScriptFile;
+            String command = buildPythonExecuteCommand(pythonScriptFile);
 
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
@@ -182,8 +189,8 @@ public class PythonTask extends AbstractTaskExecutor {
 
             // write data to file
             FileUtils.writeStringToFile(new File(pythonScriptFile),
-                sb.toString(),
-                StandardCharsets.UTF_8);
+                    sb.toString(),
+                    StandardCharsets.UTF_8);
         }
     }
 
@@ -218,6 +225,24 @@ public class PythonTask extends AbstractTaskExecutor {
         logger.info("raw python script : {}", pythonParameters.getRawScript());
 
         return rawPythonScript;
+    }
+
+    /**
+     * Build the python task command.
+     * If user have set the 'PYTHON_HOME' environment, we will use the 'PYTHON_HOME',
+     * if not, we will default use python.
+     *
+     * @param pythonFile Python file, cannot be empty.
+     * @return Python execute command, e.g. 'python test.py'.
+     */
+    private String buildPythonExecuteCommand(String pythonFile) {
+        Preconditions.checkNotNull(pythonFile, "Python file cannot be null");
+
+        String pythonHome = System.getenv(PYTHON_HOME);
+        if (StringUtils.isEmpty(pythonHome)) {
+            return DEFAULT_PYTHON_VERSION + " " + pythonFile;
+        }
+        return pythonHome + " " + pythonFile;
     }
 
 }
