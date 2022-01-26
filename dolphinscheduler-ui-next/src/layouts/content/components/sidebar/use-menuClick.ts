@@ -18,15 +18,12 @@
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { MenuOption } from 'naive-ui'
-import { useMenuStore } from '@/store/menu/menu'
 
 export function useMenuClick() {
   const router: Router = useRouter()
-  const menuStore = useMenuStore()
 
   const handleMenuClick = (key: string, item: MenuOption) => {
-    console.log(key, item)
-    menuStore.setSideMenuKey(`${key}`)
+    // console.log(key, item)
     router.push({ path: `${key}` })
   }
 

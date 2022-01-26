@@ -23,7 +23,6 @@ export const useMenuStore = defineStore({
   state: (): MenuState => ({
     menuKey: 'home',
     isShowSide: false,
-    sideMenuKey: '',
     projectCode: ''
   }),
   persist: true,
@@ -33,9 +32,6 @@ export const useMenuStore = defineStore({
     },
     getShowSideStatus(): boolean {
       return this.isShowSide || false
-    },
-    getSideMenuKey(): string {
-      return this.sideMenuKey || ''
     },
     getProjectCode(): string {
       return this.projectCode || ''
@@ -47,9 +43,6 @@ export const useMenuStore = defineStore({
     },
     setShowSideStatus(isShowSide: boolean): void {
       this.isShowSide = isShowSide
-    },
-    setSideMenuKey(sideMenuKey: string): void {
-      this.sideMenuKey = sideMenuKey
     },
     setProjectCode(projectCode: string): void {
       this.projectCode = projectCode

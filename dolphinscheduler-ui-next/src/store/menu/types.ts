@@ -18,7 +18,6 @@
 interface MenuState {
   menuKey: string
   isShowSide: boolean
-  sideMenuKey: string
   projectCode: string
 }
 
