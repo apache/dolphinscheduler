@@ -119,9 +119,9 @@ final class DolphinSchedulerExtension
 
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
-        prefs.put("download", new HashMap<>().put("prompt_for_download", false));
+        prefs.put("download.prompt_for_download", false);
         prefs.put("profile.default_content_settings.popups", 0);
-        prefs.put("safebrowsing", new HashMap<>().put("enabled", true));
+        prefs.put("safebrowsing.enabled", true);
 
 //        List<String> args = new ArrayList<>();
 //        args.add("--disable-extensions");
@@ -129,7 +129,7 @@ final class DolphinSchedulerExtension
 //        args.add("--safebrowsing-disable-download-protection");
 
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--safebrowsing-disable-download-protection");
+        options.addArguments("--safebrowsing-disable-download-protection");
 //        options.addArguments("--safebrowsing-disable-extension-blacklist");
         options.addArguments("--disable-extensions");
 
