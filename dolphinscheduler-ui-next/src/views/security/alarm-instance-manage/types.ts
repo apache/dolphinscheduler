@@ -15,20 +15,37 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { PluginTypeReq, IPluginId } from './types'
+import type { IPluginId } from '@/service/modules/ui-plugins/types'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import type { IMeta, IJsonItem, IFormItem } from '@/components/form/types'
+import type { FormRules } from 'naive-ui'
 
-export function queryUiPluginsByType(params: PluginTypeReq): any {
-  return axios({
-    url: '/ui-plugins/query-by-type',
-    method: 'get',
-    params
-  })
+interface IRecord {
+  alertPluginName?: string
+  createTime?: string
+  id: number
+  instanceName: string
+  pluginDefineId: number
+  pluginInstanceParams?: string
+  updateTime?: string
 }
 
-export function queryUiPluginDetailById(id: IPluginId): any {
-  return axios({
-    url: `/ui-plugins/${id}`,
-    method: 'get'
-  })
+interface IPlugin {
+  id: number
+  pluginName: string
+  pluginParams?: string
+  pluginType?: string
+  createTime?: string
+  updateTime?: string
+}
+
+export {
+  IPluginId,
+  IRecord,
+  IPlugin,
+  IJsonItem,
+  IMeta,
+  IFormItem,
+  TableColumns,
+  FormRules
 }

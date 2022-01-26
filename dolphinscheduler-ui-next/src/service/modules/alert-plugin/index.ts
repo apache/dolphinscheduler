@@ -40,13 +40,6 @@ export function createAlertPluginInstance(data: PluginInstanceReq): any {
   })
 }
 
-export function queryAlertPluginInstanceList(): any {
-  return axios({
-    url: '/alert-plugin-instances/list',
-    method: 'get'
-  })
-}
-
 export function verifyAlertInstanceName(params: InstanceNameReq): any {
   return axios({
     url: '/alert-plugin-instances/verify-name',

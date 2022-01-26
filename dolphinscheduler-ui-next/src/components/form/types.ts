@@ -15,20 +15,54 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { PluginTypeReq, IPluginId } from './types'
+import type {
+  GridProps,
+  FormProps,
+  FormItemGiProps,
+  FormItemRule,
+  FormRules,
+  SelectOption
+} from 'naive-ui'
 
-export function queryUiPluginsByType(params: PluginTypeReq): any {
-  return axios({
-    url: '/ui-plugins/query-by-type',
-    method: 'get',
-    params
-  })
+type IType = 'input' | 'radio'
+
+type IOption = SelectOption
+
+interface IFormItem extends FormItemGiProps {
+  widget: any
 }
 
-export function queryUiPluginDetailById(id: IPluginId): any {
-  return axios({
-    url: `/ui-plugins/${id}`,
-    method: 'get'
-  })
+interface IMeta extends Omit<FormProps, 'model'> {
+  elements?: IFormItem[]
+  model: object
+}
+
+interface IFieldParams {
+  field: string
+  props: object
+  fields: { [field: string]: any }
+  options?: IOption[]
+}
+
+interface IJsonItem {
+  field: string
+  name?: string
+  props?: object
+  title?: string
+  type?: IType
+  validate?: FormItemRule
+  value?: any
+  options?: IOption[]
+}
+
+export {
+  IMeta,
+  IType,
+  IJsonItem,
+  IOption,
+  FormItemRule,
+  FormRules,
+  IFormItem,
+  GridProps,
+  IFieldParams
 }

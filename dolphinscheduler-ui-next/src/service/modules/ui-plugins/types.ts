@@ -19,8 +19,6 @@ interface PluginTypeReq {
   pluginType: 'ALERT' | 'REGISTER' | 'TASK'
 }
 
-interface IdReq {
-  id: number
-}
+type IPluginId = number
 
-export { PluginTypeReq, IdReq }
+export { PluginTypeReq, IPluginId }

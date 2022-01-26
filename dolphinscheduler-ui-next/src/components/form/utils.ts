@@ -14,21 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { FormRules, FormItemRule } from './types'
 
-import { axios } from '@/service/service'
-import { PluginTypeReq, IPluginId } from './types'
-
-export function queryUiPluginsByType(params: PluginTypeReq): any {
-  return axios({
-    url: '/ui-plugins/query-by-type',
-    method: 'get',
-    params
-  })
+export function formatLabel(label?: string): string {
+  if (!label) return ''
+  const match = label.match(/^\$t\('(\S*)'\)/)
+  return match ? match[1] : label
 }
 
-export function queryUiPluginDetailById(id: IPluginId): any {
-  return axios({
-    url: `/ui-plugins/${id}`,
-    method: 'get'
-  })
+export function formatValidate(
+  validate?: FormItemRule | FormRules
+): FormItemRule {
+  if (!validate) return {}
+  if (Array.isArray(validate)) {
+    validate.map((item: FormItemRule) => {
+      if (!item?.message) delete item.message
+      return item
+    })
+  }
+  if (!validate.message) delete validate.message
+  return validate
 }

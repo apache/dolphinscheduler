@@ -15,20 +15,31 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { PluginTypeReq, IPluginId } from './types'
+import { reactive, ref } from 'vue'
 
-export function queryUiPluginsByType(params: PluginTypeReq): any {
-  return axios({
-    url: '/ui-plugins/query-by-type',
-    method: 'get',
-    params
+export function useForm() {
+  const state = reactive({
+    formRef: ref()
   })
-}
 
-export function queryUiPluginDetailById(id: IPluginId): any {
-  return axios({
-    url: `/ui-plugins/${id}`,
-    method: 'get'
-  })
+  const validate = () => {
+    state.formRef.validate()
+  }
+
+  const setValues = (initialValues: { [field: string]: any }) => {
+    for (let [key, value] of Object.entries(initialValues)) {
+      state.formRef.model[key] = value
+    }
+  }
+
+  const restoreValidation = () => {
+    state.formRef.restoreValidation()
+  }
+
+  return {
+    state,
+    validate,
+    setValues,
+    restoreValidation
+  }
 }

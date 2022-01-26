@@ -91,6 +91,15 @@ export default {
         title: '令牌管理管理',
         showSide: true
       }
+    },
+    {
+      path: '/security/alarm-instance-manage',
+      name: 'alarm-instance-manage',
+      component: components['security-alarm-instance-manage'],
+      meta: {
+        title: '告警实例管理',
+        showSide: true
+      }
     }
   ]
 }
