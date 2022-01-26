@@ -36,9 +36,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class TokenE2ETest {
 
-    private static String token = "";
-
-    private static final String editToken = "editToken";
+    private static final String userName = "admin";
 
     private static RemoteWebDriver browser;
 
@@ -55,7 +53,7 @@ public class TokenE2ETest {
     @Order(10)
     void testCreateToken() {
         final TokenPage page = new TokenPage(browser);
-        token = page.create().toString();
+        page.create();
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -63,7 +61,7 @@ public class TokenE2ETest {
             assertThat(page.tokenList())
                     .as("Token list should contain newly-created token")
                     .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(token));
+                    .anyMatch(it -> it.contains(userName));
         });
     }
 
@@ -71,7 +69,7 @@ public class TokenE2ETest {
     @Order(30)
     void testEditToken() {
         final TokenPage page = new TokenPage(browser);
-        page.update(editToken);
+        page.update(userName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -79,7 +77,7 @@ public class TokenE2ETest {
             assertThat(page.tokenList())
                     .as("Token list should contain newly-modified token")
                     .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(editToken));
+                    .anyMatch(it -> it.contains(userName));
         });
     }
 
@@ -87,14 +85,13 @@ public class TokenE2ETest {
     @Order(40)
     void testDeleteToken() {
         final TokenPage page = new TokenPage(browser);
-        page.delete(editToken);
+        page.delete(userName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                    .noneMatch(it -> it.getText().contains(token)
-                            || it.getText().contains(editToken));
+                    .noneMatch(it -> it.getText().contains(userName));
         });
     }
 

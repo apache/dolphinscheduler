@@ -40,7 +40,7 @@ public final class TokenPage extends NavBarPage implements Tab {
     @FindBy(id = "btnCreateToken")
     private WebElement buttonCreateToken;
 
-    @FindBy(id = "items")
+    @FindBy(className = "items")
     private List<WebElement> tokenList;
 
     @FindBys({
@@ -48,6 +48,9 @@ public final class TokenPage extends NavBarPage implements Tab {
             @FindBy(className = "el-button-primary"),
     })
     private List<WebElement> buttonConfirm;
+
+    @FindBy(className = "userName")
+    private List<WebElement> userName;
 
     private final TokenForm createTokenForm = new TokenForm();
     private final TokenForm editTokenForm = new TokenForm();
@@ -64,10 +67,10 @@ public final class TokenPage extends NavBarPage implements Tab {
         return this;
     }
 
-    public TokenPage update(String token) {
+    public TokenPage update(String userName) {
         List<WebElement> tokenList = driver.findElementsByClassName("items");
         tokenList.stream()
-                .filter(it -> it.findElement(By.className("token")).getAttribute("innerHTML").contains(token))
+                .filter(it -> it.findElement(By.className("userName")).getAttribute("innerHTML").contains(userName))
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
@@ -82,10 +85,10 @@ public final class TokenPage extends NavBarPage implements Tab {
         return this;
     }
 
-    public TokenPage delete(String token) {
+    public TokenPage delete(String userName) {
         tokenList()
                 .stream()
-                .filter(it -> it.getText().contains(token))
+                .filter(it -> it.getText().contains(userName))
                 .flatMap(it -> it.findElements(By.className("delete")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()

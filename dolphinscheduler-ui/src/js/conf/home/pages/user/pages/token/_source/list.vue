@@ -17,9 +17,9 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%" row-class-names="items">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="userName" :label="$t('User')"></el-table-column>
+        <el-table-column prop="userName" :label="$t('User')" class-name="userName"></el-table-column>
         <el-table-column prop="token" label="Token" width="300" class-name="token"></el-table-column>
         <el-table-column :label="$t('Expiration time')" min-width="120">
           <template slot-scope="scope">
