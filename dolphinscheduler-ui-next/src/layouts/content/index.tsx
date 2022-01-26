@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, watch, toRefs } from 'vue'
+import { defineComponent, onMounted, watch, toRefs, ref } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
@@ -40,6 +40,7 @@ const Content = defineComponent({
       changeHeaderMenuOptions,
       changeUserDropdown
     } = useDataList()
+    const sideKey = ref()
 
     locale.value = localesStore.getLocales
 
@@ -59,10 +60,11 @@ const Content = defineComponent({
 
     watch(
       () => route.path,
-      (path) => {
+      () => {
         state.isShowSide = menuStore.getShowSideStatus
-        menuStore.setSideMenuKey(path)
-      }
+        sideKey.value = route.matched[1]?.path
+      },
+      {immediate: true}
     )
 
     const getSideMenu = (state: any) => {
@@ -82,7 +84,8 @@ const Content = defineComponent({
       ...toRefs(state),
       menuStore,
       changeMenuOption,
-      getSideMenuOptions
+      getSideMenuOptions,
+      sideKey
     }
   },
   render() {
@@ -98,7 +101,7 @@ const Content = defineComponent({
         </NLayoutHeader>
         <NLayout has-sider position='absolute' style='top: 65px'>
           {this.isShowSide && (
-            <SideBar sideMenuOptions={this.sideMenuOptions} />
+            <SideBar sideMenuOptions={this.sideMenuOptions} sideKey={this.sideKey} />
           )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
             <router-view key={this.$route.fullPath} />
