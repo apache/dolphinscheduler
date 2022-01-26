@@ -121,6 +121,8 @@ final class DolphinSchedulerExtension
 
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.prompt_for_download", false);
+        prefs.put("download.directory_upgrade", true);
+        prefs.put("safebrowsing.enabled", true);
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--safebrowsing-disable-download-protection");
         options.setExperimentalOption("prefs", prefs);
