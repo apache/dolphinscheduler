@@ -45,7 +45,7 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     @FindBys({
             @FindBy(className = "el-popconfirm"),
-            @FindBy(className = "el-button-primary"),
+            @FindBy(className = "el-button--primary"),
     })
     private List<WebElement> buttonConfirm;
 
