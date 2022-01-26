@@ -332,11 +332,11 @@
                     })
                     if (this.type === 'instance') {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/instance/list`
+                        path: `/projects/${this.projectCode}/instance/list/${methodParam}`
                       })
                     } else {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/definition/list`
+                        path: `/projects/${this.projectCode}/definition/list/${methodParam}`
                       })
                     }
                   })
@@ -354,7 +354,7 @@
                     // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
                     if (sourceType !== 'affirm') {
                       // Jump process definition
-                      this.$router.push({ name: 'projects-definition-list' })
+                      // this.$router.push({ name: 'projects-definition-list' })
                     }
                   })
                   .catch((e) => {
