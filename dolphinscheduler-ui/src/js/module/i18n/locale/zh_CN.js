@@ -723,6 +723,7 @@ export default {
   'InputEntry Field': '输入项占位符',
   'InputEntry Type': '输入项类型',
   'InputEntry Title': '输入项标题',
+  'Error Output Path': '错误数据路径',
   Alert: '告警',
   Block: '阻断',
   'Environment manage': '环境管理',
@@ -843,7 +844,7 @@ export default {
   'Please select a process (required)': '请选择工作流（必选）',
 
   src_connector_type: '源数据类型',
-  src_datasource_id: '源数据源ID',
+  src_datasource_id: '源数据源',
   src_table: '源数据表',
   src_filter: '源表过滤条件',
   src_field: '源表检测列',

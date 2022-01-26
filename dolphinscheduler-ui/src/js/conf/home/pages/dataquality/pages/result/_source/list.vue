@@ -59,7 +59,15 @@
             {{_rtFailureStrategy(scope.row.failureStrategy)}}
           </template>
         </el-table-column>
-         <el-table-column prop="comparisonTypeName" :label="$t('Comparison Type')"></el-table-column>
+        <el-table-column prop="comparisonTypeName" :label="$t('Comparison Type')"></el-table-column>
+        <el-table-column :label="$t('Error Output Path')">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <div>{{scope.row.errorOutputPath}}</div>
+                <span slot="reference">{{ scope.row.errorOutputPath.substr(0,14)+'...' }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
@@ -105,9 +113,6 @@
       },
       _rtFailureStrategy (code) {
         return _.filter(failureStrategy, v => v.code === code)[0].label
-      },
-      _go (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
       }
     },
     watch: {

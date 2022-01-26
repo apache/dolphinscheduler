@@ -722,6 +722,7 @@ export default {
   'InputEntry Field': 'InputEntry Field',
   'InputEntry Type': 'InputEntry Type',
   'InputEntry Title': 'InputEntry Title',
+  'Error Output Path': 'Error Output Path',
   Alert: 'Alert',
   Block: 'Block',
   'Environment manage': 'Environment manage',
@@ -840,7 +841,7 @@ export default {
   'Please select a process (required)': 'Please select a process (required)',
 
   src_connector_type: 'SrcConnType',
-  src_datasource_id: 'SrcSourceId',
+  src_datasource_id: 'SrcSource',
   src_table: 'SrcTable',
   src_filter: 'SrcFilter',
   src_field: 'SrcField',
