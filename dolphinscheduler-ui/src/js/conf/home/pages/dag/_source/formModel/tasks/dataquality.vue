@@ -201,34 +201,53 @@
               if (item.title.indexOf('$t') !== -1) {
                 item.title = this.$t(item.field)
               }
+
+              if (item.field === 'mapping_columns') {
+                item.props.rules.forEach((pro) => {
+                  pro.title = this.$t(pro.title)
+                })
+              }
+
+              this._replaceOptionLabel(item, 'check_type')
+              this._replaceOptionLabel(item, 'failure_strategy')
+              this._replaceOptionLabel(item, 'comparison_type')
+
               item.props = item.props || {}
               return item
             })
-            this.fApi.on('src_connector_type-change', this.srcConnectorTypeChange)
-            this.fApi.on('target_connector_type-change', this.targetConnectorTypeChange)
-            this.fApi.on('writer_connector_type-change', this.writerConnectorTypeChange)
-            this.fApi.on('src_datasource_id-change', this.srcDatasourceIdChange)
-            this.fApi.on('target_datasource_id-change', this.targetDatasourceIdChange)
-            this.fApi.on('src_table-change', this.srcTableChange)
-            this.fApi.on('target_table-change', this.targetTableChange)
-            this.fApi.on('comparison_type-change', this.comparisonTypeChange)
+            this.fApi.on('src_connector_type-change', this._srcConnectorTypeChange)
+            this.fApi.on('target_connector_type-change', this._targetConnectorTypeChange)
+            this.fApi.on('writer_connector_type-change', this._writerConnectorTypeChange)
+            this.fApi.on('src_datasource_id-change', this._srcDatasourceIdChange)
+            this.fApi.on('target_datasource_id-change', this._targetDatasourceIdChange)
+            this.fApi.on('src_table-change', this._srcTableChange)
+            this.fApi.on('target_table-change', this._targetTableChange)
+            this.fApi.on('comparison_type-change', this._comparisonTypeChange)
           })
         })
       },
 
-      comparisonTypeChange () {
+      _replaceOptionLabel (item, field) {
+        if (item.field === field) {
+          item.options.forEach((op) => {
+            op.label = this.$t(op.label)
+          })
+        }
+      },
+
+      _comparisonTypeChange () {
         if (this.fApi.getValue('comparison_type') === 1) {
-          this.fApi.append(this.getComparisonNameInput(), 'comparison_type')
+          this.fApi.append(this._getComparisonNameInput(), 'comparison_type')
         } else {
           this.fApi.removeField('comparison_name')
         }
       },
 
-      getComparisonNameInput () {
+      _getComparisonNameInput () {
         return this.$formCreate.maker.input($t('fix_value'), 'comparison_name', this.inputEntryValueMap.comparison_name)
       },
 
-      srcConnectorTypeChange () {
+      _srcConnectorTypeChange () {
         this._updateSelectFieldOptions(
           'dag/getDatasourceOptionsById',
           'src_connector_type',
@@ -237,7 +256,7 @@
           'src_datasource_id', ['src_datasource_id', 'src_table', 'src_field'])
       },
 
-      targetConnectorTypeChange () {
+      _targetConnectorTypeChange () {
         this._updateSelectFieldOptions(
           'dag/getDatasourceOptionsById',
           'target_connector_type',
@@ -246,7 +265,7 @@
           'target_datasource_id', ['target_datasource_id', 'target_table', 'target_field'])
       },
 
-      writerConnectorTypeChange () {
+      _writerConnectorTypeChange () {
         this._updateSelectFieldOptions(
           'dag/getDatasourceOptionsById',
           'writer_connector_type',
@@ -255,7 +274,7 @@
           'writer_datasource_id', ['writer_datasource_id'])
       },
 
-      srcDatasourceIdChange () {
+      _srcDatasourceIdChange () {
         this._updateSelectFieldOptions(
           'dag/getTablesById',
           'src_datasource_id',
@@ -264,7 +283,7 @@
           'src_table', ['src_table', 'src_field'])
       },
 
-      targetDatasourceIdChange () {
+      _targetDatasourceIdChange () {
         this._updateSelectFieldOptions(
           'dag/getTablesById',
           'target_datasource_id',
@@ -273,7 +292,7 @@
           'target_table', ['target_table', 'target_field'])
       },
 
-      targetTableChange () {
+      _targetTableChange () {
         this._updateSelectFieldOptions(
           'dag/getTableColumnsByIdAndName',
           'target_table',
@@ -282,7 +301,7 @@
           'target_field', ['target_field'])
       },
 
-      srcTableChange () {
+      _srcTableChange () {
         this._updateSelectFieldOptions(
           'dag/getTableColumnsByIdAndName',
           'src_table',
@@ -405,7 +424,7 @@
 
             if (item === 'comparison_type') {
               if (this.inputEntryValueMap.comparison_type === 1) {
-                this.fApi.append(this.getComparisonNameInput(), 'comparison_type')
+                this.fApi.append(this._getComparisonNameInput(), 'comparison_type')
               } else {
                 this.fApi.removeField('comparison_name')
               }

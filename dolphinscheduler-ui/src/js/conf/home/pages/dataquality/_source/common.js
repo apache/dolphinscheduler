@@ -88,19 +88,19 @@ const ruleType = [
 
 const checkType = [
   {
-    label: `${i18n.$t('Comparison Minus Statistics')}`,
+    label: `${i18n.$t('Expected - Actual')}`,
     code: 0
   },
   {
-    label: `${i18n.$t('Statistics Minus Comparison')}`,
+    label: `${i18n.$t('Actual - Expected')}`,
     code: 1
   },
   {
-    label: `${i18n.$t('Statistics Comparison Percentage')}`,
+    label: `${i18n.$t('Actual / Expected')}`,
     code: 2
   },
   {
-    label: `${i18n.$t('(Comparison-Statistics)/Comparison Percentage')}`,
+    label: `${i18n.$t('(Expected - Actual) / Expected')}`,
     code: 3
   }
 ]
