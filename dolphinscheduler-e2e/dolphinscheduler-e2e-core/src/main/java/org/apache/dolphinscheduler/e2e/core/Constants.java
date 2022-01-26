@@ -17,35 +17,25 @@
 
 package org.apache.dolphinscheduler.e2e.core;
 
+import lombok.experimental.UtilityClass;
+
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Constants
- */
+@UtilityClass
 public final class Constants {
-
-    private Constants() {
-        throw new UnsupportedOperationException("Construct Constants");
-    }
-
     /**
      * tmp directory path
      */
-    public static final String HOST_TMP_PATH = System.getProperty("java.io.tmpdir");
+    public static final Path HOST_TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
 
     /**
      * chrome download path in host
      */
-    public static final String HOST_CHROME_DOWNLOAD_PATH = Paths.get(System.getProperty("java.io.tmpdir"), "download").toFile().getAbsolutePath();
+    public static final Path HOST_CHROME_DOWNLOAD_PATH = HOST_TMP_PATH.resolve("download");
 
     /**
      * chrome download path in selenium/standalone-chrome-debug container
      */
     public static final String SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH = "/home/seluser/Downloads";
-
-    /**
-     * host os name
-     */
-    public static final String OS_NAME = System.getProperties().getProperty("os.name");
-
 }
