@@ -131,9 +131,9 @@ final class DolphinSchedulerExtension
         args.add("safebrowsing-disable-download-protection");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("safebrowsing-disable-download-protection");
-        options.addArguments("safebrowsing-disable-extension-blacklist");
-        options.addArguments("disable-extensions");
+        options.addArguments("--safebrowsing-disable-download-protection");
+        options.addArguments("--safebrowsing-disable-extension-blacklist");
+        options.addArguments("--disable-extensions");
         options.setExperimentalOption("prefs", prefs);
         options.setExperimentalOption("args", args);
 
