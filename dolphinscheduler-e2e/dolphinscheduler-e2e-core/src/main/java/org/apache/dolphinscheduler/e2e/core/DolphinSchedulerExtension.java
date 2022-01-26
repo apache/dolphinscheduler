@@ -119,14 +119,14 @@ final class DolphinSchedulerExtension
 
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
-        prefs.put("download.prompt_for_download", "false");
+        prefs.put("download.prompt_for_download", false);
         prefs.put("profile.default_content_settings.popups", 0);
-        prefs.put("safebrowsing.enabled", "true");
+        prefs.put("safebrowsing.enabled", true);
 
-        List<String> args = new ArrayList<>();
-        args.add("--disable-extensions");
-        args.add("--safebrowsing-disable-extension-blacklist");
-        args.add("--safebrowsing-disable-download-protection");
+//        List<String> args = new ArrayList<>();
+//        args.add("--disable-extensions");
+//        args.add("--safebrowsing-disable-extension-blacklist");
+//        args.add("--safebrowsing-disable-download-protection");
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--safebrowsing-disable-download-protection");
@@ -134,9 +134,10 @@ final class DolphinSchedulerExtension
         options.addArguments("--disable-extensions");
 
         options.setExperimentalOption("prefs", prefs);
-        options.setExperimentalOption("args", args);
-        DesiredCapabilities cap = DesiredCapabilities.chrome();
+//        options.setExperimentalOption("args", args);
+        DesiredCapabilities cap = new DesiredCapabilities();
         cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        cap.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
         cap.setCapability(ChromeOptions.CAPABILITY, options);
 
         browser = new BrowserWebDriverContainer<>()
