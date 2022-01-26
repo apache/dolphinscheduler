@@ -123,6 +123,7 @@ final class DolphinSchedulerExtension
         prefs.put("download.prompt_for_download", false);
         prefs.put("safebrowsing.enabled", true);
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--safebrowsing-disable-download-protection");
         options.setExperimentalOption("prefs", prefs);
 
         browser = new BrowserWebDriverContainer<>()
