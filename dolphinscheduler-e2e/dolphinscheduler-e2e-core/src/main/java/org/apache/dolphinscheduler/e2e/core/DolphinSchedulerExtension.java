@@ -121,6 +121,7 @@ final class DolphinSchedulerExtension
         }
 
         Map<String, Object> prefs = new HashMap<>();
+        prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
         prefs.put("download.prompt_for_download", false);
         prefs.put("profile.default_content_setting_values.automatic_downloads", 10);
         prefs.put("safebrowsing.enabled", true);
