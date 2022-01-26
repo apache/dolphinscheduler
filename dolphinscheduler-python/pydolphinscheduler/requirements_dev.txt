@@ -25,3 +25,6 @@ flake8
 flake8-docstrings
 flake8-black
 isort
+# Document
+sphinx
+sphinx_rtd_theme

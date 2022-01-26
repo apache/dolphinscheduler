@@ -16,3 +16,33 @@
 # under the License.
 
 """Init pydolphinscheduler.tasks package."""
+
+from pydolphinscheduler.tasks.condition import FAILURE, SUCCESS, And, Condition, Or
+from pydolphinscheduler.tasks.datax import CustomDataX, DataX
+from pydolphinscheduler.tasks.dependent import Dependent
+from pydolphinscheduler.tasks.flink import Flink
+from pydolphinscheduler.tasks.http import Http
+from pydolphinscheduler.tasks.map_reduce import MR
+from pydolphinscheduler.tasks.procedure import Procedure
+from pydolphinscheduler.tasks.python import Python
+from pydolphinscheduler.tasks.shell import Shell
+from pydolphinscheduler.tasks.spark import Spark
+from pydolphinscheduler.tasks.sql import Sql
+from pydolphinscheduler.tasks.sub_process import SubProcess
+from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
+
+__all__ = [
+    "Condition",
+    "DataX",
+    "Dependent",
+    "Flink",
+    "Http",
+    "MR",
+    "Procedure",
+    "Python",
+    "Shell",
+    "Spark",
+    "Sql",
+    "SubProcess",
+    "Switch",
+]

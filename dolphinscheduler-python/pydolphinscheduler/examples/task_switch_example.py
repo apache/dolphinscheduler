@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 r"""
 A example workflow for task switch.
 
@@ -47,3 +48,4 @@ with ProcessDefinition(
     switch = Switch(name="switch", condition=switch_condition)
     parent >> switch
     pd.submit()
+# [end workflow_declare]

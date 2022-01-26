@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 """
 A example workflow for task datax.
 
@@ -23,7 +24,6 @@ This example will create a workflow named `task_datax`.
 You can create data sources `first_mysql` and `first_mysql` through UI.
 It creates a task to synchronize datax from the source database to the target database.
 """
-
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.datax import CustomDataX, DataX
@@ -92,3 +92,4 @@ with ProcessDefinition(
     # datax job same as task1, transfer record from `first_mysql` to `second_mysql`
     task2 = CustomDataX(name="task_custom_datax", json=str(JSON_TEMPLATE))
     pd.run()
+# [end workflow_declare]

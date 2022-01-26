@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 """A example workflow for task mr."""
 
 from pydolphinscheduler.core.engine import ProgramType
@@ -30,3 +31,4 @@ with ProcessDefinition(name="task_map_reduce_example", tenant="tenant_exists") a
         main_args="/dolphinscheduler/tenant_exists/resources/file.txt /output/ds",
     )
     pd.run()
+# [end workflow_declare]
