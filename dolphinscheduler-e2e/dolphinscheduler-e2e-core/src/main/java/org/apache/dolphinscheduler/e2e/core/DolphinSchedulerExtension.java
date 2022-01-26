@@ -119,9 +119,9 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
-        Map<String, Object> prefs = new HashMap<String, Object>();
+        Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.prompt_for_download", false);
-        prefs.put("safebrowsing.enabled", false);
+        prefs.put("safebrowsing.enabled", true);
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", prefs);
 

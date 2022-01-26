@@ -169,7 +169,7 @@ public class UdfManageE2ETest {
         page.downloadFile(testUploadUdfFileName);
 
         File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(), testUploadUdfFileName).toFile().getAbsolutePath());
-        
+
         await().untilAsserted(() -> {
             assert file.exists();
         });
