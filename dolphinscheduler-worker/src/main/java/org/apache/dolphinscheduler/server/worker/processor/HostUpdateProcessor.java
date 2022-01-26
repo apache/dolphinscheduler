@@ -45,17 +45,17 @@ public class HostUpdateProcessor implements NettyRequestProcessor {
     /**
      * task callback service
      */
-    private final TaskCallbackService taskCallbackService;
-
-    public HostUpdateProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-    }
+    private TaskCallbackService taskCallbackService;
 
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
         HostUpdateCommand updateCommand = JSONUtils.parseObject(command.getBody(), HostUpdateCommand.class);
         logger.info("received host update command : {}", updateCommand);
+
+        if (taskCallbackService == null) {
+            taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
+        }
         taskCallbackService.changeRemoteChannel(updateCommand.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
 
     }
