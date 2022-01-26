@@ -577,12 +577,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
         taskDefinitionUpdate.setUserId(loginUser.getId());
-        Date now = new Date();
         taskDefinitionUpdate.setUpdateTime(new Date());
         taskDefinitionUpdate.setId(taskDefinition.getId());
         int switchVersion = taskDefinitionMapper.updateById(taskDefinitionUpdate);
         if (switchVersion > 0) {
-            handleRelation(loginUser, taskCode, version, now);
+            handleRelation(loginUser, taskCode, version);
             result.put(Constants.DATA_LIST, taskCode);
             putMsg(result, Status.SUCCESS);
         } else {
