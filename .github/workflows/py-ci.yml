@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: 3.7
       - name: Install Development Dependences
-        run: pip install -r requirements_dev.txt
+        run: pip install -e .
       - name: Run Isort Checking
         run: isort --check .
       - name: Run Black Checking
@@ -75,7 +75,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies & pydolphinscheduler
         run: |
-          pip install -r requirements.txt -r requirements_dev.txt
           pip install -e .
       - name: Run tests
         run: |
@@ -93,7 +92,6 @@ jobs:
           python-version: 3.7
       - name: Install Development Dependences
         run: |
-          pip install -r requirements_dev.txt
           pip install -e .
       - name: Run Tests && Check coverage
         run: coverage run && coverage report
@@ -109,7 +107,6 @@ jobs:
           python-version: 3.7
       - name: Install Development Dependences
         run: |
-          pip install -r requirements_dev.txt
           pip install -e .
       - name: Test Build Document
         working-directory: dolphinscheduler-python/pydolphinscheduler/docs
