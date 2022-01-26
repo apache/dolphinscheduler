@@ -20,7 +20,7 @@
       <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange" row-class-name="items-workflow-instances">
         <el-table-column type="selection" width="50" class-name="select-all"></el-table-column>
         <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column :label="$t('Process Name')" min-width="200">
+        <el-table-column :label="$t('Process Instance')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
