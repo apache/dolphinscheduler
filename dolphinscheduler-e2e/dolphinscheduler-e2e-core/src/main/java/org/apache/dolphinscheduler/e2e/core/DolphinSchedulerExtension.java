@@ -120,7 +120,7 @@ final class DolphinSchedulerExtension
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
         prefs.put("download.prompt_for_download", false);
-        prefs.put("download.extensions_to_open", "application/xml");
+        prefs.put("download.extensions_to_open", "text/html");
         prefs.put("safebrowsing.enabled", true);
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", prefs);
