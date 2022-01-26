@@ -31,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,8 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.ContainerState;
@@ -133,15 +134,18 @@ final class DolphinSchedulerExtension
 //        args.add("--safebrowsing-disable-download-protection");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--safebrowsing-disable-download-protection");
-        options.addArguments("--safebrowsing-disable-extension-blacklist");
+//        options.addArguments("--safebrowsing-disable-download-protection");
+//        options.addArguments("--safebrowsing-disable-extension-blacklist");
 //        options.addArguments("--disable-extensions");
 
-//        options.setExperimentalOption("prefs", prefs);
+        options.setExperimentalOption("prefs", prefs);
 //        options.setExperimentalOption("args", args);
+        DesiredCapabilities cap = DesiredCapabilities.chrome();
+        cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        cap.setCapability(ChromeOptions.CAPABILITY, options);
 
         browser = new BrowserWebDriverContainer<>()
-            .withCapabilities(options)
+            .withCapabilities(cap)
             .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
             .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
                                 Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
