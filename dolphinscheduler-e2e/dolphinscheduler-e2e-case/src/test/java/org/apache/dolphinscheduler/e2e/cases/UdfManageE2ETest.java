@@ -23,6 +23,7 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
@@ -31,12 +32,16 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
 
 @DolphinScheduler(composeFiles = "docker/udf-manage/docker-compose.yaml")
@@ -79,6 +84,21 @@ public class UdfManageE2ETest {
             .update(user, user, password, email, phone)
             .goToNav(ResourcePage.class)
             .goToTab(UdfManagePage.class);
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        String[] command = {"/bin/bash", "-c", String.format("sudo rm -rf %s", Constants.HOST_CHROME_DOWNLOAD_PATH)};
+
+        try {
+            Process pro = Runtime.getRuntime().exec(command);
+            int status = pro.waitFor();
+            if (status != 0) {
+                throw new RuntimeException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -146,6 +166,20 @@ public class UdfManageE2ETest {
 
     @Test
     @Order(50)
+    void testDownloadUdf() {
+        final UdfManagePage page = new UdfManagePage(browser);
+
+        page.downloadFile(testUploadUdfFileName);
+
+        File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH, testUploadUdfFileName).toFile().getAbsolutePath());
+
+        await().untilAsserted(() -> {
+            assert file.exists();
+        });
+    }
+
+    @Test
+    @Order(60)
     void testRenameUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
 
@@ -160,7 +194,7 @@ public class UdfManageE2ETest {
     }
 
     @Test
-    @Order(60)
+    @Order(70)
     void testDeleteUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
 
