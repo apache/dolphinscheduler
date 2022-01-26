@@ -31,7 +31,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -117,8 +119,14 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
+        Map<String, Object> prefs = new HashMap<String, Object>();
+        prefs.put("download.prompt_for_download", false);
+        prefs.put("safebrowsing.enabled", false);
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("prefs", prefs);
+
         browser = new BrowserWebDriverContainer<>()
-            .withCapabilities(new ChromeOptions())
+            .withCapabilities(options)
             .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
             .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
                                 Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
