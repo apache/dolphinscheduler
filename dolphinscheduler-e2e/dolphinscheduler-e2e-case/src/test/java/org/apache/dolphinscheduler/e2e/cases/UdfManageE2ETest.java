@@ -44,7 +44,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 
-@DolphinScheduler(composeFiles = "docker/udf-manage/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class UdfManageE2ETest {
     private static RemoteWebDriver browser;
 
