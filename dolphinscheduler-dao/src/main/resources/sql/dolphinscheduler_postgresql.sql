@@ -423,6 +423,7 @@ CREATE TABLE t_ds_task_definition_log (
 ) ;
 
 create index idx_code_version on t_ds_task_definition_log (code,version);
+create index idx_task_definition_log_project_code on t_ds_task_definition_log (project_code);
 
 DROP TABLE IF EXISTS t_ds_process_task_relation;
 CREATE TABLE t_ds_process_task_relation (
@@ -722,6 +723,8 @@ CREATE TABLE t_ds_task_instance (
   dry_run int DEFAULT '0' ,
   PRIMARY KEY (id)
 ) ;
+
+create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
 
 --
 -- Table structure for table t_ds_tenant
