@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: 3.7
       - name: Install Development Dependences
-        run: pip install -e .[code_style]
+        run: pip install -e .[style]
       - name: Run Isort Checking
         run: isort --check .
       - name: Run Black Checking

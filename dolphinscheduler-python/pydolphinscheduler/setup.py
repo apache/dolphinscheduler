@@ -44,14 +44,14 @@ test = [
     "coverage>=6.1",
 ]
 
-code_style = [
+style = [
     "flake8>=4.0",
     "flake8-docstrings>=1.6",
     "flake8-black>=0.2",
     "isort>=5.10",
 ]
 
-dev = code_style + test + doc
+dev = style + test + doc
 
 all_dep = prod + dev
 # End package required
@@ -118,8 +118,10 @@ setup(
     ],
     install_requires=prod,
     extras_require={
-        "dev": dev,
-        "doc": doc,
         "all": all_dep,
+        "dev": dev,
+        "style": style,
+        "test": test,
+        "doc": doc,
     },
 )
