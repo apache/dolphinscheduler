@@ -89,14 +89,14 @@ public class UdfManageE2ETest {
             .goToTab(UdfManagePage.class);
     }
 
-    @AfterAll
-    @SneakyThrows
-    public static void cleanup() {
-        Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete);
-    }
+//    @AfterAll
+//    @SneakyThrows
+//    public static void cleanup() {
+//        Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
+//            .sorted(Comparator.reverseOrder())
+//            .map(Path::toFile)
+//            .forEach(File::delete);
+//    }
 
     @Test
     @Order(10)
