@@ -1063,3 +1063,17 @@ CREATE TABLE `t_ds_task_group` (
    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    PRIMARY KEY(`id`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `resource_type` int(11) NOT NULL COMMENT 'resource type',
+  `operation` int(11) NOT NULL COMMENT 'operation',
+  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
