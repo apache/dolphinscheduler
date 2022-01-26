@@ -31,11 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -127,10 +123,10 @@ final class DolphinSchedulerExtension
         prefs.put("profile.default_content_settings.popups", 0);
         prefs.put("safebrowsing.enabled", "true");
 
-//        List<String> args = new ArrayList<>();
-//        args.add("--disable-extensions");
-//        args.add("--safebrowsing-disable-extension-blacklist");
-//        args.add("--safebrowsing-disable-download-protection");
+        List<String> args = new ArrayList<>();
+        args.add("--disable-extensions");
+        args.add("--safebrowsing-disable-extension-blacklist");
+        args.add("--safebrowsing-disable-download-protection");
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--safebrowsing-disable-download-protection");
@@ -138,7 +134,7 @@ final class DolphinSchedulerExtension
         options.addArguments("--disable-extensions");
 
         options.setExperimentalOption("prefs", prefs);
-//        options.setExperimentalOption("args", args);
+        options.setExperimentalOption("args", args);
         DesiredCapabilities cap = DesiredCapabilities.chrome();
         cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         cap.setCapability(ChromeOptions.CAPABILITY, options);
