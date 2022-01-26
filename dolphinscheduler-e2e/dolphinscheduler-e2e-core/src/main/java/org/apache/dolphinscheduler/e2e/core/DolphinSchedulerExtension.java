@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,12 +121,19 @@ final class DolphinSchedulerExtension
         }
 
         Map<String, Object> prefs = new HashMap<>();
-        prefs.put("download.prompt_for_download", false);
-        prefs.put("download.directory_upgrade", true);
+//        prefs.put("download.prompt_for_download", false);
+//        prefs.put("download.directory_upgrade", true);
         prefs.put("safebrowsing.enabled", true);
+
+        List<String> args = new ArrayList<>();
+        args.add("disable-extensions");
+        args.add("safebrowsing-disable-extension-blacklist");
+        args.add("safebrowsing-disable-download-protection");
+
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--safebrowsing-disable-download-protection");
+//        options.addArguments("--safebrowsing-disable-download-protection");
         options.setExperimentalOption("prefs", prefs);
+        options.setExperimentalOption("args", args);
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(options)
