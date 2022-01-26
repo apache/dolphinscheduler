@@ -19,26 +19,15 @@
 
 import ast
 import importlib
-
-# import os
-# import os
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+from tests.testing.constants import task_without_example
+from tests.testing.path import get_all_examples, get_tasks
 from tests.testing.task import Task
 
 process_definition_name = set()
-
-
-def get_all_example_define():
-    """Get all examples files in examples directory."""
-    return (
-        path
-        for path in Path(__file__).parent.parent.parent.joinpath("examples").iterdir()
-        if path.is_file()
-    )
 
 
 def import_module(script_name, script_path):
@@ -47,6 +36,27 @@ def import_module(script_name, script_path):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_task_without_example():
+    """Test task which without example.
+
+    Avoiding add new type of tasks but without adding example describe how to use it.
+    """
+    # We use example/tutorial.py as shell task example
+    ignore_name = {"__init__.py", "shell.py"}
+    all_tasks = {task.stem for task in get_tasks(ignore_name=ignore_name)}
+
+    have_example_tasks = set()
+    start = "task_"
+    end = "_example"
+    for ex in get_all_examples():
+        stem = ex.stem
+        if stem.startswith(start) and stem.endswith(end):
+            task_name = stem.replace(start, "").replace(end, "")
+            have_example_tasks.add(task_name)
+
+    assert all_tasks.difference(have_example_tasks) == task_without_example
 
 
 @pytest.fixture
@@ -80,7 +90,7 @@ def test_example_basic():
     * All example except `tutorial.py` is end with keyword "_example"
     * All example must have not empty `__doc__`.
     """
-    for ex in get_all_example_define():
+    for ex in get_all_examples():
         # All files in example is python script
         assert (
             ex.suffix == ".py"
@@ -121,7 +131,7 @@ def test_example_process_definition_without_same_name(
     Our process definition would compete with others if we have same process definition name. It will make
     different between actually workflow and our workflow-as-code file which make users feel strange.
     """
-    for ex in get_all_example_define():
+    for ex in get_all_examples():
         # We use side_effect `submit_check_without_same_name` overwrite :func:`submit`
         # and check whether it have duplicate name or not
         import_module(ex.name, str(ex))
@@ -148,7 +158,7 @@ def test_file_name_in_process_definition(mock_code_version, mock_submit, mock_st
     more than one process definition.
     """
     global process_definition_name
-    for ex in get_all_example_define():
+    for ex in get_all_examples():
         # Skip bulk_create_example check, cause it contain multiple workflow and
         # without one named bulk_create_example
         if ex.stem == "bulk_create_example":
