@@ -318,6 +318,16 @@ BEGIN
           CONSTRAINT name_unique UNIQUE (name)
       )';
 
+    EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_audit_log" (
+          id serial NOT NULL,
+          user_id int NOT NULL,
+          resource_type int NOT NULL,
+          operation int NOT NULL,
+          time timestamp DEFAULT NULL ,
+          resource_id int NOT NULL,
+          PRIMARY KEY (id)
+	)';
+
     return 'Success!';
     exception when others then
         ---Raise EXCEPTION '(%)',SQLERRM;

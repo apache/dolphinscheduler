@@ -159,6 +159,9 @@ management:
     tags:
       application: ${spring.application.name}
 
+audit:
+  enabled: true
+
 # Override by profile
 ---
 spring:

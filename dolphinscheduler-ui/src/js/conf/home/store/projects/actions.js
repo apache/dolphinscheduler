@@ -137,5 +137,17 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * Get audit log list
+   */
+  getAuditLogList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('projects/audit/audit-log-list', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

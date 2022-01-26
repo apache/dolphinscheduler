@@ -101,6 +101,9 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
+audit:
+  enabled: false
+
 # Override by profile
 
 ---
