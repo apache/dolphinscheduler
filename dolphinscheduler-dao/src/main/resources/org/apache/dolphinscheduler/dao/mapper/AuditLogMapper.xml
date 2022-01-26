@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.AuditLogMapper">
+    <sql id="baseSql">
+        id, user_id, resource_type, operation, resource_id, time
+    </sql>
+    <sql id="baseSqlV2">
+        ${alias}.id, ${alias}.user_id, ${alias}.resource_type, ${alias}.operation, ${alias}.resource_id, ${alias}.time
+    </sql>
+
+    <select id="queryAuditLog" resultType="org.apache.dolphinscheduler.dao.entity.AuditLog">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="log"/>
+        </include>
+        ,
+        u.user_name as user_name
+        from t_ds_audit_log log
+        join t_ds_user u on log.user_id = u.id
+        where 1 = 1
+        <if test="startDate != null">
+            and log.time > #{startDate} and log.time <![CDATA[ <=]]> #{endDate}
+        </if>
+        <if test="resourceType != null and resourceType.length > 0">
+            and log.resource_type in
+            <foreach collection="resourceType" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="operationType != null and operationType.length > 0">
+            and log.operation in
+            <foreach collection="operationType" index="index" item="j" open="(" separator="," close=")">
+                #{j}
+            </foreach>
+        </if>
+        <if test="userName != null and userName != ''">
+            and u.user_name = #{userName}
+        </if>
+        order by log.time desc
+    </select>
+
+    <select id="queryResourceNameByType" resultType="String">
+        <if test="resourceType != null and resourceType == 'USER'">
+            select user_name from t_ds_user where id = #{resourceId}
+        </if>
+    </select>
+</mapper>

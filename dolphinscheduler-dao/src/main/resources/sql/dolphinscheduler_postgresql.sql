@@ -1062,3 +1062,17 @@ CREATE TABLE t_ds_task_group (
    update_time timestamp DEFAULT NULL ,
    PRIMARY KEY(id)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_audit_log;
+CREATE TABLE t_ds_audit_log (
+    id serial NOT NULL,
+    user_id int NOT NULL,
+    resource_type int NOT NULL,
+    operation int NOT NULL,
+    time timestamp DEFAULT NULL ,
+    resource_id int NOT NULL,
+    PRIMARY KEY (id)
+);
