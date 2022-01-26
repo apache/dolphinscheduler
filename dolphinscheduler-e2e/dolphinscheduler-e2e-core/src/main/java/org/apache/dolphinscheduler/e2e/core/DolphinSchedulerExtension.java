@@ -125,18 +125,19 @@ final class DolphinSchedulerExtension
         prefs.put("download.prompt_for_download", false);
         prefs.put("profile.default_content_setting_values.automatic_downloads", 10);
         prefs.put("safebrowsing.enabled", true);
+        prefs.put("profile.default_content_settings.popups", 0);
 
-        List<String> args = new ArrayList<>();
-        args.add("--disable-extensions");
-        args.add("--safebrowsing-disable-extension-blacklist");
-        args.add("--safebrowsing-disable-download-protection");
+//        List<String> args = new ArrayList<>();
+//        args.add("--disable-extensions");
+//        args.add("--safebrowsing-disable-extension-blacklist");
+//        args.add("--safebrowsing-disable-download-protection");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--safebrowsing-disable-download-protection");
-        options.addArguments("--safebrowsing-disable-extension-blacklist");
-        options.addArguments("--disable-extensions");
+//        options.addArguments("--safebrowsing-disable-download-protection");
+//        options.addArguments("--safebrowsing-disable-extension-blacklist");
+//        options.addArguments("--disable-extensions");
         options.setExperimentalOption("prefs", prefs);
-        options.setExperimentalOption("args", args);
+//        options.setExperimentalOption("args", args);
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(options)
