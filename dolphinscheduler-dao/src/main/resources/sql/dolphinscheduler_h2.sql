@@ -1089,3 +1089,18 @@ CREATE TABLE t_ds_k8s
     update_time  datetime DEFAULT NULL ,
     PRIMARY KEY (id)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_audit_log;
+CREATE TABLE t_ds_audit_log
+(
+    id                  int(11) NOT NULL AUTO_INCREMENT,
+    user_id             int(11) NOT NULL,
+    resource_type       int(11) NOT NULL,
+    operation           int(11) NOT NULL,
+    time                timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    resource_id         int(11) NOT NULL,
+    PRIMARY KEY (id)
+);

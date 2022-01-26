@@ -114,6 +114,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1378,30 +1379,11 @@ public class ProcessService {
      */
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
-
-        if (taskInstance.getState().typeIsFailure()) {
-            if (taskInstance.isSubProcess()) {
-                taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-            } else {
-                if (processInstanceState != ExecutionStatus.READY_STOP
-                        && processInstanceState != ExecutionStatus.READY_PAUSE) {
-                    // failure task set invalid
-                    taskInstance.setFlag(Flag.NO);
-                    updateTaskInstance(taskInstance);
-                    // crate new task instance
-                    if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-                    }
-                    taskInstance.setSubmitTime(null);
-                    taskInstance.setLogPath(null);
-                    taskInstance.setExecutePath(null);
-                    taskInstance.setStartTime(null);
-                    taskInstance.setEndTime(null);
-                    taskInstance.setFlag(Flag.YES);
-                    taskInstance.setHost(null);
-                    taskInstance.setId(0);
-                }
-            }
+        if (processInstanceState.typeIsFinished()
+                || processInstanceState == ExecutionStatus.READY_PAUSE
+                || processInstanceState == ExecutionStatus.READY_STOP) {
+            logger.warn("processInstance {} was {}, skip submit task", processInstance.getProcessDefinitionCode(), processInstanceState);
+            return null;
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());

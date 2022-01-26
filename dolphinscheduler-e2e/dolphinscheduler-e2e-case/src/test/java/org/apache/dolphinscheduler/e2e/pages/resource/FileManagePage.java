@@ -22,16 +22,18 @@ package org.apache.dolphinscheduler.e2e.pages.resource;
 
 import lombok.Getter;
 
+import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -40,7 +42,19 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(id = "btnCreateDirectory")
     private WebElement buttonCreateDirectory;
 
+    @FindBy(id = "btnCreateFile")
+    private WebElement buttonCreateFile;
+
+    @FindBy(id = "btnUploadFile")
+    private WebElement buttonUploadFile;
+
     private final CreateDirectoryBox createDirectoryBox;
+
+    private final RenameDirectoryBox renameDirectoryBox;
+
+    private final CreateFileBox createFileBox;
+
+    private final UploadFileBox uploadFileBox;
 
     @FindBy(className = "items")
     private List<WebElement> fileList;
@@ -58,12 +72,63 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         super(driver);
 
         createDirectoryBox = new CreateDirectoryBox();
+
+        renameDirectoryBox = new RenameDirectoryBox();
+
+        createFileBox = new CreateFileBox();
+
+        uploadFileBox = new UploadFileBox();
     }
 
     public FileManagePage createDirectory(String name, String description) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
+        createDirectoryBox().inputDescription().sendKeys(description);
+        createDirectoryBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage cancelCreateDirectory(String name, String description) {
+        buttonCreateDirectory().click();
+
+        createDirectoryBox().inputDirectoryName().sendKeys(name);
+        createDirectoryBox().inputDescription().sendKeys(description);
+        createDirectoryBox().buttonCancel().click();
+
+        return this;
+    }
+
+    public FileManagePage rename(String currentName, String AfterName) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(currentName))
+            .flatMap(it -> it.findElements(By.id("btnRename")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No rename button in file manage list"))
+            .click();
+
+        renameDirectoryBox().inputName().clear();
+        renameDirectoryBox().inputName().sendKeys(AfterName);
+        renameDirectoryBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage createSubDirectory(String directoryName, String subDirectoryName, String description) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(directoryName))
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in file manage list", directoryName)))
+            .click();
+
+        buttonCreateDirectory().click();
+
+        createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
         createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
@@ -90,6 +155,56 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         return this;
     }
 
+    public FileManagePage createFile(String fileName, String scripts) {
+        buttonCreateFile().click();
+
+        createFileBox().inputFileName().sendKeys(fileName);
+        createFileBox().codeEditor().content(scripts);
+        createFileBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage editFile(String fileName, String scripts) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(fileName))
+            .flatMap(it -> it.findElements(By.id("btnEdit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))
+            .click();
+
+        createFileBox().codeEditor().content(scripts);
+        createFileBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage uploadFile(String filePath) {
+        buttonUploadFile().click();
+
+        driver.setFileDetector(new LocalFileDetector());
+
+        uploadFileBox().buttonUpload().sendKeys(filePath);
+        uploadFileBox().buttonSubmit().click();
+
+        return this;
+    }
+
+    public FileManagePage downloadFile(String fileName) {
+        fileList()
+            .stream()
+            .filter(it -> it.getText().contains(fileName))
+            .flatMap(it -> it.findElements(By.id("btnDownload")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No download button in file manage list"))
+            .click();
+
+        return this;
+    }
+
     @Getter
     public class CreateDirectoryBox {
         CreateDirectoryBox() {
@@ -101,6 +216,59 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBy(id = "inputDescription")
         private WebElement inputDescription;
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class RenameDirectoryBox {
+        RenameDirectoryBox() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(id = "inputName")
+        private WebElement inputName;
+
+        @FindBy(id = "inputDescription")
+        private WebElement inputDescription;
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class CreateFileBox {
+        CreateFileBox() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(id = "inputFileName")
+        private WebElement inputFileName;
+
+        private final CodeEditor codeEditor = new CodeEditor(driver);
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class UploadFileBox {
+        UploadFileBox() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(id = "btnUpload")
+        private WebElement buttonUpload;
 
         @FindBy(id = "btnSubmit")
         private WebElement buttonSubmit;

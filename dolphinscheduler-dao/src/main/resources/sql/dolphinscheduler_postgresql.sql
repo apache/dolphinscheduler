@@ -437,6 +437,7 @@ CREATE TABLE t_ds_task_definition_log (
 ) ;
 
 create index idx_task_definition_log_code_version on t_ds_task_definition_log (code,version);
+create index idx_task_definition_log_project_code on t_ds_task_definition_log (project_code);
 
 --
 -- Table structure for table t_ds_process_task_relation
@@ -748,6 +749,8 @@ CREATE TABLE t_ds_task_instance (
   PRIMARY KEY (id),
   CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
+
+create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
 
 --
 -- Table structure for table t_ds_tenant
@@ -1076,4 +1079,18 @@ CREATE TABLE t_ds_k8s (
    create_time timestamp DEFAULT NULL ,
    update_time timestamp DEFAULT NULL ,
    PRIMARY KEY (id)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_audit_log;
+CREATE TABLE t_ds_audit_log (
+    id serial NOT NULL,
+    user_id int NOT NULL,
+    resource_type int NOT NULL,
+    operation int NOT NULL,
+    time timestamp DEFAULT NULL ,
+    resource_id int NOT NULL,
+    PRIMARY KEY (id)
 );
