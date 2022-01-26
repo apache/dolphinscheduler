@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -116,8 +117,33 @@ final class DolphinSchedulerExtension
         } else {
             record = Files.createTempDirectory("record-");
         }
+
+        // According to https://github.com/SeleniumHQ/docker-selenium#mounting-volumes-to-retrieve-downloaded-files
+        if ("linux".equalsIgnoreCase(Constants.OS_NAME)) {
+            File file = new File(Constants.HOST_CHROME_DOWNLOAD_PATH);
+            boolean result = file.mkdir();
+
+            if (!result) {
+                throw new IOException(String.format("mkdir %s error", Constants.HOST_CHROME_DOWNLOAD_PATH));
+            }
+
+            String[] command = {"/bin/bash", "-c", String.format("sudo chown 1200:1201 %s", Constants.HOST_CHROME_DOWNLOAD_PATH)};
+
+            try {
+                Process pro = Runtime.getRuntime().exec(command);
+                int status = pro.waitFor();
+                if (status != 0) {
+                    throw new IOException(String.format("Failed to call shell's command: %s", Arrays.toString(command)));
+                }
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+            
+        }
+
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
+            .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH, Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
             .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
