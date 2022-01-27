@@ -43,7 +43,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Objects;
 
@@ -158,20 +157,6 @@ public class UdfManageE2ETest {
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(testUploadUdfFileName));
-        });
-    }
-
-    @Test
-    @Order(50)
-    void testDownloadUdf() {
-        final UdfManagePage page = new UdfManagePage(browser);
-
-        page.downloadFile(testUploadUdfFileName);
-
-        File file = new File(Paths.get(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(), testUploadUdfFileName).toFile().getAbsolutePath());
-
-        await().untilAsserted(() -> {
-            assert file.exists();
         });
     }
 

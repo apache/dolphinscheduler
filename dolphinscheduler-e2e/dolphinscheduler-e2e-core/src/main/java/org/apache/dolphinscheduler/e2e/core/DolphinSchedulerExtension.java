@@ -44,8 +44,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.ContainerState;
@@ -117,21 +115,8 @@ final class DolphinSchedulerExtension
             record = Files.createTempDirectory("record-");
         }
 
-        Map<String, Object> prefs = new HashMap<>();
-        prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
-        prefs.put("download.prompt_for_download", false);
-//        prefs.put("download.extensions_to_open", "jar");
-        prefs.put("safebrowsing_for_trusted_sources_enabled", false);
-        prefs.put("download_restrictions", 0);
-        ChromeOptions options = new ChromeOptions();
-        options.setExperimentalOption("prefs", prefs);
-        options.addArguments("--disable-extensions");
-//        options.addArguments("--disable-infobars");
-//        options.addArguments("--disable-popup-blocking");
-//        options.addArguments("start-maximized");
-
         browser = new BrowserWebDriverContainer<>()
-            .withCapabilities(options)
+            .withCapabilities(new ChromeOptions())
             .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
             .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
                                 Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
