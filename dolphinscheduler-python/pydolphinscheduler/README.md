@@ -65,8 +65,14 @@ python ./tutorial.py
 
 After command execute, you could see a new project with single process definition named *tutorial* in the [UI][ui-project].
 
+## Develop
+
 Until now, we finish quick start by an example of pydolphinscheduler and run it. If you want to inspect or join
 pydolphinscheduler develop, you could take a look at [develop](./DEVELOP.md)
+
+## Release
+
+If you are interested in how to release **PyDolphinScheduler**, you could go and see at [release](./RELEASE.md)
 
 ## What's more
 
