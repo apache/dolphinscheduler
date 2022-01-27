@@ -70,41 +70,20 @@ final class DolphinSchedulerExtension
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
     private BrowserWebDriverContainer<?> browser;
+    private Network network;
+    private HostAndPort address;
+    private String rootPath;
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
-        Testcontainers.exposeHostPorts(8888);
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
         Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
 
-        Network network = null;
-        HostAndPort address = null;
-        String rootPath = "/";
-        if (!LOCAL_MODE) {
-            compose = createDockerCompose(context);
-            compose.start();
-
-            final ContainerState dsContainer = compose.getContainerByServiceName("dolphinscheduler_1")
-                                                      .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
-            final String networkId = dsContainer.getContainerInfo().getNetworkSettings().getNetworks().keySet().iterator().next();
-            network = new Network() {
-                @Override
-                public String getId() {
-                    return networkId;
-                }
-
-                @Override
-                public void close() {
-                }
-
-                @Override
-                public Statement apply(Statement base, Description description) {
-                    return null;
-                }
-            };
-            address = HostAndPort.fromParts("dolphinscheduler", 12345);
-            rootPath = "/dolphinscheduler";
+        if (LOCAL_MODE) {
+            runInLocal();
+        } else {
+            runInDockerContainer(context);
         }
 
         final Path record;
@@ -138,10 +117,6 @@ final class DolphinSchedulerExtension
         driver.manage().window()
               .maximize();
 
-        if (address == null) {
-            address = HostAndPort.fromParts("host.testcontainers.internal", 8888);
-        }
-
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
         browser.beforeTest(new TestDescription(context));
@@ -151,6 +126,38 @@ final class DolphinSchedulerExtension
               .filter(it -> Modifier.isStatic(it.getModifiers()))
               .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
               .forEach(it -> setDriver(clazz, it));
+    }
+
+    private void runInLocal() {
+        Testcontainers.exposeHostPorts(8888);
+        address = HostAndPort.fromParts("host.testcontainers.internal", 8888);
+        rootPath = "/";
+    }
+
+    private void runInDockerContainer(ExtensionContext context) {
+        compose = createDockerCompose(context);
+        compose.start();
+
+        final ContainerState dsContainer = compose.getContainerByServiceName("dolphinscheduler_1")
+                .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
+        final String networkId = dsContainer.getContainerInfo().getNetworkSettings().getNetworks().keySet().iterator().next();
+        network = new Network() {
+            @Override
+            public String getId() {
+                return networkId;
+            }
+
+            @Override
+            public void close() {
+            }
+
+            @Override
+            public Statement apply(Statement base, Description description) {
+                return null;
+            }
+        };
+        address = HostAndPort.fromParts("dolphinscheduler", 12345);
+        rootPath = "/dolphinscheduler";
     }
 
     @Override
