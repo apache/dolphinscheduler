@@ -47,6 +47,7 @@ import org.junit.runners.model.Statement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
@@ -73,6 +74,7 @@ final class DolphinSchedulerExtension
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
+        Testcontainers.exposeHostPorts(8888);
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
         Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
 
@@ -135,18 +137,11 @@ final class DolphinSchedulerExtension
               .pageLoadTimeout(5, TimeUnit.SECONDS);
         driver.manage().window()
               .maximize();
+
         if (address == null) {
-            try {
-                address = HostAndPort.fromParts(browser.getTestHostIpAddress(), 8888);
-            } catch (UnsupportedOperationException ignored) {
-                if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
-                    address = HostAndPort.fromParts("host.docker.internal", 8888);
-                }
-            }
+            address = HostAndPort.fromParts("host.testcontainers.internal", 8888);
         }
-        if (address == null) {
-            throw new UnsupportedOperationException("Unsupported operation system");
-        }
+
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
         browser.beforeTest(new TestDescription(context));
