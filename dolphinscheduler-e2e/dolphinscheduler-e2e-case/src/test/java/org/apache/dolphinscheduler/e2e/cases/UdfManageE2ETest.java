@@ -109,6 +109,8 @@ public class UdfManageE2ETest {
     void testCreateDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
+        browser.navigate().refresh();
+
         page.createDirectory(testDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.udfList())
@@ -183,7 +185,7 @@ public class UdfManageE2ETest {
         while ((byteRead = inStream.read(buffer)) != -1) {
             fs.write(buffer, 0, byteRead);
         }
-        
+
         inStream.close();
         fs.close();
     }
