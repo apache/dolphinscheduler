@@ -64,7 +64,7 @@ const Content = defineComponent({
         state.isShowSide = menuStore.getShowSideStatus
         sideKey.value = route.matched[1]?.path
       },
-      {immediate: true}
+      { immediate: true }
     )
 
     const getSideMenu = (state: any) => {
@@ -101,7 +101,10 @@ const Content = defineComponent({
         </NLayoutHeader>
         <NLayout has-sider position='absolute' style='top: 65px'>
           {this.isShowSide && (
-            <SideBar sideMenuOptions={this.sideMenuOptions} sideKey={this.sideKey} />
+            <SideBar
+              sideMenuOptions={this.sideMenuOptions}
+              sideKey={this.sideKey}
+            />
           )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
             <router-view key={this.$route.fullPath} />
