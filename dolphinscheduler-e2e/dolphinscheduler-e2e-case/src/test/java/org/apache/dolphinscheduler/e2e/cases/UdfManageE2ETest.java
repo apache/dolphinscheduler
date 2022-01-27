@@ -41,6 +41,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -60,11 +64,11 @@ public class UdfManageE2ETest {
 
     private static final String phone = "15800000000";
 
-    private static final String testDiretoryName = "test_directory";
+    private static final String testDirectoryName = "test_directory";
 
     private static final String testRenameDirectoryName = "test_rename_directory";
 
-    private final String testUploadUdfFilePath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("docker/udf-manage/hive-jdbc-3.1.2.jar")).getPath();
+    private final String testUploadUdfFilePath = Constants.HOST_TMP_PATH.resolve(testUploadUdfFileName).toFile().getAbsolutePath();
 
     private static final String testUploadUdfFileName = "hive-jdbc-3.1.2.jar";
 
@@ -102,12 +106,12 @@ public class UdfManageE2ETest {
     void testCreateDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        page.createDirectory(testDiretoryName, "test_desc");
+        page.createDirectory(testDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.udfList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(testDiretoryName)));
+            .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
     @Test
@@ -115,7 +119,7 @@ public class UdfManageE2ETest {
     void testRenameDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        page.rename(testDiretoryName, testRenameDirectoryName);
+        page.rename(testDirectoryName, testRenameDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -147,8 +151,11 @@ public class UdfManageE2ETest {
 
     @Test
     @Order(40)
+    @SneakyThrows
     void testUploadUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
+
+        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath);
 
         page.uploadFile(testUploadUdfFilePath);
 
@@ -158,6 +165,24 @@ public class UdfManageE2ETest {
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(testUploadUdfFileName));
         });
+    }
+
+    void downloadFile(String downloadUrl, String filePath) throws Exception {
+        int byteSum = 0;
+        int byteRead;
+
+        URL url = new URL(downloadUrl);
+
+        URLConnection conn = url.openConnection();
+        InputStream inStream = conn.getInputStream();
+        FileOutputStream fs = new FileOutputStream(filePath);
+
+        byte[] buffer = new byte[1024];
+        while ((byteRead = inStream.read(buffer)) != -1) {
+            byteSum += byteRead;
+            System.out.println(byteSum);
+            fs.write(buffer, 0, byteRead);
+        }
     }
 
     @Test
