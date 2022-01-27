@@ -69,7 +69,7 @@ setup(
     name="apache-dolphinscheduler",
     version=version,
     license="Apache License 2.0",
-    description="Apache DolphinScheduler's Python API",
+    description="Apache DolphinScheduler Python API",
     long_description=read("README.md"),
     # Make sure pypi is expecting markdown
     long_description_content_type="text/markdown",
