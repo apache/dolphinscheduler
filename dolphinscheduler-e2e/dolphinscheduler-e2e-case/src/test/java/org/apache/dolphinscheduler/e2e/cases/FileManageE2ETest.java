@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterAll;
@@ -46,6 +47,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.SneakyThrows;
 
@@ -288,6 +291,8 @@ public class FileManageE2ETest {
         file.setLength((long) (0.01 * 1024 * 1024 * 1024));
 
         page.uploadFile(testUnder1GBFilePath.toFile().getAbsolutePath());
+
+        new WebDriverWait(browser, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
 
         await().untilAsserted(() -> {
             assertThat(page.fileList())
