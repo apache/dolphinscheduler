@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DATA_QUALITY_JAR_NAME;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF;
@@ -106,6 +107,16 @@ public class CommonUtils {
         return false;
     }
 
+    public static String getDataQualityJarName() {
+        String dqsJarName = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
+
+        if (org.apache.commons.lang.StringUtils.isEmpty(dqsJarName)) {
+            return "dolphinscheduler-data-quality.jar";
+        }
+
+        return dqsJarName;
+    }
+
     /**
      * hdfs udf dir
      *
@@ -138,5 +149,4 @@ public class CommonUtils {
             return resourceUploadPath;
         }
     }
-
 }

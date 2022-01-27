@@ -17,6 +17,22 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_NAME;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_DATASOURCE_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
+
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -24,6 +40,7 @@ import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
@@ -32,8 +49,13 @@ import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParamete
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -44,20 +66,28 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ConnectorType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
+import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
+import org.apache.dolphinscheduler.spi.task.dq.utils.JdbcUrlParser;
+import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,6 +97,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
+import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -105,6 +136,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
         this.commitInterval = masterConfig.getTaskCommitInterval();
     }
+
+    protected javax.sql.DataSource defaultDataSource =
+                        SpringApplicationContext.getBean(javax.sql.DataSource.class);
 
     /**
      * pause task, common tasks donot need this.
@@ -236,8 +270,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     null,
-                    null
-            );
+                    null);
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
@@ -250,6 +283,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
         SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
 
         // SQL task
         if (TaskType.SQL.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
@@ -270,6 +304,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             setSqoopTaskRelation(sqoopTaskExecutionContext, taskInstance);
         }
 
+        if (TaskType.DATA_QUALITY.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
+            setDataQualityTaskRelation(dataQualityTaskExecutionContext,taskInstance,tenant.getTenantCode());
+        }
+
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
@@ -279,6 +317,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
                 .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
+                .buildDataQualityTaskRelatedInfo(dataQualityTaskExecutionContext)
                 .create();
     }
 
@@ -347,6 +386,197 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
                 sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
                 sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            }
+        }
+    }
+
+    /**
+     * set data quality task relation
+     *
+     * @param dataQualityTaskExecutionContext dataQualityTaskExecutionContext
+     * @param taskInstance taskInstance
+     */
+    private void setDataQualityTaskRelation(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, TaskInstance taskInstance, String tenantCode) {
+        DataQualityParameters dataQualityParameters =
+                JSONUtils.parseObject(taskInstance.getTaskParams(), DataQualityParameters.class);
+        if (dataQualityParameters == null) {
+            return;
+        }
+
+        Map<String,String> config = dataQualityParameters.getRuleInputParameter();
+
+        int ruleId = dataQualityParameters.getRuleId();
+        DqRule dqRule = processService.getDqRule(ruleId);
+        if (dqRule == null) {
+            logger.error("can not get DqRule by id {}",ruleId);
+            return;
+        }
+
+        dataQualityTaskExecutionContext.setRuleId(ruleId);
+        dataQualityTaskExecutionContext.setRuleType(dqRule.getType());
+        dataQualityTaskExecutionContext.setRuleName(dqRule.getName());
+
+        List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
+        if (CollectionUtils.isEmpty(ruleInputEntryList)) {
+            logger.error("{} rule input entry list is empty ",ruleId);
+            return;
+        }
+        List<DqRuleExecuteSql> executeSqlList = processService.getDqExecuteSql(ruleId);
+        setComparisonParams(dataQualityTaskExecutionContext, config, ruleInputEntryList, executeSqlList);
+        dataQualityTaskExecutionContext.setRuleInputEntryList(JSONUtils.toJsonString(ruleInputEntryList));
+        dataQualityTaskExecutionContext.setExecuteSqlList(JSONUtils.toJsonString(executeSqlList));
+
+        // set the path used to store data quality task check error data
+        dataQualityTaskExecutionContext.setHdfsPath(
+                PropertyUtils.getString(Constants.FS_DEFAULTFS)
+                + PropertyUtils.getString(
+                        Constants.DATA_QUALITY_ERROR_OUTPUT_PATH,
+                        "/user/" + tenantCode + "/data_quality_error_data"));
+
+        setSourceConfig(dataQualityTaskExecutionContext, config);
+        setTargetConfig(dataQualityTaskExecutionContext, config);
+        setWriterConfig(dataQualityTaskExecutionContext);
+        setStatisticsValueWriterConfig(dataQualityTaskExecutionContext);
+    }
+
+    /**
+     * It is used to get comparison params, the param contains
+     * comparison name、comparison table and execute sql.
+     * When the type is fixed_value, params will be null.
+     * @param dataQualityTaskExecutionContext
+     * @param config
+     * @param ruleInputEntryList
+     * @param executeSqlList
+     */
+    private void setComparisonParams(DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
+                                     Map<String, String> config,
+                                     List<DqRuleInputEntry> ruleInputEntryList,
+                                     List<DqRuleExecuteSql> executeSqlList) {
+        if (config.get(COMPARISON_TYPE) != null) {
+            int comparisonTypeId = Integer.parseInt(config.get(COMPARISON_TYPE));
+            // comparison type id 1 is fixed value ,do not need set param
+            if (comparisonTypeId > 1) {
+                DqComparisonType type = processService.getComparisonTypeById(comparisonTypeId);
+                if (type != null) {
+                    DqRuleInputEntry comparisonName = new DqRuleInputEntry();
+                    comparisonName.setField(COMPARISON_NAME);
+                    comparisonName.setValue(type.getName());
+                    ruleInputEntryList.add(comparisonName);
+
+                    DqRuleInputEntry comparisonTable = new DqRuleInputEntry();
+                    comparisonTable.setField(COMPARISON_TABLE);
+                    comparisonTable.setValue(type.getOutputTable());
+                    ruleInputEntryList.add(comparisonTable);
+
+                    if (executeSqlList == null) {
+                        executeSqlList = new ArrayList<>();
+                    }
+
+                    DqRuleExecuteSql dqRuleExecuteSql = new DqRuleExecuteSql();
+                    dqRuleExecuteSql.setType(ExecuteSqlType.MIDDLE.getCode());
+                    dqRuleExecuteSql.setIndex(1);
+                    dqRuleExecuteSql.setSql(type.getExecuteSql());
+                    dqRuleExecuteSql.setTableAlias(type.getOutputTable());
+                    executeSqlList.add(0,dqRuleExecuteSql);
+
+                    if (Boolean.TRUE.equals(type.getInnerSource())) {
+                        dataQualityTaskExecutionContext.setComparisonNeedStatisticsValueTable(true);
+                    }
+                }
+            } else if (comparisonTypeId == 1) {
+                dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
+            }
+        }
+    }
+
+    /**
+     * The default datasource is used to get the dolphinscheduler datasource info,
+     * and the info will be used in StatisticsValueConfig and WriterConfig
+     * @return DataSource
+     */
+    public DataSource getDefaultDataSource() {
+        DataSource dataSource = new DataSource();
+
+        HikariDataSource hikariDataSource = (HikariDataSource)defaultDataSource;
+        dataSource.setUserName(hikariDataSource.getUsername());
+        JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
+        if (jdbcInfo != null) {
+            Properties properties = new Properties();
+            properties.setProperty(USER,hikariDataSource.getUsername());
+            properties.setProperty(PASSWORD,hikariDataSource.getPassword());
+            properties.setProperty(DATABASE, jdbcInfo.getDatabase());
+            properties.setProperty(ADDRESS,jdbcInfo.getAddress());
+            properties.setProperty(OTHER,jdbcInfo.getParams());
+            properties.setProperty(JDBC_URL,jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
+            dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
+        }
+
+        return dataSource;
+    }
+
+    /**
+     * The StatisticsValueWriterConfig will be used in DataQualityApplication that
+     * writes the statistics value into dolphin scheduler datasource
+     * @param dataQualityTaskExecutionContext
+     */
+    private void setStatisticsValueWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        DataSource dataSource = getDefaultDataSource();
+        ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType().isHive() ? 1 : 0);
+        dataQualityTaskExecutionContext.setStatisticsValueConnectorType(writerConnectorType.getDescription());
+        dataQualityTaskExecutionContext.setStatisticsValueType(dataSource.getType().getCode());
+        dataQualityTaskExecutionContext.setStatisticsValueWriterConnectionParams(dataSource.getConnectionParams());
+        dataQualityTaskExecutionContext.setStatisticsValueTable("t_ds_dq_task_statistics_value");
+    }
+
+    /**
+     * The WriterConfig will be used in DataQualityApplication that
+     * writes the data quality check result into dolphin scheduler datasource
+     * @param dataQualityTaskExecutionContext
+     */
+    private void setWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        DataSource dataSource = getDefaultDataSource();
+        ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType().isHive() ? 1 : 0);
+        dataQualityTaskExecutionContext.setWriterConnectorType(writerConnectorType.getDescription());
+        dataQualityTaskExecutionContext.setWriterType(dataSource.getType().getCode());
+        dataQualityTaskExecutionContext.setWriterConnectionParams(dataSource.getConnectionParams());
+        dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
+    }
+
+    /**
+     * The TargetConfig will be used in DataQualityApplication that
+     * get the data which be used to compare to src value
+     * @param dataQualityTaskExecutionContext
+     * @param config
+     */
+    private void setTargetConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(TARGET_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(TARGET_DATASOURCE_ID)));
+            if (dataSource != null) {
+                ConnectorType targetConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(TARGET_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setTargetConnectorType(targetConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setTargetType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setTargetConnectionParams(dataSource.getConnectionParams());
+            }
+        }
+    }
+
+    /**
+     * The SourceConfig will be used in DataQualityApplication that
+     * get the data which be used to get the statistics value
+     * @param dataQualityTaskExecutionContext
+     * @param config
+     */
+    private void setSourceConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(SRC_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(SRC_DATASOURCE_ID)));
+            if (dataSource != null) {
+                ConnectorType srcConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
             }
         }
     }
