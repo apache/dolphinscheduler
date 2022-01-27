@@ -266,15 +266,11 @@ export function useDataList() {
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: {
-        label: string
-        key: string
-        icon: any
-      }) => {
+      (item: { label: string; key: string; icon: any }) => {
         return {
           label: item.label,
           key: item.key,
-          icon: item.icon,
+          icon: item.icon
         }
       }
     )
