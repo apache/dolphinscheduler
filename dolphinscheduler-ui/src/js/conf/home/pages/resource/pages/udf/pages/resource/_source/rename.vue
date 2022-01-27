@@ -22,6 +22,7 @@
           <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputName"
                     type="input"
                     v-model="name"
                     maxlength="60"
@@ -34,6 +35,7 @@
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDescription"
                     type="textarea"
                     v-model="description"
                     size="small"

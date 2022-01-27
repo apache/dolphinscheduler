@@ -85,6 +85,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
           - name: FileManage
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
+          - name: UdfManage
+            class: org.apache.dolphinscheduler.e2e.cases.UdfManageE2ETest
           - name: MysqlDataSource
             class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
           - name: ClickhouseDataSource

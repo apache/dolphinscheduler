@@ -29,7 +29,7 @@
                     :placeholder="$t('Please enter name')">
             </el-input>
             <div class="p1" style="position: absolute;">
-              <input ref="file" name="file" type="file" class="file-update" @change="_onChange" v-if="!progress">
+              <input id="btnUpload" ref="file" name="file" type="file" class="file-update" @change="_onChange" v-if="!progress">
               <el-button type="dashed" size="small" :disabled="progress !== 0">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
             </div>
           </div>

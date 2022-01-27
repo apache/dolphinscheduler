@@ -66,7 +66,7 @@ public class FileManageE2ETest {
 
     private static final String phone = "15800000000";
 
-    private static final String testDiretoryName = "test_directory";
+    private static final String testDirectoryName = "test_directory";
 
     private static final String testSubDirectoryName = "test_sub_directory";
 
@@ -116,12 +116,12 @@ public class FileManageE2ETest {
     void testCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.createDirectory(testDiretoryName, "test_desc");
+        page.createDirectory(testDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testDiretoryName)));
+                .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
     @Test
@@ -129,12 +129,12 @@ public class FileManageE2ETest {
     void testCancelCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.cancelCreateDirectory(testDiretoryName, "test_desc");
+        page.cancelCreateDirectory(testDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(testDiretoryName)));
+            .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class FileManageE2ETest {
     void testCreateDuplicateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.createDirectory(testDiretoryName, "test_desc");
+        page.createDirectory(testDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
                 .contains("resource already exists")
@@ -156,7 +156,7 @@ public class FileManageE2ETest {
     void testCreateSubDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.createSubDirectory(testDiretoryName, testSubDirectoryName, "test_desc");
+        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")
@@ -188,7 +188,7 @@ public class FileManageE2ETest {
 
         page.goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class)
-            .delete(testDiretoryName);
+            .delete(testDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -196,7 +196,7 @@ public class FileManageE2ETest {
             assertThat(
                     page.fileList()
             ).noneMatch(
-                    it -> it.getText().contains(testDiretoryName)
+                    it -> it.getText().contains(testDirectoryName)
             );
         });
     }

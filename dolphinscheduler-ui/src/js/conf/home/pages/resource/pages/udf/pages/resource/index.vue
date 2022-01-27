@@ -20,8 +20,8 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <el-button-group>
-            <el-button size="mini"  @click="() => this.$router.push({name: 'resource-udf-createUdfFolder'})">{{$t('Create folder')}}</el-button>
-            <el-button size="mini"  @click="_uploading">{{$t('Upload UDF Resources')}}</el-button>
+            <el-button id="btnCreateDirectory" size="mini" @click="() => this.$router.push({name: 'resource-udf-createUdfFolder'})">{{$t('Create folder')}}</el-button>
+            <el-button id="btnUploadUdf" size="mini"  @click="_uploading">{{$t('Upload UDF Resources')}}</el-button>
           </el-button-group>
         </template>
       </m-conditions>
