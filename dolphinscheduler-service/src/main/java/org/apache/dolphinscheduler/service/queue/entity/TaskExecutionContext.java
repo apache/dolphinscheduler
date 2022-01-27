@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
@@ -226,6 +227,11 @@ public class TaskExecutionContext implements Serializable {
      * sqoop TaskExecutionContext
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+    /**
+     * data quality TaskExecutionContext
+     */
+    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
     /**
      * taskInstance varPool
@@ -557,6 +563,14 @@ public class TaskExecutionContext implements Serializable {
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
     }
 
+    public DataQualityTaskExecutionContext getDataQualityTaskExecutionContext() {
+        return dataQualityTaskExecutionContext;
+    }
+
+    public void setDataQualityTaskExecutionContext(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        this.dataQualityTaskExecutionContext = dataQualityTaskExecutionContext;
+    }
+
     public int getDryRun() {
         return dryRun;
     }
@@ -606,6 +620,7 @@ public class TaskExecutionContext implements Serializable {
                 + ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext
                 + ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext
                 + ", procedureTaskExecutionContext=" + procedureTaskExecutionContext
+                + ", dataQualityTaskExecutionContext=" + dataQualityTaskExecutionContext
                 + '}';
     }
 

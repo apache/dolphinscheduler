@@ -64,4 +64,7 @@ public enum DbType {
         return null;
     }
 
+    public boolean isHive() {
+        return this == DbType.HIVE;
+    }
 }
