@@ -727,6 +727,7 @@ export default {
   webHook: 'WebHook',
   Keyword: 'Keyword',
   Secret: 'Secret',
+  MsgType: 'MsgType',
   AtMobiles: '@Mobiles',
   AtUserIds: '@UserIds',
   IsAtAll: '@All',

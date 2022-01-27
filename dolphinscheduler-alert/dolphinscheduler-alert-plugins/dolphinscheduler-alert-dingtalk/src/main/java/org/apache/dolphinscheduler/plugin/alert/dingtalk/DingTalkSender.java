@@ -64,6 +64,7 @@ public final class DingTalkSender {
     private final String url;
     private final String keyword;
     private final String secret;
+    private String msgType;
 
     private final String atMobiles;
     private final String atUserIds;
@@ -83,6 +84,7 @@ public final class DingTalkSender {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
         secret = config.get(DingTalkParamsConstants.NAME_DING_TALK_SECRET);
+        msgType = config.get(DingTalkParamsConstants.NAME_DING_TALK_MSG_TYPE);
 
         atMobiles = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES);
         atUserIds = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS);
@@ -121,33 +123,6 @@ public final class DingTalkSender {
         return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
-    private String textToJsonString(String text) {
-        Map<String, Object> items = new HashMap<>();
-        items.put("msgtype", "text");
-        Map<String, String> textContent = new HashMap<>();
-        byte[] byt = StringUtils.getBytesUtf8(text);
-        String txt = StringUtils.newStringUtf8(byt);
-        textContent.put("content", txt);
-        items.put("text", textContent);
-
-        setMsgAt(items);
-        return JSONUtils.toJsonString(items);
-    }
-
-    private void setMsgAt(Map<String, Object> items) {
-        Map<String, Object> at = new HashMap<>();
-
-        String[] atMobileArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",") : new String[0];
-        String[] atUserArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",") : new String[0];
-        boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
-
-        at.put("atMobiles", atMobileArray);
-        at.put("atUserIds", atUserArray);
-        at.put("isAtAll", isAtAll);
-
-        items.put("at", at);
-    }
-
     private AlertResult checkSendDingTalkSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
@@ -173,6 +148,13 @@ public final class DingTalkSender {
         return alertResult;
     }
 
+    /**
+     * send dingtalk msg handler
+     *
+     * @param title title
+     * @param content content
+     * @return
+     */
     public AlertResult sendDingTalkMsg(String title, String content) {
         AlertResult alertResult;
         try {
@@ -189,18 +171,9 @@ public final class DingTalkSender {
 
     private String sendMsg(String title, String content) throws IOException {
 
-        StringBuilder text = new StringBuilder();
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(keyword)) {
-            text.append(keyword);
-            text.append(":");
-        }
-        text.append(title);
-        text.append("\n");
-        text.append(content);
+        String msg = generateMsgJson(title, content);
 
-        String msgToJson = textToJsonString(text.toString());
-
-        HttpPost httpPost = constructHttpPost(org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msgToJson);
+        HttpPost httpPost = constructHttpPost(org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -228,6 +201,96 @@ public final class DingTalkSender {
         }
     }
 
+    /**
+     * generate msg json
+     *
+     * @param title title
+     * @param content content
+     * @return msg
+     */
+    private String generateMsgJson(String title, String content) {
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(msgType)) {
+            msgType = DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT;
+        }
+        Map<String, Object> items = new HashMap<>();
+        items.put("msgtype", msgType);
+        Map<String, Object> text = new HashMap<>();
+        items.put(msgType, text);
+
+        if (DingTalkParamsConstants.DING_TALK_MSG_TYPE_MARKDOWN.equals(msgType)) {
+            generateMarkdownMsg(title, content, text);
+        } else {
+            generateTextMsg(title, content, text);
+        }
+
+        setMsgAt(items);
+        return JSONUtils.toJsonString(items);
+
+    }
+
+    /**
+     * generate text msg
+     *
+     * @param title title
+     * @param content content
+     * @param text text
+     */
+    private void generateTextMsg(String title, String content, Map<String, Object> text) {
+        StringBuilder builder = new StringBuilder(title);
+        builder.append("\n");
+        builder.append(content);
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(keyword)) {
+            builder.append(" ");
+            builder.append(keyword);
+        }
+        byte[] byt = StringUtils.getBytesUtf8(builder.toString());
+        String txt = StringUtils.newStringUtf8(byt);
+        text.put("content", txt);
+    }
+
+    /**
+     * generate markdown msg
+     *
+     * @param title title
+     * @param content content
+     * @param text text
+     */
+    private void generateMarkdownMsg(String title, String content, Map<String, Object> text) {
+        StringBuilder builder = new StringBuilder(content);
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(keyword)) {
+            builder.append(" ");
+            builder.append(keyword);
+        }
+        byte[] byt = StringUtils.getBytesUtf8(builder.toString());
+        String txt = StringUtils.newStringUtf8(byt);
+        text.put("title", title);
+        text.put("text", txt);
+    }
+
+    /**
+     * configure msg @person
+     *
+     * @param items items
+     */
+    private void setMsgAt(Map<String, Object> items) {
+        Map<String, Object> at = new HashMap<>();
+
+        String[] atMobileArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",") : new String[0];
+        String[] atUserArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",") : new String[0];
+        boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
+
+        at.put("atMobiles", atMobileArray);
+        at.put("atUserIds", atUserArray);
+        at.put("isAtAll", isAtAll);
+
+        items.put("at", at);
+    }
+
+    /**
+     * generate sign url
+     *
+     * @return sign url
+     */
     private String generateSignedUrl() {
         Long timestamp = System.currentTimeMillis();
         String stringToSign = timestamp + "\n" + secret;
