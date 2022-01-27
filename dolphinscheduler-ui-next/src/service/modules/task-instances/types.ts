@@ -37,4 +37,89 @@ interface TaskListReq {
   taskName?: string
 }
 
-export { ProjectCodeReq, IdReq, TaskListReq }
+interface Dependency {
+  localParams?: any
+  varPool?: any
+  dependTaskList?: any
+  relation?: any
+  resourceFilesList: any[]
+  varPoolMap?: any
+  localParametersMap?: any
+}
+
+interface SwitchDependency extends Dependency {
+  nextNode?: any
+  resultConditionLocation: number
+  dependTaskList?: any
+}
+
+interface TotalList {
+  taskComplete: boolean
+  firstRun: boolean
+  environmentCode: number
+  processInstance?: any
+  pid: number
+  appLink: string
+  taskCode: any
+  switchTask: boolean
+  host: string
+  id: number
+  state: string
+  workerGroup: string
+  conditionsTask: boolean
+  processInstancePriority?: any
+  processInstanceId: number
+  dependency: Dependency
+  alertFlag: string
+  dependentResult?: any
+  executePath: string
+  switchDependency: SwitchDependency
+  maxRetryTimes: number
+  executorName: string
+  subProcess: boolean
+  submitTime: string
+  taskGroupId: number
+  name: string
+  taskDefinitionVersion: number
+  processInstanceName: string
+  taskGroupPriority: number
+  taskDefine?: any
+  dryRun: number
+  flag: string
+  taskParams: string
+  duration: string
+  processDefine?: any
+  taskType: string
+  taskInstancePriority: string
+  logPath: string
+  startTime: string
+  environmentConfig?: any
+  executorId: number
+  firstSubmitTime: string
+  resources?: any
+  retryTimes: number
+  varPool: string
+  dependTask: boolean
+  delayTime: number
+  retryInterval: number
+  endTime: string
+}
+
+interface TaskInstancesRes {
+  totalList: TotalList[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export {
+  ProjectCodeReq,
+  IdReq,
+  TaskListReq,
+  Dependency,
+  SwitchDependency,
+  TotalList,
+  TaskInstancesRes
+}
