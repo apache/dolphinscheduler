@@ -516,7 +516,8 @@ CREATE TABLE `t_ds_task_definition_log` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `idx_code_version` (`code`,`version`)
+  KEY `idx_code_version` (`code`,`version`),
+  KEY `idx_project_code` (`project_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -844,6 +845,7 @@ CREATE TABLE `t_ds_task_instance` (
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
+  KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
   CONSTRAINT `foreign_key_instance_id` FOREIGN KEY (`process_instance_id`) REFERENCES `t_ds_process_instance` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -1063,3 +1065,17 @@ CREATE TABLE `t_ds_task_group` (
    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    PRIMARY KEY(`id`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `resource_type` int(11) NOT NULL COMMENT 'resource type',
+  `operation` int(11) NOT NULL COMMENT 'operation',
+  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;

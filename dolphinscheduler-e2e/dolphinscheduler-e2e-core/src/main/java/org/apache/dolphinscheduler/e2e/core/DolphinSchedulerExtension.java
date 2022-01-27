@@ -116,8 +116,12 @@ final class DolphinSchedulerExtension
         } else {
             record = Files.createTempDirectory("record-");
         }
+
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
+            .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
+            .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
+                                Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
             .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);

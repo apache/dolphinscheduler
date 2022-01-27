@@ -298,6 +298,12 @@ const menu = {
           path: 'statistics',
           id: 0,
           enabled: true
+        },
+        {
+          name: 'Audit Log',
+          path: 'audit-log',
+          id: 1,
+          enabled: true
         }
       ]
     }
