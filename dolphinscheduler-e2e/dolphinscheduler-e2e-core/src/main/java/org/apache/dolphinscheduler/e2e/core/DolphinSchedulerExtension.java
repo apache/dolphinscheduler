@@ -120,15 +120,15 @@ final class DolphinSchedulerExtension
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.default_directory", Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
         prefs.put("download.prompt_for_download", false);
-        prefs.put("download.extensions_to_open", "jar");
-        prefs.put("safebrowsing.enabled", true);
+//        prefs.put("download.extensions_to_open", "jar");
+        prefs.put("safebrowsing_for_trusted_sources_enabled", false);
         prefs.put("download_restrictions", 0);
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", prefs);
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--disable-popup-blocking");
-        options.addArguments("start-maximized");
+//        options.addArguments("--disable-extensions");
+//        options.addArguments("--disable-infobars");
+//        options.addArguments("--disable-popup-blocking");
+//        options.addArguments("start-maximized");
 
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(options)
