@@ -290,7 +290,9 @@ public class FileManageE2ETest {
 
         page.uploadFile(testUnder1GBFilePath.toFile().getAbsolutePath());
 
-        await().pollDelay(Duration.ofSeconds(2)).untilAsserted(() -> {
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
