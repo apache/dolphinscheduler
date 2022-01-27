@@ -144,6 +144,7 @@
     </el-dialog>
 
     <el-dialog
+      id="fileUpdateDialog"
       :visible.sync="fileUpdateDialog"
       append-to-body="true"
       width="auto">
