@@ -15,11 +15,158 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  NSpace,
+  NInput,
+  NSelect,
+  NDatePicker,
+  NButton,
+  NIcon,
+  NDataTable,
+  NPagination,
+  NCard
+} from 'naive-ui'
+import { SearchOutlined } from '@vicons/antd'
+import { useTable } from './use-table'
+import { useI18n } from 'vue-i18n'
+import Card from '@/components/card'
+import LogModal from './components/log-modal'
+import styles from './index.module.scss'
 
-export default defineComponent({
-  name: 'TaskInstanceList',
+const TaskInstance = defineComponent({
+  name: 'task-instance',
   setup() {
-    return () => <div>TaskInstanceList</div>
+    const { t, variables, getTableData, createColumns } = useTable()
+
+    const requestTableData = () => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal,
+        processInstanceId: variables.processInstanceId,
+        host: variables.host,
+        stateType: variables.stateType,
+        datePickerRange: variables.datePickerRange,
+        executorName: variables.executorName,
+        processInstanceName: variables.processInstanceName
+      })
+    }
+
+    const onUpdatePageSize = () => {
+      variables.page = 1
+      requestTableData()
+    }
+
+    const onSearch = () => {
+      variables.page = 1
+      requestTableData()
+    }
+
+    const onConfirmModal = () => {
+      variables.showModalRef = false
+    }
+
+    onMounted(() => {
+      createColumns(variables)
+      requestTableData()
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
+    return {
+      t,
+      ...toRefs(variables),
+      requestTableData,
+      onUpdatePageSize,
+      onSearch,
+      onConfirmModal
+    }
+  },
+  render() {
+    const { t, requestTableData, onUpdatePageSize, onSearch, onConfirmModal } =
+      this
+
+    return (
+      <>
+        <NCard>
+          <NSpace justify='end'>
+            <NInput
+              v-model={[this.searchVal, 'value']}
+              size='small'
+              placeholder={t('project.task.task_name')}
+              clearable
+            />
+            <NInput
+              v-model={[this.processInstanceName, 'value']}
+              size='small'
+              placeholder={t('project.task.workflow_instance')}
+              clearable
+            />
+            <NInput
+              v-model={[this.executorName, 'value']}
+              size='small'
+              placeholder={t('project.task.executor')}
+              clearable
+            />
+            <NInput
+              v-model={[this.host, 'value']}
+              size='small'
+              placeholder={t('project.task.host')}
+              clearable
+            />
+            <NSelect
+              v-model={[this.stateType, 'value']}
+              size='small'
+              options={this.generalOptions}
+              placeholder={t('project.task.state')}
+              style={{ width: '180px' }}
+              clearable
+            />
+            <NDatePicker
+              v-model={[this.datePickerRange, 'value']}
+              type='datetimerange'
+              size='small'
+              start-placeholder={t('project.task.start_time')}
+              end-placeholder={t('project.task.end_time')}
+              clearable
+            />
+            <NButton size='small' type='primary' onClick={onSearch}>
+              {{
+                icon: () => (
+                  <NIcon>
+                    <SearchOutlined />
+                  </NIcon>
+                )
+              }}
+            </NButton>
+          </NSpace>
+        </NCard>
+        <Card class={styles['table-card']}>
+          <NDataTable columns={this.columns} data={this.tableData} />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              show-size-picker
+              page-sizes={[10, 30, 50]}
+              show-quick-jumper
+              onUpdatePage={requestTableData}
+              onUpdatePageSize={onUpdatePageSize}
+            />
+          </div>
+        </Card>
+        <LogModal
+          showModalRef={this.showModalRef}
+          row={this.row}
+          onConfirmModal={onConfirmModal}
+        />
+      </>
+    )
   }
 })
+
+export default TaskInstance
