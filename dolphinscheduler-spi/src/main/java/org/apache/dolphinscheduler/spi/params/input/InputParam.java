@@ -30,11 +30,12 @@ import java.util.List;
  */
 public class InputParam extends PluginParams {
 
+    private final InputParamProps props;
+
     private InputParam(Builder builder) {
         super(builder);
+        this.props = builder.props;
     }
-    
-    private InputParamProps props;
 
     public static Builder newBuilder(String name, String title) {
         return new Builder(name, title);
@@ -102,6 +103,38 @@ public class InputParam extends PluginParams {
 
         public Builder setDisplay(Boolean display) {
             this.display = display;
+            return this;
+        }
+
+        public Builder setEmit(List<String> emit) {
+            this.emit = emit;
+            return this;
+        }
+
+        public Builder setSize(String size) {
+            if (this.props == null) {
+                this.setProps(new InputParamProps());
+            }
+
+            this.props.setSize(size);
+            return this;
+        }
+
+        public Builder setType(String type) {
+            if (this.props == null) {
+                this.setProps(new InputParamProps());
+            }
+
+            this.props.setType(type);
+            return this;
+        }
+
+        public Builder setRows(int rows) {
+            if (this.props == null) {
+                this.setProps(new InputParamProps());
+            }
+
+            this.props.setRows(rows);
             return this;
         }
 

@@ -24,6 +24,7 @@ import projects from './module/projects'
 import resource from './module/resource'
 import security from './module/security'
 import user from './module/user'
+import dataquality from './module/dataquality'
 
 Vue.use(Router)
 
@@ -40,6 +41,7 @@ const router = new Router({
     ...projects,
     ...resource,
     ...datasource,
+    ...dataquality,
     ...security,
     ...user,
     ...monitor

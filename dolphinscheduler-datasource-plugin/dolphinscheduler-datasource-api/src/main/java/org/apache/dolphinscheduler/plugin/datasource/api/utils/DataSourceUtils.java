@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQ
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import java.sql.Connection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +82,18 @@ public class DataSourceUtils {
 
     public static String getJdbcUrl(DbType dbType, ConnectionParam baseConnectionParam) {
         return getDatasourceProcessor(dbType).getJdbcUrl(baseConnectionParam);
+    }
+
+    public static Connection getConnection(DbType dbType, ConnectionParam connectionParam) {
+        try {
+            return getDatasourceProcessor(dbType).getConnection(connectionParam);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getDatasourceDriver(DbType dbType) {
+        return getDatasourceProcessor(dbType).getDatasourceDriver();
     }
 
     public static BaseDataSourceParamDTO buildDatasourceParamDTO(DbType dbType, String connectionParams) {

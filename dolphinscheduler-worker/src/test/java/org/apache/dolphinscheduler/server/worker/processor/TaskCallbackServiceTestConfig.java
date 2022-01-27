@@ -18,11 +18,18 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -146,6 +153,41 @@ public class TaskCallbackServiceTestConfig {
     @Bean
     public PluginDefineMapper pluginDefineMapper() {
         return Mockito.mock(PluginDefineMapper.class);
+    }
+
+    @Bean
+    public DqExecuteResultMapper dqExecuteResultMapper() {
+        return Mockito.mock(DqExecuteResultMapper.class);
+    }
+
+    @Bean
+    public DqRuleMapper dqRuleMapper() {
+        return Mockito.mock(DqRuleMapper.class);
+    }
+
+    @Bean
+    public DqRuleInputEntryMapper dqRuleInputEntryMapper() {
+        return Mockito.mock(DqRuleInputEntryMapper.class);
+    }
+
+    @Bean
+    public DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper() {
+        return Mockito.mock(DqRuleExecuteSqlMapper.class);
+    }
+
+    @Bean
+    public DqComparisonTypeMapper dqComparisonTypeMapper() {
+        return Mockito.mock(DqComparisonTypeMapper.class);
+    }
+
+    @Bean
+    public DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper() {
+        return Mockito.mock(DqTaskStatisticsValueMapper.class);
+    }
+
+    @Bean
+    public SpringConnectionFactory springConnectionFactory() {
+        return Mockito.mock(SpringConnectionFactory.class);
     }
 
 }

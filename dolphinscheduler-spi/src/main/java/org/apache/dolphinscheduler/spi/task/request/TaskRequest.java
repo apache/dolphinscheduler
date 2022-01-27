@@ -225,6 +225,8 @@ public class TaskRequest {
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
 
+    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
+
     public Map<String, String> getResources() {
         return resources;
     }
@@ -503,5 +505,13 @@ public class TaskRequest {
 
     public void setProcedureTaskExecutionContext(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
         this.procedureTaskExecutionContext = procedureTaskExecutionContext;
+    }
+
+    public DataQualityTaskExecutionContext getDataQualityTaskExecutionContext() {
+        return dataQualityTaskExecutionContext;
+    }
+
+    public void setDataQualityTaskExecutionContext(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        this.dataQualityTaskExecutionContext = dataQualityTaskExecutionContext;
     }
 }

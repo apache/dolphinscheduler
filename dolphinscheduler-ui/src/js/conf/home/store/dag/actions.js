@@ -865,6 +865,60 @@ export default {
       })
     })
   },
+
+  getRuleInputEntryList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/getRuleFormCreateJson', {
+        ruleId: payload
+      }, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+
+  getRuleList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/ruleList', {}, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+
+  getDatasourceOptionsById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/getDatasourceOptionsById', {
+        datasourceId: payload
+      }, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+
+  getTablesById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('datasources/tables', payload, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+
+  getTableColumnsByIdAndName ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('datasources/tableColumns', payload, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
   /**
    * Delete Task Definition by code
    */

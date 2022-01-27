@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILU
 import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
@@ -334,5 +336,31 @@ public class DataSourceController extends BaseController {
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
+    }
+
+    @ApiOperation(value = "tables", notes = "GET_DATASOURCE_TABLES_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
+    })
+    @GetMapping(value = "/tables")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_TABLES_ERROR)
+    public Result getTables(@RequestParam("datasourceId") Integer datasourceId) {
+        Map<String, Object> result = dataSourceService.getTables(datasourceId);
+        return returnDataList(result);
+    }
+
+    @ApiOperation(value = "tableColumns", notes = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
+    })
+    @GetMapping(value = "/tableColumns")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
+    public Result getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
+                                  @RequestParam("tableName") String tableName) {
+        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId,tableName);
+        return returnDataList(result);
     }
 }

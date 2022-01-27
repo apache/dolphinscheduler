@@ -37,6 +37,11 @@ public class TaskConstants {
     public static final String PID = "pid";
 
     /**
+     * QUESTION ?
+     */
+    public static final String QUESTION = "?";
+
+    /**
      * comma ,
      */
     public static final String COMMA = ",";
@@ -88,6 +93,10 @@ public class TaskConstants {
      * AT SIGN
      */
     public static final String AT_SIGN = "@";
+    /**
+     * UNDERLINE
+     */
+    public static final String UNDERLINE = "_";
 
     /**
      * sleep time
@@ -341,9 +350,23 @@ public class TaskConstants {
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
     /**
+     * Task Logger Thread's name
+     */
+    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
+
+    /**
      * hdfs/s3 configuration
      * resource.upload.path
      */
     public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
 
+    /**
+     * data.quality.jar.name
+     */
+    public static final String DATA_QUALITY_JAR_NAME = "data-quality.jar.name";
+
+    /**
+     * data.quality.error.output.path
+     */
+    public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
 }

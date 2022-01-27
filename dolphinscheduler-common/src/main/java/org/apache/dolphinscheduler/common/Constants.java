@@ -160,6 +160,16 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
+     * QUESTION ?
+     */
+    public static final String QUESTION = "?";
+
+    /**
+     * SPACE " "
+     */
+    public static final String SPACE = " ";
+
+    /**
      * SINGLE_SLASH /
      */
     public static final String SINGLE_SLASH = "/";
@@ -173,6 +183,11 @@ public final class Constants {
      * EQUAL SIGN
      */
     public static final String EQUAL_SIGN = "=";
+
+    /**
+     * AT SIGN
+     */
+    public static final String AT_SIGN = "@";
 
     /**
      * date format of yyyy-MM-dd HH:mm:ss
@@ -710,6 +725,8 @@ public final class Constants {
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
     public static final String OTHER = "other";
+    public static final String USER = "user";
+    public static final String JDBC_URL = "jdbcUrl";
 
     /**
      * session timeout
@@ -784,6 +801,11 @@ public final class Constants {
      */
     public static final int DRY_RUN_FLAG_NO = 0;
     public static final int DRY_RUN_FLAG_YES = 1;
+
+    /**
+     * data.quality.error.output.path
+     */
+    public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
 
     public static final String CACHE_KEY_VALUE_ALL = "'all'";
 
