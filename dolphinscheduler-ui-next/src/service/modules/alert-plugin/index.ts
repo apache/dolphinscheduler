@@ -48,6 +48,13 @@ export function verifyAlertInstanceName(params: InstanceNameReq): any {
   })
 }
 
+export function queryAlertPluginInstanceList(): any {
+  return axios({
+    url: '/alert-plugin-instances/list',
+    method: 'get'
+  })
+}
+
 export function getAlertPluginInstance(id: IdReq): any {
   return axios({
     url: `/alert-plugin-instances/${id}`,
