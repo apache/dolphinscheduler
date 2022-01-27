@@ -23,7 +23,6 @@ import {
   NCard,
   NDataTable,
   NPagination,
-  NTooltip
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
@@ -48,19 +47,15 @@ const taskGroupQueue = defineComponent({
     })
 
     let updateItemData = reactive({
-      id: 0,
-      name: '',
-      projectCode: 0,
-      groupSize: 0,
-      status: 1,
-      description: ''
+      queueId: 0,
+      priority: 0,
     })
 
     const requestData = () => {
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        name: variables.name
+        groupId: variables.groupId
       })
     }
 
@@ -68,7 +63,7 @@ const taskGroupQueue = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        name: variables.name
+        groupId: variables.groupId
       })
     }
 
@@ -77,19 +72,14 @@ const taskGroupQueue = defineComponent({
       resetTableData()
     }
 
-    const updateItem = (
-      id: number,
-      name: string,
-      projectCode: number,
-      groupSize: number,
-      description: string
+    const updatePriority = (
+      queueId: number,
+      priority: number
     ) => {
+      console.log('updatePriority')
       modelStatusRef.value = 1
-      updateItemData.id = id
-      updateItemData.name = name
-      updateItemData.projectCode = projectCode
-      updateItemData.groupSize = groupSize
-      updateItemData.description = description
+      updateItemData.queueId = queueId
+      updateItemData.priority = priority
     }
 
     const onSearch = () => {
@@ -107,7 +97,7 @@ const taskGroupQueue = defineComponent({
       searchParamRef,
       resetTableData,
       onUpdatePageSize,
-      updateItem,
+      updatePriority,
       modelStatusRef,
       updateItemData
     }
@@ -117,11 +107,11 @@ const taskGroupQueue = defineComponent({
       t,
       resetTableData,
       onUpdatePageSize,
-      updateItem,
+      updatePriority,
       onSearch
     } = this
 
-    const { columns } = useTable(updateItem, resetTableData)
+    const { columns } = useTable(updatePriority, resetTableData)
 
     return (
       <div>

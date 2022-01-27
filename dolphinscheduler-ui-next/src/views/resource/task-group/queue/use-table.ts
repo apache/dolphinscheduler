@@ -23,18 +23,13 @@ import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { queryTaskGroupListPaging, queryTaskListInTaskGroupQueueById } from '@/service/modules/task-group'
-import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 
 export function useTable(
-  updateItem = (
-    id: number,
-    name: string,
-    projectCode: number,
-    groupSize: number,
-    description: string,
-    status: number
+  updatePriority = (
+    queueId: number,
+    priority: number
   ): void => {},
   resetTableData = () => {}
 ) {
@@ -45,12 +40,12 @@ export function useTable(
     { title: t('resource.task_group_queue.id'), key: 'index' },
     { title: t('resource.task_group_queue.project_name'), key: 'projectName' },
     { title: t('resource.task_group_queue.task_name'), key: 'taskName' },
-    { title: t('resource.task_group_queue.task_name'), key: 'processInstanceName' },
-    { title: t('resource.task_group_queue.task_name'), key: 'taskGroupName' },
-    { title: t('resource.task_group_queue.task_name'), key: 'priority' },
-    { title: t('resource.task_group_queue.task_name'), key: 'forceStart' },
-    { title: t('resource.task_group_queue.task_name'), key: 'inQueue' },
-    { title: t('resource.task_group_queue.task_name'), key: 'status' },
+    { title: t('resource.task_group_queue.process_instance_name'), key: 'processInstanceName' },
+    { title: t('resource.task_group_queue.task_group_name'), key: 'taskGroupName' },
+    { title: t('resource.task_group_queue.priority'), key: 'priority' },
+    { title: t('resource.task_group_queue.force_starting_status'), key: 'forceStart' },
+    { title: t('resource.task_group_queue.in_queue'), key: 'inQueue' },
+    { title: t('resource.task_group_queue.task_status'), key: 'status' },
     { title: t('resource.task_group_queue.create_time'), key: 'createTime' },
     { title: t('resource.task_group_queue.update_time'), key: 'updateTime' },
     {
@@ -66,15 +61,11 @@ export function useTable(
             }
             resetTableData()
           },
-          onUpdateItem: (
-            id: number,
-            name: string,
-            projectCode: number,
-            groupSize: number,
-            description: string,
-            status: number
+          onUpdatePriority: (
+            queueId: number,
+            priority: number,
           ) => {
-            updateItem(id, name, projectCode, groupSize, description, status)
+            updatePriority(queueId, priority)
           }
         })
     }
@@ -84,18 +75,23 @@ export function useTable(
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
-    name: ref(null),
+    groupId: ref(3),
     totalPage: ref(1)
   })
 
   const getTableData = (params: any) => {
-    Promise.all([queryTaskGroupListPaging(params), queryAllProjectList()]).then(
+    const taskGroupSearchParams = {
+      pageNo: 1,
+      pageSize: 2147483647
+    }
+    Promise.all([queryTaskListInTaskGroupQueueById(params), queryTaskGroupListPaging(taskGroupSearchParams)]).then(
       (values: any[]) => {
+        const taskGroupList = values[1].totalList
         variables.totalPage = values[0].totalPage
         variables.tableData = values[0].totalList.map(
           (item: any, index: number) => {
-            item.projectName = _.find(values[1], {
-              code: item.projectCode
+            item.taskGroupName = _.find(taskGroupList, {
+              id: item.groupId
             }).name
             item.createTime = format(
               new Date(item.createTime),

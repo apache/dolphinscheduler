@@ -17,16 +17,16 @@
 
 import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NSpace, NTooltip, NButton, NIcon, NSwitch } from 'naive-ui'
-import { EditOutlined, UnorderedListOutlined } from '@vicons/antd'
+import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
+import { EditOutlined, PlayCircleOutlined } from '@vicons/antd'
 import type {
-  TaskGroupIdReq,
-  TaskGroup
+  TaskGroupQueueIdReq,
+  TaskGroupQueuePriorityUpdateReq,
+  TaskGroupQueue
 } from '@/service/modules/task-group/types'
-import { startTaskGroup, closeTaskGroup } from '@/service/modules/task-group'
+import { forceStartTaskInQueue } from '@/service/modules/task-group'
 
-interface ItemRow extends TaskGroup {
-  projectList: []
+interface ItemRow extends TaskGroupQueue {
 }
 
 const props = {
@@ -39,75 +39,44 @@ const props = {
 const TableAction = defineComponent({
   name: 'TableAction',
   props,
-  emits: ['resetTableData', 'updateItem'],
+  emits: ['resetTableData', 'updatePriority'],
   setup(props, { emit }) {
     const { t } = useI18n()
 
-    const handleEdit = (
+    const handleEditPriority = (
       id: number,
-      name: string,
-      projectCode: number,
-      groupSize: number,
-      description: string,
-      status: number
+      priority: number
     ) => {
-      emit('updateItem', id, name, projectCode, groupSize, description, status)
+      emit('updatePriority', id, priority)
     }
 
-    const handleSwitchStatus = (value: number, id: number) => {
-      const params: TaskGroupIdReq = { id: id }
+    const handleStartTask = (id: number) => {
+      const params: TaskGroupQueueIdReq = { queueId: id }
 
-      if (value === 1) {
-        startTaskGroup(params).then(() => {
-          emit('resetTableData')
-        })
-      } else if (value === 0) {
-        closeTaskGroup(params).then(() => {
-          emit('resetTableData')
-        })
-      }
+      forceStartTaskInQueue(params).then(() => {
+        emit('resetTableData')
+      })
     }
 
-    const handleViewQueue = (id: number) => {}
-
-    return { t, handleEdit, handleViewQueue, handleSwitchStatus }
+    return { t, handleEditPriority, handleStartTask }
   },
   render() {
-    const { t, handleEdit, handleViewQueue, handleSwitchStatus } = this
+    const { t, handleEditPriority, handleStartTask } = this
 
     return (
       <NSpace>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.task_group_option.switch_status'),
-            trigger: () => (
-              <NSwitch
-                v-model={[this.row.status, 'value']}
-                checkedValue={1}
-                uncheckedValue={0}
-                onUpdate:value={(value) =>
-                  handleSwitchStatus(value, this.row.id)
-                }
-              />
-            )
-          }}
-        </NTooltip>
-        <NTooltip trigger={'hover'}>
-          {{
-            default: () => t('resource.task_group_option.edit'),
+            default: () => t('resource.task_group_queue.modify_priority'),
             trigger: () => (
               <NButton
                 size='small'
                 type='info'
                 tag='div'
                 onClick={() =>
-                  handleEdit(
+                  handleEditPriority(
                     this.row.id,
-                    this.row.name,
-                    this.row.projectCode,
-                    this.row.groupSize,
-                    this.row.description,
-                    this.row.status
+                    this.row.priority
                   )
                 }
                 circle
@@ -121,17 +90,17 @@ const TableAction = defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.task_group_option.view_queue'),
+            default: () => t('resource.task_group_queue.start_task'),
             trigger: () => (
               <NButton
                 size='small'
                 type='primary'
                 tag='div'
-                onClick={() => handleViewQueue(this.row.id)}
+                onClick={() => handleStartTask(this.row.id)}
                 circle
               >
                 <NIcon>
-                  <UnorderedListOutlined />
+                  <PlayCircleOutlined />
                 </NIcon>
               </NButton>
             )

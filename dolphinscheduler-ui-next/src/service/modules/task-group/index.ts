@@ -18,7 +18,7 @@
 import { axios } from '@/service/service'
 import {
   ListReq,
-  TaskGroupIdReq,
+  TaskGroupIdReq, TaskGroupQueueIdReq, TaskGroupQueuePriorityUpdateReq,
   TaskGroupReq,
   TaskGroupUpdateReq
 } from './types'
@@ -79,7 +79,7 @@ export function queryTaskListInTaskGroupQueueById(params: ListReq): any {
   })
 }
 
-export function modifyTaskGroupQueuePriority(data: TaskGroupIdReq): any {
+export function modifyTaskGroupQueuePriority(data: TaskGroupQueuePriorityUpdateReq): any {
   return axios({
     url: '/task-group/modifyPriority',
     method: 'post',
@@ -87,7 +87,7 @@ export function modifyTaskGroupQueuePriority(data: TaskGroupIdReq): any {
   })
 }
 
-export function forceStartTaskInQueue(data: TaskGroupIdReq): any {
+export function forceStartTaskInQueue(data: TaskGroupQueueIdReq): any {
   return axios({
     url: '/task-group/forceStart',
     method: 'post',
