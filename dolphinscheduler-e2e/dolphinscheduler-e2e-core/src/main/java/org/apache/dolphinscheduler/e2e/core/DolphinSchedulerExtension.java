@@ -125,7 +125,7 @@ final class DolphinSchedulerExtension
         prefs.put("download_restrictions", 0);
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", prefs);
-//        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-extensions");
 //        options.addArguments("--disable-infobars");
 //        options.addArguments("--disable-popup-blocking");
 //        options.addArguments("start-maximized");
