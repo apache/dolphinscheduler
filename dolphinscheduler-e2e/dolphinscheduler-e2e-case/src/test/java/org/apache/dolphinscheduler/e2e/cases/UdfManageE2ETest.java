@@ -47,6 +47,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Objects;
 
@@ -68,9 +69,9 @@ public class UdfManageE2ETest {
 
     private static final String testRenameDirectoryName = "test_rename_directory";
 
-    private final String testUploadUdfFilePath = Constants.HOST_TMP_PATH.resolve(testUploadUdfFileName).toFile().getAbsolutePath();
-
     private static final String testUploadUdfFileName = "hive-jdbc-3.1.2.jar";
+
+    private static final Path testUploadUdfFilePath = Constants.HOST_TMP_PATH.resolve(testUploadUdfFileName);
 
     private static final String testUploadUdfRenameFileName = "hive-jdbc.jar";
 
@@ -99,6 +100,8 @@ public class UdfManageE2ETest {
             .sorted(Comparator.reverseOrder())
             .map(Path::toFile)
             .forEach(File::delete);
+
+        Files.deleteIfExists(testUploadUdfFilePath);
     }
 
     @Test
@@ -155,9 +158,9 @@ public class UdfManageE2ETest {
     void testUploadUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath);
+        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
 
-        page.uploadFile(testUploadUdfFilePath);
+        page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
 
         await().untilAsserted(() -> {
             assertThat(page.udfList())
@@ -168,7 +171,6 @@ public class UdfManageE2ETest {
     }
 
     void downloadFile(String downloadUrl, String filePath) throws Exception {
-        int byteSum = 0;
         int byteRead;
 
         URL url = new URL(downloadUrl);
@@ -179,10 +181,11 @@ public class UdfManageE2ETest {
 
         byte[] buffer = new byte[1024];
         while ((byteRead = inStream.read(buffer)) != -1) {
-            byteSum += byteRead;
-            System.out.println(byteSum);
             fs.write(buffer, 0, byteRead);
         }
+        
+        inStream.close();
+        fs.close();
     }
 
     @Test
