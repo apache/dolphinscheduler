@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterAll;
@@ -289,7 +290,7 @@ public class FileManageE2ETest {
 
         page.uploadFile(testUnder1GBFilePath.toFile().getAbsolutePath());
 
-        await().untilAsserted(() -> {
+        await().pollDelay(Duration.ofSeconds(2)).untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.fileList())
