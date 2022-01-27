@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, PropType } from 'vue'
+import { defineComponent, ref, PropType, watch } from 'vue'
 import { NLayoutSider, NMenu } from 'naive-ui'
 import { useMenuClick } from './use-menuClick'
 import { useMenuStore } from '@/store/menu/menu'
+import { useRoute } from 'vue-router'
 
 const Sidebar = defineComponent({
   name: 'Sidebar',
@@ -26,9 +27,14 @@ const Sidebar = defineComponent({
     sideMenuOptions: {
       type: Array as PropType<any>,
       default: []
+    },
+    sideKey: {
+      type: String as PropType<string>,
+      default: ''
     }
   },
   setup() {
+    const route = useRoute()
     const menuStore = useMenuStore()
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
@@ -54,7 +60,7 @@ const Sidebar = defineComponent({
         onExpand={() => (this.collapsedRef = false)}
       >
         <NMenu
-          value={this.menuStore.getSideMenuKey}
+          value={this.sideKey}
           options={this.sideMenuOptions}
           defaultExpandedKeys={this.defaultExpandedKeys}
           onUpdateValue={this.handleMenuClick}
