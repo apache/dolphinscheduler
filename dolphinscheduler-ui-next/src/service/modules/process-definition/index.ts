@@ -105,7 +105,7 @@ export function getTaskListByDefinitionCodes(
   })
 }
 
-export function importProcessDefinition(data: FileReq, code: CodeReq): any {
+export function importProcessDefinition(data: FormData, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/import`,
     method: 'post',

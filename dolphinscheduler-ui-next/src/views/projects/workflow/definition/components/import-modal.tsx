@@ -15,3 +15,89 @@
  * limitations under the License.
  */
 
+import { defineComponent, PropType, toRefs } from 'vue'
+import { useI18n } from 'vue-i18n'
+import Modal from '@/components/modal'
+import { useForm } from './use-form'
+import { useModal } from './use-modal'
+import { NForm, NFormItem, NButton, NUpload, NIcon, NInput } from 'naive-ui'
+import { CloudUploadOutlined } from '@vicons/antd'
+
+const props = {
+  show: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  }
+}
+
+export default defineComponent({
+  name: 'workflowDefinitionImport',
+  props,
+  emits: ['update:show', 'updateList'],
+  setup(props, ctx) {
+    const { importState } = useForm()
+    const { handleImportDefinition } = useModal(importState, ctx)
+    const hideModal = () => {
+      ctx.emit('update:show')
+    }
+
+    const handleImport = () => {
+      handleImportDefinition()
+    }
+
+    const customRequest = ({ file }: any) => {
+      importState.importForm.name = file.name
+      importState.importForm.file = file.file
+    }
+
+    return {
+      hideModal,
+      handleImport,
+      customRequest,
+      ...toRefs(importState)
+    }
+  },
+
+  render() {
+    const { t } = useI18n()
+
+    return (
+      <Modal
+        show={this.$props.show}
+        title={t('project.workflow.upload')}
+        onCancel={this.hideModal}
+        onConfirm={this.handleImport}
+      >
+        <NForm
+          rules={this.importRules}
+          ref='importFormRef'
+          label-placement='left'
+          label-width='160'
+        >
+          <NFormItem label={t('project.workflow.upload_file')} path='file'>
+            <NButton>
+              <NUpload
+                v-model={[this.importForm.file, 'value']}
+                customRequest={this.customRequest}
+                showFileList={false}
+              >
+                <NButton text>
+                  上传
+                  <NIcon>
+                    <CloudUploadOutlined />
+                  </NIcon>
+                </NButton>
+              </NUpload>
+            </NButton>
+          </NFormItem>
+          <NFormItem label={t('project.workflow.file_name')} path='name'>
+            <NInput
+              v-model={[this.importForm.name, 'value']}
+              placeholder={t('project.workflow.enter_name_tips')}
+            />
+          </NFormItem>
+        </NForm>
+      </Modal>
+    )
+  }
+})

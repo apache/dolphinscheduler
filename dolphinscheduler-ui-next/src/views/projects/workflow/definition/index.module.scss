@@ -71,3 +71,18 @@
     margin-top: 20px;
   }
 }
+
+.operation {
+  > div {
+    > div {
+      margin-right: 5px !important;
+    }
+  }
+}
+
+.startup {
+  align-items: center;
+  > div:first-child {
+    width: 86%;
+  }
+}

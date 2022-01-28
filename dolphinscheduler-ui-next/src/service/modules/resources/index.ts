@@ -203,7 +203,8 @@ export function deleteResource(id: number): any {
 }
 
 export function downloadResource(id: number): void {
-  downloadFile(`resources/${id}/download`)
+  // http://127.0.0.1:8888/dolphinscheduler/log/download-log?taskInstanceId=164
+  downloadFile('log/download-log', { taskInstanceId: 64 })
 }
 
 export function viewUIUdfFunction(id: IdReq): any {

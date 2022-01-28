@@ -28,6 +28,8 @@ import {
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
+import ImportModal from './components/import-modal'
+import StartModal from './components/start-modal'
 import styles from './index.module.scss'
 
 export default defineComponent({
@@ -43,10 +45,29 @@ export default defineComponent({
       })
     }
 
+    const handleUpdateList = () => {
+      requestData()
+    }
+
+    const handleSearch = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const handleChangePageSize = () => {
+      variables.page = 1
+      requestData()
+    }
+
     onMounted(() => {
       requestData()
     })
+
     return {
+      requestData,
+      handleSearch,
+      handleUpdateList,
+      handleChangePageSize,
       ...toRefs(variables)
     }
   },
@@ -61,14 +82,14 @@ export default defineComponent({
               <NButton type='primary' onClick={() => {}}>
                 {t('project.workflow.create_workflow')}
               </NButton>
-              <NButton strong secondary onClick={() => {}}>
+              <NButton strong secondary onClick={() => (this.showRef = true)}>
                 {t('project.workflow.import_workflow')}
               </NButton>
             </NSpace>
             <div class={styles.right}>
               <div class={styles.search}>
                 <div class={styles.list}>
-                  <NButton type='primary' onClick={() => {}}>
+                  <NButton type='primary' onClick={this.handleSearch}>
                     <NIcon>
                       <SearchOutlined />
                     </NIcon>
@@ -94,17 +115,26 @@ export default defineComponent({
           />
           <div class={styles.pagination}>
             <NPagination
-              // v-model:page={this.page}
-              // v-model:page-size={this.pageSize}
-              // page-count={this.totalPage}
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
               show-size-picker
               page-sizes={[10, 30, 50]}
               show-quick-jumper
-              // onUpdatePage={this.requestData}
-              // onUpdatePageSize={this.handleChangePageSize}
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
             />
           </div>
         </Card>
+        <ImportModal
+          v-model:show={this.showRef}
+          onUpdateList={this.handleUpdateList}
+        />
+        <StartModal
+          v-model:row={this.row}
+          v-model:show={this.startShowRef}
+          onUpdateList={this.handleUpdateList}
+        />
       </div>
     )
   }

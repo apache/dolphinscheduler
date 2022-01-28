@@ -20,17 +20,12 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
-import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import { useAsyncState } from '@vueuse/core'
-import {
-  queryUdfFuncListPaging,
-  deleteUdfFunc
-} from '@/service/modules/resources'
 import { queryListPaging } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 
 import { IDefinitionParam } from './types'
+import styles from './index.module.scss'
 
 export function useTable() {
   const { t } = useI18n()
@@ -78,12 +73,21 @@ export function useTable() {
     {
       title: t('project.workflow.operation'),
       key: 'operation',
+      width: 300,
+      fixed: 'right',
+      className: styles.operation,
       render: (row) =>
         h(TableAction, {
-          row
+          row,
+          onStartWorkflow: () => startWorkflow(row)
         })
     }
   ]
+
+  const startWorkflow = (row: any) => {
+    variables.startShowRef = true
+    variables.row = row
+  }
 
   const variables = reactive({
     columns,
@@ -94,7 +98,8 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
-    showRef: ref(false)
+    showRef: ref(false),
+    startShowRef: ref(false)
   })
 
   const getTableData = (params: IDefinitionParam) => {
@@ -108,27 +113,6 @@ export function useTable() {
       { total: 0, table: [] }
     )
     return state
-  }
-
-  const handleEdit = (row: any) => {
-    variables.showRef = true
-    variables.row = row
-  }
-
-  const handleDelete = (id: number) => {
-    /* after deleting data from the current page, you need to jump forward when the page is empty. */
-    if (variables.tableData.length === 1 && variables.page > 1) {
-      variables.page -= 1
-    }
-
-    deleteUdfFunc(id).then(() =>
-      getTableData({
-        id: variables.id,
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
-    )
   }
 
   return {

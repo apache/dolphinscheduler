@@ -44,16 +44,19 @@ const props = {
 export default defineComponent({
   name: 'TableAction',
   props,
-  emits: ['updateList', 'renameResource'],
+  emits: ['updateList', 'startWorkflow'],
   setup(props, ctx) {
-    const { t } = useI18n()
     const router: Router = useRouter()
 
     // TODO
     const handleEditFile = () => {}
 
+    const handleStartWorkflow = () => {
+      ctx.emit('startWorkflow')
+    }
+
     return {
-      t,
+      handleStartWorkflow,
       ...props
     }
   },
@@ -65,13 +68,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.edit'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <FormOutlined />
                 </NIcon>
@@ -83,12 +80,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.start'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='primary'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='primary' circle onClick={this.handleStartWorkflow}>
                 <NIcon>
                   <PlayCircleOutlined />
                 </NIcon>
@@ -100,13 +92,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.timing'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                circle
-                style={{ marginRight: '-5px' }}
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <ClockCircleOutlined />
                 </NIcon>
@@ -118,12 +104,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.upline'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='error'
-                circle
-                style={{ marginRight: '-5px' }}
-              >
+              <NButton size='tiny' type='error' circle>
                 <NPopconfirm
                   positive-text={t('project.workflow.confirm')}
                   negative-text={t('project.workflow.cancel')}
@@ -150,13 +131,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.copy_workflow'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <CopyOutlined />
                 </NIcon>
@@ -168,13 +143,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.cron_manage'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <FieldTimeOutlined />
                 </NIcon>
@@ -186,13 +155,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.delete'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='error'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='error' tag='div' circle>
                 <NIcon>
                   <DeleteOutlined />
                 </NIcon>
@@ -204,13 +167,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.tree_view'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <FormOutlined />
                 </NIcon>
@@ -222,13 +179,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.export'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <ExportOutlined />
                 </NIcon>
@@ -240,13 +191,7 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.version_info'),
             trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                tag='div'
-                style={{ marginRight: '-5px' }}
-                circle
-              >
+              <NButton size='tiny' type='info' tag='div' circle>
                 <NIcon>
                   <InfoCircleFilled />
                 </NIcon>
