@@ -35,9 +35,9 @@ public class TelegramSenderTest {
         telegramConfig.put(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK,
                 "https://api.telegram.org/bot{botToken}/sendMessage");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "5263705405:AAEPadQyd7btmh9Hww8S7p_ZDr_hqYSlWsM");
+                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "BOT_TOKEN");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "-1001642371439");
+                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "CHAT_ID");
         telegramConfig.put(
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
     }
@@ -77,7 +77,7 @@ public class TelegramSenderTest {
         alertData.setContent("telegram test content");
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
-        Assert.assertEquals("true", result.getStatus());
+        Assert.assertEquals("false", result.getStatus());
 
     }
 
@@ -90,7 +90,7 @@ public class TelegramSenderTest {
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_MARKDOWN);
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
-        Assert.assertEquals("true", result.getStatus());
+        Assert.assertEquals("false", result.getStatus());
 
     }
 
@@ -103,7 +103,7 @@ public class TelegramSenderTest {
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_HTML);
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
-        Assert.assertEquals("true", result.getStatus());
+        Assert.assertEquals("false", result.getStatus());
 
     }
 
