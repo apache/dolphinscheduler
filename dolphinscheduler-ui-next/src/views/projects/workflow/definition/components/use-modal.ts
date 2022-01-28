@@ -26,6 +26,7 @@ import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
 import { startProcessInstance } from '@/service/modules/executors'
+import { createSchedule } from '@/service/modules/schedules'
 
 export function useModal(
   state: any,
@@ -106,6 +107,39 @@ export function useModal(
     })
   }
 
+  const handleTimingDefinition = (code: number) => {
+    state.timingFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        state.timingForm.processDefinitionCode = code
+        const start = format(
+          new Date(state.timingForm.startEndTime[0]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+        const end = format(
+          new Date(state.timingForm.startEndTime[1]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+
+        state.timingForm.schedule = JSON.stringify({
+          startTime: start,
+          endTime: end,
+          crontab: state.timingForm.crontab
+        })
+
+        const projectCode = Number(router.currentRoute.value.params.projectCode)
+
+        try {
+          await createSchedule(state.timingForm, projectCode)
+          window.$message.success(t('project.workflow.success'))
+          ctx.emit('updateList')
+          ctx.emit('update:show')
+        } catch (error: any) {
+          window.$message.error(error.message)
+        }
+      }
+    })
+  }
+
   const getWorkerGroups = () => {
     queryAllWorkerGroups().then((res: any) => {
       variables.workerGroups = res.map((item: string) => ({
@@ -138,6 +172,7 @@ export function useModal(
     variables,
     handleImportDefinition,
     handleStartDefinition,
+    handleTimingDefinition,
     getWorkerGroups,
     getAlertGroups,
     getEnvironmentList

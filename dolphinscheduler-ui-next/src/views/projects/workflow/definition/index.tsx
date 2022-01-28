@@ -30,6 +30,7 @@ import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
+import TimingModal from './components/timing-modal'
 import styles from './index.module.scss'
 
 export default defineComponent({
@@ -133,6 +134,11 @@ export default defineComponent({
         <StartModal
           v-model:row={this.row}
           v-model:show={this.startShowRef}
+          onUpdateList={this.handleUpdateList}
+        />
+        <TimingModal
+          v-model:row={this.row}
+          v-model:show={this.timingShowRef}
           onUpdateList={this.handleUpdateList}
         />
       </div>

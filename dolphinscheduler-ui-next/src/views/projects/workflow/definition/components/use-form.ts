@@ -62,8 +62,26 @@ export const useForm = () => {
     }
   })
 
+  const timingState = reactive({
+    timingFormRef: ref(),
+    timingForm: {
+      processDefinitionCode: -1,
+      schedule: null,
+      startEndTime: null,
+      crontab: '',
+      timezoneId: '',
+      failureStrategy: 'CONTINUE',
+      warningType: 'NONE',
+      processInstancePriority: 'MEDIUM',
+      warningGroupId: null,
+      workerGroup: 'default',
+      environmentCode: null
+    }
+  })
+
   return {
     importState,
-    startState
+    startState,
+    timingState
   }
 }

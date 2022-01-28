@@ -79,13 +79,19 @@ export function useTable() {
       render: (row) =>
         h(TableAction, {
           row,
-          onStartWorkflow: () => startWorkflow(row)
+          onStartWorkflow: () => startWorkflow(row),
+          onTimingWorkflow: () => timingWorkflow(row)
         })
     }
   ]
 
   const startWorkflow = (row: any) => {
     variables.startShowRef = true
+    variables.row = row
+  }
+
+  const timingWorkflow = (row: any) => {
+    variables.timingShowRef = true
     variables.row = row
   }
 
@@ -99,7 +105,8 @@ export function useTable() {
     searchVal: ref(),
     totalPage: ref(1),
     showRef: ref(false),
-    startShowRef: ref(false)
+    startShowRef: ref(false),
+    timingShowRef: ref(false)
   })
 
   const getTableData = (params: IDefinitionParam) => {

@@ -44,7 +44,7 @@ const props = {
 export default defineComponent({
   name: 'TableAction',
   props,
-  emits: ['updateList', 'startWorkflow'],
+  emits: ['updateList', 'startWorkflow', 'timingWorkflow'],
   setup(props, ctx) {
     const router: Router = useRouter()
 
@@ -55,8 +55,13 @@ export default defineComponent({
       ctx.emit('startWorkflow')
     }
 
+    const handleTimingWorkflow = () => {
+      ctx.emit('timingWorkflow')
+    }
+
     return {
       handleStartWorkflow,
+      handleTimingWorkflow,
       ...props
     }
   },
@@ -80,7 +85,12 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.start'),
             trigger: () => (
-              <NButton size='tiny' type='primary' circle onClick={this.handleStartWorkflow}>
+              <NButton
+                size='tiny'
+                type='primary'
+                circle
+                onClick={this.handleStartWorkflow}
+              >
                 <NIcon>
                   <PlayCircleOutlined />
                 </NIcon>
@@ -92,7 +102,13 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.timing'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                onClick={this.handleTimingWorkflow}
+              >
                 <NIcon>
                   <ClockCircleOutlined />
                 </NIcon>

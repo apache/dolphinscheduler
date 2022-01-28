@@ -40,7 +40,7 @@ export function queryScheduleListPaging(
 
 export function createSchedule(
   data: CreateScheduleReq & WorkerGroupIdReq,
-  projectCode: ProjectCodeReq
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/schedules`,
