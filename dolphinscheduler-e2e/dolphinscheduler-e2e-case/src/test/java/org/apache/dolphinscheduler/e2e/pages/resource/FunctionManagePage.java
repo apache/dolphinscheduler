@@ -94,13 +94,13 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("createUdfDialog")));
 
-        renameUdfFunctionBox = new RenameUdfFunctionBox();
+//        renameUdfFunctionBox = new RenameUdfFunctionBox();
+//
+//        renameUdfFunctionBox.inputFunctionName().clear();
+//
+//        renameUdfFunctionBox.inputFunctionName().sendKeys(afterName);
 
-        renameUdfFunctionBox.inputFunctionName().clear();
-
-        renameUdfFunctionBox.inputFunctionName().sendKeys(afterName);
-
-        renameUdfFunctionBox.buttonSubmit().click();
+//        renameUdfFunctionBox.buttonSubmit().click();
 
         return this;
     }
