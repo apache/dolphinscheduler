@@ -9,6 +9,7 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,36 +37,35 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
     @Override
     public List<PluginParams> params() {
 
-        InputParam webHookParam = InputParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK, TelegramParamsConstants.TELEGRAM_WEB_HOOK)
-                .setPlaceholder("telegram web hook")
+
+        InputParam webHookParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK, TelegramParamsConstants.TELEGRAM_WEB_HOOK)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
+                .setPlaceholder("telegram web hook")
                 .build();
 
         InputParam botTokenParam = InputParam
                 .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, TelegramParamsConstants.TELEGRAM_BOT_TOKEN)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
                 .setPlaceholder("telegram bot token")
+                .build();
+
+        InputParam chatIdParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, TelegramParamsConstants.TELEGRAM_CHAT_ID)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
+                .setPlaceholder("telegram channel chat id")
                 .build();
 
-        InputParam chatIdParam = InputParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, TelegramParamsConstants.TELEGRAM_CHAT_ID)
-                .setPlaceholder("telegram channel id")
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .build();
-
-        RadioParam parseMode = RadioParam
+        SelectParam parseMode = SelectParam
                 .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramParamsConstants.TELEGRAM_PARSE_MODE)
-                .addParamsOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_TXT, TelegramAlertConstants.PARSE_MODE_TXT, false))
-                .addParamsOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN, TelegramAlertConstants.PARSE_MODE_MARKDOWN, false))
-                .addParamsOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, false))
-                .addParamsOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_HTML, TelegramAlertConstants.PARSE_MODE_HTML, false))
+                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_TXT, TelegramAlertConstants.PARSE_MODE_TXT, false))
+                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN, TelegramAlertConstants.PARSE_MODE_MARKDOWN, false))
+                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, false))
+                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_HTML, TelegramAlertConstants.PARSE_MODE_HTML, false))
                 .setValue(TelegramAlertConstants.PARSE_MODE_TXT)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)

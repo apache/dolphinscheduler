@@ -568,7 +568,10 @@ const security = {
     path: 'Script Path',
     type: 'Type',
     sendType: 'Send Type',
-    username: 'Username'
+    username: 'Username',
+    botToken: 'Bot Token',
+    chatId: 'Channel Chat Id',
+    parseMode: 'Parse Mode'
   }
 }
 

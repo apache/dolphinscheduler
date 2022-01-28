@@ -1,9 +1,9 @@
 
 # 配置参数详解:
-- `WebHook` : 必填项, Telegram Bots Web Hook, 已包含 `BotToken`.
-- `BotToken` : 必填项, [从哪获取Telegram机器人Token?](https://core.telegram.org/bots#3-how-do-i-create-a-bot).
-- `ChatId` : 必填项, TG 频道 Chat ID.
-- `ParseMode` : 必填项, [Telegram bots api #sendMessage](https://core.telegram.org/bots/api#sendmessage)
+- `webHook` : 必填项, Telegram Bots Web Hook, 已包含 `BotToken`.
+- `botToken` : 必填项, [从哪获取Telegram机器人Token?](https://core.telegram.org/bots#3-how-do-i-create-a-bot).
+- `chatId` : 必填项, TG 频道 Chat ID.
+- `parseMode` : 必填项, [Telegram bots api #sendMessage](https://core.telegram.org/bots/api#sendmessage)
 - `IsEnableProxy` : 非必须, 是否启用代理.
 - `Proxy` : 非必须, 代理 Host.
 - `Port` : 非必须, 代理 Port.
