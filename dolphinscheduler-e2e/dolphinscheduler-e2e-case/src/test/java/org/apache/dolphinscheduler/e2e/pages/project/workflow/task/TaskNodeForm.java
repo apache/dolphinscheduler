@@ -22,8 +22,10 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
@@ -51,7 +53,11 @@ public abstract class TaskNodeForm {
     })
     private List<WebElement> inputParamVal;
 
-    @FindBy(id = "selectPreTask")
+    @FindBys({
+        @FindBy(className = "pre_tasks-model"),
+        @FindBy(tagName = "input"),
+//        @FindBy(id = "selectPreTask"),
+    })
     private WebElement selectPreTasks;
 
     private final WorkflowForm parent;
@@ -90,20 +96,24 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm preTask(String preTaskName) {
-        selectPreTasks().click();
+//        selectPreTasks().click();
+
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
 
         final By optionsLocator = By.className("option-pre-tasks");
 
-        new WebDriverWait(parent.driver(), 10)
+        new WebDriverWait(parent.driver(), 1)
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
-        parent.driver().findElements(optionsLocator)
-                .stream()
+        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+        webElements.forEach(e -> System.out.println("preTask："+e.getText()));
+        webElements.stream()
                 .filter(it -> it.getText().contains(preTaskName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
-                .click()
-        ;
+                .click();
+
+        inputNodeName().click();
 
         return this;
     }

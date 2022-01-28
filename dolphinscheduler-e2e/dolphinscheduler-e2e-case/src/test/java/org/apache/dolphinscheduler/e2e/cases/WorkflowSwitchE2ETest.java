@@ -117,6 +117,7 @@ class WorkflowSwitchE2ETest {
             .submit();
 
         // add branch for switch task
+        workflowForm.getTask("switch");
         switchTaskForm.addIfBranch("${key}==1", ifBranchName);
         switchTaskForm.elseBranch(elseBranchName);
 
@@ -131,61 +132,5 @@ class WorkflowSwitchE2ETest {
         ).anyMatch(it -> it.getText().contains(workflow)));
 
         workflowDefinitionPage.publish(workflow);
-    }
-
-    @Test
-    @Order(30)
-    void testRunWorkflow() {
-        final String workflow = "test-workflow-1";
-
-        final ProjectDetailPage projectPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(project);
-
-        projectPage
-            .goToTab(WorkflowInstanceTab.class)
-            .deleteAll();
-
-        projectPage
-            .goToTab(WorkflowDefinitionTab.class)
-            .run(workflow)
-            .submit();
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            final Row row = projectPage
-                .goToTab(WorkflowInstanceTab.class)
-                .instances()
-                .iterator()
-                .next();
-
-            assertThat(row.isSuccess()).isTrue();
-            assertThat(row.executionTime()).isEqualTo(1);
-        });
-
-        // Test rerun
-        projectPage
-            .goToTab(WorkflowInstanceTab.class)
-            .instances()
-            .stream()
-            .filter(it -> it.rerunButton().isDisplayed())
-            .iterator()
-            .next()
-            .rerun();
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            final Row row = projectPage
-                .goToTab(WorkflowInstanceTab.class)
-                .instances()
-                .iterator()
-                .next();
-
-            assertThat(row.isSuccess()).isTrue();
-            assertThat(row.executionTime()).isEqualTo(1);
-        });
     }
 }
