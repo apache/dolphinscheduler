@@ -23,26 +23,23 @@
 [![Code style: black][black-shield]][black-gh]
 [![Imports: isort][isort-shield]][isort-gh]
 
-pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
+**PyDolphinScheduler** is python API for Apache DolphinScheduler, which allow you definition
 your workflow by python code, aka workflow-as-codes.
 
 ## Quick Start
 
-> **_Notice:_** For now, due to pydolphinscheduler without release to any binary tarball or [PyPI][pypi], you 
-> have to clone Apache DolphinScheduler code from GitHub to ensure quick start setup
-
-Here we show you how to install and run a simple example of pydolphinscheduler
-
-### Prepare
+### Installation
 
 ```shell
-# Clone code from github
-git clone git@github.com:apache/dolphinscheduler.git
+# Install
+$ pip install apache-dolphinscheduler
 
-# Install pydolphinscheduler from source
-cd dolphinscheduler-python/pydolphinscheduler
-pip install -e .
+# Check installation, it is success if you see version output, here we use 0.1.0 as example
+$ python -c "import pydolphinscheduler; print(pydolphinscheduler.__version__)"
+0.1.0
 ```
+
+Here we show you how to install and run a simple example of pydolphinscheduler
 
 ### Start Server And Run Example
 
@@ -54,9 +51,12 @@ http://localhost:12345/dolphinscheduler
 After backend server is being start, all requests from `pydolphinscheduler` would be sent to backend server.
 And for now we could run a simple example by:
 
+<!-- TODO Add examples directory to dist package later. -->
+
 ```shell
-cd dolphinscheduler-python/pydolphinscheduler
-python example/tutorial.py
+# Please make sure your terminal could 
+curl https://raw.githubusercontent.com/apache/dolphinscheduler/dev/dolphinscheduler-python/pydolphinscheduler/examples/tutorial.py -o ./tutorial.py
+python ./tutorial.py
 ```
 
 > **_NOTICE:_** Since Apache DolphinScheduler's tenant is requests while running command, you might need to change
@@ -65,105 +65,24 @@ python example/tutorial.py
 
 After command execute, you could see a new project with single process definition named *tutorial* in the [UI][ui-project].
 
-Until now, we finish quick start by an example of pydolphinscheduler and run it. If you want to inspect or join
-pydolphinscheduler develop, you could take a look at [develop](#develop)
-
 ## Develop
 
-pydolphinscheduler is python API for Apache DolphinScheduler, it just defines what workflow look like instead of
-store or execute it. We here use [py4j][py4j] to dynamically access Java Virtual Machine.
+Until now, we finish quick start by an example of pydolphinscheduler and run it. If you want to inspect or join
+pydolphinscheduler develop, you could take a look at [develop](./DEVELOP.md)
 
-### Setup Develop Environment
+## Release
 
-We already clone the code in [quick start](#quick-start), so next step we have to open pydolphinscheduler project
-in you editor. We recommend you use [pycharm][pycharm] instead of [IntelliJ IDEA][idea] to open it. And you could
-just open directory `dolphinscheduler-python/pydolphinscheduler` instead of `dolphinscheduler-python`.
+If you are interested in how to release **PyDolphinScheduler**, you could go and see at [release](./RELEASE.md)
 
-Then you should add developer dependence to make sure you could run test and check code style locally
+## What's more
 
-```shell
-pip install -r requirements_dev.txt
-```
-
-### Brief Concept
-
-Apache DolphinScheduler is design to define workflow by UI, and pydolphinscheduler try to define it by code. When
-define by code, user usually do not care user, tenant, or queue exists or not. All user care about is created
-a new workflow by the code his/her definition. So we have some **side object** in `pydolphinscheduler/side`
-directory, their only check object exists or not, and create them if not exists. 
-
-#### Process Definition
-
-pydolphinscheduler workflow object name, process definition is also same name as Java object(maybe would be change to
-other word for more simple).
-
-#### Tasks
-
-pydolphinscheduler tasks object, we use tasks to define exact job we want DolphinScheduler do for us. For now,
-we only support `shell` task to execute shell task. [This link][all-task] list all tasks support in DolphinScheduler
-and would be implemented in the further.
-
-### Code Style
-
-We use [isort][isort] to automatically keep Python imports alphabetically, and use [Black][black] for code
-formatter and [Flake8][flake8] for pep8 checker. If you use [pycharm][pycharm]or [IntelliJ IDEA][idea],
-maybe you could follow [Black-integration][black-editor] to configure them in your environment.
-
-Our Python API CI would automatically run code style checker and unittest when you submit pull request in
-GitHub, you could also run static check locally.
-
-```shell
-# We recommend you run isort and Black before Flake8, because Black could auto fix some code style issue
-# but Flake8 just hint when code style not match pep8
-
-# Run Isort
-isort .
-
-# Run Black
-black .
-
-# Run Flake8
-flake8
-```
-
-### Testing
-
-pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
-pull request or commit to dev branch, with python version `3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`.
-
-To test locally, you could directly run pytest after set `PYTHONPATH` 
-
-```shell
-PYTHONPATH=src/ pytest
-```
-
-We try to keep pydolphinscheduler usable through unit test coverage. 90% test coverage is our target, but for
-now, we require test coverage up to 85%, and each pull request leas than 85% would fail our CI step
-`Tests coverage`. We use [coverage][coverage] to check our test coverage, and you could check it locally by
-run command.
-
-```shell
-coverage run && coverage report
-```
-
-It would not only run unit test but also show each file coverage which cover rate less than 100%, and `TOTAL`
-line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
-this command output.
+For more detail information, please go to see **PyDolphinScheduler** [document][pyds-doc-home]
 
 <!-- content -->
 [pypi]: https://pypi.org/
 [dev-setup]: https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html
 [ui-project]: http://8.142.34.29:12345/dolphinscheduler/ui/#/projects/list
-[py4j]: https://www.py4j.org/index.html
-[pycharm]: https://www.jetbrains.com/pycharm
-[idea]: https://www.jetbrains.com/idea/
-[all-task]: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/task/shell.html
-[pytest]: https://docs.pytest.org/en/latest/
-[black]: https://black.readthedocs.io/en/stable/index.html
-[flake8]: https://flake8.pycqa.org/en/latest/index.html
-[black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
-[coverage]: https://coverage.readthedocs.io/en/stable/
-[isort]: https://pycqa.github.io/isort/index.html
+[pyds-doc-home]: https://dolphinscheduler.apache.org/python/index.html
 <!-- badge -->
 [ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-ci.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions
