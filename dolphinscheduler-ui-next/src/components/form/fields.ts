@@ -17,6 +17,7 @@
 
 import { h } from 'vue'
 import { NInput, NRadio, NRadioGroup, NSpace } from 'naive-ui'
+import Editor from '@/components/monaco-editor'
 import type { IFieldParams } from './types'
 
 // TODO Support other widgets later
@@ -51,4 +52,14 @@ export function renderRadio(params: IFieldParams) {
         options.map((option) => h(NRadio, option, () => option.label))
       )
   )
+}
+
+// Editor
+export function renderEditor(params: IFieldParams) {
+  const { props, fields, field } = params
+  return h(Editor, {
+    ...props,
+    value: fields[field],
+    onUpdateValue: (value) => void (fields[field] = value)
+  })
 }
