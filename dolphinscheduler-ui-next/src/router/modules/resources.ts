@@ -118,6 +118,6 @@ export default {
       path: '/resource/task-group-queue',
       name: 'task-group-queue',
       component: components['resource-task-group-queue']
-    },
+    }
   ]
 }

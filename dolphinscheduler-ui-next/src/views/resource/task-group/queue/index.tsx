@@ -15,25 +15,26 @@
  * limitations under the License.
  */
 
-import {ref, defineComponent, toRefs, reactive, onMounted, Ref} from 'vue'
+import { ref, defineComponent, toRefs, reactive, onMounted, Ref } from 'vue'
 import {
   NButton,
   NIcon,
   NInput,
   NCard,
   NDataTable,
-  NPagination, NSelect,
+  NPagination,
+  NSelect
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
-import FormModal from "@/views/resource/task-group/queue/components/form-modal"
+import FormModal from '@/views/resource/task-group/queue/components/form-modal'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { TaskGroupRes } from '@/service/modules/task-group/types'
-import {SelectMixedOption} from "naive-ui/lib/select/src/interface";
-import {Router, useRouter} from "vue-router";
+import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
+import { Router, useRouter } from 'vue-router'
 
 const taskGroupQueue = defineComponent({
   name: 'taskGroupQueue',
@@ -56,7 +57,7 @@ const taskGroupQueue = defineComponent({
 
     let updateItemData = reactive({
       queueId: 0,
-      priority: 0,
+      priority: 0
     })
 
     const requestData = () => {
@@ -95,10 +96,7 @@ const taskGroupQueue = defineComponent({
       resetTableData()
     }
 
-    const updatePriority = (
-      queueId: number,
-      priority: number
-    ) => {
+    const updatePriority = (queueId: number, priority: number) => {
       showModalRef.value = true
       updateItemData.queueId = queueId
       updateItemData.priority = priority
@@ -113,18 +111,20 @@ const taskGroupQueue = defineComponent({
         pageNo: 1,
         pageSize: 2147483647
       }
-      if(idRef.value) {
+      if (idRef.value) {
         searchParamRef.groupId = idRef.value
       }
-      queryTaskGroupListPaging(taskGroupOptionsParams).then((res: TaskGroupRes) => {
-        res.totalList.map((item) => {
-          if(!searchParamRef.groupId) {
-            searchParamRef.groupId = item.id
-          }
-          let option: SelectMixedOption = { label: item.name, value: item.id }
-          taskGroupOptions.value.push(option)
-        })
-      })
+      queryTaskGroupListPaging(taskGroupOptionsParams).then(
+        (res: TaskGroupRes) => {
+          res.totalList.map((item) => {
+            if (!searchParamRef.groupId) {
+              searchParamRef.groupId = item.id
+            }
+            let option: SelectMixedOption = { label: item.name, value: item.id }
+            taskGroupOptions.value.push(option)
+          })
+        }
+      )
 
       resetTableData()
     })
@@ -166,20 +166,22 @@ const taskGroupQueue = defineComponent({
           <div class={styles.toolbar}>
             <div class={styles.right}>
               <NSelect
-                  size='small'
-                  options={taskGroupOptions}
-                  v-model:value={this.searchParamRef.groupId}
-                  placeholder={t('resource.task_group_queue.task_group_name')}
+                size='small'
+                options={taskGroupOptions}
+                v-model:value={this.searchParamRef.groupId}
+                placeholder={t('resource.task_group_queue.task_group_name')}
               />
               <NInput
-                  size='small'
-                  v-model={[this.searchParamRef.processName, 'value']}
-                  placeholder={t('resource.task_group_queue.process_name')}
+                size='small'
+                v-model={[this.searchParamRef.processName, 'value']}
+                placeholder={t('resource.task_group_queue.process_name')}
               ></NInput>
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.instanceName, 'value']}
-                placeholder={t('resource.task_group_queue.process_instance_name')}
+                placeholder={t(
+                  'resource.task_group_queue.process_instance_name'
+                )}
               ></NInput>
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>
@@ -215,12 +217,12 @@ const taskGroupQueue = defineComponent({
           </div>
         </Card>
         {showModalRef && (
-            <FormModal
-                show={showModalRef}
-                onCancel={onCancel}
-                onConfirm={onConfirm}
-                data={updateItemData}
-            />
+          <FormModal
+            show={showModalRef}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+            data={updateItemData}
+          />
         )}
       </div>
     )

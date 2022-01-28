@@ -22,15 +22,15 @@ import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import { queryTaskGroupListPaging, queryTaskListInTaskGroupQueueById } from '@/service/modules/task-group'
+import {
+  queryTaskGroupListPaging,
+  queryTaskListInTaskGroupQueueById
+} from '@/service/modules/task-group'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 
 export function useTable(
-  updatePriority = (
-    queueId: number,
-    priority: number
-  ): void => {},
+  updatePriority = (queueId: number, priority: number): void => {},
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
@@ -40,10 +40,19 @@ export function useTable(
     { title: t('resource.task_group_queue.id'), key: 'index' },
     { title: t('resource.task_group_queue.project_name'), key: 'projectName' },
     { title: t('resource.task_group_queue.task_name'), key: 'taskName' },
-    { title: t('resource.task_group_queue.process_instance_name'), key: 'processInstanceName' },
-    { title: t('resource.task_group_queue.task_group_name'), key: 'taskGroupName' },
+    {
+      title: t('resource.task_group_queue.process_instance_name'),
+      key: 'processInstanceName'
+    },
+    {
+      title: t('resource.task_group_queue.task_group_name'),
+      key: 'taskGroupName'
+    },
     { title: t('resource.task_group_queue.priority'), key: 'priority' },
-    { title: t('resource.task_group_queue.force_starting_status'), key: 'forceStart' },
+    {
+      title: t('resource.task_group_queue.force_starting_status'),
+      key: 'forceStart'
+    },
     { title: t('resource.task_group_queue.in_queue'), key: 'inQueue' },
     { title: t('resource.task_group_queue.task_status'), key: 'status' },
     { title: t('resource.task_group_queue.create_time'), key: 'createTime' },
@@ -61,10 +70,7 @@ export function useTable(
             }
             resetTableData()
           },
-          onUpdatePriority: (
-            queueId: number,
-            priority: number,
-          ) => {
+          onUpdatePriority: (queueId: number, priority: number) => {
             updatePriority(queueId, priority)
           }
         })
@@ -84,31 +90,32 @@ export function useTable(
       pageNo: 1,
       pageSize: 2147483647
     }
-    Promise.all([queryTaskListInTaskGroupQueueById(params), queryTaskGroupListPaging(taskGroupSearchParams)]).then(
-      (values: any[]) => {
-        const taskGroupList = values[1].totalList
-        variables.totalPage = values[0].totalPage
-        variables.tableData = values[0].totalList.map(
-          (item: any, index: number) => {
-            item.taskGroupName = _.find(taskGroupList, {
-              id: item.groupId
-            }).name
-            item.createTime = format(
-              new Date(item.createTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.updateTime = format(
-              new Date(item.updateTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            return {
-              index: index + 1,
-              ...item
-            }
+    Promise.all([
+      queryTaskListInTaskGroupQueueById(params),
+      queryTaskGroupListPaging(taskGroupSearchParams)
+    ]).then((values: any[]) => {
+      const taskGroupList = values[1].totalList
+      variables.totalPage = values[0].totalPage
+      variables.tableData = values[0].totalList.map(
+        (item: any, index: number) => {
+          item.taskGroupName = _.find(taskGroupList, {
+            id: item.groupId
+          }).name
+          item.createTime = format(
+            new Date(item.createTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          item.updateTime = format(
+            new Date(item.updateTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          return {
+            index: index + 1,
+            ...item
           }
-        )
-      }
-    )
+        }
+      )
+    })
   }
 
   return { getTableData, variables, columns }

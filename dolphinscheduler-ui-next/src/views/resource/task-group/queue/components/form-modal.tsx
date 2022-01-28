@@ -47,13 +47,13 @@ const FormModal = defineComponent({
     const { state, t } = useForm()
 
     onMounted(() => {
-        state.formData.queueId = props.data.queueId
-        state.formData.priority = props.data.priority
+      state.formData.queueId = props.data.queueId
+      state.formData.priority = props.data.priority
     })
 
     const onConfirm = () => {
       let value = state.formData.priority + ''
-      if(value) {
+      if (value) {
         modifyTaskGroupQueuePriority(state.formData).then(() => {
           emit('confirm')
         })
@@ -81,7 +81,7 @@ const FormModal = defineComponent({
             label={t('resource.task_group_queue.priority')}
             path='priority'
           >
-            <NInput v-model:value={this.formData.priority}/>
+            <NInput v-model:value={this.formData.priority} />
           </NFormItem>
         </NForm>
       </Modal>

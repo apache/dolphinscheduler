@@ -36,6 +36,13 @@
       </div>
       <div class="clearfix list">
         <div class="nav-links">
+          <router-link :to="{ path: '/dataquality'}" tag="a" active-class="active">
+            <span><em class="ansiconfont el-icon-document-checked"></em>{{$t('DataQuality')}}</span><strong></strong>
+          </router-link>
+        </div>
+      </div>
+      <div class="clearfix list">
+        <div class="nav-links">
           <router-link :to="{ path: '/resource'}" tag="a" active-class="active" id="tabResource">
             <span><em class="ansiconfont el-icon-folder"></em>{{$t('Resources manage')}}</span><strong></strong>
           </router-link>
@@ -119,6 +126,10 @@
               <em class="el-icon-tickets"></em>
               <span>{{$t('Project Manage')}}</span>
             </router-link>
+            <router-link :to="{ path: '/dataquality'}" tag="li" active-class="active">
+              <em class="el-icon-document-checked"></em>
+              <span>{{$t('DataQuality')}}</span>
+            </router-link>
             <router-link :to="{ path: '/resource'}" tag="li" active-class="active">
               <em class="el-icon-folder"></em>
               <span>{{$t('Resources manage')}}</span>
@@ -144,6 +155,7 @@
     </el-dialog>
 
     <el-dialog
+      id="fileUpdateDialog"
       :visible.sync="fileUpdateDialog"
       append-to-body="true"
       width="auto">

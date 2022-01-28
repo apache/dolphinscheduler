@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
+import { axios, downloadFile } from '@/service/service'
 import { ProjectCodeReq, IdReq, TaskListReq } from './types'
 
 export function queryTaskListPaging(
@@ -23,15 +23,19 @@ export function queryTaskListPaging(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-instances`,
+    url: `/projects/${projectCode.projectCode}/task-instances`,
     method: 'get',
     params
   })
 }
 
-export function forceSuccess(id: IdReq, projectCode: ProjectCodeReq): any {
+export function forceSuccess(taskId: IdReq, projectCode: ProjectCodeReq): any {
   return axios({
-    url: `/projects/${projectCode}/task-instances/${id}/force-success`,
+    url: `/projects/${projectCode.projectCode}/task-instances/${taskId.id}/force-success`,
     method: 'post'
   })
+}
+
+export function downloadLog(id: number): void {
+  downloadFile(`log/download-log`, { taskInstanceId: id })
 }

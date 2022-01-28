@@ -57,7 +57,6 @@ interface TaskGroupRes {
   start: number
 }
 
-
 interface TaskGroupQueue {
   id: number
   taskId: number
@@ -83,7 +82,6 @@ interface TaskGroupQueueRes {
   currentPage: number
   start: number
 }
-
 
 interface TaskGroupQueueIdReq {
   queueId: number

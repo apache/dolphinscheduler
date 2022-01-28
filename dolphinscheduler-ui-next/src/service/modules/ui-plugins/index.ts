@@ -16,7 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import { PluginTypeReq, IdReq } from './types'
+import { PluginTypeReq, IPluginId } from './types'
 
 export function queryUiPluginsByType(params: PluginTypeReq): any {
   return axios({
@@ -26,7 +26,7 @@ export function queryUiPluginsByType(params: PluginTypeReq): any {
   })
 }
 
-export function queryUiPluginDetailById(id: IdReq): any {
+export function queryUiPluginDetailById(id: IPluginId): any {
   return axios({
     url: `/ui-plugins/${id}`,
     method: 'get'

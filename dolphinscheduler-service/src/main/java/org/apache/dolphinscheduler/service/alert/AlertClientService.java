@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AlertClientService {
+public class AlertClientService implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertClientService.class);
 
@@ -70,6 +70,7 @@ public class AlertClientService {
     /**
      * close
      */
+    @Override
     public void close() {
         this.client.close();
         this.isRunning = false;

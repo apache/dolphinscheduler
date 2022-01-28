@@ -90,7 +90,7 @@ export function useDataList() {
         children: [
           {
             label: t('menu.project_overview'),
-            key: 'projects-overview',
+            key: `/projects/${menuStore.getProjectCode}`,
             icon: renderIcon(FundProjectionScreenOutlined)
           },
           {
@@ -100,30 +100,30 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.workflow_relation'),
-                key: 'workflow-relation'
+                key: `/projects/${menuStore.getProjectCode}/workflow/relation`
               },
               {
                 label: t('menu.workflow_definition'),
-                key: 'workflow-definition'
+                key: `/projects/${menuStore.getProjectCode}/workflow/definitions`
               },
               {
                 label: t('menu.workflow_instance'),
-                key: 'workflow-instance'
+                key: `/projects/${menuStore.getProjectCode}/workflow/instances`
               }
             ]
           },
           {
             label: t('menu.task'),
-            key: 'workflow',
+            key: 'task',
             icon: renderIcon(SettingOutlined),
             children: [
               {
                 label: t('menu.task_definition'),
-                key: 'task-definition'
+                key: `/projects/${menuStore.getProjectCode}/task/definitions`
               },
               {
                 label: t('menu.task_instance'),
-                key: 'task-instance'
+                key: `/projects/${menuStore.getProjectCode}/task/instances`
               }
             ]
           }
@@ -137,7 +137,7 @@ export function useDataList() {
         children: [
           {
             label: t('menu.file_manage'),
-            key: 'file-manage',
+            key: `/resource/file-manage`,
             icon: renderIcon(FileSearchOutlined)
           },
           {
@@ -147,11 +147,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.resource_manage'),
-                key: 'resource-manage'
+                key: `/resource/resource-manage`
               },
               {
                 label: t('menu.function_manage'),
-                key: 'function-manage'
+                key: `/resource/function-manage`
               }
             ]
           },
@@ -192,15 +192,15 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.master'),
-                key: 'master'
+                key: `/monitor/master`
               },
               {
                 label: t('menu.worker'),
-                key: 'worker'
+                key: `/monitor/worker`
               },
               {
                 label: t('menu.db'),
-                key: 'db'
+                key: `/monitor/db`
               }
             ]
           },
@@ -211,7 +211,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.statistics'),
-                key: 'statistics'
+                key: `/monitor/statistics`
+              },
+              {
+                label: t('menu.audit_log'),
+                key: `/monitor/audit-log`
               }
             ]
           }
@@ -225,42 +229,42 @@ export function useDataList() {
         children: [
           {
             label: t('menu.tenant_manage'),
-            key: 'tenant-manage',
+            key: `/security/tenant-manage`,
             icon: renderIcon(UsergroupAddOutlined)
           },
           {
             label: t('menu.user_manage'),
-            key: 'user-manage',
+            key: `/security/user-manage`,
             icon: renderIcon(UserAddOutlined)
           },
           {
             label: t('menu.alarm_group_manage'),
-            key: 'alarm-group-manage',
+            key: `/security/alarm-group-manage`,
             icon: renderIcon(WarningOutlined)
           },
           {
             label: t('menu.alarm_instance_manage'),
-            key: 'alarm-instance-manage',
+            key: `/security/alarm-instance-manage`,
             icon: renderIcon(InfoCircleOutlined)
           },
           {
             label: t('menu.worker_group_manage'),
-            key: 'worker-group-manage',
+            key: `/security/worker-group-manage`,
             icon: renderIcon(ControlOutlined)
           },
           {
             label: t('menu.yarn_queue_manage'),
-            key: 'yarn-queue-manage',
+            key: `/security/yarn-queue-manage`,
             icon: renderIcon(SlackOutlined)
           },
           {
             label: t('menu.environment_manage'),
-            key: 'environment-manage',
+            key: `/security/environment-manage`,
             icon: renderIcon(EnvironmentOutlined)
           },
           {
             label: t('menu.token_manage'),
-            key: 'token-manage',
+            key: `/security/token-manage`,
             icon: renderIcon(SafetyOutlined)
           }
         ]
@@ -270,15 +274,11 @@ export function useDataList() {
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: {
-        label: string
-        key: string
-        icon: any
-      }) => {
+      (item: { label: string; key: string; icon: any }) => {
         return {
           label: item.label,
           key: item.key,
-          icon: item.icon,
+          icon: item.icon
         }
       }
     )

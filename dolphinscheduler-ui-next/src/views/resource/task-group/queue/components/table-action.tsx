@@ -26,8 +26,7 @@ import type {
 } from '@/service/modules/task-group/types'
 import { forceStartTaskInQueue } from '@/service/modules/task-group'
 
-interface ItemRow extends TaskGroupQueue {
-}
+interface ItemRow extends TaskGroupQueue {}
 
 const props = {
   row: {
@@ -43,10 +42,7 @@ const TableAction = defineComponent({
   setup(props, { emit }) {
     const { t } = useI18n()
 
-    const handleEditPriority = (
-      id: number,
-      priority: number
-    ) => {
+    const handleEditPriority = (id: number, priority: number) => {
       emit('updatePriority', id, priority)
     }
 
@@ -74,10 +70,7 @@ const TableAction = defineComponent({
                 type='info'
                 tag='div'
                 onClick={() =>
-                  handleEditPriority(
-                    this.row.id,
-                    this.row.priority
-                  )
+                  handleEditPriority(this.row.id, this.row.priority)
                 }
                 circle
               >

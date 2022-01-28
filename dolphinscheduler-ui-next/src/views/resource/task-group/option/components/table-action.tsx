@@ -25,7 +25,7 @@ import type {
   TaskGroup
 } from '@/service/modules/task-group/types'
 import { startTaskGroup, closeTaskGroup } from '@/service/modules/task-group'
-import {useRouter} from "vue-router";
+import { useRouter } from 'vue-router'
 
 interface ItemRow extends TaskGroup {
   projectList: []

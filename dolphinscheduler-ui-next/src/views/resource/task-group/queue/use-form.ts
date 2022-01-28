@@ -19,7 +19,7 @@ import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import type { FormRules } from 'naive-ui'
 import type { TaskGroupQueuePriorityUpdateReq } from '@/service/modules/task-group/types'
-import _ from "lodash";
+import _ from 'lodash'
 
 export function useForm() {
   const { t } = useI18n()
@@ -28,7 +28,7 @@ export function useForm() {
     formRef: ref(),
     formData: {
       queueId: 0,
-      priority: 0,
+      priority: 0
     } as TaskGroupQueuePriorityUpdateReq,
     rules: {
       priority: {
@@ -36,7 +36,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           let value = state.formData.priority + ''
-          if (value && state.formData.priority >=0) {
+          if (value && state.formData.priority >= 0) {
           } else {
             return new Error(t('resource.task_group_queue.priority_not_empty'))
           }
