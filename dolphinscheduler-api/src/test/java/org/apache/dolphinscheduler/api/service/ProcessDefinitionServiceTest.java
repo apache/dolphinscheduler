@@ -727,6 +727,7 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(46L);
+        processDefinition.setVersion(1);
         return processDefinition;
     }
 
