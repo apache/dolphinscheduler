@@ -29,10 +29,11 @@ export default {
     title: '项目管理',
     showSide: false
   },
+  redirect: { name: 'projects-list' },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '',
+      path: '/projects/list',
       name: 'projects-list',
       component: components['projects-list'],
       meta: {
