@@ -51,12 +51,14 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final CreateUdfFunctionBox createUdfFunctionBox;
 
-    private RenameUdfFunctionBox renameUdfFunctionBox;
+    private final RenameUdfFunctionBox renameUdfFunctionBox;
 
     public FunctionManagePage(RemoteWebDriver driver) {
         super(driver);
 
         createUdfFunctionBox = new CreateUdfFunctionBox();
+
+        renameUdfFunctionBox = new RenameUdfFunctionBox();
     }
 
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
@@ -94,13 +96,11 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("createUdfDialog")));
 
-        renameUdfFunctionBox = new RenameUdfFunctionBox();
-
         renameUdfFunctionBox().inputFunctionName().clear();
 
         renameUdfFunctionBox().inputFunctionName().sendKeys(afterName);
 
-//        renameUdfFunctionBox.buttonSubmit().click();
+        renameUdfFunctionBox.buttonSubmit().click();
 
         return this;
     }
