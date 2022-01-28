@@ -94,11 +94,11 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         renameUdfFunctionBox = new RenameUdfFunctionBox();
 
-        renameUdfFunctionBox().inputFunctionName().clear();
+        renameUdfFunctionBox.inputFunctionName().clear();
 
-        renameUdfFunctionBox().inputFunctionName().sendKeys(afterName);
+        renameUdfFunctionBox.inputFunctionName().sendKeys(afterName);
 
-        renameUdfFunctionBox().buttonSubmit().click();
+        renameUdfFunctionBox.buttonSubmit().click();
 
         return this;
     }
