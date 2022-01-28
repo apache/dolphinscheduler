@@ -165,12 +165,6 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         @FindBy(id = "inputClassName")
         private WebElement inputClassName;
 
-        @FindBy(id = "btnUdfResourceDropDown")
-        private WebElement buttonUdfResourceDropDown;
-
-        @FindBy(className = "vue-treeselect__menu")
-        private List<WebElement> selectUdfResource;
-
         @FindBy(id = "inputDescription")
         private WebElement inputDescription;
 
