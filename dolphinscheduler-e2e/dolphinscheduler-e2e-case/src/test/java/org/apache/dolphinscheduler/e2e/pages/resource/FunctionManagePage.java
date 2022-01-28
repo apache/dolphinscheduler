@@ -136,7 +136,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         @FindBy(id = "btnUdfResourceDropDown")
         private WebElement buttonUdfResourceDropDown;
 
-        @FindBy(className = "options-udf-resource")
+        @FindBy(id = "createUdfDialog")
         private List<WebElement> selectUdfResource;
 
         @FindBy(id = "inputDescription")

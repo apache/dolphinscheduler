@@ -64,6 +64,7 @@
       </el-table>
     </div>
     <el-dialog
+      id="createUdfDialog"
       :visible.sync="createUdfDialog"
       width="auto">
       <m-create-udf :item="item" @onUpdate="onUpdate" @close="close"></m-create-udf>
