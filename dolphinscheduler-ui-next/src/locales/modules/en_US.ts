@@ -65,6 +65,7 @@ const menu = {
   db: 'DB',
   statistical_manage: 'Statistical Manage',
   statistics: 'Statistics',
+  audit_log: 'Audit Log',
   tenant_manage: 'Tenant Manage',
   user_manage: 'User Manage',
   alarm_group_manage: 'Alarm Group Manage',
@@ -149,6 +150,21 @@ const monitor = {
     failure_command_number: 'Failure Command Number',
     tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
     task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+  },
+  audit_log: {
+    user_name: 'User Name',
+    resource_type: 'Resource Type',
+    project_name: 'Project Name',
+    operation_type: 'Operation Type',
+    create_time: 'Create Time',
+    start_time: 'Start Time',
+    end_time: 'End Time',
+    user_audit: 'User Audit',
+    project_audit: 'Project Audit',
+    create: 'Create',
+    update: 'Update',
+    delete: 'Delete',
+    read: 'Read'
   }
 }
 

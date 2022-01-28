@@ -25,98 +25,98 @@ import Card from '@/components/card'
 import Graph from './components/Graph'
 
 const workflowRelation = defineComponent({
-	name: 'workflow-relation',
-	setup() {
-		const { t, locale } = useI18n()
-		const route = useRoute()
-		const { variables, getWorkflowName, getOneWorkflow, getWorkflowList } =
-			useRelation()
+  name: 'workflow-relation',
+  setup() {
+    const { t, locale } = useI18n()
+    const route = useRoute()
+    const { variables, getWorkflowName, getOneWorkflow, getWorkflowList } =
+      useRelation()
 
-		onMounted(() => {
-			getWorkflowList(Number(route.params.projectCode))
-			getWorkflowName(Number(route.params.projectCode))
-		})
+    onMounted(() => {
+      getWorkflowList(Number(route.params.projectCode))
+      getWorkflowName(Number(route.params.projectCode))
+    })
 
-		const handleResetDate = () => {
-			variables.seriesData = []
-			variables.workflow && variables.workflow !== 0
-				? getOneWorkflow(
-					Number(variables.workflow),
-					Number(route.params.projectCode)
-				)
-				: getWorkflowList(Number(route.params.projectCode))
-		}
+    const handleResetDate = () => {
+      variables.seriesData = []
+      variables.workflow && variables.workflow !== 0
+        ? getOneWorkflow(
+            Number(variables.workflow),
+            Number(route.params.projectCode)
+          )
+        : getWorkflowList(Number(route.params.projectCode))
+    }
 
-		watch(
-			() => [variables.workflow, variables.labelShow, locale.value],
-			() => {
-				handleResetDate()
-			}
-		)
+    watch(
+      () => [variables.workflow, variables.labelShow, locale.value],
+      () => {
+        handleResetDate()
+      }
+    )
 
-		return { t, handleResetDate, ...toRefs(variables) }
-	},
-	render() {
-		const { t, handleResetDate } = this
+    return { t, handleResetDate, ...toRefs(variables) }
+  },
+  render() {
+    const { t, handleResetDate } = this
 
-		return (
-			<Card title={t('project.workflow.workflow_relation')}>
-				{{
-					default: () =>
-						Object.keys(this.seriesData).length > 0 && (
-							<Graph seriesData={this.seriesData} labelShow={this.labelShow} />
-						),
-					'header-extra': () => (
-						<NSpace>
-							<NSelect
-								clearable
-								style={{ width: '300px' }}
-								placeholder={t('project.workflow.workflow_name')}
-								options={this.workflowOptions}
-								v-model={[this.workflow, 'value']}
-							/>
-							<NTooltip trigger={'hover'}>
-								{{
-									default: () => t('project.workflow.refresh'),
-									trigger: () => (
-										<NButton
-											strong
-											secondary
-											circle
-											type='info'
-											onClick={handleResetDate}
-										>
-											<NIcon>
-												<ReloadOutlined />
-											</NIcon>
-										</NButton>
-									)
-								}}
-							</NTooltip>
-							<NTooltip trigger={'hover'}>
-								{{
-									default: () => t('project.workflow.show_hide_label'),
-									trigger: () => (
-										<NButton
-											strong
-											secondary
-											circle
-											type='info'
-											onClick={() => (this.labelShow = !this.labelShow)}
-										>
-											<NIcon>
-												<EyeOutlined />
-											</NIcon>
-										</NButton>
-									)
-								}}
-							</NTooltip>
-						</NSpace>
-					)
-				}}
-			</Card>
-		)
-	}
+    return (
+      <Card title={t('project.workflow.workflow_relation')}>
+        {{
+          default: () =>
+            Object.keys(this.seriesData).length > 0 && (
+              <Graph seriesData={this.seriesData} labelShow={this.labelShow} />
+            ),
+          'header-extra': () => (
+            <NSpace>
+              <NSelect
+                clearable
+                style={{ width: '300px' }}
+                placeholder={t('project.workflow.workflow_name')}
+                options={this.workflowOptions}
+                v-model={[this.workflow, 'value']}
+              />
+              <NTooltip trigger={'hover'}>
+                {{
+                  default: () => t('project.workflow.refresh'),
+                  trigger: () => (
+                    <NButton
+                      strong
+                      secondary
+                      circle
+                      type='info'
+                      onClick={handleResetDate}
+                    >
+                      <NIcon>
+                        <ReloadOutlined />
+                      </NIcon>
+                    </NButton>
+                  )
+                }}
+              </NTooltip>
+              <NTooltip trigger={'hover'}>
+                {{
+                  default: () => t('project.workflow.show_hide_label'),
+                  trigger: () => (
+                    <NButton
+                      strong
+                      secondary
+                      circle
+                      type='info'
+                      onClick={() => (this.labelShow = !this.labelShow)}
+                    >
+                      <NIcon>
+                        <EyeOutlined />
+                      </NIcon>
+                    </NButton>
+                  )
+                }}
+              </NTooltip>
+            </NSpace>
+          )
+        }}
+      </Card>
+    )
+  }
 })
 
 export default workflowRelation
