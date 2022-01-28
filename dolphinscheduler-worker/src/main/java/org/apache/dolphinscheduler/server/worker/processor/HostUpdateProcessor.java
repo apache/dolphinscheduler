@@ -51,7 +51,11 @@ public class HostUpdateProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
         HostUpdateCommand updateCommand = JSONUtils.parseObject(command.getBody(), HostUpdateCommand.class);
-        logger.info("received host update command : {}", updateCommand);
+        if (updateCommand == null){
+            logger.error("host update command is null");
+            return;
+        }
+        logger.info("host update command: {}", updateCommand);
 
         if (taskCallbackService == null) {
             taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
