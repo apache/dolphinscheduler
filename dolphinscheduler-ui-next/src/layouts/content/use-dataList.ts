@@ -208,6 +208,10 @@ export function useDataList() {
               {
                 label: t('menu.statistics'),
                 key: `/monitor/statistics`
+              },
+              {
+                label: t('menu.audit_log'),
+                key: `/monitor/audit-log`
               }
             ]
           }
