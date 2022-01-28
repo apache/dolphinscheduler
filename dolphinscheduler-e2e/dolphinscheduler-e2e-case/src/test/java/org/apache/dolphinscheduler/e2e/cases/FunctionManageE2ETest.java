@@ -156,6 +156,8 @@ public class FunctionManageE2ETest {
     void testRenameUdfFunction() {
         FunctionManagePage page = new FunctionManagePage(browser);
 
+        browser.navigate().refresh();
+
         page.renameUdfFunction(testUdfFunctionName, testRenameUdfFunctionName);
 
         await().untilAsserted(() -> assertThat(page.functionList())
