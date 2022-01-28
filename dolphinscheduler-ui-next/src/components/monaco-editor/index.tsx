@@ -24,18 +24,26 @@ import {
   ref,
   watch
 } from 'vue'
+import { useFormItem } from 'naive-ui/es/_mixins'
+import { call } from 'naive-ui/es/_utils'
 import * as monaco from 'monaco-editor'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import type { MaybeArray, OnUpdateValue, OnUpdateValueImpl } from './types'
 
 const props = {
-  modelValue: {
+  value: {
     type: String as PropType<string>,
     default: ''
   },
+  defaultValue: {
+    type: String as PropType<string>
+  },
+  'onUpdate:value': [Function, Array] as PropType<MaybeArray<OnUpdateValue>>,
+  onUpdateValue: [Function, Array] as PropType<MaybeArray<OnUpdateValue>>,
   language: {
     type: String as PropType<string>,
     default: 'shell'
@@ -72,13 +80,18 @@ window.MonacoEnvironment = {
 export default defineComponent({
   name: 'MonacoEditor',
   props,
-  setup(props) {
+  emits: ['change', 'focus', 'blur'],
+  setup(props, ctx) {
     let editor = null as monaco.editor.IStandaloneCodeEditor | null
-    const content = ref()
+
+    const editorRef = ref()
+
     const getValue = () => editor?.getValue()
 
+    const formItem = useFormItem({})
+
     watch(
-      () => props.modelValue,
+      () => props.value,
       (val) => {
         if (val !== getValue()) {
           editor?.setValue(val)
@@ -87,16 +100,33 @@ export default defineComponent({
     )
 
     onMounted(async () => {
-      content.value = props.modelValue
-
       await nextTick()
-      const dom = document.getElementById('monaco-container')
+      const dom = editorRef.value
       if (dom) {
         editor = monaco.editor.create(dom, props.options, {
-          value: props.modelValue,
+          value: props.defaultValue ?? props.value,
           language: props.language,
           readOnly: props.readOnly,
           automaticLayout: true
+        })
+        editor.onDidChangeModelContent(() => {
+          const { onUpdateValue, 'onUpdate:value': _onUpdateValue } = props
+          const value = editor?.getValue() || ''
+
+          if (onUpdateValue) call(onUpdateValue as OnUpdateValueImpl, value)
+          if (_onUpdateValue) call(_onUpdateValue as OnUpdateValueImpl, value)
+          ctx.emit('change', value)
+
+          formItem.nTriggerFormChange()
+          formItem.nTriggerFormInput()
+        })
+        editor.onDidBlurEditorWidget(() => {
+          ctx.emit('blur')
+          formItem.nTriggerFormBlur()
+        })
+        editor.onDidFocusEditorWidget(() => {
+          ctx.emit('focus')
+          formItem.nTriggerFormFocus()
         })
       }
     })
@@ -105,14 +135,17 @@ export default defineComponent({
       editor?.dispose()
     })
 
-    return { getValue }
+    ctx.expose({ getValue })
+
+    return { editorRef }
   },
   render() {
     return (
       <div
-        id='monaco-container'
+        ref='editorRef'
         style={{
           height: '300px',
+          width: '100%',
           border: '1px solid #eee'
         }}
       ></div>

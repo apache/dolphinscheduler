@@ -35,7 +35,6 @@ export default defineComponent({
   setup() {
     const router: Router = useRouter()
 
-    const codeEditorRef = ref()
     const { state } = useForm()
     const { handleCreateFile } = useCreate(state)
 
@@ -46,7 +45,6 @@ export default defineComponent({
     }))
 
     const handleFile = () => {
-      state.fileForm.content = codeEditorRef.value?.getValue()
       handleCreateFile()
     }
 
@@ -57,7 +55,6 @@ export default defineComponent({
     }
 
     return {
-      codeEditorRef,
       fileSuffixOptions,
       handleFile,
       handleReturn,
@@ -105,7 +102,7 @@ export default defineComponent({
                 width: '90%'
               }}
             >
-              <MonacoEditor ref='codeEditorRef' />
+              <MonacoEditor v-model={[this.fileForm.content, 'value']} />
             </div>
           </NFormItem>
           <div class={styles['file-edit-content']}>
