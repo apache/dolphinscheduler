@@ -34,6 +34,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkerGroupE2ETest {
@@ -54,6 +56,9 @@ class WorkerGroupE2ETest {
     @Order(1)
     void testCreateWorkerGroup() {
         final WorkerGroupPage page = new WorkerGroupPage(browser);
+
+        new WebDriverWait(page.driver(), 10)
+            .until(ExpectedConditions.urlContains("/#/security/worker-groups"));
 
         page.create(workerGroupName);
 
