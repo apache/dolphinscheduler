@@ -33,7 +33,7 @@ public class TelegramSenderTest {
     @Before
     public void initConfig() {
         telegramConfig.put(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK,
-                "https://thingproxy.freeboard.io/fetch/https://api.telegram.org/bot{botToken}/sendMessage");
+                "https://api.telegram.org/bot{botToken}/sendMessage");
         telegramConfig.put(
                 TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "5263705405:AAEPadQyd7btmh9Hww8S7p_ZDr_hqYSlWsM");
         telegramConfig.put(
