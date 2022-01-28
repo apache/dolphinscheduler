@@ -92,6 +92,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
             .orElseThrow(() -> new RuntimeException("No rename button in function manage list"))
             .click();
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("createUdfDialog")));
+
         renameUdfFunctionBox = new RenameUdfFunctionBox();
 
         renameUdfFunctionBox.inputFunctionName().clear();
