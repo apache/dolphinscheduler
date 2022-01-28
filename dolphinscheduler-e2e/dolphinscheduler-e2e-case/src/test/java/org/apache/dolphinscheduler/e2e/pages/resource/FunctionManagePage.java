@@ -58,6 +58,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
+        buttonCreateUdfFunction().click();
+
         createUdfFunctionBox().inputFunctionName().sendKeys(udfFunctionName);
 
         createUdfFunctionBox().inputClassName().sendKeys(className);
