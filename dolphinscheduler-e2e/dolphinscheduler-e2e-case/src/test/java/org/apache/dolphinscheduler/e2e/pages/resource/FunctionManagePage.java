@@ -51,10 +51,14 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final CreateUdfFunctionBox createUdfFunctionBox;
 
+    private final RenameUdfFunctionBox renameUdfFunctionBox;
+
     public FunctionManagePage(RemoteWebDriver driver) {
         super(driver);
 
         createUdfFunctionBox = new CreateUdfFunctionBox();
+
+        renameUdfFunctionBox = new RenameUdfFunctionBox();
     }
 
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
@@ -90,11 +94,11 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
             .orElseThrow(() -> new RuntimeException("No rename button in function manage list"))
             .click();
 
-        createUdfFunctionBox().inputFunctionName().clear();
+        renameUdfFunctionBox().inputFunctionName().clear();
 
-        createUdfFunctionBox().inputFunctionName().sendKeys(afterName);
+        renameUdfFunctionBox().inputFunctionName().sendKeys(afterName);
 
-        createUdfFunctionBox().buttonSubmit().click();
+        renameUdfFunctionBox().buttonSubmit().click();
 
         return this;
     }
@@ -122,6 +126,34 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     @Getter
     public class CreateUdfFunctionBox {
         CreateUdfFunctionBox() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(id = "inputFunctionName")
+        private WebElement inputFunctionName;
+
+        @FindBy(id = "inputClassName")
+        private WebElement inputClassName;
+
+        @FindBy(id = "btnUdfResourceDropDown")
+        private WebElement buttonUdfResourceDropDown;
+
+        @FindBy(className = "vue-treeselect__menu")
+        private List<WebElement> selectUdfResource;
+
+        @FindBy(id = "inputDescription")
+        private WebElement inputDescription;
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class RenameUdfFunctionBox {
+        RenameUdfFunctionBox() {
             PageFactory.initElements(driver, this);
         }
 
