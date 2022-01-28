@@ -15,20 +15,41 @@
  * limitations under the License.
  */
 
-$STROKE_BLUE: #288fff;
-$BG_WHITE: #ffffff;
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 0 0 0;
+  .right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    div {
+      margin-left: 5px;
+    }
+    button {
+      margin-left: 10px;
+    }
+  }
+}
 
-.x6-node[data-shape='dag-task'] {
-  &.available {
-    .dag-task-body {
-      stroke: $STROKE_BLUE;
-      stroke-width: 1;
-      stroke-dasharray: 5, 2;
+.table-card {
+  margin-top: 2px;
+
+  .table-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+      margin: 0 2px 0 0;
     }
-    &.adsorbed {
-      .dag-task-body {
-        stroke-width: 3;
-      }
+    div {
+      margin: 0 2px 0 0;
     }
+  }
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
   }
 }

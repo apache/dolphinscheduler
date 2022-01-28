@@ -15,20 +15,35 @@
  * limitations under the License.
  */
 
-$STROKE_BLUE: #288fff;
-$BG_WHITE: #ffffff;
+import { useI18n } from 'vue-i18n'
+import { reactive, ref } from 'vue'
+import type { FormRules } from 'naive-ui'
+import type { TaskGroupQueuePriorityUpdateReq } from '@/service/modules/task-group/types'
+import _ from 'lodash'
 
-.x6-node[data-shape='dag-task'] {
-  &.available {
-    .dag-task-body {
-      stroke: $STROKE_BLUE;
-      stroke-width: 1;
-      stroke-dasharray: 5, 2;
-    }
-    &.adsorbed {
-      .dag-task-body {
-        stroke-width: 3;
+export function useForm() {
+  const { t } = useI18n()
+
+  const state = reactive({
+    formRef: ref(),
+    formData: {
+      queueId: 0,
+      priority: 0
+    } as TaskGroupQueuePriorityUpdateReq,
+    rules: {
+      priority: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          let value = state.formData.priority + ''
+          if (value && state.formData.priority >= 0) {
+          } else {
+            return new Error(t('resource.task_group_queue.priority_not_empty'))
+          }
+        }
       }
-    }
-  }
+    } as FormRules
+  })
+
+  return { state, t }
 }
