@@ -64,6 +64,15 @@ export default {
         title: '统计管理-Statistics',
         showSide: true
       }
+    },
+    {
+      path: '/monitor/audit-log',
+      name: 'statistics-audit-log',
+      component: components['monitor-statistics-audit-log'],
+      meta: {
+        title: '审计日志-AuditLog',
+        showSide: true
+      }
     }
   ]
 }
