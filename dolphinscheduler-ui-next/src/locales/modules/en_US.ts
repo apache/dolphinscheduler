@@ -73,7 +73,10 @@ const menu = {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',
-  token_manage: 'Token Manage'
+  token_manage: 'Token Manage',
+  task_group_manage: 'Task Group Manage',
+  task_group_option: 'Task Group Option',
+  task_group_queue: 'Task Group Queue'
 }
 
 const home = {
@@ -295,6 +298,13 @@ const resource = {
     please_enter_keywords: 'Please enter keywords'
   },
   task_group_queue: {
+    id: 'No.',
+    actions: 'Actions',
+    task_name: 'Task name',
+    task_group_name: 'Task group name',
+    project_name: 'Project name',
+    process_name: 'Process name',
+    process_instance_name: 'Process instance',
     queue: 'Task group queue',
     priority: 'Priority',
     priority_be_a_number:
@@ -306,10 +316,14 @@ const resource = {
     the_status_of_waiting: 'Waiting into the queue',
     the_status_of_queuing: 'Queuing',
     the_status_of_releasing: 'Released',
-    modify_priority: 'Edit the priority of the task group queue',
+    modify_priority: 'Edit the priority',
+    start_task: 'Start the task',
     priority_not_empty: 'The value of priority can not be empty',
     priority_must_be_number: 'The value of priority should be number',
-    please_select_task_name: 'Please select a task name'
+    please_select_task_name: 'Please select a task name',
+    create_time: 'Create time',
+    update_time: 'Update time',
+    edit_priority: 'Edit the task priority'
   }
 }
 

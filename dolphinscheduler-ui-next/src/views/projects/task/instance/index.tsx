@@ -140,10 +140,22 @@ const TaskInstance = defineComponent({
                   value: 'NEED_FAULT_TOLERANCE'
                 },
                 { label: t('project.task.kill'), value: 'KILL' },
-                { label: t('project.task.waiting_thread'), value: 'WAITING_THREAD' },
-                { label: t('project.task.waiting_depend'), value: 'WAITING_DEPEND' },
-                { label: t('project.task.delay_execution'), value: 'DELAY_EXECUTION' },
-                { label: t('project.task.forced_success'), value: 'FORCED_SUCCESS' },
+                {
+                  label: t('project.task.waiting_thread'),
+                  value: 'WAITING_THREAD'
+                },
+                {
+                  label: t('project.task.waiting_depend'),
+                  value: 'WAITING_DEPEND'
+                },
+                {
+                  label: t('project.task.delay_execution'),
+                  value: 'DELAY_EXECUTION'
+                },
+                {
+                  label: t('project.task.forced_success'),
+                  value: 'FORCED_SUCCESS'
+                },
                 { label: t('project.task.serial_wait'), value: 'SERIAL_WAIT' }
               ]}
               placeholder={t('project.task.state')}

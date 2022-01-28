@@ -57,11 +57,49 @@ interface TaskGroupRes {
   start: number
 }
 
+interface TaskGroupQueue {
+  id: number
+  taskId: number
+  taskName: string
+  projectName: string
+  projectCode: string
+  processInstanceName: string
+  groupId: number
+  processId: number
+  priority: number
+  forceStart: number
+  inQueue: number
+  status: string
+  createTime: string
+  updateTime: string
+}
+
+interface TaskGroupQueueRes {
+  totalList: TaskGroupQueue[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+interface TaskGroupQueueIdReq {
+  queueId: number
+}
+
+interface TaskGroupQueuePriorityUpdateReq extends TaskGroupQueueIdReq {
+  priority: number
+}
+
 export {
   ListReq,
   TaskGroupIdReq,
   TaskGroupReq,
   TaskGroupUpdateReq,
   TaskGroup,
-  TaskGroupRes
+  TaskGroupRes,
+  TaskGroupQueue,
+  TaskGroupQueueRes,
+  TaskGroupQueueIdReq,
+  TaskGroupQueuePriorityUpdateReq
 }

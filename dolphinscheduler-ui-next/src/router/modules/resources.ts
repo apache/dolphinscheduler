@@ -110,21 +110,14 @@ export default {
       }
     },
     {
-      path: '/resource/task-group',
-      name: 'task-group-manage',
-      component: components['resource-task-group-option'],
-      children: [
-        {
-          path: '/resource/task-group-option',
-          name: 'task-group-option',
-          component: components['resource-task-group-option']
-        },
-        {
-          path: '/resource/task-group-queue',
-          name: 'task-group-queue',
-          component: components['resource-task-group-queue']
-        }
-      ]
+      path: '/resource/task-group-option',
+      name: 'task-group-option',
+      component: components['resource-task-group-option']
+    },
+    {
+      path: '/resource/task-group-queue',
+      name: 'task-group-queue',
+      component: components['resource-task-group-queue']
     }
   ]
 }
