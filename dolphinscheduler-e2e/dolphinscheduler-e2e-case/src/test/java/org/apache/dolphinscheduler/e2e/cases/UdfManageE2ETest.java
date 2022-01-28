@@ -39,6 +39,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -109,7 +111,8 @@ public class UdfManageE2ETest {
     void testCreateDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        browser.navigate().refresh();
+        new WebDriverWait(page.driver(), 10)
+            .until(ExpectedConditions.urlContains("/#/resource/udf"));
 
         page.createDirectory(testDirectoryName, "test_desc");
 
