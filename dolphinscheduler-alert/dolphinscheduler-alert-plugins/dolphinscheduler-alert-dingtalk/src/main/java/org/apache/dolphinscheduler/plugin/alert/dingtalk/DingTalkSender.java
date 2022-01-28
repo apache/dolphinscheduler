@@ -39,10 +39,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -194,7 +192,7 @@ public final class DingTalkSender {
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send title :{},content : {}, resp: {}", title, content, resp);
+            logger.info("Ding Talk send msg :{}, resp: {}", msg, resp);
             return resp;
         } finally {
             httpClient.close();
@@ -261,6 +259,22 @@ public final class DingTalkSender {
             builder.append(" ");
             builder.append(keyword);
         }
+        builder.append("\n\n");
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles)) {
+            Arrays.stream(atMobiles.split(",")).forEach(value -> {
+                builder.append("@");
+                builder.append(value);
+                builder.append(" ");
+            });
+        }
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds)) {
+            Arrays.stream(atUserIds.split(",")).forEach(value -> {
+                builder.append("@");
+                builder.append(value);
+                builder.append(" ");
+            });
+        }
+
         byte[] byt = StringUtils.getBytesUtf8(builder.toString());
         String txt = StringUtils.newStringUtf8(byt);
         text.put("title", title);
@@ -329,6 +343,7 @@ public final class DingTalkSender {
             this.errmsg = errmsg;
         }
 
+        @Override
         public boolean equals(final Object o) {
             if (o == this) {
                 return true;
@@ -350,6 +365,7 @@ public final class DingTalkSender {
             return true;
         }
 
+        @Override
         public int hashCode() {
             final int PRIME = 59;
             int result = 1;
@@ -360,6 +376,7 @@ public final class DingTalkSender {
             return result;
         }
 
+        @Override
         public String toString() {
             return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg() + ")";
         }
