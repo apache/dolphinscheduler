@@ -68,8 +68,6 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         createUdfFunctionBox().buttonUdfResourceDropDown().click();
 
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.className("options-udf-resource")));
-
         createUdfFunctionBox().selectUdfResource()
             .stream()
             .filter(it -> it.getText().contains(udfResourceName))
