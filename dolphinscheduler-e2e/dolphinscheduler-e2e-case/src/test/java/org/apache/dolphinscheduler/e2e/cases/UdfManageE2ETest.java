@@ -37,8 +37,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -109,7 +112,8 @@ public class UdfManageE2ETest {
     void testCreateDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        browser.navigate().refresh();
+        new WebDriverWait(page.driver(), 10)
+            .until(ExpectedConditions.urlContains("/#/resource/udf"));
 
         page.createDirectory(testDirectoryName, "test_desc");
 
@@ -163,6 +167,8 @@ public class UdfManageE2ETest {
         downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
 
         page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
+
+        new WebDriverWait(browser, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
 
         await().untilAsserted(() -> {
             assertThat(page.udfList())
