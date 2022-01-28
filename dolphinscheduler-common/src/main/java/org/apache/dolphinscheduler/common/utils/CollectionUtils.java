@@ -86,7 +86,7 @@ public class CollectionUtils {
             BeanMap beanMap = new BeanMap(instance);
             instanceMap = new LinkedHashMap<>(16, 0.75f, true);
             for (Map.Entry<Object, Object> entry : beanMap.entrySet()) {
-                if (exclusionSet!=null && exclusionSet.contains(entry.getKey())) {
+                if (exclusionSet != null && exclusionSet.contains(entry.getKey())) {
                     continue;
                 }
                 instanceMap.put((String) entry.getKey(), entry.getValue());
