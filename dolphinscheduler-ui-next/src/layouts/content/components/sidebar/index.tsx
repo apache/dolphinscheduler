@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, PropType, watch } from 'vue'
+import { defineComponent, ref, PropType } from 'vue'
 import { NLayoutSider, NMenu } from 'naive-ui'
 import { useMenuClick } from './use-menuClick'
 import { useMenuStore } from '@/store/menu/menu'
-import { useRoute } from 'vue-router'
 
 const Sidebar = defineComponent({
   name: 'Sidebar',
@@ -34,14 +33,14 @@ const Sidebar = defineComponent({
     }
   },
   setup() {
-    const route = useRoute()
     const menuStore = useMenuStore()
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
       'workflow',
       'udf-manage',
       'service-manage',
-      'statistical-manage'
+      'statistical-manage',
+      'task-group-manage'
     ]
 
     const { handleMenuClick } = useMenuClick()
