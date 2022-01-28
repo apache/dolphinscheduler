@@ -27,9 +27,9 @@ from pydolphinscheduler.exceptions import PyDSJavaGatewayException
 
 
 def launch_gateway(
-        address: Optional[str] = None,
-        port: Optional[int] = None,
-        auto_convert: Optional[bool] = True
+    address: Optional[str] = None,
+    port: Optional[int] = None,
+    auto_convert: Optional[bool] = True,
 ) -> JavaGateway:
     """Launch java gateway to pydolphinscheduler.
 
