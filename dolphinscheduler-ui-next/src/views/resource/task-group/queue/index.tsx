@@ -15,31 +15,39 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted } from 'vue'
+import {ref, defineComponent, toRefs, reactive, onMounted, Ref} from 'vue'
 import {
   NButton,
   NIcon,
   NInput,
   NCard,
   NDataTable,
-  NPagination,
+  NPagination, NSelect,
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
+import FormModal from "@/views/resource/task-group/queue/components/form-modal"
+import { queryTaskGroupListPaging } from '@/service/modules/task-group'
+import { TaskGroupRes } from '@/service/modules/task-group/types'
+import {SelectMixedOption} from "naive-ui/lib/select/src/interface";
+import {Router, useRouter} from "vue-router";
 
 const taskGroupQueue = defineComponent({
   name: 'taskGroupQueue',
   setup() {
+    const router: Router = useRouter()
     const { t } = useI18n()
     const { variables, getTableData } = useTable()
-    const modelStatusRef = ref(0)
+    const showModalRef = ref(false)
+    const taskGroupOptions: Ref<Array<SelectMixedOption>> = ref([])
+
+    const idRef = ref(Number(router.currentRoute.value.params.id))
 
     const searchParamRef = reactive({
-      groupId: undefined,
-      taskGroupName: '',
+      groupId: 0,
       processName: '',
       instanceName: '',
       pageSize: 10,
@@ -63,8 +71,23 @@ const taskGroupQueue = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        groupId: variables.groupId
+        groupId: searchParamRef.groupId,
+        taskInstanceName: searchParamRef.instanceName,
+        processInstanceName: searchParamRef.processName
       })
+    }
+
+    const onCancel = () => {
+      showModalRef.value = false
+    }
+
+    const onConfirm = () => {
+      showModalRef.value = false
+      updateItemData = {
+        queueId: 0,
+        priority: 0
+      }
+      resetTableData()
     }
 
     const onUpdatePageSize = () => {
@@ -76,8 +99,7 @@ const taskGroupQueue = defineComponent({
       queueId: number,
       priority: number
     ) => {
-      console.log('updatePriority')
-      modelStatusRef.value = 1
+      showModalRef.value = true
       updateItemData.queueId = queueId
       updateItemData.priority = priority
     }
@@ -87,7 +109,24 @@ const taskGroupQueue = defineComponent({
     }
 
     onMounted(() => {
-      requestData()
+      const taskGroupOptionsParams = {
+        pageNo: 1,
+        pageSize: 2147483647
+      }
+      if(idRef.value) {
+        searchParamRef.groupId = idRef.value
+      }
+      queryTaskGroupListPaging(taskGroupOptionsParams).then((res: TaskGroupRes) => {
+        res.totalList.map((item) => {
+          if(!searchParamRef.groupId) {
+            searchParamRef.groupId = item.id
+          }
+          let option: SelectMixedOption = { label: item.name, value: item.id }
+          taskGroupOptions.value.push(option)
+        })
+      })
+
+      resetTableData()
     })
 
     return {
@@ -98,8 +137,11 @@ const taskGroupQueue = defineComponent({
       resetTableData,
       onUpdatePageSize,
       updatePriority,
-      modelStatusRef,
-      updateItemData
+      onCancel,
+      onConfirm,
+      showModalRef,
+      updateItemData,
+      taskGroupOptions
     }
   },
   render() {
@@ -108,7 +150,12 @@ const taskGroupQueue = defineComponent({
       resetTableData,
       onUpdatePageSize,
       updatePriority,
-      onSearch
+      onCancel,
+      onConfirm,
+      onSearch,
+      showModalRef,
+      updateItemData,
+      taskGroupOptions
     } = this
 
     const { columns } = useTable(updatePriority, resetTableData)
@@ -118,26 +165,21 @@ const taskGroupQueue = defineComponent({
         <NCard>
           <div class={styles.toolbar}>
             <div class={styles.right}>
-              <NInput
+              <NSelect
                   size='small'
-                  v-model={[this.searchParamRef.taskGroupName, 'value']}
-                  placeholder={t(
-                      'resource.task_group_queue.task_group_name'
-                  )}
-              ></NInput>
+                  options={taskGroupOptions}
+                  v-model:value={this.searchParamRef.groupId}
+                  placeholder={t('resource.task_group_queue.task_group_name')}
+              />
               <NInput
                   size='small'
                   v-model={[this.searchParamRef.processName, 'value']}
-                  placeholder={t(
-                      'resource.task_group_queue.process_name'
-                  )}
+                  placeholder={t('resource.task_group_queue.process_name')}
               ></NInput>
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.instanceName, 'value']}
-                placeholder={t(
-                  'resource.task_group_queue.process_instance_name'
-                )}
+                placeholder={t('resource.task_group_queue.process_instance_name')}
               ></NInput>
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>
@@ -172,6 +214,14 @@ const taskGroupQueue = defineComponent({
             </div>
           </div>
         </Card>
+        {showModalRef && (
+            <FormModal
+                show={showModalRef}
+                onCancel={onCancel}
+                onConfirm={onConfirm}
+                data={updateItemData}
+            />
+        )}
       </div>
     )
   }

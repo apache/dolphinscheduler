@@ -21,7 +21,8 @@ import {
   toRefs,
   ref,
   toRaw,
-  Ref
+  Ref,
+  onMounted
 } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from '../use-form'
@@ -45,10 +46,18 @@ const FormModal = defineComponent({
   setup(props, { emit }) {
     const { state, t } = useForm()
 
+    onMounted(() => {
+        state.formData.queueId = props.data.queueId
+        state.formData.priority = props.data.priority
+    })
+
     const onConfirm = () => {
-      modifyTaskGroupQueuePriority(state.formData).then(() => {
-        emit('confirm')
-      })
+      let value = state.formData.priority + ''
+      if(value) {
+        modifyTaskGroupQueuePriority(state.formData).then(() => {
+          emit('confirm')
+        })
+      }
     }
 
     const onCancel = () => {
@@ -66,18 +75,11 @@ const FormModal = defineComponent({
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        confirmDisabled={
-          !this.formData.queueId ||
-          !this.formData.priority
-        }
       >
         <NForm rules={this.rules} ref='formRef'>
-          <NFormItem label={t('resource.task_group_queue.queueId')} path='name'>
-            <NInput v-model={[this.formData.queueId, 'value']}/>
-          </NFormItem>
           <NFormItem
             label={t('resource.task_group_queue.priority')}
-            path='groupSize'
+            path='priority'
           >
             <NInput v-model:value={this.formData.priority}/>
           </NFormItem>

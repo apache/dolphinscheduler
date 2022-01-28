@@ -35,7 +35,8 @@ export function useForm() {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.formData.priority >=0) {
+          let value = state.formData.priority + ''
+          if (value && state.formData.priority >=0) {
           } else {
             return new Error(t('resource.task_group_queue.priority_not_empty'))
           }
