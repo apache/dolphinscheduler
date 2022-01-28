@@ -198,6 +198,8 @@ public class UdfManageE2ETest {
     void testRenameUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
 
+        browser.navigate().refresh();
+
         page.rename(testUploadUdfFileName, testUploadUdfRenameFileName);
 
         await().untilAsserted(() -> {
