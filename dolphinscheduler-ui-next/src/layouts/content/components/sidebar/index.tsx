@@ -37,6 +37,7 @@ const Sidebar = defineComponent({
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
       'workflow',
+      'task',
       'udf-manage',
       'service-manage',
       'statistical-manage',
