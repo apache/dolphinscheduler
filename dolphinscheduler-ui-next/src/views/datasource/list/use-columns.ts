@@ -91,7 +91,6 @@ export function useColumns(onCallback: Function) {
               NButton,
               {
                 circle: true,
-                class: styles['mr-10'],
                 type: 'info',
                 onClick: () => void onCallback(rowData.id, 'edit')
               },

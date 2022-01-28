@@ -14,55 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { MaybeArray } from 'naive-ui/es/_utils'
 
-import type {
-  GridProps,
-  FormProps,
-  FormItemGiProps,
-  FormItemRule,
-  FormRules,
-  SelectOption
-} from 'naive-ui'
+type OnUpdateValue = <T extends string>(value: T) => void
+type OnUpdateValueImpl = (value: string) => void
 
-type IType = 'input' | 'radio' | 'editor'
-
-type IOption = SelectOption
-
-interface IFormItem extends FormItemGiProps {
-  widget: any
-}
-
-interface IMeta extends Omit<FormProps, 'model'> {
-  elements?: IFormItem[]
-  model: object
-}
-
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
-}
-
-interface IJsonItem {
-  field: string
-  name?: string
-  props?: object
-  title?: string
-  type?: IType
-  validate?: FormItemRule
-  value?: any
-  options?: IOption[]
-}
-
-export {
-  IMeta,
-  IType,
-  IJsonItem,
-  IOption,
-  FormItemRule,
-  FormRules,
-  IFormItem,
-  GridProps,
-  IFieldParams
-}
+export { MaybeArray, OnUpdateValue, OnUpdateValueImpl }
