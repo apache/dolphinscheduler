@@ -27,7 +27,7 @@ export function formatValidate(
 ): FormItemRule {
   if (!validate) return {}
   if (Array.isArray(validate)) {
-    validate.map((item: FormItemRule) => {
+    validate.forEach((item: FormItemRule) => {
       if (!item?.message) delete item.message
       return item
     })

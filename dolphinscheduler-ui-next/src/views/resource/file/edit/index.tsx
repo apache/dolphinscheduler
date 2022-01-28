@@ -33,7 +33,6 @@ export default defineComponent({
     const router: Router = useRouter()
 
     const resourceViewRef = ref()
-    const codeEditorRef = ref()
     const routeNameRef = ref(router.currentRoute.value.name)
     const idRef = ref(Number(router.currentRoute.value.params.id))
 
@@ -41,7 +40,7 @@ export default defineComponent({
     const { getResourceView, handleUpdateContent } = useEdit(state)
 
     const handleFileContent = () => {
-      state.fileForm.content = codeEditorRef.value?.getValue()
+      state.fileForm.content = resourceViewRef.value.content
       handleUpdateContent(idRef.value)
     }
 
@@ -56,7 +55,6 @@ export default defineComponent({
     return {
       idRef,
       routeNameRef,
-      codeEditorRef,
       resourceViewRef,
       handleReturn,
       handleFileContent,
@@ -84,8 +82,7 @@ export default defineComponent({
                 }}
               >
                 <MonacoEditor
-                  ref='codeEditorRef'
-                  modelValue={this.resourceViewRef?.value.content}
+                  v-model={[this.resourceViewRef?.value.content, 'value']}
                 />
               </div>
             </NFormItem>

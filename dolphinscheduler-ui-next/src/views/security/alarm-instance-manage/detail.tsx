@@ -83,13 +83,12 @@ const DetailModal = defineComponent({
     watch(
       () => state.json,
       () => {
+        if (state.json?.length) return
+        state.json.forEach((item) => {
+          item.name = t('security.alarm_instance' + '.' + item.field)
+        })
         const { rules: fieldsRules, elements: fieldsElements } =
-          getElementByJson(
-            state.json,
-            state.detailForm,
-            t,
-            'security.alarm_instance'
-          )
+          getElementByJson(state.json, state.detailForm)
         rules.value = fieldsRules
         elements.value = fieldsElements
       }
