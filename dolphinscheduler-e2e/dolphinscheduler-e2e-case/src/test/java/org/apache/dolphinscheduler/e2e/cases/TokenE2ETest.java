@@ -43,9 +43,9 @@ public class TokenE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
-                .goToNav(SecurityPage.class)
-                .goToTab(TokenPage.class)
+            .login("admin", "dolphinscheduler123")
+            .goToNav(SecurityPage.class)
+            .goToTab(TokenPage.class)
         ;
     }
 
@@ -59,9 +59,9 @@ public class TokenE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                    .as("Token list should contain newly-created token")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(userName));
+                .as("Token list should contain newly-created token")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(userName));
         });
     }
 
@@ -69,15 +69,16 @@ public class TokenE2ETest {
     @Order(30)
     void testEditToken() {
         final TokenPage page = new TokenPage(browser);
+        String oldToken = page.getToken();
         page.update(userName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                    .as("Token list should contain newly-modified token")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(userName));
+                .as("Token list should contain newly-modified token")
+                .extracting(WebElement::getText)
+                .isNotEqualTo(oldToken);
         });
     }
 
@@ -91,7 +92,7 @@ public class TokenE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                    .noneMatch(it -> it.getText().contains(userName));
+                .noneMatch(it -> it.getText().contains(userName));
         });
     }
 

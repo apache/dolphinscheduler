@@ -44,13 +44,16 @@ public final class TokenPage extends NavBarPage implements Tab {
     private List<WebElement> tokenList;
 
     @FindBys({
-            @FindBy(className = "el-popconfirm"),
-            @FindBy(className = "el-button--primary"),
+        @FindBy(className = "el-popconfirm"),
+        @FindBy(className = "el-button--primary"),
     })
     private List<WebElement> buttonConfirm;
 
     @FindBy(className = "userName")
     private List<WebElement> userName;
+
+    @FindBy(className = "token")
+    private List<WebElement> token;
 
     private final TokenForm createTokenForm = new TokenForm();
     private final TokenForm editTokenForm = new TokenForm();
@@ -70,12 +73,12 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage update(String userName) {
         List<WebElement> tokenList = driver.findElementsByClassName("items");
         tokenList.stream()
-                .filter(it -> it.findElement(By.className("userName")).getAttribute("innerHTML").contains(userName))
-                .flatMap(it -> it.findElements(By.className("edit")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No edit button in token list"))
-                .click();
+            .filter(it -> it.findElement(By.className("userName")).getAttribute("innerHTML").contains(userName))
+            .flatMap(it -> it.findElements(By.className("edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in token list"))
+            .click();
 
         TokenForm editTokenForm = new TokenForm();
 
@@ -85,22 +88,26 @@ public final class TokenPage extends NavBarPage implements Tab {
         return this;
     }
 
+    public String getToken() {
+        return driver.findElementByClassName("token").getText();
+    }
+
     public TokenPage delete(String userName) {
         tokenList()
-                .stream()
-                .filter(it -> it.getText().contains(userName))
-                .flatMap(it -> it.findElements(By.className("delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in token list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(userName))
+            .flatMap(it -> it.findElements(By.className("delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No delete button in token list"))
+            .click();
 
         buttonConfirm()
-                .stream()
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-                .click();
+            .stream()
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
+            .click();
 
         return this;
     }
