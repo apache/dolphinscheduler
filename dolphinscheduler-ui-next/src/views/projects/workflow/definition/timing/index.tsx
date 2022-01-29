@@ -20,6 +20,8 @@ import { ArrowLeftOutlined } from '@vicons/antd'
 import { NButton, NDataTable, NIcon, NPagination } from 'naive-ui'
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
 import { useTable } from './use-table'
 import TimingModal from '../components/timing-modal'
 import styles from '../index.module.scss'
@@ -65,12 +67,13 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const router: Router = useRouter()
 
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
           <div class={styles.header}>
-            <NButton type='primary' onClick={this.handleSearch}>
+            <NButton type='primary' onClick={() => router.go(-1)}>
               <NIcon>
                 <ArrowLeftOutlined />
               </NIcon>

@@ -81,7 +81,7 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={() => {}}>
+              <NButton type='primary' /* TODO: Create workflow */>
                 {t('project.workflow.create_workflow')}
               </NButton>
               <NButton strong secondary onClick={() => (this.showRef = true)}>

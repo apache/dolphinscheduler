@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, toRefs } from 'vue'
 import { NSpace, NTooltip, NButton, NIcon, NPopconfirm } from 'naive-ui'
 import {
   DeleteOutlined,
@@ -26,7 +26,9 @@ import {
   ClockCircleOutlined,
   CopyOutlined,
   FieldTimeOutlined,
-  ExportOutlined
+  ExportOutlined,
+  ApartmentOutlined,
+  UploadOutlined
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
@@ -40,7 +42,17 @@ const props = {
 export default defineComponent({
   name: 'TableAction',
   props,
-  emits: ['updateList', 'startWorkflow', 'timingWorkflow', 'versionWorkflow'],
+  emits: [
+    'updateList',
+    'startWorkflow',
+    'timingWorkflow',
+    'versionWorkflow',
+    'deleteWorkflow',
+    'releaseWorkflow',
+    'copyWorkflow',
+    'exportWorkflow',
+    'gotoTimingManage'
+  ],
   setup(props, ctx) {
     const handleStartWorkflow = () => {
       ctx.emit('startWorkflow')
@@ -54,22 +66,57 @@ export default defineComponent({
       ctx.emit('versionWorkflow')
     }
 
+    const handleDeleteWorkflow = () => {
+      ctx.emit('deleteWorkflow')
+    }
+
+    const handleReleaseWorkflow = () => {
+      ctx.emit('releaseWorkflow')
+    }
+
+    const handleCopyWorkflow = () => {
+      ctx.emit('copyWorkflow')
+    }
+
+    const handleExportWorkflow = () => {
+      ctx.emit('exportWorkflow')
+    }
+
+    const handleGotoTimingManage = () => {
+      ctx.emit('gotoTimingManage')
+    }
+
     return {
       handleStartWorkflow,
       handleTimingWorkflow,
       handleVersionWorkflow,
-      ...props
+      handleDeleteWorkflow,
+      handleReleaseWorkflow,
+      handleCopyWorkflow,
+      handleExportWorkflow,
+      handleGotoTimingManage,
+      ...toRefs(props)
     }
   },
   render() {
     const { t } = useI18n()
+    const releaseState = this.row?.releaseState
+    const scheduleReleaseState = this.row?.scheduleReleaseState
+
     return (
       <NSpace>
         <NTooltip trigger={'hover'}>
           {{
             default: () => t('project.workflow.edit'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                disabled={releaseState === 'ONLINE'}
+                /* TODO: Edit workflow */
+              >
                 <NIcon>
                   <FormOutlined />
                 </NIcon>
@@ -86,6 +133,7 @@ export default defineComponent({
                 type='primary'
                 circle
                 onClick={this.handleStartWorkflow}
+                disabled={releaseState === 'OFFLINE'}
               >
                 <NIcon>
                   <PlayCircleOutlined />
@@ -104,6 +152,7 @@ export default defineComponent({
                 tag='div'
                 circle
                 onClick={this.handleTimingWorkflow}
+                disabled={releaseState !== 'ONLINE' || !!scheduleReleaseState}
               >
                 <NIcon>
                   <ClockCircleOutlined />
@@ -116,25 +165,19 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.upline'),
             trigger: () => (
-              <NButton size='tiny' type='error' circle>
-                <NPopconfirm
-                  positive-text={t('project.workflow.confirm')}
-                  negative-text={t('project.workflow.cancel')}
-                >
-                  {{
-                    default: () => t('project.workflow.copy_workflow'),
-                    icon: () => (
-                      <NIcon>
-                        <DownloadOutlined />
-                      </NIcon>
-                    ),
-                    trigger: () => (
-                      <NIcon>
-                        <DownloadOutlined />
-                      </NIcon>
-                    )
-                  }}
-                </NPopconfirm>
+              <NButton
+                size='tiny'
+                type={releaseState === 'ONLINE' ? 'warning' : 'error'}
+                circle
+                onClick={this.handleReleaseWorkflow}
+              >
+                <NIcon>
+                  {releaseState === 'ONLINE' ? (
+                    <DownloadOutlined />
+                  ) : (
+                    <UploadOutlined />
+                  )}
+                </NIcon>
               </NButton>
             )
           }}
@@ -143,7 +186,14 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.copy_workflow'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                disabled={releaseState === 'ONLINE'}
+                onClick={this.handleCopyWorkflow}
+              >
                 <NIcon>
                   <CopyOutlined />
                 </NIcon>
@@ -155,7 +205,14 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.cron_manage'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                disabled={releaseState === 'OFFLINE'}
+                onClick={this.handleGotoTimingManage}
+              >
                 <NIcon>
                   <FieldTimeOutlined />
                 </NIcon>
@@ -167,10 +224,27 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.delete'),
             trigger: () => (
-              <NButton size='tiny' type='error' tag='div' circle>
-                <NIcon>
-                  <DeleteOutlined />
-                </NIcon>
+              <NButton
+                size='tiny'
+                type='error'
+                circle
+                disabled={releaseState === 'ONLINE'}
+              >
+                <NPopconfirm onPositiveClick={this.handleDeleteWorkflow}>
+                  {{
+                    default: () => t('project.workflow.delete_confirm'),
+                    icon: () => (
+                      <NIcon>
+                        <InfoCircleFilled />
+                      </NIcon>
+                    ),
+                    trigger: () => (
+                      <NIcon>
+                        <DeleteOutlined />
+                      </NIcon>
+                    )
+                  }}
+                </NPopconfirm>
               </NButton>
             )
           }}
@@ -179,9 +253,15 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.tree_view'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                /* TODO: Goto tree view*/
+              >
                 <NIcon>
-                  <FormOutlined />
+                  <ApartmentOutlined />
                 </NIcon>
               </NButton>
             )
@@ -191,7 +271,13 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.export'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                onClick={this.handleExportWorkflow}
+              >
                 <NIcon>
                   <ExportOutlined />
                 </NIcon>

@@ -21,7 +21,13 @@ import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { useAsyncState } from '@vueuse/core'
-import { queryListPaging } from '@/service/modules/process-definition'
+import {
+  batchCopyByCodes,
+  batchExportByCodes,
+  deleteByCode,
+  queryListPaging,
+  release
+} from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 
 import { IDefinitionParam } from './types'
@@ -81,7 +87,12 @@ export function useTable() {
           row,
           onStartWorkflow: () => startWorkflow(row),
           onTimingWorkflow: () => timingWorkflow(row),
-          onVersionWorkflow: () => versionWorkflow(row)
+          onVersionWorkflow: () => versionWorkflow(row),
+          onDeleteWorkflow: () => deleteWorkflow(row),
+          onReleaseWorkflow: () => releaseWorkflow(row),
+          onCopyWorkflow: () => copyWorkflow(row),
+          onExportWorkflow: () => exportWorkflow(row),
+          onGotoTimingManage: () => gotoTimingManage(row)
         })
     }
   ]
@@ -99,6 +110,108 @@ export function useTable() {
   const versionWorkflow = (row: any) => {
     variables.versionShowRef = true
     variables.row = row
+  }
+
+  const deleteWorkflow = (row: any) => {
+    deleteByCode(variables.projectCode, row.code)
+      .then(() => {
+        window.$message.success(t('project.workflow.success'))
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message)
+      })
+  }
+
+  const releaseWorkflow = (row: any) => {
+    const data = {
+      name: row.name,
+      releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
+        | 'OFFLINE'
+        | 'ONLINE'
+    }
+    release(data, variables.projectCode, row.code)
+      .then(() => {
+        window.$message.success(t('project.workflow.success'))
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message)
+      })
+  }
+
+  const copyWorkflow = (row: any) => {
+    const data = {
+      codes: String(row.code),
+      targetProjectCode: variables.projectCode
+    }
+    batchCopyByCodes(data, variables.projectCode)
+      .then(() => {
+        window.$message.success(t('project.workflow.success'))
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message)
+      })
+  }
+
+  const downloadBlob = (data: any, fileNameS = 'json') => {
+    if (!data) {
+      return
+    }
+    const blob = new Blob([data])
+    const fileName = `${fileNameS}.json`
+    if ('download' in document.createElement('a')) {
+      // Not IE
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.setAttribute('download', fileName)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link) // remove element after downloading is complete.
+      window.URL.revokeObjectURL(url) // release blob object
+    } else {
+      // IE 10+
+      if (window.navigator.msSaveBlob) {
+        window.navigator.msSaveBlob(blob, fileName)
+      }
+    }
+  }
+
+  const exportWorkflow = (row: any) => {
+    const fileName = 'workflow_' + new Date().getTime()
+
+    const data = {
+      codes: String(row.code)
+    }
+    batchExportByCodes(data, variables.projectCode)
+      .then((res: any) => {
+        downloadBlob(res, fileName)
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message)
+      })
+  }
+
+  const gotoTimingManage = (row: any) => {
+    router.push({
+      name: 'workflow-definition-timing',
+      params: { projectCode: variables.projectCode, definitionCode: row.code }
+    })
   }
 
   const variables = reactive({

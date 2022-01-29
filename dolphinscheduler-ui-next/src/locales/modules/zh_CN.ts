@@ -346,6 +346,8 @@ const project = {
     modify_user: '修改用户',
     operation: '操作',
     edit: '编辑',
+    confirm: '确定',
+    cancel: '取消',
     start: '运行',
     timing: '定时',
     timezone: '时区',

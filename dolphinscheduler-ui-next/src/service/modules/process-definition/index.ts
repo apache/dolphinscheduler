@@ -58,7 +58,7 @@ export function queryAllByProjectCode(code: CodeReq): any {
 
 export function batchCopyByCodes(
   data: TargetCodeReq & CodesReq,
-  code: CodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/batch-copy`,
@@ -75,10 +75,11 @@ export function batchDeleteByCodes(data: CodesReq, code: CodeReq): any {
   })
 }
 
-export function batchExportByCodes(data: CodesReq, code: CodeReq): any {
+export function batchExportByCodes(data: CodesReq, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/batch-export`,
     method: 'post',
+    responseType: 'blob',
     data
   })
 }
@@ -168,7 +169,7 @@ export function update(
   })
 }
 
-export function deleteByCode(code: CodeReq, processCode: CodeReq): any {
+export function deleteByCode(code: number, processCode: number): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}`,
     method: 'delete'
@@ -177,8 +178,8 @@ export function deleteByCode(code: CodeReq, processCode: CodeReq): any {
 
 export function release(
   data: NameReq & ReleaseStateReq,
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  processCode: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/release`,
