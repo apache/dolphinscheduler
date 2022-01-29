@@ -61,8 +61,7 @@ const Content = defineComponent({
     const getSideMenu = (state: any) => {
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
-        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
-          .children || []
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]?.children || state.menuOptions
       state.isShowSide = menuStore.getShowSideStatus
     }
 
