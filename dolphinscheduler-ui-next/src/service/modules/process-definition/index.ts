@@ -199,8 +199,8 @@ export function getTasksByDefinitionCode(
 
 export function queryVersions(
   params: PageReq,
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  processCode: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/versions`,
@@ -210,9 +210,9 @@ export function queryVersions(
 }
 
 export function switchVersion(
-  code: CodeReq,
-  processCode: CodeReq,
-  version: VersionReq
+  code: number,
+  processCode: number,
+  version: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/versions/${version}`,
@@ -221,9 +221,9 @@ export function switchVersion(
 }
 
 export function deleteVersion(
-  code: CodeReq,
-  processCode: CodeReq,
-  version: VersionReq
+  code: number,
+  processCode: number,
+  version: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/versions/${version}`,

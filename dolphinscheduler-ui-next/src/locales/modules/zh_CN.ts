@@ -356,6 +356,7 @@ const project = {
     tree_view: '树形图',
     export: '导出',
     version_info: '版本信息',
+    version: '版本',
     file_upload: '文件上传',
     upload_file: '上传文件',
     upload: '上传',
@@ -394,7 +395,10 @@ const project = {
     end_time: '结束时间',
     crontab: 'Crontab',
     delete_confirm: '确定删除吗?',
-    enter_name_tips: '请输入名称'
+    enter_name_tips: '请输入名称',
+    switch_version: '切换到该版本',
+    confirm_switch_version: '确定切换到该版本吗?',
+    current_version: '当前版本'
   },
   dag: {
     createWorkflow: '创建工作流',

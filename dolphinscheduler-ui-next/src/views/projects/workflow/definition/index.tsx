@@ -31,6 +31,7 @@ import { useTable } from './use-table'
 import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
 import TimingModal from './components/timing-modal'
+import VersionModal from './components/version-modal'
 import styles from './index.module.scss'
 
 export default defineComponent({
@@ -139,6 +140,11 @@ export default defineComponent({
         <TimingModal
           v-model:row={this.row}
           v-model:show={this.timingShowRef}
+          onUpdateList={this.handleUpdateList}
+        />
+        <VersionModal
+          v-model:row={this.row}
+          v-model:show={this.versionShowRef}
           onUpdateList={this.handleUpdateList}
         />
       </div>

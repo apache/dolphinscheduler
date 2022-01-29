@@ -40,7 +40,7 @@ const props = {
 export default defineComponent({
   name: 'TableAction',
   props,
-  emits: ['updateList', 'startWorkflow', 'timingWorkflow'],
+  emits: ['updateList', 'startWorkflow', 'timingWorkflow', 'versionWorkflow'],
   setup(props, ctx) {
     const handleStartWorkflow = () => {
       ctx.emit('startWorkflow')
@@ -50,9 +50,14 @@ export default defineComponent({
       ctx.emit('timingWorkflow')
     }
 
+    const handleVersionWorkflow = () => {
+      ctx.emit('versionWorkflow')
+    }
+
     return {
       handleStartWorkflow,
       handleTimingWorkflow,
+      handleVersionWorkflow,
       ...props
     }
   },
@@ -198,7 +203,13 @@ export default defineComponent({
           {{
             default: () => t('project.workflow.version_info'),
             trigger: () => (
-              <NButton size='tiny' type='info' tag='div' circle>
+              <NButton
+                size='tiny'
+                type='info'
+                tag='div'
+                circle
+                onClick={this.handleVersionWorkflow}
+              >
                 <NIcon>
                   <InfoCircleFilled />
                 </NIcon>

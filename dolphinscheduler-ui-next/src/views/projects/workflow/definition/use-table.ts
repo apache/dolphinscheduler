@@ -80,7 +80,8 @@ export function useTable() {
         h(TableAction, {
           row,
           onStartWorkflow: () => startWorkflow(row),
-          onTimingWorkflow: () => timingWorkflow(row)
+          onTimingWorkflow: () => timingWorkflow(row),
+          onVersionWorkflow: () => versionWorkflow(row)
         })
     }
   ]
@@ -95,6 +96,11 @@ export function useTable() {
     variables.row = row
   }
 
+  const versionWorkflow = (row: any) => {
+    variables.versionShowRef = true
+    variables.row = row
+  }
+
   const variables = reactive({
     columns,
     row: {},
@@ -106,7 +112,8 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false),
     startShowRef: ref(false),
-    timingShowRef: ref(false)
+    timingShowRef: ref(false),
+    versionShowRef: ref(false)
   })
 
   const getTableData = (params: IDefinitionParam) => {

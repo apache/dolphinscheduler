@@ -357,6 +357,7 @@ const project = {
     tree_view: 'Tree View',
     export: 'Export',
     version_info: 'Version Info',
+    version: 'Version',
     file_upload: 'File Upload',
     upload_file: 'Upload File',
     upload: 'Upload',
@@ -395,7 +396,10 @@ const project = {
     end_time: 'End Time',
     crontab: 'Crontab',
     delete_confirm: 'Delete?',
-    enter_name_tips: 'Please enter name'
+    enter_name_tips: 'Please enter name',
+    switch_version: 'Switch To This Version',
+    confirm_switch_version: 'Confirm Switch To This Version?',
+    current_version: 'Current Version'
   },
   dag: {
     createWorkflow: 'Create Workflow',
