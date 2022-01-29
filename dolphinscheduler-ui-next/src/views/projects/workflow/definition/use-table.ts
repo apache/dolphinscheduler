@@ -32,6 +32,7 @@ import TableAction from './components/table-action'
 
 import { IDefinitionParam } from './types'
 import styles from './index.module.scss'
+import { NEllipsis, NTag } from 'naive-ui'
 
 export function useTable() {
   const { t } = useI18n()
@@ -46,19 +47,34 @@ export function useTable() {
     },
     {
       title: t('project.workflow.workflow_name'),
-      key: 'name'
+      key: 'name',
+      width: 200,
+      render: (_row) =>
+        h(
+          NEllipsis,
+          { style: 'max-width: 200px' },
+          {
+            default: () => _row.name
+          }
+        )
     },
     {
       title: t('project.workflow.status'),
-      key: 'releaseState'
+      key: 'releaseState',
+      render: (_row) =>
+        _row.releaseState === 'ONLINE'
+          ? t('project.workflow.up_line')
+          : t('project.workflow.down_line')
     },
     {
       title: t('project.workflow.create_time'),
-      key: 'createTime'
+      key: 'createTime',
+      width: 150
     },
     {
       title: t('project.workflow.update_time'),
-      key: 'updateTime'
+      key: 'updateTime',
+      width: 150
     },
     {
       title: t('project.workflow.description'),
@@ -74,7 +90,28 @@ export function useTable() {
     },
     {
       title: t('project.workflow.schedule_publish_status'),
-      key: 'scheduleReleaseState'
+      key: 'scheduleReleaseState',
+      render: (_row) => {
+        if (_row.scheduleReleaseState === 'ONLINE') {
+          return h(
+            NTag,
+            { type: 'success', size: 'small' },
+            {
+              default: () => t('project.workflow.up_line')
+            }
+          )
+        } else if (_row.scheduleReleaseState === 'OFFLINE') {
+          return h(
+            NTag,
+            { type: 'warning', size: 'small' },
+            {
+              default: () => t('project.workflow.down_line')
+            }
+          )
+        } else {
+          return '-'
+        }
+      }
     },
     {
       title: t('project.workflow.operation'),

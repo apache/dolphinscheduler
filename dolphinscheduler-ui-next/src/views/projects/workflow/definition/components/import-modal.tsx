@@ -33,7 +33,7 @@ const props = {
 export default defineComponent({
   name: 'workflowDefinitionImport',
   props,
-  emits: ['update:show', 'updateList'],
+  emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
     const { importState } = useForm()
     const { handleImportDefinition } = useModal(importState, ctx)
