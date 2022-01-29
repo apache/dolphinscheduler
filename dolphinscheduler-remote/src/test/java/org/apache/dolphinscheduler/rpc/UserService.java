@@ -49,4 +49,10 @@ public class UserService implements IUserService {
         logger.info("Kris UserService callBackIsFalse-------------------------------async call msg{}", s);
         return null;
     }
+
+    @Override
+    public String returnType(String type) {
+        logger.info("Kris UserService returnType-------------------------------async call msg{}", type);
+        return type;
+    }
 }

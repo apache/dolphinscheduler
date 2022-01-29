@@ -31,4 +31,7 @@ public interface IUserService {
 
     @Rpc(async = true)
     Boolean callBackIsFalse(String s);
+
+    @Rpc(async = true)
+    String returnType(String type);
 }

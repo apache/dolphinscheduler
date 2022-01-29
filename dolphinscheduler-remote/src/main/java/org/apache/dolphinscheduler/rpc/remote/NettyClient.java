@@ -211,7 +211,8 @@ public class NettyClient {
         if (Boolean.TRUE.equals(async)) {
             result = new RpcResponse();
             result.setStatus((byte) 0);
-            result.setResult(true);
+            //firstly return a null value when meet the async call
+            result.setResult(null);
             return result;
         }
         try {

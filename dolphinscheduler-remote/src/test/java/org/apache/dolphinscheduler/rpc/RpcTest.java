@@ -52,6 +52,7 @@ public class RpcTest {
         Assert.assertSame(5, result);
         userService.say("sync");
         userService.callBackIsFalse("async no call back");
+        userService.returnType("string");
         userService.hi(999999);
     }
 
