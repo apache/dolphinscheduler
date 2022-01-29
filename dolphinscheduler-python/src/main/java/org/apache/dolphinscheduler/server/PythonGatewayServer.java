@@ -524,10 +524,8 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             GatewayServer.turnLoggingOn();
             logger.info("PythonGatewayServer started on: " + gatewayHost.toString());
             server.start();
-        }
-        catch (UnknownHostException e) {
-            logger.error("exception occurred while constructing PythonGatewayServer().");
-            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            logger.error("exception occurred while constructing PythonGatewayServer().", e);
         }
     }
 
