@@ -450,6 +450,13 @@
             :prev-tasks="prevTasks"
           >
           </m-conditions>
+          <m-data-quality
+            v-if="nodeData.taskType === 'DATA_QUALITY'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="DATA_QUALITY"
+            :backfill-item="backfillItem">
+          </m-data-quality>
           <m-switch
             v-if="nodeData.taskType === 'SWITCH'"
             ref="SWITCH"
@@ -511,6 +518,7 @@
   import mDatax from './tasks/datax'
   import mPigeon from './tasks/pigeon'
   import mConditions from './tasks/conditions'
+  import mDataQuality from './tasks/dataquality'
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
@@ -1176,6 +1184,7 @@
       mPigeon,
       mSqoop,
       mConditions,
+      mDataQuality,
       mSwitch,
       mSelectInput,
       mTimeoutAlarm,

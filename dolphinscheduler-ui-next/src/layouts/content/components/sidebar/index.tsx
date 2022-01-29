@@ -26,6 +26,10 @@ const Sidebar = defineComponent({
     sideMenuOptions: {
       type: Array as PropType<any>,
       default: []
+    },
+    sideKey: {
+      type: String as PropType<string>,
+      default: ''
     }
   },
   setup() {
@@ -33,9 +37,11 @@ const Sidebar = defineComponent({
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
       'workflow',
+      'task',
       'udf-manage',
       'service-manage',
-      'statistical-manage'
+      'statistical-manage',
+      'task-group-manage'
     ]
 
     const { handleMenuClick } = useMenuClick()
@@ -54,7 +60,7 @@ const Sidebar = defineComponent({
         onExpand={() => (this.collapsedRef = false)}
       >
         <NMenu
-          value={this.menuStore.getSideMenuKey}
+          value={this.sideKey}
           options={this.sideMenuOptions}
           defaultExpandedKeys={this.defaultExpandedKeys}
           onUpdateValue={this.handleMenuClick}

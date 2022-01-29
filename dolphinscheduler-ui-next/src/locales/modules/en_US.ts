@@ -65,6 +65,7 @@ const menu = {
   db: 'DB',
   statistical_manage: 'Statistical Manage',
   statistics: 'Statistics',
+  audit_log: 'Audit Log',
   tenant_manage: 'Tenant Manage',
   user_manage: 'User Manage',
   alarm_group_manage: 'Alarm Group Manage',
@@ -72,7 +73,10 @@ const menu = {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',
-  token_manage: 'Token Manage'
+  token_manage: 'Token Manage',
+  task_group_manage: 'Task Group Manage',
+  task_group_option: 'Task Group Option',
+  task_group_queue: 'Task Group Queue'
 }
 
 const home = {
@@ -149,6 +153,21 @@ const monitor = {
     failure_command_number: 'Failure Command Number',
     tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
     task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+  },
+  audit_log: {
+    user_name: 'User Name',
+    resource_type: 'Resource Type',
+    project_name: 'Project Name',
+    operation_type: 'Operation Type',
+    create_time: 'Create Time',
+    start_time: 'Start Time',
+    end_time: 'End Time',
+    user_audit: 'User Audit',
+    project_audit: 'Project Audit',
+    create: 'Create',
+    update: 'Update',
+    delete: 'Delete',
+    read: 'Read'
   }
 }
 
@@ -279,6 +298,13 @@ const resource = {
     please_enter_keywords: 'Please enter keywords'
   },
   task_group_queue: {
+    id: 'No.',
+    actions: 'Actions',
+    task_name: 'Task name',
+    task_group_name: 'Task group name',
+    project_name: 'Project name',
+    process_name: 'Process name',
+    process_instance_name: 'Process instance',
     queue: 'Task group queue',
     priority: 'Priority',
     priority_be_a_number:
@@ -290,10 +316,14 @@ const resource = {
     the_status_of_waiting: 'Waiting into the queue',
     the_status_of_queuing: 'Queuing',
     the_status_of_releasing: 'Released',
-    modify_priority: 'Edit the priority of the task group queue',
+    modify_priority: 'Edit the priority',
+    start_task: 'Start the task',
     priority_not_empty: 'The value of priority can not be empty',
     priority_must_be_number: 'The value of priority should be number',
-    please_select_task_name: 'Please select a task name'
+    please_select_task_name: 'Please select a task name',
+    create_time: 'Create time',
+    update_time: 'Update time',
+    edit_priority: 'Edit the task priority'
   }
 }
 
@@ -400,6 +430,38 @@ const project = {
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version'
+  },
+  task: {
+    task_name: 'Task Name',
+    workflow_instance: 'Workflow Instance',
+    executor: 'Executor',
+    node_type: 'Node Type',
+    state: 'State',
+    submit_time: 'Submit Time',
+    start_time: 'Start Time',
+    end_time: 'End Time',
+    duration: 'Duration',
+    retry_count: 'Retry Count',
+    dry_run_flag: 'Dry Run Flag',
+    host: 'Host',
+    operation: 'Operation',
+    submitted_success: 'Submitted Success',
+    running_execution: 'Running Execution',
+    ready_pause: 'Ready Pause',
+    pause: 'Pause',
+    ready_stop: 'Ready Stop',
+    stop: 'Stop',
+    failure: 'Failure',
+    success: 'Success',
+    need_fault_tolerance: 'Need Fault Tolerance',
+    kill: 'Kill',
+    waiting_thread: 'Waiting Thread',
+    waiting_depend: 'Waiting Depend',
+    delay_execution: 'Delay Execution',
+    forced_success: 'Forced Success',
+    serial_wait: 'Serial Wait',
+    view_log: 'View Log',
+    download_log: 'Download Log'
   },
   dag: {
     createWorkflow: 'Create Workflow',
@@ -546,6 +608,61 @@ const security = {
     delete: 'Delete',
     save_error_msg: 'Failed to save, please retry',
     delete_error_msg: 'Failed to delete, please retry'
+  },
+  alarm_instance: {
+    search_input_tips: 'Please input the keywords',
+    alarm_instance_manage: 'Alarm instance manage',
+    alarm_instance: 'Alarm Instance',
+    serial_number: '#',
+    alarm_instance_name: 'Alarm instance name',
+    alarm_instance_name_tips: 'Please enter alarm plugin instance name',
+    alarm_plugin_name: 'Alarm plugin name',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    submit: 'Submit',
+    create: 'Create',
+    select_plugin: 'Select plugin',
+    select_plugin_tips: 'Select Alarm plugin',
+    instance_parameter_exception: 'Instance parameter exception',
+    WebHook: 'WebHook',
+    webHook: 'WebHook',
+    IsEnableProxy: 'Enable Proxy',
+    Proxy: 'Proxy',
+    Port: 'Port',
+    User: 'User',
+    corpId: 'CorpId',
+    secret: 'Secret',
+    Secret: 'Secret',
+    users: 'Users',
+    userSendMsg: 'UserSendMsg',
+    agentId: 'AgentId',
+    showType: 'Show Type',
+    receivers: 'Receivers',
+    receiverCcs: 'ReceiverCcs',
+    serverHost: 'SMTP Host',
+    serverPort: 'SMTP Port',
+    sender: 'Sender',
+    enableSmtpAuth: 'SMTP Auth',
+    Password: 'Password',
+    starttlsEnable: 'SMTP STARTTLS Enable',
+    sslEnable: 'SMTP SSL Enable',
+    smtpSslTrust: 'SMTP SSL Trust',
+    url: 'URL',
+    requestType: 'Request Type',
+    headerParams: 'Headers',
+    bodyParams: 'Body',
+    contentField: 'Content Field',
+    Keyword: 'Keyword',
+    userParams: 'User Params',
+    path: 'Script Path',
+    type: 'Type',
+    sendType: 'Send Type',
+    username: 'Username'
   }
 }
 

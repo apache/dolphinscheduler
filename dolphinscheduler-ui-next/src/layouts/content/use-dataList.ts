@@ -100,7 +100,7 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.workflow_relation'),
-                key: `/projects/workflow-relation`
+                key: `/projects/${menuStore.getProjectCode}/workflow/relation`
               },
               {
                 label: t('menu.workflow_definition'),
@@ -108,22 +108,22 @@ export function useDataList() {
               },
               {
                 label: t('menu.workflow_instance'),
-                key: `/projects/workflow-instance`
+                key: `/projects/${menuStore.getProjectCode}/workflow/instances`
               }
             ]
           },
           {
             label: t('menu.task'),
-            key: 'workflow',
+            key: 'task',
             icon: renderIcon(SettingOutlined),
             children: [
               {
                 label: t('menu.task_definition'),
-                key: `/projects/task-definition`
+                key: `/projects/${menuStore.getProjectCode}/task/definitions`
               },
               {
                 label: t('menu.task_instance'),
-                key: `/projects/task-instance`
+                key: `/projects/${menuStore.getProjectCode}/task/instances`
               }
             ]
           }
@@ -162,7 +162,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_group_option'),
-                key: `/resource/task-group-option`
+                key: 'task-group-option'
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: 'task-group-queue'
               }
             ]
           }
@@ -208,6 +212,10 @@ export function useDataList() {
               {
                 label: t('menu.statistics'),
                 key: `/monitor/statistics`
+              },
+              {
+                label: t('menu.audit_log'),
+                key: `/monitor/audit-log`
               }
             ]
           }
@@ -266,15 +274,11 @@ export function useDataList() {
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: {
-        label: string
-        key: string
-        icon: any
-      }) => {
+      (item: { label: string; key: string; icon: any }) => {
         return {
           label: item.label,
           key: item.key,
-          icon: item.icon,
+          icon: item.icon
         }
       }
     )

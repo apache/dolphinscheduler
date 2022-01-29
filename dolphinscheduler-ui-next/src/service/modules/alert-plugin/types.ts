@@ -31,10 +31,6 @@ interface InstanceNameReq {
   alertInstanceName: string
 }
 
-interface IdReq {
-  id: number
-}
-
 interface UpdatePluginInstanceReq {
   alertPluginInstanceId: number
   instanceName: string
@@ -50,6 +46,8 @@ interface AlertPluginItem {
   updateTime: string
   alertPluginName: string
 }
+
+type IdReq = number
 
 export {
   ListReq,

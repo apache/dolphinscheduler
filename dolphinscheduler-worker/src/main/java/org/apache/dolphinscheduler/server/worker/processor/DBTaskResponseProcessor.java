@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -35,6 +36,7 @@ import io.netty.channel.Channel;
 /**
  *  db task response processor
  */
+@Component
 public class DBTaskResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(DBTaskResponseProcessor.class);

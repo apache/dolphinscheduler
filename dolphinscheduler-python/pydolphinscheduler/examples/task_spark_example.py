@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 """A example workflow for task spark."""
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
@@ -29,3 +30,4 @@ with ProcessDefinition(name="task_spark_example", tenant="tenant_exists") as pd:
         deploy_mode=DeployMode.LOCAL,
     )
     pd.run()
+# [end workflow_declare]

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, watch, toRefs } from 'vue'
+import { defineComponent, onMounted, watch, toRefs, ref } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
@@ -40,6 +40,7 @@ const Content = defineComponent({
       changeHeaderMenuOptions,
       changeUserDropdown
     } = useDataList()
+    const sideKeyRef = ref()
 
     locale.value = localesStore.getLocales
 
@@ -57,19 +58,10 @@ const Content = defineComponent({
       changeUserDropdown(state)
     })
 
-    watch(
-      () => route.path,
-      (path) => {
-        state.isShowSide = menuStore.getShowSideStatus
-        menuStore.setSideMenuKey(path)
-      }
-    )
-
     const getSideMenu = (state: any) => {
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
-        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
-          .children || []
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]?.children || state.menuOptions
       state.isShowSide = menuStore.getShowSideStatus
     }
 
@@ -78,11 +70,31 @@ const Content = defineComponent({
       getSideMenu(state)
     }
 
+    watch(
+      () => route.path,
+      () => {
+        state.isShowSide = menuStore.getShowSideStatus
+        route.matched[1].path.includes(':projectCode')
+        if (route.matched[1].path === '/projects/:projectCode') {
+          changeMenuOption(state)
+          getSideMenu(state)
+        }
+        sideKeyRef.value = route.matched[1].path.includes(':projectCode')
+          ? route.matched[1].path.replace(
+              ':projectCode',
+              menuStore.getProjectCode
+            )
+          : route.matched[1].path
+      },
+      { immediate: true }
+    )
+
     return {
       ...toRefs(state),
       menuStore,
       changeMenuOption,
-      getSideMenuOptions
+      getSideMenuOptions,
+      sideKeyRef
     }
   },
   render() {
@@ -98,7 +110,10 @@ const Content = defineComponent({
         </NLayoutHeader>
         <NLayout has-sider position='absolute' style='top: 65px'>
           {this.isShowSide && (
-            <SideBar sideMenuOptions={this.sideMenuOptions} />
+            <SideBar
+              sideMenuOptions={this.sideMenuOptions}
+              sideKey={this.sideKeyRef}
+            />
           )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
             <router-view key={this.$route.fullPath} />

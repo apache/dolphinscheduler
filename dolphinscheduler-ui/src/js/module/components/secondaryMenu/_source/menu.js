@@ -88,6 +88,26 @@ const menu = {
       ]
     }
   ],
+  dataQuality: [
+    {
+      name: `${i18n.$t('DataQuality Result')}`,
+      id: 0,
+      path: 'data-quality-result',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-s-grid',
+      children: []
+    },
+    {
+      name: `${i18n.$t('DataQuality Rule')}`,
+      id: 1,
+      path: 'data-quality-rule',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-document',
+      children: []
+    }
+  ],
   security: [
     {
       name: `${i18n.$t('Tenant Manage')}`,
@@ -297,6 +317,12 @@ const menu = {
           name: 'Statistics',
           path: 'statistics',
           id: 0,
+          enabled: true
+        },
+        {
+          name: 'Audit Log',
+          path: 'audit-log',
+          id: 1,
           enabled: true
         }
       ]
