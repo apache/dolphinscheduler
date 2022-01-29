@@ -22,19 +22,25 @@ Dolphin Scheduler Official Website
 DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
 
 Its main objectives are as follows:
-
- - Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
+ -  Highly Reliable, 
+DolphinScheduler adopts a decentralized multi-master and multi-worker architecture design, which naturally supports easy expansion and high availability (not restricted by a single point of bottleneck), and its performance increases linearly with the increase of machines
+ - High performance, supporting tens of millions of tasks every day
+ - Support multi-tenant.
+ - Cloud Native, DolphinScheduler supports multi-cloud/data center workflow management, also
+supports Kubernetes, Docker deployment and custom task types, distributed
+scheduling, with overall scheduling capability increased linearly with the
+scale of the cluster
  - Support various task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Sub_Process, Procedure, etc.
  - Support scheduling of workflows and dependencies, manual scheduling to pause/stop/recover task, support failure task retry/alarm, recover specified nodes from failure, kill task, etc.
+ - Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
+ - WYSIWYG online editing tasks
  - Support the priority of workflows & tasks, task failover, and task timeout alarm or failure.
  - Support workflow global parameters and node customized parameter settings.
  - Support online upload/download/management of resource files, etc. Support online file creation and editing.
  - Support task log online viewing and scrolling and downloading, etc.
- - Have implemented cluster HA, decentralize Master cluster and Worker cluster through Zookeeper.
  - Support the viewing of Master/Worker CPU load, memory, and CPU usage metrics.
  - Support displaying workflow history in tree/Gantt chart, as well as statistical analysis on the task status & process status in each workflow.
  - Support back-filling data.
- - Support multi-tenant.
  - Support internationalization.
  - More features waiting for partners to explore...
 
@@ -85,13 +91,14 @@ We would like to express our deep gratitude to all the open-source projects used
 
 ## Get Help
 
-1. Submit an [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
-1. Subscribe to this mailing list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
+1. Submit an [issue](https://github.com/apache/dolphinscheduler/issues/new/choose).
+2. Join the DolphinSchedudler Slack workspace [Slack](http://asf-dolphinscheduler.slack.com/).
+3. Subscribe to this mailing list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org.
 
 ## Community
 
 You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
-1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw).
+1. Join the Slack channel [Slack](https://asf-dolphinscheduler.slack.com/).
 2. Follow the [Twitter account of DolphinScheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
 ### Contributor over time
