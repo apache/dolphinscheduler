@@ -7,11 +7,6 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 
 import java.util.Map;
 
-/**
- * Telegram Alert Channel
- *
- * @author pinkhello
- */
 public final class TelegramAlertChannel implements AlertChannel {
     @Override
     public AlertResult process(AlertInfo info) {

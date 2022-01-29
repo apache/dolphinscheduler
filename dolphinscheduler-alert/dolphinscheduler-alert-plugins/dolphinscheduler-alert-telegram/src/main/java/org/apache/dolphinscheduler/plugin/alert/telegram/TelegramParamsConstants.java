@@ -1,11 +1,6 @@
 package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 
-/**
- * Telegram Params Constants
- *
- * @author pinkhello
- */
 public final class TelegramParamsConstants {
 
     static final String TELEGRAM_WEB_HOOK = "$t('webHook')";

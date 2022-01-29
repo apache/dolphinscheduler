@@ -15,11 +15,6 @@ import java.util.List;
 
 import static org.apache.dolphinscheduler.spi.utils.Constants.*;
 
-/**
- * Telegram Alert Channel Factory
- *
- * @author pinkhello
- */
 @AutoService(AlertChannelFactory.class)
 public final class TelegramAlertChannelFactory implements AlertChannelFactory {
 

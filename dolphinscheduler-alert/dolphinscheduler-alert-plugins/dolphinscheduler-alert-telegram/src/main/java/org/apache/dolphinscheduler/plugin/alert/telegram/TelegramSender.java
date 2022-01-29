@@ -26,13 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * Telegram Sender
- *
- * @author pinkhello
- * @see <a href="https://core.telegram.org/api">telegram.org</a>
- */
 public final class TelegramSender {
 
     private static final Logger logger = LoggerFactory.getLogger(TelegramSender.class);

@@ -1,10 +1,5 @@
 package org.apache.dolphinscheduler.plugin.alert.telegram;
 
-/**
- * Telegram Alert Constants
- *
- * @author pinkhello
- */
 public final class TelegramAlertConstants {
 
     static final String PARSE_MODE_TXT = "Txt";
