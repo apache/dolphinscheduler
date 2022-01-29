@@ -15,54 +15,34 @@
  * limitations under the License.
  */
 
-import type {
-  GridProps,
-  FormProps,
-  FormItemGiProps,
-  FormItemRule,
-  FormRules,
-  SelectOption
-} from 'naive-ui'
-
-type IType = 'input' | 'radio' | 'editor'
-
-type IOption = SelectOption
-
-interface IFormItem extends FormItemGiProps {
-  widget: any
+interface AuditListReq {
+  pageNo: number
+  pageSize: number
+  endDate?: string
+  moduleType?: string
+  operationType?: string
+  processName?: string
+  projectName?: string
+  resourceType?: string
+  startDate?: string
+  userName?: string
 }
 
-interface IMeta extends Omit<FormProps, 'model'> {
-  elements?: IFormItem[]
-  model: object
+interface AuditItem {
+  userName: string
+  resource: string
+  operation: string
+  time: string
+  resourceName: string
 }
 
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
+interface AuditListRes {
+  totalList: AuditItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
 }
 
-interface IJsonItem {
-  field: string
-  name?: string
-  props?: object
-  title?: string
-  type?: IType
-  validate?: FormItemRule
-  value?: any
-  options?: IOption[]
-}
-
-export {
-  IMeta,
-  IType,
-  IJsonItem,
-  IOption,
-  FormItemRule,
-  FormRules,
-  IFormItem,
-  GridProps,
-  IFieldParams
-}
+export { AuditListReq, AuditListRes }

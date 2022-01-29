@@ -15,54 +15,13 @@
  * limitations under the License.
  */
 
-import type {
-  GridProps,
-  FormProps,
-  FormItemGiProps,
-  FormItemRule,
-  FormRules,
-  SelectOption
-} from 'naive-ui'
+import { axios } from '@/service/service'
+import type { AuditListReq } from './types'
 
-type IType = 'input' | 'radio' | 'editor'
-
-type IOption = SelectOption
-
-interface IFormItem extends FormItemGiProps {
-  widget: any
-}
-
-interface IMeta extends Omit<FormProps, 'model'> {
-  elements?: IFormItem[]
-  model: object
-}
-
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
-}
-
-interface IJsonItem {
-  field: string
-  name?: string
-  props?: object
-  title?: string
-  type?: IType
-  validate?: FormItemRule
-  value?: any
-  options?: IOption[]
-}
-
-export {
-  IMeta,
-  IType,
-  IJsonItem,
-  IOption,
-  FormItemRule,
-  FormRules,
-  IFormItem,
-  GridProps,
-  IFieldParams
+export function queryAuditLogListPaging(params: AuditListReq): any {
+  return axios({
+    url: '/projects/audit/audit-log-list',
+    method: 'get',
+    params
+  })
 }

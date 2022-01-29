@@ -31,11 +31,10 @@ import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import LogModal from './components/log-modal'
 import styles from './index.module.scss'
 
-const TaskInstance = defineComponent({
-  name: 'task-instance',
+const AuditLog = defineComponent({
+  name: 'audit-log',
   setup() {
     const { t, variables, getTableData, createColumns } = useTable()
 
@@ -43,13 +42,10 @@ const TaskInstance = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal,
-        processInstanceId: variables.processInstanceId,
-        host: variables.host,
-        stateType: variables.stateType,
-        datePickerRange: variables.datePickerRange,
-        executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        resourceType: variables.resourceType,
+        operationType: variables.operationType,
+        userName: variables.userName,
+        datePickerRange: variables.datePickerRange
       })
     }
 
@@ -61,10 +57,6 @@ const TaskInstance = defineComponent({
     const onSearch = () => {
       variables.page = 1
       requestTableData()
-    }
-
-    const onConfirmModal = () => {
-      variables.showModalRef = false
     }
 
     onMounted(() => {
@@ -81,84 +73,49 @@ const TaskInstance = defineComponent({
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
-      onSearch,
-      onConfirmModal
+      onSearch
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch, onConfirmModal } =
-      this
+    const { t, requestTableData, onUpdatePageSize, onSearch } = this
 
     return (
       <>
         <NCard>
           <NSpace justify='end'>
             <NInput
-              v-model={[this.searchVal, 'value']}
+              v-model={[this.userName, 'value']}
               size='small'
-              placeholder={t('project.task.task_name')}
-              clearable
-            />
-            <NInput
-              v-model={[this.processInstanceName, 'value']}
-              size='small'
-              placeholder={t('project.task.workflow_instance')}
-              clearable
-            />
-            <NInput
-              v-model={[this.executorName, 'value']}
-              size='small'
-              placeholder={t('project.task.executor')}
-              clearable
-            />
-            <NInput
-              v-model={[this.host, 'value']}
-              size='small'
-              placeholder={t('project.task.host')}
+              placeholder={t('monitor.audit_log.user_name')}
               clearable
             />
             <NSelect
-              v-model={[this.stateType, 'value']}
+              v-model={[this.operationType, 'value']}
+              size='small'
+              options={[
+                { value: 'CREATE', label: t('monitor.audit_log.create') },
+                { value: 'UPDATE', label: t('monitor.audit_log.update') },
+                { value: 'DELETE', label: t('monitor.audit_log.delete') },
+                { value: 'READ', label: t('monitor.audit_log.read') }
+              ]}
+              placeholder={t('monitor.audit_log.operation_type')}
+              style={{ width: '180px' }}
+              clearable
+            />
+            <NSelect
+              v-model={[this.resourceType, 'value']}
               size='small'
               options={[
                 {
-                  label: t('project.task.submitted_success'),
-                  value: 'SUBMITTED_SUCCESS'
+                  value: 'USER_MODULE',
+                  label: t('monitor.audit_log.user_audit')
                 },
                 {
-                  label: t('project.task.running_execution'),
-                  value: 'RUNNING_EXECUTION'
-                },
-                { label: t('project.task.ready_pause'), value: 'READY_PAUSE' },
-                { label: t('project.task.pause'), value: 'PAUSE' },
-                { label: t('project.task.ready_stop'), value: 'READY_STOP' },
-                { label: t('project.task.stop'), value: 'STOP' },
-                { label: t('project.task.failure'), value: 'FAILURE' },
-                { label: t('project.task.success'), value: 'SUCCESS' },
-                {
-                  label: t('project.task.need_fault_tolerance'),
-                  value: 'NEED_FAULT_TOLERANCE'
-                },
-                { label: t('project.task.kill'), value: 'KILL' },
-                {
-                  label: t('project.task.waiting_thread'),
-                  value: 'WAITING_THREAD'
-                },
-                {
-                  label: t('project.task.waiting_depend'),
-                  value: 'WAITING_DEPEND'
-                },
-                {
-                  label: t('project.task.delay_execution'),
-                  value: 'DELAY_EXECUTION'
-                },
-                {
-                  label: t('project.task.forced_success'),
-                  value: 'FORCED_SUCCESS'
-                },
-                { label: t('project.task.serial_wait'), value: 'SERIAL_WAIT' }
+                  value: 'PROJECT_MODULE',
+                  label: t('monitor.audit_log.project_audit')
+                }
               ]}
-              placeholder={t('project.task.state')}
+              placeholder={t('monitor.audit_log.resource_type')}
               style={{ width: '180px' }}
               clearable
             />
@@ -166,8 +123,8 @@ const TaskInstance = defineComponent({
               v-model={[this.datePickerRange, 'value']}
               type='datetimerange'
               size='small'
-              start-placeholder={t('project.task.start_time')}
-              end-placeholder={t('project.task.end_time')}
+              start-placeholder={t('monitor.audit_log.start_time')}
+              end-placeholder={t('monitor.audit_log.end_time')}
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>
@@ -196,14 +153,9 @@ const TaskInstance = defineComponent({
             />
           </div>
         </Card>
-        <LogModal
-          showModalRef={this.showModalRef}
-          row={this.row}
-          onConfirmModal={onConfirmModal}
-        />
       </>
     )
   }
 })
 
-export default TaskInstance
+export default AuditLog

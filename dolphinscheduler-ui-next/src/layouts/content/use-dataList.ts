@@ -162,7 +162,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_group_option'),
-                key: `/resource/task-group-option`
+                key: 'task-group-option'
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: 'task-group-queue'
               }
             ]
           }
@@ -208,6 +212,10 @@ export function useDataList() {
               {
                 label: t('menu.statistics'),
                 key: `/monitor/statistics`
+              },
+              {
+                label: t('menu.audit_log'),
+                key: `/monitor/audit-log`
               }
             ]
           }

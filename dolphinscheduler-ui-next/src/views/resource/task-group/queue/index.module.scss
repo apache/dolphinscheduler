@@ -15,54 +15,41 @@
  * limitations under the License.
  */
 
-import type {
-  GridProps,
-  FormProps,
-  FormItemGiProps,
-  FormItemRule,
-  FormRules,
-  SelectOption
-} from 'naive-ui'
-
-type IType = 'input' | 'radio' | 'editor'
-
-type IOption = SelectOption
-
-interface IFormItem extends FormItemGiProps {
-  widget: any
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 0 0 0;
+  .right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    div {
+      margin-left: 5px;
+    }
+    button {
+      margin-left: 10px;
+    }
+  }
 }
 
-interface IMeta extends Omit<FormProps, 'model'> {
-  elements?: IFormItem[]
-  model: object
-}
+.table-card {
+  margin-top: 2px;
 
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
-}
-
-interface IJsonItem {
-  field: string
-  name?: string
-  props?: object
-  title?: string
-  type?: IType
-  validate?: FormItemRule
-  value?: any
-  options?: IOption[]
-}
-
-export {
-  IMeta,
-  IType,
-  IJsonItem,
-  IOption,
-  FormItemRule,
-  FormRules,
-  IFormItem,
-  GridProps,
-  IFieldParams
+  .table-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+      margin: 0 2px 0 0;
+    }
+    div {
+      margin: 0 2px 0 0;
+    }
+  }
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }

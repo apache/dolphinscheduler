@@ -22,9 +22,7 @@ import type { IJsonItem } from './types'
 
 export default function getElementByJson(
   json: IJsonItem[],
-  fields: { [field: string]: any },
-  t: Function,
-  prefix: string
+  fields: { [field: string]: any }
 ) {
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
@@ -41,6 +39,13 @@ export default function getElementByJson(
         options
       })
     }
+    if (type === 'editor') {
+      return Field.renderEditor({
+        field,
+        fields,
+        props
+      })
+    }
 
     return Field.renderInput({ field, fields, props })
   }
@@ -50,7 +55,7 @@ export default function getElementByJson(
     initialValues[item.field] = item.value
     if (item.validate) rules[item.field] = formatValidate(item.validate)
     elements.push({
-      label: t(prefix + '.' + item.field),
+      label: item.name,
       path: item.field,
       widget: () => getElement(item)
     })
