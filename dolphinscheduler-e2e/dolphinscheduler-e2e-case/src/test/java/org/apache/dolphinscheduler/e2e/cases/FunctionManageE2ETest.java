@@ -161,7 +161,7 @@ public class FunctionManageE2ETest {
 
         page.renameUdfFunction(testUdfFunctionName, testRenameUdfFunctionName);
 
-        await().pollDelay(Duration.ofSeconds(1)).untilAsserted(() -> assertThat(page.functionList())
+        await().pollDelay(Duration.ofSeconds(2)).untilAsserted(() -> assertThat(page.functionList())
             .as("Function list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testRenameUdfFunctionName)));
