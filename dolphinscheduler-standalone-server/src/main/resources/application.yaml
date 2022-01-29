@@ -149,9 +149,11 @@ python-gateway:
   python-address: 127.0.0.1
   # The port of Python callback client.
   python-port: 25334
-  # Close connection of socket server if no other request accept after x milliseconds.
+  # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
+  # and socket server would never close even though no requests accept
   connect-timeout: 0
-  # Close each active connection of socket server if python program not active after x milliseconds.
+  # Close each active connection of socket server if python program not active after x milliseconds. Define value is
+  # (0 = infinite), and socket server would never close even though no requests accept
   read-timeout: 0
 
 server:

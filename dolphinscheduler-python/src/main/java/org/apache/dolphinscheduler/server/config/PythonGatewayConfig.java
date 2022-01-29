@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 @Component
-@Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties("python-gateway")
 public class PythonGatewayConfig {
