@@ -4,16 +4,16 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 public final class TelegramParamsConstants {
 
     static final String TELEGRAM_WEB_HOOK = "$t('webHook')";
-    static final String NAME_TELEGRAM_WEB_HOOK = "WebHook";
+    static final String NAME_TELEGRAM_WEB_HOOK = "webHook";
 
-    static final String TELEGRAM_BOT_TOKEN = "$t('botToken')";
-    static final String NAME_TELEGRAM_BOT_TOKEN = "BotToken";
+    static final String TELEGRAM_BOT_TOKEN = "botToken";
+    static final String NAME_TELEGRAM_BOT_TOKEN = "botToken";
 
-    static final String TELEGRAM_CHAT_ID = "$t('chatId')";
-    static final String NAME_TELEGRAM_CHAT_ID = "ChatId";
+    static final String TELEGRAM_CHAT_ID = "chatId";
+    static final String NAME_TELEGRAM_CHAT_ID = "chatId";
 
-    static final String TELEGRAM_PARSE_MODE = "$t('parseMode')";
-    static final String NAME_TELEGRAM_PARSE_MODE = "ParseMode";
+    static final String TELEGRAM_PARSE_MODE = "parseMode";
+    static final String NAME_TELEGRAM_PARSE_MODE = "parseMode";
 
     static final String TELEGRAM_PROXY_ENABLE = "$t('isEnableProxy')";
     static final String NAME_TELEGRAM_PROXY_ENABLE = "IsEnableProxy";
