@@ -18,14 +18,17 @@
 import { useRouter } from 'vue-router'
 import { logout } from '@/service/modules/logout'
 import { useUserStore } from '@/store/user/user'
+import { useMenuStore } from '@/store/menu/menu'
 import type { Router } from 'vue-router'
 import { DropdownOption } from 'naive-ui'
 
 export function useDropDown() {
   const router: Router = useRouter()
   const userStore = useUserStore()
+  const menuStore = useMenuStore()
 
   const handleSelect = (key: string | number, option: DropdownOption) => {
+    menuStore.setMenuKey('')
     if (key === 'logout') {
       useLogout()
     } else if (key === 'password') {
