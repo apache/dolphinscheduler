@@ -99,6 +99,10 @@ class JavaGatewayDefault(str):
 
     RESULT_DATA = "data"
 
+    SERVER_ADDRESS = "127.0.0.1"
+    SERVER_PORT = 25333
+    AUTO_CONVERT = True
+
 
 class Delimiter(str):
     """Constants for delimiter."""
