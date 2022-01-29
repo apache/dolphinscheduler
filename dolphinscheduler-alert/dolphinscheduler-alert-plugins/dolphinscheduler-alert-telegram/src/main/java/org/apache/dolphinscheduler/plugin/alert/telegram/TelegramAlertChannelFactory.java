@@ -57,8 +57,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .setPlaceholder("telegram web hook")
                 .build();
 
-        InputParam botTokenParam = InputParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, TelegramParamsConstants.TELEGRAM_BOT_TOKEN)
+        InputParam botTokenParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, TelegramParamsConstants.TELEGRAM_BOT_TOKEN)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -72,8 +71,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .setPlaceholder("telegram channel chat id")
                 .build();
 
-        SelectParam parseMode = SelectParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramParamsConstants.TELEGRAM_PARSE_MODE)
+        SelectParam parseMode = SelectParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramParamsConstants.TELEGRAM_PARSE_MODE)
                 .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_TXT, TelegramAlertConstants.PARSE_MODE_TXT, false))
                 .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN, TelegramAlertConstants.PARSE_MODE_MARKDOWN, false))
                 .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, false))
@@ -84,8 +82,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                         .build())
                 .build();
 
-        RadioParam isEnableProxy = RadioParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PROXY_ENABLE, TelegramParamsConstants.TELEGRAM_PROXY_ENABLE)
+        RadioParam isEnableProxy = RadioParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PROXY_ENABLE, TelegramParamsConstants.TELEGRAM_PROXY_ENABLE)
                 .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
                 .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
                 .setValue(STRING_FALSE)
@@ -94,28 +91,24 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                         .build())
                 .build();
 
-        InputParam proxyParam = InputParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PROXY, TelegramParamsConstants.TELEGRAM_PROXY)
+        InputParam proxyParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PROXY, TelegramParamsConstants.TELEGRAM_PROXY)
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
                 .build();
 
-        InputParam portParam = InputParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
+        InputParam portParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
                 .build();
 
-        InputParam userParam = InputParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_USER, TelegramParamsConstants.TELEGRAM_USER)
+        InputParam userParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_USER, TelegramParamsConstants.TELEGRAM_USER)
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
                 .build();
-        PasswordParam passwordParam = PasswordParam
-                .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PASSWORD, TelegramParamsConstants.TELEGRAM_PASSWORD)
+        PasswordParam passwordParam = PasswordParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PASSWORD, TelegramParamsConstants.TELEGRAM_PASSWORD)
                 .setPlaceholder("if enable use authentication, you need input password")
                 .build();
 
