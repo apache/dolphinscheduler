@@ -41,6 +41,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterAll;
@@ -160,7 +161,7 @@ public class FunctionManageE2ETest {
 
         page.renameUdfFunction(testUdfFunctionName, testRenameUdfFunctionName);
 
-        await().untilAsserted(() -> assertThat(page.functionList())
+        await().pollDelay(Duration.ofSeconds(1)).untilAsserted(() -> assertThat(page.functionList())
             .as("Function list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testRenameUdfFunctionName)));
