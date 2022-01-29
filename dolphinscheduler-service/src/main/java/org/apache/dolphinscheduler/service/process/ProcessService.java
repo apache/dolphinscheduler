@@ -2250,7 +2250,7 @@ public class ProcessService {
         if (result > 0) {
             result = switchProcessTaskRelationVersion(processDefinitionLog);
             if (result <= 0) {
-                return Constants.DEFINITION_FAILURE;
+                return Constants.EXIT_CODE_FAILURE;
             }
         }
         return result;
@@ -2262,7 +2262,36 @@ public class ProcessService {
             processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         }
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        return processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+        int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+        if (batchInsert == 0) {
+            return Constants.EXIT_CODE_FAILURE;
+        } else {
+            int result = 0;
+            for (ProcessTaskRelationLog taskRelationLog : processTaskRelationLogList) {
+                int switchResult = switchTaskDefinitionVersion(taskRelationLog.getPostTaskCode(), taskRelationLog.getPostTaskVersion());
+                if (switchResult != Constants.EXIT_CODE_FAILURE) {
+                    result++;
+                }
+            }
+            return result;
+        }
+    }
+
+    public int switchTaskDefinitionVersion(long taskCode, int taskVersion) {
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition == null) {
+            return Constants.EXIT_CODE_FAILURE;
+        }
+        if (taskDefinition.getVersion() == taskVersion) {
+            return Constants.EXIT_CODE_SUCCESS;
+        }
+        TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskVersion);
+        if (taskDefinitionUpdate == null) {
+            return Constants.EXIT_CODE_FAILURE;
+        }
+        taskDefinitionUpdate.setUpdateTime(new Date());
+        taskDefinitionUpdate.setId(taskDefinition.getId());
+        return taskDefinitionMapper.updateById(taskDefinitionUpdate);
     }
 
     /**

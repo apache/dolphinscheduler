@@ -40,7 +40,7 @@ const Content = defineComponent({
       changeHeaderMenuOptions,
       changeUserDropdown
     } = useDataList()
-    const sideKey = ref()
+    const sideKeyRef = ref()
 
     locale.value = localesStore.getLocales
 
@@ -58,20 +58,10 @@ const Content = defineComponent({
       changeUserDropdown(state)
     })
 
-    watch(
-      () => route.path,
-      () => {
-        state.isShowSide = menuStore.getShowSideStatus
-        sideKey.value = route.matched[1]?.path
-      },
-      { immediate: true }
-    )
-
     const getSideMenu = (state: any) => {
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
-        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
-          .children || []
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]?.children || state.menuOptions
       state.isShowSide = menuStore.getShowSideStatus
     }
 
@@ -80,12 +70,31 @@ const Content = defineComponent({
       getSideMenu(state)
     }
 
+    watch(
+      () => route.path,
+      () => {
+        state.isShowSide = menuStore.getShowSideStatus
+        route.matched[1].path.includes(':projectCode')
+        if (route.matched[1].path === '/projects/:projectCode') {
+          changeMenuOption(state)
+          getSideMenu(state)
+        }
+        sideKeyRef.value = route.matched[1].path.includes(':projectCode')
+          ? route.matched[1].path.replace(
+              ':projectCode',
+              menuStore.getProjectCode
+            )
+          : route.matched[1].path
+      },
+      { immediate: true }
+    )
+
     return {
       ...toRefs(state),
       menuStore,
       changeMenuOption,
       getSideMenuOptions,
-      sideKey
+      sideKeyRef
     }
   },
   render() {
@@ -103,7 +112,7 @@ const Content = defineComponent({
           {this.isShowSide && (
             <SideBar
               sideMenuOptions={this.sideMenuOptions}
-              sideKey={this.sideKey}
+              sideKey={this.sideKeyRef}
             />
           )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>

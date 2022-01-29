@@ -70,6 +70,10 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-pagerduty</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-webexteams</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>

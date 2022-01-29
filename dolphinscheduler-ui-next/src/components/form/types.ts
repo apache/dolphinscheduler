@@ -24,7 +24,7 @@ import type {
   SelectOption
 } from 'naive-ui'
 
-type IType = 'input' | 'radio'
+type IType = 'input' | 'radio' | 'editor'
 
 type IOption = SelectOption
 

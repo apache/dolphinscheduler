@@ -65,6 +65,7 @@ const menu = {
   db: 'DB',
   statistical_manage: '统计管理',
   statistics: 'Statistics',
+  audit_log: '审计日志',
   tenant_manage: '租户管理',
   user_manage: '用户管理',
   alarm_group_manage: '告警组管理',
@@ -150,6 +151,21 @@ const monitor = {
     failure_command_number: '执行失败的命令数',
     tasks_number_of_waiting_running: '待运行任务数',
     task_number_of_ready_to_kill: '待杀死任务数'
+  },
+  audit_log: {
+    user_name: '用户名称',
+    resource_type: '资源类型',
+    project_name: '项目名称',
+    operation_type: '操作类型',
+    create_time: '创建时间',
+    start_time: '开始时间',
+    end_time: '结束时间',
+    user_audit: '用户管理审计',
+    project_audit: '项目管理审计',
+    create: '创建',
+    update: '更新',
+    delete: '删除',
+    read: '读取'
   }
 }
 
@@ -278,6 +294,13 @@ const resource = {
     please_enter_keywords: '请输入搜索关键词'
   },
   task_group_queue: {
+    id: '编号',
+    actions: '操作',
+    task_name: '任务名称',
+    task_group_name: '任务组名称',
+    project_name: '项目名称',
+    process_name: '工作流名称',
+    process_instance_name: '工作流实例',
     queue: '任务组队列',
     priority: '组内优先级',
     priority_be_a_number: '优先级必须是大于等于0的数值',
@@ -289,10 +312,13 @@ const resource = {
     the_status_of_queuing: '排队中',
     the_status_of_releasing: '已释放',
     modify_priority: '修改优先级',
-    force_to_start_task: '强制启动',
+    start_task: '强制启动',
     priority_not_empty: '优先级不能为空',
     priority_must_be_number: '优先级必须是数值',
-    please_select_task_name: '请选择节点名称'
+    please_select_task_name: '请选择节点名称',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    edit_priority: '修改优先级'
   }
 }
 
