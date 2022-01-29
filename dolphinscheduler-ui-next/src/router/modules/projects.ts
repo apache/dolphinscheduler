@@ -59,7 +59,7 @@ export default {
       }
     },
     {
-      path: '/projects/:projectCode/workflow/definitions',
+      path: '/projects/:projectCode/workflow-definition',
       name: 'workflow-definition-list',
       component: components['projects-workflow-definition'],
       meta: {
@@ -68,7 +68,7 @@ export default {
       }
     },
     {
-      path: '/projects/:projectCode/workflow/definitions/timing/:definitionCode',
+      path: '/projects/:projectCode/workflow-definition/timing/:definitionCode',
       name: 'workflow-definition-timing',
       component: components['projects-workflow-definition-timing'],
       meta: {

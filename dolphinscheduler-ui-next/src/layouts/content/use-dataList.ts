@@ -104,7 +104,7 @@ export function useDataList() {
               },
               {
                 label: t('menu.workflow_definition'),
-                key: `/projects/workflow-definition`
+                key: `/projects/${menuStore.getProjectCode}/workflow-definition`
               },
               {
                 label: t('menu.workflow_instance'),
