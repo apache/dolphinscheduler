@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.rpc.client;
 
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.rpc.base.Rpc;
@@ -28,15 +31,10 @@ import org.apache.dolphinscheduler.rpc.protocol.MessageHeader;
 import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 import org.apache.dolphinscheduler.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
-
-import java.lang.reflect.Method;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import java.lang.reflect.Method;
 
 /**
  * ConsumerInterceptor
@@ -98,7 +96,7 @@ public class ConsumerInterceptor {
             Rpc rpc = method.getAnnotation(Rpc.class);
             consumerConfig.setAsync(rpc.async());
             consumerConfig.setServiceCallBackClass(rpc.serviceCallback());
-            if (!rpc.serviceCallback().isInstance(AbstractRpcCallBack.class)) {
+            if ((!AbstractRpcCallBack.class.equals(rpc.serviceCallback()) && AbstractRpcCallBack.class.isAssignableFrom(rpc.serviceCallback()))) {
                 consumerConfig.setCallBack(true);
             }
             consumerConfig.setAckCallBackClass(rpc.ackCallback());
