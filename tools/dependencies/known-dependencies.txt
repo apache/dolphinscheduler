@@ -237,3 +237,4 @@ xmlbeans-3.1.0.jar
 xmlenc-0.52.jar
 zookeeper-3.4.14.jar
 Java-WebSocket-1.5.1.jar
+kubernetes-client-5.8.0.jar
