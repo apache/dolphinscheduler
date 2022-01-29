@@ -192,6 +192,9 @@ export default defineComponent({
 
   render() {
     const { t } = this
+    if (Number(this.timingForm.warningGroupId) === 0) {
+      this.timingForm.warningGroupId = ''
+    }
 
     return (
       <Modal

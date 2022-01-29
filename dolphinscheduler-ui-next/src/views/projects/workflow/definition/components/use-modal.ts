@@ -45,7 +45,6 @@ export function useModal(
     alertGroups: [],
     environmentList: [],
     startParamsList: [] as Array<{ prop: string; value: string }>,
-    scheduleTime: null,
     schedulePreviewList: []
   })
 
@@ -77,13 +76,13 @@ export function useModal(
     state.startFormRef.validate(async (valid: any) => {
       if (!valid) {
         state.startForm.processDefinitionCode = code
-        if (variables.scheduleTime) {
+        if (state.startForm.startEndTime) {
           const start = format(
-            new Date(variables.scheduleTime[0]),
+            new Date(state.startForm.startEndTime[0]),
             'yyyy-MM-dd hh:mm:ss'
           )
           const end = format(
-            new Date(variables.scheduleTime[1]),
+            new Date(state.startForm.startEndTime[1]),
             'yyyy-MM-dd hh:mm:ss'
           )
           state.startForm.scheduleTime = `${start},${end}`
@@ -99,10 +98,8 @@ export function useModal(
           ? JSON.stringify(startParams)
           : ''
 
-        const projectCode = Number(router.currentRoute.value.params.projectCode)
-
         try {
-          await startProcessInstance(state.startForm, projectCode)
+          await startProcessInstance(state.startForm, variables.projectCode)
           window.$message.success(t('project.workflow.success'))
           ctx.emit('updateList')
           ctx.emit('update:show')
@@ -168,8 +165,11 @@ export function useModal(
       failureStrategy: state.timingForm.failureStrategy,
       warningType: state.timingForm.warningType,
       processInstancePriority: state.timingForm.processInstancePriority,
-      warningGroupId: state.timingForm.warningGroupId,
-      workerGroup: state.timingForm.workerGroup,
+      warningGroupId:
+        state.timingForm.warningGroupId === ''
+          ? 0
+          : state.timingForm.warningGroupId,
+      workerGroup: state.timingForm.workerGroups,
       environmentCode: state.timingForm.environmentCode
     }
     return data

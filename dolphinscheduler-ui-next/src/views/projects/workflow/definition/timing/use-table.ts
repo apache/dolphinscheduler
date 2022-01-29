@@ -18,7 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm, NEllipsis } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -49,7 +49,16 @@ export function useTable() {
     },
     {
       title: t('project.workflow.workflow_name'),
-      key: 'processDefinitionName'
+      key: 'processDefinitionName',
+      width: 200,
+      render: (_row) =>
+        h(
+          NEllipsis,
+          { style: 'max-width: 200px' },
+          {
+            default: () => _row.processDefinitionName
+          }
+        )
     },
     {
       title: t('project.workflow.start_time'),
@@ -69,7 +78,11 @@ export function useTable() {
     },
     {
       title: t('project.workflow.status'),
-      key: 'releaseState'
+      key: 'releaseState',
+      render: (_row) =>
+        _row.releaseState === 'ONLINE'
+          ? t('project.workflow.up_line')
+          : t('project.workflow.down_line')
     },
     {
       title: t('project.workflow.create_time'),

@@ -320,12 +320,12 @@ export default defineComponent({
               )}
               <NFormItem
                 label={t('project.workflow.schedule_date')}
-                path='complement_data'
+                path='startEndTime'
               >
                 <NDatePicker
                   type='datetimerange'
                   clearable
-                  v-model:value={this.scheduleTime}
+                  v-model:value={this.startForm.startEndTime}
                 />
               </NFormItem>
             </NSpace>

@@ -49,6 +49,7 @@ export const useForm = () => {
     startFormRef: ref(),
     startForm: {
       processDefinitionCode: -1,
+      startEndTime: [new Date(year, month, day), new Date(year, month, day)],
       scheduleTime: null,
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
@@ -78,7 +79,7 @@ export const useForm = () => {
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       processInstancePriority: 'MEDIUM',
-      warningGroupId: 0,
+      warningGroupId: '',
       workerGroup: 'default',
       environmentCode: null
     }
