@@ -31,20 +31,26 @@ import {
   NRadioGroup,
   NSelect,
   NDatePicker,
-  NInputGroup
+  NInputGroup,
+  NList,
+  NListItem,
+  NThing
 } from 'naive-ui'
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { timezoneList } from '@/utils/timezone'
-import { IDefinitionData } from '../types'
 
 const props = {
   row: {
-    type: Object as PropType<IDefinitionData>,
+    type: Object,
     default: {}
   },
   show: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  type: {
+    type: String as PropType<String>,
+    default: 'create'
   }
 }
 
@@ -58,10 +64,12 @@ export default defineComponent({
     const { timingState } = useForm()
     const {
       variables,
-      handleTimingDefinition,
+      handleCreateTiming,
+      handleUpdateTiming,
       getWorkerGroups,
       getAlertGroups,
-      getEnvironmentList
+      getEnvironmentList,
+      getPreviewSchedule
     } = useModal(timingState, ctx)
 
     const hideModal = () => {
@@ -69,7 +77,11 @@ export default defineComponent({
     }
 
     const handleTiming = () => {
-      handleTimingDefinition(props.row.code)
+      if (props.type === 'create') {
+        handleCreateTiming(props.row.code as number)
+      } else {
+        handleUpdateTiming(props.row.id)
+      }
     }
 
     const generalWarningTypeListOptions = () => [
@@ -151,6 +163,10 @@ export default defineComponent({
       timingState.timingForm.environmentCode = null
     }
 
+    const handlePreview = () => {
+      getPreviewSchedule()
+    }
+
     onMounted(() => {
       getWorkerGroups()
       getAlertGroups()
@@ -167,6 +183,7 @@ export default defineComponent({
       timezoneOptions,
       renderLabel,
       updateWorkerGroup,
+      handlePreview,
       ...toRefs(variables),
       ...toRefs(timingState),
       ...toRefs(props)
@@ -200,19 +217,36 @@ export default defineComponent({
                 style={{ width: '80%' }}
                 v-model:value={this.timingForm.crontab}
               ></NInput>
-              <NButton type='primary' ghost>
+              <NButton type='primary' ghost onClick={this.handlePreview}>
                 {t('project.workflow.execute_time')}
               </NButton>
             </NInputGroup>
           </NFormItem>
-          <NFormItem label={t('project.workflow.timezone')} path='timezoneId'>
+          <NFormItem
+            label={t('project.workflow.timezone')}
+            path='timezoneId'
+            showFeedback={false}
+          >
             <NSelect
               v-model:value={this.timingForm.timezoneId}
               options={this.timezoneOptions()}
             />
           </NFormItem>
-          <NFormItem label=' '>
-            {t('project.workflow.next_five_execution_times')}
+          <NFormItem label=' ' showFeedback={false}>
+            <NList>
+              <NListItem>
+                <NThing
+                  description={t('project.workflow.next_five_execution_times')}
+                >
+                  {this.schedulePreviewList.map((item: string) => (
+                    <NSpace>
+                      {item}
+                      <br />
+                    </NSpace>
+                  ))}
+                </NThing>
+              </NListItem>
+            </NList>
           </NFormItem>
           <NFormItem
             label={t('project.workflow.failure_strategy')}

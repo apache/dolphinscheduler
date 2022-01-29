@@ -373,7 +373,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem
             label={t('project.workflow.whether_dry_run')}
-            path='whether_dry_run'
+            path='dryRun'
           >
             <NSwitch
               checkedValue={1}

@@ -47,3 +47,26 @@ export interface IDefinitionData {
   version: number
   warningGroupId: number
 }
+
+export interface ICrontabData {
+  id: number
+  crontab: string
+  definitionDescription: string
+  endTime: string
+  environmentCode: number
+  failureStrategy: string
+  processDefinitionCode: number
+  processDefinitionName: string
+  processInstancePriority: string
+  projectName: string
+  releaseState: 'ONLINE' | 'OFFLINE'
+  startTime: string
+  timezoneId: string
+  createTime: string
+  updateTime: string
+  userId: 1
+  userName: string
+  warningGroupId: number
+  warningType: string
+  workerGroup: string
+}

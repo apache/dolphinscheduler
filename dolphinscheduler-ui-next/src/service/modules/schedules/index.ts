@@ -57,10 +57,7 @@ export function queryScheduleList(projectCode: ProjectCodeReq): any {
   })
 }
 
-export function previewSchedule(
-  data: ScheduleReq,
-  projectCode: ProjectCodeReq
-): any {
+export function previewSchedule(data: ScheduleReq, projectCode: number): any {
   return axios({
     url: `/projects/${projectCode}/schedules/preview`,
     method: 'post',
@@ -82,8 +79,8 @@ export function updateScheduleByProcessDefinitionCode(
 
 export function updateSchedule(
   data: CreateScheduleReq,
-  projectCode: ProjectCodeReq,
-  id: IdReq
+  projectCode: number,
+  id: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/schedules/${id}`,

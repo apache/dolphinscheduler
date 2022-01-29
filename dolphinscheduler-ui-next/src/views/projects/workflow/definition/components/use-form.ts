@@ -21,6 +21,10 @@ import type { FormRules } from 'naive-ui'
 
 export const useForm = () => {
   const { t } = useI18n()
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = date.getMonth()
+  const day = date.getDate()
 
   const importState = reactive({
     importFormRef: ref(),
@@ -65,20 +69,20 @@ export const useForm = () => {
   const timingState = reactive({
     timingFormRef: ref(),
     timingForm: {
-      processDefinitionCode: -1,
-      schedule: null,
-      startEndTime: null,
-      crontab: '',
-      timezoneId: '',
+      startEndTime: [
+        new Date(year, month, day),
+        new Date(year + 100, month, day)
+      ],
+      crontab: '0 0 * * * ? *',
+      timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       processInstancePriority: 'MEDIUM',
-      warningGroupId: null,
+      warningGroupId: 0,
       workerGroup: 'default',
       environmentCode: null
     }
   })
-
   return {
     importState,
     startState,

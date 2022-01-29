@@ -102,6 +102,7 @@ export default defineComponent({
           </div>
         </Card>
         <TimingModal
+          type={'update'}
           v-model:row={this.row}
           v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}

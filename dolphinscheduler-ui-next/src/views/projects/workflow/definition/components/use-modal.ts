@@ -26,7 +26,11 @@ import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
 import { startProcessInstance } from '@/service/modules/executors'
-import { createSchedule } from '@/service/modules/schedules'
+import {
+  createSchedule,
+  updateSchedule,
+  previewSchedule
+} from '@/service/modules/schedules'
 
 export function useModal(
   state: any,
@@ -36,11 +40,13 @@ export function useModal(
   const router: Router = useRouter()
 
   const variables = reactive({
+    projectCode: Number(router.currentRoute.value.params.projectCode),
     workerGroups: [],
     alertGroups: [],
     environmentList: [],
     startParamsList: [] as Array<{ prop: string; value: string }>,
-    scheduleTime: null
+    scheduleTime: null,
+    schedulePreviewList: []
   })
 
   const resetImportForm = () => {
@@ -107,29 +113,14 @@ export function useModal(
     })
   }
 
-  const handleTimingDefinition = (code: number) => {
+  const handleCreateTiming = (code: number) => {
     state.timingFormRef.validate(async (valid: any) => {
       if (!valid) {
-        state.timingForm.processDefinitionCode = code
-        const start = format(
-          new Date(state.timingForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
-        )
-        const end = format(
-          new Date(state.timingForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
-        )
-
-        state.timingForm.schedule = JSON.stringify({
-          startTime: start,
-          endTime: end,
-          crontab: state.timingForm.crontab
-        })
-
-        const projectCode = Number(router.currentRoute.value.params.projectCode)
+        const data: any = getTimingData()
+        data.processDefinitionCode = code
 
         try {
-          await createSchedule(state.timingForm, projectCode)
+          await createSchedule(data, variables.projectCode)
           window.$message.success(t('project.workflow.success'))
           ctx.emit('updateList')
           ctx.emit('update:show')
@@ -138,6 +129,50 @@ export function useModal(
         }
       }
     })
+  }
+
+  const handleUpdateTiming = (id: number) => {
+    state.timingFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        const data: any = getTimingData()
+        data.id = id
+
+        try {
+          await updateSchedule(data, variables.projectCode, id)
+          window.$message.success(t('project.workflow.success'))
+          ctx.emit('updateList')
+          ctx.emit('update:show')
+        } catch (error: any) {
+          window.$message.error(error.message)
+        }
+      }
+    })
+  }
+
+  const getTimingData = () => {
+    const start = format(
+      new Date(state.timingForm.startEndTime[0]),
+      'yyyy-MM-dd hh:mm:ss'
+    )
+    const end = format(
+      new Date(state.timingForm.startEndTime[1]),
+      'yyyy-MM-dd hh:mm:ss'
+    )
+
+    const data = {
+      schedule: JSON.stringify({
+        startTime: start,
+        endTime: end,
+        crontab: state.timingForm.crontab
+      }),
+      failureStrategy: state.timingForm.failureStrategy,
+      warningType: state.timingForm.warningType,
+      processInstancePriority: state.timingForm.processInstancePriority,
+      warningGroupId: state.timingForm.warningGroupId,
+      workerGroup: state.timingForm.workerGroup,
+      environmentCode: state.timingForm.environmentCode
+    }
+    return data
   }
 
   const getWorkerGroups = () => {
@@ -168,13 +203,45 @@ export function useModal(
     })
   }
 
+  const getPreviewSchedule = () => {
+    state.timingFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        const projectCode = Number(router.currentRoute.value.params.projectCode)
+
+        const start = format(
+          new Date(state.timingForm.startEndTime[0]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+        const end = format(
+          new Date(state.timingForm.startEndTime[1]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+
+        const schedule = JSON.stringify({
+          startTime: start,
+          endTime: end,
+          crontab: state.timingForm.crontab
+        })
+        previewSchedule({ schedule }, projectCode)
+          .then((res: any) => {
+            variables.schedulePreviewList = res
+          })
+          .catch((error: any) => {
+            window.$message.error(error.message)
+          })
+      }
+    })
+  }
+
   return {
     variables,
     handleImportDefinition,
     handleStartDefinition,
-    handleTimingDefinition,
+    handleCreateTiming,
+    handleUpdateTiming,
     getWorkerGroups,
     getAlertGroups,
-    getEnvironmentList
+    getEnvironmentList,
+    getPreviewSchedule
   }
 }
