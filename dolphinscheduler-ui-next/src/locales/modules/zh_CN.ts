@@ -390,6 +390,10 @@ const project = {
     custom_parallelism: '自定义并行度',
     please_enter_parallelism: '请输入并行度',
     please_choose: '请选择',
+    start_time: '开始时间',
+    end_time: '结束时间',
+    crontab: 'Crontab',
+    delete_confirm: '确定删除吗?',
     enter_name_tips: '请输入名称'
   },
   dag: {

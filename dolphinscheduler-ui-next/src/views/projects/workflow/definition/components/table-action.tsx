@@ -15,25 +15,21 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
 import { defineComponent, PropType } from 'vue'
 import { NSpace, NTooltip, NButton, NIcon, NPopconfirm } from 'naive-ui'
 import {
   DeleteOutlined,
   DownloadOutlined,
   FormOutlined,
-  EditOutlined,
   InfoCircleFilled,
   PlayCircleOutlined,
   ClockCircleOutlined,
   CopyOutlined,
   FieldTimeOutlined,
-  ImportOutlined,
   ExportOutlined
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
-import type { Router } from 'vue-router'
 
 const props = {
   row: {
@@ -46,11 +42,6 @@ export default defineComponent({
   props,
   emits: ['updateList', 'startWorkflow', 'timingWorkflow'],
   setup(props, ctx) {
-    const router: Router = useRouter()
-
-    // TODO
-    const handleEditFile = () => {}
-
     const handleStartWorkflow = () => {
       ctx.emit('startWorkflow')
     }

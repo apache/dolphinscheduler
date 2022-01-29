@@ -68,6 +68,15 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/workflow/definitions/timing/:definitionCode',
+      name: 'workflow-definition-timing',
+      component: components['projects-workflow-definition-timing'],
+      meta: {
+        title: '定时管理',
+        showSide: true
+      }
+    },
+    {
       path: '/projects/:projectCode/workflow/definitions/create',
       name: 'workflow-definition-create',
       component: components['projects-workflow-definition-create'],

@@ -391,6 +391,10 @@ const project = {
     custom_parallelism: 'Custom Parallelism',
     please_enter_parallelism: 'Please enter Parallelism',
     please_choose: 'Please Choose',
+    start_time: 'Start Time',
+    end_time: 'End Time',
+    crontab: 'Crontab',
+    delete_confirm: 'Delete?',
     enter_name_tips: 'Please enter name'
   },
   dag: {
