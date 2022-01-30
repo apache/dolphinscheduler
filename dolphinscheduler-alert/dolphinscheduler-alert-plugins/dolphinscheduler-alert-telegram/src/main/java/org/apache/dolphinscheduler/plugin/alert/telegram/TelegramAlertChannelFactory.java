@@ -108,8 +108,11 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                         .setRequired(false)
                         .build())
                 .build();
-        
+
         PasswordParam passwordParam = PasswordParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PASSWORD, TelegramParamsConstants.TELEGRAM_PASSWORD)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
                 .setPlaceholder("if enable use authentication, you need input password")
                 .build();
 
