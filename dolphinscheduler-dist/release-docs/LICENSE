@@ -406,6 +406,27 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     prometheus client_java(simpleclient) 0.12.0: https://github.com/prometheus/client_java, Apache 2.0
     snowflake snowflake-2010: https://github.com/twitter-archive/snowflake/tree/snowflake-2010, Apache 2.0
     kubernetes-client 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-client/5.8.0, Apache 2.0
+    kubernetes-model-admissionregistration 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-admissionregistration/5.8.0, Apache 2.0
+    kubernetes-model-apiextensions 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-apiextensions/5.8.0, Apache 2.0
+    kubernetes-model-apps 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-apps/5.8.0, Apache 2.0
+    kubernetes-model-autoscaling 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-autoscaling/5.8.0, Apache 2.0
+    kubernetes-model-batch 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-autoscaling/5.8.0, Apache 2.0
+    kubernetes-model-certificates 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-certificates/5.8.0, Apache 2.0
+    kubernetes-model-common 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-common/5.8.0, Apache 2.0
+    kubernetes-model-coordination 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-coordination/5.8.0, Apache 2.0
+    kubernetes-model-core 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-core/5.8.0, Apache 2.0
+    kubernetes-model-discovery 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-discovery/5.8.0, Apache 2.0
+    kubernetes-model-events 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-events/5.8.0, Apache 2.0
+    kubernetes-model-extensions 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-extensions/5.8.0, Apache 2.0
+    kubernetes-model-flowcontrol 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-flowcontrol/5.8.0, Apache 2.0
+    kubernetes-model-metrics 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-metrics/5.8.0, Apache 2.0
+    kubernetes-model-networking 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-networking/5.8.0, Apache 2.0
+    kubernetes-model-node 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-node/5.8.0, Apache 2.0
+    kubernetes-model-policy 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-policy/5.8.0, Apache 2.0
+    kubernetes-model-rbac 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-rbac/5.8.0, Apache 2.0
+    kubernetes-model-scheduling 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-scheduling/5.8.0, Apache 2.0
+    kubernetes-model-storageclass 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-storageclass/5.8.0, Apache 2.0
+    zjsonpatch 0.3.0 https://mvnrepository.com/artifact/io.fabric8/zjsonpatch/0.3.0, Apache 2.0
 
 ========================================================================
 BSD licenses

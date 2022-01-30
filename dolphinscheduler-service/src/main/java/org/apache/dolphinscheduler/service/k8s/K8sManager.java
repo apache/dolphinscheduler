@@ -25,11 +25,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -60,8 +60,10 @@ public class K8sManager {
         return clientMap.get(k8sName);
     }
 
-    @PostConstruct
-    public void buildApiClientAll() throws RemotingException {
+
+    //    @PostConstruct
+    @EventListener
+    public void buildApiClientAll(ApplicationReadyEvent readyEvent) throws RemotingException {
         QueryWrapper<K8s> nodeWrapper = new QueryWrapper<>();
         List<K8s> k8sList = k8sMapper.selectList(nodeWrapper);
 
