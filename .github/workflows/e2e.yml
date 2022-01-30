@@ -81,12 +81,16 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
           - name: Environment
             class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
+          - name: Token
+            class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
           - name: Workflow
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
           - name: FileManage
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
           - name: UdfManage
             class: org.apache.dolphinscheduler.e2e.cases.UdfManageE2ETest
+          - name: FunctionManage
+            class: org.apache.dolphinscheduler.e2e.cases.FunctionManageE2ETest
           - name: MysqlDataSource
             class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
           - name: ClickhouseDataSource

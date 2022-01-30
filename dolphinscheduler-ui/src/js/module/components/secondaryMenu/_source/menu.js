@@ -182,9 +182,10 @@ const menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
+      enabled: true,
       icon: 'el-icon-document',
       children: [],
-      enabled: true
+      classNames: 'tab-token-manage'
     },
     {
       name: `${i18n.$t('K8s Namespace')}`,
@@ -193,7 +194,8 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-s-grid',
       children: [],
-      enabled: true
+      enabled: true,
+      classNames: 'tab-namespace-manage'
     }
   ],
   resource: [

@@ -61,7 +61,6 @@ public class K8sManager {
     }
 
 
-    //    @PostConstruct
     @EventListener
     public void buildApiClientAll(ApplicationReadyEvent readyEvent) throws RemotingException {
         QueryWrapper<K8s> nodeWrapper = new QueryWrapper<>();
