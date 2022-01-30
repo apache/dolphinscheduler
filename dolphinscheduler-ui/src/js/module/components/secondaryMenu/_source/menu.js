@@ -182,9 +182,10 @@ const menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
+      enabled: true,
       icon: 'el-icon-document',
       children: [],
-      enabled: true
+      classNames: 'tab-token-manage'
     }
   ],
   resource: [
