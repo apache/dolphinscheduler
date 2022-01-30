@@ -259,3 +259,9 @@ kubernetes-model-rbac-5.8.0.jar
 kubernetes-model-scheduling-5.8.0.jar
 kubernetes-model-storageclass-5.8.0.jar
 zjsonpatch-0.3.0.jar
+automaton-1.11-8.jar
+generex-1.0.2.jar
+jackson-dataformat-yaml-2.12.5.jar
+logging-interceptor-3.14.9.jar
+okhttp-3.14.9.jar
+okio-1.17.2.jar

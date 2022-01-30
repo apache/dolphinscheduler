@@ -427,6 +427,11 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     kubernetes-model-scheduling 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-scheduling/5.8.0, Apache 2.0
     kubernetes-model-storageclass 5.8.0: https://mvnrepository.com/artifact/io.fabric8/kubernetes-model-storageclass/5.8.0, Apache 2.0
     zjsonpatch 0.3.0 https://mvnrepository.com/artifact/io.fabric8/zjsonpatch/0.3.0, Apache 2.0
+    generex 1.0.2 https://mvnrepository.com/artifact/com.github.mifmif/generex/1.0.2, Apache 2.0
+    jackson-dataformat-yaml 2.12.5 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.12.5, Apache 2.0
+    logging-interceptor 3.14.9 https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor/3.14.9, Apache 2.0
+    okhttp 3.14.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp/3.14.3, Apache 2.0
+    okio 1.17.2 https://mvnrepository.com/artifact/com.squareup.okio/okio/1.17.2, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -450,6 +455,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     LatencyUtils 2.0.3: https://github.com/LatencyUtils/LatencyUtils, BSD-2-Clause
     janino 3.1.6: https://mvnrepository.com/artifact/org.codehaus.janino/janino/3.1.6, BSD 3-clause
     commons-compiler 3.1.6: https://mvnrepository.com/artifact/org.codehaus.janino/janino/3.1.6, BSD 3-clause
+    automaton 1.11-8 https://mvnrepository.com/artifact/dk.brics.automaton/automaton/1.11-8, BSD 2-clause
 
 ========================================================================
 CDDL licenses
