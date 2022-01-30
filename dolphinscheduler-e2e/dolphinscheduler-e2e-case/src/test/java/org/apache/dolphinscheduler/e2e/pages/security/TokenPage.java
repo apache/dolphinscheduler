@@ -35,6 +35,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
+import com.google.common.base.Strings;
+
 @Getter
 public final class TokenPage extends NavBarPage implements Tab {
     @FindBy(id = "btnCreateToken")
@@ -71,8 +73,7 @@ public final class TokenPage extends NavBarPage implements Tab {
     }
 
     public TokenPage update(String userName) {
-        List<WebElement> tokenList = driver.findElementsByClassName("items");
-        tokenList.stream()
+        tokenList().stream()
             .filter(it -> it.findElement(By.className("userName")).getAttribute("innerHTML").contains(userName))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
@@ -89,7 +90,13 @@ public final class TokenPage extends NavBarPage implements Tab {
     }
 
     public String getToken(String userName) {
-        return driver.findElementByClassName("token").getText();
+        return tokenList().stream()
+                          .filter(it -> it.findElement(By.className("userName")).getAttribute("innerHTML").contains(userName))
+                          .flatMap(it -> it.findElements(By.className("token")).stream())
+                          .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
+                          .map(it -> it.getAttribute("innerHTML"))
+                          .findFirst()
+                          .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
     }
 
     public TokenPage delete(String userName) {
