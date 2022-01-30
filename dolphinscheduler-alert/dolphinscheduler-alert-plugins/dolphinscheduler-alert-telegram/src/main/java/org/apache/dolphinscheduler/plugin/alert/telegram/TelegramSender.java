@@ -122,7 +122,7 @@ public final class TelegramSender {
         }
         if (!response.isOk()) {
             result.setMessage(String.format("send telegram alert fail. telegram server error_code: %d,  description: %s",
-                    response.error_code, response.description));
+                    response.errorCode, response.description));
         } else {
             result.setStatus("true");
             result.setMessage("send telegram msg success.");
@@ -162,15 +162,15 @@ public final class TelegramSender {
     private String buildMsgJsonStr(String content) {
         Map<String, Object> items = new HashMap<>();
         items.put("chat_id", chatId);
-        if (isNotTextParseMode()) {
+        if (!isTextParseMode()) {
             items.put("parse_mode", parseMode);
         }
         items.put("text", content);
         return JSONUtils.toJsonString(items);
     }
 
-    private boolean isNotTextParseMode() {
-        return !TelegramAlertConstants.PARSE_MODE_TXT.equals(parseMode);
+    private boolean isTextParseMode() {
+        return null == parseMode || TelegramAlertConstants.PARSE_MODE_TXT.equals(parseMode);
     }
 
     private static class TelegramSendMsgResponse {
@@ -180,7 +180,7 @@ public final class TelegramSender {
         }
 
         private Boolean ok;
-        private Integer error_code;
+        private Integer errorCode;
         private String description;
         private Object result;
 
@@ -192,12 +192,16 @@ public final class TelegramSender {
             this.ok = ok;
         }
 
-        public Integer getError_code() {
-            return error_code;
+        public void setError_code(Integer errorCode) {
+            this.errorCode = errorCode;
         }
 
-        public void setError_code(Integer error_code) {
-            this.error_code = error_code;
+        public void setErrorCode(Integer errorCode) {
+            this.errorCode = errorCode;
+        }
+
+        public Integer getErrorCode() {
+            return errorCode;
         }
 
         public String getDescription() {
