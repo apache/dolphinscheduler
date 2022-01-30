@@ -57,7 +57,7 @@
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
             <treeselect id="btnUdfResourceDropDown" style="width:535px;float:left;" v-model="resourceId" maxHeight="200" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
-              <div class="options-udf-resource" slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+              <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
             <el-button type="primary" size="small" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</el-button>
           </template>
