@@ -69,7 +69,7 @@ public class TokenE2ETest {
     @Order(30)
     void testEditToken() {
         final TokenPage page = new TokenPage(browser);
-        String oldToken = page.getToken();
+        String oldToken = page.getToken(userName);
         page.update(userName);
 
         await().untilAsserted(() -> {

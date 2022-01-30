@@ -88,7 +88,7 @@ public final class TokenPage extends NavBarPage implements Tab {
         return this;
     }
 
-    public String getToken() {
+    public String getToken(String userName) {
         return driver.findElementByClassName("token").getText();
     }
 
