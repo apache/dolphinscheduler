@@ -25,7 +25,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
@@ -56,7 +55,6 @@ public abstract class TaskNodeForm {
     @FindBys({
         @FindBy(className = "pre_tasks-model"),
         @FindBy(tagName = "input"),
-//        @FindBy(id = "selectPreTask"),
     })
     private WebElement selectPreTasks;
 
@@ -96,17 +94,14 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm preTask(String preTaskName) {
-//        selectPreTasks().click();
-
         ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
 
         final By optionsLocator = By.className("option-pre-tasks");
 
-        new WebDriverWait(parent.driver(), 1)
+        new WebDriverWait(parent.driver(), 10)
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
-        webElements.forEach(e -> System.out.println("preTask："+e.getText()));
         webElements.stream()
                 .filter(it -> it.getText().contains(preTaskName))
                 .findFirst()

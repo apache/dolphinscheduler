@@ -23,7 +23,7 @@
           <a href="javascript:"
              @click="!isDetails && _addDep()"
              class="add-dep">
-            <em v-if="!isLoading" class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+            <em v-if="!isLoading" id="add-if-branch" class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
             <em v-if="isLoading" class="el-icon-loading as as-spin" data-toggle="tooltip" :title="$t('Add')"></em>
           </a>
         </div>
@@ -35,7 +35,7 @@
             </label>
             <span class="text-b" style="padding-left: 0">{{$t('Branch flow')}}</span>
             <el-select style="width: 157px;" size="small" v-model="el.nextNode" clearable :disabled="isDetails">
-              <el-option v-for="item in postTasks" :key="item.code" :value="item.code" :label="item.name"></el-option>
+              <el-option class="option-if-branches" v-for="item in postTasks" :key="item.code" :value="item.code" :label="item.name"></el-option>
             </el-select>
             <span class="operation">
               <a href="javascript:" class="delete" @click="!isDetails && _removeDep(index)" v-if="index === (dependItemList.length - 1)">
@@ -51,9 +51,9 @@
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Branch flow')}}</div>
-      <div slot="content">
+      <div slot="content" class="switch-else">
         <el-select style="width: 157px;" size="small" v-model="nextNode" clearable :disabled="isDetails">
-          <el-option v-for="item in postTasks" :key="item.code" :value="item.code" :label="item.name"></el-option>
+          <el-option class="option-else-branches" v-for="item in postTasks" :key="item.code" :value="item.code" :label="item.name"></el-option>
         </el-select>
       </div>
     </m-list-box>

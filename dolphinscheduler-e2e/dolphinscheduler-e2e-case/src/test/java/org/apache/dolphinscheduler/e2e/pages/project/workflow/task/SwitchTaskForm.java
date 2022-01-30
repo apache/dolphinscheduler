@@ -20,45 +20,26 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import lombok.Getter;
-import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.pagefactory.ByChained;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Getter
 public final class SwitchTaskForm extends TaskNodeForm {
 
-    @FindBys({
-            @FindBy(className = "switch-task"),
-            @FindBy(className = "dep-opt"),
-            @FindBy(className = "add-dep")
-    })
+    @FindBy(id = "add-if-branch")
     private WebElement addBranchButton;
 
     @FindBys({
             @FindBy(className = "switch-task"),
-            @FindBy(className = "switch-list"),
-            @FindBy(className = "el-input")
-    })
-    private List<WebElement> ifBranches;
-
-    @FindBys({
-            @FindBy(className = "switch-task"),
-            @FindBy(className = "switch-list"),
-            @FindBy(className = "el-input__inner")
-    })
-    private List<CodeEditor> ifScriptList;
-
-    @FindBys({
-            @FindBy(className = "switch-task"),
-            @FindBy(className = "clearfix list"),
+            @FindBy(className = "switch-else"),
             @FindBy(className = "el-input__inner")
     })
     private WebElement elseBranch;
@@ -68,21 +49,46 @@ public final class SwitchTaskForm extends TaskNodeForm {
     }
 
     public SwitchTaskForm elseBranch(String elseBranchName) {
-        elseBranch().sendKeys(elseBranchName);
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", elseBranch());
+
+        final By optionsLocator = By.className("option-else-branches");
+
+        new WebDriverWait(parent().driver(), 10)
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements =  parent().driver().findElements(optionsLocator);
+        webElements.stream()
+                .filter(it -> it.getText().contains(elseBranchName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such else branch: " + elseBranchName))
+                .click();
+
+        inputNodeName().click();
 
         return this;
     }
 
     public SwitchTaskForm addIfBranch(String switchScript, String ifBranchName) {
-        final int len = ifBranches().size();
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", addBranchButton);
 
-        addBranchButton.click();
+        SwitchTaskIfBranch switchTaskIfBranch = new SwitchTaskIfBranch(this);
+        switchTaskIfBranch.codeEditor().content(switchScript);
 
-        ifScriptList.add(new CodeEditor(this.parent().driver()).content(switchScript));
-        ifBranches().get(len).sendKeys(ifBranchName);
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", switchTaskIfBranch.ifBranch());
 
+        final By optionsLocator = By.className("option-if-branches");
+
+        new WebDriverWait(parent().driver(), 10)
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements =  parent().driver().findElements(optionsLocator);
+        webElements.stream()
+                .filter(it -> it.getText().contains(ifBranchName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such if branch: " + ifBranchName))
+                .click();
+
+        inputNodeName().click();
         return this;
     }
-
-
 }

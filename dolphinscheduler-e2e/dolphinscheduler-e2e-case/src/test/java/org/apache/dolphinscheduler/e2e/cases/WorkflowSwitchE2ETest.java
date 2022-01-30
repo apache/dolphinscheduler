@@ -24,13 +24,13 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm.TaskType;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab.Row;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
@@ -40,12 +40,18 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowSwitchE2ETest {
     private static final String project = "test-workflow-1";
+    private static final String workflow = "test-workflow-1";
+    private static final String ifBranchName = "key==1";
+    private static final String elseBranchName = "key!=1";
+
     private static final String tenant = System.getProperty("user.name");
 
     private static RemoteWebDriver browser;
@@ -83,9 +89,6 @@ class WorkflowSwitchE2ETest {
     @Test
     @Order(1)
     void testCreateSwitchWorkflow() {
-        final String workflow = "test-workflow-1";
-        final String ifBranchName = "key==1";
-        final String elseBranchName = "key!=1";
 
         final WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
@@ -116,10 +119,14 @@ class WorkflowSwitchE2ETest {
             .name(elseBranchName)
             .submit();
 
+        // format dag
+        workflowForm.formatDAG().confirm();
+
         // add branch for switch task
         workflowForm.getTask("switch");
         switchTaskForm.addIfBranch("${key}==1", ifBranchName);
         switchTaskForm.elseBranch(elseBranchName);
+        switchTaskForm.submit();
 
         workflowForm.submit()
             .name(workflow)
@@ -132,5 +139,47 @@ class WorkflowSwitchE2ETest {
         ).anyMatch(it -> it.getText().contains(workflow)));
 
         workflowDefinitionPage.publish(workflow);
+    }
+
+    @Test
+    @Order(10)
+    void testRunWorkflow() {
+        final ProjectDetailPage projectPage =
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(project);
+
+        projectPage
+                .goToTab(WorkflowInstanceTab.class)
+                .deleteAll();
+
+        projectPage
+                .goToTab(WorkflowDefinitionTab.class)
+                .run(workflow)
+                .submit();
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            final Row row = projectPage
+                    .goToTab(WorkflowInstanceTab.class)
+                    .instances()
+                    .iterator()
+                    .next();
+
+            assertThat(row.isSuccess()).isTrue();
+            assertThat(row.executionTime()).isEqualTo(1);
+        });
+
+        // check task for switch
+        List<TaskInstanceTab.Row> taskInstances = projectPage
+                .goToTab(TaskInstanceTab.class)
+                .instances();
+
+        await().untilAsserted(() -> {
+            assertThat(taskInstances.size()).isEqualTo(3);
+            assertThat(taskInstances.stream().filter(row -> row.name().contains(ifBranchName)).count()).isEqualTo(1);
+            assertThat(taskInstances.stream().noneMatch(row -> row.name().contains(elseBranchName))).isTrue();
+        });
     }
 }

@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.TaskNodeForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -47,6 +46,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public final class WorkflowForm {
     private final WebDriver driver;
     private final WorkflowSaveDialog saveForm;
+    private final WorkflowFormatDialog formatDialog;
 
     @FindBy(className = "graph-format")
     private WebElement formatBtn;
@@ -57,6 +57,7 @@ public final class WorkflowForm {
     public WorkflowForm(WebDriver driver) {
         this.driver = driver;
         this.saveForm = new WorkflowSaveDialog(this);
+        this.formatDialog = new WorkflowFormatDialog(this);
 
         PageFactory.initElements(driver, this);
     }
@@ -69,7 +70,7 @@ public final class WorkflowForm {
 
         final JavascriptExecutor js = (JavascriptExecutor) driver;
         final String dragAndDrop = String.join("\n",
-            Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
+                Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
         js.executeScript(dragAndDrop, task, canvas);
 
         switch (type) {
@@ -83,27 +84,17 @@ public final class WorkflowForm {
         throw new UnsupportedOperationException("Unknown task type");
     }
 
-    public void moveTask(String taskName, int xOffset, int yOffset) {
-        WebElement task = getTask(taskName);
-        Actions builder = new Actions(driver);
-        builder.moveToElement(task, xOffset, yOffset);
-        builder.click().build().perform();
-    }
-
     public WebElement getTask(String taskName) {
         List<WebElement> tasks = new WebDriverWait(driver, 10)
                 .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
 
-        System.out.println("getTask:"+ tasks.size());
-        tasks.forEach( t -> {
-            System.out.println("getTask:" + t.getText());
-            System.out.println(t.getAttribute("class"));
-            System.out.println(t.getAttribute("data-shape"));
-        });
         WebElement task = tasks.stream()
                 .filter(t -> t.getText().contains(taskName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such task: " + taskName));
+
+        Actions action = new Actions(driver);
+        action.doubleClick(task).build().perform();
 
         return task;
     }
@@ -114,14 +105,10 @@ public final class WorkflowForm {
         return new WorkflowSaveDialog(this);
     }
 
-    public void formatDAG() {
+    public WorkflowFormatDialog formatDAG() {
         formatBtn.click();
-    }
 
-    public void moveTo(int xOffset, int yOffset) {
-        Actions builder = new Actions(driver);
-        builder.moveByOffset(xOffset, yOffset);
-        builder.build().perform();
+        return new WorkflowFormatDialog(this);
     }
 
     public enum TaskType {

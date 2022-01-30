@@ -17,48 +17,36 @@
  * under the License.
  *
  */
-package org.apache.dolphinscheduler.e2e.pages.project.workflow;
+package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import lombok.Getter;
-import org.openqa.selenium.By;
+import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.ByChained;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Getter
-public final class WorkflowFormatDialog {
+public final class SwitchTaskIfBranch {
     private final WebDriver driver;
-    private final WorkflowForm parent;
+    private final SwitchTaskForm parent;
+
+    private final CodeEditor codeEditor;
 
     @FindBys({
-            @FindBy(className = "el-dialog__wrapper"),
-            @FindBy(className = "el-button--primary"),
+            @FindBy(className = "switch-task"),
+            @FindBy(className = "switch-list"),
+            @FindBy(className = "el-input")
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement ifBranch;
 
-    public WorkflowFormatDialog(WorkflowForm parent) {
+    public SwitchTaskIfBranch(SwitchTaskForm parent) {
         this.parent = parent;
-        this.driver = parent.driver();
+        this.driver = parent.parent().driver();
+
+        this.codeEditor = new CodeEditor(driver);
 
         PageFactory.initElements(driver, this);
-    }
-
-    public WorkflowForm confirm() {
-        buttonConfirm()
-                .stream()
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No confirm button when confirm"))
-                .click();
-
-        return parent;
     }
 }
