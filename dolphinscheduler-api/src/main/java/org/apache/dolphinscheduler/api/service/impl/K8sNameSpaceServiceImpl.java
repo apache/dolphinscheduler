@@ -134,7 +134,6 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
         }
 
         if (checkNamespaceExistInDb(namespace, k8s)) {
-            logger.error("namespace {} has exist, can't recreate", namespace);
             putMsg(result, Status.K8S_NAMESPACE_EXIST, namespace, k8s);
             return result;
         }
@@ -159,6 +158,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
             String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
             k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
         } catch (Exception e) {
+            logger.error("namespace create to k8s error", e);
             putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
             return result;
         }
@@ -212,6 +212,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
             String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
             k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
         } catch (Exception e) {
+            logger.error("namespace update to k8s error", e);
             putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
             return result;
         }
