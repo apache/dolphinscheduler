@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.telegram;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -121,7 +122,7 @@ public final class TelegramSender {
             return result;
         }
         if (!response.isOk()) {
-            result.setMessage(String.format("send telegram alert fail. telegram server error_code: %d,  description: %s",
+            result.setMessage(String.format("send telegram alert fail. telegram server error_code: %d, description: %s",
                     response.errorCode, response.description));
         } else {
             result.setStatus("true");
@@ -173,29 +174,30 @@ public final class TelegramSender {
         return null == parseMode || TelegramAlertConstants.PARSE_MODE_TXT.equals(parseMode);
     }
 
-    private static class TelegramSendMsgResponse {
+    static class TelegramSendMsgResponse {
+        @JsonProperty("ok")
+        private Boolean ok;
+        @JsonProperty("error_code")
+        private Integer errorCode;
+        @JsonProperty("description")
+        private String description;
+        @JsonProperty("result")
+        private Object result;
 
         public boolean isOk() {
             return null != ok && ok;
         }
 
-        private Boolean ok;
-        private Integer errorCode;
-        private String description;
-        private Object result;
-
         public Boolean getOk() {
             return ok;
         }
 
+        @JsonProperty("ok")
         public void setOk(Boolean ok) {
             this.ok = ok;
         }
 
-        public void setError_code(Integer errorCode) {
-            this.errorCode = errorCode;
-        }
-
+        @JsonProperty("error_code")
         public void setErrorCode(Integer errorCode) {
             this.errorCode = errorCode;
         }
@@ -208,6 +210,7 @@ public final class TelegramSender {
             return description;
         }
 
+        @JsonProperty("description")
         public void setDescription(String description) {
             this.description = description;
         }
@@ -216,6 +219,7 @@ public final class TelegramSender {
             return result;
         }
 
+        @JsonProperty("result")
         public void setResult(Object result) {
             this.result = result;
         }

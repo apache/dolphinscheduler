@@ -32,12 +32,20 @@ public class TelegramSenderTest {
 
     @Before
     public void initConfig() {
+//        telegramConfig.put(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK,
+//                "https://api.telegram.org/bot{botToken}/sendMessage");
+//        telegramConfig.put(
+//                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "BOT_TOKEN");
+//        telegramConfig.put(
+//                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "CHAT_ID");
+//        telegramConfig.put(
+//                TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
         telegramConfig.put(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK,
-                "https://api.telegram.org/bot{botToken}/sendMessage");
+                "https://thingproxy.freeboard.io/fetch/https://api.telegram.org/bot{botToken}/sendMessage");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "BOT_TOKEN");
+                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "5263705405:AAEPadQyd7btmh9Hww8S7p_ZDr_hqYSlWsM");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "CHAT_ID");
+                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "-1001642371439");
         telegramConfig.put(
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
     }
