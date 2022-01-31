@@ -15,31 +15,15 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
+import { h } from 'vue'
+import { NInput } from 'naive-ui'
+import type { IFieldParams } from '../types'
 
-export function useForm() {
-  const state = reactive({
-    formRef: ref()
+export function renderInput(params: IFieldParams) {
+  const { props, fields, field } = params
+  return h(NInput, {
+    ...props,
+    value: fields[field],
+    onUpdateValue: (value: string) => void (fields[field] = value)
   })
-
-  const validate = (...args: []) => {
-    state.formRef.validate(...args)
-  }
-
-  const setValues = (initialValues: { [field: string]: any }) => {
-    for (let [key, value] of Object.entries(initialValues)) {
-      state.formRef.model[key] = value
-    }
-  }
-
-  const restoreValidation = () => {
-    state.formRef.restoreValidation()
-  }
-
-  return {
-    state,
-    validate,
-    setValues,
-    restoreValidation
-  }
 }

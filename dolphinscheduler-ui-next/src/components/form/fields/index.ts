@@ -15,31 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
-
-export function useForm() {
-  const state = reactive({
-    formRef: ref()
-  })
-
-  const validate = (...args: []) => {
-    state.formRef.validate(...args)
-  }
-
-  const setValues = (initialValues: { [field: string]: any }) => {
-    for (let [key, value] of Object.entries(initialValues)) {
-      state.formRef.model[key] = value
-    }
-  }
-
-  const restoreValidation = () => {
-    state.formRef.restoreValidation()
-  }
-
-  return {
-    state,
-    validate,
-    setValues,
-    restoreValidation
-  }
-}
+export { renderInput } from './input'
+export { renderRadio } from './radio'
+export { renderEditor } from './monaco-editor'
+export { renderCustomParameters } from './custom-parameters'
