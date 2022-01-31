@@ -24,7 +24,7 @@ import type {
   SelectOption
 } from 'naive-ui'
 
-type IType = 'input' | 'radio' | 'editor'
+type IType = 'input' | 'radio' | 'editor' | 'custom-parameters'
 
 type IOption = SelectOption
 
@@ -42,6 +42,8 @@ interface IFieldParams {
   props: object
   fields: { [field: string]: any }
   options?: IOption[]
+  rules?: FormRules | { [key: string]: FormRules }
+  children?: IJsonItem[]
 }
 
 interface IJsonItem {
@@ -53,6 +55,7 @@ interface IJsonItem {
   validate?: FormItemRule
   value?: any
   options?: IOption[]
+  children?: IJsonItem[]
 }
 
 export {
