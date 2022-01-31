@@ -827,6 +827,7 @@ export default {
   'Task group queue the status of queuing': 'Queuing',
   'Task group queue the status of releasing': 'Released',
   'Modify task group queue priority': 'Edit the priority of the task group queue',
+  'Force to start task': 'Force to start the task',
   'Priority not empty': 'The value of priority can not be empty',
   'Priority must be number': 'The value of priority should be number',
   'Please select task name': 'Please select a task name',
