@@ -79,13 +79,13 @@
 
     <update id="updateForceStart">
         update t_ds_task_group_queue
-               set priority = #{priority}
+        set force_start = #{forceStart}
         where id = #{queueId}
     </update>
 
     <update id="modifyPriority">
         update t_ds_task_group_queue
-               set force_start = #{forceStart}
+        set priority = #{priority}
         where id = #{queueId}
     </update>
 
