@@ -16,29 +16,16 @@
  */
 
 import { h } from 'vue'
-import { NInput, NRadio, NRadioGroup, NSpace } from 'naive-ui'
-import Editor from '@/components/monaco-editor'
-import type { IFieldParams } from './types'
+import { NRadio, NRadioGroup, NSpace } from 'naive-ui'
+import type { IFieldParams, IOption } from '../types'
 
-// TODO Support other widgets later
-// Input
-export function renderInput(params: IFieldParams) {
-  const { props, fields, field } = params
-  return h(NInput, {
-    ...props,
-    value: fields[field],
-    onUpdateValue: (value) => void (fields[field] = value)
-  })
-}
-
-// Radio && RadioGroup
 export function renderRadio(params: IFieldParams) {
   const { props, fields, field, options } = params
   if (!options || options.length === 0) {
     return h(NRadio, {
       ...props,
       value: fields[field],
-      onUpdateChecked: (checked) => void (fields[field] = checked)
+      onUpdateChecked: (checked: boolean) => void (fields[field] = checked)
     })
   }
   return h(
@@ -49,17 +36,7 @@ export function renderRadio(params: IFieldParams) {
     },
     () =>
       h(NSpace, null, () =>
-        options.map((option) => h(NRadio, option, () => option.label))
+        options.map((option: IOption) => h(NRadio, option, () => option.label))
       )
   )
-}
-
-// Editor
-export function renderEditor(params: IFieldParams) {
-  const { props, fields, field } = params
-  return h(Editor, {
-    ...props,
-    value: fields[field],
-    onUpdateValue: (value) => void (fields[field] = value)
-  })
 }
