@@ -77,8 +77,6 @@ services:
     expose:
       - "10000"
     depends_on:
-      hive-metastore:
-        condition: service_healthy
       datanode:
         condition: service_healthy
       namenode:
@@ -102,7 +100,6 @@ services:
     depends_on:
       hive-metastore-postgresql:
         condition: service_healthy
-
   hive-metastore-postgresql:
     image: bde2020/hive-metastore-postgresql:2.3.0
     networks:
