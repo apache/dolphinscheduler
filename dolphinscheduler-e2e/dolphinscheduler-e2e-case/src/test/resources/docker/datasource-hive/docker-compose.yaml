@@ -46,7 +46,7 @@ services:
     expose:
       - "50070"
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:9870/" ]
+      test: [ "CMD", "curl", "http://localhost:50070/" ]
       interval: 5s
       timeout: 60s
       retries: 120
@@ -61,7 +61,7 @@ services:
     expose:
       - "50075"
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:9864" ]
+      test: [ "CMD", "curl", "http://localhost:50075" ]
       interval: 5s
       timeout: 60s
       retries: 120
