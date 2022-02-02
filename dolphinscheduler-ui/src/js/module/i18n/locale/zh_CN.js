@@ -903,7 +903,7 @@ export default {
   TargetTableTotalRows: '目标表总行数',
   'Alert When Blocking': '阻断时告警',
   'Blocking Condition': '阻断时机',
-  'Blocking on Failed': '失败时阻断',
-  'Blocking on Success': '成功时阻断',
+  'Blocking on Failed': '自定义参数失败时阻断',
+  'Blocking on Success': '自定义参数成功时阻断',
   'Do not Alert': '不告警'
 }

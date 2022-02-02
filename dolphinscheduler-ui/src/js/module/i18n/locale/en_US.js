@@ -903,7 +903,7 @@ export default {
   TargetTableTotalRows: 'TargetTableTotalRows',
   'Alert When Blocking': 'Alert When Blocking',
   'Blocking Condition': 'Blocking Condition',
-  'Blocking on Failed': 'Blocking on Failed',
-  'Blocking on Success': 'Blocking on Success',
+  'Blocking on Failed': 'Blocking on Custom Param Failed',
+  'Blocking on Success': 'Blocking on Custom Param Success',
   'Do not Alert': 'Do not Alert'
 }
