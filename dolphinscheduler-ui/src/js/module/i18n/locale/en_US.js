@@ -905,6 +905,5 @@ export default {
   'Blocking Condition': 'Blocking Condition',
   'Blocking on Failed': 'Blocking on Failed',
   'Blocking on Success': 'Blocking on Success',
-  Alert: 'Alert',
   'Do not Alert': 'Do not Alert'
 }

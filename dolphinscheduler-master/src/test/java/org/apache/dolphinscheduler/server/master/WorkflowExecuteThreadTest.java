@@ -29,15 +29,11 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
@@ -45,6 +41,7 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
@@ -58,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +70,7 @@ import org.springframework.context.ApplicationContext;
  * test for WorkflowExecuteThread
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({WorkflowExecuteThread.class,TaskProcessorFactory.class})
+@PrepareForTest({WorkflowExecuteThread.class})
 public class WorkflowExecuteThreadTest {
 
     private WorkflowExecuteThread workflowExecuteThread;
@@ -122,9 +120,9 @@ public class WorkflowExecuteThreadTest {
         stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
         workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread));
         // prepareProcess init dag
-//        dag = WorkflowExecuteThread.class.getDeclaredField("dag");
-//        dag.setAccessible(true);
-//        dag.set(workflowExecuteThread, new DAG());
+        Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
+        dag.setAccessible(true);
+        dag.set(workflowExecuteThread, new DAG());
         PowerMockito.doNothing().when(workflowExecuteThread, "endProcess");
     }
 

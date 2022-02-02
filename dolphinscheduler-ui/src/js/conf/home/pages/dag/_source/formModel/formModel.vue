@@ -933,15 +933,12 @@
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime,
             environmentCode: this.environmentCode || -1,
-<<<<<<< HEAD
             status: this.status,
             branch: this.branch,
             blockingCondition: this.blockingCondition,
-            alertWhenBlocking: this.alertWhenBlocking
-=======
+            alertWhenBlocking: this.alertWhenBlocking,
             taskGroupId: this.taskGroupId,
             taskGroupPriority: this.taskGroupPriority
->>>>>>> temp
           },
           fromThis: this,
           ...(this.fromTaskDefinition ? {
@@ -1212,13 +1209,9 @@
       mWorkerGroups,
       mRelatedEnvironment,
       mPreTasks,
-<<<<<<< HEAD
-      mBlocking
-      // ReferenceFromTask
-=======
+      mBlocking,
       mTaskGroups
     // ReferenceFromTask
->>>>>>> temp
     }
   }
 </script>

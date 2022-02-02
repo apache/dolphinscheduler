@@ -255,6 +255,12 @@ public class ProcessInstance {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date restartTime;
 
+    /**
+     * workflow block flag
+     */
+    @TableField(exist = false)
+    private boolean isBlocked;
+
     public ProcessInstance() {
 
     }
@@ -629,6 +635,14 @@ public class ProcessInstance {
         this.processDefinitionVersion = processDefinitionVersion;
     }
 
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{"
@@ -707,6 +721,8 @@ public class ProcessInstance {
             + ", restartTime='"
             + restartTime
             + '\''
+            + ", isBlocked="
+            + isBlocked
             + '}';
     }
 

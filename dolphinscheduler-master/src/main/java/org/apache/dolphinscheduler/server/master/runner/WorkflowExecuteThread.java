@@ -25,28 +25,14 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DependResult;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
-import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -330,6 +316,8 @@ public class WorkflowExecuteThread {
             case TASK_RETRY:
                 result = taskRetryEventHandler(stateEvent);
                 break;
+            case PROCESS_BLOCKED:
+                result = processBlockHandler(stateEvent);
             default:
                 break;
         }
@@ -440,14 +428,17 @@ public class WorkflowExecuteThread {
             completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
-            submitPostNode(Long.toString(taskInstance.getTaskCode()));
+            if (!processInstance.isBlocked()) {
+                submitPostNode(Long.toString(taskInstance.getTaskCode()));
+            }
         } else if (taskInstance.taskCanRetry()) {
             // retry task
             retryTaskInstance(taskInstance);
         } else if (taskInstance.getState().typeIsFailure()) {
             completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             if (taskInstance.isConditionsTask()
-                || DagHelper.haveConditionsAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
+                || DagHelper.haveConditionsAfterNode(Long.toString(taskInstance.getTaskCode()), dag)
+                || DagHelper.haveBlockingAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
                 submitPostNode(Long.toString(taskInstance.getTaskCode()));
             } else {
                 errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
@@ -648,6 +639,23 @@ public class WorkflowExecuteThread {
             return true;
         } catch (Exception e) {
             logger.error("process state change error:", e);
+        }
+        return true;
+    }
+
+    private boolean processBlockHandler(StateEvent stateEvent) {
+        try {
+            TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+            BlockingParameters parameters = (BlockingParameters) TaskParametersUtils.getParameters(TaskType.BLOCKING.getDesc(),
+                    task.getTaskParams());
+            if (parameters.isAlertWhenBlocking()) {
+                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+                processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+                logger.info("block alert send successful!");
+            }
+            taskStateChangeHandler(stateEvent);
+        } catch (Exception e) {
+            logger.error("sending blocking message error:", e);
         }
         return true;
     }
@@ -952,7 +960,11 @@ public class WorkflowExecuteThread {
                 stateEvent.setProcessInstanceId(this.processInstance.getId());
                 stateEvent.setTaskInstanceId(taskInstance.getId());
                 stateEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
-                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                if (processInstance.isBlocked()) {
+                    stateEvent.setType(StateEventType.PROCESS_BLOCKED);
+                } else {
+                    stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                }
                 this.stateEvents.add(stateEvent);
             }
             return taskInstance;
@@ -1273,8 +1285,8 @@ public class WorkflowExecuteThread {
                 if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
                     return DependResult.NON_EXEC;
                 }
-                // ignore task state if current task is condition
-                if (taskNode.isConditionsTask()) {
+                // ignore task state if current task is condition and block
+                if (taskNode.isConditionsTask() || taskNode.isBlockingTask()) {
                     continue;
                 }
                 if (!dependTaskSuccess(depsNode, taskCode)) {
@@ -1421,6 +1433,7 @@ public class WorkflowExecuteThread {
 
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
         if (CollectionUtils.isNotEmpty(pauseList)
+            || processInstance.isBlocked()
             || !isComplementEnd()
             || readyToSubmitTaskQueue.size() > 0) {
             return ExecutionStatus.PAUSE;

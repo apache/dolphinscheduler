@@ -901,11 +901,9 @@ export default {
   Last30DayFluctuation: '最近30天波动',
   SrcTableTotalRows: '源表总行数',
   TargetTableTotalRows: '目标表总行数',
-  'No more...': '没有更多了...',
   'Alert When Blocking': '阻断时告警',
   'Blocking Condition': '阻断时机',
   'Blocking on Failed': '失败时阻断',
   'Blocking on Success': '成功时阻断',
-  Alert: '告警',
   'Do not Alert': '不告警'
 }

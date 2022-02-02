@@ -33,8 +33,4 @@ public interface ITaskProcessor {
 
     TaskInstance taskInstance();
 
-    default Object taskExtraInfo() {
-        return null;
-    }
-
 }

@@ -188,14 +188,14 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
 
     private void endTask() {
         ExecutionStatus status = ExecutionStatus.SUCCESS;
-        BlockingOpportunity actual = this.conditionResult == DependResult.SUCCESS ?
-                BlockingOpportunity.BLOCKING_ON_SUCCESS : BlockingOpportunity.BLOCKING_ON_FAILED;
-        boolean isBlocked = this.blockingParam.getBlockingOpportunity().equals(actual.getDesc());
-        logger.info("blocking result: expected-->{}, actual-->{}",this.blockingParam.getBlockingOpportunity(),
-                actual.getDesc());
+        DependResult expected = this.blockingParam.getBlockingOpportunity()
+                .equals(BlockingOpportunity.BLOCKING_ON_SUCCESS.getDesc()) ?
+                DependResult.SUCCESS : DependResult.FAILED;
+        boolean isBlocked = (expected == this.conditionResult);
+        logger.info("blocking opportunity: expected-->{}, actual-->{}", expected, this.conditionResult);
         processInstance.setBlocked(isBlocked);
         if (isBlocked) {
-            status = ExecutionStatus.READY_PAUSE;
+            processInstance.setState(ExecutionStatus.READY_PAUSE);
         }
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());

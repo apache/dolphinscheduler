@@ -26,14 +26,16 @@ import java.util.List;
 
 public class BlockingParameters extends AbstractParameters {
     // condition of blocking: BlockingOnFailed or BlockingOnSuccess
-    private String blockingCondition;
+
+    private String blockingOpportunity;
 
     // if true, alert when blocking, otherwise do nothing
+
     private boolean isAlertWhenBlocking;
 
     @Override
     public boolean checkParameters() {
-        return !StringUtils.isEmpty(blockingCondition);
+        return !StringUtils.isEmpty(blockingOpportunity);
     }
 
     @Override
@@ -41,12 +43,12 @@ public class BlockingParameters extends AbstractParameters {
         return new ArrayList<>();
     }
 
-    public String getBlockingCondition() {
-        return blockingCondition;
+    public String getBlockingOpportunity() {
+        return blockingOpportunity;
     }
 
-    public void setBlockingCondition(String blockingCondition) {
-        this.blockingCondition = blockingCondition;
+    public void setBlockingCondition(String blockingOpportunity) {
+        this.blockingOpportunity = blockingOpportunity;
     }
 
     public boolean isAlertWhenBlocking() {
