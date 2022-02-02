@@ -15,40 +15,8 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import {
-  ExecuteReq,
-  ProjectCodeReq,
-  ProcessDefinitionCodeReq,
-  ProcessInstanceReq
-} from './types'
-
-export function execute(data: ExecuteReq, code: ProjectCodeReq): any {
-  return axios({
-    url: `/projects/${code}/executors/execute`,
-    method: 'post',
-    data
-  })
-}
-
-export function startCheckProcessDefinition(
-  data: ProcessDefinitionCodeReq,
-  code: ProjectCodeReq
-): any {
-  return axios({
-    url: `/projects/${code}/executors/start-check`,
-    method: 'post',
-    data
-  })
-}
-
-export function startProcessInstance(
-  data: ProcessInstanceReq,
-  code: number
-): any {
-  return axios({
-    url: `/projects/${code}/executors/start-process-instance`,
-    method: 'post',
-    data
-  })
+export interface ISearchParam {
+  pageSize: number
+  pageNo: number
+  searchVal: string | undefined
 }
