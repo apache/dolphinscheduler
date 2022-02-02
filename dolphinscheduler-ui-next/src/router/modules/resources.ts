@@ -86,7 +86,7 @@ export default {
     {
       path: '/resource/resource-manage',
       name: 'resource-manage',
-      component: components['resource'],
+      component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
         showSide: true
@@ -95,7 +95,7 @@ export default {
     {
       path: '/resource/resource-manage/:id',
       name: 'resource-sub-manage',
-      component: components['resource'],
+      component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
         showSide: true
@@ -106,7 +106,8 @@ export default {
       name: 'function-manage',
       component: components['resource-udf-function'],
       meta: {
-        title: '函数管理'
+        title: '函数管理',
+        showSide: true
       }
     },
     {
