@@ -32,16 +32,6 @@ on:
       - 'dolphinscheduler-rpc/**'
       - 'dolphinscheduler-server/**'
   pull_request:
-    paths:
-      - '.github/workflows/backend.yml'
-      - 'package.xml'
-      - 'pom.xml'
-      - 'dolphinscheduler-alert/**'
-      - 'dolphinscheduler-api/**'
-      - 'dolphinscheduler-common/**'
-      - 'dolphinscheduler-dao/**'
-      - 'dolphinscheduler-rpc/**'
-      - 'dolphinscheduler-server/**'
 
 concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
@@ -57,8 +47,6 @@ jobs:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }} # We only need to pass this token in one workflow
       - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
@@ -66,7 +54,7 @@ jobs:
       - name: Build and Package
         run: |
           ./mvnw -B clean install \
-                 -Prelease \
+                 -Prelease,docker \
                  -Dmaven.test.skip=true \
                  -Dcheckstyle.skip=true \
                  -Dhttp.keepAlive=false \

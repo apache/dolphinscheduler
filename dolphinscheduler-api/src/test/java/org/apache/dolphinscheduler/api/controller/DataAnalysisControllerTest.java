@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,7 +28,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -43,15 +43,14 @@ import org.springframework.util.MultiValueMap;
  * data analysis controller test
  */
 public class DataAnalysisControllerTest extends AbstractControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
-    private static Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
-
-    @MockBean
-    ProjectMapper projectMapper;
+    @MockBean(name = "projectMapper")
+    private ProjectMapper projectMapper;
 
     @Test
     public void testCountTaskState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("startDate","2019-12-01 00:00:00");
@@ -62,17 +61,16 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(
-                Status.SUCCESS.getCode(),result.getCode().intValue());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCountProcessInstanceState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("startDate","2019-12-01 00:00:00");
@@ -83,16 +81,16 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCountDefinitionByUser() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId","16");
@@ -101,10 +99,10 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -113,10 +111,10 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/command-state-count")
                 .header("sessionId", sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -125,10 +123,10 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/queue-count")
                 .header("sessionId", sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

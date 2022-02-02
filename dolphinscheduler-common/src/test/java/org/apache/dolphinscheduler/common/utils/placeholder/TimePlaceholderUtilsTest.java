@@ -20,14 +20,21 @@ package org.apache.dolphinscheduler.common.utils.placeholder;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TimePlaceholderUtilsTest {
 
     private Date date;
+
+    @BeforeClass
+    public static void setup() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+    }
 
     @Before
     public void init() {

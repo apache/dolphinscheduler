@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -29,27 +29,15 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class TaskDefinitionMapperTest {
+public class TaskDefinitionMapperTest extends BaseDaoTest {
 
     @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    UserMapper userMapper;
-
-    @Autowired
-    ProjectMapper projectMapper;
+    private UserMapper userMapper;
 
     public TaskDefinition insertOne() {
         return insertOne(99);

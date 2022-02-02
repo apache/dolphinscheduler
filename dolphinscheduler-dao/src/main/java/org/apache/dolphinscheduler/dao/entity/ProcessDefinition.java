@@ -18,9 +18,12 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,7 +36,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -163,19 +165,17 @@ public class ProcessDefinition {
     private String modifyBy;
 
     /**
-     * resource ids
-     */
-    @TableField(exist = false)
-    private String resourceIds;
-
-    /**
      * warningGroupId
      */
     @TableField(exist = false)
     private int warningGroupId;
 
-    public ProcessDefinition() {
-    }
+    /**
+     * execution type
+     */
+    private ProcessExecutionTypeEnum executionType;
+
+    public ProcessDefinition() { }
 
     public ProcessDefinition(long projectCode,
                              String name,
@@ -340,14 +340,6 @@ public class ProcessDefinition {
         this.scheduleReleaseState = scheduleReleaseState;
     }
 
-    public String getResourceIds() {
-        return resourceIds;
-    }
-
-    public void setResourceIds(String resourceIds) {
-        this.resourceIds = resourceIds;
-    }
-
     public int getTimeout() {
         return timeout;
     }
@@ -412,6 +404,14 @@ public class ProcessDefinition {
         this.warningGroupId = warningGroupId;
     }
 
+    public ProcessExecutionTypeEnum getExecutionType() {
+        return executionType;
+    }
+
+    public void setExecutionType(ProcessExecutionTypeEnum executionType) {
+        this.executionType = executionType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -430,6 +430,7 @@ public class ProcessDefinition {
             && Objects.equals(description, that.description)
             && Objects.equals(globalParams, that.globalParams)
             && flag == that.flag
+            && executionType == that.executionType
             && Objects.equals(locations, that.locations);
     }
 
@@ -458,7 +459,6 @@ public class ProcessDefinition {
             + ", tenantId=" + tenantId
             + ", tenantCode='" + tenantCode + '\''
             + ", modifyBy='" + modifyBy + '\''
-            + ", resourceIds='" + resourceIds + '\''
             + ", warningGroupId=" + warningGroupId
             + '}';
     }

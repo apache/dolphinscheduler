@@ -149,7 +149,6 @@ public class LogClientService implements AutoCloseable {
     public byte[] getLogBytes(String host, int port, String path) {
         logger.info("log path {}", path);
         GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
-        byte[] result = null;
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
@@ -157,14 +156,14 @@ public class LogClientService implements AutoCloseable {
             if (response != null) {
                 GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
                         response.getBody(), GetLogBytesResponseCommand.class);
-                return getLog.getData();
+                return getLog.getData() == null ? new byte[0] : getLog.getData();
             }
         } catch (Exception e) {
             logger.error("get log size error", e);
         } finally {
             this.client.closeChannel(address);
         }
-        return result;
+        return new byte[0];
     }
 
     /**

@@ -1,0 +1,38 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+---
+version: 2
+mergeable:
+  - when: pull_request.*, pull_request_review.*
+    name: synchronize change for sql files
+    validate:
+      # Sql files must change synchronize
+      - do: dependent
+        files: ['sql/dolphinscheduler_h2.sql', 'sql/dolphinscheduler_mysql.sql', 'sql/dolphinscheduler_postgre.sql']
+        message: 'Sql files not change synchronize'
+    # Add labels 'sql not sync' if Sql files not change synchronize
+    fail:
+      - do: checks
+        status: 'failure'
+      - do: labels
+        add: 'sql not sync'
+    # Remove labels 'sql not sync' if pass
+    pass:
+      - do: checks
+        status: 'success'
+      - do: labels
+        delete: 'sql not sync'

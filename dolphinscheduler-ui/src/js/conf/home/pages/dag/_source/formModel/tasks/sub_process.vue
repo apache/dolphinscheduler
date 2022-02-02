@@ -29,7 +29,7 @@
           <el-option
                 v-for="city in processDefinitionList"
                 :key="city.code"
-                :value="city.id"
+                :value="city.code"
                 :label="city.name">
           </el-option>
         </el-select>
@@ -42,6 +42,7 @@
   import i18n from '@/module/i18n'
   import disabledState from '@/module/mixin/disabledState'
   import mListBox from './_source/listBox'
+  import { mapActions, mapState } from 'vuex'
 
   export default {
     name: 'sub_process',
@@ -57,7 +58,11 @@
     props: {
       backfillItem: Object
     },
+    computed: {
+      ...mapState('dag', ['processListS'])
+    },
     methods: {
+      ...mapActions('dag', ['getProcessList']),
       /**
        * Node unified authentication parameters
        */
@@ -67,7 +72,7 @@
           return false
         }
         this.$emit('on-params', {
-          processDefinitionId: this.wdiCurr
+          processDefinitionCode: this.wdiCurr
         })
         return true
       },
@@ -80,44 +85,53 @@
       /**
        * Return the name according to the process definition id
        */
-      _handleName (id) {
-        return _.filter(this.processDefinitionList, v => id === v.id)[0].name
+      _handleName (code) {
+        return _.filter(this.processDefinitionList, v => code === v.code)[0].name
+      },
+      /**
+       * Get all processDefinition list
+       */
+      getAllProcessDefinitions () {
+        if (!this.processListS || this.processListS.length === 0) {
+          return this.getProcessList()
+        }
+        return Promise.resolve(this.processListS)
       }
     },
     watch: {
       wdiCurr (val) {
         this.$emit('on-cache-params', {
-          processDefinitionId: this.wdiCurr
+          processDefinitionCode: this.wdiCurr
         })
       }
     },
     created () {
-      let processListS = _.cloneDeep(this.store.state.dag.processListS)
       let code = null
       if (this.router.history.current.name === 'projects-instance-details') {
         code = this.router.history.current.query.code || null
       } else {
         code = this.router.history.current.params.code || null
       }
-      this.processDefinitionList = processListS.map(v => {
-        return {
-          id: v.processDefinition.id,
-          code: v.processDefinition.code,
-          name: v.processDefinition.name,
-          disabled: false
+      this.getAllProcessDefinitions().then((processListS) => {
+        this.processDefinitionList = processListS.map(def => {
+          return {
+            id: def.id,
+            code: def.code,
+            name: def.name,
+            disabled: false
+          }
+        }).filter(a => (a.code + '') !== code)
+        let o = this.backfillItem
+        // Non-null objects represent backfill
+        if (!_.isEmpty(o)) {
+          this.wdiCurr = o.params.processDefinitionCode
+        } else {
+          if (this.processDefinitionList.length) {
+            this.wdiCurr = this.processDefinitionList[0].code
+            this.$emit('on-set-process-name', this._handleName(this.wdiCurr))
+          }
         }
-      }).filter(a => (a.code + '') !== code)
-
-      let o = this.backfillItem
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        this.wdiCurr = o.params.processDefinitionId
-      } else {
-        if (this.processDefinitionList.length) {
-          this.wdiCurr = this.processDefinitionList[0].id
-          this.$emit('on-set-process-name', this._handleName(this.wdiCurr))
-        }
-      }
+      })
     },
     mounted () {
     },

@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.hadoop.hive.common.LogUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -307,12 +309,11 @@ public abstract class AbstractCommandExecutor {
      * @param process process
      */
     private void parseProcessOutput(Process process) {
-        String threadLoggerInfoName = String.format(TaskConstants.TASK_LOGGER_THREAD_NAME + "-%s", taskRequest.getTaskAppId());
-        ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
+        String threadLoggerInfoName = taskRequest.getTaskLogName();
+        ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
         getOutputLogService.submit(() -> {
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
-                logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(")) {
                         varPool.append(line, "${setValue(".length(), line.length() - 2);

@@ -82,9 +82,11 @@ public interface AlertPluginInstanceService {
 
     /**
      * queryPluginPage
-     * @param pageIndex page index
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo    page index
      * @param pageSize  page size
      * @return plugins
      */
-    Result queryPluginPage(int pageIndex, int pageSize);
+    Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize);
 }

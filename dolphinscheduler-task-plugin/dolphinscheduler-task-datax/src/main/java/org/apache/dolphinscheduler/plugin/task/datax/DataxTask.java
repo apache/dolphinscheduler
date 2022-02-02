@@ -17,17 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
@@ -36,10 +37,10 @@ import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -144,10 +145,6 @@ public class DataxTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         try {
-            // set the name of the current thread
-            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
-            Thread.currentThread().setName(threadLoggerInfoName);
-
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
             if (MapUtils.isEmpty(paramsMap)) {
@@ -234,11 +231,11 @@ public class DataxTask extends AbstractTaskExecutor {
      */
     private List<ObjectNode> buildDataxJobContentJson() {
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
-        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 DbType.of(dataxTaskExecutionContext.getSourcetype()),
                 dataxTaskExecutionContext.getSourceConnectionParams());
 
-        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
@@ -251,7 +248,7 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        urlArr.add(DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
+        urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
 
         readerConnArr.add(readerConn);
 
@@ -269,7 +266,7 @@ public class DataxTask extends AbstractTaskExecutor {
         ArrayNode tableArr = writerConn.putArray("table");
         tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
@@ -547,7 +544,7 @@ public class DataxTask extends AbstractTaskExecutor {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DatasourceUtil.getConnection(sourceType, baseDataSource);
+                Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 

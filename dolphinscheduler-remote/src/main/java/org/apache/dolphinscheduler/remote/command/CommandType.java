@@ -126,7 +126,7 @@ public enum CommandType {
     /**
      * process host update
      */
-    PROCESS_HOST_UPDATE_REQUST,
+    PROCESS_HOST_UPDATE_REQUEST,
 
     /**
      * process host update response
@@ -136,5 +136,17 @@ public enum CommandType {
     /**
      * state event request
      */
-    STATE_EVENT_REQUEST;
+    STATE_EVENT_REQUEST,
+    /**
+     * cache expire
+     */
+    CACHE_EXPIRE,
+    /**
+     * task state event request
+     */
+    TASK_FORCE_STATE_EVENT_REQUEST,
+    /**
+     * task state event request
+     */
+    TASK_WAKEUP_EVENT_REQUEST;
 }

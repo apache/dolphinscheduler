@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
 
@@ -128,4 +128,19 @@ public interface DataSourceService {
      * @return authorized result code
      */
     Map<String, Object> authedDatasource(User loginUser, Integer userId);
+
+    /**
+     * get tables
+     * @param datasourceId
+     * @return
+     */
+    Map<String, Object> getTables(Integer datasourceId);
+
+    /**
+     * get table columns
+     * @param datasourceId
+     * @param tableName
+     * @return
+     */
+    Map<String, Object> getTableColumns(Integer datasourceId,String tableName);
 }

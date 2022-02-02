@@ -20,9 +20,11 @@
           @change="_onChange"
           v-model="selectedValue"
           size="small"
+          id="selectTenant"
           style="width: 180px">
     <el-option
             v-for="item in itemList"
+            class="option-tenants"
             :key="item.id"
             :value="item.id"
             :label="item.tenantCode">

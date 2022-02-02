@@ -64,6 +64,12 @@ export default {
     state.timeout = payload
   },
   /**
+   * set executionType
+   */
+  setExecutionType (state, payload) {
+    state.executionType = payload
+  },
+  /**
    * set tenantCode
    */
   setTenantCode (state, payload) {
@@ -105,6 +111,13 @@ export default {
   },
 
   /**
+   * set depend result
+   */
+  setDependResult (state, payload) {
+    state.dependResult = Object.assign(state.dependResult, {}, payload)
+  },
+
+  /**
    * reset params
    */
   resetParams (state, payload) {
@@ -113,6 +126,7 @@ export default {
     state.name = (payload && payload.name) || ''
     state.description = (payload && payload.description) || ''
     state.timeout = (payload && payload.timeout) || 0
+    state.executionType = (payload && payload.executionType) || 'PARALLEL'
     state.tenantCode = (payload && payload.tenantCode) || 'default'
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []
@@ -122,6 +136,7 @@ export default {
     state.runFlag = (payload && payload.runFlag) || ''
     state.locations = (payload && payload.locations) || {}
     state.connects = (payload && payload.connects) || []
+    state.dependResult = (payload && payload.dependResult) || {}
   },
   /**
    * add task

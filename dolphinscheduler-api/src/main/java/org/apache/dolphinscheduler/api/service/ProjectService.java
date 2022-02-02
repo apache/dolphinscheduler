@@ -47,6 +47,15 @@ public interface ProjectService {
     Map<String, Object> queryByCode(User loginUser, long projectCode);
 
     /**
+     * query project details by name
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @return project detail information
+     */
+    Map<String, Object> queryByName(User loginUser, String projectName);
+
+    /**
      * check project and authorization
      *
      * @param loginUser login user
@@ -109,6 +118,15 @@ public interface ProjectService {
      * @return projects which the user have permission to see, Except for items created by this user
      */
     Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId);
+
+    /**
+     * query authorized user
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return users        who have permission for the specified project
+     */
+    Map<String, Object> queryAuthorizedUser(User loginUser, Long projectCode);
 
     /**
      * query authorized project

@@ -34,12 +34,33 @@
 
     .minimap {
       position: absolute;
-      width: 300px;
-      height: 200px;
-      right: 10px;
-      bottom: 10px;
+      right: 0px;
+      bottom: 0px;
       border: dashed 1px #e4e4e4;
       z-index: 9;
+    }
+
+    .scale-slider{
+      position: absolute;
+      height: 140px;
+      width: 70px;
+      right: 0px;
+      bottom: 140px;
+      z-index: 9;
+      display: flex;
+      justify-content: center;
+
+      ::v-deep .el-slider__runway{
+        background-color: #fff;
+      }
+
+      .scale-title{
+        position: absolute;
+        top: -30px;
+        left: 22px;
+        font-size: 12px;
+        color: #666;
+      }
     }
 
     .context-menu{

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.spi.params.select;
 
 import static org.apache.dolphinscheduler.spi.params.base.FormType.SELECT;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_OPTIONS;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -26,17 +27,19 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * front-end select component
  */
 public class SelectParam extends PluginParams {
 
-    private List<ParamsOptions> options;
-
-    private SelectParamProps props;
+    @JsonProperty(STRING_PLUGIN_PARAM_OPTIONS)
+    private final List<ParamsOptions> options;
 
     private SelectParam(Builder builder) {
         super(builder);
+        this.options = builder.options;
     }
 
     public static Builder newBuilder(String name, String title) {
@@ -50,8 +53,6 @@ public class SelectParam extends PluginParams {
         }
 
         private List<ParamsOptions> options;
-
-        private SelectParamProps props;
 
         public Builder setOptions(List<ParamsOptions> options) {
             this.options = options;
@@ -114,14 +115,37 @@ public class SelectParam extends PluginParams {
             this.display = display;
             return this;
         }
+
+        public Builder setEmit(List<String> emit) {
+            this.emit = emit;
+            return this;
+        }
+
+        public Builder setPlaceHolder(String placeholder) {
+            if (this.props == null) {
+                this.setProps(new SelectParamProps());
+            }
+
+            this.props.setPlaceholder(placeholder);
+            return this;
+        }
+
+        public Builder setSize(String size) {
+            if (this.props == null) {
+                this.setProps(new SelectParamProps());
+            }
+
+            this.props.setSize(size);
+            return this;
+        }
+
+        @Override
+        public SelectParam build() {
+            return new SelectParam(this);
+        }
     }
 
     public List<ParamsOptions> getOptions() {
         return options;
-    }
-
-    @Override
-    public SelectParamProps getProps() {
-        return props;
     }
 }

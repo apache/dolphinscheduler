@@ -363,7 +363,7 @@
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
-            this.warningGroupId = item.warningGroupId
+            this.warningGroupId = item.warningGroupId === 0 ? '' : item.warningGroupId
           })
         }).catch(() => { this.warningGroupId = '' })
       } else {

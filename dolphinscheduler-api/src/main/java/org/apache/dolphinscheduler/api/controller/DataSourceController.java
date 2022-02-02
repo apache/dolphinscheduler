@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILU
 import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
@@ -34,13 +36,13 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
 
@@ -210,8 +212,8 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result connectDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        DatasourceUtil.checkDatasourceParam(dataSourceParam);
-        ConnectionParam connectionParams = DatasourceUtil.buildConnectionParams(dataSourceParam);
+        DataSourceUtils.checkDatasourceParam(dataSourceParam);
+        ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
         return dataSourceService.checkConnection(dataSourceParam.getType(), connectionParams);
     }
 
@@ -334,5 +336,31 @@ public class DataSourceController extends BaseController {
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
+    }
+
+    @ApiOperation(value = "tables", notes = "GET_DATASOURCE_TABLES_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
+    })
+    @GetMapping(value = "/tables")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_TABLES_ERROR)
+    public Result getTables(@RequestParam("datasourceId") Integer datasourceId) {
+        Map<String, Object> result = dataSourceService.getTables(datasourceId);
+        return returnDataList(result);
+    }
+
+    @ApiOperation(value = "tableColumns", notes = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
+    })
+    @GetMapping(value = "/tableColumns")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
+    public Result getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
+                                  @RequestParam("tableName") String tableName) {
+        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId,tableName);
+        return returnDataList(result);
     }
 }

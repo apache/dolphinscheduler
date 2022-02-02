@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -30,32 +30,21 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProcessInstanceMapperTest {
-
+public class ProcessInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProcessInstanceMapper processInstanceMapper;
+    private ProcessInstanceMapper processInstanceMapper;
 
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    ProjectMapper projectMapper;
-
+    private ProjectMapper projectMapper;
 
     /**
      * insert process instance with specified start time and end time,set state to SUCCESS
@@ -277,7 +266,7 @@ public class ProcessInstanceMapperTest {
 
         Long[] projectCodes = new Long[]{processDefinition.getProjectCode()};
 
-        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByUser(null, null, projectCodes);
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByProjectCodes(null, null, projectCodes);
 
 
         Assert.assertNotEquals(executeStatusCounts.size(), 0);
@@ -393,7 +382,7 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstance3 = insertOne(startTime3, endTime3);
         Date start = new Date(2020, 1, 1, 1, 1, 1);
         Date end = new Date(2021, 1, 1, 1, 1, 1);
-        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end, ExecutionStatus.SUCCESS);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end, ExecutionStatus.SUCCESS,0L);
         Assert.assertEquals(2, processInstances.size());
         Assert.assertTrue(isSortedByDuration(processInstances));
         for (ProcessInstance processInstance : processInstances) {

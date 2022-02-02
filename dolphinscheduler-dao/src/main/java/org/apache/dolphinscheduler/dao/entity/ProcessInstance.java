@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,7 +35,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -238,11 +239,21 @@ public class ProcessInstance {
      * varPool string
      */
     private String varPool;
+    /**
+     * serial queue next processInstanceId
+     */
+    private int nextProcessInstanceId;
 
     /**
      * dry run flag
      */
     private int dryRun;
+
+    /**
+     * re-start time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date restartTime;
 
     public ProcessInstance() {
 
@@ -516,6 +527,14 @@ public class ProcessInstance {
         this.dryRun = dryRun;
     }
 
+    public Date getRestartTime() {
+        return restartTime;
+    }
+
+    public void setRestartTime(Date restartTime) {
+        this.restartTime = restartTime;
+    }
+
     /**
      * add command to history
      *
@@ -684,6 +703,10 @@ public class ProcessInstance {
             + ", dryRun='"
             + dryRun
             + '\''
+            + '}'
+            + ", restartTime='"
+            + restartTime
+            + '\''
             + '}';
     }
 
@@ -706,4 +729,11 @@ public class ProcessInstance {
         return Objects.hash(id);
     }
 
+    public int getNextProcessInstanceId() {
+        return nextProcessInstanceId;
+    }
+
+    public void setNextProcessInstanceId(int nextProcessInstanceId) {
+        this.nextProcessInstanceId = nextProcessInstanceId;
+    }
 }

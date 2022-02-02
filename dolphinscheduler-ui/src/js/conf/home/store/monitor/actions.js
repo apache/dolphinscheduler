@@ -44,14 +44,5 @@ export default {
         reject(e)
       })
     })
-  },
-  getZookeeperData ({ state }, payload) {
-    return new Promise((resolve, reject) => {
-      io.get('monitor/zookeepers', payload, res => {
-        resolve(res.data)
-      }).catch(e => {
-        reject(e)
-      })
-    })
   }
 }

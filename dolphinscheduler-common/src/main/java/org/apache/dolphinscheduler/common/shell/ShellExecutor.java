@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.shell;
 
 import java.io.BufferedReader;
@@ -34,7 +35,6 @@ public class ShellExecutor extends AbstractShell {
     private String[] command;
     private StringBuffer output;
 
-
     public ShellExecutor(String... execString) {
         this(execString, null);
     }
@@ -45,7 +45,7 @@ public class ShellExecutor extends AbstractShell {
 
     public ShellExecutor(String[] execString, File dir,
                                 Map<String, String> env) {
-        this(execString, dir, env , 0L);
+        this(execString, dir, env,0L);
     }
 
     /**
@@ -73,7 +73,6 @@ public class ShellExecutor extends AbstractShell {
         }
         timeOutInterval = timeout;
     }
-
 
     /**
      * Static method to execute a shell command.
@@ -114,7 +113,7 @@ public class ShellExecutor extends AbstractShell {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static String execCommand(Map<String,String> env, String ... cmd)
+    public static String execCommand(Map<String,String> env, String... cmd)
             throws IOException {
         return execCommand(env, cmd, 0L);
     }
@@ -138,7 +137,7 @@ public class ShellExecutor extends AbstractShell {
         char[] buf = new char[1024];
         int nRead;
         String line = "";
-        while ( (nRead = lines.read(buf, 0, buf.length)) > 0 ) {
+        while ((nRead = lines.read(buf, 0, buf.length)) > 0) {
             line = new String(buf,0,nRead);
             output.append(line);
         }

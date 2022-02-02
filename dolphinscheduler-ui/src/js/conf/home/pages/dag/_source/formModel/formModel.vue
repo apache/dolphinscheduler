@@ -17,7 +17,18 @@
 <template>
   <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
-      <span class="name">{{ $t("Current node settings") }}</span>
+      <span class="name"
+        >{{ $t("Current node settings") }}
+        <a
+          v-if="helpUrlEnable(nodeData.taskType)"
+          class="helper-link"
+          target="_blank"
+          :href="helpUrl(nodeData.taskType)"
+        >
+          <i class="el-icon-question" />
+          {{ nodeData.taskType }} {{ $t("Instructions") }}</a
+        >
+      </span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log
@@ -46,7 +57,6 @@
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="form-model">
-
         <!-- Reference from task -->
         <!-- <reference-from-task :taskType="nodeData.taskType" /> -->
 
@@ -61,9 +71,52 @@
               :disabled="isDetails"
               :placeholder="$t('Please enter name (required)')"
               maxlength="100"
-              @blur="_verifName()"
+              id="inputNodeName"
             >
             </el-input>
+          </div>
+        </m-list-box>
+
+        <m-list-box v-if="fromTaskDefinition">
+          <div slot="text">{{ $t("Task Type") }}</div>
+          <div slot="content">
+            <el-select
+              @change="changeTaskType"
+              :value="nodeData.taskType"
+              :placeholder="$t('Please select a task type (required)')"
+              size="small"
+              style="width: 100%"
+              :disabled="isDetails"
+            >
+              <el-option
+                v-for="type in tasksTypeList"
+                :key="type"
+                :label="type"
+                :value="type"
+                :disabled="type === 'CONDITIONS' || type === 'SWITCH'"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </m-list-box>
+
+        <m-list-box v-if="fromTaskDefinition">
+          <div slot="text">{{ $t("Process Name") }}</div>
+          <div slot="content">
+            <el-select
+              @change="changeProcessCode"
+              :value="processCode"
+              size="small"
+              style="width: 100%"
+              :disabled="isDetails || taskDefinition"
+            >
+              <el-option
+                v-for="process in processListS"
+                :key="process.code"
+                :label="process.name"
+                :value="process.code"
+              />
+            </el-select>
           </div>
         </m-list-box>
 
@@ -124,20 +177,39 @@
           </div>
         </m-list-box>
 
+        <!-- Worker group and environment -->
+        <m-list-box>
+          <div slot="text">{{ $t("Task group name") }}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px; display: inline-block">
+              <m-task-groups
+                v-model="taskGroupId"
+                :project-code="this.projectCode"
+                v-on:taskGroupIdEvent="_onUpdateTaskGroupId"
+              ></m-task-groups>
+            </span>
+            <span class="text-b">{{ $t("Task group queue priority") }}</span>
+            <el-input
+              :disabled="taskGroupId === ''"
+              style="width: 166px"
+              type="input"
+              v-model="taskGroupPriority"
+              maxlength="60"
+              v-on:input="_onUpdateTaskGroupPriority"
+              size="small"
+            >
+            </el-input>
+          </div>
+        </m-list-box>
+
         <!-- Number of failed retries -->
         <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS'">
           <div slot="text">{{ $t("Number of failed retries") }}</div>
           <div slot="content">
-            <m-select-input
-              v-model="maxRetryTimes"
-              :list="[0, 1, 2, 3, 4]"
-            ></m-select-input>
+            <el-input v-model.number="maxRetryTimes" size="small" style="width: 150px;" />
             <span>({{ $t("Times") }})</span>
             <span class="text-b">{{ $t("Failed retry interval") }}</span>
-            <m-select-input
-              v-model="retryInterval"
-              :list="[1, 10, 30, 60, 120]"
-            ></m-select-input>
+            <el-input v-model.number="retryInterval" size="small" style="width: 150px;" />
             <span>({{ $t("Minute") }})</span>
           </div>
         </m-list-box>
@@ -156,7 +228,7 @@
           <div slot="content">
             <m-select-input
               v-model="delayTime"
-              :list="[0, 1, 5, 10]"
+              :list="[]"
             ></m-select-input>
             <span>({{ $t("Minute") }})</span>
           </div>
@@ -194,7 +266,7 @@
               <el-option
                 v-for="item in postTasks"
                 :key="item.code"
-                :value="item.name"
+                :value="item.code"
                 :label="item.name"
               ></el-option>
             </el-select>
@@ -231,7 +303,7 @@
               <el-option
                 v-for="item in postTasks"
                 :key="item.code"
-                :value="item.name"
+                :value="item.code"
                 :label="item.name"
               ></el-option>
             </el-select>
@@ -354,13 +426,14 @@
             :backfill-item="backfillItem"
           >
           </m-datax>
-        <m-pigeon
-          v-if="nodeData.taskType === 'PIGEON'"
-          @on-params="_onParams"
-          @on-cache-params="_onCacheParams"
-          :backfill-item="backfillItem"
-          ref="PIGEON">
-        </m-pigeon>
+          <m-pigeon
+            v-if="nodeData.taskType === 'PIGEON'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            :backfill-item="backfillItem"
+            ref="PIGEON"
+          >
+          </m-pigeon>
           <m-sqoop
             v-if="nodeData.taskType === 'SQOOP'"
             @on-params="_onParams"
@@ -388,6 +461,13 @@
             :backfill-item="backfillItem"
             :prev-tasks="prevTasks">
           </m-blocking>
+          <m-data-quality
+            v-if="nodeData.taskType === 'DATA_QUALITY'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="DATA_QUALITY"
+            :backfill-item="backfillItem">
+          </m-data-quality>
           <m-switch
             v-if="nodeData.taskType === 'SWITCH'"
             ref="SWITCH"
@@ -396,22 +476,18 @@
             :nodeData="nodeData"
             :postTasks="postTasks"
           ></m-switch>
-          <!-- waterdrop node -->
-          <m-waterdrop
-            v-if="nodeData.taskType === 'WATERDROP'"
+          <!-- seatunnel node -->
+          <m-seatunnel
+            v-if="nodeData.taskType === 'SEATUNNEL'"
             @on-params="_onParams"
             @on-cache-params="_onCacheParams"
-            ref="WATERDROP"
+            ref="SEATUNNEL"
             :backfill-item="backfillItem"
           >
-          </m-waterdrop>
+          </m-seatunnel>
         </div>
         <!-- Pre-tasks in workflow -->
-        <m-pre-tasks
-          ref="preTasks"
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
-          :code="code"
-        />
+        <m-pre-tasks ref="preTasks" :code="code" :fromTaskDefinition="fromTaskDefinition" :prevTasks="prevTasks" :processDefinition="processDefinition"/>
       </div>
     </div>
     <div class="bottom-box">
@@ -426,7 +502,8 @@
           :loading="spinnerLoading"
           @click="ok()"
           :disabled="isDetails"
-          >{{ spinnerLoading ? $t("Loading...") : $t("Confirm add") }}
+          id="btnSubmit"
+          >{{ spinnerLoading ? $t("Loading...") : $t("Confirm") }}
         </el-button>
       </div>
     </div>
@@ -439,9 +516,10 @@
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
+  import { findLocale } from '@/module/i18n/config'
   import mListBox from './tasks/_source/listBox'
   import mShell from './tasks/shell'
-  import mWaterdrop from './tasks/waterdrop'
+  import mSeatunnel from './tasks/seatunnel'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
@@ -451,6 +529,7 @@
   import mDatax from './tasks/datax'
   import mPigeon from './tasks/pigeon'
   import mConditions from './tasks/conditions'
+  import mDataQuality from './tasks/dataquality'
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
@@ -459,12 +538,14 @@
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
   import mRelatedEnvironment from './_source/relatedEnvironment'
+  import mTaskGroups from './_source/taskGroups'
   import mPreTasks from './tasks/pre_tasks'
   import mBlocking from './tasks/blocking'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
   import { findComponentDownward } from '@/module/util/'
+  import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
   // import ReferenceFromTask from './_source/referenceFromTask.vue'
 
   export default {
@@ -520,6 +601,8 @@
         // selected environment
         environmentCode: '',
         selectedWorkerGroup: '',
+        taskGroupId: '',
+        taskGroupPriority: 0,
         stateList: [
           {
             value: 'success',
@@ -536,7 +619,11 @@
         // refresh part of the formModel, after set backfillItem outside
         backfillRefresh: true,
         // whether this is a new Task
-        isNewCreate: true
+        isNewCreate: true,
+        tasksTypeList: Object.keys(tasksType),
+        // processCode
+        processCode: undefined,
+        processDefinition: null
       }
     },
     provide () {
@@ -554,12 +641,34 @@
       type: {
         type: String,
         default: ''
+      },
+      taskDefinition: Object,
+      projectCode: {
+        type: Number
       }
     },
     inject: ['dagChart'],
     methods: {
-      ...mapActions('dag', ['getTaskInstanceList']),
+      ...mapActions('dag', ['getTaskInstanceList', 'getProcessDefinition']),
+      helpUrlEnable (typekey) {
+        const type = tasksType[typekey]
+        if (!type) return false
+        if (!type.helperLinkDisable) return true
+        return !type.helperLinkDisable
+      },
+      helpUrl (tasktype) {
+        return 'https://dolphinscheduler.apache.org/' +
+          findLocale(i18n.globalScope.LOCALE).helperContext +
+          '/docs/latest/user_doc/guide/task/' + tasktype.toLowerCase() + '.html'
+      },
       taskToBackfillItem (task) {
+        let strategy = ''
+        if (this.nodeData.taskType === 'DEPENDENT') {
+          strategy = task.timeoutNotifyStrategy === 'WARNFAILED' ? 'WARN,FAILED' : task.timeoutNotifyStrategy
+        } else {
+          strategy = task.timeoutNotifyStrategy
+        }
+
         return {
           code: task.code,
           conditionResult: task.taskParams.conditionResult,
@@ -581,13 +690,15 @@
           taskInstancePriority: task.taskPriority,
           timeout: {
             interval: task.timeout,
-            strategy: task.timeoutNotifyStrategy,
+            strategy,
             enable: task.timeoutFlag === 'OPEN'
           },
           type: task.taskType,
           waitStartTimeout: task.taskParams.waitStartTimeout,
           workerGroup: task.workerGroup,
-          environmentCode: task.environmentCode
+          environmentCode: task.environmentCode,
+          taskGroupId: task.taskGroupId,
+          taskGroupPriority: task.taskGroupPriority
         }
       },
       /**
@@ -671,10 +782,10 @@
           const processDefinitionId =
             this.backfillItem.params.processDefinitionId
           const process = this.processListS.find(
-            (process) => process.processDefinition.id === processDefinitionId
+            (def) => def.id === processDefinitionId
           )
           this.$emit('onSubProcess', {
-            subProcessCode: process.processDefinition.code,
+            subProcessCode: process.code,
             fromThis: this
           })
         }
@@ -691,6 +802,15 @@
       _onUpdateEnvironmentCode (o) {
         this.environmentCode = o
       },
+      _onUpdateTaskGroupId (o) {
+        this.taskGroupId = o
+        if (this.taskGroupId === '') {
+          this.taskGroupPriority = 0
+        }
+      },
+      _onUpdateTaskGroupPriority (o) {
+        this.taskGroupPriority = o
+      },
       /**
        * _onCacheParams is reserved
        */
@@ -706,8 +826,7 @@
           return false
         }
         if (
-          this.successBranch !== '' &&
-          this.successBranch !== null &&
+          this.successBranch &&
           this.successBranch === this.failedBranch
         ) {
           this.$message.warning(
@@ -736,6 +855,16 @@
         }
         return true
       },
+      _verifTaskType () {
+        if (!this.fromTaskDefinition) return true
+        if (!this.nodeData.taskType) {
+          this.$message.warning(
+            `${i18n.$t('Please select a task type (required)')}`
+          )
+          return false
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
@@ -744,6 +873,12 @@
         if (!this._verifName()) {
           return
         }
+
+        // Verify task type
+        if (!this._verifTaskType()) {
+          return
+        }
+
         // verif workGroup
         if (!this._verifWorkGroup()) {
           return
@@ -762,12 +897,19 @@
         if (!this.$refs[this.nodeData.taskType]._verification()) {
           return
         }
-        // set preTask
-        if (this.$refs.preTasks) {
-          this.$refs.preTasks.setPreNodes()
+        // set dag preTask
+        if (this.dagChart && this.$refs.preTasks) {
+          this.$refs.preTasks.setDagPreNodes()
         }
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
+
+        // set edge label
+        if (this.dagChart) {
+          this._setEdgeLabel()
+        }
+
+        this.successBranch && (this.conditionResult.successNode[0] = this.successBranch)
+        this.failedBranch && (this.conditionResult.failedNode[0] = this.failedBranch)
+
         this.$emit('addTaskInfo', {
           item: {
             code: this.nodeData.id,
@@ -787,21 +929,26 @@
             failRetryTimes: this.maxRetryTimes,
             failRetryInterval: this.retryInterval,
             timeoutFlag: this.timeout.enable ? 'OPEN' : 'CLOSE',
-            timeoutNotifyStrategy: this.timeout.strategy,
+            timeoutNotifyStrategy: this.timeout.strategy.indexOf(',') > 0 ? 'WARNFAILED' : this.timeout.strategy,
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime,
             environmentCode: this.environmentCode || -1,
+<<<<<<< HEAD
             status: this.status,
             branch: this.branch,
             blockingCondition: this.blockingCondition,
             alertWhenBlocking: this.alertWhenBlocking
+=======
+            taskGroupId: this.taskGroupId,
+            taskGroupPriority: this.taskGroupPriority
+>>>>>>> temp
           },
-          fromThis: this
+          fromThis: this,
+          ...(this.fromTaskDefinition ? {
+            prevTasks: this.$refs.preTasks ? this.$refs.preTasks.preTasks : [],
+            processCode: this.processCode
+          } : {})
         })
-        // set run flag
-        this._setRunFlag()
-        // set edge label
-        this._setEdgeLabel()
       },
       /**
        * Sub-workflow selected node echo name
@@ -810,10 +957,8 @@
         this.name = name
       },
       /**
-       *  set run flag
-       *  TODO
+       *  set edge label by successBranch && failedBranch
        */
-      _setRunFlag () {},
       _setEdgeLabel () {
         if (this.successBranch || this.failedBranch) {
           const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
@@ -907,32 +1052,86 @@
           } else {
             this.workerGroup = o.workerGroup
           }
-          this.environmentCode = o.environmentCode === -1 ? '' : o.environmentCode
+          this.environmentCode =
+            o.environmentCode === -1 ? '' : o.environmentCode
           this.params = o.params || {}
           this.dependence = o.dependence || {}
           this.cacheDependence = o.dependence || {}
+          this.taskGroupId = o.taskGroupId
+          this.taskGroupPriority = o.taskGroupPriority
         } else {
           this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
         }
         this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
         this.isContentBox = true
+      },
+      changeTaskType (value) {
+        this.$emit('changeTaskType', value)
+      },
+      calculateRelatedTasks () {
+        if (this.processDefinition && this.taskDefinition) {
+          const relations = this.processDefinition.processTaskRelationList || []
+          const tasks = this.processDefinition.taskDefinitionList || []
+          const tasksMap = {}
+          tasks.forEach(task => {
+            tasksMap[task.code] = task
+          })
+          const taskCode = this.taskDefinition.code
+          const buildTask = (task) => ({
+            code: task.code,
+            name: task.name,
+            type: task.taskType
+          })
+          // Downstream tasks
+          const postTasks = relations
+            .filter(relation => relation.preTaskCode === taskCode)
+            .map(relation => buildTask(tasksMap[relation.postTaskCode]))
+
+          // Upstream tasks
+          const prevTasks = relations
+            .filter(relation => relation.postTaskCode === taskCode && relation.preTaskCode !== 0)
+            .map(relation => buildTask(tasksMap[relation.preTaskCode]))
+
+          this.postTasks = postTasks
+          this.prevTasks = prevTasks
+        }
+      },
+      getProcessDetails () {
+        this.getProcessDefinition(this.processCode).then(res => {
+          this.processDefinition = res
+          this.calculateRelatedTasks()
+        })
+      },
+      changeProcessCode (code) {
+        this.processCode = code
+        this.getProcessDetails()
       }
     },
     created () {
       // Backfill data
-      let taskList = this.store.state.dag.tasks
       let o = {}
-      if (taskList.length) {
-        taskList.forEach((task) => {
-          if (task.code === this.nodeData.id) {
-            const backfillItem = this.taskToBackfillItem(task)
-            o = backfillItem
-            this.backfillItem = backfillItem
-            this.isNewCreate = false
-          }
-        })
-      }
       this.code = this.nodeData.id
+      if (this.fromTaskDefinition) {
+        if (this.taskDefinition) {
+          const backfillItem = this.taskToBackfillItem(this.taskDefinition)
+          o = backfillItem
+          this.backfillItem = backfillItem
+          this.isNewCreate = false
+        }
+      } else {
+        let taskList = this.store.state.dag.tasks
+        if (taskList.length) {
+          taskList.forEach((task) => {
+            if (task.code === this.nodeData.id) {
+              const backfillItem = this.taskToBackfillItem(task)
+              o = backfillItem
+              this.backfillItem = backfillItem
+              this.isNewCreate = false
+            }
+          })
+        }
+      }
+
       this.backfill(o)
 
       if (this.dagChart) {
@@ -946,6 +1145,11 @@
         })
         this.postTasks = postNodes.map(buildTask)
         this.prevTasks = prevNodes.map(buildTask)
+      }
+
+      if (this.fromTaskDefinition && this.taskDefinition) {
+        this.processCode = this.taskDefinition.processCode
+        this.getProcessDetails()
       }
     },
     mounted () {
@@ -964,7 +1168,7 @@
        * Child workflow entry show/hide
        */
       _isGoSubProcess () {
-        return this.nodeData.taskType === 'SUB_PROCESS' && this.name
+        return this.nodeData.taskType === 'SUB_PROCESS' && this.name && this.processListS && this.processListS.length > 0
       },
       taskInstance () {
         if (this.taskInstances.length > 0) {
@@ -973,13 +1177,19 @@
           )
         }
         return null
+      },
+      /**
+       * Open the modal from task definition
+       */
+      fromTaskDefinition () {
+        return this.type === 'task-definition'
       }
     },
     components: {
       mListBox,
       mMr,
       mShell,
-      mWaterdrop,
+      mSeatunnel,
       mSubProcess,
       mProcedure,
       mSql,
@@ -993,6 +1203,7 @@
       mPigeon,
       mSqoop,
       mConditions,
+      mDataQuality,
       mSwitch,
       mSelectInput,
       mTimeoutAlarm,
@@ -1001,8 +1212,13 @@
       mWorkerGroups,
       mRelatedEnvironment,
       mPreTasks,
+<<<<<<< HEAD
       mBlocking
       // ReferenceFromTask
+=======
+      mTaskGroups
+    // ReferenceFromTask
+>>>>>>> temp
     }
   }
 </script>

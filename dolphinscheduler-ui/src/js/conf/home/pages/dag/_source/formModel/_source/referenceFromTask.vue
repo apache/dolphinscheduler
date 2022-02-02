@@ -81,7 +81,7 @@
       document.removeEventListener('click', this.outsideClick)
     },
     methods: {
-      ...mapActions('dag', ['getTaskDefinitions']),
+      ...mapActions('dag', ['getTaskDefinitionList']),
       outsideClick (e) {
         const elem = this.$refs.copyFrom
         if (!elem.contains(e.target) && this.dropdownVisible) {
@@ -99,7 +99,7 @@
         }
         if (this.noMore) return
         this.loading = true
-        this.getTaskDefinitions({
+        this.getTaskDefinitionsList({
           pageNo: this.pageNo,
           pageSize: this.pageSize,
           searchVal: this.searchVal,

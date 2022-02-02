@@ -75,7 +75,7 @@ public class TaskInstanceTest {
         List<DependentTaskModel> dependTaskList = new ArrayList<>();
         List<DependentItem> dependentItems = new ArrayList<>();
         DependentItem dependentItem = new DependentItem();
-        dependentItem.setDepTasks("A");
+        dependentItem.setDepTaskCode(111L);
         dependentItem.setDefinitionCode(222L);
         dependentItem.setCycle("today");
         dependentItems.add(dependentItem);

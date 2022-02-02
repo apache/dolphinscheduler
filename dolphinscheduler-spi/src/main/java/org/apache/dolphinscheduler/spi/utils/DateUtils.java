@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.spi.utils;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,7 +40,6 @@ public class DateUtils {
     static final long C3 = C2 * 1000L;
     static final long C4 = C3 * 60L;
     static final long C5 = C4 * 60L;
-    static final long C6 = C5 * 24L;
 
     /**
      * a default datetime formatter for the timestamp
@@ -95,25 +93,6 @@ public class DateUtils {
     }
 
     /**
-     * get current date str
-     *
-     * @return date string
-     */
-    public static String getCurrentTime() {
-        return getCurrentTime(Constants.YYYY_MM_DD_HH_MM_SS);
-    }
-
-    /**
-     * get the date string in the specified format of the current time
-     *
-     * @param format date format
-     * @return date string
-     */
-    public static String getCurrentTime(String format) {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(format));
-    }
-
-    /**
      * get the formatted date string
      *
      * @param date date
@@ -133,16 +112,6 @@ public class DateUtils {
      */
     public static String format(LocalDateTime localDateTime, String format) {
         return localDateTime.format(DateTimeFormatter.ofPattern(format));
-    }
-
-    /**
-     * convert time to yyyy-MM-dd HH:mm:ss format
-     *
-     * @param date date
-     * @return date string
-     */
-    public static String dateToString(Date date) {
-        return format(date, Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
     /**
@@ -198,54 +167,6 @@ public class DateUtils {
     }
 
     /**
-     * get hours between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ hours
-     */
-    public static long diffHours(Date d1, Date d2) {
-        return (long) Math.ceil(diffMin(d1, d2) / 60.0);
-    }
-
-    /**
-     * get minutes between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ minutes
-     */
-    public static long diffMin(Date d1, Date d2) {
-        return (long) Math.ceil(differSec(d1, d2) / 60.0);
-    }
-
-    /**
-     * get the date of the specified date in the days before and after
-     *
-     * @param date date
-     * @param day day
-     * @return the date of the specified date in the days before and after
-     */
-    public static Date getSomeDay(Date date, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DATE, day);
-        return calendar.getTime();
-    }
-
-    /**
-     * get the hour of day.
-     *
-     * @param date date
-     * @return hour of day
-     */
-    public static int getHourIndex(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar.get(Calendar.HOUR_OF_DAY);
-    }
-
-    /**
      * compare two dates
      *
      * @param future future date
@@ -264,60 +185,6 @@ public class DateUtils {
      */
     public static Date getScheduleDate(String schedule) {
         return stringToDate(schedule);
-    }
-
-    /**
-     * format time to readable
-     *
-     * @param ms ms
-     * @return format time
-     */
-    public static String format2Readable(long ms) {
-
-        long days = MILLISECONDS.toDays(ms);
-        long hours = MILLISECONDS.toDurationHours(ms);
-        long minutes = MILLISECONDS.toDurationMinutes(ms);
-        long seconds = MILLISECONDS.toDurationSeconds(ms);
-
-        return String.format("%02d %02d:%02d:%02d", days, hours, minutes, seconds);
-
-    }
-
-    /**
-     * format time to duration
-     *
-     * @param d1 d1
-     * @param d2 d2
-     * @return format time
-     */
-    public static String format2Duration(Date d1, Date d2) {
-        if (d1 == null || d2 == null) {
-            return null;
-        }
-        return format2Duration(differMs(d1, d2));
-    }
-
-    /**
-     * format time to duration
-     *
-     * @param ms ms
-     * @return format time
-     */
-    public static String format2Duration(long ms) {
-
-        long days = MILLISECONDS.toDays(ms);
-        long hours = MILLISECONDS.toDurationHours(ms);
-        long minutes = MILLISECONDS.toDurationMinutes(ms);
-        long seconds = MILLISECONDS.toDurationSeconds(ms);
-
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder = days > 0 ? strBuilder.append(days).append("d").append(" ") : strBuilder;
-        strBuilder = hours > 0 ? strBuilder.append(hours).append("h").append(" ") : strBuilder;
-        strBuilder = minutes > 0 ? strBuilder.append(minutes).append("m").append(" ") : strBuilder;
-        strBuilder = seconds > 0 ? strBuilder.append(seconds).append("s") : strBuilder;
-
-        return strBuilder.toString();
-
     }
 
     /**
@@ -373,25 +240,6 @@ public class DateUtils {
     }
 
     /**
-     * get some hour of day
-     *
-     * @param date date
-     * @param offsetHour hours
-     * @return some hour of day
-     */
-    public static Date getSomeHourOfDay(Date date, int offsetHour) {
-        Calendar cal = Calendar.getInstance();
-
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY) + offsetHour);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        return cal.getTime();
-    }
-
-    /**
      * get last day of month
      *
      * @param date date
@@ -409,108 +257,16 @@ public class DateUtils {
         return cal.getTime();
     }
 
-    /**
-     * return YYYY-MM-DD 00:00:00
-     *
-     * @param inputDay date
-     * @return start day
-     */
-    public static Date getStartOfDay(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
-    }
-
-    /**
-     * return YYYY-MM-DD 23:59:59
-     *
-     * @param inputDay day
-     * @return end of day
-     */
-    public static Date getEndOfDay(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 999);
-        return cal.getTime();
-    }
-
-    /**
-     * return YYYY-MM-DD 00:00:00
-     *
-     * @param inputDay day
-     * @return start of hour
-     */
-    public static Date getStartOfHour(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
-    }
-
-    /**
-     * return YYYY-MM-DD 23:59:59
-     *
-     * @param inputDay day
-     * @return end of hour
-     */
-    public static Date getEndOfHour(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 999);
-        return cal.getTime();
-    }
-
-    /**
-     * get current date
-     *
-     * @return current date
-     */
-    public static Date getCurrentDate() {
-        return DateUtils.parse(DateUtils.getCurrentTime(),
-                Constants.YYYY_MM_DD_HH_MM_SS);
-    }
-
-    public static Date addYears(Date date, int amount) {
-        return add(date, 1, amount);
-    }
-
     public static Date addMonths(Date date, int amount) {
         return add(date, 2, amount);
-    }
-
-    public static Date addWeeks(Date date, int amount) {
-        return add(date, 3, amount);
     }
 
     public static Date addDays(Date date, int amount) {
         return add(date, 5, amount);
     }
 
-    public static Date addHours(Date date, int amount) {
-        return add(date, 11, amount);
-    }
-
     public static Date addMinutes(Date date, int amount) {
         return add(date, 12, amount);
-    }
-
-    public static Date addSeconds(Date date, int amount) {
-        return add(date, 13, amount);
-    }
-
-    public static Date addMilliseconds(Date date, int amount) {
-        return add(date, 14, amount);
     }
 
     /**
@@ -548,33 +304,6 @@ public class DateUtils {
     }
 
     /**
-     * get current time stamp : yyyyMMddHHmmssSSS
-     *
-     * @return date string
-     */
-    public static String getCurrentTimeStamp() {
-        return getCurrentTime(Constants.YYYYMMDDHHMMSSSSS);
-    }
-
-    /**
-     * transform date to target timezone date
-     * <p>e.g.
-     * <p> if input date is 2020-01-01 00:00:00 current timezone is CST
-     * <p>targetTimezoneId is MST
-     * <p>this method will return 2020-01-01 15:00:00
-     */
-    public static Date getTimezoneDate(Date date, String targetTimezoneId) {
-        if (StringUtils.isEmpty(targetTimezoneId)) {
-            return date;
-        }
-
-        String dateToString = dateToString(date);
-        LocalDateTime localDateTime = LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
-        return Date.from(zonedDateTime.toInstant());
-    }
-
-    /**
      * get timezone by timezoneId
      */
     public static TimeZone getTimezone(String timezoneId) {
@@ -583,40 +312,4 @@ public class DateUtils {
         }
         return TimeZone.getTimeZone(timezoneId);
     }
-
-    /**
-     * Time unit representing one thousandth of a second
-     */
-    public static class MILLISECONDS {
-
-        public static long toSeconds(long d) {
-            return d / (C3 / C2);
-        }
-
-        public static long toMinutes(long d) {
-            return d / (C4 / C2);
-        }
-
-        public static long toHours(long d) {
-            return d / (C5 / C2);
-        }
-
-        public static long toDays(long d) {
-            return d / (C6 / C2);
-        }
-
-        public static long toDurationSeconds(long d) {
-            return (d % (C4 / C2)) / (C3 / C2);
-        }
-
-        public static long toDurationMinutes(long d) {
-            return (d % (C5 / C2)) / (C4 / C2);
-        }
-
-        public static long toDurationHours(long d) {
-            return (d % (C6 / C2)) / (C5 / C2);
-        }
-
-    }
-
 }

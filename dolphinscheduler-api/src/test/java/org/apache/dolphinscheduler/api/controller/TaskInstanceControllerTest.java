@@ -50,11 +50,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * task instance controller test
- */
 public class TaskInstanceControllerTest extends AbstractControllerTest {
-
     @InjectMocks
     private TaskInstanceController taskInstanceController;
 
@@ -94,7 +90,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

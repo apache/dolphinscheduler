@@ -38,7 +38,20 @@
     },
     mounted () {
       const graphGrid = echarts.init(this.$refs['graph-grid'])
-      graphGrid.setOption(graphGridOption(this.locations, this.connects, this.sourceWorkFlowCode, this.isShowLabel), true)
+      graphGrid.setOption(
+        graphGridOption(
+          this.locations.map(item => {
+            item.crontab = item.crontab !== null ? item.crontab : '-'
+            item.scheduleEndTime = item.scheduleEndTime !== null ? item.scheduleEndTime : '-'
+            item.scheduleStartTime = item.scheduleStartTime !== null ? item.scheduleStartTime : '-'
+            return item
+          }),
+          this.connects,
+          this.sourceWorkFlowCode,
+          this.isShowLabel
+        ),
+        true
+      )
       graphGrid.on('click', (params) => {
         // Jump to the definition page
         this.$router.push({ path: `/projects/${this.projectCode}/definition/list/${params.data.code}` })

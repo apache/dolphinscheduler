@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -30,6 +29,8 @@ import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
@@ -39,6 +40,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * task instance
@@ -83,6 +85,12 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private String processInstanceName;
+
+    /**
+     * process instance name
+     */
+    @TableField(exist = false)
+    private int taskGroupPriority;
 
     /**
      * state
@@ -259,14 +267,6 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
-    /**
-     * blocking task params
-     */
-    @TableField(exist = false)
-    private String blockingCondition;
-
-    @TableField(exist = false)
-    private boolean alertWhenBlocking = false;
 
     /**
      * task params
@@ -277,6 +277,10 @@ public class TaskInstance implements Serializable {
      * dry run flag
      */
     private int dryRun;
+    /**
+     * task group id
+     */
+    private int taskGroupId;
 
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
@@ -290,6 +294,14 @@ public class TaskInstance implements Serializable {
 
     public void setVarPool(String varPool) {
         this.varPool = varPool;
+    }
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
     }
 
     public ProcessInstance getProcessInstance() {
@@ -466,7 +478,8 @@ public class TaskInstance implements Serializable {
 
     public DependentParameters getDependency() {
         if (this.dependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
             this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
         }
         return this.dependency;
@@ -478,15 +491,17 @@ public class TaskInstance implements Serializable {
 
     public SwitchParameters getSwitchDependency() {
         if (this.switchDependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
             this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
         }
         return this.switchDependency;
     }
 
     public void setSwitchDependency(SwitchParameters switchDependency) {
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {});
-        taskParamsMap.put(Constants.SWITCH_RESULT,JSONUtils.toJsonString(switchDependency));
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+        });
+        taskParamsMap.put(Constants.SWITCH_RESULT, JSONUtils.toJsonString(switchDependency));
         this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 
@@ -586,8 +601,13 @@ public class TaskInstance implements Serializable {
         return TaskType.SWITCH.getDesc().equalsIgnoreCase(this.taskType);
     }
 
+    public boolean isBlockingTask() {
+        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.taskType);
+    }
+
     /**
-     * determine if you can try again
+     * determine if a task instance can retry
+     * if subProcess,
      *
      * @return can try result
      */
@@ -597,10 +617,8 @@ public class TaskInstance implements Serializable {
         }
         if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        } else {
-            return (this.getState().typeIsFailure()
-                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+        return this.getState() == ExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
     }
 
     /**
@@ -612,9 +630,7 @@ public class TaskInstance implements Serializable {
         if (getState() != ExecutionStatus.FAILURE) {
             return true;
         }
-        if (getId() == 0
-                || getMaxRetryTimes() == 0
-                || getRetryInterval() == 0) {
+        if (getMaxRetryTimes() == 0 || getRetryInterval() == 0) {
             return true;
         }
         Date now = new Date();
@@ -731,30 +747,11 @@ public class TaskInstance implements Serializable {
         return endTime == null;
     }
 
-    public boolean isBlockingTask() {
-        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.taskType);
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
     }
 
-    public String getBlockingCondition() {
-        if (this.blockingCondition == null) {
-            Map<String, String> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(),new TypeReference<Map<String, String>>() {});
-            this.blockingCondition = taskParamsMap.get(Constants.BLOCKING_CONDITION);
-        }
-        return blockingCondition;
-    }
-
-    public void setBlockingCondition(String blockingCondition) {
-        this.blockingCondition = blockingCondition;
-    }
-
-    public boolean getAlertWhenBlocking() {
-        Map<String,Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(),new TypeReference<Map<String, Object>>() {});
-        Boolean alertWhenBlocking = (Boolean) taskParamsMap.get(Constants.ALERT_WHEN_BLOCKING);
-        this.alertWhenBlocking = alertWhenBlocking == null ? false : alertWhenBlocking;
-        return this.alertWhenBlocking;
-    }
-
-    public void setAlertWhenBlocking(boolean alertWhenBlocking) {
-        this.alertWhenBlocking = alertWhenBlocking;
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

@@ -17,7 +17,7 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="udf-items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('UDF Resource Name')" min-width="100">
           <template slot-scope="scope">
@@ -58,10 +58,10 @@
         <el-table-column :label="$t('Operation')" min-width="120">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
+              <span><el-button id="btnRename" type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Download')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
+              <span><el-button id="btnDownload" type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
@@ -72,7 +72,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button id="btnDelete" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -81,7 +81,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
-      width="45%">
+      width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
   </div>

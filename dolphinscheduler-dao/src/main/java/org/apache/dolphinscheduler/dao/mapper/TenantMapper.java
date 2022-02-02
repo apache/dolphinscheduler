@@ -14,29 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * tenant mapper interface
  */
+@CacheConfig(cacheNames = "tenant", keyGenerator = "cacheKeyGenerator")
 public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**
      * query tenant by id
+     *
      * @param tenantId tenantId
      * @return tenant
      */
+    @Cacheable(sync = true)
     Tenant queryById(@Param("tenantId") int tenantId);
 
     /**
+     * delete by id
+     */
+    @CacheEvict
+    int deleteById(int id);
+
+    /**
+     * update
+     */
+    @CacheEvict(key = "#p0.id")
+    int updateById(@Param("et") Tenant tenant);
+
+    /**
      * query tenant by code
+     *
      * @param tenantCode tenantCode
      * @return tenant
      */
@@ -44,6 +65,7 @@ public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**
      * tenant page
+     *
      * @param page page
      * @param searchVal searchVal
      * @return tenant IPage
@@ -53,6 +75,7 @@ public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**
      * check tenant exist
+     *
      * @param tenantCode tenantCode
      * @return true if exist else return null
      */

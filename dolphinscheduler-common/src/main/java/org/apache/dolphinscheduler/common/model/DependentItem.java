@@ -26,16 +26,16 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 public class DependentItem {
     private long projectCode;
     private long definitionCode;
-    private String depTasks;
+    private long depTaskCode;
     private String cycle;
     private String dateValue;
     private DependResult dependResult;
     private ExecutionStatus status;
 
     public String getKey() {
-        return String.format("%d-%s-%s-%s",
+        return String.format("%d-%d-%s-%s",
                 getDefinitionCode(),
-                getDepTasks(),
+                getDepTaskCode(),
                 getCycle(),
                 getDateValue());
     }
@@ -56,12 +56,12 @@ public class DependentItem {
         this.definitionCode = definitionCode;
     }
 
-    public String getDepTasks() {
-        return depTasks;
+    public long getDepTaskCode() {
+        return depTaskCode;
     }
 
-    public void setDepTasks(String depTasks) {
-        this.depTasks = depTasks;
+    public void setDepTaskCode(long depTaskCode) {
+        this.depTaskCode = depTaskCode;
     }
 
     public String getCycle() {

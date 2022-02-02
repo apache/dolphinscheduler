@@ -26,7 +26,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
-            <el-select v-model="selected" size="small">
+            <el-select v-model="selected" filterable size="small">
               <el-option
                       v-for="item in itemList"
                       :key="item.code"

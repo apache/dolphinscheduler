@@ -18,55 +18,57 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.RegistryServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.curator.test.TestingServer;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * abstract controller test
  */
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
-@PrepareForTest({ RegistryCenterUtils.class, RegistryClient.class })
-@PowerMockIgnore({"javax.management.*"})
-public class AbstractControllerTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {ApiApplicationServer.class, DaoConfiguration.class, RegistryServer.class})
+@AutoConfigureMockMvc
+@DirtiesContext
+public abstract class AbstractControllerTest {
 
     public static final String SESSION_ID = "sessionId";
 
+    @Autowired
     protected MockMvc mockMvc;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private SessionService sessionService;
 
     @Autowired
-    private SessionService sessionService;
+    private UsersService usersService;
 
     protected User user;
 
@@ -74,12 +76,8 @@ public class AbstractControllerTest {
 
     @Before
     public void setUp() {
-        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
-        PowerMockito.mockStatic(RegistryCenterUtils.class);
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-        createSession();
+        user = usersService.queryUser(1);
+        createSession(user);
     }
 
     @After
@@ -87,18 +85,14 @@ public class AbstractControllerTest {
         sessionService.signOut("127.0.0.1", user);
     }
 
-    private void createSession() {
-
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.GENERAL_USER);
+    private void createSession(User loginUser) {
 
         user = loginUser;
 
         String session = sessionService.createSession(loginUser, "127.0.0.1");
         sessionId = session;
 
-        Assert.assertTrue(!StringUtils.isEmpty(session));
+        Assert.assertFalse(StringUtils.isEmpty(session));
     }
 
     public Map<String, Object> success() {
@@ -113,6 +107,15 @@ public class AbstractControllerTest {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
         } else {
             result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    @Configuration
+    public static class RegistryServer {
+        @PostConstruct
+        public void startEmbedRegistryServer() throws Exception {
+            final TestingServer server = new TestingServer(true);
+            System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
         }
     }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="conditions-model">
+  <div class="conditions-task">
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -147,7 +147,7 @@
         // Process instance return status display matches by key
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
           $(`#${o.id}`).siblings().each(function () {
-            if (v1.depTasks === $(this).text()) {
+            if (v1.depTaskCode === $(this).text()) {
               v1.state = $(this).attr('data-dependent-depstate')
             }
           })
@@ -175,8 +175,8 @@
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-  .conditions-model {
+<style lang="scss" rel="stylesheet/scss" scoped>
+  .conditions-task {
     margin-top: -10px;
     .dep-opt {
       margin-bottom: 10px;

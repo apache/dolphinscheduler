@@ -34,18 +34,14 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -170,47 +166,6 @@ public class JSONUtils {
     }
 
     /**
-     * check json object valid
-     *
-     * @param json json
-     * @return true if valid
-     */
-    public static boolean checkJsonValid(String json) {
-
-        if (StringUtils.isEmpty(json)) {
-            return false;
-        }
-
-        try {
-            objectMapper.readTree(json);
-            return true;
-        } catch (IOException e) {
-            logger.error("check json object valid exception!", e);
-        }
-
-        return false;
-    }
-
-    /**
-     * Method for finding a JSON Object field with specified name in this
-     * node or its child nodes, and returning value it has.
-     * If no matching field is found in this node or its descendants, returns null.
-     *
-     * @param jsonNode json node
-     * @param fieldName Name of field to look for
-     * @return Value of first matching node found, if any; null if none
-     */
-    public static String findValue(JsonNode jsonNode, String fieldName) {
-        JsonNode node = jsonNode.findValue(fieldName);
-
-        if (node == null) {
-            return null;
-        }
-
-        return node.asText();
-    }
-
-    /**
      * json to map
      * {@link #toMap(String, Class, Class)}
      *
@@ -219,21 +174,6 @@ public class JSONUtils {
      */
     public static Map<String, String> toMap(String json) {
         return parseObject(json, new TypeReference<Map<String, String>>() {});
-    }
-
-    /**
-     * from the key-value generated json  to get the str value no matter the real type of value
-     * @param json the json str
-     * @param nodeName key
-     * @return the str value of key
-     */
-    public static String getNodeString(String json, String nodeName) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(json);
-            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
-        } catch (JsonProcessingException e) {
-            return "";
-        }
     }
 
     /**
@@ -325,18 +265,6 @@ public class JSONUtils {
         } catch (Exception e) {
             throw new RuntimeException("Json deserialization exception.", e);
         }
-    }
-
-    /**
-     * json serializer
-     */
-    public static class JsonDataSerializer extends JsonSerializer<String> {
-
-        @Override
-        public void serialize(String value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            gen.writeRawValue(value);
-        }
-
     }
 
     /**

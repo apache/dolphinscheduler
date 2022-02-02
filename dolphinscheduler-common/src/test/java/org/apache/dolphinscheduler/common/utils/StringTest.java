@@ -47,7 +47,6 @@ public class StringTest {
                 }
             }
             double during = (System.currentTimeMillis() - start) / 1000.0;
-            System.out.println(during);
             Assert.assertEquals("1_0000000000_0000000001", origin);
         }
     }

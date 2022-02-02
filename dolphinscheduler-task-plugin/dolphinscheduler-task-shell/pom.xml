@@ -21,12 +21,12 @@
     <parent>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-shell</artifactId>
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -45,8 +45,4 @@
             <artifactId>commons-collections4</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-task-shell-${project.version}</finalName>
-    </build>
 </project>

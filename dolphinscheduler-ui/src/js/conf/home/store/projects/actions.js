@@ -31,9 +31,9 @@ export default {
     })
   },
   /**
-   * Get project by id
+   * Get project by code
    */
-  getProjectById ({ state }, payload) {
+  getProjectByCode ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${payload}`, {}, res => {
         resolve(res.data)
@@ -133,6 +133,18 @@ export default {
     return new Promise((resolve, reject) => {
       io.get('projects/analysis/define-user-count', payload, res => {
         resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Get audit log list
+   */
+  getAuditLogList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('projects/audit/audit-log-list', payload, res => {
+        resolve(res.data)
       }).catch(e => {
         reject(e)
       })

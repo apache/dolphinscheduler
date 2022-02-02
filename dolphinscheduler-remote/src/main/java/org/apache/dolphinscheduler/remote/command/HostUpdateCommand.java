@@ -56,7 +56,7 @@ public class HostUpdateCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.PROCESS_HOST_UPDATE_REQUST);
+        command.setType(CommandType.PROCESS_HOST_UPDATE_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;

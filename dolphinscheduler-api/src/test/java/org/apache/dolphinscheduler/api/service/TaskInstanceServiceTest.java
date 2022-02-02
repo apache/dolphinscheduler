@@ -32,9 +32,11 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -81,20 +83,23 @@ public class TaskInstanceServiceTest {
     @Mock
     UsersService usersService;
 
+    @Mock
+    TaskDefinitionMapper taskDefinitionMapper;
+
     @Test
     public void queryTaskListPaging() {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         //project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Result projectAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 0, "", "",
                 "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), (int)projectAuthFailRes.getCode());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)projectAuthFailRes.getCode());
 
         // data parameter check
         putMsg(result, Status.SUCCESS, projectCode);
@@ -249,6 +254,9 @@ public class TaskInstanceServiceTest {
         // test task not found
         when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(mockSuccess);
         when(taskInstanceMapper.selectById(Mockito.anyInt())).thenReturn(null);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(projectCode);
+        when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
         Map<String, Object> taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
 

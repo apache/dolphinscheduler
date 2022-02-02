@@ -103,9 +103,7 @@ public class TaskPriorityQueueImplTest {
         queue.poll(1000, TimeUnit.MILLISECONDS);
         queue.poll(1000, TimeUnit.MILLISECONDS);
         Assert.assertTrue(queue.size() == 0);
-        System.out.println(System.currentTimeMillis());
         queue.poll(1000, TimeUnit.MILLISECONDS);
-        System.out.println(System.currentTimeMillis());
     }
 
     @Test

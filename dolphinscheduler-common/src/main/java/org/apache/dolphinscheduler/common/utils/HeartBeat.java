@@ -184,6 +184,7 @@ public class HeartBeat {
      * update server state
      */
     public void updateServerState() {
+        this.reportTime = System.currentTimeMillis();
         if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
             logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
                     loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);

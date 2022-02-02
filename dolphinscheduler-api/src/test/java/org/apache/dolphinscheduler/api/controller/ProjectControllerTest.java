@@ -126,6 +126,16 @@ public class ProjectControllerTest {
     }
 
     @Test
+    public void testQueryAuthorizedUser() {
+        Map<String, Object> result = new HashMap<>();
+        this.putMsg(result, Status.SUCCESS);
+
+        Mockito.when(this.projectService.queryAuthorizedUser(this.user, 3682329499136L)).thenReturn(result);
+        Result response = this.projectController.queryAuthorizedUser(this.user, 3682329499136L);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+
+    @Test
     public void testQueryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);

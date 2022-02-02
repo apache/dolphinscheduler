@@ -17,14 +17,14 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items-project">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Project Name')">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <a href="javascript:" class="links" @click="_switchProjects(scope.row)">{{ scope.row.name }}</a>
+                <a href="javascript:" class="links project-name" @click="_switchProjects(scope.row)">{{ scope.row.name }}</a>
               </div>
             </el-popover>
           </template>
@@ -61,7 +61,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" class="delete"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>

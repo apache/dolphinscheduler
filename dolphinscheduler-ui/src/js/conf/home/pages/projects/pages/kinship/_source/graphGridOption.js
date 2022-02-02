@@ -16,6 +16,7 @@
  */
 import _ from 'lodash'
 import i18n from '@/module/i18n/index.js'
+import dayjs from 'dayjs'
 
 const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus, code }, sourceWorkFlowCode) => {
   if (code === sourceWorkFlowCode) return categoryDic.active
@@ -28,6 +29,16 @@ const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus
     default:
       return categoryDic['1']
   }
+}
+
+const formatName = (str) => {
+  if (typeof str !== 'string') return ''
+
+  return str.slice(0, 6) + (str.length > 6 ? '\n...' : '')
+}
+
+const publishStatusFormat = (status) => {
+  return status === 0 || status === '0' ? i18n.$t('offline') : status === 1 || status === '1' ? i18n.$t('online') : '-'
 }
 
 export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
@@ -66,15 +77,14 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
       formatter: (params) => {
         if (!params.data.name) return ''
         const { name, scheduleStartTime, scheduleEndTime, crontab, workFlowPublishStatus, schedulePublishStatus } = params.data
-        const str = `
-      工作流名字：${name}<br/>
-      调度开始时间：${scheduleStartTime}<br/>
-      调度结束时间：${scheduleEndTime}<br/>
-      crontab表达式：${crontab}<br/>
-      工作流发布状态：${workFlowPublishStatus}<br/>
-      调度发布状态：${schedulePublishStatus}<br/>
-      `
-        return str
+        return `
+          ${i18n.$t('workflowName')}：${name}<br/>
+          ${i18n.$t('scheduleStartTime')}：${dayjs(scheduleStartTime).format('YYYY-MM-DD HH:mm:ss')}<br/>
+          ${i18n.$t('scheduleEndTime')}：${dayjs(scheduleEndTime).format('YYYY-MM-DD HH:mm:ss')}<br/>
+          ${i18n.$t('crontabExpression')}：${crontab}<br/>
+          ${i18n.$t('workflowPublishStatus')}：${publishStatusFormat(workFlowPublishStatus)}<br/>
+          ${i18n.$t('schedulePublishStatus')}：${publishStatusFormat(schedulePublishStatus)}<br/>
+        `
       },
       color: '#2D303A',
       textStyle: {
@@ -112,8 +122,7 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
         position: 'inside',
         formatter: (params) => {
           if (!params.data.name) return ''
-          const str = params.data.name.split('_').map(item => `{a|${item}\n}`).join('')
-          return str
+          return formatName(params.data.name)
         },
         color: '#222222',
         textStyle: {

@@ -71,7 +71,7 @@ public class Instance {
      */
     private String duration;
 
-    private int subflowId;
+    private long subflowCode;
 
     public Instance() {
     }
@@ -83,7 +83,7 @@ public class Instance {
         this.type = type;
     }
 
-    public Instance(int id, String name, long code, String type, String state, Date startTime, Date endTime, String host, String duration, int subflowId) {
+    public Instance(int id, String name, long code, String type, String state, Date startTime, Date endTime, String host, String duration, long subflowCode) {
         this.id = id;
         this.name = name;
         this.code = code;
@@ -93,7 +93,7 @@ public class Instance {
         this.endTime = endTime;
         this.host = host;
         this.duration = duration;
-        this.subflowId = subflowId;
+        this.subflowCode = subflowCode;
     }
 
     public Instance(int id, String name, long code, String type, String state, Date startTime, Date endTime, String host, String duration) {
@@ -173,11 +173,11 @@ public class Instance {
         this.duration = duration;
     }
 
-    public int getSubflowId() {
-        return subflowId;
+    public long getSubflowCode() {
+        return subflowCode;
     }
 
-    public void setSubflowId(int subflowId) {
-        this.subflowId = subflowId;
+    public void setSubflowCode(long subflowCode) {
+        this.subflowCode = subflowCode;
     }
 }
