@@ -30,7 +30,7 @@ import {
   TargetCodeReq
 } from './types'
 
-export function queryListPaging(params: PageReq & ListReq, code: CodeReq): any {
+export function queryListPaging(params: PageReq & ListReq, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition`,
     method: 'get',
@@ -58,7 +58,7 @@ export function queryAllByProjectCode(code: CodeReq): any {
 
 export function batchCopyByCodes(
   data: TargetCodeReq & CodesReq,
-  code: CodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/batch-copy`,
@@ -75,10 +75,11 @@ export function batchDeleteByCodes(data: CodesReq, code: CodeReq): any {
   })
 }
 
-export function batchExportByCodes(data: CodesReq, code: CodeReq): any {
+export function batchExportByCodes(data: CodesReq, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/batch-export`,
     method: 'post',
+    responseType: 'blob',
     data
   })
 }
@@ -105,7 +106,7 @@ export function getTaskListByDefinitionCodes(
   })
 }
 
-export function importProcessDefinition(data: FileReq, code: CodeReq): any {
+export function importProcessDefinition(data: FormData, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/import`,
     method: 'post',
@@ -168,7 +169,7 @@ export function update(
   })
 }
 
-export function deleteByCode(code: CodeReq, processCode: CodeReq): any {
+export function deleteByCode(code: number, processCode: number): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}`,
     method: 'delete'
@@ -177,8 +178,8 @@ export function deleteByCode(code: CodeReq, processCode: CodeReq): any {
 
 export function release(
   data: NameReq & ReleaseStateReq,
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  processCode: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/release`,
@@ -199,8 +200,8 @@ export function getTasksByDefinitionCode(
 
 export function queryVersions(
   params: PageReq,
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  processCode: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/versions`,
@@ -210,9 +211,9 @@ export function queryVersions(
 }
 
 export function switchVersion(
-  code: CodeReq,
-  processCode: CodeReq,
-  version: VersionReq
+  code: number,
+  processCode: number,
+  version: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/versions/${version}`,
@@ -221,9 +222,9 @@ export function switchVersion(
 }
 
 export function deleteVersion(
-  code: CodeReq,
-  processCode: CodeReq,
-  version: VersionReq
+  code: number,
+  processCode: number,
+  version: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/versions/${version}`,

@@ -16,26 +16,18 @@
  */
 
 import Card from '@/components/card'
-import { SearchOutlined } from '@vicons/antd'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NInput,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { ArrowLeftOutlined } from '@vicons/antd'
+import { NButton, NDataTable, NIcon, NPagination } from 'naive-ui'
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
 import { useTable } from './use-table'
-import ImportModal from './components/import-modal'
-import StartModal from './components/start-modal'
-import TimingModal from './components/timing-modal'
-import VersionModal from './components/version-modal'
-import styles from './index.module.scss'
+import TimingModal from '../components/timing-modal'
+import styles from '../index.module.scss'
 
 export default defineComponent({
-  name: 'WorkflowDefinitionList',
+  name: 'WorkflowDefinitionTiming',
   setup() {
     const { variables, getTableData } = useTable()
 
@@ -75,39 +67,20 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const router: Router = useRouter()
 
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
           <div class={styles.header}>
-            <NSpace>
-              <NButton type='primary' /* TODO: Create workflow */>
-                {t('project.workflow.create_workflow')}
-              </NButton>
-              <NButton strong secondary onClick={() => (this.showRef = true)}>
-                {t('project.workflow.import_workflow')}
-              </NButton>
-            </NSpace>
-            <div class={styles.right}>
-              <div class={styles.search}>
-                <div class={styles.list}>
-                  <NButton type='primary' onClick={this.handleSearch}>
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  </NButton>
-                </div>
-                <div class={styles.list}>
-                  <NInput
-                    placeholder={t('resource.function.enter_keyword_tips')}
-                    v-model={[this.searchVal, 'value']}
-                  />
-                </div>
-              </div>
-            </div>
+            <NButton type='primary' onClick={() => router.go(-1)}>
+              <NIcon>
+                <ArrowLeftOutlined />
+              </NIcon>
+            </NButton>
           </div>
         </Card>
-        <Card title={t('project.workflow.workflow_definition')}>
+        <Card title={t('project.workflow.cron_manage')}>
           <NDataTable
             columns={this.columns}
             data={this.tableData}
@@ -128,23 +101,10 @@ export default defineComponent({
             />
           </div>
         </Card>
-        <ImportModal
-          v-model:show={this.showRef}
-          onUpdateList={this.handleUpdateList}
-        />
-        <StartModal
-          v-model:row={this.row}
-          v-model:show={this.startShowRef}
-          onUpdateList={this.handleUpdateList}
-        />
         <TimingModal
+          type={'update'}
           v-model:row={this.row}
-          v-model:show={this.timingShowRef}
-          onUpdateList={this.handleUpdateList}
-        />
-        <VersionModal
-          v-model:row={this.row}
-          v-model:show={this.versionShowRef}
+          v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}
         />
       </div>
