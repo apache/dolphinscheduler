@@ -42,7 +42,9 @@ import {
   EnvironmentOutlined,
   KeyOutlined,
   SafetyOutlined,
-  GroupOutlined
+  GroupOutlined,
+  ContainerOutlined,
+  ApartmentOutlined
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
 
@@ -169,6 +171,19 @@ export function useDataList() {
                 key: 'task-group-queue'
               }
             ]
+          }
+        ]
+      },
+      {
+        label: t('menu.data_quality'),
+        key: 'data-quality',
+        icon: renderIcon(ContainerOutlined),
+        isShowSide: true,
+        children: [
+          {
+            label: t('menu.task_result'),
+            key: `/data-quality/task-result`,
+            icon: renderIcon(ApartmentOutlined)
           }
         ]
       },
