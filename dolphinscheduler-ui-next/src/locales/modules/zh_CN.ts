@@ -76,7 +76,9 @@ const menu = {
   token_manage: '令牌管理',
   task_group_manage: '任务组管理',
   task_group_option: '任务组配置',
-  task_group_queue: '任务组队列'
+  task_group_queue: '任务组队列',
+  data_quality: '数据质量',
+  task_result: '任务结果'
 }
 
 const home = {
@@ -708,6 +710,38 @@ const datasource = {
   user_password_tips: '请输入密码'
 }
 
+const data_quality = {
+  task_result: {
+    task_name: '任务名称',
+    workflow_instance: '工作流实例',
+    rule_type: '规则类型',
+    rule_name: '规则名称',
+    state: '状态',
+    actual_value: '实际值',
+    excepted_value: '期望值',
+    check_type: '检测类型',
+    operator: '操作符',
+    threshold: '阈值',
+    failure_strategy: '失败策略',
+    excepted_value_type: '期望值类型',
+    error_output_path: '错误数据路径',
+    username: '用户名',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    undone: '未完成',
+    success: '成功',
+    failure: '失败',
+    single_table: '单表检测',
+    single_table_custom_sql: '自定义SQL',
+    multi_table_accuracy: '多表准确性',
+    multi_table_comparison: '两表值对比',
+    expected_and_actual_or_expected: '(期望值-实际值)/实际值 x 100%',
+    expected_and_actual: '期望值-实际值',
+    actual_and_expected: '实际值-期望值',
+    actual_or_expected: '实际值/期望值 x 100%'
+  }
+}
+
 export default {
   login,
   modal,
@@ -721,5 +755,6 @@ export default {
   resource,
   project,
   security,
-  datasource
+  datasource,
+  data_quality
 }
