@@ -76,7 +76,9 @@ const menu = {
   token_manage: 'Token Manage',
   task_group_manage: 'Task Group Manage',
   task_group_option: 'Task Group Option',
-  task_group_queue: 'Task Group Queue'
+  task_group_queue: 'Task Group Queue',
+  data_quality: 'Data Quality',
+  task_result: 'Task Result'
 }
 
 const home = {
@@ -715,6 +717,38 @@ const datasource = {
   user_password_tips: 'Please enter your password'
 }
 
+const data_quality = {
+  task_result: {
+    task_name: 'Task Name',
+    workflow_instance: 'Workflow Instance',
+    rule_type: 'Rule Type',
+    rule_name: 'Rule Name',
+    state: 'State',
+    actual_value: 'Actual Value',
+    excepted_value: 'Excepted Value',
+    check_type: 'Check Type',
+    operator: 'Operator',
+    threshold: 'Threshold',
+    failure_strategy: 'Failure Strategy',
+    excepted_value_type: 'Excepted Value Type',
+    error_output_path: 'Error Output Path',
+    username: 'Username',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    undone: 'Undone',
+    success: 'Success',
+    failure: 'Failure',
+    single_table: 'Single Table',
+    single_table_custom_sql: 'Single Table Custom Sql',
+    multi_table_accuracy: 'Multi Table Accuracy',
+    multi_table_comparison: 'Multi Table Comparison',
+    expected_and_actual_or_expected: '(Expected - Actual) / Expected x 100%',
+    expected_and_actual: 'Expected - Actual',
+    actual_and_expected: 'Actual - Expected',
+    actual_or_expected: 'Actual / Expected x 100%'
+  }
+}
+
 export default {
   login,
   modal,
@@ -728,5 +762,6 @@ export default {
   resource,
   project,
   security,
-  datasource
+  datasource,
+  data_quality
 }
