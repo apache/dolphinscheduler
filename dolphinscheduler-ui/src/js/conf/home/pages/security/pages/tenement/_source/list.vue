@@ -19,7 +19,7 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="tenantCode" :label="$t('OS Tenant Code')" min-width="100"></el-table-column>
+        <el-table-column prop="tenantCode" :label="$t('OS Tenant Code')" min-width="100" class-name="tenantCode"></el-table-column>
         <el-table-column :label="$t('Description')" min-width="100">
           <template slot-scope="scope">
             <span>{{scope.row.description | filterNull}}</span>

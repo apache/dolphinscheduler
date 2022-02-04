@@ -46,6 +46,9 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     })
     private WebElement buttonConfirm;
 
+    @FindBy(className = "tenantCode")
+    private WebElement tenantCode;
+
     private final TenantForm tenantForm;
     private final TenantForm editTenantForm;
 
@@ -70,8 +73,8 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     }
 
     public TenantPage update(String tenant, String editTenant, String description) {
-        tenantList.stream()
-            .filter(it -> it.findElement(By.className("")).getAttribute("innerHTML").contains(tenant))
+        tenantList().stream()
+            .filter(it -> it.findElement(By.className("tenantCode")).getAttribute("innerHTML").contains(tenant))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
