@@ -51,6 +51,7 @@
                 and name like concat('%', #{name}, '%')
             </if>
         </where>
+        order by update_time desc
     </select>
 
     <select id="queryTaskGroupPagingByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -59,6 +60,7 @@
         </include>
         from t_ds_task_group
         where project_code in ( #{projectCode} ,  0)
+        order by update_time desc
     </select>
 
     <!--modify data by id-->
