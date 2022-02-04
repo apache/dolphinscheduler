@@ -46,12 +46,14 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     })
     private WebElement buttonConfirm;
 
-    private final CreateTenantForm createTenantForm;
+    private final TenantForm tenantForm;
+    private final TenantForm editTenantForm;
 
     public TenantPage(RemoteWebDriver driver) {
         super(driver);
 
-        createTenantForm = new CreateTenantForm();
+        tenantForm = new TenantForm();
+        editTenantForm = new TenantForm();
     }
 
     public TenantPage create(String tenant) {
@@ -60,9 +62,29 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     public TenantPage create(String tenant, String description) {
         buttonCreateTenant().click();
-        createTenantForm().inputTenantCode().sendKeys(tenant);
-        createTenantForm().inputDescription().sendKeys(description);
-        createTenantForm().buttonSubmit().click();
+        tenantForm().inputTenantCode().sendKeys(tenant);
+        tenantForm().inputDescription().sendKeys(description);
+        tenantForm().buttonSubmit().click();
+
+        return this;
+    }
+
+    public TenantPage update(String tenant, String editTenant, String description) {
+        tenantList.stream()
+            .filter(it -> it.findElement(By.className("")).getAttribute("innerHTML").contains(tenant))
+            .flatMap(it -> it.findElements(By.className("edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in tenant list"))
+            .click();
+
+        TenantForm editTenantForm = new TenantForm();
+
+        editTenantForm.inputTenantCode().clear();
+        editTenantForm.inputTenantCode().sendKeys(editTenant);
+        editTenantForm.inputDescription().clear();
+        editTenantForm.inputDescription().sendKeys(description);
+        editTenantForm.buttonSubmit().click();
 
         return this;
     }
@@ -83,8 +105,8 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     }
 
     @Getter
-    public class CreateTenantForm {
-        CreateTenantForm() {
+    public class TenantForm {
+        TenantForm() {
             PageFactory.initElements(driver, this);
         }
 
