@@ -142,7 +142,7 @@ public class FunctionManageE2ETest {
         FunctionManagePage page = new FunctionManagePage(browser);
 
         new WebDriverWait(page.driver(), 10)
-            .until(ExpectedConditions.urlContains("/#/resource/func"));
+            .until(ExpectedConditions.elementToBeClickable(By.id("btnCreateUdfFunction")));
 
         page.createUdfFunction(testUdfFunctionName, testClassName, testUploadUdfFileName, testDescription);
 
