@@ -72,7 +72,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public TenantPage update(String tenant, String editTenant, String description) {
+    public TenantPage update(String tenant, String description) {
         tenantList().stream()
             .filter(it -> it.findElement(By.className("tenantCode")).getAttribute("innerHTML").contains(tenant))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
@@ -83,8 +83,6 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
         TenantForm editTenantForm = new TenantForm();
 
-        editTenantForm.inputTenantCode().clear();
-        editTenantForm.inputTenantCode().sendKeys(editTenant);
         editTenantForm.inputDescription().clear();
         editTenantForm.inputDescription().sendKeys(description);
         editTenantForm.buttonSubmit().click();

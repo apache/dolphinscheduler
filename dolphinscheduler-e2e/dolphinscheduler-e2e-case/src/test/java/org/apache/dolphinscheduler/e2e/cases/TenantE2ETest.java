@@ -37,7 +37,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class TenantE2ETest {
     private static final String tenant = System.getProperty("user.name");
-    private static final String editTenant = "edit_tenant";
     private static final String editDescription = "This is a test";
 
     private static RemoteWebDriver browser;
@@ -83,14 +82,14 @@ class TenantE2ETest {
     void testUpdateTenant() {
         TenantPage page = new TenantPage(browser);
 
-        page.update(tenant, editTenant, editDescription);
+        page.update(tenant, editDescription);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.tenantList())
                 .as("Tenant list should contain newly-modified tenant")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(editTenant));
+                .anyMatch(it -> it.contains(tenant));
         });
     }
 
@@ -98,7 +97,7 @@ class TenantE2ETest {
     @Order(40)
     void testDeleteTenant() {
         final TenantPage page = new TenantPage(browser);
-        page.delete(editTenant);
+        page.delete(tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -106,7 +105,7 @@ class TenantE2ETest {
             assertThat(
                 page.tenantList()
             ).noneMatch(
-                it -> it.getText().contains(tenant) || it.getText().contains(editTenant)
+                it -> it.getText().contains(tenant)
             );
         });
     }
