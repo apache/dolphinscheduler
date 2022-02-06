@@ -15,54 +15,19 @@
  * limitations under the License.
  */
 
-import type {
-  GridProps,
-  FormProps,
-  FormItemGiProps,
-  FormItemRule,
-  FormRules,
-  SelectOption
-} from 'naive-ui'
+import { h } from 'vue'
+import { NInputNumber } from 'naive-ui'
+import type { IJsonItem } from '../types'
 
-type IType =
-  | 'input'
-  | 'radio'
-  | 'editor'
-  | 'custom-parameters'
-  | 'switch'
-  | 'input-number'
-  | 'select'
+export function renderInputNumber(
+  item: IJsonItem,
+  fields: { [field: string]: any }
+) {
+  const { props, field } = item
 
-type IOption = SelectOption
-
-interface IFormItem extends FormItemGiProps {
-  widget: any
-}
-
-interface IMeta extends Omit<FormProps, 'model'> {
-  elements?: IFormItem[]
-  model: object
-}
-
-interface IJsonItem {
-  field: string
-  name?: string
-  props?: object
-  title?: string
-  type?: IType
-  validate?: FormItemRule
-  value?: any
-  options?: IOption[]
-  children?: IJsonItem[]
-}
-
-export {
-  IMeta,
-  IType,
-  IJsonItem,
-  IOption,
-  FormItemRule,
-  FormRules,
-  IFormItem,
-  GridProps
+  return h(NInputNumber, {
+    ...props,
+    value: fields[field],
+    onUpdateValue: (value) => void (fields[field] = value)
+  })
 }
