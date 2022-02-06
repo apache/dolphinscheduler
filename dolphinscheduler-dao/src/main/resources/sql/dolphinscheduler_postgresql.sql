@@ -489,6 +489,8 @@ CREATE TABLE t_ds_process_task_relation_log (
 
 create index process_task_relation_log_idx_project_code_process_definition_code on t_ds_process_task_relation_log (project_code,process_definition_code);
 
+create index process_task_relation_log_idx_process_definition_code_definition_version on t_ds_process_task_relation_log (process_definition_code, process_definition_version);
+
 --
 -- Table structure for table t_ds_process_instance
 --
@@ -600,6 +602,10 @@ CREATE TABLE t_ds_relation_process_instance (
   PRIMARY KEY (id)
 ) ;
 
+create index idx_relation_process_instance_pproc_inst_id_ptask_inst_id on t_ds_relation_process_instance (
+  parent_process_instance_id,
+  parent_task_instance_id
+);
 
 --
 -- Table structure for table t_ds_relation_project_user
@@ -752,6 +758,7 @@ CREATE TABLE t_ds_task_instance (
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
 
+create index idx_task_instance_proc_inst_id_flag_start_time on t_ds_task_instance(process_instance_id, flag, start_time);
 --
 -- Table structure for table t_ds_tenant
 --

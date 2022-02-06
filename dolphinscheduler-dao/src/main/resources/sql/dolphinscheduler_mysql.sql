@@ -566,6 +566,8 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+create index `process_task_relation_log_idx_process_definition_code_definition_version` on `t_ds_process_task_relation_log` (`process_definition_code`, `process_definition_version`);
+
 -- ----------------------------
 -- Table structure for t_ds_process_instance
 -- ----------------------------
@@ -683,6 +685,10 @@ CREATE TABLE `t_ds_relation_process_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+create index `idx_relation_process_instance_pproc_inst_id_ptask_inst_id` on `t_ds_relation_process_instance` (
+  `parent_process_instance_id`,
+  `parent_task_instance_id`
+);
 -- ----------------------------
 -- Records of t_ds_relation_process_instance
 -- ----------------------------
@@ -848,6 +854,8 @@ CREATE TABLE `t_ds_task_instance` (
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
   CONSTRAINT `foreign_key_instance_id` FOREIGN KEY (`process_instance_id`) REFERENCES `t_ds_process_instance` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+create index `idx_task_instance_proc_inst_id_flag_start_time` on `t_ds_task_instance`(`process_instance_id`, `flag`, `start_time`);
 
 -- ----------------------------
 -- Records of t_ds_task_instance
