@@ -40,7 +40,7 @@ services:
       mc:
         condition: service_completed_successfully
   s3:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2022-01-25T19-56-04Z
     hostname: s3
     tty: true
     stdin_open: true
@@ -58,7 +58,7 @@ services:
       timeout: 120s
       retries: 120
   mc:
-    image: minio/mc:latest
+    image: minio/mc:RELEASE.2022-01-07T06-01-38Z
     entrypoint: bash
     networks:
       - e2e
