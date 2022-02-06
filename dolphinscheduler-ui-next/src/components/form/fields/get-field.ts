@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 import * as Field from './index'
-import type { FormRules } from 'naive-ui'
+import { camelCase, upperFirst } from 'lodash'
+import type { FormRules, FormItemRule } from 'naive-ui'
 import type { IJsonItem } from '../types'
 
 const getField = (
@@ -23,39 +24,17 @@ const getField = (
   fields: { [field: string]: any },
   rules?: FormRules
 ) => {
-  const { type, props = {}, field, options, children } = item
+  const { type = 'input' } = item
+  const renderTypeName = `render${upperFirst(camelCase(type))}`
   // TODO Support other widgets later
-  if (type === 'radio') {
-    return Field.renderRadio({
-      field,
-      fields,
-      props,
-      options
-    })
-  }
-  if (type === 'editor') {
-    return Field.renderEditor({
-      field,
-      fields,
-      props
-    })
-  }
-
   if (type === 'custom-parameters') {
-    const params = {
-      field,
-      fields,
-      children,
-      props,
-      rules: []
-    }
-    if (rules) {
-      params.rules = rules[field] = []
-    }
-    return Field.renderCustomParameters(params)
+    let fieldRules: { [key: string]: FormItemRule }[] = []
+    if (rules && !rules[item.field]) fieldRules = rules[item.field] = []
+    // @ts-ignore
+    return Field[renderTypeName](item, fields, fieldRules)
   }
-
-  return Field.renderInput({ field, fields, props })
+  // @ts-ignore
+  return Field[renderTypeName](item, fields)
 }
 
 export default getField

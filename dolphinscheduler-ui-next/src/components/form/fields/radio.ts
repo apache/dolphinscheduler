@@ -17,10 +17,10 @@
 
 import { h } from 'vue'
 import { NRadio, NRadioGroup, NSpace } from 'naive-ui'
-import type { IFieldParams, IOption } from '../types'
+import type { IJsonItem, IOption } from '../types'
 
-export function renderRadio(params: IFieldParams) {
-  const { props, fields, field, options } = params
+export function renderRadio(item: IJsonItem, fields: { [field: string]: any }) {
+  const { props, field, options } = item
   if (!options || options.length === 0) {
     return h(NRadio, {
       ...props,

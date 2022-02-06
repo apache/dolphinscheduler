@@ -17,10 +17,13 @@
 
 import { h } from 'vue'
 import Editor from '@/components/monaco-editor'
-import type { IFieldParams } from '../types'
+import type { IJsonItem } from '../types'
 
-export function renderEditor(params: IFieldParams) {
-  const { props, fields, field } = params
+export function renderEditor(
+  item: IJsonItem,
+  fields: { [field: string]: any }
+) {
+  const { props, field } = item
   return h(Editor, {
     ...props,
     value: fields[field],

@@ -17,10 +17,10 @@
 
 import { h } from 'vue'
 import { NInput } from 'naive-ui'
-import type { IFieldParams } from '../types'
+import type { IJsonItem } from '../types'
 
-export function renderInput(params: IFieldParams) {
-  const { props, fields, field } = params
+export function renderInput(item: IJsonItem, fields: { [field: string]: any }) {
+  const { props, field } = item
   return h(NInput, {
     ...props,
     value: fields[field],
