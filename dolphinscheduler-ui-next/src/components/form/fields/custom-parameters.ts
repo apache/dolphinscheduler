@@ -20,14 +20,14 @@ import { NFormItem, NSpace, NButton, NIcon } from 'naive-ui'
 import { PlusCircleOutlined, DeleteOutlined } from '@vicons/antd'
 import getField from './get-field'
 import { formatValidate } from '../utils'
-import type { IFieldParams, IJsonItem, FormItemRule } from '../types'
+import type { IJsonItem, FormItemRule } from '../types'
 
-interface ICustomParameters extends Omit<IFieldParams, 'rules'> {
-  rules?: { [key: string]: FormItemRule }[]
-}
-
-export function renderCustomParameters(params: ICustomParameters) {
-  const { fields, field, children = [], rules = [] } = params
+export function renderCustomParameters(
+  item: IJsonItem,
+  fields: { [field: string]: any },
+  rules: { [key: string]: FormItemRule }[]
+) {
+  const { field, children = [] } = item
   let defaultValue: { [field: string]: any } = {}
   let ruleItem: { [key: string]: FormItemRule } = {}
   children.forEach((child) => {
@@ -77,7 +77,6 @@ export function renderCustomParameters(params: ICustomParameters) {
         onClick: () => {
           rules.push(ruleItem)
           fields[field].push({ ...defaultValue })
-          console.log(rules)
         }
       },
       () => h(NIcon, { size: 24 }, () => h(PlusCircleOutlined))

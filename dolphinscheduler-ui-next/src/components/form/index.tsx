@@ -47,20 +47,19 @@ const Form = defineComponent({
   },
   render(props: { meta: IMeta; layout?: GridProps; loading?: boolean }) {
     const { loading, layout, meta } = props
-    const { elements, ...restFormProps } = meta
+    const { elements = [], ...restFormProps } = meta
     return (
       <NSpin show={loading}>
         <NForm {...restFormProps} ref='formRef'>
           <NGrid {...layout}>
-            {elements &&
-              elements.map((element) => {
-                const { span = 24, path, widget, ...formItemProps } = element
-                return (
-                  <NFormItemGi {...formItemProps} span={span} path={path}>
-                    {h(widget)}
-                  </NFormItemGi>
-                )
-              })}
+            {elements.map((element) => {
+              const { span = 24, path, widget, ...formItemProps } = element
+              return (
+                <NFormItemGi {...formItemProps} span={span} path={path}>
+                  {h(widget)}
+                </NFormItemGi>
+              )
+            })}
           </NGrid>
         </NForm>
       </NSpin>
