@@ -17,6 +17,7 @@
 
 import { formatValidate } from './utils'
 import getField from './fields/get-field'
+import { omit } from 'lodash'
 import type { FormRules } from 'naive-ui'
 import type { IJsonItem } from './types'
 
@@ -27,20 +28,20 @@ export default function getElementByJson(
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
   const elements = []
-
   for (let item of json) {
-    if (item.value) {
-      fields[item.field] = item.value
-      initialValues[item.field] = item.value
+    const { name, value, field, children, validate, ...rest } = item
+    if (value) {
+      fields[field] = value
+      initialValues[field] = value
     }
-    if (item.validate) rules[item.field] = formatValidate(item.validate)
+    if (validate) rules[field] = formatValidate(validate)
     elements.push({
-      label: item.name,
-      path: !item.children ? item.field : '',
-      showLabel: !!item.name,
+      showLabel: !!name,
+      ...omit(rest, ['type', 'props', 'options']),
+      label: name,
+      path: !children ? field : '',
       widget: () => getField(item, fields, rules)
     })
   }
-
   return { rules, elements, initialValues }
 }
