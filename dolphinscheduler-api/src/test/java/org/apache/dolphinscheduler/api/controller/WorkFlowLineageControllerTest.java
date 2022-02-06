@@ -21,28 +21,27 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationContext;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * work flow lineage controller test
  */
-public class WorkFlowLineageControllerTest extends AbstractControllerTest {
+@RunWith(MockitoJUnitRunner.class)
+public class WorkFlowLineageControllerTest {
 
     @InjectMocks
     private WorkFlowLineageController workFlowLineageController;
@@ -50,30 +49,15 @@ public class WorkFlowLineageControllerTest extends AbstractControllerTest {
     @Mock
     private WorkFlowLineageServiceImpl workFlowLineageService;
 
+    protected User user;
+
     @Before
-    public void init() {
-        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
-        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
-        springApplicationContext.setApplicationContext(applicationContext);
-
-        ProjectMapper projectMapper = Mockito.mock(ProjectMapper.class);
-        Mockito.when(applicationContext.getBean(ProjectMapper.class)).thenReturn(projectMapper);
-        Project project = new Project();
-        project.setId(1);
-        project.setCode(1L);
-        Mockito.when(projectMapper.selectById(1)).thenReturn(project);
-    }
-
-    @Test
-    public void testQueryWorkFlowLineageByName() {
-        int projectId = 1;
-        String searchVal = "test";
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, 1);
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(searchVal, projectId)).thenReturn(result);
-        Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectId, searchVal);
-        Assert.assertTrue(response.isSuccess());
+    public void before() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+        user = loginUser;
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
@@ -86,17 +70,26 @@ public class WorkFlowLineageControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public  void testQueryWorkFlowLineageByIds() {
-        int projectId = 1;
-        String ids = "1";
+    public void testQueryWorkFlowLineageByName() {
+        long projectCode = 1L;
+        String searchVal = "test";
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, 1);
-        Set<Integer> idSet = new HashSet<>();
-        idSet.add(1);
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByIds(idSet, projectId)).thenReturn(result);
-        Result response = workFlowLineageController.queryWorkFlowLineageByIds(user, projectId, ids);
-        Assert.assertTrue(response.isSuccess());
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal)).thenReturn(result);
+        Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
+    @Test
+    public  void testQueryWorkFlowLineageByCode() {
+        long projectCode = 1L;
+        long code = 1L;
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, 1);
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(result);
+        Result response = workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
 }

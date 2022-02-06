@@ -1,0 +1,136 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: master-server
+  cache:
+    # default enable cache, you can disable by `type: none`
+    type: none
+    cache-names:
+      - tenant
+      - user
+      - processDefinition
+      - processTaskRelation
+      - taskDefinition
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=300s,recordStats
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+    username: root
+    password: root
+    hikari:
+      connection-test-query: select 1
+      minimum-idle: 5
+      auto-commit: true
+      validation-timeout: 3000
+      pool-name: DolphinScheduler
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      leak-detection-threshold: 0
+      initialization-fail-timeout: 1
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.threadPool:threadPriority: 5
+      org.quartz.jobStore.isClustered: true
+      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.scheduler.instanceId: AUTO
+      org.quartz.jobStore.tablePrefix: QRTZ_
+      org.quartz.jobStore.acquireTriggersWithinLock: true
+      org.quartz.scheduler.instanceName: DolphinScheduler
+      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
+      org.quartz.jobStore.useProperties: false
+      org.quartz.threadPool.makeThreadsDaemons: true
+      org.quartz.threadPool.threadCount: 25
+      org.quartz.jobStore.misfireThreshold: 60000
+      org.quartz.scheduler.makeSchedulerThreadDaemon: true
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.clusterCheckinInterval: 5000
+
+registry:
+  type: zookeeper
+  zookeeper:
+    namespace: dolphinscheduler
+    connect-string: localhost:2181
+    retry-policy:
+      base-sleep-time: 60ms
+      max-sleep: 300ms
+      max-retries: 5
+    session-timeout: 30s
+    connection-timeout: 9s
+    block-until-connected: 600ms
+    digest: ~
+
+master:
+  listen-port: 5678
+  # master fetch command num
+  fetch-command-num: 10
+  # master prepare execute thread number to limit handle commands in parallel
+  pre-exec-threads: 10
+  # master execute thread number to limit process instances in parallel
+  exec-threads: 100
+  # master dispatch task number per batch
+  dispatch-task-number: 3
+  # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
+  host-selector: lower_weight
+  # master heartbeat interval, the unit is second
+  heartbeat-interval: 10
+  # master commit task retry times
+  task-commit-retry-times: 5
+  # master commit task interval, the unit is millisecond
+  task-commit-interval: 1000
+  state-wheel-interval: 5
+  # master max cpuload avg, only higher than the system cpu load average, master server can schedule. default value -1: the number of cpu cores * 2
+  max-cpu-load-avg: -1
+  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
+  reserved-memory: 0.3
+  # failover interval, the unit is minute
+  failover-interval: 10
+  # kill yarn jon when failover taskInstance, default true
+  kill-yarn-job-when-task-failover: true
+
+server:
+  port: 5679
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+# Override by profile
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+  quartz:
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate

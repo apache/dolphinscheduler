@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -24,18 +25,23 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * task definition
@@ -87,6 +93,8 @@ public class TaskDefinition {
     /**
      * user defined parameters
      */
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String taskParams;
 
     /**
@@ -129,6 +137,11 @@ public class TaskDefinition {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private long environmentCode;
+
+    /**
      * fail retry times
      */
     private int failRetryTimes;
@@ -146,6 +159,7 @@ public class TaskDefinition {
     /**
      * timeout notify strategy
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private TaskTimeoutStrategy timeoutNotifyStrategy;
 
     /**
@@ -175,12 +189,35 @@ public class TaskDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    /**
+     * modify user name
+     */
+    @TableField(exist = false)
+    private String modifyBy;
+
+    /**
+     * task group id
+     */
+    private int taskGroupId;
+    /**
+     * task group id
+     */
+    private int taskGroupPriority;
+
     public TaskDefinition() {
     }
 
     public TaskDefinition(long code, int version) {
         this.code = code;
         this.version = version;
+    }
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
     }
 
     public String getName() {
@@ -395,6 +432,52 @@ public class TaskDefinition {
         this.delayTime = delayTime;
     }
 
+    public String getDependence() {
+        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
+    }
+
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
+    }
+
+    public long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        TaskDefinition that = (TaskDefinition) o;
+        return failRetryTimes == that.failRetryTimes
+            && failRetryInterval == that.failRetryInterval
+            && timeout == that.timeout
+            && delayTime == that.delayTime
+            && Objects.equals(name, that.name)
+            && Objects.equals(description, that.description)
+            && Objects.equals(taskType, that.taskType)
+            && Objects.equals(taskParams, that.taskParams)
+            && flag == that.flag
+            && taskPriority == that.taskPriority
+            && Objects.equals(workerGroup, that.workerGroup)
+            && timeoutFlag == that.timeoutFlag
+            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+            && (Objects.equals(resourceIds, that.resourceIds)
+            || (StringUtils.EMPTY.equals(resourceIds) && that.resourceIds == null)
+            || (StringUtils.EMPTY.equals(that.resourceIds) && resourceIds == null))
+            && environmentCode == that.environmentCode
+            && taskGroupId == that.taskGroupId
+            && taskGroupPriority == that.taskGroupPriority;
+    }
     @Override
     public String toString() {
         return "TaskDefinition{"
@@ -415,6 +498,9 @@ public class TaskDefinition {
                 + ", projectName='" + projectName + '\''
                 + ", workerGroup='" + workerGroup + '\''
                 + ", failRetryTimes=" + failRetryTimes
+                + ", environmentCode='" + environmentCode + '\''
+                + ", taskGroupId='" + taskGroupId + '\''
+                + ", taskGroupPriority='" + taskGroupPriority + '\''
                 + ", failRetryInterval=" + failRetryInterval
                 + ", timeoutFlag=" + timeoutFlag
                 + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
@@ -424,5 +510,13 @@ public class TaskDefinition {
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

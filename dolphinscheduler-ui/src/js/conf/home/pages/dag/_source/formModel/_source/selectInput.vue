@@ -20,7 +20,9 @@
           :disabled="isDetails"
           size="small"
           @change="_onChange"
-          v-model="selectedValue">
+          v-model="selectedValue"
+          filterable
+          allow-create>
       <el-input
               ref="input"
               slot="trigger"
@@ -69,8 +71,14 @@
     },
     methods: {
       _onChange (o) {
-        this.$emit('valueEvent', +o)
-        this._setIconState(+o)
+        // positive integer judgment
+        const r = /^\+?[1-9][0-9]*$/
+        if (!r.test(o)) {
+          this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
+        } else {
+          this.$emit('valueEvent', +o)
+          this._setIconState(+o)
+        }
       },
       _setIconState (value) {
         // Whether there is a list

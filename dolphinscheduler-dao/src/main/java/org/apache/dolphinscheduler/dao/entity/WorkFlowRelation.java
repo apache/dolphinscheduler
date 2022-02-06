@@ -14,47 +14,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Objects;
 
 public class WorkFlowRelation {
-    private int sourceWorkFlowId;
-    private int targetWorkFlowId;
+    private long sourceWorkFlowCode;
+    private long targetWorkFlowCode;
 
-    public int getSourceWorkFlowId() {
-        return sourceWorkFlowId;
+    public long getSourceWorkFlowCode() {
+        return sourceWorkFlowCode;
     }
 
-    public void setSourceWorkFlowId(int sourceWorkFlowId) {
-        this.sourceWorkFlowId = sourceWorkFlowId;
+    public void setSourceWorkFlowCode(long sourceWorkFlowCode) {
+        this.sourceWorkFlowCode = sourceWorkFlowCode;
     }
 
-    public int getTargetWorkFlowId() {
-        return targetWorkFlowId;
+    public long getTargetWorkFlowCode() {
+        return targetWorkFlowCode;
     }
 
-    public void setTargetWorkFlowId(int targetWorkFlowId) {
-        this.targetWorkFlowId = targetWorkFlowId;
+    public void setTargetWorkFlowCode(long targetWorkFlowCode) {
+        this.targetWorkFlowCode = targetWorkFlowCode;
     }
 
     public WorkFlowRelation() {
     }
 
-    public WorkFlowRelation(int sourceWorkFlowId, int targetWorkFlowId) {
-        this.sourceWorkFlowId = sourceWorkFlowId;
-        this.targetWorkFlowId = targetWorkFlowId;
+    public WorkFlowRelation(long sourceWorkFlowCode, long targetWorkFlowCode) {
+        this.sourceWorkFlowCode = sourceWorkFlowCode;
+        this.targetWorkFlowCode = targetWorkFlowCode;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return obj instanceof WorkFlowRelation
-                && this.sourceWorkFlowId == ((WorkFlowRelation) obj).getSourceWorkFlowId()
-                && this.targetWorkFlowId == ((WorkFlowRelation) obj).getTargetWorkFlowId();
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        WorkFlowRelation that = (WorkFlowRelation) o;
+        return sourceWorkFlowCode == that.sourceWorkFlowCode
+            && targetWorkFlowCode == that.targetWorkFlowCode;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceWorkFlowId, targetWorkFlowId);
+        return Objects.hash(sourceWorkFlowCode, targetWorkFlowCode);
     }
 }

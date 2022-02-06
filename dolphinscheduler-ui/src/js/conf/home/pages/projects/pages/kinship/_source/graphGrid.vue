@@ -28,9 +28,6 @@
       return {}
     },
     props: {
-      id: String,
-      locations: Array,
-      connects: Array,
       isShowLabel: Boolean
     },
     methods: {
@@ -41,16 +38,29 @@
     },
     mounted () {
       const graphGrid = echarts.init(this.$refs['graph-grid'])
-      graphGrid.setOption(graphGridOption(this.locations, this.connects, this.sourceWorkFlowId, this.isShowLabel), true)
+      graphGrid.setOption(
+        graphGridOption(
+          this.locations.map(item => {
+            item.crontab = item.crontab !== null ? item.crontab : '-'
+            item.scheduleEndTime = item.scheduleEndTime !== null ? item.scheduleEndTime : '-'
+            item.scheduleStartTime = item.scheduleStartTime !== null ? item.scheduleStartTime : '-'
+            return item
+          }),
+          this.connects,
+          this.sourceWorkFlowCode,
+          this.isShowLabel
+        ),
+        true
+      )
       graphGrid.on('click', (params) => {
         // Jump to the definition page
-        this.$router.push({ path: `/projects/${this.projectId}/definition/list/${params.data.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/list/${params.data.code}` })
       })
     },
     components: {},
     computed: {
-      ...mapState('dag', ['projectId']),
-      ...mapState('kinship', ['locations', 'connects', 'sourceWorkFlowId'])
+      ...mapState('dag', ['projectCode']),
+      ...mapState('kinship', ['locations', 'connects', 'sourceWorkFlowCode'])
     }
   }
 </script>

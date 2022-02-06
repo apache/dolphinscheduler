@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -35,68 +36,56 @@ import org.springframework.test.web.servlet.MvcResult;
  * monitor controller test
  */
 public class MonitorControllerTest extends AbstractControllerTest {
-
     private static final Logger logger = LoggerFactory.getLogger(MonitorControllerTest.class);
 
     @Test
     public void testListMaster() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/master/list")
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/masters")
             .header(SESSION_ID, sessionId)
            /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testListWorker() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/worker/list")
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/workers")
             .header(SESSION_ID, sessionId)
            /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryDatabaseState() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/database")
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/databases")
             .header(SESSION_ID, sessionId)
             /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Test
-    public void testQueryZookeeperState() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/zookeeper/list")
-            .header(SESSION_ID, sessionId)
-            /* .param("type", ResourceType.FILE.name())*/)
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
 }

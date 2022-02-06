@@ -20,8 +20,8 @@
       <slot name="content"></slot>
     </div>
     <div class="bottom-p">
-      <el-button type="text" size="mini" round @click="close()" :disabled="disabled"> {{$t('Cancel')}} </el-button>
-      <el-button type="primary" size="mini" round :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? $t('Loading...') : okText}} </el-button>
+      <el-button :id="cancelId" type="text" size="mini" round @click="close()" :disabled="disabled"> {{$t('Cancel')}} </el-button>
+      <el-button :id="okId" type="primary" size="mini" round :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? $t('Loading...') : okText}} </el-button>
     </div>
   </div>
 </template>
@@ -47,6 +47,14 @@
       asynLoading: {
         type: Boolean,
         default: false
+      },
+      cancelId: {
+        type: String,
+        default: ''
+      },
+      okId: {
+        type: String,
+        default: ''
       }
     },
     methods: {

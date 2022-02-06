@@ -87,9 +87,7 @@
         this.$router.go(-1)
       },
       _downloadFile () {
-        downloadFile('resources/download', {
-          id: this.$route.params.id
-        })
+        downloadFile(`resources/${this.$route.params.id}/download`)
       },
       _getViewResources () {
         this.isLoading = true

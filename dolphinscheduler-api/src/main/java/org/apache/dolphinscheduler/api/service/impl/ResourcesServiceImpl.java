@@ -33,14 +33,11 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -55,11 +52,14 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 
 import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,6 +81,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.io.Files;
 
 /**
  * resources service impl
@@ -128,16 +129,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           int pid,
                                           String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource directory {} has exist, can't recreate", fullName);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -193,23 +194,23 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          int pid,
                                          String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         result = verifyPid(loginUser, pid);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         result = verifyFile(name, type, file);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         // check resource name exists
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(name));
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -247,13 +248,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * check resource is exists
      *
      * @param fullName  fullName
-     * @param userId    user id
      * @param type      type
      * @return true if resource exists
      */
-    private boolean checkResourceExists(String fullName, int userId, int type) {
-        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
-        return BooleanUtils.isTrue(existResource);
+    private boolean checkResourceExists(String fullName, int type) {
+        Boolean existResource = resourcesMapper.existResource(fullName, type);
+        return existResource == Boolean.TRUE;
     }
 
     /**
@@ -275,7 +275,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -299,14 +299,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/") + 1),name);
-        if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (!originResourceName.equals(name) && checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
         }
 
         result = verifyFile(name, type, file);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -331,8 +331,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!resource.isDirectory()) {
             //get the origin file suffix
-            String originSuffix = FileUtils.suffix(originFullName);
-            String suffix = FileUtils.suffix(fullName);
+            String originSuffix = Files.getFileExtension(originFullName);
+            String suffix = Files.getFileExtension(fullName);
             boolean suffixIsChanged = false;
             if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
                 suffixIsChanged = true;
@@ -475,8 +475,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             // file suffix
-            String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-            String nameSuffix = FileUtils.suffix(name);
+            String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
+            String nameSuffix = Files.getFileExtension(name);
 
             // determine file suffix
             if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -577,8 +577,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
-        String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-        String nameSuffix = FileUtils.suffix(fullName);
+        String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
+        String nameSuffix = Files.getFileExtension(fullName);
 
         // determine file suffix
         if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -597,14 +597,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (!HadoopUtils.getInstance().exists(resourcePath)) {
                 createTenantDirIfNotExists(tenantCode);
             }
-            org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
+            org.apache.dolphinscheduler.api.utils.FileUtils.copyInputStreamToFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
-            try {
-                FileUtils.deleteFile(localFilename);
-            } catch (IOException ex) {
-                logger.error("delete local tmp file:{} error", localFilename, ex);
-            }
+            FileUtils.deleteFile(localFilename);
             logger.error(e.getMessage(), e);
             return false;
         }
@@ -674,7 +670,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> delete(User loginUser, int resourceId) throws IOException {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -752,7 +748,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
@@ -773,7 +769,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     putMsg(result,Status.HDFS_OPERATION_ERROR);
                 }
             } else {
-                putMsg(result,Status.TENANT_NOT_EXIST);
+                putMsg(result,Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             }
         }
 
@@ -830,7 +826,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> readResource(int resourceId, int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -841,7 +837,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         //check preview or not by file suffix
-        String nameSuffix = FileUtils.suffix(resource.getAlias());
+        String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixs = FileUtils.getResourceViewSuffixs();
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
@@ -899,7 +895,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -918,7 +914,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String name = fileName.trim() + "." + nameSuffix;
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -941,7 +937,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
         result = uploadContentToHdfs(fullName, tenantCode, content);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
         return result;
@@ -961,7 +957,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private Result<Object> verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
         Result<Object> result = verifyResourceName(fullName, type, loginUser);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
         return verifyPid(loginUser, pid);
@@ -995,7 +991,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> updateResourceContent(int resourceId, String content) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -1006,7 +1002,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         //check can edit by file suffix
-        String nameSuffix = FileUtils.suffix(resource.getAlias());
+        String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixs = FileUtils.getResourceViewSuffixs();
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
@@ -1026,7 +1022,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resourcesMapper.updateById(resource);
 
         result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
         return result;
@@ -1135,12 +1131,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
-
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
+
+        List<Resource> resourceList;
+        if (isAdmin(loginUser)) {
+            // admin gets all resources except userId
+            resourceList = resourcesMapper.queryResourceExceptUserId(userId);
+        } else {
+            // non-admins users get their own resources
+            resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), -1);
         }
-        List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
         List<ResourceComponent> list;
         if (CollectionUtils.isNotEmpty(resourceList)) {
             Visitor visitor = new ResourceTreeVisitor(resourceList);
@@ -1163,12 +1163,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     public Map<String, Object> unauthorizedFile(User loginUser, Integer userId) {
-
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
+
+        List<Resource> resourceList;
+        if (isAdmin(loginUser)) {
+            // admin gets all resources except userId
+            resourceList = resourcesMapper.queryResourceExceptUserId(userId);
+        } else {
+            // non-admins users get their own resources
+            resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), -1);
         }
-        List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
         List<Resource> list;
         if (resourceList != null && !resourceList.isEmpty()) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
@@ -1194,12 +1198,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
 
-        List<UdfFunc> udfFuncList = udfFunctionMapper.queryUdfFuncExceptUserId(userId);
+        List<UdfFunc> udfFuncList;
+        if (isAdmin(loginUser)) {
+            // admin gets all udfs except userId
+            udfFuncList = udfFunctionMapper.queryUdfFuncExceptUserId(userId);
+        } else {
+            // non-admins users get their own udfs
+            udfFuncList = udfFunctionMapper.selectByMap(Collections.singletonMap("user_id", loginUser.getId()));
+        }
         List<UdfFunc> resultList = new ArrayList<>();
         Set<UdfFunc> udfFuncSet;
         if (CollectionUtils.isNotEmpty(udfFuncList)) {
@@ -1225,9 +1232,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
+
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
         putMsg(result, Status.SUCCESS);
@@ -1244,9 +1249,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
+
         List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
         String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
@@ -1290,7 +1293,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             logger.error("tenant not exists");
-            putMsg(result, Status.TENANT_NOT_EXIST);
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return null;
         }
         return tenant.getTenantCode();

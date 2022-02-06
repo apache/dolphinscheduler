@@ -1,11 +1,11 @@
-
-# Development
+# How To Contribute
 
 Start by forking the dolphinscheduler GitHub repository, make changes in a branch and then send a pull request.
 
 ## Set up your dolphinscheduler GitHub Repository
 
 There are three branches in the remote repository currently:
+
   - `master` : normal delivery branch. After the stable version is released, the code for the stable version branch is merged into the master branch.
             
   - `dev` : daily development branch. The daily development branch, the newly submitted code can pull requests to this branch.
@@ -17,12 +17,12 @@ So, you should fork the `dev` branch.
 After forking the [dolphinscheduler upstream source repository](https://github.com/apache/dolphinscheduler/fork) to your personal repository, you can set your  personal development environment.
 
 ```sh
-$ cd <your work direcotry>
-$ git clone < your personal forked dolphinscheduler repo>
-$ cd dolphinscheduler
+cd <your work direcotry>
+git clone <your personal forked dolphinscheduler repo>
+cd dolphinscheduler
 ```
 
-## Set git remote as ``upstream``
+## Set git remote as `upstream`
 
 Add remote repository address, named upstream
 
@@ -52,35 +52,35 @@ git checkout origin/dev
 git merge --no-ff upstream/dev
 ```
 
-If remote branch has a new branch `DEV-1.0`, you need to synchronize this branch to the local repository.
+If remote branch has a new branch `dev-1.0`, you need to synchronize this branch to the local repository, then push to your own repository.
 
-```
+```sh
 git checkout -b dev-1.0 upstream/dev-1.0
 git push --set-upstream origin dev-1.0
 ```
 
 ## Create your feature branch
+
 Before making code changes, make sure you create a separate branch for them.
 
 ```sh
-$ git checkout -b <your-feature>
+git checkout -b <your-feature-branch> dev
 ```
 
 ## Commit changes
+
 After modifying the code locally, submit it to your own repository:
 
 ```sh
-
 git commit -m 'information about your feature'
 ```
 
 ## Push to the branch
 
-
 Push your locally committed changes to the remote origin (your fork).
 
-```
-$ git push origin <your-feature>
+```sh
+git push origin <your-feature-branch>
 ```
 
 ## Create a pull request
@@ -99,14 +99,3 @@ Select the modified local branch and the branch to merge past to create a pull r
 </p>
 
 Next, the administrator is responsible for **merging** to complete the pull request.
-
-
-
-
-
-
-
-
-
-
-

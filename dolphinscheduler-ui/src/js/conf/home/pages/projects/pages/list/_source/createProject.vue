@@ -16,13 +16,14 @@
  */
 <template>
   <m-popover ref="popover" :nameText="item ? $t('Edit') : $t('Create Project')" :ok-text="item ? $t('Edit') : $t('Submit')"
-           @close="_close" @ok="_ok">
+           @close="_close" @ok="_ok" ok-id="btnSubmit">
     <template slot="content">
       <div class="projects-create-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{ $t('Project Name') }}</template>
           <template slot="content">
             <el-input
+              id="inputProjectName"
               v-model="projectName"
               :placeholder="$t('Please enter name')"
               maxlength="60"
@@ -92,7 +93,7 @@
 
         // edit
         if (this.item) {
-          param.projectId = this.item.id
+          param.projectCode = this.item.code
         }
 
         this.$refs.popover.spinnerLoading = true

@@ -18,7 +18,9 @@ package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+
+import org.apache.commons.collections.CollectionUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 

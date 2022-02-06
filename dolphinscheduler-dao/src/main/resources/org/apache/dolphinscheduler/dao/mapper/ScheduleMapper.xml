@@ -19,32 +19,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ScheduleMapper">
     <sql id="baseSql">
-        id, process_definition_id, start_time, end_time, timezone_id, crontab, failure_strategy, user_id, release_state,
-        warning_type, warning_group_id, process_instance_priority, worker_group, create_time, update_time
+        id, process_definition_code, start_time, end_time, timezone_id, crontab, failure_strategy, user_id, release_state,
+        warning_type, warning_group_id, process_instance_priority, worker_group, environment_code, create_time, update_time
     </sql>
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.process_definition_id, ${alias}.start_time, ${alias}.end_time, ${alias}.timezone_id, ${alias}.crontab, ${alias}.failure_strategy, ${alias}.user_id, ${alias}.release_state,
-        ${alias}.warning_type, ${alias}.warning_group_id, ${alias}.process_instance_priority, ${alias}.worker_group, ${alias}.create_time, ${alias}.update_time
+        ${alias}.id, ${alias}.process_definition_code, ${alias}.start_time, ${alias}.end_time, ${alias}.timezone_id,
+        ${alias}.crontab, ${alias}.failure_strategy, ${alias}.user_id, ${alias}.release_state, ${alias}.warning_type,
+        ${alias}.warning_group_id, ${alias}.process_instance_priority, ${alias}.worker_group, ${alias}.environment_code, ${alias}.create_time,
+        ${alias}.update_time
     </sql>
-    <select id="queryByProcessDefineIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+    <select id="queryByProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select p_f.name as process_definition_name, p.name as project_name,u.user_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
         from t_ds_schedules s
-        join t_ds_process_definition p_f on s.process_definition_id = p_f.id
+        join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
         where 1=1
-        <if test="processDefinitionId!= 0">
-            and s.process_definition_id = #{processDefinitionId}
+        <if test="processDefinitionCode != 0">
+            and s.process_definition_code = #{processDefinitionCode}
         </if>
         order by s.update_time desc
     </select>
     <select id="querySchedulerListByProjectName" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name,s.*
         from t_ds_schedules s
-        join t_ds_process_definition p_f on s.process_definition_id = p_f.id
+        join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
         where p.name = #{projectName}
@@ -54,25 +56,25 @@
         <include refid="baseSql"/>
         from t_ds_schedules
         where 1= 1
-        <if test="processDefineIds != null and processDefineIds.length != 0 ">
-            and process_definition_id in
-            <foreach collection="processDefineIds" index="index" item="i" open="(" separator="," close=")">
+        <if test="processDefineCodes != null and processDefineCodes.length != 0 ">
+            and process_definition_code in
+            <foreach collection="processDefineCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         and release_state = 1
     </select>
-    <select id="queryByProcessDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+    <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        where process_definition_id =#{processDefinitionId}
+        where process_definition_code = #{processDefinitionCode}
     </select>
-    <select id="queryReleaseSchedulerListByProcessDefinitionId"
+    <select id="queryReleaseSchedulerListByProcessDefinitionCode"
             resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        where process_definition_id =#{processDefinitionId} and release_state = 1
+        where process_definition_code = #{processDefinitionCode} and release_state = 1
     </select>
 </mapper>

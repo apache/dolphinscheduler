@@ -78,6 +78,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        {{$t('Environment Name')}}
+      </div>
+      <div class="cont">
+        <m-related-environment v-model="environmentCode" :workerGroup="workerGroup" v-on:environmentCodeEvent="_onUpdateEnvironmentCode"></m-related-environment>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Alarm group')}}
       </div>
       <div class="cont">
@@ -175,9 +183,15 @@
         </div>
       </div>
     </div>
+    <div class="clearfix list">
+      <span class="text">{{$t('Whether dry-run')}}</span>
+      <span class="cont" style="padding-top: 5px;">
+          <el-switch v-model="dryRun" size="small" active-value="1" inactive-value="0"></el-switch>
+      </span>
+    </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Start')}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" id="btnSubmit">{{spinnerLoading ? $t('Loading...') : $t('Start')}} </el-button>
     </div>
   </div>
 </template>
@@ -189,6 +203,7 @@
   import { warningTypeList } from './util'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
+  import mRelatedEnvironment from '@/conf/home/pages/dag/_source/formModel/_source/relatedEnvironment'
   import mLocalParams from '@/conf/home/pages/dag/_source/formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import { mapMutations } from 'vuex'
@@ -214,9 +229,11 @@
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
         workerGroup: 'default',
+        environmentCode: '',
         // Global custom parameters
         definitionGlobalParams: [],
-        udpList: []
+        udpList: [],
+        dryRun: 0
       }
     },
     mixins: [disabledState],
@@ -242,6 +259,9 @@
       _datepicker (val) {
         this.scheduleTime = val
       },
+      _onUpdateEnvironmentCode (o) {
+        this.environmentCode = o
+      },
       _verification () {
         if (this.enableCustomParallelism && !this.parallismNumber) {
           this.$message.warning(`${i18n.$t('Parallelism number should be positive integer')}`)
@@ -265,7 +285,7 @@
           }
         }
         let param = {
-          processDefinitionId: this.startData.id,
+          processDefinitionCode: this.startData.code,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
@@ -276,8 +296,10 @@
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
           workerGroup: this.workerGroup,
+          environmentCode: this.environmentCode,
           startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : '',
-          expectedParallelismNumber: this.parallismNumber
+          expectedParallelismNumber: this.parallismNumber,
+          dryRun: this.dryRun
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
@@ -319,7 +341,7 @@
         }
       },
       _getGlobalParams () {
-        this.store.dispatch('dag/getProcessDetails', this.startData.id).then(res => {
+        this.store.dispatch('dag/getProcessDetails', this.startData.code).then(res => {
           this.definitionGlobalParams = _.cloneDeep(this.store.state.dag.globalParams)
           this.udpList = _.cloneDeep(this.store.state.dag.globalParams)
         })
@@ -362,7 +384,7 @@
       this.workflowName = this.startData.name
     },
     computed: {},
-    components: { mPriority, mWorkerGroups, mLocalParams }
+    components: { mPriority, mWorkerGroups, mLocalParams, mRelatedEnvironment }
   }
 </script>
 
@@ -381,14 +403,12 @@
         display: block;
       }
     }
-
     .ans {
       color: #0097e0;
       font-size: 14px;
       vertical-align: middle;
       cursor: pointer;
     }
-
     .list {
       margin-bottom: 14px;
       .text {

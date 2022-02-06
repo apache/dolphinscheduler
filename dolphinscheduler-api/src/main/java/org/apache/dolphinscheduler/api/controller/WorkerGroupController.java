@@ -34,7 +34,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,7 +55,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "WORKER_GROUP_TAG")
 @RestController
-@RequestMapping("/worker-group")
+@RequestMapping("/worker-groups")
 public class WorkerGroupController extends BaseController {
 
     @Autowired
@@ -63,18 +65,18 @@ public class WorkerGroupController extends BaseController {
      * create or update a worker group
      *
      * @param loginUser login user
-     * @param id        worker group id
-     * @param name      worker group name
-     * @param addrList  addr list
+     * @param id worker group id
+     * @param name worker group name
+     * @param addrList addr list
      * @return create or update result code
      */
     @ApiOperation(value = "saveWorkerGroup", notes = "CREATE_WORKER_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
-            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+        @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String")
     })
-    @PostMapping(value = "/save")
+    @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SAVE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -91,18 +93,18 @@ public class WorkerGroupController extends BaseController {
      * query worker groups paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return worker group list page
      */
     @ApiOperation(value = "queryAllWorkerGroupsPaging", notes = "QUERY_WORKER_GROUP_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String")
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -128,7 +130,7 @@ public class WorkerGroupController extends BaseController {
      * @return all worker group list
      */
     @ApiOperation(value = "queryAllWorkerGroups", notes = "QUERY_WORKER_GROUP_LIST_NOTES")
-    @GetMapping(value = "/all-groups")
+    @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -141,19 +143,19 @@ public class WorkerGroupController extends BaseController {
      * delete worker group by id
      *
      * @param loginUser login user
-     * @param id        group id
+     * @param id group id
      * @return delete result code
      */
     @ApiOperation(value = "deleteById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
+        @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
     })
-    @PostMapping(value = "/delete-by-id")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam("id") Integer id
+                             @PathVariable("id") Integer id
     ) {
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
         return returnDataList(result);

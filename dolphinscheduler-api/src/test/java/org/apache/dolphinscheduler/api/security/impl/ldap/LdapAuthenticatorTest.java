@@ -60,11 +60,11 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
     @Autowired
     protected AutowireCapableBeanFactory beanFactory;
-    @MockBean
+    @MockBean(name = "ldapService")
     private LdapService ldapService;
-    @MockBean
+    @MockBean(name = "sessionServiceImpl")
     private SessionService sessionService;
-    @MockBean
+    @MockBean(name = "usersServiceImpl")
     private UsersService usersService;
 
     private LdapAuthenticator ldapAuthenticator;
@@ -79,6 +79,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     private String ip = "127.0.0.1";
     private UserType userType = UserType.GENERAL_USER;
 
+    @Override
     @Before
     public void setUp() {
         ldapAuthenticator = new LdapAuthenticator();

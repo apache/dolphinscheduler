@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 /**
@@ -27,7 +28,7 @@ public enum TaskStateType {
      * 3 failed
      * 4 success
      */
-    WAITING, RUNNING, FINISH, FAILED, SUCCESS;
+    WAITTING, RUNNING, FINISH, FAILED, SUCCESS;
 
     /**
      * convert task state to execute status integer array ;
@@ -55,7 +56,7 @@ public enum TaskStateType {
                         ExecutionStatus.DELAY_EXECUTION.ordinal(),
                         ExecutionStatus.READY_PAUSE.ordinal(),
                         ExecutionStatus.READY_STOP.ordinal()};
-            case WAITING:
+            case WAITTING:
                 return new int[]{
                         ExecutionStatus.SUBMITTED_SUCCESS.ordinal()
                 };

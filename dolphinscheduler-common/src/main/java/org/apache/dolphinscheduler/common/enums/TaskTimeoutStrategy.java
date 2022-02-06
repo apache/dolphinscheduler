@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -28,11 +29,10 @@ public enum TaskTimeoutStrategy {
      * 2 warn+failed
      */
     WARN(0, "warn"),
-    FAILED(1,"failed"),
-    WARNFAILED(2,"warnfailed");
+    FAILED(1, "failed"),
+    WARNFAILED(2, "warnfailed");
 
-
-    TaskTimeoutStrategy(int code, String descp){
+    TaskTimeoutStrategy(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -49,9 +49,9 @@ public enum TaskTimeoutStrategy {
         return descp;
     }
 
-    public static TaskTimeoutStrategy of(int status){
-        for(TaskTimeoutStrategy es : values()){
-            if(es.getCode() == status){
+    public static TaskTimeoutStrategy of(int status) {
+        for (TaskTimeoutStrategy es : values()) {
+            if (es.getCode() == status) {
                 return es;
             }
         }

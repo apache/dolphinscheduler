@@ -111,7 +111,20 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * @return true is contains
      */
     public boolean contains(TaskInstance taskInstance) {
-        return queue.contains(taskInstance);
+        return this.contains(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
+    }
+
+    public boolean contains(long taskCode, int taskVersion) {
+        Iterator<TaskInstance> iterator = this.queue.iterator();
+        while (iterator.hasNext()) {
+            TaskInstance taskInstance = iterator.next();
+            if (taskCode == taskInstance.getTaskCode()
+                    && taskVersion == taskInstance.getTaskDefinitionVersion()) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
     /**

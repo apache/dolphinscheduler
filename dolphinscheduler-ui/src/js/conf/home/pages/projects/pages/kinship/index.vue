@@ -22,12 +22,13 @@
                   :placeholder="$t('Process Name')"
                   @change="onChange"
                   :style="inputFocusStyle"
+                  v-model="currentItemName"
                   v-tooltip="tooltipOption(currentItemName)"
                   size="small">
           <el-option
             v-for="work in workList"
-            :key="work.id"
-            :value="work.id"
+            :key="work.code"
+            :value="work.code"
             :label="work.name"
             v-tooltip="tooltipOption(work.name)"
             >
@@ -72,7 +73,7 @@
     },
     props: {},
     methods: {
-      ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG']),
+      ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG', 'getWorkFlowDAGAll']),
       /**
        * init
        */
@@ -82,7 +83,7 @@
         Promise.all([
           // get process definition
           this.getWorkFlowList(),
-          this.getWorkFlowDAG()
+          this.getWorkFlowDAGAll()
         ]).then((data) => {
           this.isLoading = false
         }).catch(() => {
@@ -102,7 +103,11 @@
         this.isLoading = true
         this.currentItemName = item
         try {
-          await this.getWorkFlowDAG(item)
+          if (item) {
+            await this.getWorkFlowDAG(item)
+          } else {
+            await this.getWorkFlowDAGAll()
+          }
         } catch (error) {
           this.$message.error(error.msg || '')
         }

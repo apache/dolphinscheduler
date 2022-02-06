@@ -28,10 +28,10 @@ import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
@@ -70,16 +70,16 @@ public class LoginController extends BaseController {
     /**
      * login
      *
-     * @param userName     user name
+     * @param userName user name
      * @param userPassword user password
-     * @param request      request
-     * @param response     response
+     * @param request request
+     * @param response response
      * @return login result
      */
     @ApiOperation(value = "login", notes = "LOGIN_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType = "String")
+        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType = "String")
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
@@ -91,7 +91,7 @@ public class LoginController extends BaseController {
         //user name check
         if (StringUtils.isEmpty(userName)) {
             return error(Status.USER_NAME_NULL.getCode(),
-                    Status.USER_NAME_NULL.getMsg());
+                Status.USER_NAME_NULL.getMsg());
         }
 
         // user ip check
@@ -102,7 +102,7 @@ public class LoginController extends BaseController {
 
         // verify username and password
         Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip);
-        if (result.isFailed()) {
+        if (result.getCode() != Status.SUCCESS.getCode()) {
             return result;
         }
 
@@ -121,7 +121,7 @@ public class LoginController extends BaseController {
      * sign out
      *
      * @param loginUser login user
-     * @param request   request
+     * @param request request
      * @return sign out result
      */
     @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")

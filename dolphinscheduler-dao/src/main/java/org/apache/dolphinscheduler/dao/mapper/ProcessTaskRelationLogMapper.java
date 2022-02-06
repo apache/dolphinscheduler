@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
@@ -40,8 +41,37 @@ public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRela
     List<ProcessTaskRelationLog> queryByProcessCodeAndVersion(@Param("processCode") long processCode,
                                                               @Param("processVersion") int processVersion);
 
-    List<ProcessTaskRelationLog> queryByTaskRelationList(@Param("processCode") long processCode,
-                                                         @Param("processVersion") int processVersion,
-                                                         @Param("taskCode") long taskCode,
-                                                         @Param("taskVersion") long taskVersion);
+    /**
+     * batch insert process task relation
+     *
+     * @param taskRelationList taskRelationList
+     * @return int
+     */
+    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
+
+    /**
+     * delete process task relation log by processCode and version
+     *
+     * @param processCode process definition code
+     * @param processVersion process version
+     * @return int
+     */
+    int deleteByCode(@Param("processCode") long processCode,
+                     @Param("processVersion") int processVersion);
+
+    /**
+     * delete process task relation
+     *
+     * @param processTaskRelationLog  processTaskRelationLog
+     * @return int
+     */
+    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
+
+    /**
+     * query process task relation log
+     *
+     * @param processTaskRelation processTaskRelation
+     * @return process task relation log
+     */
+    ProcessTaskRelationLog queryRelationLogByRelation(@Param("processTaskRelation") ProcessTaskRelation processTaskRelation);
 }

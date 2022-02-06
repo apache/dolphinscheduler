@@ -19,6 +19,7 @@ import localStore from '@/module/util/localStorage'
 
 // Get the project currently clicked
 const projectId = localStore.getItem('projectId')
+const projectCode = localStore.getItem('projectCode')
 const projectName = localStore.getItem('projectName')
 
 export default {
@@ -34,15 +35,15 @@ export default {
   globalParams: [],
   // Node information
   tasks: [],
-  // Node cache information, cache the previous input
-  cacheTasks: {},
   // Timeout alarm
   timeout: 0,
-  // tenant id
-  tenantId: -1,
+  // process execute type
+  executionType: 'PARALLEL',
+  // tenant code
+  tenantCode: 'default',
   // Node location information
   locations: {},
-  // Node-to-node connection
+  // Node relations
   connects: [],
   // Running sign
   runFlag: '',
@@ -50,6 +51,8 @@ export default {
   isEditDag: false,
   // Current project id
   projectId: projectId,
+  // Current project code
+  projectCode: projectCode,
   // Current project name
   projectName: projectName || '',
   // Whether to go online the process definition
@@ -118,7 +121,7 @@ export default {
   instanceListS: [],
   // Operating state
   isDetails: false,
-  startup: {
-
-  }
+  startup: {},
+  taskInstances: [],
+  dependResult: {}
 }

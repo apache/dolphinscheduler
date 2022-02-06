@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,149 +28,193 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
+import java.util.Date;
+
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 /**
  * alert group controller test
  */
 public class AlertGroupControllerTest extends AbstractControllerTest {
-
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
+    private static final String defaultTestAlertGroupName = "cxc test group name";
+
+    @Autowired
+    AlertGroupMapper alertGroupMapper;
+
+    private int createEntity() {
+        AlertGroup alertGroup = new AlertGroup();
+        alertGroup.setGroupName(defaultTestAlertGroupName);
+        alertGroup.setCreateTime(new Date());
+        alertGroup.setUpdateTime(new Date());
+        alertGroupMapper.insert(alertGroup);
+        return alertGroup.getId();
+    }
+
+    @After
+    public void clear() {
+        alertGroupMapper.delete(new QueryWrapper<AlertGroup>().lambda().eq(AlertGroup::getGroupName, defaultTestAlertGroupName));
+    }
+
     @Test
-    public void testCreateAlertgroup() throws Exception {
+    public void test010CreateAlertGroup() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("groupName","cxc test group name");
+        paramsMap.add("groupName", defaultTestAlertGroupName);
         paramsMap.add("groupType", AlertType.EMAIL.toString());
-        paramsMap.add("description","cxc junit 测试告警描述");
+        paramsMap.add("description", "cxc junit 测试告警描述");
         paramsMap.add("alertInstanceIds", "");
-        MvcResult mvcResult = mockMvc.perform(post("/alert-group/create")
+        MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testList() throws Exception {
+    public void test020List() throws Exception {
+        createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        MvcResult mvcResult = mockMvc.perform(get("/alert-group/list")
+        MvcResult mvcResult = mockMvc.perform(get("/alert-groups/list")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
 
     @Test
-    public void testListPaging() throws Exception {
+    public void test030ListPaging() throws Exception {
+        createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","1");
+        paramsMap.add("pageNo", "1");
         paramsMap.add("searchVal", AlertType.EMAIL.toString());
-        paramsMap.add("pageSize","1");
-        MvcResult mvcResult = mockMvc.perform(get("/alert-group/list-paging")
+        paramsMap.add("pageSize", "1");
+        MvcResult mvcResult = mockMvc.perform(get("/alert-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testQueryAlertGroupById() throws Exception {
+    public void test040QueryAlertGroupById() throws Exception {
+        int entityId = createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","22");
-        MvcResult mvcResult = mockMvc.perform(post("/alert-group/query")
+        paramsMap.add("id", Integer.toString(entityId));
+        MvcResult mvcResult = mockMvc.perform(post("/alert-groups/query")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_NOT_EXIST));
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUpdateAlertgroup() throws Exception {
+    public void test050UpdateAlertGroup() throws Exception {
+        int entityId = createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","22");
-        paramsMap.add("groupName", "cxc test group name");
-        paramsMap.add("groupType",AlertType.EMAIL.toString());
-        paramsMap.add("description","update alter group");
+        paramsMap.add("groupName", defaultTestAlertGroupName);
+        paramsMap.add("groupType", AlertType.EMAIL.toString());
+        paramsMap.add("description", "update alter group");
         paramsMap.add("alertInstanceIds", "");
-        MvcResult mvcResult = mockMvc.perform(post("/alert-group/update")
+        MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + entityId)
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_NOT_EXIST));
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testVerifyGroupName() throws Exception {
+    public void test060VerifyGroupName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("groupName","cxc test group name");
-        MvcResult mvcResult = mockMvc.perform(get("/alert-group/verify-group-name")
+        paramsMap.add("groupName", defaultTestAlertGroupName);
+        MvcResult mvcResult = mockMvc.perform(get("/alert-groups/verify-name")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_EXIST));
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testVerifyGroupNameNotExit() throws Exception {
+    public void test070VerifyGroupNameNotExit() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("groupName","cxc test group name");
-        MvcResult mvcResult = mockMvc.perform(get("/alert-group/verify-group-name")
+        paramsMap.add("groupName", "cxc test group name xx");
+        MvcResult mvcResult = mockMvc.perform(get("/alert-groups/verify-name")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_EXIST));
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testDelAlertgroupById() throws Exception {
+    public void test080DelAlertGroupById() throws Exception {
+        int entityId = createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","22");
-        MvcResult mvcResult = mockMvc.perform(post("/alert-group/delete")
+        MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/" + entityId)
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_NOT_EXIST));
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void test090DelAlertGroupById() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
+            .header("sessionId", sessionId)
+            .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

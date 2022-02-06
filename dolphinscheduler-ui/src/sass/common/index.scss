@@ -80,21 +80,19 @@ body{
       //background: #f8fbfe;
     }
     .conditions-model {
-      height: 50px;
-      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
       .left {
-        position: absolute;
-        left: 12px;
-        top: 13px;
+        margin-left: 12px;
       }
       .right {
-        position: absolute;
-        right: 8px;
-        top: 13px;
-        .form-box {
+        margin-right: 8px;
+        > .form-box {
           .list {
             float: right;
-            margin-right: 4px;
+            margin: 3px 4px 3px 0;
           }
         }
       }

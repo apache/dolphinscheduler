@@ -23,7 +23,8 @@ import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,6 @@ public class SqlParametersTest {
     private final String showType = "TABLE";
     private final String title = "sql test";
     private final int groupId = 0;
-    private final int limit = 0;
 
     @Test
     public void testSqlParameters() {
@@ -68,7 +68,6 @@ public class SqlParametersTest {
         sqlParameters.setShowType(showType);
         sqlParameters.setTitle(title);
         sqlParameters.setGroupId(groupId);
-        sqlParameters.setLimit(limit);
 
         Assert.assertEquals(type, sqlParameters.getType());
         Assert.assertEquals(sql, sqlParameters.getSql());
@@ -80,7 +79,6 @@ public class SqlParametersTest {
         Assert.assertEquals(showType, sqlParameters.getShowType());
         Assert.assertEquals(title, sqlParameters.getTitle());
         Assert.assertEquals(groupId, sqlParameters.getGroupId());
-        Assert.assertEquals(limit, sqlParameters.getLimit());
 
         String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
         String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";

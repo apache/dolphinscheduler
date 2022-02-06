@@ -20,9 +20,11 @@
           @change="_onChange"
           v-model="selectedValue"
           size="small"
+          id="selectTenant"
           style="width: 180px">
     <el-option
             v-for="item in itemList"
+            class="option-tenants"
             :key="item.id"
             :value="item.id"
             :label="item.tenantCode">
@@ -61,8 +63,11 @@
       }
     },
     methods: {
-      _onChange (o) {
-        this.$emit('tenantSelectEvent', o)
+      _onChange (id) {
+        const tenant = this.itemList.find(item => item.id === id)
+        if (tenant) {
+          this.$emit('tenantSelectEvent', tenant.tenantCode)
+        }
       }
     },
     watch: {

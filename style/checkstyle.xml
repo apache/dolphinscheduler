@@ -34,6 +34,11 @@
         <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
     </module>
 
+    <module name="RegexpSingleline">
+        <property name="format" value="System\.out\.println"/>
+        <property name="message" value="Prohibit invoking System.out.println in source code !"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename">
             <property name="severity" value="error"/>
@@ -197,7 +202,6 @@
                       ^cc\.concurrent\.mango\.util\.concurrent,
                       ^org\.apache\.curator-test\.shaded,
                       ^com\.sun\.istack,
-                      ^org\.apache\.commons\.lang,
                       ^org\.jetbrains\.annotations,
                       ^jline\.internal,
                       ^com\.cronutils\.utils,

@@ -32,7 +32,7 @@ public interface TaskInstanceService {
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @param searchVal search value
      * @param taskName task name
@@ -44,19 +44,29 @@ public interface TaskInstanceService {
      * @param pageSize page size
      * @return task list page
      */
-    Result queryTaskListPaging(User loginUser, String projectName,
-                               Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
-                               String endDate, String searchVal, ExecutionStatus stateType, String host,
-                               Integer pageNo, Integer pageSize);
+    Result queryTaskListPaging(User loginUser,
+                               long projectCode,
+                               Integer processInstanceId,
+                               String processInstanceName,
+                               String taskName,
+                               String executorName,
+                               String startDate,
+                               String endDate,
+                               String searchVal,
+                               ExecutionStatus stateType,
+                               String host,
+                               Integer pageNo,
+                               Integer pageSize);
 
     /**
      * change one task instance's state from failure to forced success
      *
-     * @param loginUser      login user
-     * @param projectName    project name
+     * @param loginUser login user
+     * @param projectCode project code
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId);
-
+    Map<String, Object> forceTaskSuccess(User loginUser,
+                                         long projectCode,
+                                         Integer taskInstanceId);
 }

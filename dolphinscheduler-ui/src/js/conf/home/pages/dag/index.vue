@@ -40,7 +40,7 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams']),
-      ...mapActions('dag', ['getProcessList', 'getProjectList', 'getResourcesList', 'getResourcesListJar', 'getResourcesListJar']),
+      ...mapActions('dag', ['getProjectList', 'getResourcesList']),
       ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll', 'getAlarmGroupsAll']),
       /**
        * init
@@ -51,16 +51,10 @@
         this.resetParams()
         // Promise Get node needs data
         Promise.all([
-          // get process definition
-          this.getProcessList(),
           // get project
           this.getProjectList(),
-          // get jar
-          this.getResourcesListJar(),
           // get resource
           this.getResourcesList(),
-          // get jar
-          this.getResourcesListJar(),
           // get worker group list
           this.getWorkerGroupsAll(),
           // get alarm group list

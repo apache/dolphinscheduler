@@ -25,7 +25,8 @@ import static org.apache.dolphinscheduler.common.Constants.HTTP_X_REAL_IP;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -172,11 +173,11 @@ public class BaseController {
      * @param totalList success object list
      * @param currentPage current page
      * @param total total
-     * @param totalPage  total page
+     * @param totalPage total page
      * @return success result code
      */
     public Result success(Object totalList, Integer currentPage,
-                                                  Integer total, Integer totalPage) {
+                          Integer total, Integer totalPage) {
         Result result = new Result();
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
@@ -240,6 +241,7 @@ public class BaseController {
 
     /**
      * get result
+     *
      * @param msg message
      * @param list object list
      * @return result code

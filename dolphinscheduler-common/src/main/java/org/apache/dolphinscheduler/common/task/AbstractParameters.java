@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -168,7 +170,7 @@ public abstract class AbstractParameters implements IParameters {
         String[] formatResult = result.split("\\$VarPool\\$");
         Map<String, String> format = new HashMap<>();
         for (String info : formatResult) {
-            if (StringUtils.isNotEmpty(info) && info.contains("=")) {
+            if (!StringUtils.isEmpty(info) && info.contains("=")) {
                 String[] keyValue = info.split("=");
                 format.put(keyValue[0], keyValue[1]);
             }

@@ -17,28 +17,19 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-
-public class PluginDefineTest {
+public class PluginDefineTest extends BaseDaoTest {
 
     @Autowired
-    PluginDefineMapper pluginDefineMapper;
+    private PluginDefineMapper pluginDefineMapper;
 
     @Test
     public void testQueryAllPluginDefineList() {
@@ -58,10 +49,10 @@ public class PluginDefineTest {
     @Test
     public void testQueryByNameAndType() {
         PluginDefine pluginDefine = createPluginDefine();
-        List<PluginDefine> pluginDefines = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
-        Assert.assertTrue(pluginDefines.size() > 0);
-        Assert.assertEquals(pluginDefines.get(0).getPluginType(), pluginDefine.getPluginType());
-        Assert.assertEquals(pluginDefines.get(0).getPluginName(), pluginDefine.getPluginName());
+        PluginDefine pluginDefineSaved = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+        Assert.assertNotNull(pluginDefineSaved);
+        Assert.assertEquals(pluginDefineSaved.getPluginType(), pluginDefine.getPluginType());
+        Assert.assertEquals(pluginDefineSaved.getPluginName(), pluginDefine.getPluginName());
     }
 
     /**

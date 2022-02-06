@@ -39,10 +39,11 @@ public class Schedule {
 
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+
     /**
-     * process definition id
+     * process definition code
      */
-    private int processDefinitionId;
+    private long processDefinitionCode;
 
     /**
      * process definition name
@@ -139,6 +140,11 @@ public class Schedule {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
     public int getWarningGroupId() {
         return warningGroupId;
     }
@@ -222,12 +228,12 @@ public class Schedule {
         this.releaseState = releaseState;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
     }
 
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
 
     public String getProcessDefinitionName() {
@@ -286,11 +292,19 @@ public class Schedule {
         this.workerGroup = workerGroup;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
     @Override
     public String toString() {
         return "Schedule{"
                 + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
+                + ", processDefinitionCode=" + processDefinitionCode
                 + ", processDefinitionName='" + processDefinitionName + '\''
                 + ", projectName='" + projectName + '\''
                 + ", description='" + definitionDescription + '\''
@@ -308,6 +322,7 @@ public class Schedule {
                 + ", warningGroupId=" + warningGroupId
                 + ", processInstancePriority=" + processInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
                 + '}';
     }
 

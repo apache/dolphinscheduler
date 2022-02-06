@@ -17,17 +17,23 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -37,49 +43,54 @@ import org.springframework.util.MultiValueMap;
  * data analysis controller test
  */
 public class DataAnalysisControllerTest extends AbstractControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
-    private static Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
+    @MockBean(name = "projectMapper")
+    private ProjectMapper projectMapper;
 
     @Test
     public void testCountTaskState() throws Exception {
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("startDate","2019-12-01 00:00:00");
         paramsMap.add("endDate","2019-12-28 00:00:00");
-        paramsMap.add("projectId","16");
+        paramsMap.add("projectCode","16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/task-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCountProcessInstanceState() throws Exception {
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("startDate","2019-12-01 00:00:00");
         paramsMap.add("endDate","2019-12-28 00:00:00");
-        paramsMap.add("projectId","16");
+        paramsMap.add("projectCode","16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCountDefinitionByUser() throws Exception {
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId","16");
@@ -88,43 +99,49 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCountCommandState() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-12-01");
-        paramsMap.add("endDate","2019-12-15");
-        paramsMap.add("projectId","16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/command-state-count")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCountQueueState() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId","16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/queue-count")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    /**
+     * get mock Project
+     *
+     * @param projectName projectName
+     * @return Project
+     */
+    private Project getProject(String projectName) {
+        Project project = new Project();
+        project.setCode(11L);
+        project.setId(1);
+        project.setName(projectName);
+        project.setUserId(1);
+        return project;
     }
 }

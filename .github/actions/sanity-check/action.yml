@@ -32,7 +32,7 @@ runs:
   using: "composite"
   steps:
     - name: Check License Header
-      uses: apache/skywalking-eyes@a63f4afcc287dfb3727ecc45a4afc55a5e69c15f
+      uses: apache/skywalking-eyes@30367d8286e324d5efc58de4c70c37ea3648306d
 
     - uses: ./.github/actions/reviewdog-setup
       with:

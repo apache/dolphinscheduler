@@ -24,11 +24,14 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -159,7 +162,6 @@ public class JSONUtils {
         }
 
         try {
-
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {
@@ -222,21 +224,6 @@ public class JSONUtils {
     }
 
     /**
-     * from the key-value generated json  to get the str value no matter the real type of value
-     * @param json the json str
-     * @param nodeName key
-     * @return the str value of key
-     */
-    public static String getNodeString(String json, String nodeName) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(json);
-            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
-        } catch (JsonProcessingException e) {
-            return "";
-        }
-    }
-    
-    /**
      * json to map
      *
      * @param json json
@@ -247,7 +234,37 @@ public class JSONUtils {
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
+        if (StringUtils.isEmpty(json)) {
+            return Collections.emptyMap();
+        }
+
+        try {
+            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
+            });
+        } catch (Exception e) {
+            logger.error("json to map exception!", e);
+        }
+
+        return Collections.emptyMap();
+    }
+
+    /**
+     * from the key-value generated json  to get the str value no matter the real type of value
+     * @param json the json str
+     * @param nodeName key
+     * @return the str value of key
+     */
+    public static String getNodeString(String json, String nodeName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            JsonNode jsonNode = rootNode.findValue(nodeName);
+            if (Objects.isNull(jsonNode)) {
+                return "";
+            }
+            return jsonNode.isTextual() ? jsonNode.asText() : jsonNode.toString();
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 
     /**

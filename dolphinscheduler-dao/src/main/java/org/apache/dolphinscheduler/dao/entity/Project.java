@@ -50,7 +50,7 @@ public class Project {
     /**
      * project code
      */
-    private Long code;
+    private long code;
 
     /**
      * project name
@@ -90,11 +90,11 @@ public class Project {
     @TableField(exist = false)
     private int instRunningCount;
 
-    public Long getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(long code) {
         this.code = code;
     }
 
@@ -228,7 +228,7 @@ public class Project {
         private int id;
         private int userId;
         private String userName;
-        private Long code;
+        private long code;
         private String name;
         private String description;
         private Date createTime;
@@ -240,7 +240,7 @@ public class Project {
         private Builder() {
         }
 
-        public Builder code(Long code) {
+        public Builder code(long code) {
             this.code = code;
             return this;
         }

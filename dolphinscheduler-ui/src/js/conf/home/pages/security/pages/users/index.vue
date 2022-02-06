@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="userList.length">
-          <el-button size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
+          <el-button id="btnCreateUser" size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
           <el-dialog
             :title="item ? $t('Edit User') : $t('Create User')"
             v-if="createUserDialog"
@@ -60,7 +60,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapMutations } from 'vuex'
   import mList from './_source/list'
   import mCreateUser from './_source/createUser'
   import mSpin from '@/module/components/spin/spin'
@@ -89,6 +89,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
+      ...mapMutations('user', ['setUserInfo']),
       ...mapActions('security', ['getUsersListP']),
       /**
        * Query

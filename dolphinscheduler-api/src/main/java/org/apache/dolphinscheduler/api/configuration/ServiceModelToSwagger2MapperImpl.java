@@ -16,25 +16,44 @@
  */
 package org.apache.dolphinscheduler.api.configuration;
 
-import com.google.common.collect.Multimap;
-import io.swagger.models.*;
-import io.swagger.models.parameters.Parameter;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import static com.google.common.collect.Maps.newTreeMap;
+
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Multimap;
+
+import io.swagger.models.Contact;
+import io.swagger.models.Info;
+import io.swagger.models.Model;
+import io.swagger.models.Scheme;
+import io.swagger.models.Swagger;
+import io.swagger.models.Tag;
+import io.swagger.models.parameters.Parameter;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiListing;
 import springfox.documentation.service.Documentation;
 import springfox.documentation.service.ResourceListing;
-import springfox.documentation.swagger2.mappers.*;
-
-import java.util.*;
-
-import static com.google.common.collect.Maps.newTreeMap;
+import springfox.documentation.swagger2.mappers.LicenseMapper;
+import springfox.documentation.swagger2.mappers.ModelMapper;
+import springfox.documentation.swagger2.mappers.ParameterMapper;
+import springfox.documentation.swagger2.mappers.SecurityMapper;
+import springfox.documentation.swagger2.mappers.ServiceModelToSwagger2Mapper;
+import springfox.documentation.swagger2.mappers.VendorExtensionsMapper;
 
 /**
  * application configuration

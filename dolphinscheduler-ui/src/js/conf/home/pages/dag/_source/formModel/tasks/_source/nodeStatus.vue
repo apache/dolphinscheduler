@@ -17,8 +17,8 @@
 <template>
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
-      <el-select style="width: 150px;" size="small" v-model="el.depTasks" :disabled="isDetails">
-        <el-option v-for="item in preNode" :key="item.value" :value="item.value" :label="item.label">
+      <el-select style="width: 150px;" size="small" :value="el.depTaskCode || ''" @change="(val) => { el.depTaskCode = val }" :disabled="isDetails">
+        <el-option v-for="item in prevTasks" :key="item.code" :value="item.code" :label="item.name">
         </el-option>
       </el-select>
       <el-select style="width: 116px;" size="small" v-model="el.status" :disabled="isDetails">
@@ -65,7 +65,7 @@
       dependItemList: Array,
       index: Number,
       dependTaskList: Array,
-      preNode: Array
+      prevTasks: Array
     },
     model: {
       prop: 'dependItemList',
@@ -107,9 +107,9 @@
           resolve()
         })
       },
-      _getProcessByProjectId (id) {
+      _getProcessByProjectCode (code) {
         return new Promise((resolve, reject) => {
-          this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
+          this.store.dispatch('dag/getProcessByProjectCode', code).then(res => {
             this.definitionList = _.map(_.cloneDeep(res), v => {
               return {
                 value: v.code,
@@ -134,13 +134,13 @@
       },
       _rtNewParams () {
         return {
-          depTasks: '',
+          depTaskCode: 0,
           status: ''
         }
       },
       _rtOldParams (value, depTasksList, item) {
         return {
-          depTasks: '',
+          depTaskCode: 0,
           status: ''
         }
       },
@@ -168,7 +168,7 @@
           // get item list
           this._getDependItemList(codes, false).then(res => {
             _.map(this.dependItemList, (v, i) => {
-              this._getProcessByProjectId(v.projectId).then(definitionList => {
+              this._getProcessByProjectCode(v.projectCode).then(definitionList => {
                 this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode, ['ALL'].concat(_.map(res[v.definitionCode] || [], v => v.name)), v))
               })
             })

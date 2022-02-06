@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="searchParams.projectId ? `${$t('Project Home')} - ${projectName}` : $t('Home')">
+  <m-list-construction :title="searchParams.projectCode ? `${$t('Project Home')} - ${projectName}` : $t('Home')">
     <template slot="content">
       <div class="perject-home-content">
         <div class="time-model">
@@ -56,7 +56,7 @@
               <span>{{$t('Process Definition Statistics')}}</span>
             </div>
             <div>
-              <m-define-user-count :project-id="searchParams.projectId">
+              <m-define-user-count :project-code="searchParams.projectCode">
               </m-define-user-count>
             </div>
           </div>
@@ -71,7 +71,6 @@
   import mDefineUserCount from './_source/defineUserCount'
   import mTaskStatusCount from './_source/taskStatusCount'
   import mProcessStateCount from './_source/processStateCount'
-  import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -79,15 +78,12 @@
     data () {
       return {
         searchParams: {
-          projectId: null,
+          projectCode: null,
           startDate: '',
           endDate: ''
         },
         dataTime: []
       }
-    },
-    props: {
-      id: Number
     },
     methods: {
       _datepicker (val) {
@@ -96,7 +92,7 @@
       }
     },
     created () {
-      this.searchParams.projectId = this.id === 0 ? 0 : localStore.getItem('projectId')
+      this.searchParams.projectCode = this.$route.params.projectCode == null ? 0 : this.$route.params.projectCode
       this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
       this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
       this.searchParams.startDate = this.dataTime[0]

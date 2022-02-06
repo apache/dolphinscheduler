@@ -177,7 +177,7 @@
           formData.append('pid', this.id)
           formData.append('currentDir', this.currentDir)
           formData.append('description', this.description)
-          io.post('resources/create', res => {
+          io.post('resources', res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateFileChildUpdate')

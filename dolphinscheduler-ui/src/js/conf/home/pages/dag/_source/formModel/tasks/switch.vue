@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="conditions-model">
+  <div class="switch-task">
     <m-list-box>
       <div slot="text">{{$t('condition')}}</div>
       <div slot="content">
@@ -34,8 +34,8 @@
               </textarea>
             </label>
             <span class="text-b" style="padding-left: 0">{{$t('Branch flow')}}</span>
-            <el-select style="width: 157px;" size="small" v-model="el.nextNode" clearable>
-              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            <el-select style="width: 157px;" size="small" v-model="el.nextNode" clearable :disabled="isDetails">
+              <el-option v-for="item in postTasks" :key="item.code" :value="item.code" :label="item.name"></el-option>
             </el-select>
             <span class="operation">
               <a href="javascript:" class="delete" @click="!isDetails && _removeDep(index)" v-if="index === (dependItemList.length - 1)">
@@ -53,7 +53,7 @@
       <div slot="text">{{$t('Branch flow')}}</div>
       <div slot="content">
         <el-select style="width: 157px;" size="small" v-model="nextNode" clearable :disabled="isDetails">
-          <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+          <el-option v-for="item in postTasks" :key="item.code" :value="item.code" :label="item.name"></el-option>
         </el-select>
       </div>
     </m-list-box>
@@ -82,7 +82,7 @@
     props: {
       nodeData: Object,
       backfillItem: Object,
-      rearList: Array
+      postTasks: Array
     },
     methods: {
       editList (index) {
@@ -90,7 +90,7 @@
         const self = this
         const editor = codemirror(`code-switch-mirror${index}`, {
           mode: 'shell',
-          readOnly: this.isInstance
+          readOnly: this.isDetails
         }, this)
         editor.on('change', function () {
           const outputList = _.cloneDeep(self.dependItemList)
@@ -101,7 +101,10 @@
         this.keypress = () => {
           if (!editor.getOption('readOnly')) {
             editor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }
@@ -181,8 +184,8 @@
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-  .conditions-model {
+<style lang="scss" rel="stylesheet/scss" scoped>
+  .switch-task {
     margin-top: -10px;
     .dep-opt {
       margin-bottom: 10px;

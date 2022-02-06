@@ -22,8 +22,10 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -72,7 +74,7 @@ public class CheckUtils {
      */
     public static Map<String, Object> checkDesc(String desc) {
         Map<String, Object> result = new HashMap<>();
-        if (StringUtils.isNotEmpty(desc) && desc.length() > 200) {
+        if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
             result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             result.put(Constants.MSG,
                     MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
@@ -89,7 +91,7 @@ public class CheckUtils {
      * @return true if other parameters are valid, otherwise return false
      */
     public static boolean checkOtherParams(String otherParams) {
-        return StringUtils.isNotEmpty(otherParams) && !JSONUtils.checkJsonValid(otherParams);
+        return !StringUtils.isEmpty(otherParams) && !JSONUtils.checkJsonValid(otherParams);
     }
 
     /**
@@ -99,7 +101,7 @@ public class CheckUtils {
      * @return true if password regex valid, otherwise return false
      */
     public static boolean checkPassword(String password) {
-        return StringUtils.isNotEmpty(password) && password.length() >= 2 && password.length() <= 20;
+        return !StringUtils.isEmpty(password) && password.length() >= 2 && password.length() <= 20;
     }
 
     /**
@@ -129,7 +131,7 @@ public class CheckUtils {
         } else if (TaskType.SWITCH.getDesc().equalsIgnoreCase(taskType)) {
             abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getSwitchResult());
         } else {
-            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getParams());
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getTaskParams());
         }
 
         if (abstractParameters != null) {
@@ -139,18 +141,20 @@ public class CheckUtils {
         return false;
     }
 
-    /**
-     * check params
-     *
-     * @param userName user name
-     * @param password password
-     * @param email    email
-     * @param phone    phone
-     * @return true if user parameters are valid, other return false
-     */
-    public static boolean checkUserParams(String userName, String password, String email, String phone) {
-        return CheckUtils.checkUserName(userName) && CheckUtils.checkEmail(email) && CheckUtils.checkPassword(password)
-                && CheckUtils.checkPhone(phone);
+    public static boolean checkTaskDefinitionParameters(TaskDefinition taskDefinition) {
+        AbstractParameters abstractParameters;
+        String taskType = taskDefinition.getTaskType();
+        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskDefinition.getDependence());
+        } else {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskDefinition.getTaskParams());
+        }
+
+        if (abstractParameters != null) {
+            return abstractParameters.checkParameters();
+        }
+
+        return false;
     }
 
     /**

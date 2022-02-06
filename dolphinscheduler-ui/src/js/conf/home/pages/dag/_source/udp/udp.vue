@@ -22,6 +22,7 @@
                 type="text"
                 size="small"
                 v-model="name"
+                id="inputName"
                 :disabled="router.history.current.name === 'projects-instance-details'"
                 :placeholder="$t('Please enter name (required)')">
         </el-input>
@@ -42,7 +43,7 @@
 
       <div class="title" style="padding-top: 6px;">
         <span class="text-b">{{$t('select tenant')}}</span>
-        <form-tenant v-model="tenantId"></form-tenant>
+        <form-tenant v-model="tenantCode"></form-tenant>
       </div>
       <div class="title" style="padding-top: 6px;">
         <span class="text-b">{{$t('warning of timeout')}}</span>
@@ -57,7 +58,23 @@
           </el-input>
         </span>
       </div>
-
+      <div class="title" style="padding-top: 6px;">
+        <span class="text-b">{{$t('Process execute type')}}</span>
+        <span >
+          <el-select
+            :disabled="isDetails"
+            v-model="executionType"
+            size="small"
+            style="width: 180px">
+            <el-option
+                    v-for="item in itemsList"
+                    :key="item.key"
+                    :value="item.key"
+                    :label="$t(item.val)">
+            </el-option>
+          </el-select>
+        </span>
+      </div>
       <div class="title" style="padding-top: 6px;">
         <span>{{$t('Set global')}}</span>
       </div>
@@ -85,7 +102,7 @@
           </div>
         </template>
         <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()">{{$t('Add')}}</el-button>
+        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()" id="btnSubmit">{{$t('Add')}}</el-button>
       </div>
     </div>
   </div>
@@ -117,10 +134,18 @@
         syncDefine: true,
         // Timeout alarm
         timeout: 0,
-
-        tenantId: -1,
+        // tenant code
+        tenantCode: 'default',
         // checked Timeout alarm
-        checkedTimeout: true
+        checkedTimeout: true,
+        // process execute type
+        executionType: 'PARALLEL',
+        itemsList: [
+          { key: 'PARALLEL', val: 'parallel' },
+          { key: 'SERIAL_WAIT', val: 'Serial wait' },
+          { key: 'SERIAL_DISCARD', val: 'Serial discard' },
+          { key: 'SERIAL_PRIORITY', val: 'Serial priority' }
+        ]
       }
     },
     mixins: [disabledState],
@@ -150,7 +175,8 @@
 
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-        this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
+        this.store.commit('dag/setTenantCode', _.cloneDeep(this.tenantCode))
+        this.store.commit('dag/setExecutionType', _.cloneDeep(this.executionType))
         this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
         this.store.commit('dag/setReleaseState', this.releaseState)
@@ -202,8 +228,38 @@
        */
       reloadParam () {
         const dag = _.cloneDeep(this.store.state.dag)
+        let fixedParam = []
+        const tasks = this.store.state.dag.tasks
+        for (const task of tasks) {
+          const localParam = task.params ? task.params.localParams : []
+          localParam.forEach(l => {
+            if (!fixedParam.some(f => { return f.prop === l.prop })) {
+              fixedParam.push(Object.assign({
+                ifFixed: true
+              }, l))
+            }
+          })
+        }
+
         let globalParams = _.cloneDeep(dag.globalParams)
-        let udpList = [...globalParams]
+
+        globalParams = globalParams.map(g => {
+          if (fixedParam.some(f => { return g.prop === f.prop })) {
+            fixedParam = fixedParam.filter(f => { return g.prop !== f.prop })
+            return Object.assign(g, {
+              ifFixed: true
+            })
+          } else {
+            return g
+          }
+        })
+        let udpList = [...fixedParam, ...globalParams].sort(s => {
+          if (s.ifFixed) {
+            return -1
+          } else {
+            return 1
+          }
+        })
         this.udpList = udpList
         this.udpListCache = udpList
       }
@@ -227,12 +283,13 @@
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {
-        if (dag.tenantId > -1) {
-          this.tenantId = dag.tenantId
-        } else if (this.store.state.user.userInfo.tenantId) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
+        if (dag.tenantCode) {
+          this.tenantCode = dag.tenantCode
+        } else {
+          this.tenantCode = this.store.state.user.userInfo.tenantCode || 'default'
         }
       })
+      this.executionType = dag.executionType
     },
     mounted () {},
     components: { FormTenant, mLocalParams }

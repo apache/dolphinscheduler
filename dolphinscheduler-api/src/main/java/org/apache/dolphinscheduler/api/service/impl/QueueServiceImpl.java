@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -89,7 +89,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -151,6 +151,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueObj.setUpdateTime(now);
 
         queueMapper.insert(queueObj);
+        result.put(Constants.DATA_LIST, queueObj);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -230,7 +231,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     /**
      * verify queue and queueName
      *
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
@@ -263,6 +264,32 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     }
 
     /**
+     * query queue by queueName
+     *
+     * @param queueName queue name
+     * @return queue object for provide queue name
+     */
+    @Override
+    public Map<String, Object> queryQueueName(String queueName) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (StringUtils.isEmpty(queueName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
+            return result;
+        }
+
+        if (!checkQueueNameExist(queueName)) {
+            putMsg(result, Status.QUEUE_NOT_EXIST, queueName);
+            return result;
+        }
+
+        List<Queue> queueList = queueMapper.queryQueueName(queueName);
+        result.put(Constants.DATA_LIST, queueList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * check queue exist
      * if exists return true，not exists return false
      * check queue exist
@@ -271,7 +298,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return BooleanUtils.isTrue(queueMapper.existQueue(queue, null));
+        return queueMapper.existQueue(queue, null) == Boolean.TRUE;
     }
 
     /**
@@ -282,7 +309,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return BooleanUtils.isTrue(queueMapper.existQueue(null, queueName));
+        return queueMapper.existQueue(null, queueName) == Boolean.TRUE;
     }
 
     /**
@@ -293,8 +320,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param newQueue new queue name
      * @return true if need to update user
      */
-    private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
-        return !oldQueue.equals(newQueue) && BooleanUtils.isTrue(userMapper.existUser(oldQueue));
+    private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
+        return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
     }
 
 }

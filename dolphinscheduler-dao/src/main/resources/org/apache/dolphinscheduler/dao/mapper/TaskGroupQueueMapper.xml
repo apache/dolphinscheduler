@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper">
+
+    <resultMap type="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue" id="TaskGroupQueueMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="taskId" column="task_id" jdbcType="INTEGER"/>
+        <result property="taskName" column="task_name" jdbcType="VARCHAR"/>
+        <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+        <result property="processId" column="process_id" jdbcType="INTEGER"/>
+        <result property="priority" column="priority" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="forceStart" column="force_start" jdbcType="INTEGER"/>
+        <result property="inQueue" column="in_queue" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id = "baseSql">
+        id, task_id, task_name, group_id, process_id, priority, status , force_start , in_queue, create_time, update_time
+    </sql>
+
+    <select id="queryTaskGroupQueuePaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql">
+        </include>
+        from t_ds_task_group_queue
+        <where>
+            <if test="groupId != 0">
+                and group_id = #{groupId}
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+
+    <select id="queryByStatus" resultMap="TaskGroupQueueMap" resultType="map">
+        select
+        <include refid="baseSql">
+        </include>
+        from t_ds_task_group_queue
+            where status = #{status}
+    </select>
+
+    <delete id="deleteByTaskId">
+        delete from t_ds_task_group_queue
+        where task_id = #{taskId}
+    </delete>
+
+    <update id="updateStatusByTaskId">
+        update t_ds_task_group_queue
+        <set>
+            <if test="status != 0">
+                status = #{status},
+            </if>
+        </set>
+        where task_id = #{taskId}
+    </update>
+
+    <update id="updateInQueue">
+        update t_ds_task_group_queue
+               set in_queue = #{inQueue}
+        where id = #{id}
+    </update>
+
+    <update id="updateForceStart">
+        update t_ds_task_group_queue
+        set force_start = #{forceStart}
+        where id = #{queueId}
+    </update>
+
+    <update id="modifyPriority">
+        update t_ds_task_group_queue
+        set priority = #{priority}
+        where id = #{queueId}
+    </update>
+
+    <update id="updateInQueueLimit1">
+        update t_ds_task_group_queue
+               set in_queue = #{newValue}
+        where group_id = #{groupId} and in_queue = #{oldValue} and status = #{status} order by priority desc limit 1
+    </update>
+
+    <update id="updateInQueueCAS">
+        update t_ds_task_group_queue
+               set in_queue = #{newValue}
+        where id = #{id} and in_queue = #{oldValue}
+    </update>
+
+    <select id="queryHighPriorityTasks" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where group_id = #{groupId} and status = #{status} and  priority &gt; #{priority}
+    </select>
+    <select id="queryTheHighestPriorityTasks" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where priority = (select max(priority) from t_ds_task_group_queue where group_id = #{groupId}
+        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} ) and group_id = #{groupId}
+        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} limit 1
+    </select>
+
+    <select id="queryByTaskId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where task_id = #{taskId}
+    </select>
+
+    <select id="queryTaskGroupQueueByTaskGroupIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        queue.id, queue.task_name, queue.group_id, queue.process_id, queue.priority, queue.status
+        , queue.force_start, queue.create_time, queue.update_time,
+        process.name as processInstanceName,p.name as projectName,p.code as projectCode
+        from t_ds_task_group_queue queue
+        left join t_ds_process_instance process on queue.process_id = process.id
+        left join t_ds_process_definition p_f on process.process_definition_code = p_f.code
+        and process.process_definition_version = p_f.version
+        join t_ds_project as p on p_f.project_code = p.code
+        where queue.group_id = #{groupId}
+        <if test="taskName != null and taskName != ''">
+            and task_name =#{taskName}
+        </if>
+        <if test="processName != null and processName != ''">
+            and process.name =#{processName}
+        </if>
+        <if test="status != null">
+            and queue.status =#{status}
+        </if>
+        <if test="projects != null and projects.size() > 0">
+            and p.code in
+            <foreach collection="projects" index="index" item="i" open="(" separator="," close=")">
+                #{i.code}
+            </foreach>
+        </if>
+        order by queue.update_time desc
+    </select>
+
+</mapper>

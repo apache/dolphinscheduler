@@ -20,19 +20,32 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.model.DependentItem;
+import org.apache.dolphinscheduler.common.model.DependentTaskModel;
+import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.curator.shaded.com.google.common.collect.Sets;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,78 +62,143 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     @Autowired
     private ProjectMapper projectMapper;
 
+    @Autowired
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
     @Override
-    public Map<String, Object> queryWorkFlowLineageByName(String workFlowName, int projectId) {
-        Project project = projectMapper.selectById(projectId);
+    public Map<String, Object> queryWorkFlowLineageByName(long projectCode, String workFlowName) {
         Map<String, Object> result = new HashMap<>();
-        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByName(workFlowName, project.getCode());
+        Project project = projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
+        }
+        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryWorkFlowLineageByName(projectCode, workFlowName);
         result.put(Constants.DATA_LIST, workFlowLineageList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    private void getRelation(Map<Integer, WorkFlowLineage> workFlowLineageMap,
-                             Set<WorkFlowRelation> workFlowRelations,
-                             ProcessLineage processLineage) {
-        List<ProcessLineage> relations = workFlowLineageMapper.queryCodeRelation(
-                processLineage.getPostTaskCode(), processLineage.getPostTaskVersion(),
-                processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
-        if (!relations.isEmpty()) {
-            Set<Integer> preWorkFlowIds = new HashSet<>();
-            List<ProcessLineage> preRelations = workFlowLineageMapper.queryCodeRelation(
-                    processLineage.getPreTaskCode(), processLineage.getPreTaskVersion(),
-                    processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
-            for (ProcessLineage preRelation : preRelations) {
-                WorkFlowLineage pre = workFlowLineageMapper.queryWorkFlowLineageByCode(
-                        preRelation.getProcessDefinitionCode(), preRelation.getProjectCode());
-                preWorkFlowIds.add(pre.getWorkFlowId());
-            }
-            ProcessLineage postRelation = relations.get(0);
-            WorkFlowLineage post = workFlowLineageMapper.queryWorkFlowLineageByCode(
-                    postRelation.getProcessDefinitionCode(), postRelation.getProjectCode());
-            if (!workFlowLineageMap.containsKey(post.getWorkFlowId())) {
-                post.setSourceWorkFlowId(StringUtils.join(preWorkFlowIds, ","));
-                workFlowLineageMap.put(post.getWorkFlowId(), post);
-            } else {
-                WorkFlowLineage workFlowLineage = workFlowLineageMap.get(post.getWorkFlowId());
-                String sourceWorkFlowId = workFlowLineage.getSourceWorkFlowId();
-                if (sourceWorkFlowId.equals("")) {
-                    workFlowLineage.setSourceWorkFlowId(StringUtils.join(preWorkFlowIds, ","));
-                } else {
-                    if (!preWorkFlowIds.isEmpty()) {
-                        workFlowLineage.setSourceWorkFlowId(sourceWorkFlowId + "," + StringUtils.join(preWorkFlowIds, ","));
-                    }
-                }
-            }
-            if (preWorkFlowIds.isEmpty()) {
-                workFlowRelations.add(new WorkFlowRelation(0, post.getWorkFlowId()));
-            } else {
-                for (Integer workFlowId : preWorkFlowIds) {
-                    workFlowRelations.add(new WorkFlowRelation(workFlowId, post.getWorkFlowId()));
-                }
-            }
-        }
-    }
-
     @Override
-    public Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids, int projectId) {
+    public Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long workFlowCode) {
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.selectById(projectId);
-        List<ProcessLineage> processLineages = workFlowLineageMapper.queryRelationByIds(ids, project.getCode());
-
-        Map<Integer, WorkFlowLineage> workFlowLineages = new HashMap<>();
-        Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
-
-        for (ProcessLineage processLineage : processLineages) {
-            getRelation(workFlowLineages, workFlowRelations, processLineage);
+        Project project = projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
         }
-
+        Map<Long, WorkFlowLineage> workFlowLineagesMap = new HashMap<>();
+        Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
+        Set<Long> sourceWorkFlowCodes = Sets.newHashSet(workFlowCode);
+        recursiveWorkFlow(projectCode, workFlowLineagesMap, workFlowRelations, sourceWorkFlowCodes);
         Map<String, Object> workFlowLists = new HashMap<>();
-        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineages.values());
+        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineagesMap.values());
         workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
         result.put(Constants.DATA_LIST, workFlowLists);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
+    private void recursiveWorkFlow(long projectCode,
+                                   Map<Long, WorkFlowLineage> workFlowLineagesMap,
+                                   Set<WorkFlowRelation> workFlowRelations,
+                                   Set<Long> sourceWorkFlowCodes) {
+        for (Long workFlowCode : sourceWorkFlowCodes) {
+            WorkFlowLineage workFlowLineage = workFlowLineageMapper.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+            workFlowLineagesMap.put(workFlowCode, workFlowLineage);
+            List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineageByCode(projectCode, workFlowCode);
+            List<TaskDefinition> taskDefinitionList = new ArrayList<>();
+            for (ProcessLineage processLineage : processLineages) {
+                if (processLineage.getPreTaskCode() > 0) {
+                    taskDefinitionList.add(new TaskDefinition(processLineage.getPreTaskCode(), processLineage.getPreTaskVersion()));
+                }
+                if (processLineage.getPostTaskCode() > 0) {
+                    taskDefinitionList.add(new TaskDefinition(processLineage.getPostTaskCode(), processLineage.getPostTaskVersion()));
+                }
+            }
+            sourceWorkFlowCodes = querySourceWorkFlowCodes(projectCode, workFlowCode, taskDefinitionList);
+            if (sourceWorkFlowCodes.isEmpty()) {
+                workFlowRelations.add(new WorkFlowRelation(0L, workFlowCode));
+                return;
+            } else {
+                workFlowLineagesMap.get(workFlowCode).setSourceWorkFlowCode(StringUtils.join(sourceWorkFlowCodes, Constants.COMMA));
+                sourceWorkFlowCodes.forEach(code -> workFlowRelations.add(new WorkFlowRelation(code, workFlowCode)));
+                recursiveWorkFlow(projectCode, workFlowLineagesMap, workFlowRelations, sourceWorkFlowCodes);
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Object> queryWorkFlowLineage(long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
+        }
+        List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineage(projectCode);
+        Map<Long, WorkFlowLineage> workFlowLineagesMap = new HashMap<>();
+        Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
+        if (!processLineages.isEmpty()) {
+            List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryWorkFlowLineageByLineage(processLineages);
+            workFlowLineagesMap = workFlowLineages.stream().collect(Collectors.toMap(WorkFlowLineage::getWorkFlowCode, workFlowLineage -> workFlowLineage));
+            Map<Long, List<TaskDefinition>> workFlowMap = new HashMap<>();
+            for (ProcessLineage processLineage : processLineages) {
+                workFlowMap.compute(processLineage.getProcessDefinitionCode(), (k, v) -> {
+                    if (v == null) {
+                        v = new ArrayList<>();
+                    }
+                    if (processLineage.getPreTaskCode() > 0) {
+                        v.add(new TaskDefinition(processLineage.getPreTaskCode(), processLineage.getPreTaskVersion()));
+                    }
+                    if (processLineage.getPostTaskCode() > 0) {
+                        v.add(new TaskDefinition(processLineage.getPostTaskCode(), processLineage.getPostTaskVersion()));
+                    }
+                    return v;
+                });
+            }
+            for (Entry<Long, List<TaskDefinition>> workFlow : workFlowMap.entrySet()) {
+                Set<Long> sourceWorkFlowCodes = querySourceWorkFlowCodes(projectCode, workFlow.getKey(), workFlow.getValue());
+                if (sourceWorkFlowCodes.isEmpty()) {
+                    workFlowRelations.add(new WorkFlowRelation(0L, workFlow.getKey()));
+                } else {
+                    workFlowLineagesMap.get(workFlow.getKey()).setSourceWorkFlowCode(StringUtils.join(sourceWorkFlowCodes, Constants.COMMA));
+                    sourceWorkFlowCodes.forEach(code -> workFlowRelations.add(new WorkFlowRelation(code, workFlow.getKey())));
+                }
+            }
+        }
+        Map<String, Object> workFlowLists = new HashMap<>();
+        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineagesMap.values());
+        workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
+        result.put(Constants.DATA_LIST, workFlowLists);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    private Set<Long> querySourceWorkFlowCodes(long projectCode, long workFlowCode, List<TaskDefinition> taskDefinitionList) {
+        Set<Long> sourceWorkFlowCodes = new HashSet<>();
+        if (taskDefinitionList == null || taskDefinitionList.isEmpty()) {
+            return sourceWorkFlowCodes;
+        }
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList);
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getProjectCode() == projectCode) {
+                if (taskDefinitionLog.getTaskType().equals(TaskType.DEPENDENT.getDesc())) {
+                    DependentParameters dependentParameters = JSONUtils.parseObject(taskDefinitionLog.getDependence(), DependentParameters.class);
+                    if (dependentParameters != null) {
+                        List<DependentTaskModel> dependTaskList = dependentParameters.getDependTaskList();
+                        for (DependentTaskModel taskModel : dependTaskList) {
+                            List<DependentItem> dependItemList = taskModel.getDependItemList();
+                            for (DependentItem dependentItem : dependItemList) {
+                                if (dependentItem.getProjectCode() == projectCode && dependentItem.getDefinitionCode() != workFlowCode) {
+                                    sourceWorkFlowCodes.add(dependentItem.getDefinitionCode());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return sourceWorkFlowCodes;
+    }
 }

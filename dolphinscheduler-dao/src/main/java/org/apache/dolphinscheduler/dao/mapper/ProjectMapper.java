@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -36,7 +37,14 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @param projectCode projectCode
      * @return project
      */
-    Project queryByCode(@Param("projectCode") Long projectCode);
+    Project queryByCode(@Param("projectCode") long projectCode);
+
+    /**
+     * query project detail by code list
+     * @param codes codes
+     * @return project list
+     */
+    List<Project> queryByCodes(@Param("codes") Collection<Long> codes);
 
     /**
      * TODO: delete
@@ -51,7 +59,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @param projectCode projectCode
      * @return project
      */
-    Project queryDetailByCode(@Param("projectCode") Long projectCode);
+    Project queryDetailByCode(@Param("projectCode") long projectCode);
 
     /**
      * query project by name
@@ -118,5 +126,4 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return projectList
      */
     List<Project> queryAllProject();
-
 }

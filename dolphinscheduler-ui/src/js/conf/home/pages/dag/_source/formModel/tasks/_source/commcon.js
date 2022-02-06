@@ -209,11 +209,6 @@ const typeList = [
     id: 9,
     code: 'BOOLEAN',
     disabled: false
-  },
-  {
-    id: 10,
-    code: 'LIST',
-    disabled: false
   }
 ]
 

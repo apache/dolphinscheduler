@@ -21,17 +21,19 @@ import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,18 +41,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
 @Component
-public class AlertDao extends AbstractBaseDao {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class AlertDao {
     @Autowired
     private AlertMapper alertMapper;
 
@@ -59,13 +56,6 @@ public class AlertDao extends AbstractBaseDao {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
-
-    @Override
-    protected void init() {
-        alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
-        alertPluginInstanceMapper = ConnectionFactory.getInstance().getMapper(AlertPluginInstanceMapper.class);
-        alertGroupMapper = ConnectionFactory.getInstance().getMapper(AlertGroupMapper.class);
-    }
 
     /**
      * insert alert
@@ -131,8 +121,14 @@ public class AlertDao extends AbstractBaseDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .projectCode(processDefinition.getProjectCode())
+                .projectName(processDefinition.getProjectName())
+                .owner(processDefinition.getUserName())
                 .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
                 .processName(processInstance.getName())
+                .processStartTime(processInstance.getStartTime())
+                .processHost(processInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
                 .warningLevel(AlertWarnLevel.MIDDLE)
                 .build();
@@ -153,36 +149,38 @@ public class AlertDao extends AbstractBaseDao {
     /**
      * task timeout warn
      *
-     * @param alertGroupId alertGroupId
-     * @param processInstanceId processInstanceId
-     * @param processInstanceName processInstanceName
-     * @param taskId taskId
-     * @param taskName taskName
+     * @param processInstance processInstanceId
+     * @param taskInstance taskInstance
+     * @param taskDefinition taskDefinition
      */
-    public void sendTaskTimeoutAlert(int alertGroupId, int processInstanceId,
-                                     String processInstanceName, int taskId, String taskName) {
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .processId(processInstanceId)
-                .processName(processInstanceName)
-                .taskId(taskId)
-                .taskName(taskName)
+                .projectCode(taskDefinition.getProjectCode())
+                .projectName(taskDefinition.getProjectName())
+                .owner(taskDefinition.getUserName())
+                .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                .processName(processInstance.getName())
+                .taskCode(taskInstance.getTaskCode())
+                .taskName(taskInstance.getName())
+                .taskType(taskInstance.getTaskType())
+                .taskStartTime(taskInstance.getStartTime())
+                .taskHost(taskInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
                 .warningLevel(AlertWarnLevel.MIDDLE)
                 .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
-        saveTaskTimeoutAlert(alert, content, alertGroupId);
+        saveTaskTimeoutAlert(alert, content, processInstance.getWarningGroupId());
     }
 
     /**
-     * list the alert information of waiting to be executed
-     *
-     * @return alert list
+     * List alerts that are pending for execution
      */
-    public List<Alert> listWaitExecutionAlert() {
+    public List<Alert> listPendingAlerts() {
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
     }
 

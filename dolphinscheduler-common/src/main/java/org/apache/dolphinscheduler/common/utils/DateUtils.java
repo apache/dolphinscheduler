@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,16 +28,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * date utils
- */
-public class DateUtils {
+public final class DateUtils {
 
     static final long C0 = 1L;
     static final long C1 = C0 * 1000L;
@@ -45,34 +43,10 @@ public class DateUtils {
     static final long C5 = C4 * 60L;
     static final long C6 = C5 * 24L;
 
-    /**
-     * a default datetime formatter for the timestamp
-     */
-    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
-    }
-
-    /**
-     * @param timeMillis timeMillis like System.currentTimeMillis()
-     * @return string formatted as yyyy-MM-dd HH:mm:ss
-     */
-    public static String formatTimeStamp(long timeMillis) {
-        return formatTimeStamp(timeMillis, DEFAULT_DATETIME_FORMATTER);
-    }
-
-    /**
-     * @param timeMillis timeMillis like System.currentTimeMillis()
-     * @param dateTimeFormatter expect formatter, like yyyy-MM-dd HH:mm:ss
-     * @return formatted string
-     */
-    public static String formatTimeStamp(long timeMillis, DateTimeFormatter dateTimeFormatter) {
-        Objects.requireNonNull(dateTimeFormatter);
-        return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
-                ZoneId.systemDefault()));
     }
 
     /**
@@ -118,7 +92,7 @@ public class DateUtils {
     /**
      * get the formatted date string
      *
-     * @param date date
+     * @param date   date
      * @param format e.g. yyyy-MM-dd HH:mm:ss
      * @return date string
      */
@@ -130,7 +104,7 @@ public class DateUtils {
      * get the formatted date string
      *
      * @param localDateTime local data time
-     * @param format yyyy-MM-dd HH:mm:ss
+     * @param format        yyyy-MM-dd HH:mm:ss
      * @return date string
      */
     public static String format(LocalDateTime localDateTime, String format) {
@@ -150,7 +124,7 @@ public class DateUtils {
     /**
      * convert string to date and time
      *
-     * @param date date
+     * @param date   date
      * @param format format
      * @return date
      */
@@ -200,32 +174,10 @@ public class DateUtils {
     }
 
     /**
-     * get hours between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ hours
-     */
-    public static long diffHours(Date d1, Date d2) {
-        return (long) Math.ceil(diffMin(d1, d2) / 60.0);
-    }
-
-    /**
-     * get minutes between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ minutes
-     */
-    public static long diffMin(Date d1, Date d2) {
-        return (long) Math.ceil(differSec(d1, d2) / 60.0);
-    }
-
-    /**
      * get the date of the specified date in the days before and after
      *
      * @param date date
-     * @param day day
+     * @param day  day
      * @return the date of the specified date in the days before and after
      */
     public static Date getSomeDay(Date date, int day) {
@@ -251,7 +203,7 @@ public class DateUtils {
      * compare two dates
      *
      * @param future future date
-     * @param old old date
+     * @param old    old date
      * @return true if future time greater than old time
      */
     public static boolean compare(Date future, Date old) {
@@ -377,7 +329,7 @@ public class DateUtils {
     /**
      * get some hour of day
      *
-     * @param date date
+     * @param date       date
      * @param offsetHour hours
      * @return some hour of day
      */
@@ -480,15 +432,15 @@ public class DateUtils {
      */
     public static Date getCurrentDate() {
         return DateUtils.parse(DateUtils.getCurrentTime(),
-                Constants.YYYY_MM_DD_HH_MM_SS);
+            Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
     /**
      * get date
      *
-     * @param date date
+     * @param date          date
      * @param calendarField calendarField
-     * @param amount amount
+     * @param amount        amount
      * @return date
      */
     public static Date add(final Date date, final int calendarField, final int amount) {
@@ -505,7 +457,7 @@ public class DateUtils {
      * starting from the current time, get how many seconds are left before the target time.
      * targetTime = baseTime + intervalSeconds
      *
-     * @param baseTime base time
+     * @param baseTime        base time
      * @param intervalSeconds a period of time
      * @return the number of seconds
      */
@@ -558,19 +510,6 @@ public class DateUtils {
      * Time unit representing one thousandth of a second
      */
     public static class MILLISECONDS {
-
-        public static long toSeconds(long d) {
-            return d / (C3 / C2);
-        }
-
-        public static long toMinutes(long d) {
-            return d / (C4 / C2);
-        }
-
-        public static long toHours(long d) {
-            return d / (C5 / C2);
-        }
-
         public static long toDays(long d) {
             return d / (C6 / C2);
         }

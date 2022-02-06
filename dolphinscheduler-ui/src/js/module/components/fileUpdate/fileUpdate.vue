@@ -70,7 +70,7 @@
             <template slot="content">
               <div class="file-update-box">
                 <template v-if="progress === 0">
-                  <input ref="file" name="file" type="file" class="file-update" @change="_onChange">
+                  <input id="btnUpload" ref="file" name="file" type="file" class="file-update" @change="_onChange">
                   <el-button type="dashed" size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
@@ -175,7 +175,7 @@
           formData.append('pid', this.pid)
           formData.append('currentDir', this.currentDir)
           formData.append('description', this.description)
-          io.post('resources/create', res => {
+          io.post('resources', res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateFileUpdate')

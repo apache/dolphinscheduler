@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -123,4 +123,12 @@
             #{id}
         </foreach>
     </select>
+    <select id="queryAuthedUserListByProjectId" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="u"/>
+        </include>
+        from t_ds_user u, t_ds_relation_project_user rel
+        where u.id = rel.user_id and rel.project_id = #{projectId}
+    </select>
 </mapper>

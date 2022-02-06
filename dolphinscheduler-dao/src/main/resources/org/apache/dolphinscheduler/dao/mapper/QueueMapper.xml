@@ -54,4 +54,13 @@
             and queue_name =#{queueName}
         </if>
     </select>
+    <select id="queryQueueName" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
+        select
+        <include refid="baseSql"/>
+        from t_ds_queue
+        where 1 = 1
+        <if test="queueName != null and queueName != ''">
+            and queue_name =#{queueName}
+        </if>
+    </select>
 </mapper>

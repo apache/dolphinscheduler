@@ -17,15 +17,15 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
-        <el-table-column type="selection" width="50"></el-table-column>
+      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange" row-class-name="items-workflow-instances">
+        <el-table-column type="selection" width="50" class-name="select-all"></el-table-column>
         <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: `/projects/${projectId}/instance/list/${scope.row.id}` , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
+                <router-link :to="{ path: `/projects/${projectCode}/instance/list/${scope.row.id}` , query:{code: scope.row.processDefinitionCode}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -61,8 +61,14 @@
             <span>{{scope.row.duration | filterNull}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
+        <el-table-column prop="runTimes" :label="$t('Run Times')" class-name="execution-time"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
+        <el-table-column :label="$t('Dry-run flag')" width="100">
+          <template slot-scope="scope">
+            <span v-if="scope.row.dryRun == 1">YES</span>
+            <span v-else>NO</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
         <el-table-column prop="host" :label="$t('host')" min-width="210"></el-table-column>
         <el-table-column :label="$t('Operation')" width="240" fixed="right">
@@ -74,7 +80,7 @@
                 </span>
               </el-tooltip>
               <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
-                <span><el-button type="primary" size="mini" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'"  icon="el-icon-refresh" @click="_reRun(scope.row,scope.$index)" circle></el-button></span>
+                <span><el-button type="primary" size="mini" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'"  icon="el-icon-refresh" @click="_reRun(scope.row,scope.$index)" circle class="btn-rerun"></el-button></span>
               </el-tooltip>
               <el-tooltip :content="$t('Recovery Failed')" placement="top" :enterable="false">
                 <span>
@@ -227,7 +233,7 @@
         :title="$t('Delete?')"
         @onConfirm="_delete({},-1)"
       >
-        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strDelete" slot="reference">{{$t('Delete')}}</el-button>
+        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strDelete" slot="reference" class="btn-delete-all">{{$t('Delete')}}</el-button>
       </el-popconfirm>
     </el-tooltip>
   </div>
@@ -260,14 +266,14 @@
        * Return run type
        */
       _rtRunningType (code) {
-        return _.filter(runningType, v => v.code === code)[0].desc
+        return (_.filter(runningType, v => v.code === code)[0] || {}).desc
       },
       /**
        * Return status
        */
       _rtState (code) {
         let o = tasksState[code]
-        return `<em class="fa ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
+        return `<em class="fa ansfont ${o.classNames} ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       /**
        * delete
@@ -292,7 +298,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}`, query: { code: item.processDefinitionCode } })
       },
       /**
        * Rerun
@@ -433,7 +439,7 @@
         }
       },
       _gantt (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/gantt/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/gantt/${item.id}` })
       },
       _topCheckBoxClick (v) {
         this.list.forEach((item, i) => {
@@ -455,6 +461,7 @@
           this.strDelete = ''
           this.$message.success(res.msg)
         }).catch(e => {
+          this._onUpdate()
           this.checkAll = false
           this.strDelete = ''
           this.$message.error(e.msg || '')
@@ -482,7 +489,7 @@
     mounted () {
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectCode'])
     },
     components: { }
   }

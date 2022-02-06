@@ -109,6 +109,10 @@
       // Routing parameter merging
       if (!_.isEmpty(this.$route.query)) {
         this.searchParams = _.assign(this.searchParams, this.$route.query)
+        if (this.searchParams.endDate && this.searchParams.startDate) {
+          this.dataTime[0] = this.searchParams.startDate
+          this.dataTime[1] = this.searchParams.endDate
+        }
       }
     },
     mounted () {

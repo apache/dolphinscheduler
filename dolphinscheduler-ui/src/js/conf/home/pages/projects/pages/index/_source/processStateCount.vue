@@ -33,7 +33,7 @@
                 <td><span>{{$index+1}}</span></td>
                 <td>
                   <a v-if="currentName === 'home'" style="cursor: default">{{item.value}}</a>
-                  <span v-else><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)">{{item.value}}</a></span>
+                  <span v-else><a href="javascript:" @click="searchParams.projectCode && _goProcess(item.key)">{{item.value}}</a></span>
                 </td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
               </tr>
@@ -90,8 +90,8 @@
         })
         const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
         myChart.echart.setOption(pie)
-        // 首页不允许跳转
-        if (this.searchParams.projectId) {
+        // Jump not allowed on home page
+        if (this.searchParams.projectCode) {
           myChart.echart.on('click', e => {
             this._goProcess(e.data.name)
           })

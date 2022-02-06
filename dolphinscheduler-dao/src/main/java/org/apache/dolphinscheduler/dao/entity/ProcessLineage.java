@@ -25,12 +25,12 @@ public class ProcessLineage {
     /**
      * project code
      */
-    private Long projectCode;
+    private long projectCode;
 
     /**
      * post task code
      */
-    private Long postTaskCode;
+    private long postTaskCode;
 
     /**
      * post task version
@@ -40,7 +40,7 @@ public class ProcessLineage {
     /**
      * pre task code
      */
-    private Long preTaskCode;
+    private long preTaskCode;
 
     /**
      * pre task version
@@ -50,46 +50,42 @@ public class ProcessLineage {
     /**
      * process definition code
      */
-    private Long processDefinitionCode;
+    private long processDefinitionCode;
 
     /**
      * process definition version
      */
     private int processDefinitionVersion;
 
-    public Long getProjectCode() {
+    public long getProjectCode() {
         return projectCode;
     }
 
-    public void setProjectCode(Long projectCode) {
+    public void setProjectCode(long projectCode) {
         this.projectCode = projectCode;
     }
 
-    public Long getProcessDefinitionCode() {
-        return processDefinitionCode;
+    public long getPostTaskCode() {
+        return postTaskCode;
     }
 
-    public void setProcessDefinitionCode(Long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public void setPostTaskCode(Long postTaskCode) {
+    public void setPostTaskCode(long postTaskCode) {
         this.postTaskCode = postTaskCode;
     }
 
-    public Long getPreTaskCode() {
+    public int getPostTaskVersion() {
+        return postTaskVersion;
+    }
+
+    public void setPostTaskVersion(int postTaskVersion) {
+        this.postTaskVersion = postTaskVersion;
+    }
+
+    public long getPreTaskCode() {
         return preTaskCode;
     }
 
-    public void setPreTaskCode(Long preTaskCode) {
+    public void setPreTaskCode(long preTaskCode) {
         this.preTaskCode = preTaskCode;
     }
 
@@ -101,20 +97,19 @@ public class ProcessLineage {
         this.preTaskVersion = preTaskVersion;
     }
 
-    public int getPostTaskVersion() {
-        return postTaskVersion;
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
     }
 
-    public void setPostTaskVersion(int postTaskVersion) {
-        this.postTaskVersion = postTaskVersion;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
 
-    public long getPostTaskCode() {
-        return postTaskCode;
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
     }
 
-    public void setPostTaskCode(long postTaskCode) {
-        this.postTaskCode = postTaskCode;
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
     }
-
 }

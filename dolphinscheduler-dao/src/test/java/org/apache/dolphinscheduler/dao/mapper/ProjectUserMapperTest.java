@@ -16,40 +16,30 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.*;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProjectUserMapperTest {
-
+public class ProjectUserMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProjectUserMapper projectUserMapper;
+    private ProjectUserMapper projectUserMapper;
 
     /**
      * insert
+     *
      * @return ProjectUser
      */
-    private ProjectUser insertOne(){
+    private ProjectUser insertOne() {
         //insertOne
         ProjectUser projectUser = new ProjectUser();
         projectUser.setProjectId(1010);
@@ -97,7 +87,6 @@ public class ProjectUserMapperTest {
      */
     @Test
     public void testDeleteProjectRelation() {
-
 
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());

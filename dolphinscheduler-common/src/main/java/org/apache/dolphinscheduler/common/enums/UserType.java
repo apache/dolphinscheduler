@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -28,8 +29,7 @@ public enum UserType {
     ADMIN_USER(0, "admin user"),
     GENERAL_USER(1, "general user");
 
-
-    UserType(int code, String descp){
+    UserType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

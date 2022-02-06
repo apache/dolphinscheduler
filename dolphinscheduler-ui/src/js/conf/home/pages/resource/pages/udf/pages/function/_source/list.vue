@@ -17,7 +17,7 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="udf-function-items">
         <el-table-column type="index" :label="$t('#')" min-width="120"></el-table-column>
         <el-table-column :label="$t('UDF Function Name')">
           <template slot-scope="scope">
@@ -45,7 +45,7 @@
         <el-table-column :label="$t('Operation')" min-width="100">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
+              <span><el-button id="btnRename" type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
@@ -56,7 +56,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button id="btnDelete" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -64,6 +64,7 @@
       </el-table>
     </div>
     <el-dialog
+      id="createUdfDialog"
       :visible.sync="createUdfDialog"
       width="auto">
       <m-create-udf :item="item" @onUpdate="onUpdate" @close="close"></m-create-udf>

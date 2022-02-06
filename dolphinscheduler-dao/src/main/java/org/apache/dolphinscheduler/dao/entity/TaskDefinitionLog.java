@@ -53,6 +53,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setUserId(taskDefinition.getUserId());
         this.setUserName(taskDefinition.getUserName());
         this.setWorkerGroup(taskDefinition.getWorkerGroup());
+        this.setEnvironmentCode(taskDefinition.getEnvironmentCode());
         this.setProjectCode(taskDefinition.getProjectCode());
         this.setProjectName(taskDefinition.getProjectName());
         this.setResourceIds(taskDefinition.getResourceIds());
@@ -70,6 +71,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setFailRetryInterval(taskDefinition.getFailRetryInterval());
         this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
         this.setFlag(taskDefinition.getFlag());
+        this.setModifyBy(taskDefinition.getModifyBy());
     }
 
     public int getOperator() {
@@ -86,6 +88,16 @@ public class TaskDefinitionLog extends TaskDefinition {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override

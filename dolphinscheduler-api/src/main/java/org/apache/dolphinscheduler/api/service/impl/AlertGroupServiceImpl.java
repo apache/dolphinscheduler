@@ -22,12 +22,11 @@ import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -116,12 +115,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
 
-        Page<AlertGroupVo> page = new Page<>(pageNo, pageSize);
-        IPage<AlertGroupVo> alertGroupVoIPage = alertGroupMapper.queryAlertGroupVo(page, searchVal);
-        PageInfo<AlertGroupVo> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        pageInfo.setTotal((int) alertGroupVoIPage.getTotal());
-        pageInfo.setTotalList(alertGroupVoIPage.getRecords());
+        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
+        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
+                page, searchVal);
+        PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) alertGroupIPage.getTotal());
+        pageInfo.setTotalList(alertGroupIPage.getRecords());
         result.setData(pageInfo);
 
         putMsg(result, Status.SUCCESS);
@@ -195,7 +194,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
 
         Date now = new Date();
 
-        if (StringUtils.isNotEmpty(groupName)) {
+        if (!StringUtils.isEmpty(groupName)) {
             alertGroup.setGroupName(groupName);
         }
         alertGroup.setDescription(desc);
@@ -229,12 +228,20 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
+
+        // Not allow to delete the default alarm group ,because the module of service need to use it.
+        if (id == 1) {
+            putMsg(result, Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
+            return result;
+        }
+
         //check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
         }
+
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -248,6 +255,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      */
     @Override
     public boolean existGroupName(String groupName) {
-        return BooleanUtils.isTrue(alertGroupMapper.existGroupName(groupName));
+        return alertGroupMapper.existGroupName(groupName) == Boolean.TRUE;
     }
 }

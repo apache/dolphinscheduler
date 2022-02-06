@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,7 +35,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -151,11 +152,10 @@ public class ProcessInstance {
     private String globalParams;
 
     /**
-     * process instance json
-     * TODO delete
+     * dagData
      */
     @TableField(exist = false)
-    private String processInstanceJson;
+    private DagData dagData;
 
     /**
      * executor id
@@ -192,12 +192,6 @@ public class ProcessInstance {
     private String locations;
 
     /**
-     * task connects for web
-     */
-    @TableField(exist = false)
-    private String connects;
-
-    /**
      * history command
      */
     private String historyCmd;
@@ -227,6 +221,11 @@ public class ProcessInstance {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * process timeout for warning
      */
     private int timeout;
@@ -240,6 +239,21 @@ public class ProcessInstance {
      * varPool string
      */
     private String varPool;
+    /**
+     * serial queue next processInstanceId
+     */
+    private int nextProcessInstanceId;
+
+    /**
+     * dry run flag
+     */
+    private int dryRun;
+
+    /**
+     * re-start time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date restartTime;
 
     public ProcessInstance() {
 
@@ -253,12 +267,12 @@ public class ProcessInstance {
     public ProcessInstance(ProcessDefinition processDefinition) {
         this.processDefinition = processDefinition;
         this.name = processDefinition.getName()
-                + "-"
-                +
-                processDefinition.getVersion()
-                + "-"
-                +
-                DateUtils.getCurrentTimeStamp();
+            + "-"
+            +
+            processDefinition.getVersion()
+            + "-"
+            +
+            DateUtils.getCurrentTimeStamp();
     }
 
     public String getVarPool() {
@@ -425,12 +439,12 @@ public class ProcessInstance {
         this.globalParams = globalParams;
     }
 
-    public String getProcessInstanceJson() {
-        return processInstanceJson;
+    public DagData getDagData() {
+        return dagData;
     }
 
-    public void setProcessInstanceJson(String processInstanceJson) {
-        this.processInstanceJson = processInstanceJson;
+    public void setDagData(DagData dagData) {
+        this.dagData = dagData;
     }
 
     public String getTenantCode() {
@@ -481,14 +495,6 @@ public class ProcessInstance {
         this.locations = locations;
     }
 
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
-    }
-
     public String getHistoryCmd() {
         return historyCmd;
     }
@@ -503,6 +509,30 @@ public class ProcessInstance {
 
     public void setExecutorName(String executorName) {
         this.executorName = executorName;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
+    public Date getRestartTime() {
+        return restartTime;
+    }
+
+    public void setRestartTime(Date restartTime) {
+        this.restartTime = restartTime;
     }
 
     /**
@@ -602,81 +632,82 @@ public class ProcessInstance {
     @Override
     public String toString() {
         return "ProcessInstance{"
-                + "id=" + id
-                + ", state=" + state
-                + ", recovery=" + recovery
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", runTimes=" + runTimes
-                + ", name='" + name + '\''
-                + ", host='" + host + '\''
-                + ", processDefinition="
-                + processDefinition
-                + ", commandType="
-                + commandType
-                + ", commandParam='"
-                + commandParam
-                + '\''
-                + ", taskDependType="
-                + taskDependType
-                + ", maxTryTimes="
-                + maxTryTimes
-                + ", failureStrategy="
-                + failureStrategy
-                + ", warningType="
-                + warningType
-                + ", warningGroupId="
-                + warningGroupId
-                + ", scheduleTime="
-                + scheduleTime
-                + ", commandStartTime="
-                + commandStartTime
-                + ", globalParams='"
-                + globalParams
-                + '\''
-                + ", processInstanceJson='"
-                + processInstanceJson
-                + '\''
-                + ", executorId="
-                + executorId
-                + ", tenantCode='"
-                + tenantCode
-                + '\''
-                + ", queue='"
-                + queue
-                + '\''
-                + ", isSubProcess="
-                + isSubProcess
-                + ", locations='"
-                + locations
-                + '\''
-                + ", connects='"
-                + connects
-                + '\''
-                + ", historyCmd='"
-                + historyCmd
-                + '\''
-                + ", dependenceScheduleTimes='"
-                + dependenceScheduleTimes
-                + '\''
-                + ", duration="
-                + duration
-                + ", processInstancePriority="
-                + processInstancePriority
-                + ", workerGroup='"
-                + workerGroup
-                + '\''
-                + ", timeout="
-                + timeout
-                + ", tenantId="
-                + tenantId
-                + ", processDefinitionCode='"
-                + processDefinitionCode
-                + '\''
-                + ", processDefinitionVersion='"
-                + processDefinitionVersion
-                + '\''
-                + '}';
+            + "id=" + id
+            + ", state=" + state
+            + ", recovery=" + recovery
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", runTimes=" + runTimes
+            + ", name='" + name + '\''
+            + ", host='" + host + '\''
+            + ", processDefinition="
+            + processDefinition
+            + ", commandType="
+            + commandType
+            + ", commandParam='"
+            + commandParam
+            + '\''
+            + ", taskDependType="
+            + taskDependType
+            + ", maxTryTimes="
+            + maxTryTimes
+            + ", failureStrategy="
+            + failureStrategy
+            + ", warningType="
+            + warningType
+            + ", warningGroupId="
+            + warningGroupId
+            + ", scheduleTime="
+            + scheduleTime
+            + ", commandStartTime="
+            + commandStartTime
+            + ", globalParams='"
+            + globalParams
+            + '\''
+            + ", executorId="
+            + executorId
+            + ", tenantCode='"
+            + tenantCode
+            + '\''
+            + ", queue='"
+            + queue
+            + '\''
+            + ", isSubProcess="
+            + isSubProcess
+            + ", locations='"
+            + locations
+            + '\''
+            + ", historyCmd='"
+            + historyCmd
+            + '\''
+            + ", dependenceScheduleTimes='"
+            + dependenceScheduleTimes
+            + '\''
+            + ", duration="
+            + duration
+            + ", processInstancePriority="
+            + processInstancePriority
+            + ", workerGroup='"
+            + workerGroup
+            + '\''
+            + ", timeout="
+            + timeout
+            + ", tenantId="
+            + tenantId
+            + ", processDefinitionCode='"
+            + processDefinitionCode
+            + '\''
+            + ", processDefinitionVersion='"
+            + processDefinitionVersion
+            + '\''
+            + ", dryRun='"
+            + dryRun
+            + '\''
+            + '}'
+            + ", restartTime='"
+            + restartTime
+            + '\''
+            + '}';
     }
 
     @Override
@@ -698,4 +729,11 @@ public class ProcessInstance {
         return Objects.hash(id);
     }
 
+    public int getNextProcessInstanceId() {
+        return nextProcessInstanceId;
+    }
+
+    public void setNextProcessInstanceId(int nextProcessInstanceId) {
+        this.nextProcessInstanceId = nextProcessInstanceId;
+    }
 }

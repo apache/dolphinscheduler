@@ -23,7 +23,7 @@
     <div class="leven-1" v-for="(item,$index) in menuList" :key="$index">
       <div v-if="item.enabled">
         <template v-if="item.path">
-          <router-link :to="{ name: item.path}">
+          <router-link :to="{ name: item.path}" :class="item.classNames">
             <div class="name" @click="_toggleSubMenu(item)">
               <a href="javascript:">
                 <em class="fa icon" :class="item.icon"></em>
@@ -44,7 +44,7 @@
         </template>
         <ul v-if="item.isOpen && item.children.length">
           <template v-for="(el,index) in item.children">
-            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.enabled" :key="index">
+            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.enabled" :key="index" :class="el.classNames">
               <span>{{el.name}}</span>
             </router-link>
           </template>
@@ -56,6 +56,7 @@
 <script>
   import { mapState } from 'vuex'
   import menu from './_source/menu'
+  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'secondary-menu',
@@ -88,6 +89,12 @@
           sessionStorage.setItem('isLeft', 0)
         } else {
           sessionStorage.setItem('isLeft', 1)
+        }
+
+        const routeName = this.$route.name
+        if (routeName === 'projects-instance-details' || routeName === 'projects-instance-details' || routeName === 'definition-create') {
+          const dag = findComponentDownward(this.$root, 'dag-chart')
+          dag && dag.canvasResize()
         }
       }
     },

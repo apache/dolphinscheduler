@@ -24,7 +24,7 @@ import { resolveURL } from '@/module/io'
 const downloadFile = ($url, $obj) => {
   const param = {
     url: resolveURL($url),
-    obj: $obj
+    obj: $obj || {}
   }
 
   if (!param.url) {

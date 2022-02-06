@@ -32,14 +32,20 @@ public class TaskExecuteResponseCommand implements Serializable {
     public TaskExecuteResponseCommand() {
     }
 
-    public TaskExecuteResponseCommand(int taskInstanceId) {
+    public TaskExecuteResponseCommand(int taskInstanceId, int processInstanceId) {
         this.taskInstanceId = taskInstanceId;
+        this.processInstanceId = processInstanceId;
     }
 
     /**
      *  task instance id
      */
     private int taskInstanceId;
+
+    /**
+     * process instance id
+     */
+    private  int processInstanceId;
 
     /**
      *  status
@@ -138,5 +144,13 @@ public class TaskExecuteResponseCommand implements Serializable {
                 + ", processId=" + processId
                 + ", appIds='" + appIds + '\''
                 + '}';
+    }
+
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 }

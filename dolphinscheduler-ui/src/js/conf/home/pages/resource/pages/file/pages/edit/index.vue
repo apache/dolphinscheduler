@@ -27,8 +27,8 @@
               <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
             </div>
             <div class="submit-c">
-              <el-button type="text" @click="close()" :disabled="disabled" size="small"> {{$t('Return')}} </el-button>
-              <el-button type="primary" :loading="spinnerLoading" @click="ok()" round size="small">{{spinnerLoading ? $t('Loading...') : $t('Save')}} </el-button>
+              <el-button id="btnCancel" type="text" @click="close()" :disabled="disabled" size="small"> {{$t('Return')}} </el-button>
+              <el-button id="btnSubmit" type="primary" :loading="spinnerLoading" @click="ok()" round size="small">{{spinnerLoading ? $t('Loading...') : $t('Save')}} </el-button>
             </div>
           </template>
           <m-no-data :msg="msg" v-if="msg"></m-no-data>
@@ -143,7 +143,10 @@
         this.keypress = () => {
           if (!editor.getOption('readOnly')) {
             editor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }

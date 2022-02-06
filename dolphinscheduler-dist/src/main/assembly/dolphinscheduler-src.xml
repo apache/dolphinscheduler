@@ -50,7 +50,6 @@
                 <!-- maven plugin ignore -->
                 <exclude>release.properties</exclude>
                 <exclude>**/pom.xml.releaseBackup</exclude>
-                <exclude>**/cobertura.ser</exclude>
                 <exclude>*.gpg</exclude>
 
                 <!-- node ignore -->

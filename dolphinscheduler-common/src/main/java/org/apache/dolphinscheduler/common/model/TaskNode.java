@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -24,7 +25,8 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +46,7 @@ public class TaskNode {
     /**
      * task node code
      */
-    private Long code;
+    private long code;
 
     /**
      * task node version
@@ -85,6 +87,15 @@ public class TaskNode {
      * Unit of retry interval: points
      */
     private int retryInterval;
+
+    /**
+     * task group id
+     */
+    private int taskGroupId;
+    /**
+     * task group id
+     */
+    private int taskGroupPriority;
 
     /**
      * params information
@@ -133,6 +144,10 @@ public class TaskNode {
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String switchResult;
 
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+    private String waitStartTimeout;
+
     /**
      * task instance priority
      */
@@ -142,6 +157,11 @@ public class TaskNode {
      * worker group
      */
     private String workerGroup;
+
+    /**
+     * environment code
+     */
+    private Long environmentCode;
 
     /**
      * task time out
@@ -240,7 +260,7 @@ public class TaskNode {
     }
 
     public Boolean isForbidden() {
-        return (StringUtils.isNotEmpty(this.runFlag)
+        return (!StringUtils.isEmpty(this.runFlag)
                 && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
 
@@ -262,6 +282,7 @@ public class TaskNode {
                 && Objects.equals(runFlag, taskNode.runFlag)
                 && Objects.equals(dependence, taskNode.dependence)
                 && Objects.equals(workerGroup, taskNode.workerGroup)
+                && Objects.equals(environmentCode, taskNode.environmentCode)
                 && Objects.equals(conditionResult, taskNode.conditionResult)
                 && CollectionUtils.equalLists(depList, taskNode.depList);
     }
@@ -335,11 +356,11 @@ public class TaskNode {
         this.delayTime = delayTime;
     }
 
-    public Long getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(long code) {
         this.code = code;
     }
 
@@ -357,7 +378,7 @@ public class TaskNode {
      * @return task time out parameter
      */
     public TaskTimeoutParameter getTaskTimeoutParameter() {
-        if (StringUtils.isNotEmpty(this.getTimeout())) {
+        if (!StringUtils.isEmpty(this.getTimeout())) {
             String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
             String taskTimeout = this.getTimeout().replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
             return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
@@ -382,18 +403,20 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-        Map<String, Object> taskParams = JSONUtils.toMap(this.params, String.class, Object.class);
+        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
+
         if (taskParams == null) {
             taskParams = new HashMap<>();
         }
         taskParams.put(Constants.CONDITION_RESULT, this.conditionResult);
         taskParams.put(Constants.DEPENDENCE, this.dependence);
         taskParams.put(Constants.SWITCH_RESULT, this.switchResult);
+        taskParams.put(Constants.WAIT_START_TIMEOUT, this.waitStartTimeout);
         return JSONUtils.toJsonString(taskParams);
     }
 
     public Map<String, Object> taskParamsToJsonObj(String taskParams) {
-        Map<String, Object> taskParamsMap = JSONUtils.toMap(taskParams, String.class, Object.class);
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {});
         if (taskParamsMap == null) {
             taskParamsMap = new HashMap<>();
         }
@@ -422,9 +445,18 @@ public class TaskNode {
                 + ", conditionResult='" + conditionResult + '\''
                 + ", taskInstancePriority=" + taskInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
                 + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime
                 + '}';
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
     }
 
     public String getSwitchResult() {
@@ -433,5 +465,29 @@ public class TaskNode {
 
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
+    }
+
+    public String getWaitStartTimeout() {
+        return this.waitStartTimeout;
+    }
+
+    public void setWaitStartTimeout(String waitStartTimeout) {
+        this.waitStartTimeout = waitStartTimeout;
+    }
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

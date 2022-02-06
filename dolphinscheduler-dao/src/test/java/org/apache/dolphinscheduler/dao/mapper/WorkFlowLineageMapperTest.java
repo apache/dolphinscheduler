@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -26,23 +27,13 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class WorkFlowLineageMapperTest {
+public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
@@ -54,7 +45,7 @@ public class WorkFlowLineageMapperTest {
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    ProcessTaskRelationMapper processTaskRelationMapper;
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * insert
@@ -81,9 +72,8 @@ public class WorkFlowLineageMapperTest {
     /**
      * insert
      *
-     * @return ProcessDefinition
      */
-    private ProcessDefinition insertOneProcessDefinition() {
+    private void insertOneProcessDefinition() {
         //insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
@@ -93,15 +83,13 @@ public class WorkFlowLineageMapperTest {
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
-        return processDefinition;
     }
 
     /**
      * insert
      *
-     * @return Schedule
      */
-    private Schedule insertOneSchedule(int id) {
+    private void insertOneSchedule(int id) {
         //insertOne
         Schedule schedule = new Schedule();
         schedule.setStartTime(new Date());
@@ -112,39 +100,34 @@ public class WorkFlowLineageMapperTest {
         schedule.setWarningType(WarningType.NONE);
         schedule.setCreateTime(new Date());
         schedule.setUpdateTime(new Date());
-        schedule.setProcessDefinitionId(id);
+        schedule.setProcessDefinitionCode(id);
         scheduleMapper.insert(schedule);
-        return schedule;
     }
 
     @Test
-    public void testQueryByName() {
+    public void testQueryWorkFlowLineageByName() {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneSchedule(processDefinition.getId());
 
-        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByName(processDefinition.getName(), processDefinition.getProjectCode());
+        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryWorkFlowLineageByName(processDefinition.getProjectCode(), processDefinition.getName());
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 
     @Test
     public void testQueryCodeRelation() {
         ProcessTaskRelation processTaskRelation = insertOneProcessTaskRelation();
-
-        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryCodeRelation(processTaskRelation.getPreTaskCode()
-                , processTaskRelation.getPreTaskVersion(), 11L, 1L);
+        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryProcessLineageByCode(processTaskRelation.getProjectCode(),
+            processTaskRelation.getProcessDefinitionCode());
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 
     @Test
-    public void testQueryRelationByIds() {
+    public void testQueryWorkFlowLineage() {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneProcessTaskRelation();
-
-        HashSet<Integer> set = new HashSet<>();
-        set.add(processDefinition.getId());
-        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryRelationByIds(set, processDefinition.getProjectCode());
+        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryProcessLineage(processDefinition.getProjectCode());
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 
@@ -153,8 +136,7 @@ public class WorkFlowLineageMapperTest {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneSchedule(processDefinition.getId());
-
-        WorkFlowLineage workFlowLineages = workFlowLineageMapper.queryWorkFlowLineageByCode(processDefinition.getCode(), processDefinition.getProjectCode());
+        WorkFlowLineage workFlowLineages = workFlowLineageMapper.queryWorkFlowLineageByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         Assert.assertNotNull(workFlowLineages);
     }
 
