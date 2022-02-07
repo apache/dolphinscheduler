@@ -335,6 +335,7 @@ public class WorkflowExecuteThread {
                 break;
             case PROCESS_BLOCKED:
                 result = processBlockHandler(stateEvent);
+                break;
             default:
                 break;
         }
@@ -667,7 +668,7 @@ public class WorkflowExecuteThread {
                     task.getTaskParams());
             if (parameters.isAlertWhenBlocking()) {
                 ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-                processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+                processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
                 logger.info("block alert send successful!");
             }
             taskStateChangeHandler(stateEvent);

@@ -45,11 +45,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BlockingTaskProcessor extends BaseTaskProcessor{
 
     /**
-     * logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(BlockingTaskProcessor.class);
-
-    /**
      * dependent parameters
      */
     private DependentParameters dependentParameters;
@@ -101,14 +96,6 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
 
     @Override
     protected boolean taskTimeout() {
-        TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
-        if (taskTimeoutStrategy == TaskTimeoutStrategy.WARN) {
-            return true;
-        }
-        logger.info("blocking task {} timeout, strategy {} ",
-                taskInstance.getId(), taskTimeoutStrategy.getDescp());
-        conditionResult = DependResult.FAILED;
-        endTask();
         return true;
     }
 
