@@ -726,6 +726,7 @@ export default {
   webHook: 'Web钩子',
   Keyword: '关键词',
   Secret: '密钥',
+  MsgType: '消息类型',
   AtMobiles: '@手机号',
   AtUserIds: '@用户ID',
   IsAtAll: '@所有人',
