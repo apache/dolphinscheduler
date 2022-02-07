@@ -154,6 +154,14 @@ EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_project_code ON ' ||
 EXECUTE 'DROP INDEX IF EXISTS "idx_task_instance_code_version"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_instance_code_version ON' || quote_ident(v_schema) ||'.t_ds_task_instance USING Btree("task_code","task_definition_version")';
 
+EXECUTE 'DROP INDEX IF EXISTS "idx_process_code_version"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_process_code_version ON' || quote_ident(v_schema) ||'.t_ds_process_task_relation_log (process_definition_code, process_definition_version)';
+
+EXECUTE 'DROP INDEX IF EXISTS "idx_relation_process_instance_pproc_inst_id_ptask_inst_id"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_relation_process_instance_pproc_inst_id_ptask_inst_id ON' || quote_ident(v_schema) ||'.t_ds_relation_process_instance (parent_process_instance_id, parent_task_instance_id)';
+
+EXECUTE 'DROP INDEX IF EXISTS "idx_task_instance_proc_inst_id_flag_start_time"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_instance_proc_inst_id_flag_start_time ON' || quote_ident(v_schema) ||'.t_ds_task_instance(process_instance_id, flag, start_time)';
 
 return 'Success!';
 exception when others then

@@ -489,7 +489,7 @@ CREATE TABLE t_ds_process_task_relation_log (
 
 create index process_task_relation_log_idx_project_code_process_definition_code on t_ds_process_task_relation_log (project_code,process_definition_code);
 
-create index process_task_relation_log_idx_process_definition_code_definition_version on t_ds_process_task_relation_log (process_definition_code, process_definition_version);
+create index idx_process_code_version on t_ds_process_task_relation_log (process_definition_code, process_definition_version);
 
 --
 -- Table structure for table t_ds_process_instance
