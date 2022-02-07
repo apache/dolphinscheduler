@@ -17,21 +17,28 @@
 
 import { defineComponent } from 'vue'
 import Dag from '../../components/dag'
-import { NCard } from 'naive-ui'
-import styles from './index.module.scss'
+import { useThemeStore } from '@/store/theme/theme'
+import Styles from './index.module.scss'
 
 export default defineComponent({
   name: 'WorkflowDefinitionCreate',
   setup() {
+    const theme = useThemeStore()
+
     const slots = {
       toolbarLeft: () => <span>left-operations</span>,
       toolbarRight: () => <span>right-operations</span>
     }
 
     return () => (
-      <NCard class={styles.container}>
+      <div
+        class={[
+          Styles.container,
+          theme.darkTheme ? Styles['dark'] : Styles['light']
+        ]}
+      >
         <Dag v-slots={slots} />
-      </NCard>
+      </div>
     )
   }
 })
