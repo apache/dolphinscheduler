@@ -15,25 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.slack;
+package org.apache.dolphinscheduler.plugin.alert.telegram;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class TelegramAlertConstants {
 
-import org.junit.Assert;
-import org.junit.Test;
+    static final String PARSE_MODE_TXT = "Txt";
 
-public class SlackSenderTest {
+    static final String PARSE_MODE_MARKDOWN = "Markdown";
 
-    @Test
-    public void testSendMessage() {
-        Map<String, String> alertparam = new HashMap<>();
-        alertparam.put(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME,
-            "https://hooks.slack.com/services/123456");
-        alertparam.put(SlackParamsConstants.SLACK_BOT_NAME, "Dolphinscheduler");
+    static final String PARSE_MODE_MARKDOWN_V2 = "MarkdownV2";
 
-        SlackSender slackSender = new SlackSender(alertparam);
-        String response = slackSender.sendMessage("test title", "test content");
-        Assert.assertNotEquals("ok", response);
+    static final String PARSE_MODE_HTML = "Html";
+
+    /**
+     * TELEGRAM_PUSH_URL
+     *
+     * <pre>
+     *     https://api.telegram.org/bot{botToken}/sendMessage
+     * </pre>
+     */
+    static final String TELEGRAM_PUSH_URL = "https://api.telegram.org/bot{botToken}/sendMessage";
+
+    private TelegramAlertConstants() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
