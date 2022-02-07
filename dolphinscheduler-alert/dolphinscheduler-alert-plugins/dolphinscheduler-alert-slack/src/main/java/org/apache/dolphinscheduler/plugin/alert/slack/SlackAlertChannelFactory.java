@@ -39,7 +39,7 @@ public final class SlackAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
         List<PluginParams> paramsList = new LinkedList<>();
 
-        InputParam webHookParam = InputParam.newBuilder(SlackParamsConstants.SLACK_WEN_HOOK_URL_NAME, SlackParamsConstants.SLACK_WEB_HOOK_URL)
+        InputParam webHookParam = InputParam.newBuilder(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME, SlackParamsConstants.SLACK_WEB_HOOK_URL)
                                             .addValidate(Validate.newBuilder()
                                                                  .setRequired(true)
                                                                  .build())
