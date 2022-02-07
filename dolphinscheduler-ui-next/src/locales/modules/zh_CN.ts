@@ -464,15 +464,19 @@ const project = {
     download_log: '下载日志'
   },
   dag: {
-    createWorkflow: '创建工作流',
+    create: '创建工作流',
     search: '搜索',
     download_png: '下载工作流图片',
     fullscreen_open: '全屏',
     fullscreen_close: '退出全屏',
-    workflow_version: '工作流版本信息',
     save: '保存',
     close: '关闭',
-    format: '格式化'
+    format: '格式化',
+    layout_type: '布局类型',
+    grid_layout: '网格布局',
+    dagre_layout: '层次布局',
+    rows: '行数',
+    cols: '列数'
   }
 }
 
