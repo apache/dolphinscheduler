@@ -42,6 +42,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+          fetch-depth: 0
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
       - name: Set up JDK 1.8
