@@ -40,7 +40,6 @@ const VersionModal = defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
     const { variables, getTableData, createColumns } = useVersion()
-    console.log(useThemeVars())
 
     const requestData = () => {
       getTableData({

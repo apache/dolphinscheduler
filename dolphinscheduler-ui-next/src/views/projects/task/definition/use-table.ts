@@ -77,13 +77,15 @@ export function useTable() {
             null,
             row.upstreamTaskMap.length < 1
               ? '-'
-              : row.upstreamTaskMap.map((item: string) => {
+              : h(NSpace, null, {
+                default: () => row.upstreamTaskMap.map((item: string) => {
                   return h(
                     NTag,
                     { type: 'info', size: 'small' },
                     { default: () => item }
                   )
                 })
+              })
           )
       },
       {
