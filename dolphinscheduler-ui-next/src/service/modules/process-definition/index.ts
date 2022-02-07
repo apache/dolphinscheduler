@@ -132,7 +132,7 @@ export function queryProcessDefinitionByName(
   })
 }
 
-export function querySimpleList(code: CodeReq): any {
+export function querySimpleList(code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/simple-list`,
     method: 'get'

@@ -32,7 +32,7 @@ export function queryTaskDefinitionListPaging(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition`,
+    url: `/projects/${projectCode.projectCode}/task-definition`,
     method: 'get',
     params
   })
@@ -82,14 +82,12 @@ export function update(
 }
 
 export function deleteTaskDefinition(
-  data: TaskDefinitionJsonObjReq,
   code: CodeReq,
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}`,
-    method: 'put',
-    data
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}`,
+    method: 'delete'
   })
 }
 
@@ -105,13 +103,13 @@ export function releaseTaskDefinition(
   })
 }
 
-export function queryVersions(
+export function queryTaskVersions(
   params: PageReq,
   code: CodeReq,
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/versions`,
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions`,
     method: 'get',
     params
   })
@@ -123,7 +121,7 @@ export function switchVersion(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/versions/${version}`,
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions/${version.version}`,
     method: 'get'
   })
 }
@@ -134,7 +132,7 @@ export function deleteVersion(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/versions/${version}`,
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions/${version.version}`,
     method: 'delete'
   })
 }

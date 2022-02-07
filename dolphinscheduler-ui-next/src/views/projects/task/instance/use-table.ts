@@ -53,7 +53,6 @@ export function useTable() {
     processInstanceName: ref(null),
     totalPage: ref(1),
     showModalRef: ref(false),
-    statusRef: ref(0),
     row: {}
   })
 

@@ -115,7 +115,7 @@ export default {
     },
     {
       path: '/projects/:projectCode/task/definitions',
-      name: 'task-definition-list',
+      name: 'task-definition',
       component: components['projects-task-definition'],
       meta: {
         title: '任务定义',
@@ -124,7 +124,7 @@ export default {
     },
     {
       path: '/projects/:projectCode/task/instances',
-      name: 'task-instance-list',
+      name: 'task-instance',
       component: components['projects-task-instance'],
       meta: {
         title: '任务实例',
