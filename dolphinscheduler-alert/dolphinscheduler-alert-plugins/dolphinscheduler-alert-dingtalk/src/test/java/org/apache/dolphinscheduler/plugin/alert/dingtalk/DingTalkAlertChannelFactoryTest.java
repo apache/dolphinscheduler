@@ -32,7 +32,7 @@ public class DingTalkAlertChannelFactoryTest {
         DingTalkAlertChannelFactory dingTalkAlertChannelFactory = new DingTalkAlertChannelFactory();
         List<PluginParams> params = dingTalkAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assert.assertEquals(11, params.size());
+        Assert.assertEquals(12, params.size());
     }
 
     @Test

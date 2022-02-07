@@ -33,8 +33,10 @@ public class DingTalkSenderTest {
     @Before
     public void initDingTalkConfig() {
 
-        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, "keyWord");
+        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, "keyword");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK, "url");
+        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_MSG_TYPE, DingTalkParamsConstants.DING_TALK_MSG_TYPE_MARKDOWN);
+
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "false");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, "password");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PORT, "9988");
