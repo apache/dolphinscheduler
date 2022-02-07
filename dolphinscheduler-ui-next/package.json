@@ -10,6 +10,7 @@
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\""
   },
   "dependencies": {
+    "@antv/layout": "^0.1.31",
     "@antv/x6": "^1.29.5",
     "@vueuse/core": "^7.5.3",
     "axios": "^0.24.0",
@@ -36,7 +37,7 @@
     "@vicons/antd": "^0.11.0",
     "@vitejs/plugin-vue": "^1.10.2",
     "@vitejs/plugin-vue-jsx": "^1.3.3",
-    "dart-sass": "^1.48.0",
+    "dart-sass": "^1.25.0",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",

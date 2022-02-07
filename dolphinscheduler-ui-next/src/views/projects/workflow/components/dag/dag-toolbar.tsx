@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, inject } from 'vue'
+import { defineComponent, ref, inject, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
 import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
@@ -31,11 +31,23 @@ import { useNodeSearch } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
 import { useRouter } from 'vue-router'
+import { useThemeStore } from '@/store/theme/theme'
+
+const props = {
+  layoutToggle: {
+    type: Function as PropType<(bool?: boolean) => void>,
+    default: () => {}
+  }
+}
 
 export default defineComponent({
   name: 'workflow-dag-toolbar',
+  props,
   setup(props, context) {
     const { t } = useI18n()
+
+    const themeStore = useThemeStore()
+
     const graph = inject('graph', ref())
     const router = useRouter()
 
@@ -88,11 +100,8 @@ export default defineComponent({
     /**
      * Open DAG format modal
      */
-    const { openFormatModal } = inject('formatModal', {
-      openFormatModal: (bool: boolean) => {}
-    })
     const onFormat = () => {
-      openFormatModal(true)
+      props.layoutToggle(true)
     }
 
     /**
@@ -103,10 +112,13 @@ export default defineComponent({
     }
 
     return () => (
-      <div class={Styles.toolbar}>
-        <span class={Styles['workflow-name']}>
-          {t('project.workflow.create_workflow')}
-        </span>
+      <div
+        class={[
+          Styles.toolbar,
+          Styles[themeStore.darkTheme ? 'toolbar-dark' : 'toolbar-light']
+        ]}
+      >
+        <span class={Styles['workflow-name']}>{t('project.dag.create')}</span>
         <div class={Styles['toolbar-right-part']}>
           {/* Search node */}
           <NTooltip
@@ -128,7 +140,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.workflow.search')
+              default: () => t('project.dag.search')
             }}
           ></NTooltip>
           <div
@@ -164,7 +176,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.workflow.download_png')
+              default: () => t('project.dag.download_png')
             }}
           ></NTooltip>
           {/* Toggle fullscreen */}
@@ -193,8 +205,8 @@ export default defineComponent({
               ),
               default: () =>
                 isFullscreen.value
-                  ? t('project.workflow.fullscreen_close')
-                  : t('project.workflow.fullscreen_open')
+                  ? t('project.dag.fullscreen_close')
+                  : t('project.dag.fullscreen_open')
             }}
           ></NTooltip>
           {/* DAG Format */}
@@ -217,7 +229,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.workflow.format')
+              default: () => t('project.dag.format')
             }}
           ></NTooltip>
           {/* Version info */}
@@ -240,7 +252,7 @@ export default defineComponent({
                   }}
                 />
               ),
-              default: () => t('project.workflow.workflow_version')
+              default: () => t('project.workflow.version_info')
             }}
           ></NTooltip>
           {/* Save workflow */}
@@ -250,11 +262,11 @@ export default defineComponent({
             secondary
             round
           >
-            {t('project.workflow.save')}
+            {t('project.dag.save')}
           </NButton>
           {/* Return to previous page */}
           <NButton secondary round onClick={onClose}>
-            {t('project.workflow.close')}
+            {t('project.dag.close')}
           </NButton>
         </div>
       </div>

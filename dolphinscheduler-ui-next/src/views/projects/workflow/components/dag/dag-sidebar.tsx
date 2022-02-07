@@ -57,9 +57,10 @@ export default defineComponent({
             onDragstart={(e) => onDragStart(e, task.type)}
           >
             <em
-              class={`${Styles['sidebar-icon']} ${
+              class={[
+                Styles['sidebar-icon'],
                 Styles['icon-' + task.type.toLocaleLowerCase()]
-              }`}
+              ]}
             ></em>
             <span>{task.alias}</span>
           </div>

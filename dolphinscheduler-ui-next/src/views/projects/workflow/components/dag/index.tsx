@@ -21,7 +21,9 @@ import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
 import Styles from './dag.module.scss'
-import DagFormatModal from './dag-format-modal'
+import DagAutoLayoutModal from './dag-auto-layout-modal'
+import { useGraphAutoLayout } from './dag-hooks'
+import { useThemeStore } from '@/store/theme/theme'
 import './x6-style.scss'
 
 export interface Dragged {
@@ -33,6 +35,8 @@ export interface Dragged {
 export default defineComponent({
   name: 'workflow-dag',
   setup(props, context) {
+    const theme = useThemeStore()
+
     // Whether the graph can be operated
     const readonly = ref(false)
     provide('readonly', readonly)
@@ -53,24 +57,35 @@ export default defineComponent({
       type: ''
     })
 
-    // Dag format modal visible
-    const formatModalVisible = ref<boolean>(false)
-    const openFormatModal = (bool: boolean) => {
-      formatModalVisible.value = bool
-    }
-    provide('formatModal', {
-      openFormatModal,
-      formatModalVisible
-    })
+    // Auto layout
+    const {
+      visible: layoutVisible,
+      toggle: layoutToggle,
+      formValue,
+      formRef,
+      submit,
+      cancel
+    } = useGraphAutoLayout({ graph })
 
     return () => (
-      <div class={Styles.dag}>
-        <DagToolbar v-slots={toolbarSlots} />
+      <div
+        class={[
+          Styles.dag,
+          Styles[`dag-${theme.darkTheme ? 'dark' : 'light'}`]
+        ]}
+      >
+        <DagToolbar v-slots={toolbarSlots} layoutToggle={layoutToggle} />
         <div class={Styles.content}>
           <DagSidebar dragged={dragged} />
           <DagCanvas dragged={dragged} />
         </div>
-        <DagFormatModal show={formatModalVisible.value} />
+        <DagAutoLayoutModal
+          visible={layoutVisible.value}
+          submit={submit}
+          cancel={cancel}
+          formValue={formValue}
+          formRef={formRef}
+        />
       </div>
     )
   }

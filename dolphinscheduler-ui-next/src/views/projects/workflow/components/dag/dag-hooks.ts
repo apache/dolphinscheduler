@@ -21,6 +21,7 @@ import { useCellActive } from './use-cell-active'
 import { useSidebarDrag } from './use-sidebar-drag'
 import { useCanvasDrop } from './use-canvas-drop'
 import { useNodeSearch } from './use-node-search'
+import { useGraphAutoLayout } from './use-graph-auto-layout'
 
 export {
   useCanvasInit,
@@ -28,5 +29,6 @@ export {
   useCellActive,
   useSidebarDrag,
   useCanvasDrop,
-  useNodeSearch
+  useNodeSearch,
+  useGraphAutoLayout
 }
