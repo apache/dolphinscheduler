@@ -30,6 +30,12 @@ public final class DingTalkParamsConstants {
     static final String DING_TALK_SECRET = "$t('secret')";
     static final String NAME_DING_TALK_SECRET = "Secret";
 
+    static final String DING_TALK_MSG_TYPE = "$t('msgType')";
+    static final String NAME_DING_TALK_MSG_TYPE = "MsgType";
+
+    static final String DING_TALK_MSG_TYPE_TEXT = "text";
+    static final String DING_TALK_MSG_TYPE_MARKDOWN = "markdown";
+
     static final String DING_TALK_AT_MOBILES = "$t('atMobiles')";
     static final String NAME_DING_TALK_AT_MOBILES = "AtMobiles";
 
