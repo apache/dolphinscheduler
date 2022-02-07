@@ -15,25 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.slack;
+package org.apache.dolphinscheduler.plugin.alert.telegram;
 
-import java.util.HashMap;
+import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertData;
+import org.apache.dolphinscheduler.alert.api.AlertInfo;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-public class SlackSenderTest {
-
-    @Test
-    public void testSendMessage() {
-        Map<String, String> alertparam = new HashMap<>();
-        alertparam.put(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME,
-            "https://hooks.slack.com/services/123456");
-        alertparam.put(SlackParamsConstants.SLACK_BOT_NAME, "Dolphinscheduler");
-
-        SlackSender slackSender = new SlackSender(alertparam);
-        String response = slackSender.sendMessage("test title", "test content");
-        Assert.assertNotEquals("ok", response);
+public final class TelegramAlertChannel implements AlertChannel {
+    @Override
+    public AlertResult process(AlertInfo info) {
+        Map<String, String> alertParams = info.getAlertParams();
+        if (alertParams == null || alertParams.isEmpty()) {
+            return new AlertResult("false", "Telegram alert params is empty");
+        }
+        AlertData data = info.getAlertData();
+        return new TelegramSender(alertParams).sendMessage(data);
     }
 }

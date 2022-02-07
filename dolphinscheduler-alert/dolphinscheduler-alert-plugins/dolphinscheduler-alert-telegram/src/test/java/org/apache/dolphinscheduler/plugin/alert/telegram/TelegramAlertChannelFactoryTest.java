@@ -15,25 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.slack;
+package org.apache.dolphinscheduler.plugin.alert.telegram;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SlackSenderTest {
+import java.util.List;
+
+public class TelegramAlertChannelFactoryTest {
+
+    private TelegramAlertChannelFactory telegramAlertChannelFactory = new TelegramAlertChannelFactory();
 
     @Test
-    public void testSendMessage() {
-        Map<String, String> alertparam = new HashMap<>();
-        alertparam.put(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME,
-            "https://hooks.slack.com/services/123456");
-        alertparam.put(SlackParamsConstants.SLACK_BOT_NAME, "Dolphinscheduler");
+    public void testTestGetName() {
+        Assert.assertEquals("Telegram", telegramAlertChannelFactory.name());
+    }
 
-        SlackSender slackSender = new SlackSender(alertparam);
-        String response = slackSender.sendMessage("test title", "test content");
-        Assert.assertNotEquals("ok", response);
+    @Test
+    public void testGetParams() {
+        List<PluginParams> params = telegramAlertChannelFactory.params();
+        Assert.assertEquals(9, params.size());
+    }
+
+    @Test
+    public void testCreate() {
+        AlertChannel alertChannel = telegramAlertChannelFactory.create();
+        Assert.assertTrue(alertChannel instanceof TelegramAlertChannel);
     }
 }

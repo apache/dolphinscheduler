@@ -660,7 +660,10 @@ const security = {
     path: '脚本路径',
     type: '类型',
     sendType: '发送类型',
-    username: '用户名'
+    username: '用户名',
+    botToken: '机器人Token',
+    chatId: '频道ID',
+    parseMode: '解析类型'
   }
 }
 
