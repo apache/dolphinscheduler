@@ -623,6 +623,8 @@ const security = {
     phone: 'Phone',
     phone_rule_msg: 'Please enter valid phone number',
     state: 'State',
+    state_enabled: 'Enabled',
+    state_disabled: 'Disabled',
     create_time: 'Create Time',
     update_time: 'Update Time',
     operation: 'Operation',

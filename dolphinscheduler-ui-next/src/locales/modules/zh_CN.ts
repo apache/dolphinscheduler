@@ -620,6 +620,8 @@ const security = {
     phone: '手机',
     phone_rule_msg: '请输入正确的手机号',
     state: '状态',
+    state_enabled: '启用',
+    state_disabled: '停用',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
