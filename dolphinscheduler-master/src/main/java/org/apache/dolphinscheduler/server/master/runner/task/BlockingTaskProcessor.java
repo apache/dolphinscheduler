@@ -78,16 +78,16 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
 
     @Override
     protected boolean pauseTask() {
-        this.taskInstance.setState(ExecutionStatus.PAUSE);
-        this.taskInstance.setEndTime(new Date());
+        taskInstance.setState(ExecutionStatus.PAUSE);
+        taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;
     }
 
     @Override
     protected boolean killTask() {
-        this.taskInstance.setState(ExecutionStatus.KILL);
-        this.taskInstance.setEndTime(new Date());
+        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;
     }
@@ -168,7 +168,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
             modelResultList.add(modelResult);
         }
         conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), modelResultList);
-        logger.info("the conditions task depend result : {}", conditionResult);
+        logger.info("the blocking task depend result : {}", conditionResult);
     }
 
     private void endTask() {
