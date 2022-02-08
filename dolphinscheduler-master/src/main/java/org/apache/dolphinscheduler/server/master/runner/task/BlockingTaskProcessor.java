@@ -81,6 +81,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
         taskInstance.setState(ExecutionStatus.PAUSE);
         taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
+        logger.info("blocking task has been paused");
         return true;
     }
 
@@ -89,6 +90,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
+        logger.info("blocking task has been killed");
         return true;
     }
 
@@ -158,16 +160,16 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
 
-        List<DependResult> modelResultList = new ArrayList<>();
+        List<DependResult> tempResultList = new ArrayList<>();
         for (DependentTaskModel dependentTaskModel : dependentParameters.getDependTaskList()) {
             List<DependResult> itemDependResult = new ArrayList<>();
             for (DependentItem item : dependentTaskModel.getDependItemList()) {
                 itemDependResult.add(getDependResultForItem(item));
             }
-            DependResult modelResult = DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
-            modelResultList.add(modelResult);
+            DependResult tempResult = DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
+            tempResultList.add(tempResult);
         }
-        conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), modelResultList);
+        conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), tempResultList);
         logger.info("the blocking task depend result : {}", conditionResult);
     }
 
