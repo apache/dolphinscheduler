@@ -31,13 +31,13 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({HiveDataSourceChannel.class, HiveDataSourceClient.class})
+@PrepareForTest({HiveDataSourceChannel.class, HiveCommonDataSourceClient.class})
 public class HiveDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
         HiveDataSourceChannel sourceChannel = PowerMockito.mock(HiveDataSourceChannel.class);
-        HiveDataSourceClient dataSourceClient = PowerMockito.mock(HiveDataSourceClient.class);
+        HiveCommonDataSourceClient dataSourceClient = PowerMockito.mock(HiveCommonDataSourceClient.class);
         PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new HiveConnectionParam(), DbType.HIVE));
     }
