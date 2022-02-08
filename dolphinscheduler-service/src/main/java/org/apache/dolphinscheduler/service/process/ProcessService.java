@@ -2416,7 +2416,13 @@ public class ProcessService {
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
         if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
             taskDefinitionLogMap = taskDefinitionLogs.stream()
-                    .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinitionLog -> taskDefinitionLog));
+                    .collect(
+                        Collectors.toMap(
+                            TaskDefinition::getCode,
+                            taskDefinitionLog -> taskDefinitionLog,
+                            (entityOld , entityNew) -> entityOld
+                        )
+                    );
         }
         Date now = new Date();
         for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
@@ -2579,7 +2585,13 @@ public class ProcessService {
             taskDefinitionLogs = genTaskDefineList(taskRelationList);
         }
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream()
-                .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
+                .collect(
+                    Collectors.toMap(
+                        TaskDefinitionLog::getCode,
+                        taskDefinitionLog -> taskDefinitionLog,
+                        (entityOld, entityNew) -> entityOld
+                    )
+                );
         List<TaskNode> taskNodeList = new ArrayList<>();
         for (Entry<Long, List<Long>> code : taskCodeMap.entrySet()) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(code.getKey());
