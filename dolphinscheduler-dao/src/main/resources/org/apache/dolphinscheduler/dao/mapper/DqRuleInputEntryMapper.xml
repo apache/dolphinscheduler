@@ -22,10 +22,10 @@
     <select id="getRuleInputEntryList" resultType="org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry">
         SELECT a.id,
                a.field,
-               a.`type`,
+               a.type,
                a.title,
                a.value,
-               a.`options`,
+               a.options,
                a.placeholder,
                a.option_source_type,
                a.value_type,
