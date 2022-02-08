@@ -23,6 +23,7 @@ import type { Rule, RuleRes } from '@/service/modules/data-quality/types'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import { format } from 'date-fns'
+import {TableColumns} from "naive-ui/es/data-table/src/interface";
 
 
 export function useTable(
@@ -31,7 +32,6 @@ export function useTable(
   const { t } = useI18n()
 
   const variables = reactive({
-    columns: [],
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
@@ -40,44 +40,42 @@ export function useTable(
     totalPage: ref(1)
   })
 
-  const createColumns = (variables: any) => {
-    variables.columns = [
-      {
-        title: t('data_quality.rule.name'),
-        key: 'ruleName'
-      },
-      {
-        title: t('data_quality.rule.type'),
-        key: 'ruleTypeName'
-      },
-      {
-        title: t('data_quality.rule.username'),
-        key: 'userName'
-      },
-      {
-        title: t('data_quality.rule.create_time'),
-        key: 'createTime'
-      },
-      {
-        title: t('data_quality.rule.update_time'),
-        key: 'updateTime'
-      },
-      {
-        title: t('data_quality.rule.actions'),
-        key: 'actions',
-        width: 150,
-        render: (row: any) =>
-            h(TableAction, {
-              row,
-              onViewRuleEntry: (ruleJson: string) => {
-                console.log('aaa')
-                console.log(ruleJson)
-                viewRuleEntry(ruleJson)
-              },
-            })
-      }
-    ]
-  }
+  const columns: TableColumns<any> = [
+    {
+      title: t('data_quality.rule.name'),
+      key: 'ruleName'
+    },
+    {
+      title: t('data_quality.rule.type'),
+      key: 'ruleTypeName'
+    },
+    {
+      title: t('data_quality.rule.username'),
+      key: 'userName'
+    },
+    {
+      title: t('data_quality.rule.create_time'),
+      key: 'createTime'
+    },
+    {
+      title: t('data_quality.rule.update_time'),
+      key: 'updateTime'
+    },
+    {
+      title: t('data_quality.rule.actions'),
+      key: 'actions',
+      width: 150,
+      render: (row: any) =>
+          h(TableAction, {
+            row,
+            onViewRuleEntry: (ruleJson: string) => {
+              console.log('aaa')
+              console.log(ruleJson)
+              viewRuleEntry(ruleJson)
+            },
+          })
+    }
+  ]
 
   const ruleTypeMapping = [
     {
@@ -135,10 +133,5 @@ export function useTable(
     return state
   }
 
-  return {
-    t,
-    variables,
-    getTableData,
-    createColumns
-  }
+  return { t, variables, getTableData, columns }
 }

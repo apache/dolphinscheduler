@@ -27,7 +27,6 @@ import {
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
-import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import styles from './index.module.scss'
 import RuleModal from "./components/rule-modal"
@@ -36,9 +35,11 @@ import RuleModal from "./components/rule-modal"
 const TaskResult = defineComponent({
   name: 'rule',
   setup() {
-    const { t, variables, getTableData, createColumns } = useTable()
+    const { t, variables, getTableData } = useTable()
 
     const showModalRef = ref(false)
+
+    const ruleEntryData = ref([])
 
     const requestTableData = () => {
       getTableData({
@@ -68,14 +69,12 @@ const TaskResult = defineComponent({
       showModalRef.value = false
     }
 
-    onMounted(() => {
-      createColumns(variables)
-      requestTableData()
-    })
-
-    watch(useI18n().locale, () => {
-      createColumns(variables)
-    })
+    const viewRuleEntry = (
+       ruleJson: string
+    ) => {
+      showModalRef.value = true
+      console.log(ruleJson)
+    }
 
     return {
       t,
@@ -85,11 +84,15 @@ const TaskResult = defineComponent({
       showModalRef,
       onCancel,
       onConfirm,
-      onSearch
+      onSearch,
+      ruleEntryData,
+      viewRuleEntry
     }
   },
   render() {
-    const { t, showModalRef, requestTableData, onUpdatePageSize, onSearch, onCancel, onConfirm } = this
+    const { t, showModalRef, requestTableData, onUpdatePageSize, onSearch, onCancel, onConfirm, viewRuleEntry, ruleEntryData } = this
+
+    const { columns } = useTable(viewRuleEntry)
 
     return (
       <div>
@@ -113,7 +116,7 @@ const TaskResult = defineComponent({
           </NSpace>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable columns={columns} data={this.tableData} />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

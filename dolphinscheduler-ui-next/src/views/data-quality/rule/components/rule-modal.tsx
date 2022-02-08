@@ -26,9 +26,8 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  row: {
-    type: Object as PropType<any>,
-    default: {}
+  data: {
+    type: Object as PropType<any>
   }
 }
 
