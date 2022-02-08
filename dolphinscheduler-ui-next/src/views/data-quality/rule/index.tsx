@@ -40,7 +40,8 @@ const TaskResult = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        state: variables.state,
+        startDate: '',
+        endDate: '',
         searchVal: variables.searchVal
       })
     }
@@ -82,7 +83,7 @@ const TaskResult = defineComponent({
             <NInput
               v-model={[this.searchVal, 'value']}
               size='small'
-              placeholder={t('data_quality.task_result.task_name')}
+              placeholder={t('data_quality.rule.name')}
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>

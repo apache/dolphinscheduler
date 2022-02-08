@@ -747,6 +747,7 @@ const data_quality = {
     username: '用户名',
     create_time: '创建时间',
     update_time: '更新时间',
+    input_item: '规则输入项',
     input_item_title: '输入项标题',
     input_item_placeholder: '输入项占位符',
     input_item_type: '输入项类型',

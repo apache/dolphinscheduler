@@ -754,6 +754,7 @@ const data_quality = {
     username: 'Username',
     create_time: 'Create time',
     update_time: 'Update time',
+    input_item: 'Rule input item',
     input_item_title: 'Input item title',
     input_item_placeholder: 'Input item placeholder',
     input_item_type: 'Input item type',

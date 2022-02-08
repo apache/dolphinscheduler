@@ -19,7 +19,6 @@ import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryRuleListPaging } from '@/service/modules/data-quality'
-import { format } from 'date-fns'
 import type { Rule, RuleRes } from '@/service/modules/data-quality/types'
 
 export function useTable() {
@@ -64,7 +63,9 @@ export function useTable() {
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
-      searchVal: params.searchVal
+      searchVal: params.searchVal,
+      startDate: params.startDate,
+      endDate: params.endDate
     }
 
     const { state } = useAsyncState(
