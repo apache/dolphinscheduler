@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import Modal from '@/components/modal'
-import './x6-style.scss'
+import { axios } from '@/service/service'
+import type { RuleListReq, ResultListReq } from './types'
 
-const props = {
-  show: {
-    type: Boolean as PropType<boolean>,
-    default: false
-  }
+export function queryRuleListPaging(params: RuleListReq): any {
+  return axios({
+    url: '/data-quality/rule/page',
+    method: 'get',
+    params
+  })
 }
 
-export default defineComponent({
-  name: 'dag-format-modal',
-  props,
-  setup(props, context) {
-    return () => <Modal show={props.show}></Modal>
-  }
-})
+export function queryExecuteResultListPaging(params: ResultListReq): any {
+  return axios({
+    url: '/data-quality/result/page',
+    method: 'get',
+    params
+  })
+}

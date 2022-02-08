@@ -46,6 +46,7 @@
                 and group_id = #{groupId}
             </if>
         </where>
+        order by update_time desc
     </select>
 
     <select id="queryByStatus" resultMap="TaskGroupQueueMap" resultType="map">
@@ -79,13 +80,13 @@
 
     <update id="updateForceStart">
         update t_ds_task_group_queue
-               set priority = #{priority}
+        set force_start = #{forceStart}
         where id = #{queueId}
     </update>
 
     <update id="modifyPriority">
         update t_ds_task_group_queue
-               set force_start = #{forceStart}
+        set priority = #{priority}
         where id = #{queueId}
     </update>
 
@@ -149,6 +150,7 @@
                 #{i.code}
             </foreach>
         </if>
+        order by queue.update_time desc
     </select>
 
 </mapper>

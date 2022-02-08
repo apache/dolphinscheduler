@@ -65,6 +65,7 @@ const menu = {
   db: 'DB',
   statistical_manage: '统计管理',
   statistics: 'Statistics',
+  audit_log: '审计日志',
   tenant_manage: '租户管理',
   user_manage: '用户管理',
   alarm_group_manage: '告警组管理',
@@ -75,7 +76,9 @@ const menu = {
   token_manage: '令牌管理',
   task_group_manage: '任务组管理',
   task_group_option: '任务组配置',
-  task_group_queue: '任务组队列'
+  task_group_queue: '任务组队列',
+  data_quality: '数据质量',
+  task_result: '任务结果'
 }
 
 const home = {
@@ -150,6 +153,21 @@ const monitor = {
     failure_command_number: '执行失败的命令数',
     tasks_number_of_waiting_running: '待运行任务数',
     task_number_of_ready_to_kill: '待杀死任务数'
+  },
+  audit_log: {
+    user_name: '用户名称',
+    resource_type: '资源类型',
+    project_name: '项目名称',
+    operation_type: '操作类型',
+    create_time: '创建时间',
+    start_time: '开始时间',
+    end_time: '结束时间',
+    user_audit: '用户管理审计',
+    project_audit: '项目管理审计',
+    create: '创建',
+    update: '更新',
+    delete: '删除',
+    read: '读取'
   }
 }
 
@@ -278,6 +296,13 @@ const resource = {
     please_enter_keywords: '请输入搜索关键词'
   },
   task_group_queue: {
+    id: '编号',
+    actions: '操作',
+    task_name: '任务名称',
+    task_group_name: '任务组名称',
+    project_name: '项目名称',
+    process_name: '工作流名称',
+    process_instance_name: '工作流实例',
     queue: '任务组队列',
     priority: '组内优先级',
     priority_be_a_number: '优先级必须是大于等于0的数值',
@@ -289,10 +314,13 @@ const resource = {
     the_status_of_queuing: '排队中',
     the_status_of_releasing: '已释放',
     modify_priority: '修改优先级',
-    force_to_start_task: '强制启动',
+    start_task: '强制启动',
     priority_not_empty: '优先级不能为空',
     priority_must_be_number: '优先级必须是数值',
-    please_select_task_name: '请选择节点名称'
+    please_select_task_name: '请选择节点名称',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    edit_priority: '修改优先级'
   }
 }
 
@@ -322,6 +350,7 @@ const project = {
   workflow: {
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
+    import_workflow: '导入工作流',
     workflow_name: '工作流名称',
     current_selection: '当前选择',
     online: '已上线',
@@ -334,18 +363,137 @@ const project = {
     schedule_end_time: '定时结束时间',
     crontab_expression: 'Crontab',
     workflow_publish_status: '工作流上线状态',
-    schedule_publish_status: '定时状态'
+    schedule_publish_status: '定时状态',
+    workflow_definition: '工作流定义',
+    id: '编号',
+    status: '状态',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    description: '描述',
+    create_user: '创建用户',
+    modify_user: '修改用户',
+    operation: '操作',
+    edit: '编辑',
+    confirm: '确定',
+    cancel: '取消',
+    start: '运行',
+    timing: '定时',
+    timezone: '时区',
+    up_line: '上线',
+    down_line: '下线',
+    copy_workflow: '复制工作流',
+    cron_manage: '定时管理',
+    delete: '删除',
+    tree_view: '树形图',
+    export: '导出',
+    version_info: '版本信息',
+    version: '版本',
+    file_upload: '文件上传',
+    upload_file: '上传文件',
+    upload: '上传',
+    file_name: '文件名称',
+    success: '成功',
+    set_parameters_before_starting: '启动前请先设置参数',
+    set_parameters_before_timing: '定时前请先设置参数',
+    start_and_stop_time: '起止时间',
+    next_five_execution_times: '接下来五次执行时间',
+    execute_time: '执行时间',
+    failure_strategy: '失败策略',
+    notification_strategy: '通知策略',
+    workflow_priority: '流程优先级',
+    worker_group: 'Worker分组',
+    environment_name: '环境名称',
+    alarm_group: '告警组',
+    complement_data: '补数',
+    startup_parameter: '启动参数',
+    whether_dry_run: '是否空跑',
+    continue: '继续',
+    end: '结束',
+    none_send: '都不发',
+    success_send: '成功发',
+    failure_send: '失败发',
+    all_send: '成功或失败都发',
+    whether_complement_data: '是否是补数',
+    schedule_date: '调度日期',
+    mode_of_execution: '执行方式',
+    serial_execution: '串行执行',
+    parallel_execution: '并行执行',
+    parallelism: '并行度',
+    custom_parallelism: '自定义并行度',
+    please_enter_parallelism: '请输入并行度',
+    please_choose: '请选择',
+    start_time: '开始时间',
+    end_time: '结束时间',
+    crontab: 'Crontab',
+    delete_confirm: '确定删除吗?',
+    enter_name_tips: '请输入名称',
+    switch_version: '切换到该版本',
+    confirm_switch_version: '确定切换到该版本吗?',
+    current_version: '当前版本'
+  },
+  task: {
+    task_name: '任务名称',
+    task_type: '任务类型',
+    create_task: '创建任务',
+    workflow_instance: '工作流实例',
+    workflow_name: '工作流名称',
+    workflow_name_tips: '请选择工作流名称',
+    workflow_state: '工作流状态',
+    version: '版本',
+    current_version: '当前版本',
+    switch_version: '切换到该版本',
+    confirm_switch_version: '确定切换到该版本吗?',
+    description: '描述',
+    move: '移动',
+    upstream_tasks: '上游任务',
+    executor: '执行用户',
+    node_type: '节点类型',
+    state: '状态',
+    submit_time: '提交时间',
+    start_time: '开始时间',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    end_time: '结束时间',
+    duration: '运行时间',
+    retry_count: '重试次数',
+    dry_run_flag: '空跑标识',
+    host: '主机',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    delete_confirm: '确定删除吗?',
+    submitted_success: '提交成功',
+    running_execution: '正在运行',
+    ready_pause: '准备暂停',
+    pause: '暂停',
+    ready_stop: '准备停止',
+    stop: '停止',
+    failure: '失败',
+    success: '成功',
+    need_fault_tolerance: '需要容错',
+    kill: '已被杀',
+    waiting_thread: '等待线程',
+    waiting_depend: '等待依赖完成',
+    delay_execution: '延时执行',
+    forced_success: '强制成功',
+    serial_wait: '串行等待',
+    view_log: '查看日志',
+    download_log: '下载日志'
   },
   dag: {
-    createWorkflow: '创建工作流',
+    create: '创建工作流',
     search: '搜索',
     download_png: '下载工作流图片',
     fullscreen_open: '全屏',
     fullscreen_close: '退出全屏',
-    workflow_version: '工作流版本信息',
     save: '保存',
     close: '关闭',
-    format: '格式化'
+    format: '格式化',
+    layout_type: '布局类型',
+    grid_layout: '网格布局',
+    dagre_layout: '层次布局',
+    rows: '行数',
+    cols: '列数'
   }
 }
 
@@ -533,7 +681,10 @@ const security = {
     path: '脚本路径',
     type: '类型',
     sendType: '发送类型',
-    username: '用户名'
+    username: '用户名',
+    botToken: '机器人Token',
+    chatId: '频道ID',
+    parseMode: '解析类型'
   }
 }
 
@@ -583,6 +734,38 @@ const datasource = {
   user_password_tips: '请输入密码'
 }
 
+const data_quality = {
+  task_result: {
+    task_name: '任务名称',
+    workflow_instance: '工作流实例',
+    rule_type: '规则类型',
+    rule_name: '规则名称',
+    state: '状态',
+    actual_value: '实际值',
+    excepted_value: '期望值',
+    check_type: '检测类型',
+    operator: '操作符',
+    threshold: '阈值',
+    failure_strategy: '失败策略',
+    excepted_value_type: '期望值类型',
+    error_output_path: '错误数据路径',
+    username: '用户名',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    undone: '未完成',
+    success: '成功',
+    failure: '失败',
+    single_table: '单表检测',
+    single_table_custom_sql: '自定义SQL',
+    multi_table_accuracy: '多表准确性',
+    multi_table_comparison: '两表值对比',
+    expected_and_actual_or_expected: '(期望值-实际值)/实际值 x 100%',
+    expected_and_actual: '期望值-实际值',
+    actual_and_expected: '实际值-期望值',
+    actual_or_expected: '实际值/期望值 x 100%'
+  }
+}
+
 export default {
   login,
   modal,
@@ -596,5 +779,6 @@ export default {
   resource,
   project,
   security,
-  datasource
+  datasource,
+  data_quality
 }

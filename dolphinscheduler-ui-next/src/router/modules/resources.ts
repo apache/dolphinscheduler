@@ -86,7 +86,7 @@ export default {
     {
       path: '/resource/resource-manage',
       name: 'resource-manage',
-      component: components['resource'],
+      component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
         showSide: true
@@ -95,7 +95,7 @@ export default {
     {
       path: '/resource/resource-manage/:id',
       name: 'resource-sub-manage',
-      component: components['resource'],
+      component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
         showSide: true
@@ -106,25 +106,19 @@ export default {
       name: 'function-manage',
       component: components['resource-udf-function'],
       meta: {
-        title: '函数管理'
+        title: '函数管理',
+        showSide: true
       }
     },
     {
-      path: '/resource/task-group',
-      name: 'task-group-manage',
-      component: components['resource-task-group-option'],
-      children: [
-        {
-          path: '/resource/task-group-option',
-          name: 'task-group-option',
-          component: components['resource-task-group-option']
-        },
-        {
-          path: '/resource/task-group-queue',
-          name: 'task-group-queue',
-          component: components['resource-task-group-queue']
-        }
-      ]
+      path: '/resource/task-group-option',
+      name: 'task-group-option',
+      component: components['resource-task-group-option']
+    },
+    {
+      path: '/resource/task-group-queue',
+      name: 'task-group-queue',
+      component: components['resource-task-group-queue']
     }
   ]
 }

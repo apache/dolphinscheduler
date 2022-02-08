@@ -16,39 +16,14 @@
  */
 
 import { h } from 'vue'
-import { NInput, NRadio, NRadioGroup, NSpace } from 'naive-ui'
-import type { IFieldParams } from './types'
+import { NInput } from 'naive-ui'
+import type { IJsonItem } from '../types'
 
-// TODO Support other widgets later
-// Input
-export function renderInput(params: IFieldParams) {
-  const { props, fields, field } = params
+export function renderInput(item: IJsonItem, fields: { [field: string]: any }) {
+  const { props, field } = item
   return h(NInput, {
     ...props,
     value: fields[field],
-    onUpdateValue: (value) => void (fields[field] = value)
+    onUpdateValue: (value: string) => void (fields[field] = value)
   })
-}
-
-// Radio && RadioGroup
-export function renderRadio(params: IFieldParams) {
-  const { props, fields, field, options } = params
-  if (!options || options.length === 0) {
-    return h(NRadio, {
-      ...props,
-      value: fields[field],
-      onUpdateChecked: (checked) => void (fields[field] = checked)
-    })
-  }
-  return h(
-    NRadioGroup,
-    {
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    () =>
-      h(NSpace, null, () =>
-        options.map((option) => h(NRadio, option, () => option.label))
-      )
-  )
 }

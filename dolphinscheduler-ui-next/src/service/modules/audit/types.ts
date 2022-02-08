@@ -15,11 +15,34 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+interface AuditListReq {
+  pageNo: number
+  pageSize: number
+  endDate?: string
+  moduleType?: string
+  operationType?: string
+  processName?: string
+  projectName?: string
+  resourceType?: string
+  startDate?: string
+  userName?: string
+}
 
-export default defineComponent({
-  name: 'TaskConfigModal',
-  setup() {
-    return () => <div>TaskConfigModal</div>
-  }
-})
+interface AuditItem {
+  userName: string
+  resource: string
+  operation: string
+  time: string
+  resourceName: string
+}
+
+interface AuditListRes {
+  totalList: AuditItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { AuditListReq, AuditListRes }

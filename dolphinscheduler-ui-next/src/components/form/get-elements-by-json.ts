@@ -15,46 +15,33 @@
  * limitations under the License.
  */
 
-import * as Field from './fields'
 import { formatValidate } from './utils'
+import getField from './fields/get-field'
+import { omit } from 'lodash'
 import type { FormRules } from 'naive-ui'
 import type { IJsonItem } from './types'
 
 export default function getElementByJson(
   json: IJsonItem[],
-  fields: { [field: string]: any },
-  t: Function,
-  prefix: string
+  fields: { [field: string]: any }
 ) {
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
   const elements = []
-
-  const getElement = (item: IJsonItem) => {
-    const { type, props = {}, field, options } = item
-    // TODO Support other widgets later
-    if (type === 'radio') {
-      return Field.renderRadio({
-        field,
-        fields,
-        props,
-        options
-      })
-    }
-
-    return Field.renderInput({ field, fields, props })
-  }
-
   for (let item of json) {
-    fields[item.field] = item.value
-    initialValues[item.field] = item.value
-    if (item.validate) rules[item.field] = formatValidate(item.validate)
+    const { name, value, field, children, validate, ...rest } = item
+    if (value) {
+      fields[field] = value
+      initialValues[field] = value
+    }
+    if (validate) rules[field] = formatValidate(validate)
     elements.push({
-      label: t(prefix + '.' + item.field),
-      path: item.field,
-      widget: () => getElement(item)
+      showLabel: !!name,
+      ...omit(rest, ['type', 'props', 'options']),
+      label: name,
+      path: !children ? field : '',
+      widget: () => getField(item, fields, rules)
     })
   }
-
   return { rules, elements, initialValues }
 }

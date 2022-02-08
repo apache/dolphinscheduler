@@ -65,6 +65,7 @@ const menu = {
   db: 'DB',
   statistical_manage: 'Statistical Manage',
   statistics: 'Statistics',
+  audit_log: 'Audit Log',
   tenant_manage: 'Tenant Manage',
   user_manage: 'User Manage',
   alarm_group_manage: 'Alarm Group Manage',
@@ -72,7 +73,12 @@ const menu = {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',
-  token_manage: 'Token Manage'
+  token_manage: 'Token Manage',
+  task_group_manage: 'Task Group Manage',
+  task_group_option: 'Task Group Option',
+  task_group_queue: 'Task Group Queue',
+  data_quality: 'Data Quality',
+  task_result: 'Task Result'
 }
 
 const home = {
@@ -149,6 +155,21 @@ const monitor = {
     failure_command_number: 'Failure Command Number',
     tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
     task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+  },
+  audit_log: {
+    user_name: 'User Name',
+    resource_type: 'Resource Type',
+    project_name: 'Project Name',
+    operation_type: 'Operation Type',
+    create_time: 'Create Time',
+    start_time: 'Start Time',
+    end_time: 'End Time',
+    user_audit: 'User Audit',
+    project_audit: 'Project Audit',
+    create: 'Create',
+    update: 'Update',
+    delete: 'Delete',
+    read: 'Read'
   }
 }
 
@@ -279,6 +300,13 @@ const resource = {
     please_enter_keywords: 'Please enter keywords'
   },
   task_group_queue: {
+    id: 'No.',
+    actions: 'Actions',
+    task_name: 'Task name',
+    task_group_name: 'Task group name',
+    project_name: 'Project name',
+    process_name: 'Process name',
+    process_instance_name: 'Process instance',
     queue: 'Task group queue',
     priority: 'Priority',
     priority_be_a_number:
@@ -290,10 +318,14 @@ const resource = {
     the_status_of_waiting: 'Waiting into the queue',
     the_status_of_queuing: 'Queuing',
     the_status_of_releasing: 'Released',
-    modify_priority: 'Edit the priority of the task group queue',
+    modify_priority: 'Edit the priority',
+    start_task: 'Start the task',
     priority_not_empty: 'The value of priority can not be empty',
     priority_must_be_number: 'The value of priority should be number',
-    please_select_task_name: 'Please select a task name'
+    please_select_task_name: 'Please select a task name',
+    create_time: 'Create time',
+    update_time: 'Update time',
+    edit_priority: 'Edit the task priority'
   }
 }
 
@@ -323,6 +355,7 @@ const project = {
   workflow: {
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
+    import_workflow: 'Import Workflow',
     workflow_name: 'Workflow Name',
     current_selection: 'Current Selection',
     online: 'Online',
@@ -335,18 +368,133 @@ const project = {
     schedule_end_time: 'Schedule End Time',
     crontab_expression: 'Crontab',
     workflow_publish_status: 'Workflow Publish Status',
-    schedule_publish_status: 'Schedule Publish Status'
+    schedule_publish_status: 'Schedule Publish Status',
+    workflow_definition: 'Workflow Definition',
+    id: '#',
+    status: 'Status',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    description: 'Description',
+    create_user: 'Create User',
+    modify_user: 'Modify User',
+    operation: 'Operation',
+    edit: 'Edit',
+    start: 'Start',
+    timing: 'Timing',
+    timezone: 'Timezone',
+    upline: 'Online',
+    copy_workflow: 'Copy Workflow',
+    cron_manage: 'Cron manage',
+    delete: 'Delete',
+    tree_view: 'Tree View',
+    export: 'Export',
+    version_info: 'Version Info',
+    version: 'Version',
+    file_upload: 'File Upload',
+    upload_file: 'Upload File',
+    upload: 'Upload',
+    file_name: 'File Name',
+    success: 'Success',
+    set_parameters_before_starting: 'Please set the parameters before starting',
+    set_parameters_before_timing: 'Set parameters before timing',
+    start_and_stop_time: 'Start and stop time',
+    next_five_execution_times: 'Next five execution times',
+    execute_time: 'Execute time',
+    failure_strategy: 'Failure Strategy',
+    notification_strategy: 'Notification Strategy',
+    workflow_priority: 'Workflow Priority',
+    worker_group: 'Worker Group',
+    environment_name: 'Environment Name',
+    alarm_group: 'Alarm Group',
+    complement_data: 'Complement Data',
+    startup_parameter: 'Startup Parameter',
+    whether_dry_run: 'Whether Dry-Run',
+    continue: 'Continue',
+    end: 'End',
+    none_send: 'None',
+    success_send: 'Success',
+    failure_send: 'Failure',
+    all_send: 'All',
+    whether_complement_data: 'Whether it is a complement process?',
+    schedule_date: 'Schedule date',
+    mode_of_execution: 'Mode of execution',
+    serial_execution: 'Serial execution',
+    parallel_execution: 'Parallel execution',
+    parallelism: 'Parallelism',
+    custom_parallelism: 'Custom Parallelism',
+    please_enter_parallelism: 'Please enter Parallelism',
+    please_choose: 'Please Choose',
+    start_time: 'Start Time',
+    end_time: 'End Time',
+    crontab: 'Crontab',
+    delete_confirm: 'Delete?',
+    enter_name_tips: 'Please enter name',
+    confirm_switch_version: 'Confirm Switch To This Version?',
+    current_version: 'Current Version'
+  },
+  task: {
+    task_name: 'Task Name',
+    task_type: 'Task Type',
+    create_task: 'Create Task',
+    workflow_instance: 'Workflow Instance',
+    workflow_name: 'Workflow Name',
+    workflow_name_tips: 'Please select workflow name',
+    workflow_state: 'Workflow State',
+    version: 'Version',
+    current_version: 'Current Version',
+    switch_version: 'Switch To This Version',
+    confirm_switch_version: 'Confirm Switch To This Version?',
+    description: 'Description',
+    move: 'Move',
+    upstream_tasks: 'Upstream Tasks',
+    executor: 'Executor',
+    node_type: 'Node Type',
+    state: 'State',
+    submit_time: 'Submit Time',
+    start_time: 'Start Time',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    end_time: 'End Time',
+    duration: 'Duration',
+    retry_count: 'Retry Count',
+    dry_run_flag: 'Dry Run Flag',
+    host: 'Host',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?',
+    submitted_success: 'Submitted Success',
+    running_execution: 'Running Execution',
+    ready_pause: 'Ready Pause',
+    pause: 'Pause',
+    ready_stop: 'Ready Stop',
+    stop: 'Stop',
+    failure: 'Failure',
+    success: 'Success',
+    need_fault_tolerance: 'Need Fault Tolerance',
+    kill: 'Kill',
+    waiting_thread: 'Waiting Thread',
+    waiting_depend: 'Waiting Depend',
+    delay_execution: 'Delay Execution',
+    forced_success: 'Forced Success',
+    serial_wait: 'Serial Wait',
+    view_log: 'View Log',
+    download_log: 'Download Log'
   },
   dag: {
-    createWorkflow: 'Create Workflow',
+    create: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',
     fullscreen_close: 'Close Fullscreen',
-    workflow_version: 'Workflow Version Info',
     save: 'Save',
     close: 'Close',
-    format: 'Format'
+    format: 'Format',
+    layout_type: 'Layout Type',
+    grid_layout: 'Grid',
+    dagre_layout: 'Dagre',
+    rows: 'Rows',
+    cols: 'Cols'
   }
 }
 
@@ -536,7 +684,10 @@ const security = {
     path: 'Script Path',
     type: 'Type',
     sendType: 'Send Type',
-    username: 'Username'
+    username: 'Username',
+    botToken: 'Bot Token',
+    chatId: 'Channel Chat Id',
+    parseMode: 'Parse Mode'
   }
 }
 
@@ -589,6 +740,38 @@ const datasource = {
   user_password_tips: 'Please enter your password'
 }
 
+const data_quality = {
+  task_result: {
+    task_name: 'Task Name',
+    workflow_instance: 'Workflow Instance',
+    rule_type: 'Rule Type',
+    rule_name: 'Rule Name',
+    state: 'State',
+    actual_value: 'Actual Value',
+    excepted_value: 'Excepted Value',
+    check_type: 'Check Type',
+    operator: 'Operator',
+    threshold: 'Threshold',
+    failure_strategy: 'Failure Strategy',
+    excepted_value_type: 'Excepted Value Type',
+    error_output_path: 'Error Output Path',
+    username: 'Username',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    undone: 'Undone',
+    success: 'Success',
+    failure: 'Failure',
+    single_table: 'Single Table',
+    single_table_custom_sql: 'Single Table Custom Sql',
+    multi_table_accuracy: 'Multi Table Accuracy',
+    multi_table_comparison: 'Multi Table Comparison',
+    expected_and_actual_or_expected: '(Expected - Actual) / Expected x 100%',
+    expected_and_actual: 'Expected - Actual',
+    actual_and_expected: 'Actual - Expected',
+    actual_or_expected: 'Actual / Expected x 100%'
+  }
+}
+
 export default {
   login,
   modal,
@@ -602,5 +785,6 @@ export default {
   resource,
   project,
   security,
-  datasource
+  datasource,
+  data_quality
 }

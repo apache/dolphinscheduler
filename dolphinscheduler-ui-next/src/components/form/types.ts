@@ -24,7 +24,14 @@ import type {
   SelectOption
 } from 'naive-ui'
 
-type IType = 'input' | 'radio'
+type IType =
+  | 'input'
+  | 'radio'
+  | 'editor'
+  | 'custom-parameters'
+  | 'switch'
+  | 'input-number'
+  | 'select'
 
 type IOption = SelectOption
 
@@ -37,13 +44,6 @@ interface IMeta extends Omit<FormProps, 'model'> {
   model: object
 }
 
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
-}
-
 interface IJsonItem {
   field: string
   name?: string
@@ -53,6 +53,7 @@ interface IJsonItem {
   validate?: FormItemRule
   value?: any
   options?: IOption[]
+  children?: IJsonItem[]
 }
 
 export {
@@ -63,6 +64,5 @@ export {
   FormItemRule,
   FormRules,
   IFormItem,
-  GridProps,
-  IFieldParams
+  GridProps
 }

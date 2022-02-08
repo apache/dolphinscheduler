@@ -23,7 +23,10 @@ import { useUserStore } from '@/store/user/user'
 const userStore = useUserStore()
 
 const baseRequestConfig: AxiosRequestConfig = {
-  baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
+  baseURL:
+    import.meta.env.MODE === 'development'
+      ? '/dolphinscheduler'
+      : import.meta.env.VITE_APP_PROD_WEB_URL + '/dolphinscheduler',
   timeout: 10000,
   transformRequest: (params) => {
     if (_.isPlainObject(params)) {
