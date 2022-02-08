@@ -70,7 +70,7 @@ jobs:
         run: >
           ./mvnw --batch-mode verify sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-          -Dmaven.test.skip=false
+          -Dmaven.test.skip=true
           -Dcheckstyle.skip=true
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=apache
