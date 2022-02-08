@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import {defineComponent, h, PropType, reactive, ref, toRefs, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NDataTable } from 'naive-ui'
 import Modal from '@/components/modal'
-import { useTable } from '../use-table'
 import styles from '../index.module.scss'
 
 const props = {
@@ -36,24 +35,54 @@ const props = {
 export default defineComponent({
   name: 'ruleInputEntry',
   props,
-  emits: ['update:show', 'update:row', 'updateList'],
+  emits: ['cancel', 'confirm'],
   setup(props, ctx) {
-    const { variables, getTableData } = useTable(ctx)
 
-    const hideModal = () => {
-      ctx.emit('update:show')
+    const { t } = useI18n()
+
+    const variables = reactive({
+      columns: [],
+      tableData: []
+    })
+
+    const createColumns = (variables: any) => {
+      variables.columns = [
+        {
+          title: t('data_quality.rule.name'),
+          key: 'ruleName'
+        },
+        {
+          title: t('data_quality.rule.type'),
+          key: 'ruleTypeName'
+        },
+        {
+          title: t('data_quality.rule.username'),
+          key: 'userName'
+        },
+        {
+          title: t('data_quality.rule.create_time'),
+          key: 'createTime'
+        },
+        {
+          title: t('data_quality.rule.update_time'),
+          key: 'updateTime'
+        }
+      ]
     }
 
-    watch(
-      () => props.row.code,
-      () => {
-        getTableData(props.row)
-      }
-    )
+    const onCancel = () => {
+      ctx.emit('cancel')
+    }
+
+    const onConfirm = () => {
+      ctx.emit('confirm')
+    }
 
     return {
-      hideModal,
-      ...toRefs(variables)
+      onCancel,
+      onConfirm,
+      createColumns,
+      ...variables
     }
   },
 
@@ -64,8 +93,8 @@ export default defineComponent({
       <Modal
         show={this.$props.show}
         title={t('data_quality.rule.input_item')}
-        onCancel={this.hideModal}
-        onConfirm={this.hideModal}
+        onCancel={this.onCancel}
+        onConfirm={this.onConfirm}
       >
         <NDataTable
           columns={this.columns}

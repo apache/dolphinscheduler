@@ -774,12 +774,14 @@ const data_quality = {
     actual_or_expected: 'Actual / Expected x 100%'
   },
   rule: {
+    actions: 'Actions',
     name: 'Rule name',
     type: 'Rule type',
     username: 'Username',
     create_time: 'Create time',
     update_time: 'Update time',
     input_item: 'Rule input item',
+    view_input_item: 'View input items',
     input_item_title: 'Input item title',
     input_item_placeholder: 'Input item placeholder',
     input_item_type: 'Input item type',

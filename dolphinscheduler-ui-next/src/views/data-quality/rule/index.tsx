@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {defineComponent, onMounted, ref, toRefs, watch} from 'vue'
 import {
   NSpace,
   NInput,
@@ -30,11 +30,15 @@ import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import styles from './index.module.scss'
+import RuleModal from "./components/rule-modal"
+
 
 const TaskResult = defineComponent({
   name: 'rule',
   setup() {
     const { t, variables, getTableData, createColumns } = useTable()
+
+    const showModalRef = ref(false)
 
     const requestTableData = () => {
       getTableData({
@@ -56,6 +60,14 @@ const TaskResult = defineComponent({
       requestTableData()
     }
 
+    const onCancel = () => {
+      showModalRef.value = false
+    }
+
+    const onConfirm = () => {
+      showModalRef.value = false
+    }
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -70,14 +82,17 @@ const TaskResult = defineComponent({
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
+      showModalRef,
+      onCancel,
+      onConfirm,
       onSearch
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch } = this
+    const { t, showModalRef, requestTableData, onUpdatePageSize, onSearch, onCancel, onConfirm } = this
 
     return (
-      <>
+      <div>
         <NCard>
           <NSpace justify='end'>
             <NInput
@@ -112,7 +127,15 @@ const TaskResult = defineComponent({
             />
           </div>
         </Card>
-      </>
+        {showModalRef && (
+          <RuleModal
+              show={showModalRef}
+              onCancel={onCancel}
+              onConfirm={onConfirm}
+              data={ruleEntryData}
+          />
+        )}
+      </div>
     )
   }
 })

@@ -16,12 +16,18 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { reactive, ref } from 'vue'
+import {h, reactive, ref} from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryRuleListPaging } from '@/service/modules/data-quality'
 import type { Rule, RuleRes } from '@/service/modules/data-quality/types'
+import TableAction from './components/table-action'
+import _ from 'lodash'
+import { format } from 'date-fns'
 
-export function useTable() {
+
+export function useTable(
+    viewRuleEntry = (ruleJson: string): void => {}
+) {
   const { t } = useI18n()
 
   const variables = reactive({
@@ -38,11 +44,11 @@ export function useTable() {
     variables.columns = [
       {
         title: t('data_quality.rule.name'),
-        key: 'name'
+        key: 'ruleName'
       },
       {
         title: t('data_quality.rule.type'),
-        key: 'type'
+        key: 'ruleTypeName'
       },
       {
         title: t('data_quality.rule.username'),
@@ -55,9 +61,46 @@ export function useTable() {
       {
         title: t('data_quality.rule.update_time'),
         key: 'updateTime'
+      },
+      {
+        title: t('data_quality.rule.actions'),
+        key: 'actions',
+        width: 150,
+        render: (row: any) =>
+            h(TableAction, {
+              row,
+              onViewRuleEntry: (ruleJson: string) => {
+                console.log('aaa')
+                console.log(ruleJson)
+                viewRuleEntry(ruleJson)
+              },
+            })
       }
     ]
   }
+
+  const ruleTypeMapping = [
+    {
+      code: -1,
+      label: t('data_quality.rule.all')
+    },
+    {
+      code: 0,
+      label: t('data_quality.rule.single_table')
+    },
+    {
+      code: 1,
+      label: t('data_quality.rule.custom_sql')
+    },
+    {
+      code: 2,
+      label: t('data_quality.rule.multi_table_accuracy')
+    },
+    {
+      code: 3,
+      label: t('data_quality.rule.multi_table_value_comparison')
+    }
+  ]
 
   const getTableData = (params: any) => {
     const data = {
@@ -70,12 +113,21 @@ export function useTable() {
 
     const { state } = useAsyncState(
         queryRuleListPaging(data).then((res: RuleRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
-          return {
-            index: index + 1,
-            ...item
-          }
-        }) as any
+          variables.tableData = res.totalList.map((item, index) => {
+            const ruleName = 'data_quality.rule.' + item.name.substring(3,item.name.length-1)
+            const ruleNameLocale = t(ruleName)
+            const ruleTypeName = _.find(ruleTypeMapping, {code: item.type}).label
+
+            item.createTime = format(new Date(item.createTime), 'yyyy-MM-dd HH:mm:ss')
+            item.updateTime = format(new Date(item.updateTime), 'yyyy-MM-dd HH:mm:ss')
+
+            return {
+              index: index + 1,
+              ...item,
+              ruleName: ruleNameLocale,
+              ruleTypeName: ruleTypeName
+            }
+          }) as any
       }),
       {}
     )

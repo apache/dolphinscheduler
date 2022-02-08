@@ -19,13 +19,9 @@ import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
 import { InfoCircleFilled } from '@vicons/antd'
-import type {
-  TaskGroupQueueIdReq,
-  TaskGroupQueue
-} from '@/service/modules/task-group/types'
-import { forceStartTaskInQueue } from '@/service/modules/task-group'
+import type { Rule } from '@/service/modules/data-quality/types'
 
-interface ItemRow extends TaskGroupQueue {}
+interface ItemRow extends Rule {}
 
 const props = {
   row: {
@@ -37,34 +33,31 @@ const props = {
 const TableAction = defineComponent({
   name: 'TableAction',
   props,
-  emits: ['resetTableData', 'updatePriority'],
+  emits: ['viewRuleEntry'],
   setup(props, { emit }) {
     const { t } = useI18n()
 
-    const handleStartTask = (id: number) => {
-      const params: TaskGroupQueueIdReq = { queueId: id }
-
-      forceStartTaskInQueue(params).then(() => {
-        emit('resetTableData')
-      })
+    const viewRuleEntryDetails = (detail: string) => {
+      console.log(detail)
+      emit('viewRuleEntry', detail)
     }
 
-    return { t, handleStartTask }
+    return { t, viewRuleEntryDetails }
   },
   render() {
-    const { t, handleStartTask } = this
+    const { t, viewRuleEntryDetails } = this
 
     return (
       <NSpace>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('data_quality.rule.input_item'),
+            default: () => t('data_quality.rule.view_input_item'),
             trigger: () => (
               <NButton
                 size='small'
                 type='primary'
                 tag='div'
-                onClick={() => handleStartTask(this.row.id)}
+                onClick={() => viewRuleEntryDetails(this.row.ruleJson)}
                 circle
               >
                 <NIcon>
