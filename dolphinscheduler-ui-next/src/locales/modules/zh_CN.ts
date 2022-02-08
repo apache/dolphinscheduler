@@ -434,18 +434,35 @@ const project = {
   },
   task: {
     task_name: '任务名称',
+    task_type: '任务类型',
+    create_task: '创建任务',
     workflow_instance: '工作流实例',
+    workflow_name: '工作流名称',
+    workflow_name_tips: '请选择工作流名称',
+    workflow_state: '工作流状态',
+    version: '版本',
+    current_version: '当前版本',
+    switch_version: '切换到该版本',
+    confirm_switch_version: '确定切换到该版本吗?',
+    description: '描述',
+    move: '移动',
+    upstream_tasks: '上游任务',
     executor: '执行用户',
     node_type: '节点类型',
     state: '状态',
     submit_time: '提交时间',
     start_time: '开始时间',
+    create_time: '创建时间',
+    update_time: '更新时间',
     end_time: '结束时间',
     duration: '运行时间',
     retry_count: '重试次数',
     dry_run_flag: '空跑标识',
     host: '主机',
     operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    delete_confirm: '确定删除吗?',
     submitted_success: '提交成功',
     running_execution: '正在运行',
     ready_pause: '准备暂停',
@@ -465,15 +482,19 @@ const project = {
     download_log: '下载日志'
   },
   dag: {
-    createWorkflow: '创建工作流',
+    create: '创建工作流',
     search: '搜索',
     download_png: '下载工作流图片',
     fullscreen_open: '全屏',
     fullscreen_close: '退出全屏',
-    workflow_version: '工作流版本信息',
     save: '保存',
     close: '关闭',
-    format: '格式化'
+    format: '格式化',
+    layout_type: '布局类型',
+    grid_layout: '网格布局',
+    dagre_layout: '层次布局',
+    rows: '行数',
+    cols: '列数'
   }
 }
 
@@ -600,6 +621,8 @@ const security = {
     phone: '手机',
     phone_rule_msg: '请输入正确的手机号',
     state: '状态',
+    state_enabled: '启用',
+    state_disabled: '停用',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
@@ -661,7 +684,10 @@ const security = {
     path: '脚本路径',
     type: '类型',
     sendType: '发送类型',
-    username: '用户名'
+    username: '用户名',
+    botToken: '机器人Token',
+    chatId: '频道ID',
+    parseMode: '解析类型'
   }
 }
 

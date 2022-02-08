@@ -15,21 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import Modal from '@/components/modal'
-import './x6-style.scss'
-
-const props = {
-  show: {
-    type: Boolean as PropType<boolean>,
-    default: false
-  }
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
-
-export default defineComponent({
-  name: 'dag-format-modal',
-  props,
-  setup(props, context) {
-    return () => <Modal show={props.show}></Modal>
-  }
-})

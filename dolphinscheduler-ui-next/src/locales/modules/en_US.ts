@@ -430,24 +430,40 @@ const project = {
     crontab: 'Crontab',
     delete_confirm: 'Delete?',
     enter_name_tips: 'Please enter name',
-    switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version'
   },
   task: {
     task_name: 'Task Name',
+    task_type: 'Task Type',
+    create_task: 'Create Task',
     workflow_instance: 'Workflow Instance',
+    workflow_name: 'Workflow Name',
+    workflow_name_tips: 'Please select workflow name',
+    workflow_state: 'Workflow State',
+    version: 'Version',
+    current_version: 'Current Version',
+    switch_version: 'Switch To This Version',
+    confirm_switch_version: 'Confirm Switch To This Version?',
+    description: 'Description',
+    move: 'Move',
+    upstream_tasks: 'Upstream Tasks',
     executor: 'Executor',
     node_type: 'Node Type',
     state: 'State',
     submit_time: 'Submit Time',
     start_time: 'Start Time',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
     end_time: 'End Time',
     duration: 'Duration',
     retry_count: 'Retry Count',
     dry_run_flag: 'Dry Run Flag',
     host: 'Host',
     operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?',
     submitted_success: 'Submitted Success',
     running_execution: 'Running Execution',
     ready_pause: 'Ready Pause',
@@ -467,15 +483,19 @@ const project = {
     download_log: 'Download Log'
   },
   dag: {
-    createWorkflow: 'Create Workflow',
+    create: 'Create Workflow',
     search: 'Search',
     download_png: 'Download PNG',
     fullscreen_open: 'Open Fullscreen',
     fullscreen_close: 'Close Fullscreen',
-    workflow_version: 'Workflow Version Info',
     save: 'Save',
     close: 'Close',
-    format: 'Format'
+    format: 'Format',
+    layout_type: 'Layout Type',
+    grid_layout: 'Grid',
+    dagre_layout: 'Dagre',
+    rows: 'Rows',
+    cols: 'Cols'
   }
 }
 
@@ -604,6 +624,8 @@ const security = {
     phone: 'Phone',
     phone_rule_msg: 'Please enter valid phone number',
     state: 'State',
+    state_enabled: 'Enabled',
+    state_disabled: 'Disabled',
     create_time: 'Create Time',
     update_time: 'Update Time',
     operation: 'Operation',
@@ -665,7 +687,10 @@ const security = {
     path: 'Script Path',
     type: 'Type',
     sendType: 'Send Type',
-    username: 'Username'
+    username: 'Username',
+    botToken: 'Bot Token',
+    chatId: 'Channel Chat Id',
+    parseMode: 'Parse Mode'
   }
 }
 
