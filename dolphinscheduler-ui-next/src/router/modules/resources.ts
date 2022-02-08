@@ -113,12 +113,20 @@ export default {
     {
       path: '/resource/task-group-option',
       name: 'task-group-option',
-      component: components['resource-task-group-option']
+      component: components['resource-task-group-option'],
+      meta: {
+        title: '任务组配置',
+        showSide: true
+      }
     },
     {
       path: '/resource/task-group-queue',
       name: 'task-group-queue',
-      component: components['resource-task-group-queue']
+      component: components['resource-task-group-queue'],
+      meta: {
+        title: '任务组队列',
+        showSide: true
+      }
     }
   ]
 }
