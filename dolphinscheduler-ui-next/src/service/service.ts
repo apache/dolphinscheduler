@@ -16,9 +16,10 @@
  */
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import { useUserStore } from '@/store/user/user'
 import qs from 'qs'
 import _ from 'lodash'
-import { useUserStore } from '@/store/user/user'
+import router from "@/router";
 
 const userStore = useUserStore()
 
@@ -43,12 +44,16 @@ const baseRequestConfig: AxiosRequestConfig = {
 const service = axios.create(baseRequestConfig)
 
 const err = (err: AxiosError): Promise<AxiosError> => {
+  if (err.response?.status === 401 || err.response?.status === 504) {
+    userStore.setSessionId('')
+    userStore.setUserInfo({})
+    router.push({ path: '/login' })
+  }
+
   return Promise.reject(err)
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  // console.log('config', config)
-
   config.headers && (config.headers.sessionId = userStore.getSessionId)
 
   return config
