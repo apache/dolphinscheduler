@@ -20,6 +20,7 @@ import { useI18n } from 'vue-i18n'
 import { NDataTable } from 'naive-ui'
 import Modal from '@/components/modal'
 import styles from '../index.module.scss'
+import { TableColumns } from "naive-ui/es/data-table/src/interface";
 
 const props = {
   show: {
@@ -27,7 +28,8 @@ const props = {
     default: false
   },
   data: {
-    type: Object as PropType<any>
+    type: String as PropType<string>,
+    default: ''
   }
 }
 
@@ -39,35 +41,26 @@ export default defineComponent({
 
     const { t } = useI18n()
 
-    const variables = reactive({
-      columns: [],
-      tableData: []
+    const ruleInputEntryList = JSON.parse(props.data).ruleInputEntryList
+
+    ruleInputEntryList.forEach((item: any) => {
+      item.title = t('data_quality.rule.'+item.title.substring(3,item.title.length-1))
     })
 
-    const createColumns = (variables: any) => {
-      variables.columns = [
-        {
-          title: t('data_quality.rule.name'),
-          key: 'ruleName'
-        },
-        {
-          title: t('data_quality.rule.type'),
-          key: 'ruleTypeName'
-        },
-        {
-          title: t('data_quality.rule.username'),
-          key: 'userName'
-        },
-        {
-          title: t('data_quality.rule.create_time'),
-          key: 'createTime'
-        },
-        {
-          title: t('data_quality.rule.update_time'),
-          key: 'updateTime'
-        }
-      ]
-    }
+    const columns: TableColumns<any> = [
+      {
+        title: t('data_quality.rule.input_item_title'),
+        key: 'title'
+      },
+      {
+        title: t('data_quality.rule.input_item_placeholder'),
+        key: 'field'
+      },
+      {
+        title: t('data_quality.rule.input_item_type'),
+        key: 'type'
+      }
+    ]
 
     const onCancel = () => {
       ctx.emit('cancel')
@@ -80,8 +73,8 @@ export default defineComponent({
     return {
       onCancel,
       onConfirm,
-      createColumns,
-      ...variables
+      columns,
+      ruleInputEntryList
     }
   },
 
@@ -92,12 +85,12 @@ export default defineComponent({
       <Modal
         show={this.$props.show}
         title={t('data_quality.rule.input_item')}
-        onCancel={this.onCancel}
+        cancelShow={false}
         onConfirm={this.onConfirm}
       >
         <NDataTable
           columns={this.columns}
-          data={this.tableData}
+          data={this.ruleInputEntryList}
           striped
           size={'small'}
           class={styles.table}

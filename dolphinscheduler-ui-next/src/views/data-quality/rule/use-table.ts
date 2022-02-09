@@ -69,8 +69,6 @@ export function useTable(
           h(TableAction, {
             row,
             onViewRuleEntry: (ruleJson: string) => {
-              console.log('aaa')
-              console.log(ruleJson)
               viewRuleEntry(ruleJson)
             },
           })

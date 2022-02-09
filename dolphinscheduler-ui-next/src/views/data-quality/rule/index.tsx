@@ -39,7 +39,7 @@ const TaskResult = defineComponent({
 
     const showModalRef = ref(false)
 
-    const ruleEntryData = ref([])
+    const ruleEntryData = ref('')
 
     const requestTableData = () => {
       getTableData({
@@ -73,8 +73,12 @@ const TaskResult = defineComponent({
        ruleJson: string
     ) => {
       showModalRef.value = true
-      console.log(ruleJson)
+      ruleEntryData.value = ruleJson
     }
+
+    onMounted(() => {
+      requestTableData()
+    })
 
     return {
       t,

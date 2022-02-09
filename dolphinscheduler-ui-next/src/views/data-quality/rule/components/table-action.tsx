@@ -38,7 +38,6 @@ const TableAction = defineComponent({
     const { t } = useI18n()
 
     const viewRuleEntryDetails = (detail: string) => {
-      console.log(detail)
       emit('viewRuleEntry', detail)
     }
 
