@@ -97,9 +97,15 @@ export function useTable(
         variables.totalPage = values[0].totalPage
         variables.tableData = values[0].totalList.map(
           (item: any, index: number) => {
-            item.projectName = _.find(values[1], {
-              code: item.projectCode
-            }).name
+            let projectName = ''
+            if (values[1]) {
+              let project = _.find(values[1], { code: item.projectCode })
+              if (project) {
+                projectName = project.name
+              }
+            }
+
+            item.projectName = projectName
             item.createTime = format(
               new Date(item.createTime),
               'yyyy-MM-dd HH:mm:ss'
