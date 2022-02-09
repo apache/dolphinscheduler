@@ -83,9 +83,9 @@ const Content = defineComponent({
           }
           sideKeyRef.value = route.matched[1].path.includes(':projectCode')
             ? route.matched[1].path.replace(
-              ':projectCode',
-              menuStore.getProjectCode
-            )
+                ':projectCode',
+                menuStore.getProjectCode
+              )
             : route.matched[1].path
         }
       },

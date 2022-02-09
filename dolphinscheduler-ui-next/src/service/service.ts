@@ -19,7 +19,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { useUserStore } from '@/store/user/user'
 import qs from 'qs'
 import _ from 'lodash'
-import router from "@/router";
+import router from '@/router'
 
 const userStore = useUserStore()
 
