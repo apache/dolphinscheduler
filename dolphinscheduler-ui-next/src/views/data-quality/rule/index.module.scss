@@ -15,26 +15,12 @@
  * limitations under the License.
  */
 
-$borderDark: rgba(255, 255, 255, 0.09);
-$borderLight: rgb(239, 239, 245);
-$bgDark: rgb(24, 24, 28);
-$bgLight: #ffffff;
+.table-card {
+  margin-top: 8px;
 
-.container {
-  width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-  height: calc(100vh - 100px);
-  overflow: hidden;
-  display: block;
-}
-
-.dark {
-  border: solid 1px $borderDark;
-  background-color: $bgDark;
-}
-
-.light {
-  border: solid 1px $borderLight;
-  background-color: $bgLight;
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }

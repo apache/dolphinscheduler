@@ -15,21 +15,30 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import Modal from '@/components/modal'
-import './x6-style.scss'
+.search-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-const props = {
-  show: {
-    type: Boolean as PropType<boolean>,
-    default: false
+  .box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 300px;
+
+    button,
+    input {
+      margin-left: 10px;
+    }
   }
 }
 
-export default defineComponent({
-  name: 'dag-format-modal',
-  props,
-  setup(props, context) {
-    return () => <Modal show={props.show}></Modal>
+.table-card {
+  margin-top: 8px;
+
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
   }
-})
+}

@@ -19,8 +19,14 @@ $blue: #288fff;
 $blueBg: rgba(40, 143, 255, 0.1);
 $toolbarHeight: 50px;
 
+$borderDark: rgba(255, 255, 255, 0.09);
+$borderLight: rgb(239, 239, 245);
+$bgDark: rgb(24, 24, 28);
+$bgLight: #ffffff;
+
 .dag {
   height: 100%;
+  overflow: hidden;
 }
 
 .content {
@@ -34,9 +40,16 @@ $toolbarHeight: 50px;
   display: flex;
   align-items: center;
   padding: 0 20px;
-  border: 1px solid var(--n-border-color);
   border-radius: 4px;
   justify-content: space-between;
+}
+
+.dag-dark .toolbar {
+  border: 1px solid $borderDark;
+}
+
+.dag-light .toolbar-light {
+  border: 1px solid $borderLight;
 }
 
 .canvas {
@@ -45,6 +58,7 @@ $toolbarHeight: 50px;
   position: relative;
   overflow: hidden;
   display: flex;
+  flex: 1;
 }
 
 .paper {
@@ -68,7 +82,6 @@ $toolbarHeight: 50px;
   height: 32px;
   margin-bottom: 10px;
   align-items: center;
-  border: 1px solid var(--n-border-color);
   padding: 0 10px;
   border-radius: 4px;
   transform: translate(0, 0);
@@ -133,9 +146,6 @@ $toolbarHeight: 50px;
   }
 
   &:hover {
-    color: $blue;
-    border: 1px dashed $blue;
-    background-color: $blueBg;
     .sidebar-icon {
       &.icon-shell {
         background-image: url('@/assets/images/task-icons/shell_hover.png');
@@ -186,6 +196,22 @@ $toolbarHeight: 50px;
         background-image: url('@/assets/images/task-icons/switch_hover.png');
       }
     }
+  }
+}
+
+.dag-dark .draggable {
+  border: 1px solid $borderDark;
+}
+
+.dag-light .draggable {
+  border: 1px solid $borderLight;
+}
+
+.dag .draggable {
+  &:hover {
+    color: $blue;
+    border: 1px dashed $blue;
+    background-color: $blueBg;
   }
 }
 

@@ -143,8 +143,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Map<Integer, User> userMap = users.stream().collect(Collectors.toMap(User::getId, v -> v));
         for (TaskInstance taskInstance : taskInstanceList) {
             taskInstance.setDuration(DateUtils.format2Duration(taskInstance.getStartTime(), taskInstance.getEndTime()));
-            if (userMap.containsKey(taskInstance.getExecutorId())) {
-                taskInstance.setExecutorName(userMap.get(taskInstance.getExecutorId()).getUserName());
+            User user = userMap.get(taskInstance.getExecutorId());
+            if (user != null) {
+                taskInstance.setExecutorName(user.getUserName());
             }
         }
         pageInfo.setTotal((int) taskInstanceIPage.getTotal());
