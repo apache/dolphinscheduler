@@ -67,6 +67,13 @@ interface TargetCodeReq {
   targetProjectCode: number
 }
 
+interface SimpleListRes {
+  id: number
+  code: any
+  name: string
+  projectCode: any
+}
+
 export {
   CodeReq,
   CodesReq,
@@ -79,4 +86,5 @@ export {
   ListReq,
   ProcessDefinitionReq,
   TargetCodeReq,
+  SimpleListRes
 }

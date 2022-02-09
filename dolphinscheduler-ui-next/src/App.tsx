@@ -15,20 +15,43 @@
  * limitations under the License.
  */
 
-import { defineComponent, computed } from 'vue'
-import { NConfigProvider, darkTheme, GlobalThemeOverrides } from 'naive-ui'
+import { defineComponent, computed, ref, nextTick, provide } from 'vue'
+import {
+  zhCN,
+  enUS,
+  NConfigProvider,
+  darkTheme,
+  GlobalThemeOverrides,
+  NMessageProvider
+} from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
+import { useLocalesStore } from '@/store/locales/locales'
 import themeList from '@/themes'
 
 const App = defineComponent({
   name: 'App',
   setup() {
+    const isRouterAlive = ref(true)
     const themeStore = useThemeStore()
     const currentTheme = computed(() =>
       themeStore.darkTheme ? darkTheme : undefined
     )
+    const localesStore = useLocalesStore()
+    /*refresh page when router params change*/
+    const reload = () => {
+      isRouterAlive.value = false
+      nextTick(() => {
+        isRouterAlive.value = true
+      })
+    }
+
+    provide('reload', reload)
+
     return {
+      reload,
+      isRouterAlive,
       currentTheme,
+      localesStore
     }
   },
   render() {
@@ -40,11 +63,14 @@ const App = defineComponent({
         theme={this.currentTheme}
         themeOverrides={themeOverrides}
         style={{ width: '100%', height: '100vh' }}
+        locale={String(this.localesStore.getLocales) === 'zh_CN' ? zhCN : enUS}
       >
-        <router-view />
+        <NMessageProvider>
+          {this.isRouterAlive ? <router-view /> : ''}
+        </NMessageProvider>
       </NConfigProvider>
     )
-  },
+  }
 })
 
 export default App

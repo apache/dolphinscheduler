@@ -17,25 +17,18 @@
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
 import { useForm } from './use-form'
-import {
-  NButton,
-  NForm,
-  NFormItem,
-  NInput,
-  NRadioGroup,
-  NRadio,
-} from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput } from 'naive-ui'
 import { useUserinfo } from './use-userinfo'
 import { useUpdate } from './use-update'
 import Card from '@/components/card'
 import Modal from '@/components/modal'
-import Info from './info'
+import Info from './components/info'
 import utils from '@/utils'
 
 const profile = defineComponent({
   name: 'profile',
   setup() {
-    let showModalRef = ref(false)
+    const showModalRef = ref(false)
     const { state, t } = useForm()
     const { handleUpdate } = useUpdate(state)
     const { getUserInfo } = useUserinfo()
@@ -72,7 +65,7 @@ const profile = defineComponent({
               >
                 {t('profile.edit')}
               </NButton>
-            ),
+            )
           }}
         </Card>
         <Modal
@@ -107,23 +100,13 @@ const profile = defineComponent({
                     placeholder={t('profile.phone_tips')}
                   />
                 </NFormItem>
-                <NFormItem label={t('profile.state')} path='state'>
-                  <NRadioGroup v-model={[this.profileForm.state, 'value']}>
-                    {[
-                      { value: 1, label: t('profile.enable') },
-                      { value: 0, label: t('profile.disable') },
-                    ].map((item) => {
-                      return <NRadio value={item.value}>{item.label}</NRadio>
-                    })}
-                  </NRadioGroup>
-                </NFormItem>
               </NForm>
-            ),
+            )
           }}
         </Modal>
       </div>
     )
-  },
+  }
 })
 
 export default profile

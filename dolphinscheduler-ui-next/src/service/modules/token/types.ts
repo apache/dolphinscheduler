@@ -48,4 +48,23 @@ interface UpdateTokenReq extends TokenReq {
   userType?: string
 }
 
-export { ListReq, TokenReq, UserReq, UpdateTokenReq }
+interface TokenItem {
+  id: number
+  userId: number
+  token: string
+  expireTime: string
+  createTime: string
+  updateTime: string
+  userName: string
+}
+
+interface TokenRes {
+  totalList: TokenItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { ListReq, TokenReq, UserReq, UpdateTokenReq, TokenItem, TokenRes }

@@ -21,51 +21,47 @@ import {
   IdReq,
   CodeReq,
   ListReq,
-  ProcessDefinitionCodeReq,
   ScheduleReq,
   WorkerGroupIdReq,
-  ScheduleListReq,
   CreateScheduleReq,
   DeleteScheduleReq,
+  ProcessDefinitionCodeReq
 } from './types'
 
 export function queryScheduleListPaging(
-  params: ScheduleListReq,
-  projectCode: ProjectCodeReq
+  params: ListReq & ProcessDefinitionCodeReq,
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/schedules`,
     method: 'get',
-    params,
+    params
   })
 }
 
 export function createSchedule(
   data: CreateScheduleReq & WorkerGroupIdReq,
-  projectCode: ProjectCodeReq
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/schedules`,
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryScheduleList(projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/schedules/list`,
-    method: 'post',
+    method: 'post'
   })
 }
 
-export function previewSchedule(
-  data: ScheduleReq,
-  projectCode: ProjectCodeReq
-): any {
+export function previewSchedule(data: ScheduleReq, projectCode: number): any {
   return axios({
     url: `/projects/${projectCode}/schedules/preview`,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -77,43 +73,43 @@ export function updateScheduleByProcessDefinitionCode(
   return axios({
     url: `/projects/${projectCode}/schedules/update/${code}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function updateSchedule(
   data: CreateScheduleReq,
-  projectCode: ProjectCodeReq,
-  id: IdReq
+  projectCode: number,
+  id: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/schedules/${id}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function deleteScheduleById(
-  data: DeleteScheduleReq,
-  projectCode: ProjectCodeReq
+  scheduleId: number,
+  projectCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/schedules/${data.id}`,
+    url: `/projects/${projectCode}/schedules/${scheduleId}`,
     method: 'delete',
-    data,
+    params: { scheduleId }
   })
 }
 
-export function offline(projectCode: ProjectCodeReq, id: IdReq): any {
+export function offline(projectCode: number, id: number): any {
   return axios({
     url: `/projects/${projectCode}/schedules/${id}/offline`,
-    method: 'post',
+    method: 'post'
   })
 }
 
-export function online(projectCode: ProjectCodeReq, id: IdReq): any {
+export function online(projectCode: number, id: number): any {
   return axios({
     url: `/projects/${projectCode}/schedules/${id}/online`,
-    method: 'post',
+    method: 'post'
   })
 }

@@ -31,4 +31,22 @@ interface IdReq {
   id: number
 }
 
-export { ListReq, WorkerGroupReq, IdReq }
+interface WorkerGroupItem {
+  id: number
+  name: string
+  addrList: string
+  createTime: string
+  updateTime: string
+  systemDefault: boolean
+}
+
+interface WorkerGroupRes {
+  totalList: WorkerGroupItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { ListReq, WorkerGroupReq, IdReq, WorkerGroupItem, WorkerGroupRes }

@@ -81,6 +81,7 @@ public class WorkerServer implements IStoppable {
     /**
      * alert model netty remote server
      */
+    @Autowired
     private AlertClientService alertClientService;
 
     @Autowired
@@ -98,6 +99,24 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private TaskPluginManager taskPluginManager;
 
+    @Autowired
+    private TaskExecuteProcessor taskExecuteProcessor;
+
+    @Autowired
+    private TaskKillProcessor taskKillProcessor;
+
+    @Autowired
+    private DBTaskAckProcessor dbTaskAckProcessor;
+
+    @Autowired
+    private DBTaskResponseProcessor dbTaskResponseProcessor;
+
+    @Autowired
+    private HostUpdateProcessor hostUpdateProcessor;
+
+    @Autowired
+    private LoggerRequestProcessor loggerRequestProcessor;
+
     /**
      * worker server startup, not use web service
      *
@@ -113,22 +132,17 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run() {
-        // alert-server client registry
-        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(),
-                                                    workerConfig.getAlertListenPort());
-
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService, taskPluginManager));
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, new HostUpdateProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, taskExecuteProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, dbTaskAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, dbTaskResponseProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
 
         // logger server
-        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);

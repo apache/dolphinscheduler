@@ -42,10 +42,15 @@ import {
   EnvironmentOutlined,
   KeyOutlined,
   SafetyOutlined,
+  GroupOutlined,
+  ContainerOutlined,
+  ApartmentOutlined
 } from '@vicons/antd'
+import { useMenuStore } from '@/store/menu/menu'
 
 export function useDataList() {
   const { t } = useI18n()
+  const menuStore = useMenuStore()
 
   const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
@@ -54,12 +59,12 @@ export function useDataList() {
   const localesOptions = [
     {
       label: 'English',
-      key: 'en_US',
+      key: 'en_US'
     },
     {
       label: '中文',
-      key: 'zh_CN',
-    },
+      key: 'zh_CN'
+    }
   ]
 
   const state = reactive({
@@ -68,7 +73,7 @@ export function useDataList() {
     userDropdownOptions: [],
     menuOptions: [],
     headerMenuOptions: [],
-    sideMenuOptions: [],
+    sideMenuOptions: []
   })
 
   const changeMenuOption = (state: any) => {
@@ -81,55 +86,61 @@ export function useDataList() {
       },
       {
         label: t('menu.project'),
-        key: 'project',
+        key: 'projects',
         icon: renderIcon(ProfileOutlined),
         isShowSide: false,
         children: [
           {
-            label: t('menu.workflow_monitoring'),
-            key: 'workflow-monitoring',
-            icon: renderIcon(FundProjectionScreenOutlined),
-          },
-          {
-            label: t('menu.workflow_relationships'),
-            key: 'workflow-relationships',
-            icon: renderIcon(PartitionOutlined),
+            label: t('menu.project_overview'),
+            key: `/projects/${menuStore.getProjectCode}`,
+            icon: renderIcon(FundProjectionScreenOutlined)
           },
           {
             label: t('menu.workflow'),
             key: 'workflow',
-            icon: renderIcon(SettingOutlined),
+            icon: renderIcon(PartitionOutlined),
             children: [
               {
+                label: t('menu.workflow_relation'),
+                key: `/projects/${menuStore.getProjectCode}/workflow/relation`
+              },
+              {
                 label: t('menu.workflow_definition'),
-                key: 'workflow-definition',
+                key: `/projects/${menuStore.getProjectCode}/workflow-definition`
               },
               {
                 label: t('menu.workflow_instance'),
-                key: 'workflow-instance',
+                key: `/projects/${menuStore.getProjectCode}/workflow/instances`
+              }
+            ]
+          },
+          {
+            label: t('menu.task'),
+            key: 'task',
+            icon: renderIcon(SettingOutlined),
+            children: [
+              {
+                label: t('menu.task_definition'),
+                key: `/projects/${menuStore.getProjectCode}/task/definitions`
               },
               {
                 label: t('menu.task_instance'),
-                key: 'task-instance',
-              },
-              {
-                label: t('menu.task_definition'),
-                key: 'task-definition',
-              },
-            ],
-          },
-        ],
+                key: `/projects/${menuStore.getProjectCode}/task/instances`
+              }
+            ]
+          }
+        ]
       },
       {
         label: t('menu.resources'),
-        key: 'resources',
+        key: 'resource',
         icon: renderIcon(FolderOutlined),
         isShowSide: true,
         children: [
           {
             label: t('menu.file_manage'),
-            key: 'file-manage',
-            icon: renderIcon(FileSearchOutlined),
+            key: `/resource/file-manage`,
+            icon: renderIcon(FileSearchOutlined)
           },
           {
             label: t('menu.udf_manage'),
@@ -138,21 +149,50 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.resource_manage'),
-                key: 'resource-manage',
+                key: `/resource/resource-manage`
               },
               {
                 label: t('menu.function_manage'),
-                key: 'function-manage',
-              },
-            ],
+                key: `/resource/function-manage`
+              }
+            ]
           },
-        ],
+          {
+            label: t('menu.task_group_manage'),
+            key: 'task-group-manage',
+            icon: renderIcon(GroupOutlined),
+            children: [
+              {
+                label: t('menu.task_group_option'),
+                key: 'task-group-option'
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: 'task-group-queue'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        label: t('menu.data_quality'),
+        key: 'data-quality',
+        icon: renderIcon(ContainerOutlined),
+        isShowSide: true,
+        children: [
+          {
+            label: t('menu.task_result'),
+            key: `/data-quality/task-result`,
+            icon: renderIcon(ApartmentOutlined)
+          }
+        ]
       },
       {
         label: t('menu.datasource'),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
-        isShowSide: false
+        isShowSide: false,
+        children: []
       },
       {
         label: t('menu.monitor'),
@@ -167,17 +207,17 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.master'),
-                key: 'master',
+                key: `/monitor/master`
               },
               {
                 label: t('menu.worker'),
-                key: 'worker',
+                key: `/monitor/worker`
               },
               {
                 label: t('menu.db'),
-                key: 'db',
-              },
-            ],
+                key: `/monitor/db`
+              }
+            ]
           },
           {
             label: t('menu.statistical_manage'),
@@ -186,11 +226,15 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.statistics'),
-                key: 'statistics',
+                key: `/monitor/statistics`
               },
-            ],
-          },
-        ],
+              {
+                label: t('menu.audit_log'),
+                key: `/monitor/audit-log`
+              }
+            ]
+          }
+        ]
       },
       {
         label: t('menu.security'),
@@ -200,57 +244,56 @@ export function useDataList() {
         children: [
           {
             label: t('menu.tenant_manage'),
-            key: 'tenant-manage',
-            icon: renderIcon(UsergroupAddOutlined),
+            key: `/security/tenant-manage`,
+            icon: renderIcon(UsergroupAddOutlined)
           },
           {
             label: t('menu.user_manage'),
-            key: 'user-manage',
-            icon: renderIcon(UserAddOutlined),
+            key: `/security/user-manage`,
+            icon: renderIcon(UserAddOutlined)
           },
           {
             label: t('menu.alarm_group_manage'),
-            key: 'alarm-group-manage',
-            icon: renderIcon(WarningOutlined),
+            key: `/security/alarm-group-manage`,
+            icon: renderIcon(WarningOutlined)
           },
           {
             label: t('menu.alarm_instance_manage'),
-            key: 'alarm-instance-manage',
-            icon: renderIcon(InfoCircleOutlined),
+            key: `/security/alarm-instance-manage`,
+            icon: renderIcon(InfoCircleOutlined)
           },
           {
             label: t('menu.worker_group_manage'),
-            key: 'worker-group-manage',
-            icon: renderIcon(ControlOutlined),
+            key: `/security/worker-group-manage`,
+            icon: renderIcon(ControlOutlined)
           },
           {
             label: t('menu.yarn_queue_manage'),
-            key: 'yarn-queue-manage',
-            icon: renderIcon(SlackOutlined),
+            key: `/security/yarn-queue-manage`,
+            icon: renderIcon(SlackOutlined)
           },
           {
-            label: t('menu.environmental_manage'),
-            key: 'environmental-manage',
-            icon: renderIcon(EnvironmentOutlined),
+            label: t('menu.environment_manage'),
+            key: `/security/environment-manage`,
+            icon: renderIcon(EnvironmentOutlined)
           },
           {
             label: t('menu.token_manage'),
-            key: 'token-manage',
-            icon: renderIcon(SafetyOutlined),
-          },
-        ],
-      },
+            key: `/security/token-manage`,
+            icon: renderIcon(SafetyOutlined)
+          }
+        ]
+      }
     ]
   }
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: { label: string; key: string; icon: any, isShowSide: boolean }) => {
+      (item: { label: string; key: string; icon: any }) => {
         return {
           label: item.label,
           key: item.key,
-          icon: item.icon,
-          isShowSide: item.isShowSide
+          icon: item.icon
         }
       }
     )
@@ -261,18 +304,18 @@ export function useDataList() {
       {
         label: t('userDropdown.profile'),
         key: 'profile',
-        icon: renderIcon(UserOutlined),
+        icon: renderIcon(UserOutlined)
       },
       {
         label: t('userDropdown.password'),
         key: 'password',
-        icon: renderIcon(KeyOutlined),
+        icon: renderIcon(KeyOutlined)
       },
       {
         label: t('userDropdown.logout'),
         key: 'logout',
-        icon: renderIcon(LogoutOutlined),
-      },
+        icon: renderIcon(LogoutOutlined)
+      }
     ]
   }
 

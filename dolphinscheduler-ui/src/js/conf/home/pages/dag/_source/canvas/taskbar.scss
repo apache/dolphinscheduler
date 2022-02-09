@@ -111,6 +111,9 @@
           &.icos-switch {
             background-image: url("../images/task-icos/switch.png");
           }
+          &.icos-data_quality {
+            background-image: url("../images/task-icos/data_quality.png");
+          }
         }
 
         span {
@@ -170,6 +173,9 @@
             }
             &.icos-switch {
               background-image: url("../images/task-icos/switch_hover.png");
+            }
+            &.icos-data_quality {
+              background-image: url("../images/task-icos/data_quality_hover.png");
             }
           }
         }

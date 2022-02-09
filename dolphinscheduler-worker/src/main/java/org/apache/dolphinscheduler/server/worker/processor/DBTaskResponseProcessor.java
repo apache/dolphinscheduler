@@ -23,10 +23,11 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -35,6 +36,7 @@ import io.netty.channel.Channel;
 /**
  *  db task response processor
  */
+@Component
 public class DBTaskResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(DBTaskResponseProcessor.class);
@@ -52,7 +54,7 @@ public class DBTaskResponseProcessor implements NettyRequestProcessor {
         }
 
         if (taskResponseCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-            ResponceCache.get().removeResponseCache(taskResponseCommand.getTaskInstanceId());
+            ResponseCache.get().removeResponseCache(taskResponseCommand.getTaskInstanceId());
             TaskCallbackService.remove(taskResponseCommand.getTaskInstanceId());
             logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskResponseCommand.getTaskInstanceId());
         }

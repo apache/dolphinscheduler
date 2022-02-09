@@ -33,14 +33,14 @@ export function useUpdate(state: any) {
           tenantId: userInfo.tenantId,
           email: state.profileForm.email,
           phone: state.profileForm.phone,
-          state: state.profileForm.state,
-          queue: userInfo.queue,
+          state: userInfo.state,
+          queue: userInfo.queue
         })
       }
     })
   }
 
   return {
-    handleUpdate,
+    handleUpdate
   }
 }

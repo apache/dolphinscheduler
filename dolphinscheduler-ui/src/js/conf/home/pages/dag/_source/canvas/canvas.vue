@@ -277,6 +277,35 @@
             edge.setSource(sourceNode)
           }
         })
+
+        // Add a node tool when the mouse entering
+        this.graph.on('node:mouseenter', ({ e, x, y, node, view }) => {
+          const nodeName = node.getData().taskName
+          node.addTools({
+            name: 'button',
+            args: {
+              markup: [
+                {
+                  tagName: 'text',
+                  textContent: nodeName,
+                  attrs: {
+                    fill: '#868686',
+                    'font-size': 16,
+                    'text-anchor': 'center'
+                  }
+                }
+              ],
+              x: 0,
+              y: 0,
+              offset: { x: 0, y: -10 }
+            }
+          })
+        })
+
+        // Remove all tools when the mouse leaving
+        this.graph.on('node:mouseleave', ({ node }) => {
+          node.removeTools()
+        })
       },
       /**
        * @param {Edge|string} edge

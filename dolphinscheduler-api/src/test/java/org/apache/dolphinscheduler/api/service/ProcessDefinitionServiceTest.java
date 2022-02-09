@@ -31,12 +31,14 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -90,6 +92,14 @@ public class ProcessDefinitionServiceTest {
     private static final String taskRelationJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
             + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
+
+    private static final String taskDefinitionJson = "[{\"code\":123456789,\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\"," +
+        "\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{}," +
+        "\"switchResult\":{}},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\"," +
+        "\"timeoutNotifyStrategy\":null,\"timeout\":0,\"environmentCode\":-1},{\"code\":123451234,\"name\":\"test2\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\"," +
+        "\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 2\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{}," +
+        "\"switchResult\":{}},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\"," +
+        "\"timeoutNotifyStrategy\":\"WARN\",\"timeout\":0,\"environmentCode\":-1}]";
 
     @InjectMocks
     private ProcessDefinitionServiceImpl processDefinitionService;
@@ -298,7 +308,7 @@ public class ProcessDefinitionServiceTest {
         processDefinitionList.add(definition);
         Set<Long> definitionCodes = Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
         Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
-        Mockito.when(processService.saveProcessDefine(loginUser, definition, true)).thenReturn(2);
+        Mockito.when(processService.saveProcessDefine(loginUser, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
                 loginUser, projectCode, "46", 1L);
         Assert.assertEquals(Status.SUCCESS, map3.get(Constants.STATUS));
@@ -330,7 +340,7 @@ public class ProcessDefinitionServiceTest {
         processDefinitionList.add(definition);
         Set<Long> definitionCodes = Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
         Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
-        Mockito.when(processService.saveProcessDefine(loginUser, definition, true)).thenReturn(2);
+        Mockito.when(processService.saveProcessDefine(loginUser, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 46L)).thenReturn(getProcessTaskRelation(projectCode));
         putMsg(result, Status.SUCCESS);
 
@@ -442,7 +452,7 @@ public class ProcessDefinitionServiceTest {
         processTaskRelation.setProcessDefinitionCode(46L);
         processTaskRelation.setPostTaskCode(123L);
         processTaskRelationList.add(processTaskRelation);
-        Mockito.when(processService.findRelationByCode(projectCode, 46L)).thenReturn(processTaskRelationList);
+        Mockito.when(processService.findRelationByCode(46L, 1)).thenReturn(processTaskRelationList);
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
@@ -493,10 +503,12 @@ public class ProcessDefinitionServiceTest {
 
     @Test
     public void testCheckProcessNodeList() {
-        Map<String, Object> dataNotValidRes = processDefinitionService.checkProcessNodeList(null);
+        Map<String, Object> dataNotValidRes = processDefinitionService.checkProcessNodeList(null, null);
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
 
-        Map<String, Object> taskEmptyRes = processDefinitionService.checkProcessNodeList(taskRelationJson);
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
+        Map<String, Object> taskEmptyRes = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
         Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, taskEmptyRes.get(Constants.STATUS));
     }
 
@@ -692,10 +704,10 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(dataSourceMapper.queryDataSourceByNameAndUserId(userId, "mysql_1")).thenReturn(dataSource);
 
         long projectCode =  1001;
-        Mockito.when(processService.saveTaskDefine(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.notNull())).thenReturn(2);
-        Mockito.when(processService.saveProcessDefine(Mockito.same(loginUser), Mockito.notNull(), Mockito.notNull())).thenReturn(1);
+        Mockito.when(processService.saveTaskDefine(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(2);
+        Mockito.when(processService.saveProcessDefine(Mockito.same(loginUser), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(1);
         Mockito.when(processService.saveTaskRelation(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.anyLong(),
-            Mockito.eq(1), Mockito.notNull(), Mockito.notNull())).thenReturn(0);
+            Mockito.eq(1), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(0);
 
         Map<String, Object> result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
 
@@ -715,6 +727,7 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(46L);
+        processDefinition.setVersion(1);
         return processDefinition;
     }
 

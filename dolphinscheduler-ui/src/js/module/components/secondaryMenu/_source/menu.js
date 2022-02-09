@@ -88,6 +88,26 @@ const menu = {
       ]
     }
   ],
+  dataQuality: [
+    {
+      name: `${i18n.$t('DataQuality Result')}`,
+      id: 0,
+      path: 'data-quality-result',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-s-grid',
+      children: []
+    },
+    {
+      name: `${i18n.$t('DataQuality Rule')}`,
+      id: 1,
+      path: 'data-quality-rule',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-document',
+      children: []
+    }
+  ],
   security: [
     {
       name: `${i18n.$t('Tenant Manage')}`,
@@ -144,7 +164,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-s-grid',
-      children: []
+      children: [],
+      classNames: 'tab-queue-manage'
     },
     {
       name: `${i18n.$t('Environment manage')}`,
@@ -153,16 +174,18 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-setting',
-      children: []
+      children: [],
+      classNames: 'tab-environment-manage'
     },
     {
       name: `${i18n.$t('Token manage')}`,
       id: 2,
       path: 'token-manage',
       isOpen: true,
+      enabled: true,
       icon: 'el-icon-document',
       children: [],
-      enabled: true
+      classNames: 'tab-token-manage'
     }
   ],
   resource: [
@@ -173,7 +196,8 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-document-copy',
       children: [],
-      enabled: true
+      enabled: true,
+      classNames: 'tab-file-manage'
     },
     {
       name: `${i18n.$t('UDF manage')}`,
@@ -187,13 +211,15 @@ const menu = {
           name: `${i18n.$t('Resource manage')}`,
           path: 'resource-udf',
           id: 0,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-udf-resource-manage'
         },
         {
           name: `${i18n.$t('Function manage')}`,
           path: 'resource-func',
           id: 1,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-function-resource-manage'
         }
       ]
     },
@@ -209,13 +235,15 @@ const menu = {
           name: `${i18n.$t('Task group option')}`,
           path: 'task-group-option',
           id: 0,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-task-group-option-manage'
         },
         {
           name: `${i18n.$t('Task group queue')}`,
           path: 'task-group-queue',
           id: 1,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-task-group-queue-manage'
         }
       ]
     }
@@ -290,6 +318,12 @@ const menu = {
           name: 'Statistics',
           path: 'statistics',
           id: 0,
+          enabled: true
+        },
+        {
+          name: 'Audit Log',
+          path: 'audit-log',
+          id: 1,
           enabled: true
         }
       ]

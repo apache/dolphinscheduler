@@ -77,8 +77,9 @@ public class JDBCDataSourceProvider {
         dataSource.setUsername(properties.getUser());
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
-        dataSource.setMinimumIdle(1);
-        dataSource.setMaximumPoolSize(1);
+        Boolean isOneSession = PropertyUtils.getBoolean(Constants.SUPPORT_HIVE_ONE_SESSION, false);
+        dataSource.setMinimumIdle(isOneSession ? 1 : PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMaximumPoolSize(isOneSession ? 1 : PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
         if (properties.getProps() != null) {

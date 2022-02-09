@@ -137,7 +137,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 return result;
             }
         }
-        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
+        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
@@ -230,13 +230,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 processTaskRelationLogList.addAll(processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList()));
             }
             int insertResult = processService.saveTaskRelation(loginUser, projectCode, processDefinition.getCode(), processDefinition.getVersion(),
-                processTaskRelationLogList, null);
+                processTaskRelationLogList, Lists.newArrayList(), Boolean.TRUE);
             if (insertResult != Constants.EXIT_CODE_SUCCESS) {
                 putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
                 throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
             }
         }
-        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, Lists.newArrayList(taskDefinition));
+        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, Lists.newArrayList(taskDefinition), Boolean.TRUE);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
@@ -279,6 +279,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param projectCode project code
      * @param taskCode task code
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -314,21 +315,33 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
             if (!taskRelationList.isEmpty()) {
                 int deleteRelation = 0;
-                int deleteRelationLog = 0;
                 for (ProcessTaskRelation processTaskRelation : taskRelationList) {
-                    ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
-                    deleteRelation += processTaskRelationMapper.deleteRelation(processTaskRelationLog);
-                    deleteRelationLog += processTaskRelationLogMapper.deleteRelation(processTaskRelationLog);
+                    deleteRelation += processTaskRelationMapper.deleteById(processTaskRelation.getId());
                 }
-                if ((deleteRelation & deleteRelationLog) == 0) {
+                if (deleteRelation == 0) {
                     throw new ServiceException(Status.DELETE_TASK_PROCESS_RELATION_ERROR);
                 }
+                long processDefinitionCode = taskRelationList.get(0).getProcessDefinitionCode();
+                updateProcessDefiniteVersion(loginUser, processDefinitionCode);
             }
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+            throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
         }
         return result;
+    }
+
+    private int updateProcessDefiniteVersion(User loginUser, long processDefinitionCode) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST);
+        }
+        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+        if (insertVersion <= 0) {
+            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+        }
+        return insertVersion;
     }
 
     /**
@@ -347,37 +360,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (version <= 0) {
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
-        if (!processTaskRelationList.isEmpty()) {
-            List<ProcessTaskRelationLog> processTaskRelationLogList = new ArrayList<>();
-            int delete = 0;
-            int deleteLog = 0;
-            Date now = new Date();
-            for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
-                ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
-                delete += processTaskRelationMapper.deleteRelation(processTaskRelationLog);
-                deleteLog += processTaskRelationLogMapper.deleteRelation(processTaskRelationLog);
-                if (processTaskRelationLog.getPreTaskCode() == taskCode) {
-                    processTaskRelationLog.setPreTaskVersion(version);
-                }
-                if (processTaskRelationLog.getPostTaskCode() == taskCode) {
-                    processTaskRelationLog.setPostTaskVersion(version);
-                }
-                processTaskRelationLog.setOperator(loginUser.getId());
-                processTaskRelationLog.setOperateTime(now);
-                processTaskRelationLog.setUpdateTime(now);
-                processTaskRelationLogList.add(processTaskRelationLog);
-            }
-            if ((delete & deleteLog) == 0) {
-                throw new ServiceException(Status.DELETE_TASK_PROCESS_RELATION_ERROR);
-            } else {
-                int insertRelation = processTaskRelationMapper.batchInsert(processTaskRelationLogList);
-                int insertRelationLog = processTaskRelationLogMapper.batchInsert(processTaskRelationLogList);
-                if ((insertRelation & insertRelationLog) == 0) {
-                    throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-                }
-            }
-        }
+        handleRelation(loginUser, taskCode, version);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -439,6 +422,41 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return version;
     }
 
+    private void handleRelation(User loginUser, long taskCode, Integer version) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (!processTaskRelationList.isEmpty()) {
+            long processDefinitionCode = processTaskRelationList.get(0).getProcessDefinitionCode();
+            int definiteVersion = updateProcessDefiniteVersion(loginUser, processDefinitionCode);
+            List<ProcessTaskRelationLog> processTaskRelationLogList = new ArrayList<>();
+            int delete = 0;
+            Date now = new Date();
+            for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
+                ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+                delete += processTaskRelationMapper.deleteRelation(processTaskRelationLog);
+                if (processTaskRelationLog.getPreTaskCode() == taskCode) {
+                    processTaskRelationLog.setPreTaskVersion(version);
+                }
+                if (processTaskRelationLog.getPostTaskCode() == taskCode) {
+                    processTaskRelationLog.setPostTaskVersion(version);
+                }
+                processTaskRelationLog.setProcessDefinitionVersion(definiteVersion);
+                processTaskRelationLog.setOperator(loginUser.getId());
+                processTaskRelationLog.setOperateTime(now);
+                processTaskRelationLog.setUpdateTime(now);
+                processTaskRelationLogList.add(processTaskRelationLog);
+            }
+            if (delete == 0) {
+                throw new ServiceException(Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+            } else {
+                int insertRelation = processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+                int insertRelationLog = processTaskRelationLogMapper.batchInsert(processTaskRelationLogList);
+                if ((insertRelation & insertRelationLog) == 0) {
+                    throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+                }
+            }
+        }
+    }
+
     /**
      * update task definition and upstream
      *
@@ -476,6 +494,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             throw new ServiceException(Status.PROCESS_TASK_RELATION_NOT_EXIST);
         }
         if (!processTaskRelationList.isEmpty()) {
+            long processDefinitionCode = processTaskRelationList.get(0).getProcessDefinitionCode();
+            int definiteVersion = updateProcessDefiniteVersion(loginUser, processDefinitionCode);
             List<ProcessTaskRelationLog> relationLogs = new ArrayList<>();
             Date now = new Date();
             int delete = 0;
@@ -498,6 +518,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         processTaskRelationLog.setPreTaskVersion(0);
                     }
                 }
+                processTaskRelationLog.setProcessDefinitionVersion(definiteVersion);
                 relationLogs.add(processTaskRelationLog);
             }
             if ((delete & deleteLog) == 0) {
@@ -560,6 +581,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionUpdate.setId(taskDefinition.getId());
         int switchVersion = taskDefinitionMapper.updateById(taskDefinitionUpdate);
         if (switchVersion > 0) {
+            handleRelation(loginUser, taskCode, version);
             result.put(Constants.DATA_LIST, taskCode);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -768,7 +790,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     }
                 }
                 taskDefinition.setFlag(Flag.YES);
-                taskDefinitionLog.setFlag(Flag.NO);
+                taskDefinitionLog.setFlag(Flag.YES);
                 break;
             default:
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);

@@ -34,13 +34,12 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -49,6 +48,8 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -57,6 +58,7 @@ import io.netty.channel.Channel;
 /**
  * worker request processor
  */
+@Component
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
@@ -64,30 +66,29 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     /**
      * worker config
      */
-    private final WorkerConfig workerConfig;
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      * task callback service
      */
-    private final TaskCallbackService taskCallbackService;
+    @Autowired
+    private TaskCallbackService taskCallbackService;
 
     /**
      * alert client service
      */
+    @Autowired
     private AlertClientService alertClientService;
 
+    @Autowired
     private TaskPluginManager taskPluginManager;
 
-    /*
+    /**
      * task execute manager
      */
-    private final WorkerManagerThread workerManager;
-
-    public TaskExecuteProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
-    }
+    @Autowired
+    private WorkerManagerThread workerManager;
 
     /**
      * Pre-cache task to avoid extreme situations when kill task. There is no such task in the cache
@@ -99,12 +100,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
         TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
-    }
-
-    public TaskExecuteProcessor(AlertClientService alertClientService, TaskPluginManager taskPluginManager) {
-        this();
-        this.alertClientService = alertClientService;
-        this.taskPluginManager = taskPluginManager;
     }
 
     @Override
@@ -178,7 +173,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private void doAck(TaskExecutionContext taskExecutionContext) {
         // tell master that task is in executing
         TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command(), Event.ACK);
+        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command(), Event.ACK);
         taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
     }
 

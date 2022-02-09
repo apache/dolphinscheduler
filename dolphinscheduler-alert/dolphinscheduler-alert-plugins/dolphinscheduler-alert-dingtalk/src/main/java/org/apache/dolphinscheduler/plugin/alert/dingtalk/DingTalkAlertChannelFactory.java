@@ -45,46 +45,93 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> params() {
-        InputParam webHookParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK, DingTalkParamsConstants.DING_TALK_WEB_HOOK)
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
-        InputParam keywordParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, DingTalkParamsConstants.DING_TALK_KEYWORD)
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
-        RadioParam isEnableProxy =
-            RadioParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.DING_TALK_PROXY_ENABLE)
-                      .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
-                      .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
-                      .setValue(STRING_TRUE)
-                      .addValidate(Validate.newBuilder()
-                                           .setRequired(false)
-                                           .build())
-                      .build();
-        InputParam proxyParam =
-            InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY, DingTalkParamsConstants.DING_TALK_PROXY)
-                      .addValidate(Validate.newBuilder()
-                                           .setRequired(false).build())
-                      .build();
+        InputParam webHookParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK, DingTalkParamsConstants.DING_TALK_WEB_HOOK)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+        InputParam keywordParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, DingTalkParamsConstants.DING_TALK_KEYWORD)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
 
-        InputParam portParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PORT, DingTalkParamsConstants.DING_TALK_PORT)
-                                         .addValidate(Validate.newBuilder()
-                                                              .setRequired(false).build())
-                                         .build();
+        InputParam secretParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_SECRET, DingTalkParamsConstants.DING_TALK_SECRET)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
 
-        InputParam userParam =
-            InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_USER, DingTalkParamsConstants.DING_TALK_USER)
-                      .addValidate(Validate.newBuilder()
-                                           .setRequired(false).build())
-                      .build();
-        PasswordParam passwordParam = PasswordParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, DingTalkParamsConstants.DING_TALK_PASSWORD)
-                                                   .setPlaceholder("if enable use authentication, you need input password")
-                                                   .build();
+        RadioParam msgTypeParam = RadioParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_MSG_TYPE, DingTalkParamsConstants.DING_TALK_MSG_TYPE)
+                .addParamsOptions(new ParamsOptions(DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT, DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT, false))
+                .addParamsOptions(new ParamsOptions(DingTalkParamsConstants.DING_TALK_MSG_TYPE_MARKDOWN, DingTalkParamsConstants.DING_TALK_MSG_TYPE_MARKDOWN, false))
+                .setValue(DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
 
-        return Arrays.asList(webHookParam, keywordParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
+        InputParam atMobilesParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES, DingTalkParamsConstants.DING_TALK_AT_MOBILES)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        InputParam atUserIdsParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS, DingTalkParamsConstants.DING_TALK_AT_USERIDS)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        RadioParam isAtAll = RadioParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_ALL, DingTalkParamsConstants.DING_TALK_AT_ALL)
+                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_FALSE)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+
+        RadioParam isEnableProxy = RadioParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.DING_TALK_PROXY_ENABLE)
+                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_FALSE)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        InputParam proxyParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY, DingTalkParamsConstants.DING_TALK_PROXY)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+
+        InputParam portParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PORT, DingTalkParamsConstants.DING_TALK_PORT)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+
+        InputParam userParam = InputParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_USER, DingTalkParamsConstants.DING_TALK_USER)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        PasswordParam passwordParam = PasswordParam
+                .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, DingTalkParamsConstants.DING_TALK_PASSWORD)
+                .setPlaceholder("if enable use authentication, you need input password")
+                .build();
+
+        return Arrays.asList(webHookParam, keywordParam, secretParam, msgTypeParam, atMobilesParam, atUserIdsParam, isAtAll, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
 
     @Override

@@ -17,6 +17,8 @@
 
 interface MenuState {
   menuKey: string
+  isShowSide: boolean
+  projectCode: string
 }
 
 export default MenuState

@@ -22,7 +22,7 @@ export function queryAccessTokenList(params: ListReq): any {
   return axios({
     url: '/access-tokens',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -30,7 +30,7 @@ export function createToken(data: TokenReq): any {
   return axios({
     url: '/access-tokens',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -38,14 +38,30 @@ export function queryAccessTokenByUser(params: UserReq): any {
   return axios({
     url: '/access-tokens',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function updateToken(data: UpdateTokenReq): any {
   return axios({
-    url: '/access-tokens',
+    url: `/access-tokens/${data.id}`,
     method: 'put',
-    data,
+    data
+  })
+}
+
+export function deleteToken(id: number): any {
+  return axios({
+    url: `/access-tokens/${id}`,
+    method: 'delete',
+    params: { id }
+  })
+}
+
+export function generateToken(data: TokenReq): any {
+  return axios({
+    url: `/access-tokens/generate`,
+    method: 'post',
+    data
   })
 }
