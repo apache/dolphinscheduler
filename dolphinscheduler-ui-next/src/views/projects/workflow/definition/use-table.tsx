@@ -17,7 +17,7 @@
 
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { useAsyncState } from '@vueuse/core'
@@ -49,14 +49,21 @@ export function useTable() {
       title: t('project.workflow.workflow_name'),
       key: 'name',
       width: 200,
-      render: (_row) =>
-        h(
-          NEllipsis,
-          { style: 'max-width: 200px' },
-          {
-            default: () => _row.name
-          }
-        )
+      render: (_row) => (
+        <NEllipsis
+          style={{
+            maxWidth: '200px'
+          }}
+        >
+          <RouterLink
+            to={{
+              path: `/projects/${_row.projectCode}/workflow/definitions/${_row.code}`
+            }}
+          >
+            {_row.name}
+          </RouterLink>
+        </NEllipsis>
+      )
     },
     {
       title: t('project.workflow.status'),

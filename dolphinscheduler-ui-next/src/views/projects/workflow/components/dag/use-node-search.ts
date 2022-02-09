@@ -17,7 +17,7 @@
 
 import type { Graph } from '@antv/x6'
 import { ref, Ref } from 'vue'
-import { useGraphOperations } from './dag-hooks'
+import { useCellQuery } from './dag-hooks'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -29,30 +29,43 @@ interface Options {
 export function useNodeSearch(options: Options) {
   const { graph } = options
 
+  /**
+   * Search input visible control
+   */
   const searchInputVisible = ref(false)
-  const allNodes = ref<any>([])
   const toggleSearchInput = () => {
     searchInputVisible.value = !searchInputVisible.value
   }
-  const { getNodes, navigateTo } = useGraphOperations({ graph })
-  const searchNode = (val: string) => {
-    navigateTo(val)
+
+  /**
+   * Search dropdown control
+   */
+  const { getNodes } = useCellQuery({ graph })
+  const nodesDropdown = ref<{ label: string; value: string }[]>([])
+  const reQueryNodes = () => {
+    nodesDropdown.value = getNodes().map((node) => ({
+      label: node.name,
+      value: node.code
+    }))
   }
-  const getAllNodes = () => {
-    const nodes = getNodes()
-    allNodes.value = nodes.map((node) => {
-      return {
-        label: node.name,
-        value: node.code
-      }
-    })
+
+  /**
+   * Navigate to cell
+   * @param {string} code
+   */
+  function navigateTo(code: string) {
+    if (!graph.value) return
+    const cell = graph.value.getCellById(code)
+    graph.value.scrollToCell(cell, { animation: { duration: 600 } })
+    graph.value.cleanSelection()
+    graph.value.select(cell)
   }
 
   return {
-    searchNode,
-    getAllNodes,
-    allNodes,
+    navigateTo,
     toggleSearchInput,
-    searchInputVisible
+    searchInputVisible,
+    reQueryNodes,
+    nodesDropdown
   }
 }

@@ -16,32 +16,39 @@
  */
 
 import type { Ref } from 'vue'
-import type { Dragged } from './dag'
+import type { Graph } from '@antv/x6'
+import { TaskType } from '../../../task/constants/task-type'
 
 interface Options {
-  readonly: Ref<boolean>
-  dragged: Ref<Dragged>
+  graph: Ref<Graph | undefined>
 }
 
 /**
- * Sidebar drag
+ * Expose some cell-related query methods and refs
+ * @param {Options} options
  */
-export function useSidebarDrag(options: Options) {
-  const { readonly, dragged } = options
+export function useCellQuery(options: Options) {
+  const { graph } = options
 
-  const onDragStart = (e: DragEvent, type: string) => {
-    if (readonly.value) {
-      e.preventDefault()
-      return
-    }
-    dragged.value = {
-      x: e.offsetX,
-      y: e.offsetY,
-      type: type
-    }
+  /**
+   * Get all nodes
+   */
+  function getNodes() {
+    const nodes = graph.value?.getNodes()
+    if (!nodes) return []
+    return nodes.map((node) => {
+      const position = node.getPosition()
+      const data = node.getData()
+      return {
+        code: node.id,
+        position: position,
+        name: data.taskName as string,
+        type: data.taskType as TaskType
+      }
+    })
   }
 
   return {
-    onDragStart
+    getNodes
   }
 }

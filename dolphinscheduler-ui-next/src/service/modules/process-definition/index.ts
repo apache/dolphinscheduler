@@ -148,11 +148,11 @@ export function verifyName(params: NameReq, code: CodeReq): any {
 }
 
 export function queryProcessDefinitionByCode(
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  projectCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}`,
+    url: `/projects/${projectCode}/process-definition/${code}`,
     method: 'get'
   })
 }

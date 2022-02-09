@@ -25,11 +25,6 @@ export default defineComponent({
   setup() {
     const theme = useThemeStore()
 
-    const slots = {
-      toolbarLeft: () => <span>left-operations</span>,
-      toolbarRight: () => <span>right-operations</span>
-    }
-
     return () => (
       <div
         class={[
@@ -37,7 +32,7 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        <Dag v-slots={slots} />
+        <Dag />
       </div>
     )
   }

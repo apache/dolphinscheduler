@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export const ALL_TASK_TYPES: any = {
+export const TASK_TYPES_MAP = {
   SHELL: {
     alias: 'SHELL'
   },
@@ -65,3 +65,5 @@ export const ALL_TASK_TYPES: any = {
     alias: 'WATERDROP'
   }
 }
+
+export type TaskType = keyof typeof TASK_TYPES_MAP

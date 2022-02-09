@@ -16,48 +16,48 @@
  */
 
 import type { Graph } from '@antv/x6'
-import { defineComponent, ref, provide } from 'vue'
+import { defineComponent, ref, provide, PropType, toRef } from 'vue'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
 import Styles from './dag.module.scss'
 import DagAutoLayoutModal from './dag-auto-layout-modal'
-import { useGraphAutoLayout } from './dag-hooks'
+import {
+  useGraphAutoLayout,
+  useGraphBackfill,
+  useDagDragAndDrop
+} from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
+import VersionModal from '../../definition/components/version-modal'
+import { WorkflowDefinition } from './types'
 import './x6-style.scss'
 
-export interface Dragged {
-  x: number
-  y: number
-  type: string
+const props = {
+  // If this prop is passed, it means from definition detail
+  definition: {
+    type: Object as PropType<WorkflowDefinition>,
+    default: undefined
+  },
+  readonly: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  }
 }
 
 export default defineComponent({
   name: 'workflow-dag',
+  props,
+  emits: ['refresh'],
   setup(props, context) {
     const theme = useThemeStore()
 
     // Whether the graph can be operated
-    const readonly = ref(false)
-    provide('readonly', readonly)
+    provide('readonly', toRef(props, 'readonly'))
 
     const graph = ref<Graph>()
     provide('graph', graph)
 
-    // The sidebar slots
-    const toolbarSlots = {
-      left: context.slots.toolbarLeft,
-      right: context.slots.toolbarRight
-    }
-
-    // The element currently being dragged up
-    const dragged = ref<Dragged>({
-      x: 0,
-      y: 0,
-      type: ''
-    })
-
-    // Auto layout
+    // Auto layout modal
     const {
       visible: layoutVisible,
       toggle: layoutToggle,
@@ -67,6 +67,28 @@ export default defineComponent({
       cancel
     } = useGraphAutoLayout({ graph })
 
+    const { onDragStart, onDrop } = useDagDragAndDrop({
+      graph,
+      readonly: toRef(props, 'readonly')
+    })
+
+    // backfill
+    useGraphBackfill({ graph, definition: toRef(props, 'definition') })
+
+    // version modal
+    const versionModalShow = ref(false)
+    const versionToggle = (bool: boolean) => {
+      if (typeof bool === 'boolean') {
+        versionModalShow.value = bool
+      } else {
+        versionModalShow.value = !versionModalShow.value
+      }
+    }
+    const refreshDetail = () => {
+      context.emit('refresh')
+      versionModalShow.value = false
+    }
+
     return () => (
       <div
         class={[
@@ -74,10 +96,14 @@ export default defineComponent({
           Styles[`dag-${theme.darkTheme ? 'dark' : 'light'}`]
         ]}
       >
-        <DagToolbar v-slots={toolbarSlots} layoutToggle={layoutToggle} />
+        <DagToolbar
+          layoutToggle={layoutToggle}
+          definition={props.definition}
+          onVersionToggle={versionToggle}
+        />
         <div class={Styles.content}>
-          <DagSidebar dragged={dragged} />
-          <DagCanvas dragged={dragged} />
+          <DagSidebar onDragStart={onDragStart} />
+          <DagCanvas onDrop={onDrop} />
         </div>
         <DagAutoLayoutModal
           visible={layoutVisible.value}
@@ -86,6 +112,13 @@ export default defineComponent({
           formValue={formValue}
           formRef={formRef}
         />
+        {!!props.definition && (
+          <VersionModal
+            v-model:row={props.definition.processDefinition}
+            v-model:show={versionModalShow.value}
+            onUpdateList={refreshDetail}
+          />
+        )}
       </div>
     )
   }

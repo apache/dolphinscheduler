@@ -494,7 +494,8 @@ const project = {
     grid_layout: '网格布局',
     dagre_layout: '层次布局',
     rows: '行数',
-    cols: '列数'
+    cols: '列数',
+    copy_success: '复制成功'
   }
 }
 

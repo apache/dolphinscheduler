@@ -495,7 +495,8 @@ const project = {
     grid_layout: 'Grid',
     dagre_layout: 'Dagre',
     rows: 'Rows',
-    cols: 'Cols'
+    cols: 'Cols',
+    copy_success: 'Copy Success'
   }
 }
 
