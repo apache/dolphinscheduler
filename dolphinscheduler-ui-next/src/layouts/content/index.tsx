@@ -74,18 +74,20 @@ const Content = defineComponent({
     watch(
       () => route.path,
       () => {
-        state.isShowSide = menuStore.getShowSideStatus
-        route.matched[1].path.includes(':projectCode')
-        if (route.matched[1].path === '/projects/:projectCode') {
-          changeMenuOption(state)
-          getSideMenu(state)
+        if (route.path !== '/login') {
+          state.isShowSide = menuStore.getShowSideStatus
+          route.matched[1].path.includes(':projectCode')
+          if (route.matched[1].path === '/projects/:projectCode') {
+            changeMenuOption(state)
+            getSideMenu(state)
+          }
+          sideKeyRef.value = route.matched[1].path.includes(':projectCode')
+            ? route.matched[1].path.replace(
+                ':projectCode',
+                menuStore.getProjectCode
+              )
+            : route.matched[1].path
         }
-        sideKeyRef.value = route.matched[1].path.includes(':projectCode')
-          ? route.matched[1].path.replace(
-              ':projectCode',
-              menuStore.getProjectCode
-            )
-          : route.matched[1].path
       },
       { immediate: true }
     )
