@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {defineComponent, onMounted, ref, toRefs, watch} from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NSpace,
   NInput,
@@ -29,8 +29,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import Card from '@/components/card'
 import styles from './index.module.scss'
-import RuleModal from "./components/rule-modal"
-
+import RuleModal from './components/rule-modal'
 
 const TaskResult = defineComponent({
   name: 'rule',
@@ -69,9 +68,7 @@ const TaskResult = defineComponent({
       showModalRef.value = false
     }
 
-    const viewRuleEntry = (
-       ruleJson: string
-    ) => {
+    const viewRuleEntry = (ruleJson: string) => {
       showModalRef.value = true
       ruleEntryData.value = ruleJson
     }
@@ -94,7 +91,17 @@ const TaskResult = defineComponent({
     }
   },
   render() {
-    const { t, showModalRef, requestTableData, onUpdatePageSize, onSearch, onCancel, onConfirm, viewRuleEntry, ruleEntryData } = this
+    const {
+      t,
+      showModalRef,
+      requestTableData,
+      onUpdatePageSize,
+      onSearch,
+      onCancel,
+      onConfirm,
+      viewRuleEntry,
+      ruleEntryData
+    } = this
 
     const { columns } = useTable(viewRuleEntry)
 
@@ -136,10 +143,10 @@ const TaskResult = defineComponent({
         </Card>
         {showModalRef && (
           <RuleModal
-              show={showModalRef}
-              onCancel={onCancel}
-              onConfirm={onConfirm}
-              data={ruleEntryData}
+            show={showModalRef}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+            data={ruleEntryData}
           />
         )}
       </div>

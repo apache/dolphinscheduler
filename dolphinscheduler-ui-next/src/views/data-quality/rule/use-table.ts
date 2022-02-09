@@ -16,19 +16,16 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import {h, reactive, ref} from 'vue'
+import { h, reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryRuleListPaging } from '@/service/modules/data-quality'
 import type { Rule, RuleRes } from '@/service/modules/data-quality/types'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import { format } from 'date-fns'
-import {TableColumns} from "naive-ui/es/data-table/src/interface";
+import { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
-
-export function useTable(
-    viewRuleEntry = (ruleJson: string): void => {}
-) {
+export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
   const { t } = useI18n()
 
   const variables = reactive({
@@ -66,12 +63,12 @@ export function useTable(
       key: 'actions',
       width: 150,
       render: (row: any) =>
-          h(TableAction, {
-            row,
-            onViewRuleEntry: (ruleJson: string) => {
-              viewRuleEntry(ruleJson)
-            },
-          })
+        h(TableAction, {
+          row,
+          onViewRuleEntry: (ruleJson: string) => {
+            viewRuleEntry(ruleJson)
+          }
+        })
     }
   ]
 
@@ -108,22 +105,36 @@ export function useTable(
     }
 
     const { state } = useAsyncState(
-        queryRuleListPaging(data).then((res: RuleRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
-            const ruleName = 'data_quality.rule.' + item.name.substring(3,item.name.length-1)
-            const ruleNameLocale = t(ruleName)
-            const ruleTypeName = _.find(ruleTypeMapping, {code: item.type}).label
+      queryRuleListPaging(data).then((res: RuleRes) => {
+        variables.tableData = res.totalList.map((item, index) => {
+          const ruleName =
+            'data_quality.rule.' + item.name.substring(3, item.name.length - 1)
+          const ruleNameLocale = t(ruleName)
 
-            item.createTime = format(new Date(item.createTime), 'yyyy-MM-dd HH:mm:ss')
-            item.updateTime = format(new Date(item.updateTime), 'yyyy-MM-dd HH:mm:ss')
+          const ruleType = _.find(ruleTypeMapping, { code: item.type })
 
-            return {
-              index: index + 1,
-              ...item,
-              ruleName: ruleNameLocale,
-              ruleTypeName: ruleTypeName
-            }
-          }) as any
+          let ruleTypeName = ''
+
+          if (ruleType) {
+            ruleTypeName = ruleType.label
+          }
+
+          item.createTime = format(
+            new Date(item.createTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          item.updateTime = format(
+            new Date(item.updateTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+
+          return {
+            index: index + 1,
+            ...item,
+            ruleName: ruleNameLocale,
+            ruleTypeName: ruleTypeName
+          }
+        }) as any
       }),
       {}
     )

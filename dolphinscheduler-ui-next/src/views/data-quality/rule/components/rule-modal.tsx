@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-import {defineComponent, h, PropType, reactive, ref, toRefs, watch} from 'vue'
+import { defineComponent, h, PropType, reactive, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NDataTable } from 'naive-ui'
 import Modal from '@/components/modal'
 import styles from '../index.module.scss'
-import { TableColumns } from "naive-ui/es/data-table/src/interface";
+import { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 const props = {
   show: {
@@ -38,13 +38,14 @@ export default defineComponent({
   props,
   emits: ['cancel', 'confirm'],
   setup(props, ctx) {
-
     const { t } = useI18n()
 
     const ruleInputEntryList = JSON.parse(props.data).ruleInputEntryList
 
     ruleInputEntryList.forEach((item: any) => {
-      item.title = t('data_quality.rule.'+item.title.substring(3,item.title.length-1))
+      item.title = t(
+        'data_quality.rule.' + item.title.substring(3, item.title.length - 1)
+      )
     })
 
     const columns: TableColumns<any> = [
