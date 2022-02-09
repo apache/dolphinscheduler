@@ -98,9 +98,15 @@ export function useTable(
       variables.totalPage = values[0].totalPage
       variables.tableData = values[0].totalList.map(
         (item: any, index: number) => {
-          item.taskGroupName = _.find(taskGroupList, {
-            id: item.groupId
-          }).name
+          let taskGroupName = ''
+          if (taskGroupList) {
+            let taskGroup = _.find(taskGroupList, { id: item.groupId })
+            if (taskGroup) {
+              taskGroupName = taskGroup.name
+            }
+          }
+
+          item.taskGroupName = taskGroupName
           item.createTime = format(
             new Date(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
