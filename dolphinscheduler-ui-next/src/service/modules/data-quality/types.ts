@@ -71,4 +71,24 @@ interface ResultListRes {
   start: number
 }
 
-export { RuleListReq, ResultListReq, ResultItem, ResultListRes }
+interface Rule {
+  id: number
+  name: string
+  ruleJson: string
+  type: number
+  userId: number
+  userName: string
+  createTime: string
+  updateTime: string
+}
+
+interface RuleRes {
+  totalList: Rule[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { RuleListReq, ResultListReq, ResultItem, ResultListRes, Rule, RuleRes }

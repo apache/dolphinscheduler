@@ -37,6 +37,15 @@ export default {
         title: '数据质量-task-result',
         showSide: true
       }
+    },
+    {
+      path: '/data-quality/rule',
+      name: 'data-quality-rule',
+      component: components['data-quality-rule'],
+      meta: {
+        title: '数据质量-rule',
+        showSide: true
+      }
     }
   ]
 }
