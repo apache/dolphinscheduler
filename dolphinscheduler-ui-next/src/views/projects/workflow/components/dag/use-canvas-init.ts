@@ -16,7 +16,7 @@
  */
 
 import type { Node } from '@antv/x6'
-import { ref, onMounted, Ref, onUnmounted } from 'vue'
+import { ref, onMounted, Ref } from 'vue'
 import { Graph } from '@antv/x6'
 import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import { debounce } from 'lodash'
