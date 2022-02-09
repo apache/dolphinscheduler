@@ -160,8 +160,8 @@ public class TaskResponsePersistThread implements Runnable {
                 }
 
                 if (channel != null) {
-                    channel.writeAndFlush(taskKillAckCommand.convert2Command());
                     TaskKillAckCommand taskKillAckCommand = new TaskKillAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+                    channel.writeAndFlush(taskKillAckCommand.convert2Command());
                 }
 
                 break;
