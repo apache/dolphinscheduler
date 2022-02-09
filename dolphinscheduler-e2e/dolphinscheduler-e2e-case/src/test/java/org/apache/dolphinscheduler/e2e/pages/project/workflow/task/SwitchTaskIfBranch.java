@@ -39,7 +39,7 @@ public final class SwitchTaskIfBranch {
             @FindBy(className = "switch-list"),
             @FindBy(className = "el-input")
     })
-    private WebElement ifBranch;
+    private WebElement inputIfBranch;
 
     public SwitchTaskIfBranch(SwitchTaskForm parent) {
         this.parent = parent;

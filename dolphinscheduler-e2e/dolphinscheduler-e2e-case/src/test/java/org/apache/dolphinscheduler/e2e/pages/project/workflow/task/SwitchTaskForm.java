@@ -34,22 +34,22 @@ import java.util.List;
 @Getter
 public final class SwitchTaskForm extends TaskNodeForm {
 
-    @FindBy(id = "add-if-branch")
-    private WebElement addBranchButton;
+    @FindBy(id = "btnAddIfBranch")
+    private WebElement buttonAddBranch;
 
     @FindBys({
             @FindBy(className = "switch-task"),
             @FindBy(className = "switch-else"),
             @FindBy(className = "el-input__inner")
     })
-    private WebElement elseBranch;
+    private WebElement inputElseBranch;
 
     public SwitchTaskForm(WorkflowForm parent) {
         super(parent);
     }
 
     public SwitchTaskForm elseBranch(String elseBranchName) {
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", elseBranch());
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", inputElseBranch());
 
         final By optionsLocator = By.className("option-else-branches");
 
@@ -69,12 +69,12 @@ public final class SwitchTaskForm extends TaskNodeForm {
     }
 
     public SwitchTaskForm addIfBranch(String switchScript, String ifBranchName) {
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", addBranchButton);
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", buttonAddBranch);
 
         SwitchTaskIfBranch switchTaskIfBranch = new SwitchTaskIfBranch(this);
         switchTaskIfBranch.codeEditor().content(switchScript);
 
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", switchTaskIfBranch.ifBranch());
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", switchTaskIfBranch.inputIfBranch());
 
         final By optionsLocator = By.className("option-if-branches");
 

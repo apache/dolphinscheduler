@@ -23,7 +23,7 @@
           <a href="javascript:"
              @click="!isDetails && _addDep()"
              class="add-dep">
-            <em v-if="!isLoading" id="add-if-branch" class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+            <em v-if="!isLoading" id="btnAddIfBranch" class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
             <em v-if="isLoading" class="el-icon-loading as as-spin" data-toggle="tooltip" :title="$t('Add')"></em>
           </a>
         </div>
