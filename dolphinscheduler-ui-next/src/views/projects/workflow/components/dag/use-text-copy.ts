@@ -15,26 +15,23 @@
  * limitations under the License.
  */
 
-import { useCanvasInit } from './use-canvas-init'
-import { useCellQuery } from './use-cell-query'
-import { useCellActive } from './use-cell-active'
-import { useCellUpdate } from './use-cell-update'
-import { useNodeSearch } from './use-node-search'
-import { useGraphAutoLayout } from './use-graph-auto-layout'
-import { useTextCopy } from './use-text-copy'
-import { useCustomCellBuilder } from './use-custom-cell-builder'
-import { useGraphBackfill } from './use-graph-backfill'
-import { useDagDragAndDrop } from './use-dag-drag-drop'
+import { useClipboard } from '@vueuse/core'
+import { useMessage } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
-export {
-  useCanvasInit,
-  useCellQuery,
-  useCellActive,
-  useNodeSearch,
-  useGraphAutoLayout,
-  useTextCopy,
-  useCustomCellBuilder,
-  useGraphBackfill,
-  useCellUpdate,
-  useDagDragAndDrop
+/**
+ * Text copy with success message
+ */
+export function useTextCopy() {
+  const { t } = useI18n()
+  const { copy } = useClipboard()
+  const message = useMessage()
+  const copyText = (text: string) => {
+    copy(text).then((res) => {
+      message.success(t('project.dag.copy_success'))
+    })
+  }
+  return {
+    copy: copyText
+  }
 }

@@ -58,9 +58,11 @@ export default defineComponent({
     }
 
     watch(
-      () => props.row.code,
+      () => props.show,
       () => {
-        getTableData(props.row)
+        if (props.show && props.row?.code) {
+          getTableData(props.row)
+        }
       }
     )
 
