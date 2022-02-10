@@ -26,6 +26,6 @@ public class HiveDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new HiveCommonDataSourceClient(baseConnectionParam, dbType);
+        return new HiveDataSourceClient(baseConnectionParam, dbType);
     }
 }
