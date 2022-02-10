@@ -14,26 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { reactive, ref } from 'vue'
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
+export function useDetail() {
+  const state = reactive({
+    formRef: ref(),
+    loading: false,
+    saving: false
+  })
 
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    {
-      ...slots
-    }
-  )
+  const onSubmit = async (model: object) => {
+    await state.formRef.validate()
+  }
+  return {
+    state,
+    onSubmit
+  }
 }

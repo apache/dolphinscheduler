@@ -14,14 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { Ref } from 'vue'
 import type {
   GridProps,
   FormProps,
   FormItemGiProps,
   FormItemRule,
   FormRules,
-  SelectOption
+  SelectOption,
+  TreeSelectOption
 } from 'naive-ui'
 
 type IType =
@@ -32,11 +33,16 @@ type IType =
   | 'switch'
   | 'input-number'
   | 'select'
+  | 'checkbox'
+  | 'tree-select'
 
-type IOption = SelectOption
+interface IOption extends SelectOption, TreeSelectOption {
+  label: string
+}
 
-interface IFormItem extends FormItemGiProps {
+interface IFormItem extends Omit<FormItemGiProps, 'span'> {
   widget: any
+  span?: any
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
@@ -54,6 +60,8 @@ interface IJsonItem {
   value?: any
   options?: IOption[]
   children?: IJsonItem[]
+  slots?: object
+  span?: number | Ref<number>
 }
 
 export {

@@ -15,25 +15,17 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
+import { useI18n } from 'vue-i18n'
 
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    {
-      ...slots
+export function useDelayTime() {
+  const { t } = useI18n()
+  return {
+    type: 'input-number',
+    field: 'delayTime',
+    name: t('project.node.delay_execution_time'),
+    span: 12,
+    slots: {
+      suffix: () => t('project.node.minute')
     }
-  )
+  }
 }

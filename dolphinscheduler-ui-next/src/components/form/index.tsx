@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, h } from 'vue'
+import { defineComponent, PropType, toRefs, h, toRef, isRef } from 'vue'
 import { NSpin, NGrid, NForm, NFormItemGi } from 'naive-ui'
 import { useForm } from './use-form'
 import type { GridProps, IMeta } from './types'
@@ -55,7 +55,11 @@ const Form = defineComponent({
             {elements.map((element) => {
               const { span = 24, path, widget, ...formItemProps } = element
               return (
-                <NFormItemGi {...formItemProps} span={span} path={path}>
+                <NFormItemGi
+                  {...formItemProps}
+                  span={isRef(span) ? span.value : span}
+                  path={path}
+                >
                   {h(widget)}
                 </NFormItemGi>
               )
