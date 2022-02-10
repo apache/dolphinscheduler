@@ -470,7 +470,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout);
-        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        List<TaskDefinitionLog> taskDefinitionLogsDuplicate = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogsDuplicate.stream().distinct().collect(Collectors.toList());
         if (taskDefinitionLogs.isEmpty()) {
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             return result;
@@ -487,7 +488,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
-        List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+        List<ProcessTaskRelationLog> taskRelationListDuplicate = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+        List<ProcessTaskRelationLog> taskRelationList = taskRelationListDuplicate.stream().distinct().collect(Collectors.toList());
         //check workflow json is valid
         result = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {

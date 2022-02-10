@@ -2419,8 +2419,7 @@ public class ProcessService {
                     .collect(
                         Collectors.toMap(
                             TaskDefinition::getCode,
-                            taskDefinitionLog -> taskDefinitionLog,
-                            (entityOld , entityNew) -> entityOld
+                            taskDefinitionLog -> taskDefinitionLog
                         )
                     );
         }
@@ -2588,8 +2587,7 @@ public class ProcessService {
                 .collect(
                     Collectors.toMap(
                         TaskDefinitionLog::getCode,
-                        taskDefinitionLog -> taskDefinitionLog,
-                        (entityOld, entityNew) -> entityOld
+                        taskDefinitionLog -> taskDefinitionLog
                     )
                 );
         List<TaskNode> taskNodeList = new ArrayList<>();
