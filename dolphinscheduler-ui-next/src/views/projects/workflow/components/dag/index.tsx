@@ -30,6 +30,7 @@ import {
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
+import DagSaveModal from './dag-save-modal';
 import './x6-style.scss'
 
 const props = {
@@ -89,6 +90,20 @@ export default defineComponent({
       versionModalShow.value = false
     }
 
+    // Save modal
+    const saveModalShow = ref(false);
+    const saveModelToggle = (bool: boolean) => {
+      if (typeof bool === 'boolean') {
+        saveModalShow.value = bool
+      } else {
+        saveModalShow.value = !versionModalShow.value
+      }
+    }
+    const onSave = (form: any) => {
+      // TODO
+      console.log(form)
+    }
+
     return () => (
       <div
         class={[
@@ -100,6 +115,7 @@ export default defineComponent({
           layoutToggle={layoutToggle}
           definition={props.definition}
           onVersionToggle={versionToggle}
+          onSaveModelToggle={saveModelToggle}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -119,6 +135,7 @@ export default defineComponent({
             onUpdateList={refreshDetail}
           />
         )}
+        <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} />
       </div>
     )
   }

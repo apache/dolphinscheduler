@@ -42,7 +42,7 @@ import { useThemeStore } from '@/store/theme/theme'
 const props = {
   layoutToggle: {
     type: Function as PropType<(bool?: boolean) => void>,
-    default: () => {}
+    default: () => { }
   },
   // If this prop is passed, it means from definition detail
   definition: {
@@ -55,7 +55,7 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle'],
+  emits: ['versionToggle', 'saveModelToggle'],
   setup(props, context) {
     const { t } = useI18n()
 
@@ -179,9 +179,8 @@ export default defineComponent({
             }}
           ></NTooltip>
           <div
-            class={`${Styles['toolbar-right-item']} ${
-              Styles['node-selector']
-            } ${searchInputVisible.value ? Styles['visible'] : ''}`}
+            class={`${Styles['toolbar-right-item']} ${Styles['node-selector']
+              } ${searchInputVisible.value ? Styles['visible'] : ''}`}
           >
             <NSelect
               size='small'
@@ -298,6 +297,7 @@ export default defineComponent({
             type='info'
             secondary
             round
+            onClick={() => { context.emit('saveModelToggle', true) }}
           >
             {t('project.dag.save')}
           </NButton>
