@@ -71,7 +71,8 @@ const menu = {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
           id: 2,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-task-instance'
         },
         {
           name: `${i18n.$t('Task record')}`,
