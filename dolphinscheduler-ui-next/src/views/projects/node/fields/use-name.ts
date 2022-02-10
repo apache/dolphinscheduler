@@ -15,25 +15,22 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
+import { useI18n } from 'vue-i18n'
 
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
+export function useName() {
+  const { t } = useI18n()
+  return {
+    type: 'input',
+    field: 'name',
+    name: t('project.node.name'),
+    props: {
+      placeholder: t('project.node.name_tips'),
+      maxLength: 100
     },
-    {
-      ...slots
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      message: t('project.node.name_tips')
     }
-  )
+  }
 }

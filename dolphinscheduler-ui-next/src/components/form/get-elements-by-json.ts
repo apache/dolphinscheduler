@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { toRef } from 'vue'
 import { formatValidate } from './utils'
 import getField from './fields/get-field'
 import { omit } from 'lodash'
@@ -29,18 +30,20 @@ export default function getElementByJson(
   const initialValues: { [field: string]: any } = {}
   const elements = []
   for (let item of json) {
-    const { name, value, field, children, validate, ...rest } = item
-    if (value) {
+    const { name, value, field, span, children, validate, ...rest } = item
+    if (value || value === 0) {
       fields[field] = value
       initialValues[field] = value
     }
     if (validate) rules[field] = formatValidate(validate)
+    const spanRef = span === void 0 ? 24 : toRef(item, 'span')
     elements.push({
       showLabel: !!name,
       ...omit(rest, ['type', 'props', 'options']),
       label: name,
       path: !children ? field : '',
-      widget: () => getField(item, fields, rules)
+      widget: () => getField(item, fields, rules),
+      span: spanRef
     })
   }
   return { rules, elements, initialValues }

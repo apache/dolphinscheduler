@@ -16,24 +16,30 @@
  */
 
 import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
+import { NCheckbox, NCheckboxGroup, NSpace } from 'naive-ui'
 import type { IJsonItem } from '../types'
 
-export function renderInputNumber(
+export function renderCheckbox(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
+  const { props, field, options } = item
+  if (!options || options.length === 0) {
+    return h(NCheckbox, {
       ...props,
+      value: fields[field],
+      onUpdateChecked: (checked: boolean) => void (fields[field] = checked)
+    })
+  }
+  return h(
+    NCheckboxGroup,
+    {
       value: fields[field],
       onUpdateValue: (value) => void (fields[field] = value)
     },
-    {
-      ...slots
-    }
+    () =>
+      h(NSpace, null, () =>
+        options.map((option: object) => h(NCheckbox, { ...option }))
+      )
   )
 }

@@ -15,25 +15,28 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
+import { useI18n } from 'vue-i18n'
 
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
+export function useFailed() {
+  const { t } = useI18n()
+  return [
     {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
+      type: 'input-number',
+      field: 'maxRetryTimes',
+      name: t('project.node.number_of_failed_retries'),
+      span: 12,
+      slots: {
+        suffix: () => t('project.node.times')
+      }
     },
     {
-      ...slots
+      type: 'input-number',
+      field: 'retryInterval',
+      name: t('project.node.failed_retry_interval'),
+      span: 12,
+      slots: {
+        suffix: () => t('project.node.minute')
+      }
     }
-  )
+  ]
 }

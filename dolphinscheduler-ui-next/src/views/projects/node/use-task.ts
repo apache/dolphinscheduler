@@ -14,26 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useShell } from './tasks/use-shell'
+import { IJsonItem, ITaskType } from './types'
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
-
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    {
-      ...slots
-    }
-  )
+export function useTask({
+  taskType,
+  projectCode
+}: {
+  taskType: ITaskType
+  projectCode?: number
+}): { json: IJsonItem[]; model: object } {
+  let node = {} as { json: IJsonItem[]; model: object }
+  if (taskType === 'SHELL' && projectCode) {
+    node = useShell({ isCreate: true, projectCode: projectCode })
+  }
+  return node
 }

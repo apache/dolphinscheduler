@@ -81,7 +81,11 @@ const Modal = defineComponent({
         mask-closable={false}
         auto-focus={this.autoFocus}
       >
-        <NCard title={this.title}>
+        <NCard
+          title={this.title}
+          class={styles['modal-card']}
+          contentStyle={{ overflowY: 'auto' }}
+        >
           {{
             default: () => renderSlot($slots, 'default'),
             footer: () => (

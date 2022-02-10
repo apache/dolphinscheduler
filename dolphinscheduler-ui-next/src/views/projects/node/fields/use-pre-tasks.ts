@@ -15,25 +15,27 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
+import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
+export function usePreTasks() {
+  const { t } = useI18n()
 
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
+  const options = ref([])
+  const loading = ref(false)
+
+  onMounted(() => {})
+
+  return {
+    type: 'select',
+    field: 'preTasks',
+    span: 24,
+    name: t('project.node.pre_tasks'),
+    props: {
+      loading,
+      multiple: true,
+      filterable: true
     },
-    {
-      ...slots
-    }
-  )
+    options
+  }
 }
