@@ -16,24 +16,18 @@
  */
 
 import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
+import { NTreeSelect } from 'naive-ui'
 import type { IJsonItem } from '../types'
 
-export function renderInputNumber(
+export function renderTreeSelect(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    {
-      ...slots
-    }
-  )
+  const { props = {}, field, options = [] } = item
+  return h(NTreeSelect, {
+    ...props,
+    value: fields[field],
+    onUpdateValue: (value) => void (fields[field] = value),
+    options
+  })
 }

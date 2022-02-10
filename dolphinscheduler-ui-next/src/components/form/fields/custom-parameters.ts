@@ -15,12 +15,47 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NFormItem, NSpace, NButton, NIcon } from 'naive-ui'
+import { defineComponent, h, renderSlot } from 'vue'
+import { useFormItem } from 'naive-ui/es/_mixins'
+import { NFormItemGi, NSpace, NButton, NIcon, NGrid } from 'naive-ui'
 import { PlusCircleOutlined, DeleteOutlined } from '@vicons/antd'
+import { omit } from 'lodash'
 import getField from './get-field'
 import { formatValidate } from '../utils'
 import type { IJsonItem, FormItemRule } from '../types'
+
+const CustomParameters = defineComponent({
+  name: 'CustomParameters',
+  emits: ['add'],
+  setup(props, ctx) {
+    const formItem = useFormItem({})
+
+    const onAdd = () => void ctx.emit('add')
+
+    return { onAdd, disabled: formItem.mergedDisabledRef }
+  },
+  render() {
+    const { disabled, $slots, onAdd } = this
+    return h(NSpace, null, {
+      default: () => {
+        return [
+          renderSlot($slots, 'default', { disabled }),
+          h(
+            NButton,
+            {
+              tertiary: true,
+              circle: true,
+              type: 'info',
+              disabled,
+              onClick: onAdd
+            },
+            () => h(NIcon, { size: 24 }, () => h(PlusCircleOutlined))
+          )
+        ]
+      }
+    })
+  }
+})
 
 export function renderCustomParameters(
   item: IJsonItem,
@@ -30,6 +65,7 @@ export function renderCustomParameters(
   const { field, children = [] } = item
   let defaultValue: { [field: string]: any } = {}
   let ruleItem: { [key: string]: FormItemRule } = {}
+
   children.forEach((child) => {
     defaultValue[child.field] = child.value || null
     if (child.validate) ruleItem[child.field] = formatValidate(child.validate)
@@ -37,18 +73,19 @@ export function renderCustomParameters(
   const getChild = (item: object, i: number) =>
     children.map((child: IJsonItem) => {
       return h(
-        NFormItem,
+        NFormItemGi,
         {
           showLabel: false,
-          path: `${field}[${i}].${child.field}`
+          ...omit(item, ['field', 'type', 'props', 'options']),
+          path: `${field}[${i}].${child.field}`,
+          span: 6
         },
         () => getField(child, item)
       )
     })
-
-  const getChildren = () =>
+  const getChildren = ({ disabled }: { disabled: boolean }) =>
     fields[field].map((item: object, i: number) => {
-      return h(NSpace, { ':key': i }, () => [
+      return h(NGrid, { xGap: 10 }, () => [
         ...getChild(item, i),
         h(
           NButton,
@@ -56,6 +93,7 @@ export function renderCustomParameters(
             tertiary: true,
             circle: true,
             type: 'error',
+            disabled,
             onClick: () => {
               fields[field].splice(i, 1)
               rules.splice(i, 1)
@@ -66,20 +104,16 @@ export function renderCustomParameters(
       ])
     })
 
-  return h(NSpace, null, () => [
-    ...getChildren(),
-    h(
-      NButton,
-      {
-        tertiary: true,
-        circle: true,
-        type: 'info',
-        onClick: () => {
-          rules.push(ruleItem)
-          fields[field].push({ ...defaultValue })
-        }
-      },
-      () => h(NIcon, { size: 24 }, () => h(PlusCircleOutlined))
-    )
-  ])
+  return h(
+    CustomParameters,
+    {
+      onAdd: () => {
+        rules.push(ruleItem)
+        fields[field].push({ ...defaultValue })
+      }
+    },
+    {
+      default: getChildren
+    }
+  )
 }

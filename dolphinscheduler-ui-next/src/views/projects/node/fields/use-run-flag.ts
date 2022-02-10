@@ -15,25 +15,24 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
+import { useI18n } from 'vue-i18n'
 
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
+export function useRunFlag() {
+  const { t } = useI18n()
+  const options = [
     {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
+      label: t('project.node.normal'),
+      value: 'YES'
     },
     {
-      ...slots
+      label: t('project.node.prohibition_execution'),
+      value: 'NO'
     }
-  )
+  ]
+  return {
+    type: 'radio',
+    field: 'runFlag',
+    name: t('project.node.run_flag'),
+    options: options
+  }
 }

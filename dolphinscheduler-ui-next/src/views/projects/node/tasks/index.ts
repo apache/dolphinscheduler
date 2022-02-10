@@ -14,26 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
-
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    {
-      ...slots
-    }
-  )
-}

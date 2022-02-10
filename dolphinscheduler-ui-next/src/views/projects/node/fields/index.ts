@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NInputNumber } from 'naive-ui'
-import type { IJsonItem } from '../types'
-
-export function renderInputNumber(
-  item: IJsonItem,
-  fields: { [field: string]: any }
-) {
-  const { props, field, slots = {} } = item
-
-  return h(
-    NInputNumber,
-    {
-      ...props,
-      value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
-    },
-    {
-      ...slots
-    }
-  )
-}
+export { useName } from './use-name'
+export { useRunFlag } from './use-run-flag'
+export { useDescription } from './use-description'
+export { useTaskPriority } from './use-task-priority'
+export { useWorkerGroup } from './use-worker-group'
+export { useEnvironmentName } from './use-environment-name'
+export { useTaskGroup } from './use-task-group'
+export { useFailed } from './use-failed'
+export { useDelayTime } from './use-delay-time'
+export { useTimeoutAlarm } from './use-timeout-alarm'
+export { usePreTasks } from './use-pre-tasks'
+export { useShell } from './use-shell'
