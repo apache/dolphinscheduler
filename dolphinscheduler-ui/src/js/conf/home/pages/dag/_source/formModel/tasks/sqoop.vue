@@ -326,6 +326,18 @@
           </div>
         </m-list-box>
         <m-list-box>
+          <div slot="text">{{$t('Hive Target Dir')}}</div>
+          <div slot="content">
+            <el-input
+              :disabled="isDetails"
+              type="text"
+              size="small"
+              v-model="targetHiveParams.hiveTargetDir"
+              :placeholder="$t('Please enter hive target dir')">
+            </el-input>
+          </div>
+        </m-list-box>
+        <m-list-box>
           <div slot="text">{{$t('ReplaceDelimiter')}}</div>
           <div slot="content">
             <el-input
@@ -691,6 +703,7 @@
           dropDelimiter: false,
           hiveOverWrite: true,
           replaceDelimiter: '',
+          hiveTargetDir: '',
           hivePartitionKey: '',
           hivePartitionValue: ''
         },
@@ -1081,7 +1094,10 @@
         this.keypress = () => {
           if (!editor.getOption('readOnly')) {
             editor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }
@@ -1115,7 +1131,10 @@
         this.keypress = () => {
           if (!shellEditor.getOption('readOnly')) {
             shellEditor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }

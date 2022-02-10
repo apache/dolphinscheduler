@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.sql.Connection;
@@ -46,11 +47,11 @@ public class CommonDataSourceClient implements DataSourceClient {
     protected DataSource dataSource;
     protected JdbcTemplate jdbcTemplate;
 
-    public CommonDataSourceClient(BaseConnectionParam baseConnectionParam) {
+    public CommonDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         this.baseConnectionParam = baseConnectionParam;
         preInit();
         checkEnv(baseConnectionParam);
-        initClient(baseConnectionParam);
+        initClient(baseConnectionParam, dbType);
         checkClient();
     }
 
@@ -63,8 +64,8 @@ public class CommonDataSourceClient implements DataSourceClient {
         checkUser(baseConnectionParam);
     }
 
-    protected void initClient(BaseConnectionParam baseConnectionParam) {
-        this.dataSource = JdbcDataSourceProvider.createJdbcDataSource(baseConnectionParam);
+    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        this.dataSource = JDBCDataSourceProvider.createJdbcDataSource(baseConnectionParam, dbType);
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

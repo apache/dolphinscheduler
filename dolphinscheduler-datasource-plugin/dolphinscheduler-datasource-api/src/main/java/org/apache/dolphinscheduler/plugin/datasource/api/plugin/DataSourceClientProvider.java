@@ -61,7 +61,7 @@ public class DataSourceClientProvider {
             if (null == dataSourceChannel) {
                 throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
             }
-            return dataSourceChannel.createDataSourceClient(baseConnectionParam);
+            return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
         });
         return dataSourceClient.getConnection();
     }

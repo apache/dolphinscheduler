@@ -72,6 +72,14 @@ class TaskType(str):
     PYTHON = "PYTHON"
     SQL = "SQL"
     SUB_PROCESS = "SUB_PROCESS"
+    PROCEDURE = "PROCEDURE"
+    DATAX = "DATAX"
+    DEPENDENT = "DEPENDENT"
+    CONDITIONS = "CONDITIONS"
+    SWITCH = "SWITCH"
+    FLINK = "FLINK"
+    SPARK = "SPARK"
+    MR = "MR"
 
 
 class DefaultTaskCodeNum(str):
@@ -91,6 +99,10 @@ class JavaGatewayDefault(str):
 
     RESULT_DATA = "data"
 
+    SERVER_ADDRESS = "127.0.0.1"
+    SERVER_PORT = 25333
+    AUTO_CONVERT = True
+
 
 class Delimiter(str):
     """Constants for delimiter."""
@@ -99,6 +111,7 @@ class Delimiter(str):
     DASH = "/"
     COLON = ":"
     UNDERSCORE = "_"
+    DIRECTION = "->"
 
 
 class Time(str):

@@ -17,6 +17,8 @@
   -->
 
 <configuration scan="true" scanPeriod="120 seconds">
+    <property name="log.base" value="logs"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
@@ -26,7 +28,58 @@
         </encoder>
     </appender>
 
+    <appender name="STANDALONELOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/dolphinscheduler-standalone.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.base}/dolphinscheduler-standalone.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <maxHistory>168</maxHistory>
+            <maxFileSize>200MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
+            </pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.zookeeper" level="WARN"/>
+    <logger name="org.apache.hbase" level="WARN"/>
+    <logger name="org.apache.hadoop" level="WARN"/>
+
+    <conversionRule conversionWord="messsage"
+                    converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+    <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
+        <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+            <key>taskAppId</key>
+            <logBase>${log.base}</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
+                <file>${log.base}/${taskAppId}.log</file>
+                <encoder>
+                    <pattern>
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{96}:[%line] - %messsage%n
+                    </pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
+
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <if condition="${DOCKER:-false}">
+            <then>
+                <appender-ref ref="STDOUT"/>
+            </then>
+        </if>
+        <appender-ref ref="STANDALONELOGFILE"/>
+        <appender-ref ref="TASKLOGFILE"/>
     </root>
+
 </configuration>

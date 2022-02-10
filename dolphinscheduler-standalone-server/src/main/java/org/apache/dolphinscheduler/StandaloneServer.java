@@ -27,7 +27,6 @@ public class StandaloneServer {
     public static void main(String[] args) throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
-
         SpringApplication.run(StandaloneServer.class, args);
     }
 }

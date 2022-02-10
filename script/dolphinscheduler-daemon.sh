@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|python-gateway-server|standalone-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -47,23 +47,22 @@ if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
   mkdir $DOLPHINSCHEDULER_LOG_DIR
 fi
 
-log=$DOLPHINSCHEDULER_HOME/$command-$HOSTNAME.out
 pid=$DOLPHINSCHEDULER_HOME/$command/pid
 
 cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
-  :
+  log=$DOLPHINSCHEDULER_HOME/api-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "master-server" ]; then
-  :
+  log=$DOLPHINSCHEDULER_HOME/master-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "worker-server" ]; then
-  :
+  log=$DOLPHINSCHEDULER_HOME/worker-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "alert-server" ]; then
-  :
-elif [ "$command" = "logger-server" ]; then
-  :
+  log=$DOLPHINSCHEDULER_HOME/alert-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "standalone-server" ]; then
-  :
+  log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
+elif [ "$command" = "python-gateway-server" ]; then
+  log=$DOLPHINSCHEDULER_HOME/python-gateway-server/logs/$command-$HOSTNAME.out
 else
   echo "Error: No command named '$command' was found."
   exit 1
@@ -98,7 +97,7 @@ case $startStop in
 
   (status)
     # more details about the status can be added later
-    serverCount=`ps -ef |grep "$CLASS" |grep -v "grep" |wc -l`
+    serverCount=`ps -ef | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
     state="STOP"
     #  font color - red
     state="[ \033[1;31m $state \033[0m ]"

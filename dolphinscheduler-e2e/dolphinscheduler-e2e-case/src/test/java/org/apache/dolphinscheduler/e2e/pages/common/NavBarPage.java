@@ -19,13 +19,18 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.common;
 
+import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
+import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
@@ -33,10 +38,17 @@ import lombok.Getter;
 public class NavBarPage {
     protected final RemoteWebDriver driver;
 
-    @FindBy(id = "project-tab")
+    @FindBy(id = "tabProject")
     private WebElement projectTab;
-    @FindBy(id = "security-tab")
+
+    @FindBy(id = "tabSecurity")
     private WebElement securityTab;
+
+    @FindBy(id = "tabResource")
+    private WebElement resourceTab;
+
+    @FindBy(id = "tabDataSource")
+    private WebElement dataSourceTab;
 
     public NavBarPage(RemoteWebDriver driver) {
         this.driver = driver;
@@ -46,12 +58,31 @@ public class NavBarPage {
 
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
-            projectTab().click();
+            WebElement projectTabElement = new WebDriverWait(driver, 60)
+                .until(ExpectedConditions.elementToBeClickable(projectTab));
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", projectTabElement);
             return nav.cast(new ProjectPage(driver));
         }
+
         if (nav == SecurityPage.class) {
-            securityTab().click();
+            WebElement securityTabElement = new WebDriverWait(driver, 60)
+                .until(ExpectedConditions.elementToBeClickable(securityTab));
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", securityTabElement);
             return nav.cast(new SecurityPage(driver));
+        }
+
+        if (nav == ResourcePage.class) {
+            WebElement resourceTabElement = new WebDriverWait(driver, 60)
+                .until(ExpectedConditions.elementToBeClickable(resourceTab));
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", resourceTabElement);
+            return nav.cast(new ResourcePage(driver));
+        }
+
+        if (nav == DataSourcePage.class) {
+            WebElement dataSourceTabElement = new WebDriverWait(driver, 60)
+                .until(ExpectedConditions.elementToBeClickable(dataSourceTab));
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", dataSourceTabElement);
+            return nav.cast(new DataSourcePage(driver));
         }
 
         throw new UnsupportedOperationException("Unknown nav bar");

@@ -152,6 +152,35 @@ const resource = [
             }
           }
         ]
+      },
+      {
+        path: '/resource/task-group',
+        name: 'task-group-manage',
+        component: resolve => require(['../../pages/resource/pages/taskGroups'], resolve),
+        meta: {
+          title: `${i18n.$t('Task group manage')}`,
+          refreshInSwitchedTab: config.refreshInSwitchedTab
+        },
+        children: [
+          {
+            path: '/resource/task-group',
+            name: 'task-group-option',
+            component: resolve => require(['../../pages/resource/pages/taskGroups/taskGroupOption'], resolve),
+            meta: {
+              title: `${i18n.$t('Task group option')}`,
+              refreshInSwitchedTab: config.refreshInSwitchedTab
+            }
+          },
+          {
+            path: '/resource/task-group-queue',
+            name: 'task-group-queue',
+            component: resolve => require(['../../pages/resource/pages/taskGroups/taskGroupQueue'], resolve),
+            meta: {
+              title: `${i18n.$t('Task group queue')}`,
+              refreshInSwitchedTab: config.refreshInSwitchedTab
+            }
+          }
+        ]
       }
     ]
   }

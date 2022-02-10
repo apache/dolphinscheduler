@@ -25,24 +25,6 @@ import pytest
 from pydolphinscheduler.tasks.sql import Sql, SqlType
 
 
-@patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
-)
-@patch(
-    "pydolphinscheduler.tasks.sql.Sql.get_datasource_info",
-    return_value=({"id": 1, "type": "mock_type"}),
-)
-def test_get_datasource_detail(mock_datasource, mock_code_version):
-    """Test :func:`get_datasource_type` and :func:`get_datasource_id` can return expect value."""
-    name = "test_get_sql_type"
-    datasource_name = "test_datasource"
-    sql = "select 1"
-    task = Sql(name, datasource_name, sql)
-    assert 1 == task.get_datasource_id()
-    assert "mock_type" == task.get_datasource_type()
-
-
 @pytest.mark.parametrize(
     "sql, sql_type",
     [
@@ -69,7 +51,7 @@ def test_get_datasource_detail(mock_datasource, mock_code_version):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.tasks.sql.Sql.get_datasource_info",
+    "pydolphinscheduler.core.database.Database.get_database_info",
     return_value=({"id": 1, "type": "mock_type"}),
 )
 def test_get_sql_type(mock_datasource, mock_code_version, sql, sql_type):
@@ -109,7 +91,7 @@ def test_get_sql_type(mock_datasource, mock_code_version, sql, sql_type):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.tasks.sql.Sql.get_datasource_info",
+    "pydolphinscheduler.core.database.Database.get_database_info",
     return_value=({"id": 1, "type": "MYSQL"}),
 )
 def test_property_task_params(mock_datasource, mock_code_version, attr, expect):
@@ -119,14 +101,14 @@ def test_property_task_params(mock_datasource, mock_code_version, attr, expect):
 
 
 @patch(
-    "pydolphinscheduler.tasks.sql.Sql.get_datasource_info",
+    "pydolphinscheduler.core.database.Database.get_database_info",
     return_value=({"id": 1, "type": "MYSQL"}),
 )
 def test_sql_get_define(mock_datasource):
     """Test task sql function get_define."""
     code = 123
     version = 1
-    name = "test_sql_dict"
+    name = "test_sql_get_define"
     command = "select 1"
     datasource_name = "test_datasource"
     expect = {

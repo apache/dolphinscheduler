@@ -21,8 +21,8 @@ import re
 from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
+from pydolphinscheduler.core.database import Database
 from pydolphinscheduler.core.task import Task
-from pydolphinscheduler.java_gateway import launch_gateway
 
 
 class SqlType:
@@ -68,29 +68,11 @@ class Sql(Task):
         **kwargs
     ):
         super().__init__(name, TaskType.SQL, *args, **kwargs)
-        self.datasource_name = datasource_name
         self.sql = sql
+        self.datasource_name = datasource_name
         self.pre_statements = pre_statements or []
         self.post_statements = post_statements or []
         self.display_rows = display_rows
-        self._datasource = {}
-
-    def get_datasource_type(self) -> str:
-        """Get datasource type from java gateway, a wrapper for :func:`get_datasource_info`."""
-        return self.get_datasource_info(self.datasource_name).get("type")
-
-    def get_datasource_id(self) -> str:
-        """Get datasource id from java gateway, a wrapper for :func:`get_datasource_info`."""
-        return self.get_datasource_info(self.datasource_name).get("id")
-
-    def get_datasource_info(self, name) -> Dict:
-        """Get datasource info from java gateway, contains datasource id, type, name."""
-        if self._datasource:
-            return self._datasource
-        else:
-            gateway = launch_gateway()
-            self._datasource = gateway.entry_point.getDatasourceInfo(name)
-            return self._datasource
 
     @property
     def sql_type(self) -> int:
@@ -108,13 +90,10 @@ class Sql(Task):
     def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:
         """Override Task.task_params for sql task.
 
-        Sql task have some specials attribute for task_params, and is odd if we
+        sql task have some specials attribute for task_params, and is odd if we
         directly set as python property, so we Override Task.task_params here.
         """
         params = super().task_params
-        custom_params = {
-            "type": self.get_datasource_type(),
-            "datasource": self.get_datasource_id(),
-        }
-        params.update(custom_params)
+        datasource = Database(self.datasource_name, "type", "datasource")
+        params.update(datasource)
         return params

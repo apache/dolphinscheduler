@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.server;
 
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.QueueService;
+import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.TenantService;
@@ -31,6 +33,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -50,11 +53,16 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.server.config.PythonGatewayConfig;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -62,14 +70,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 
 import py4j.GatewayServer;
 
+import org.apache.commons.collections.CollectionUtils;
+
+@SpringBootApplication
 @ComponentScan(value = "org.apache.dolphinscheduler")
 public class PythonGatewayServer extends SpringBootServletInitializer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PythonGatewayServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(PythonGatewayServer.class);
 
     private static final WarningType DEFAULT_WARNING_TYPE = WarningType.NONE;
     private static final int DEFAULT_WARNING_GROUP_ID = 0;
@@ -106,6 +118,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     private QueueService queueService;
 
     @Autowired
+    private ResourcesService resourceService;
+
+    @Autowired
     private ProjectMapper projectMapper;
 
     @Autowired
@@ -119,6 +134,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
+
+    @Autowired
+    private PythonGatewayConfig pythonGatewayConfig;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -242,7 +260,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         } else if (verifyStatus != Status.SUCCESS) {
             String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
-            LOGGER.error(msg);
+            logger.error(msg);
             throw new RuntimeException(msg);
         }
 
@@ -380,12 +398,12 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     public Map<String, Object> getDatasourceInfo(String datasourceName) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
-        if (dataSourceList.size() > 1) {
-            String msg = String.format("Get more than one datasource by name %s", datasourceName);
+        if (dataSourceList == null || dataSourceList.isEmpty()) {
+            String msg = String.format("Can not find any datasource by name %s", datasourceName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
-        } else if (dataSourceList.size() == 0) {
-            String msg = String.format("Can not find any datasource by name %s", datasourceName);
+        } else if (dataSourceList.size() > 1) {
+            String msg = String.format("Get more than one datasource by name %s", datasourceName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         } else {
@@ -428,12 +446,87 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         return result;
     }
 
+    /**
+     * Get project, process definition, task code.
+     * Useful in Python API create dependent task which need processDefinition information.
+     *
+     * @param projectName           project name which process definition belongs to
+     * @param processDefinitionName process definition name
+     * @param taskName              task name
+     */
+    public Map<String, Object> getDependentInfo(String projectName, String processDefinitionName, String taskName) {
+        Map<String, Object> result = new HashMap<>();
+
+        Project project = projectMapper.queryByName(projectName);
+        if (project == null) {
+            String msg = String.format("Can not find valid project by name %s", projectName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        long projectCode = project.getCode();
+        result.put("projectCode", projectCode);
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
+        if (processDefinition == null) {
+            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        result.put("processDefinitionCode", processDefinition.getCode());
+
+        if (taskName != null) {
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskName);
+            result.put("taskDefinitionCode", taskDefinition.getCode());
+        }
+        return result;
+    }
+
+    /**
+     * Get resource by given program type and full name. It return map contain resource id, name.
+     * Useful in Python API create flink or spark task which need processDefinition information.
+     *
+     * @param programType program type one of SCALA, JAVA and PYTHON
+     * @param fullName    full name of the resource
+     */
+    public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
+        Map<String, Object> result = new HashMap<>();
+
+        Map<String, Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
+        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.get(Constants.DATA_LIST);
+        List<ResourceComponent> namedResources = resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(namedResources)) {
+            String msg = String.format("Can not find valid resource by program type %s and name %s", programType, fullName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
+        result.put("id", namedResources.get(0).getId());
+        result.put("name", namedResources.get(0).getName());
+        return result;
+    }
+
     @PostConstruct
     public void run() {
-        GatewayServer server = new GatewayServer(this);
-        GatewayServer.turnLoggingOn();
-        // Start server to accept python client RPC
-        server.start();
+        GatewayServer server;
+        try {
+            InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfig.getGatewayServerAddress());
+            InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfig.getPythonAddress());
+            server = new GatewayServer(
+                this,
+                pythonGatewayConfig.getGatewayServerPort(),
+                pythonGatewayConfig.getPythonPort(),
+                gatewayHost,
+                pythonHost,
+                pythonGatewayConfig.getConnectTimeout(),
+                pythonGatewayConfig.getReadTimeout(),
+                null
+            );
+            GatewayServer.turnLoggingOn();
+            logger.info("PythonGatewayServer started on: " + gatewayHost.toString());
+            server.start();
+        } catch (UnknownHostException e) {
+            logger.error("exception occurred while constructing PythonGatewayServer().", e);
+        }
     }
 
     public static void main(String[] args) {

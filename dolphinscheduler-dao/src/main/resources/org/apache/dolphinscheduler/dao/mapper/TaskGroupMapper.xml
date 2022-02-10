@@ -25,13 +25,14 @@
         <result property="groupSize" column="group_size" jdbcType="INTEGER"/>
         <result property="useSize" column="use_size" jdbcType="INTEGER"/>
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="projectCode" column="project_code" jdbcType="INTEGER"/>
         <result property="status" column="status" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id = "baseSql">
-        id,name,description,group_size,use_size,create_time,update_time
+        id,name,description,project_code,group_size,use_size,status,create_time,update_time
     </sql>
 
     <select id="queryTaskGroupPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -43,13 +44,23 @@
             <if test="userId != 0">
                 and user_id = #{userId}
             </if>
-            <if test="status != 0">
+            <if test="status != null">
                 and status = #{status}
             </if>
             <if test="name != null and name != '' ">
                 and name like concat('%', #{name}, '%')
             </if>
         </where>
+        order by update_time desc
+    </select>
+
+    <select id="queryTaskGroupPagingByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql">
+        </include>
+        from t_ds_task_group
+        where project_code in ( #{projectCode} ,  0)
+        order by update_time desc
     </select>
 
     <!--modify data by id-->

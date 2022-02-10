@@ -31,6 +31,10 @@ public final class WeChatAlertParamsConstants {
     static final String ENTERPRISE_WE_CHAT_USERS = "$t('users')";
     static final String NAME_ENTERPRISE_WE_CHAT_USERS = "users";
 
+    static final String NAME_ENTERPRISE_WE_CHAT_SEND_TYPE = "sendType";
+
+    static final String ENTERPRISE_WE_CHAT_SEND_TYPE = "send.type";
+
     private WeChatAlertParamsConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }

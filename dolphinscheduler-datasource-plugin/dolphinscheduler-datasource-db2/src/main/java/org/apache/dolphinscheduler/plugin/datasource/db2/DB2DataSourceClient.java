@@ -19,11 +19,12 @@ package org.apache.dolphinscheduler.plugin.datasource.db2;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class DB2DataSourceClient extends CommonDataSourceClient {
 
-    public DB2DataSourceClient(BaseConnectionParam baseConnectionParam) {
-        super(baseConnectionParam);
+    public DB2DataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
 
 }

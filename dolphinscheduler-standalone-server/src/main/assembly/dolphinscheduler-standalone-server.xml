@@ -60,6 +60,13 @@
             </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-python-gateway/target/python-gateway</directory>
+            <includes>
+                <include>libs</include>
+            </includes>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
 
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>

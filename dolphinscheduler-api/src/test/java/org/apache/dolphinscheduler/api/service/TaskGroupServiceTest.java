@@ -92,7 +92,7 @@ public class TaskGroupServiceTest {
     }
 
     private TaskGroup getTaskGroup() {
-        TaskGroup taskGroup = new TaskGroup(taskGroupName, taskGroupDesc,
+        TaskGroup taskGroup = new TaskGroup(taskGroupName,0, taskGroupDesc,
             100, 1,1);
         return taskGroup;
     }
@@ -109,9 +109,8 @@ public class TaskGroupServiceTest {
         TaskGroup taskGroup = getTaskGroup();
         Mockito.when(taskGroupMapper.insert(taskGroup)).thenReturn(1);
         Mockito.when(taskGroupMapper.queryByName(loginUser.getId(), taskGroupName)).thenReturn(null);
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, taskGroupName, taskGroupDesc, 100);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser,0L, taskGroupName, taskGroupDesc, 100);
+        Assert.assertNotNull(result);
 
     }
 
@@ -134,7 +133,7 @@ public class TaskGroupServiceTest {
             Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
 
         // query all
-        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, 1, 10);
+        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, null, null,1,10);
         PageInfo<TaskGroup> pageInfo = (PageInfo<TaskGroup>) result.get(Constants.DATA_LIST);
         Assert.assertNotNull(pageInfo.getTotalList());
     }
@@ -162,8 +161,18 @@ public class TaskGroupServiceTest {
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
 
         //close failed
-        Map<String, Object> result1 = taskGroupService.closeTaskGroup(loginUser, 1);
-        Assert.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
+        Map<String, Object> result = taskGroupService.closeTaskGroup(loginUser, 1);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        taskGroup.setStatus(0);
+        Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
+        result = taskGroupService.closeTaskGroup(loginUser, 1);
+        Assert.assertEquals(Status.TASK_GROUP_STATUS_CLOSED, result.get(Constants.STATUS));
+
+        taskGroup.setStatus(1);
+        Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
+        result = taskGroupService.startTaskGroup(loginUser, 1);
+        Assert.assertEquals(Status.TASK_GROUP_STATUS_OPENED, result.get(Constants.STATUS));
     }
 
     @Test
@@ -171,7 +180,7 @@ public class TaskGroupServiceTest {
 
         TreeMap<Integer, Integer> tm = new TreeMap<>();
         tm.put(1, 1);
-        Map<String, Object> map1 = taskGroupService.wakeTaskcompulsively(getLoginUser(), 1);
+        Map<String, Object> map1 = taskGroupService.forceStartTask(getLoginUser(), 1);
         Assert.assertEquals(Status.SUCCESS, map1.get(Constants.STATUS));
 
     }

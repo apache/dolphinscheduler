@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -137,12 +138,14 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
-
+        List<Integer> executorIds = taskInstanceList.stream().map(TaskInstance::getExecutorId).distinct().collect(Collectors.toList());
+        List<User> users = usersService.queryUser(executorIds);
+        Map<Integer, User> userMap = users.stream().collect(Collectors.toMap(User::getId, v -> v));
         for (TaskInstance taskInstance : taskInstanceList) {
             taskInstance.setDuration(DateUtils.format2Duration(taskInstance.getStartTime(), taskInstance.getEndTime()));
-            User executor = usersService.queryUser(taskInstance.getExecutorId());
-            if (null != executor) {
-                taskInstance.setExecutorName(executor.getUserName());
+            User user = userMap.get(taskInstance.getExecutorId());
+            if (user != null) {
+                taskInstance.setExecutorName(user.getUserName());
             }
         }
         pageInfo.setTotal((int) taskInstanceIPage.getTotal());

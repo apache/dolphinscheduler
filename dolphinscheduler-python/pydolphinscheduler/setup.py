@@ -22,12 +22,40 @@ from os.path import dirname, join
 
 from setuptools import find_packages, setup
 
-version = "0.0.1.dev0"
-
 if sys.version_info[0] < 3:
     raise Exception(
         "pydolphinscheduler does not support Python 2. Please upgrade to Python 3."
     )
+
+version = "0.1.0"
+
+# Start package required
+prod = [
+    "py4j~=0.10",
+]
+
+doc = [
+    "sphinx>=4.3",
+    "sphinx_rtd_theme>=1.0",
+]
+
+test = [
+    "pytest>=6.2",
+    "freezegun>=1.1",
+    "coverage>=6.1",
+]
+
+style = [
+    "flake8>=4.0",
+    "flake8-docstrings>=1.6",
+    "flake8-black>=0.2",
+    "isort>=5.10",
+]
+
+dev = style + test + doc
+
+all_dep = prod + dev
+# End package required
 
 
 def read(*names, **kwargs):
@@ -38,10 +66,10 @@ def read(*names, **kwargs):
 
 
 setup(
-    name="pydolphinscheduler",
+    name="apache-dolphinscheduler",
     version=version,
     license="Apache License 2.0",
-    description="Apache DolphinScheduler python SDK",
+    description="Apache DolphinScheduler Python API",
     long_description=read("README.md"),
     # Make sure pypi is expecting markdown
     long_description_content_type="text/markdown",
@@ -57,8 +85,8 @@ setup(
     ],
     project_urls={
         "Homepage": "https://dolphinscheduler.apache.org",
-        "Documentation": "https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/quick-start.html",
-        "Source": "https://github.com/apache/dolphinscheduler",
+        "Documentation": "https://dolphinscheduler.apache.org/python/index.html",
+        "Source": "https://github.com/apache/dolphinscheduler/dolphinscheduler-python/pydolphinscheduler",
         "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues",
         "Discussion": "https://github.com/apache/dolphinscheduler/discussions",
         "Twitter": "https://twitter.com/dolphinschedule",
@@ -66,9 +94,13 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     include_package_data=True,
+    package_data={
+        "examples": ["examples.tutorial.py"],
+    },
+    platforms=["any"],
     classifiers=[
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
@@ -85,10 +117,12 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: User Interfaces",
     ],
-    install_requires=[
-        # Core
-        "py4j~=0.10",
-        # Dev
-        "pytest~=6.2",
-    ],
+    install_requires=prod,
+    extras_require={
+        "all": all_dep,
+        "dev": dev,
+        "style": style,
+        "test": test,
+        "doc": doc,
+    },
 )

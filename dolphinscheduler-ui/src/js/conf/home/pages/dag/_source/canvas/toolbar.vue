@@ -74,16 +74,14 @@
           'visible': searchInputVisible
         }"
       >
-        <el-input
-          v-model="searchText"
-          placeholder=""
-          prefix-icon="el-icon-search"
-          size="mini"
-          @keyup.enter.native="onSearch"
-          clearable
-          @blur="searchInputBlur"
-          ref="searchInput"
-        ></el-input>
+        <el-select v-if="searchInputVisible" ref="searchInput" v-model="searchText" size="mini" clearable prefix-icon="el-icon-search" @change="onSearch" @keyup.enter.native="onSearch" filterable :placeholder="$t('Please select task name')">
+          <el-option
+            v-for="item in getTaskNodeOptions()"
+            :key="item.id"
+            :label="item.data.taskName"
+            :value="item.data.taskName">
+          </el-option>
+        </el-select>
       </div>
       <el-tooltip
         class="toolbar-operation"
@@ -143,7 +141,7 @@
         type="primary"
         size="mini"
         @click="saveProcess"
-        id="button-save"
+        id="btnSave"
         >{{ $t("Save") }}</el-button
       >
       <el-button
@@ -191,14 +189,12 @@
         const canvas = this.getDagCanvasRef()
         canvas.navigateTo(this.searchText)
       },
+      getTaskNodeOptions () {
+        const canvas = this.getDagCanvasRef()
+        return canvas.getNodes()
+      },
       showSearchInput () {
         this.searchInputVisible = true
-        this.$refs.searchInput.focus()
-      },
-      searchInputBlur () {
-        if (!this.searchText) {
-          this.searchInputVisible = false
-        }
       },
       getDagCanvasRef () {
         if (this.canvasRef) {

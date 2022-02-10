@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
@@ -83,6 +85,12 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private String processInstanceName;
+
+    /**
+     * process instance name
+     */
+    @TableField(exist = false)
+    private int taskGroupPriority;
 
     /**
      * state
@@ -593,7 +601,8 @@ public class TaskInstance implements Serializable {
     }
 
     /**
-     * determine if you can try again
+     * determine if a task instance can retry
+     * if subProcess,
      *
      * @return can try result
      */
@@ -603,10 +612,8 @@ public class TaskInstance implements Serializable {
         }
         if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        } else {
-            return (this.getState().typeIsFailure()
-                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+        return this.getState() == ExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
     }
 
     /**
@@ -618,9 +625,7 @@ public class TaskInstance implements Serializable {
         if (getState() != ExecutionStatus.FAILURE) {
             return true;
         }
-        if (getId() == 0
-                || getMaxRetryTimes() == 0
-                || getRetryInterval() == 0) {
+        if (getMaxRetryTimes() == 0 || getRetryInterval() == 0) {
             return true;
         }
         Date now = new Date();
@@ -735,5 +740,13 @@ public class TaskInstance implements Serializable {
 
     public boolean isFirstRun() {
         return endTime == null;
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

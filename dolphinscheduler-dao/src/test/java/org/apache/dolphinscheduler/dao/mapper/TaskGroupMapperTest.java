@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
     public TaskGroup insertOne() {
         TaskGroup taskGroup = new TaskGroup();
         taskGroup.setName("task group");
+        taskGroup.setId(1);
         taskGroup.setUserId(1);
         taskGroup.setStatus(1);
         taskGroup.setGroupSize(10);
@@ -52,7 +54,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         taskGroup.setUpdateTime(date);
         taskGroup.setUpdateTime(date);
 
-        taskGroupMapper.insert(taskGroup);
+        int i = taskGroupMapper.insert(taskGroup);
         return taskGroup;
     }
 

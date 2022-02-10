@@ -17,25 +17,26 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * task group queue service
@@ -49,6 +50,9 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
 
+    @Autowired
+    private ProjectService projectService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupQueueServiceImpl.class);
 
     /**
@@ -61,8 +65,22 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryTasksByGroupId(User loginUser, int groupId, int pageNo, int pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, groupId);
+    public Map<String, Object> queryTasksByGroupId(User loginUser, String taskName
+        , String processName, Integer status, int groupId, int pageNo, int pageSize) {
+        Map<String, Object> result = new HashMap<>();
+        Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
+        Map<String, Object> objectMap = this.projectService.queryAuthorizedProject(loginUser, loginUser.getId());
+        List<Project> projects = (List<Project>)objectMap.get(Constants.DATA_LIST);
+        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(page, taskName
+            ,processName,status,groupId,projects);
+
+        PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) taskGroupQueue.getTotal());
+        pageInfo.setTotalList(taskGroupQueue.getRecords());
+
+        result.put(Constants.DATA_LIST, pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -124,7 +142,12 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     }
 
     @Override
-    public void forceStartTask(int taskId,int forceStart) {
-        taskGroupQueueMapper.updateForceStart(taskId,forceStart);
+    public void forceStartTask(int queueId,int forceStart) {
+        taskGroupQueueMapper.updateForceStart(queueId,forceStart);
+    }
+
+    @Override
+    public void modifyPriority(Integer queueId, Integer priority) {
+        taskGroupQueueMapper.modifyPriority(queueId,priority);
     }
 }

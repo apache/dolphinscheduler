@@ -20,6 +20,7 @@
       <div slot="text">{{ $t("Pre tasks") }}</div>
       <div slot="content">
         <el-select
+          id="selectPreTask"
           style="width: 100%"
           filterable
           multiple
@@ -29,6 +30,7 @@
         >
           <el-option
             v-for="task in options"
+            class="option-pre-tasks"
             :key="task.code"
             :value="task.code"
             :label="task.name"
@@ -53,7 +55,11 @@
       code: {
         type: Number,
         default: 0
-      }
+      },
+      processDefinition: {
+        type: Object
+      },
+      prevTasks: Array
     },
     data () {
       return {
@@ -61,20 +67,45 @@
         preTasks: []
       }
     },
-    mounted () {
-      const canvas = this.getDagCanvasRef()
-      const edges = canvas.getEdges()
-      this.preTasks = canvas.getPrevNodes(this.code).map(node => node.id)
-      this.options = this.tasks.filter((task) => {
-        // The current node cannot be used as the prev node
-        if (task.code === this.code) return false
-        if (this.preTasks.includes(task.code)) return true
-        // The number of edges start with CONDITIONS task cannot be greater than 2
-        if (task.taskType === 'CONDITIONS') {
-          return edges.filter((e) => e.sourceId === task.code).length < 2
+    watch: {
+      processDefinition (def) {
+        if (def) {
+          this.preTasks = []
+          const relations = def.processTaskRelationList
+          this.options = def.taskDefinitionList.filter((task) => {
+            // The current node cannot be used as the prev node
+            if (task.code === this.code) return false
+            // The number of edges start with CONDITIONS task cannot be greater than 2
+            if (task.taskType === 'CONDITIONS') {
+              return relations.filter((e) => e.preTaskCode === task.code).length < 2
+            }
+            return true
+          })
         }
-        return true
-      })
+      },
+      prevTasks (prevTasks) {
+        if (prevTasks) {
+          this.preTasks = prevTasks.map(task => task.code)
+        }
+      }
+    },
+    mounted () {
+      // Called by dag
+      if (this.dagChart) {
+        const canvas = this.getDagCanvasRef()
+        const edges = canvas.getEdges()
+        this.preTasks = canvas.getPrevNodes(this.code).map(node => node.id)
+        this.options = this.tasks.filter((task) => {
+          // The current node cannot be used as the prev node
+          if (task.code === this.code) return false
+          if (this.preTasks.includes(task.code)) return true
+          // The number of edges start with CONDITIONS task cannot be greater than 2
+          if (task.taskType === 'CONDITIONS') {
+            return edges.filter((e) => e.sourceId === task.code).length < 2
+          }
+          return true
+        })
+      }
     },
     computed: {
       ...mapState('dag', ['tasks'])
@@ -89,7 +120,7 @@
           return canvas
         }
       },
-      setPreNodes () {
+      setDagPreNodes () {
         const canvas = this.getDagCanvasRef()
         canvas.setPreNodes(this.code, this.preTasks, true)
       }

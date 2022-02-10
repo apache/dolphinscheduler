@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,9 @@ public class StateEventResponseService {
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
+    @Autowired
+    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @PostConstruct
     public void start() {
@@ -141,7 +145,7 @@ public class StateEventResponseService {
                     break;
                 default:
             }
-            workflowExecuteThread.addStateEvent(stateEvent);
+            workflowExecuteThreadPool.submitStateEvent(stateEvent);
             writeResponse(stateEvent, ExecutionStatus.SUCCESS);
         } catch (Exception e) {
             logger.error("persist event queue error, event: {}", stateEvent, e);
@@ -149,10 +153,6 @@ public class StateEventResponseService {
     }
 
     public void addEvent2WorkflowExecute(StateEvent stateEvent) {
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
-        workflowExecuteThread.addStateEvent(stateEvent);
-    }
-    public BlockingQueue<StateEvent> getEventQueue() {
-        return eventQueue;
+        workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 }

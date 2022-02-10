@@ -28,9 +28,5 @@ spec:
       targetPort: worker-port
       protocol: TCP
       name: worker-port
-    - port: 50051
-      targetPort: logger-port
-      protocol: TCP
-      name: logger-port
   selector:
     {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}

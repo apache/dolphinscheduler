@@ -35,8 +35,8 @@ public interface TaskGroupQueueService {
 
      * @return tasks list
      */
-    Map<String, Object> queryTasksByGroupId(User loginUser, int groupId, int pageNo,
-                                            int pageSize);
+    Map<String, Object> queryTasksByGroupId(User loginUser, String taskName
+        , String processName, Integer status, int groupId, int pageNo,int pageSize);
 
     /**
      * query tasks in task group queue by project id
@@ -65,5 +65,7 @@ public interface TaskGroupQueueService {
      */
     boolean deleteByTaskId(int taskId);
 
-    void forceStartTask(int taskId,int forceStart);
+    void forceStartTask(int queueId,int forceStart);
+
+    void modifyPriority(Integer queueId, Integer priority);
 }

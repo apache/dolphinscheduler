@@ -114,10 +114,6 @@ public class SqlTask extends AbstractTaskExecutor {
 
     @Override
     public void handle() throws Exception {
-        // set the name of the current thread
-        String threadLoggerInfoName = String.format(TaskConstants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
-        Thread.currentThread().setName(threadLoggerInfoName);
-
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
@@ -409,35 +405,6 @@ public class SqlTask extends AbstractTaskExecutor {
     }
 
     /**
-     * regular expressions match the contents between two specified strings
-     *
-     * @param content content
-     * @param rgex rgex
-     * @param sqlParamsMap sql params map
-     * @param paramsPropsMap params props map
-     */
-    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsPropsMap) {
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        int index = 1;
-        while (m.find()) {
-
-            String paramName = m.group(1);
-            Property prop = paramsPropsMap.get(paramName);
-
-            if (prop == null) {
-                logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
-                        + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskExecutionContext.getTaskInstanceId());
-            } else {
-                sqlParamsMap.put(index, prop);
-                index++;
-                logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
-            }
-
-        }
-    }
-
-    /**
      * print replace sql
      *
      * @param content content
@@ -488,8 +455,7 @@ public class SqlTask extends AbstractTaskExecutor {
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
         sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
-        String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
-        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
+        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap,taskExecutionContext.getTaskInstanceId());
         //Replace the original value in sql ！{...} ，Does not participate in precompilation
         String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
         sql = replaceOriginalValue(sql, rgexo, paramsMap);

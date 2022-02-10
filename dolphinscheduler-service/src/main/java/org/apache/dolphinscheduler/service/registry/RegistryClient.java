@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -309,5 +310,9 @@ public class RegistryClient {
                 logger.info("{} server {} deleted from zk dead server path success", serverType, host);
             }
         }
+    }
+
+    public Duration getSessionTimeout() {
+        return registry.getSessionTimeout();
     }
 }

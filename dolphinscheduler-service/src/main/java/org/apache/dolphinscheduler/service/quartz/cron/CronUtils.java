@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.hour;
 import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.min;
 import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.month;
 import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.year;
 
 import static com.cronutils.model.CronType.QUARTZ;
 
@@ -90,7 +91,7 @@ public class CronUtils {
      * @return CycleEnum
      */
     public static CycleEnum getMaxCycle(Cron cron) {
-        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).getCycle();
+        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).addCycle(year(cron)).getCycle();
     }
 
     /**
@@ -100,7 +101,7 @@ public class CronUtils {
      * @return CycleEnum
      */
     public static CycleEnum getMiniCycle(Cron cron) {
-        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).getMiniCycle();
+        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).addCycle(year(cron)).getMiniCycle();
     }
 
     /**
@@ -186,14 +187,14 @@ public class CronUtils {
      */
     public static List<Date> getSelfFireDateList(final Date startTime, final Date endTime, final List<Schedule> schedules) {
         List<Date> result = new ArrayList<>();
-        if(startTime.equals(endTime)){
+        if (startTime.equals(endTime)) {
             result.add(startTime);
             return result;
         }
 
-        // support left closed and right open time interval (startDate <= N < endDate)
+        // support left closed and right closed time interval (startDate <= N <= endDate)
         Date from = new Date(startTime.getTime() - Constants.SECOND_TIME_MILLIS);
-        Date to = new Date(endTime.getTime() - Constants.SECOND_TIME_MILLIS);
+        Date to = new Date(endTime.getTime() + Constants.SECOND_TIME_MILLIS);
 
         List<Schedule> listSchedule = new ArrayList<>();
         listSchedule.addAll(schedules);

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHdfsDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class HiveDataSourceParamDTO extends BaseHdfsDatasourceParamDTO {
+public class HiveDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
 
     @Override
     public String toString() {

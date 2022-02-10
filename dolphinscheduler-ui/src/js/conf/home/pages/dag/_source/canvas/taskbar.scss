@@ -102,14 +102,17 @@
           &.icos-conditions {
             background-image: url("../images/task-icos/conditions.png");
           }
-          &.icos-waterdrop {
-            background-image: url("../images/task-icos/waterdrop.png");
+          &.icos-seatunnel {
+            background-image: url("../images/task-icos/seatunnel.png");
           }
           &.icos-spark {
             background-image: url("../images/task-icos/spark.png");
           }
           &.icos-switch {
             background-image: url("../images/task-icos/switch.png");
+          }
+          &.icos-data_quality {
+            background-image: url("../images/task-icos/data_quality.png");
           }
         }
 
@@ -162,14 +165,17 @@
             &.icos-conditions {
               background-image: url("../images/task-icos/conditions_hover.png");
             }
-            &.icos-waterdrop {
-              background-image: url("../images/task-icos/waterdrop_hover.png");
+            &.icos-seatunnel {
+              background-image: url("../images/task-icos/seatunnel_hover.png");
             }
             &.icos-spark {
               background-image: url("../images/task-icos/spark_hover.png");
             }
             &.icos-switch {
               background-image: url("../images/task-icos/switch_hover.png");
+            }
+            &.icos-data_quality {
+              background-image: url("../images/task-icos/data_quality_hover.png");
             }
           }
         }

@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CLOSE_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_QUEUE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_GROUP_ERROR;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
@@ -43,12 +40,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.enums.Status.CLOSE_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_QUEUE_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_GROUP_ERROR;
 
 
 /**
@@ -72,9 +73,10 @@ public class TaskGroupController extends BaseController {
      * @param name        project id
      * @return result and msg code
      */
-    @ApiOperation(value = "createTaskGroup", notes = "CREATE_TAKS_GROUP_NOTE")
+    @ApiOperation(value = "create", notes = "CREATE_TAKS_GROUP_NOTE")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", type = "Long"),
         @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
         @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
 
@@ -85,9 +87,10 @@ public class TaskGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("name") String name,
+                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectcode,
                                   @RequestParam("description") String description,
                                   @RequestParam("groupSize") Integer groupSize) {
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, name, description, groupSize);
+        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, projectcode, name, description, groupSize);
         return returnDataList(result);
     }
 
@@ -101,7 +104,7 @@ public class TaskGroupController extends BaseController {
      * @param name        project id
      * @return result and msg code
      */
-    @ApiOperation(value = "updateTaskGroup", notes = "UPDATE_TAKS_GROUP_NOTE")
+    @ApiOperation(value = "update", notes = "UPDATE_TAKS_GROUP_NOTE")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "id", dataType = "Int"),
         @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
@@ -130,19 +133,22 @@ public class TaskGroupController extends BaseController {
      * @param pageSize  page size
      * @return queue list
      */
-    @ApiOperation(value = "queryAllTaskGroup", notes = "QUERY_ALL_TASK_GROUP_NOTES")
+    @ApiOperation(value = "list-paging", notes = "QUERY_ALL_TASK_GROUP_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "name", value = "NAME", required = false, dataType = "String"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
-    @GetMapping(value = "/query-list-all")
+    @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                    @RequestParam(value = "name", required = false) String name,
+                                    @RequestParam(value = "status", required = false) Integer status,
                                     @RequestParam("pageNo") Integer pageNo,
                                     @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, pageNo, pageSize);
+        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, name, status, pageNo, pageSize);
         return returnDataList(result);
     }
 
@@ -174,29 +180,29 @@ public class TaskGroupController extends BaseController {
     }
 
     /**
-     * query task group list paging by project id
+     * query task group list paging by project code
      *
-     * @param loginUser login user
-     * @param pageNo    page number
-     * @param name      project id
-     * @param pageSize  page size
+     * @param loginUser   login user
+     * @param pageNo      page number
+     * @param projectCode project code
+     * @param pageSize    page size
      * @return queue list
      */
     @ApiOperation(value = "queryTaskGroupByName", notes = "QUERY_TASK_GROUP_LIST_BY_PROJECT_ID_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-        @ApiImplicitParam(name = "name", value = "PROJECT_ID", required = true, dataType = "String")
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "String")
     })
-    @GetMapping(value = "/query-list-by-name")
+    @GetMapping(value = "/query-list-by-projectCode")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryTaskGroupByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryTaskGroupByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam("pageNo") Integer pageNo,
-                                       @RequestParam(value = "name", required = false) String name,
+                                       @RequestParam(value = "projectCode", required = false) Long projectCode,
                                        @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupService.queryTaskGroupByName(loginUser, pageNo, pageSize, name);
+        Map<String, Object> result = taskGroupService.queryTaskGroupByProjectCode(loginUser, pageNo, pageSize, projectCode);
         return returnDataList(result);
     }
 
@@ -247,20 +253,43 @@ public class TaskGroupController extends BaseController {
      * force start task without task group
      *
      * @param loginUser login user
-     * @param taskId    task id
+     * @param queueId   task group queue id
      * @return result
      */
-    @ApiOperation(value = "wakeCompulsively", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
+    @ApiOperation(value = "forceStart", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskId", value = "TASKID", required = true, dataType = "Int")
+        @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataType = "Int")
     })
-    @PostMapping(value = "/wake-task-compulsively")
+    @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result wakeCompulsively(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "taskId") Integer taskId) {
-        Map<String, Object> result = taskGroupService.wakeTaskcompulsively(loginUser, taskId);
+    public Result forceStart(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @RequestParam(value = "queueId") Integer queueId) {
+        Map<String, Object> result = taskGroupService.forceStartTask(loginUser, queueId);
+        return returnDataList(result);
+    }
+
+    /**
+     * force start task without task group
+     *
+     * @param loginUser login user
+     * @param queueId   task group queue id
+     * @return result
+     */
+    @ApiOperation(value = "modifyPriority", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataType = "Int"),
+        @ApiImplicitParam(name = "priority", value = "TASK_GROUP_QUEUE_PRIORITY", required = true, dataType = "Int")
+    })
+    @PostMapping(value = "/modifyPriority")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(START_TASK_GROUP_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result modifyPriority(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam(value = "queueId") Integer queueId,
+                                 @RequestParam(value = "priority") Integer priority) {
+        Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId,priority);
         return returnDataList(result);
     }
 
@@ -287,9 +316,13 @@ public class TaskGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("groupId") Integer groupId,
+                                      @RequestParam(value = "taskInstanceName",required = false) String taskName,
+                                      @RequestParam(value = "processInstanceName",required = false) String processName,
+                                      @RequestParam(value = "status",required = false) Integer status,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, groupId, pageNo, pageSize);
+        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName,processName,status,
+            groupId, pageNo, pageSize);
         return returnDataList(result);
     }
 

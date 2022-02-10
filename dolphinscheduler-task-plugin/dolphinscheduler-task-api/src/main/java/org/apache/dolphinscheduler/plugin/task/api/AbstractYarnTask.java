@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 /**
@@ -80,4 +81,21 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      * set main jar name
      */
     protected abstract void setMainJarName();
+
+    /**
+     * Get name of jar resource.
+     *
+     * @param mainJar
+     * @return
+     */
+    protected String getResourceNameOfMainJar(ResourceInfo mainJar) {
+        if (null == mainJar) {
+            throw new RuntimeException("The jar for the task is required.");
+        }
+
+        return mainJar.getId() == 0
+                ? mainJar.getRes()
+                // when update resource maybe has error
+                : mainJar.getResourceName().replaceFirst("/", "");
+    }
 }

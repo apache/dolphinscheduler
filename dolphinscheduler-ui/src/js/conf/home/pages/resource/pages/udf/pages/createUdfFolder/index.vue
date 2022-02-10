@@ -22,6 +22,7 @@
           <template slot="name"><strong>*</strong>{{$t('Folder Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDirectoryName"
                     type="input"
                     v-model="name"
                     maxlength="60"
@@ -35,6 +36,7 @@
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDescription"
                     type="textarea"
                     v-model="description"
                     style="width: 430px;"
@@ -47,8 +49,8 @@
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <div class="submit">
-              <el-button type="primary" size="mini" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Create')}} </el-button>
-              <el-button type="text" size="mini" @click="() => $router.push({name: 'resource-udf'})"> {{$t('Cancel')}} </el-button>
+              <el-button id="btnSubmit" type="primary" size="mini" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Create')}} </el-button>
+              <el-button id="btnCancel" type="text" size="mini" @click="() => $router.push({name: 'resource-udf'})"> {{$t('Cancel')}} </el-button>
             </div>
           </template>
         </m-list-box-f>

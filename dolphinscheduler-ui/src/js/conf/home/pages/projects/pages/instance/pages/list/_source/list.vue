@@ -17,7 +17,7 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange" row-class-name="rows-workflow-instances">
+      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange" row-class-name="items-workflow-instances">
         <el-table-column type="selection" width="50" class-name="select-all"></el-table-column>
         <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
@@ -80,7 +80,7 @@
                 </span>
               </el-tooltip>
               <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
-                <span><el-button type="primary" size="mini" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'"  icon="el-icon-refresh" @click="_reRun(scope.row,scope.$index)" circle class="button-rerun"></el-button></span>
+                <span><el-button type="primary" size="mini" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'"  icon="el-icon-refresh" @click="_reRun(scope.row,scope.$index)" circle class="btn-rerun"></el-button></span>
               </el-tooltip>
               <el-tooltip :content="$t('Recovery Failed')" placement="top" :enterable="false">
                 <span>
@@ -233,7 +233,7 @@
         :title="$t('Delete?')"
         @onConfirm="_delete({},-1)"
       >
-        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strDelete" slot="reference" class="button-delete-all">{{$t('Delete')}}</el-button>
+        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strDelete" slot="reference" class="btn-delete-all">{{$t('Delete')}}</el-button>
       </el-popconfirm>
     </el-tooltip>
   </div>
@@ -461,6 +461,7 @@
           this.strDelete = ''
           this.$message.success(res.msg)
         }).catch(e => {
+          this._onUpdate()
           this.checkAll = false
           this.strDelete = ''
           this.$message.error(e.msg || '')

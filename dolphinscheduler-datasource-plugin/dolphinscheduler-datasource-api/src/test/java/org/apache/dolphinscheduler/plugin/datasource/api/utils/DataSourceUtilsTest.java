@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -39,12 +39,12 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class, DataSourceClientProvider.class, PasswordUtils.class, CommonUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, MySQLDataSourceProcessor.class, DataSourceClientProvider.class, PasswordUtils.class, CommonUtils.class})
 public class DataSourceUtilsTest {
 
     @Test
     public void testCheckDatasourceParam() {
-        MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
         mysqlDatasourceParamDTO.setHost("localhost");
         mysqlDatasourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
@@ -58,7 +58,7 @@ public class DataSourceUtilsTest {
 
     @Test
     public void testBuildConnectionParams() {
-        MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
         mysqlDatasourceParamDTO.setHost("localhost");
         mysqlDatasourceParamDTO.setDatabase("default");
         mysqlDatasourceParamDTO.setUserName("root");
@@ -74,7 +74,7 @@ public class DataSourceUtilsTest {
 
     @Test
     public void testBuildConnectionParams2() {
-        MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
         mysqlDatasourceParamDTO.setHost("localhost");
         mysqlDatasourceParamDTO.setDatabase("default");
         mysqlDatasourceParamDTO.setUserName("root");
@@ -94,7 +94,7 @@ public class DataSourceUtilsTest {
         Connection connection = PowerMockito.mock(Connection.class);
         PowerMockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
-        MysqlConnectionParam connectionParam = new MysqlConnectionParam();
+        MySQLConnectionParam connectionParam = new MySQLConnectionParam();
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
         connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
@@ -105,7 +105,7 @@ public class DataSourceUtilsTest {
 
     @Test
     public void testGetJdbcUrl() {
-        MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
+        MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3308");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.MYSQL, mysqlConnectionParam);
         Assert.assertEquals("jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
@@ -114,7 +114,7 @@ public class DataSourceUtilsTest {
 
     @Test
     public void testBuildDatasourceParamDTO() {
-        MysqlConnectionParam connectionParam = new MysqlConnectionParam();
+        MySQLConnectionParam connectionParam = new MySQLConnectionParam();
         connectionParam.setJdbcUrl("jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false");
         connectionParam.setAddress("jdbc:mysql://localhost:3308");
         connectionParam.setUser("root");

@@ -21,8 +21,13 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content" size="small">
-              <el-select style="width: 100%;" v-model="type" :disabled="this.item.id">
-                <el-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
+              <el-select id="btnDataSourceTypeDropDown" style="width: 100%;" v-model="type" :disabled="this.item.id">
+                <el-option
+                      class="options-datasource-type"
+                      v-for="item in datasourceTypeList"
+                      :key="item.value"
+                      :value="item.value"
+                      :label="item.label">
                 </el-option>
               </el-select>
           </template>
@@ -31,6 +36,7 @@
           <template slot="name"><strong>*</strong>{{$t('Datasource Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDataSourceName"
                     type="input"
                     v-model="name"
                     maxlength="60"
@@ -43,6 +49,7 @@
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDataSourceDescription"
                     type="textarea"
                     v-model="note"
                     size="small"
@@ -54,9 +61,10 @@
           <template slot="name"><strong>*</strong>{{$t('IP')}}</template>
           <template slot="content">
             <el-input
+                    id="inputIP"
                     type="input"
                     v-model="host"
-                    maxlength="60"
+                    maxlength="255"
                     size="small"
                     :placeholder="$t('Please enter IP')">
             </el-input>
@@ -66,6 +74,7 @@
           <template slot="name"><strong>*</strong>{{$t('Port')}}</template>
           <template slot="content">
             <el-input
+                    id="inputPort"
                     type="input"
                     v-model="port"
                     size="small"
@@ -121,6 +130,7 @@
           <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputUserName"
                     type="input"
                     v-model="userName"
                     maxlength="60"
@@ -133,6 +143,7 @@
           <template slot="name">{{$t('Password')}}</template>
           <template slot="content">
             <el-input
+                    id="inputPassword"
                     type="password"
                     v-model="password"
                     size="small"
@@ -144,6 +155,7 @@
           <template slot="name"><strong :class="{hidden:showDatabase}">*</strong>{{$t('Database Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDataBase"
                     type="input"
                     v-model="database"
                     maxlength="60"
@@ -165,6 +177,7 @@
           <template slot="name">{{$t('jdbc connect parameters')}}</template>
           <template slot="content">
             <el-input
+                    id="inputJdbcParams"
                     type="textarea"
                     v-model="other"
                     :autosize="{minRows:2}"
@@ -176,9 +189,9 @@
       </div>
     </div>
     <div class="bottom-p">
-      <el-button type="text" ize="mini" @click="_close()"> {{$t('Cancel')}} </el-button>
-      <el-button type="success" size="mini" round @click="_testConnect()" :loading="testLoading">{{testLoading ? $t('Loading...') : $t('Test Connect')}}</el-button>
-      <el-button type="primary" size="mini" round :loading="spinnerLoading" @click="_ok()">{{spinnerLoading ? $t('Loading...') :item ? `${$t('Edit')}` : `${$t('Submit')}`}} </el-button>
+      <el-button id="btnCancel" type="text" ize="mini" @click="_close()"> {{$t('Cancel')}} </el-button>
+      <el-button id="btnTestConnection" type="success" size="mini" round @click="_testConnect()" :loading="testLoading">{{testLoading ? $t('Loading...') : $t('Test Connect')}}</el-button>
+      <el-button id="btnSubmit" type="primary" size="mini" round :loading="spinnerLoading" @click="_ok()">{{spinnerLoading ? $t('Loading...') :item ? `${$t('Edit')}` : `${$t('Submit')}`}} </el-button>
     </div>
   </div>
 </template>

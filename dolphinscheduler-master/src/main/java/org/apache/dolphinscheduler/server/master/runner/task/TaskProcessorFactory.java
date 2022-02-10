@@ -21,39 +21,35 @@ import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * the factory to create task processor
  */
-@Service
 public class TaskProcessorFactory {
+
+    public static final Map<String, ITaskProcessor> PROCESS_MAP = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_PROCESSOR = COMMON_TASK_TYPE;
 
-    private Map<String, ITaskProcessor> taskProcessorMap;
-
-    @Autowired
-    public TaskProcessorFactory(List<ITaskProcessor> taskProcessors) {
-        taskProcessorMap = taskProcessors.stream().collect(Collectors.toMap(ITaskProcessor::getType, Function.identity(), (v1, v2) -> v2));
+    static {
+        for (ITaskProcessor iTaskProcessor : ServiceLoader.load(ITaskProcessor.class)) {
+            PROCESS_MAP.put(iTaskProcessor.getType(), iTaskProcessor);
+        }
     }
 
-    public ITaskProcessor getTaskProcessor(String key) {
-        if (StringUtils.isEmpty(key)) {
-            key = DEFAULT_PROCESSOR;
+    public static ITaskProcessor getTaskProcessor(String type) throws InstantiationException, IllegalAccessException {
+        if (StringUtils.isEmpty(type)) {
+            type = DEFAULT_PROCESSOR;
         }
-        ITaskProcessor taskProcessor = taskProcessorMap.get(key);
-        if (Objects.isNull(taskProcessor)) {
-            taskProcessor = taskProcessorMap.get(DEFAULT_PROCESSOR);
+        ITaskProcessor iTaskProcessor = PROCESS_MAP.get(type);
+        if (Objects.isNull(iTaskProcessor)) {
+            iTaskProcessor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
         }
 
-        return taskProcessor;
+        return iTaskProcessor.getClass().newInstance();
     }
 }

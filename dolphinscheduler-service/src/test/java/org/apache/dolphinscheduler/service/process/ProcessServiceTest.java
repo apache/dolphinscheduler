@@ -39,6 +39,10 @@ import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -52,6 +56,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -67,9 +76,16 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
+import org.apache.dolphinscheduler.spi.params.base.FormType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -133,6 +149,21 @@ public class ProcessServiceTest {
     private TaskGroupMapper taskGroupMapper;
     @Mock
     private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Mock
+    private DqExecuteResultMapper dqExecuteResultMapper;
+
+    @Mock
+    private DqRuleMapper dqRuleMapper;
+
+    @Mock
+    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+
+    @Mock
+    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
+
+    @Mock
+    private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -539,6 +570,102 @@ public class ProcessServiceTest {
     }
 
     @Test
+    public void getDqRule() {
+        Mockito.when(dqRuleMapper.selectById(1)).thenReturn(new DqRule());
+        Assert.assertNotNull(processService.getDqRule(1));
+    }
+
+    @Test
+    public void getRuleInputEntry() {
+        Mockito.when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
+        Assert.assertNotNull(processService.getRuleInputEntry(1));
+    }
+
+    @Test
+    public void getDqExecuteSql() {
+        Mockito.when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
+        Assert.assertNotNull(processService.getDqExecuteSql(1));
+    }
+
+    private List<DqRuleInputEntry> getRuleInputEntryList() {
+        List<DqRuleInputEntry> list = new ArrayList<>();
+
+        DqRuleInputEntry srcConnectorType = new DqRuleInputEntry();
+        srcConnectorType.setTitle("源数据类型");
+        srcConnectorType.setField("src_connector_type");
+        srcConnectorType.setType(FormType.SELECT.getFormType());
+        srcConnectorType.setCanEdit(true);
+        srcConnectorType.setShow(true);
+        srcConnectorType.setValue("JDBC");
+        srcConnectorType.setPlaceholder("Please select the source connector type");
+        srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
+        srcConnectorType.setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
+        srcConnectorType.setInputType(InputType.DEFAULT.getCode());
+        srcConnectorType.setValueType(ValueType.NUMBER.getCode());
+        srcConnectorType.setEmit(true);
+
+        DqRuleInputEntry statisticsName = new DqRuleInputEntry();
+        statisticsName.setTitle("统计值名");
+        statisticsName.setField("statistics_name");
+        statisticsName.setType(FormType.INPUT.getFormType());
+        statisticsName.setCanEdit(true);
+        statisticsName.setShow(true);
+        statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
+        statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
+        statisticsName.setInputType(InputType.DEFAULT.getCode());
+        statisticsName.setValueType(ValueType.STRING.getCode());
+        statisticsName.setEmit(false);
+
+        DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
+        statisticsExecuteSql.setTitle("统计值计算SQL");
+        statisticsExecuteSql.setField("statistics_execute_sql");
+        statisticsExecuteSql.setType(FormType.TEXTAREA.getFormType());
+        statisticsExecuteSql.setCanEdit(true);
+        statisticsExecuteSql.setShow(true);
+        statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
+        statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
+        statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
+        statisticsExecuteSql.setEmit(false);
+
+        list.add(srcConnectorType);
+        list.add(statisticsName);
+        list.add(statisticsExecuteSql);
+
+        return list;
+    }
+
+    private List<DqRuleExecuteSql> getRuleExecuteSqlList() {
+        List<DqRuleExecuteSql> list = new ArrayList<>();
+
+        DqRuleExecuteSql executeSqlDefinition = new DqRuleExecuteSql();
+        executeSqlDefinition.setIndex(0);
+        executeSqlDefinition.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
+        executeSqlDefinition.setTableAlias("total_count");
+        executeSqlDefinition.setType(ExecuteSqlType.COMPARISON.getCode());
+        list.add(executeSqlDefinition);
+
+        return list;
+    }
+
+    public DqExecuteResult getExecuteResult() {
+        DqExecuteResult dqExecuteResult = new DqExecuteResult();
+        dqExecuteResult.setId(1);
+        dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
+
+        return dqExecuteResult;
+    }
+
+    public List<DqExecuteResult> getExecuteResultList() {
+
+        List<DqExecuteResult> list = new ArrayList<>();
+        DqExecuteResult dqExecuteResult = new DqExecuteResult();
+        dqExecuteResult.setId(1);
+        dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
+        list.add(dqExecuteResult);
+
+        return list;
+    }
+
     public void testSaveTaskDefine() {
         User operator = new User();
         operator.setId(-1);
@@ -566,7 +693,7 @@ public class ProcessServiceTest {
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
         Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
-        int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs);
+        int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs, Boolean.TRUE);
         Assert.assertEquals(0, result);
     }
 
@@ -579,7 +706,7 @@ public class ProcessServiceTest {
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
 
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
         processTaskRelation.setName("def 1");
         processTaskRelation.setProcessDefinitionVersion(1);
         processTaskRelation.setProjectCode(1L);
@@ -588,7 +715,7 @@ public class ProcessServiceTest {
         processTaskRelation.setPreTaskCode(2L);
         processTaskRelation.setUpdateTime(new Date());
         processTaskRelation.setCreateTime(new Date());
-        List<ProcessTaskRelation> list = new ArrayList<>();
+        List<ProcessTaskRelationLog> list = new ArrayList<>();
         list.add(processTaskRelation);
 
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
@@ -616,7 +743,7 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(td2);
 
         Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(Mockito.anyLong(), Mockito.anyLong())).thenReturn(list);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
 
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG = processService.genDagGraph(processDefinition);
         Assert.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
@@ -790,6 +917,23 @@ public class ProcessServiceTest {
 
     }
 
+    @Test
+    public void testFindTaskInstanceByIdList() {
+        List<Integer> emptyList = new ArrayList<>();
+        Mockito.when(taskInstanceMapper.selectBatchIds(emptyList)).thenReturn(new ArrayList<>());
+        Assert.assertEquals(0, processService.findTaskInstanceByIdList(emptyList).size());
+
+        List<Integer> idList = Collections.singletonList(1);
+        TaskInstance instance = new TaskInstance();
+        instance.setId(1);
+
+        Mockito.when(taskInstanceMapper.selectBatchIds(idList)).thenReturn(Collections.singletonList(instance));
+        List<TaskInstance> taskInstanceByIdList = processService.findTaskInstanceByIdList(idList);
+
+        Assert.assertEquals(1, taskInstanceByIdList.size());
+        Assert.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
+    }
+
     private TaskGroupQueue getTaskGroupQueue() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task name");
@@ -803,5 +947,4 @@ public class ProcessServiceTest {
         taskGroupQueue.setCreateTime(date);
         return taskGroupQueue;
     }
-
 }

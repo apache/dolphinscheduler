@@ -27,10 +27,7 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -39,21 +36,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.google.auto.service.AutoService;
 
 /**
  * condition task processor
  */
-@Service
+@AutoService(ITaskProcessor.class)
 public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     /**
      * dependent parameters
      */
     private DependentParameters dependentParameters;
-
-    ProcessInstance processInstance;
 
     /**
      * condition result
@@ -65,44 +59,32 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      */
     private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
-    @Autowired
-    private MasterConfig masterConfig;
-
-    private TaskDefinition taskDefinition;
-
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
-        this.processInstance = processInstance;
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
-
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
         if (this.taskInstance == null) {
             return false;
         }
-        taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
-        );
-
-        setTaskExecutionLogger();
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
-        Thread.currentThread().setName(threadLoggerInfoName);
+        this.setTaskExecutionLogger();
         initTaskParameters();
         logger.info("dependent task start");
         return true;
     }
 
     @Override
-    public ExecutionStatus taskState() {
-        return this.taskInstance.getState();
-    }
-
-    @Override
-    public void run() {
+    public boolean runTask() {
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
             endTask();
         } else {
             endTask();
         }
+        return true;
+    }
+
+    @Override
+    protected boolean dispatchTask() {
+        return true;
     }
 
     @Override
@@ -115,8 +97,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean taskTimeout() {
-        TaskTimeoutStrategy taskTimeoutStrategy =
-                taskDefinition.getTimeoutNotifyStrategy();
+        TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         if (taskTimeoutStrategy == TaskTimeoutStrategy.WARN) {
             return true;
         }
@@ -141,7 +122,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),processInstance.getProcessDefinitionCode(),
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));

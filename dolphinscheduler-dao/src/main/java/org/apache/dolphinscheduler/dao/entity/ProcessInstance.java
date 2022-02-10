@@ -249,6 +249,12 @@ public class ProcessInstance {
      */
     private int dryRun;
 
+    /**
+     * re-start time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date restartTime;
+
     public ProcessInstance() {
 
     }
@@ -521,6 +527,14 @@ public class ProcessInstance {
         this.dryRun = dryRun;
     }
 
+    public Date getRestartTime() {
+        return restartTime;
+    }
+
+    public void setRestartTime(Date restartTime) {
+        this.restartTime = restartTime;
+    }
+
     /**
      * add command to history
      *
@@ -688,6 +702,10 @@ public class ProcessInstance {
             + '\''
             + ", dryRun='"
             + dryRun
+            + '\''
+            + '}'
+            + ", restartTime='"
+            + restartTime
             + '\''
             + '}';
     }

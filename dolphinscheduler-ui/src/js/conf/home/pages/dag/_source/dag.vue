@@ -32,6 +32,7 @@
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
+        :project-code="projectCode"
         @seeHistory="seeHistory"
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"
@@ -226,7 +227,8 @@
         'setIsEditDag',
         'setName',
         'setLocations',
-        'resetLocalParam'
+        'resetLocalParam',
+        'setDependResult'
       ]),
       /**
        * Toggle full screen
@@ -330,11 +332,11 @@
                     })
                     if (this.type === 'instance') {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/instance/list`
+                        path: `/projects/${this.projectCode}/instance/list/${methodParam}`
                       })
                     } else {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/definition/list`
+                        path: `/projects/${this.projectCode}/definition/list/${methodParam}`
                       })
                     }
                   })
@@ -530,7 +532,7 @@
         this.$router.push({
           name: 'task-instance',
           query: {
-            processInstanceId: this.$route.params.code,
+            processInstanceId: this.instanceId,
             taskName: taskName
           }
         })
@@ -562,6 +564,7 @@
           .then((res) => {
             this.$message(this.$t('Refresh status succeeded'))
             const { taskList } = res.data
+            const list = res.list
             if (taskList) {
               this.taskInstances = taskList
               taskList.forEach((taskInstance) => {
@@ -570,6 +573,13 @@
                   state: taskInstance.state,
                   taskInstance
                 })
+              })
+            }
+            if (list) {
+              list.forEach((dependent) => {
+                if (dependent.dependentResult) {
+                  this.setDependResult(JSON.parse(dependent.dependentResult))
+                }
               })
             }
           })

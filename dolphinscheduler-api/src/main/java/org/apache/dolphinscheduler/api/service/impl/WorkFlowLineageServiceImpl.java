@@ -70,7 +70,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
         List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryWorkFlowLineageByName(projectCode, workFlowName);
@@ -84,7 +84,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
         Map<Long, WorkFlowLineage> workFlowLineagesMap = new HashMap<>();
@@ -133,7 +133,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
         List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineage(projectCode);
