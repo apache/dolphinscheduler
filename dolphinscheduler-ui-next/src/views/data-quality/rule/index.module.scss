@@ -15,26 +15,12 @@
  * limitations under the License.
  */
 
-import { useCanvasInit } from './use-canvas-init'
-import { useCellQuery } from './use-cell-query'
-import { useCellActive } from './use-cell-active'
-import { useCellUpdate } from './use-cell-update'
-import { useNodeSearch } from './use-node-search'
-import { useGraphAutoLayout } from './use-graph-auto-layout'
-import { useTextCopy } from './use-text-copy'
-import { useCustomCellBuilder } from './use-custom-cell-builder'
-import { useGraphBackfill } from './use-graph-backfill'
-import { useDagDragAndDrop } from './use-dag-drag-drop'
+.table-card {
+  margin-top: 8px;
 
-export {
-  useCanvasInit,
-  useCellQuery,
-  useCellActive,
-  useNodeSearch,
-  useGraphAutoLayout,
-  useTextCopy,
-  useCustomCellBuilder,
-  useGraphBackfill,
-  useCellUpdate,
-  useDagDragAndDrop
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }

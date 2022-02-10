@@ -15,62 +15,67 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import { defineComponent, h, PropType, reactive, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NDataTable } from 'naive-ui'
 import Modal from '@/components/modal'
-import { useForm } from './use-form'
-import { useModal } from './use-modal'
-import { useTable } from './use-table'
-import { IDefinitionData } from '../types'
 import styles from '../index.module.scss'
+import { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  row: {
-    type: Object as PropType<IDefinitionData>,
-    default: {}
+  data: {
+    type: String as PropType<string>,
+    default: ''
   }
 }
 
 export default defineComponent({
-  name: 'workflowDefinitionVersion',
+  name: 'ruleInputEntry',
   props,
-  emits: ['update:show', 'update:row', 'updateList'],
+  emits: ['cancel', 'confirm'],
   setup(props, ctx) {
-    const { variables, getTableData } = useTable(ctx)
-    const { importState } = useForm()
-    const { handleImportDefinition } = useModal(importState, ctx)
-    const hideModal = () => {
-      ctx.emit('update:show')
-    }
+    const { t } = useI18n()
 
-    const handleImport = () => {
-      handleImportDefinition()
-    }
+    const ruleInputEntryList = JSON.parse(props.data).ruleInputEntryList
 
-    const customRequest = ({ file }: any) => {
-      importState.importForm.name = file.name
-      importState.importForm.file = file.file
-    }
+    ruleInputEntryList.forEach((item: any) => {
+      item.title = t(
+        'data_quality.rule.' + item.title.substring(3, item.title.length - 1)
+      )
+    })
 
-    watch(
-      () => props.show,
-      () => {
-        if (props.show && props.row?.code) {
-          getTableData(props.row)
-        }
+    const columns: TableColumns<any> = [
+      {
+        title: t('data_quality.rule.input_item_title'),
+        key: 'title'
+      },
+      {
+        title: t('data_quality.rule.input_item_placeholder'),
+        key: 'field'
+      },
+      {
+        title: t('data_quality.rule.input_item_type'),
+        key: 'type'
       }
-    )
+    ]
+
+    const onCancel = () => {
+      ctx.emit('cancel')
+    }
+
+    const onConfirm = () => {
+      ctx.emit('confirm')
+    }
 
     return {
-      hideModal,
-      handleImport,
-      customRequest,
-      ...toRefs(variables)
+      onCancel,
+      onConfirm,
+      columns,
+      ruleInputEntryList
     }
   },
 
@@ -80,13 +85,13 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('project.workflow.version_info')}
-        onCancel={this.hideModal}
-        onConfirm={this.hideModal}
+        title={t('data_quality.rule.input_item')}
+        cancelShow={false}
+        onConfirm={this.onConfirm}
       >
         <NDataTable
           columns={this.columns}
-          data={this.tableData}
+          data={this.ruleInputEntryList}
           striped
           size={'small'}
           class={styles.table}
