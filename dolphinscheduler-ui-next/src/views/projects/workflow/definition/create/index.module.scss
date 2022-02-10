@@ -15,8 +15,26 @@
  * limitations under the License.
  */
 
-.container{
+$borderDark: rgba(255, 255, 255, 0.09);
+$borderLight: rgb(239, 239, 245);
+$bgDark: rgb(24, 24, 28);
+$bgLight: #ffffff;
+
+.container {
   width: 100%;
+  padding: 20px;
   box-sizing: border-box;
   height: calc(100vh - 100px);
- }
+  overflow: hidden;
+  display: block;
+}
+
+.dark {
+  border: solid 1px $borderDark;
+  background-color: $bgDark;
+}
+
+.light {
+  border: solid 1px $borderLight;
+  background-color: $bgLight;
+}

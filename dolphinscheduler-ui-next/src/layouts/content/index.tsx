@@ -62,7 +62,7 @@ const Content = defineComponent({
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
-          .children || []
+          ?.children || state.menuOptions
       state.isShowSide = menuStore.getShowSideStatus
     }
 
@@ -74,18 +74,22 @@ const Content = defineComponent({
     watch(
       () => route.path,
       () => {
-        state.isShowSide = menuStore.getShowSideStatus
-        route.matched[1].path.includes(':projectCode')
-        if (route.matched[1].path === '/projects/:projectCode') {
-          changeMenuOption(state)
-          getSideMenu(state)
-        }
-        sideKeyRef.value = 
+        if (route.path !== '/login') {
+          state.isShowSide = menuStore.getShowSideStatus
           route.matched[1].path.includes(':projectCode')
-           ? route.matched[1].path.replace(':projectCode', menuStore.getProjectCode)
-           : route.matched[1].path
+          if (route.matched[1].path === '/projects/:projectCode') {
+            changeMenuOption(state)
+            getSideMenu(state)
+          }
+          sideKeyRef.value = route.matched[1].path.includes(':projectCode')
+            ? route.matched[1].path.replace(
+                ':projectCode',
+                menuStore.getProjectCode
+              )
+            : route.matched[1].path
+        }
       },
-      {immediate: true}
+      { immediate: true }
     )
 
     return {

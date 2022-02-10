@@ -71,7 +71,8 @@ const menu = {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
           id: 2,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-task-instance'
         },
         {
           name: `${i18n.$t('Task record')}`,
@@ -182,9 +183,10 @@ const menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
+      enabled: true,
       icon: 'el-icon-document',
       children: [],
-      enabled: true
+      classNames: 'tab-token-manage'
     }
   ],
   resource: [

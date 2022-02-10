@@ -28,7 +28,7 @@ export const useMenuStore = defineStore({
   persist: true,
   getters: {
     getMenuKey(): string {
-      return this.menuKey || 'home'
+      return this.menuKey
     },
     getShowSideStatus(): boolean {
       return this.isShowSide || false

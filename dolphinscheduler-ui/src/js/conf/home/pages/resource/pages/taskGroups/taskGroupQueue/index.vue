@@ -117,7 +117,6 @@
         this.searchParams.pageNo = 1
       },
       _ckQuery () {
-        console.log(this.groupId)
         this.searchParams.groupId = this.groupId
         this.searchParams.instanceName = this.instanceName
         this.searchParams.processName = this.processName
@@ -166,9 +165,11 @@
           this.taskGroupList = []
           this.taskGroupList = values.totalList
           if (this.taskGroupList) {
-            if (this.searchParams.id) {
-              this.groupId = _.parseInt(this.searchParams.id)
+            if (this.groupId) {
+              this.searchParams.groupId = _.parseInt(this.groupId)
+            } else {
               this.searchParams.groupId = _.parseInt(this.searchParams.id)
+              this.groupId = this.searchParams.groupId
             }
             this.getTaskListInTaskGroupQueueById(this.searchParams).then((res) => {
               if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {

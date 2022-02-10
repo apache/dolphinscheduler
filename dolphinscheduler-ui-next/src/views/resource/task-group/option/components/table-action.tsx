@@ -17,6 +17,7 @@
 
 import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { Router } from 'vue-router'
 import { NSpace, NTooltip, NButton, NIcon, NSwitch } from 'naive-ui'
 import { EditOutlined, UnorderedListOutlined } from '@vicons/antd'
 import type {
@@ -24,6 +25,7 @@ import type {
   TaskGroup
 } from '@/service/modules/task-group/types'
 import { startTaskGroup, closeTaskGroup } from '@/service/modules/task-group'
+import { useRouter } from 'vue-router'
 
 interface ItemRow extends TaskGroup {
   projectList: []
@@ -42,6 +44,7 @@ const TableAction = defineComponent({
   emits: ['resetTableData', 'updateItem'],
   setup(props, { emit }) {
     const { t } = useI18n()
+    const router: Router = useRouter()
 
     const handleEdit = (
       id: number,
@@ -68,7 +71,9 @@ const TableAction = defineComponent({
       }
     }
 
-    const handleViewQueue = (id: number) => {}
+    const handleViewQueue = (id: number) => {
+      router.push({ name: 'task-group-queue', params: { id: id } })
+    }
 
     return { t, handleEdit, handleViewQueue, handleSwitchStatus }
   },

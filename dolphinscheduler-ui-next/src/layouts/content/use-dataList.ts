@@ -42,7 +42,10 @@ import {
   EnvironmentOutlined,
   KeyOutlined,
   SafetyOutlined,
-  GroupOutlined
+  GroupOutlined,
+  ContainerOutlined,
+  ApartmentOutlined,
+  BarsOutlined
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
 
@@ -104,7 +107,7 @@ export function useDataList() {
               },
               {
                 label: t('menu.workflow_definition'),
-                key: `/projects/${menuStore.getProjectCode}/workflow/definitions`
+                key: `/projects/${menuStore.getProjectCode}/workflow-definition`
               },
               {
                 label: t('menu.workflow_instance'),
@@ -162,9 +165,31 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_group_option'),
-                key: `/resource/task-group-option`
+                key: 'task-group-option'
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: 'task-group-queue'
               }
             ]
+          }
+        ]
+      },
+      {
+        label: t('menu.data_quality'),
+        key: 'data-quality',
+        icon: renderIcon(ContainerOutlined),
+        isShowSide: true,
+        children: [
+          {
+            label: t('menu.task_result'),
+            key: `/data-quality/task-result`,
+            icon: renderIcon(ApartmentOutlined)
+          },
+          {
+            label: t('menu.rule'),
+            key: `/data-quality/rule`,
+            icon: renderIcon(BarsOutlined)
           }
         ]
       },

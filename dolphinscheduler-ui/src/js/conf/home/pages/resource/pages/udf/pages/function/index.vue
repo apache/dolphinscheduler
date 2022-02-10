@@ -20,7 +20,7 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <el-button-group>
-            <el-button size="mini" @click="_create">{{$t('Create UDF Function')}}</el-button>
+            <el-button id="btnCreateUdfFunction" size="mini" @click="_create">{{$t('Create UDF Function')}}</el-button>
           </el-button-group>
           <el-dialog
             :visible.sync="createUdfDialog"

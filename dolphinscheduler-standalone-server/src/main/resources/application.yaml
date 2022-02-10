@@ -138,6 +138,24 @@ worker:
 alert:
   port: 50052
 
+python-gateway:
+  # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
+  # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
+  gateway-server-address: 0.0.0.0
+  # The port of Python gateway server start. Define which port you could connect to Python gateway server from
+  # Python API side.
+  gateway-server-port: 25333
+  # The address of Python callback client.
+  python-address: 127.0.0.1
+  # The port of Python callback client.
+  python-port: 25334
+  # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
+  # and socket server would never close even though no requests accept
+  connect-timeout: 0
+  # Close each active connection of socket server if python program not active after x milliseconds. Define value is
+  # (0 = infinite), and socket server would never close even though no requests accept
+  read-timeout: 0
+
 server:
   port: 12345
   servlet:
