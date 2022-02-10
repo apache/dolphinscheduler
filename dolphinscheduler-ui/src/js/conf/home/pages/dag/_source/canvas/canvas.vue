@@ -297,7 +297,7 @@
 
         // Remove all tools when the mouse leaving
         this.graph.on('node:mouseleave', ({ node }) => {
-          node.removeTools()
+          node.removeTool('button')
         })
       },
       /**
@@ -363,6 +363,17 @@
           const truncation = this.truncateText(name, 18)
           node.attr('title/text', truncation)
           node.setData({ taskName: name })
+        }
+      },
+      setNodeForbiddenStatus (id, flag) {
+        id += ''
+        const node = this.graph.getCellById(id)
+        if (node) {
+          if (flag) {
+            node.attr('rect/fill', '#c4c4c4')
+          } else {
+            node.attr('rect/fill', '#ffffff')
+          }
         }
       },
       /**
@@ -522,20 +533,22 @@
           console.warn(`taskType:${taskType} is invalid!`)
           return
         }
-        const node = this.genNodeJSON(id, taskType, '', coordinate)
+        const node = this.genNodeJSON(id, taskType, '', false, coordinate)
         this.graph.addNode(node)
       },
       /**
        * generate node json
        * @param {number|string} id
        * @param {string} taskType
+       * @param {boolean} forbidden flag
        * @param {{x:number;y:number}} coordinate Default is { x: 100, y: 100 }
        */
-      genNodeJSON (id, taskType, taskName, coordinate = { x: 100, y: 100 }) {
+      genNodeJSON (id, taskType, taskName, flag, coordinate = { x: 100, y: 100 }) {
         id += ''
         const url = require(`../images/task-icos/${taskType.toLocaleLowerCase()}.png`)
         const truncation = taskName ? this.truncateText(taskName, 18) : id
-        return {
+
+        const nodeJson = {
           id: id,
           shape: X6_NODE_NAME,
           x: coordinate.x,
@@ -554,6 +567,12 @@
             }
           }
         }
+
+        if (flag) {
+          nodeJson.attrs.rect = { fill: '#c4c4c4' }
+        }
+
+        return nodeJson
       },
       /**
        * generate edge json
