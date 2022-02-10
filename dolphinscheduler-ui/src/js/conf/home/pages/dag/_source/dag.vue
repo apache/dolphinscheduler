@@ -270,6 +270,7 @@
       addTaskInfo ({ item }) {
         this.addTask(item)
         this.$refs.canvas.setNodeName(item.code, item.name)
+        this.$refs.canvas.setNodeForbiddenStatus(item.code, item.flag === 'NO')
         this.taskDrawer = false
       },
       closeTaskDrawer ({ flag }) {
@@ -413,6 +414,7 @@
             task.code,
             task.taskType,
             task.name,
+            task.flag === 'NO',
             {
               x: location.x,
               y: location.y
@@ -420,6 +422,7 @@
           )
           nodes.push(node)
         })
+
         connects
           .filter((r) => !!r.preTaskCode)
           .forEach((c) => {
