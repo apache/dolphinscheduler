@@ -27,7 +27,7 @@ import {
   NInputNumber,
   NDynamicInput
 } from 'naive-ui'
-import { queryTenantList } from '@/service/modules/tenants';
+import { queryTenantList } from '@/service/modules/tenants'
 import './x6-style.scss'
 
 const props = {
@@ -38,8 +38,8 @@ const props = {
 }
 
 interface Tenant {
-  tenantCode: string;
-  id: number;
+  tenantCode: string
+  id: number
 }
 
 export default defineComponent({
@@ -49,15 +49,17 @@ export default defineComponent({
   setup(props, context) {
     const { t } = useI18n()
 
-    const tenants = ref<Tenant[]>([]);
+    const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
       if (tenants.value) {
-        return tenants.value.map(t => ({
-          label: t.tenantCode,
-          value: t.tenantCode
-        })).concat({ label: "default", value: "default" })
+        return tenants.value
+          .map((t) => ({
+            label: t.tenantCode,
+            value: t.tenantCode
+          }))
+          .concat({ label: 'default', value: 'default' })
       }
-      return [];
+      return []
     })
     onMounted(() => {
       queryTenantList().then((res: any) => {
@@ -71,12 +73,12 @@ export default defineComponent({
       tenantCode: 'default',
       timeoutFlag: false,
       timeout: 0,
-      globalParams: [],
-    });
-    const formRef = ref();
+      globalParams: []
+    })
+    const formRef = ref()
     const rule = {
       name: {
-        required: true,
+        required: true
       }
     }
     const onSubmit = () => {
@@ -106,7 +108,10 @@ export default defineComponent({
             <NInput v-model:value={formValue.value.name} />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
-            <NInput type="textarea" v-model:value={formValue.value.description} />
+            <NInput
+              type='textarea'
+              v-model:value={formValue.value.description}
+            />
           </NFormItem>
           <NFormItem label={t('project.dag.tenant')} path='tenantCode'>
             <NSelect
@@ -114,23 +119,28 @@ export default defineComponent({
               v-model:value={formValue.value.tenantCode}
             />
           </NFormItem>
-          <NFormItem label={t('project.dag.timeout_alert')} path="timeoutFlag">
+          <NFormItem label={t('project.dag.timeout_alert')} path='timeoutFlag'>
             <NSwitch v-model:value={formValue.value.timeoutFlag} />
           </NFormItem>
-          {
-            formValue.value.timeoutFlag && (
-              <NFormItem label=" " path='timeout'>
-                <NInputNumber v-model:value={formValue.value.timeout} show-button={false} min={0} v-slots={{
-                  suffix: () => "分"
-                }}>
-                </NInputNumber>
-              </NFormItem>
-            )
-          }
-          <NFormItem label={t('project.dag.global_variables')} path='globalParams'>
+          {formValue.value.timeoutFlag && (
+            <NFormItem label=' ' path='timeout'>
+              <NInputNumber
+                v-model:value={formValue.value.timeout}
+                show-button={false}
+                min={0}
+                v-slots={{
+                  suffix: () => '分'
+                }}
+              ></NInputNumber>
+            </NFormItem>
+          )}
+          <NFormItem
+            label={t('project.dag.global_variables')}
+            path='globalParams'
+          >
             <NDynamicInput
               v-model:value={formValue.value.globalParams}
-              preset="pair"
+              preset='pair'
               key-placeholder={t('project.dag.key')}
               value-placeholder={t('project.dag.value')}
             />

@@ -30,7 +30,7 @@ import {
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
-import DagSaveModal from './dag-save-modal';
+import DagSaveModal from './dag-save-modal'
 import './x6-style.scss'
 
 const props = {
@@ -91,7 +91,7 @@ export default defineComponent({
     }
 
     // Save modal
-    const saveModalShow = ref(false);
+    const saveModalShow = ref(false)
     const saveModelToggle = (bool: boolean) => {
       if (typeof bool === 'boolean') {
         saveModalShow.value = bool

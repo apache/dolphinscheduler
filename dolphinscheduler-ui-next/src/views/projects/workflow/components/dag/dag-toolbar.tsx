@@ -15,12 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  ref,
-  inject,
-  PropType,
-} from 'vue'
+import { defineComponent, ref, inject, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
 import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
@@ -42,7 +37,7 @@ import { useThemeStore } from '@/store/theme/theme'
 const props = {
   layoutToggle: {
     type: Function as PropType<(bool?: boolean) => void>,
-    default: () => { }
+    default: () => {}
   },
   // If this prop is passed, it means from definition detail
   definition: {
@@ -179,8 +174,9 @@ export default defineComponent({
             }}
           ></NTooltip>
           <div
-            class={`${Styles['toolbar-right-item']} ${Styles['node-selector']
-              } ${searchInputVisible.value ? Styles['visible'] : ''}`}
+            class={`${Styles['toolbar-right-item']} ${
+              Styles['node-selector']
+            } ${searchInputVisible.value ? Styles['visible'] : ''}`}
           >
             <NSelect
               size='small'
@@ -297,7 +293,9 @@ export default defineComponent({
             type='info'
             secondary
             round
-            onClick={() => { context.emit('saveModelToggle', true) }}
+            onClick={() => {
+              context.emit('saveModelToggle', true)
+            }}
           >
             {t('project.dag.save')}
           </NButton>
