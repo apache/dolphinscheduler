@@ -32,11 +32,17 @@ import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
 import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
+import { useRouter, useRoute } from 'vue-router'
+import type { Router } from 'vue-router'
 import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
   setup() {
+    const router: Router = useRouter()
+    const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+
     const { variables, getTableData } = useTable()
 
     const requestData = () => {
@@ -61,6 +67,12 @@ export default defineComponent({
       requestData()
     }
 
+    const createDefinition = () => {
+      router.push({
+        path: `/projects/${projectCode}/workflow/definitions/create`
+      })
+    }
+
     onMounted(() => {
       requestData()
     })
@@ -69,6 +81,7 @@ export default defineComponent({
       requestData,
       handleSearch,
       handleUpdateList,
+      createDefinition,
       handleChangePageSize,
       ...toRefs(variables)
     }
@@ -81,7 +94,7 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' /* TODO: Create workflow */>
+              <NButton type='primary' onClick={this.createDefinition}>
                 {t('project.workflow.create_workflow')}
               </NButton>
               <NButton strong secondary onClick={() => (this.showRef = true)}>

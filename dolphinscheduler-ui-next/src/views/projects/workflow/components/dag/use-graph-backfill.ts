@@ -15,26 +15,29 @@
  * limitations under the License.
  */
 
-import { useCanvasInit } from './use-canvas-init'
-import { useCellQuery } from './use-cell-query'
-import { useCellActive } from './use-cell-active'
-import { useCellUpdate } from './use-cell-update'
-import { useNodeSearch } from './use-node-search'
-import { useGraphAutoLayout } from './use-graph-auto-layout'
-import { useTextCopy } from './use-text-copy'
-import { useCustomCellBuilder } from './use-custom-cell-builder'
-import { useGraphBackfill } from './use-graph-backfill'
-import { useDagDragAndDrop } from './use-dag-drag-drop'
+import { Ref, watch } from 'vue'
+import { useCustomCellBuilder } from './dag-hooks'
+import type { Graph } from '@antv/x6'
+import { WorkflowDefinition } from './types'
 
-export {
-  useCanvasInit,
-  useCellQuery,
-  useCellActive,
-  useNodeSearch,
-  useGraphAutoLayout,
-  useTextCopy,
-  useCustomCellBuilder,
-  useGraphBackfill,
-  useCellUpdate,
-  useDagDragAndDrop
+interface Options {
+  graph: Ref<Graph | undefined>
+  definition: Ref<WorkflowDefinition | undefined>
+}
+
+/**
+ * Backfill workflow into graph
+ */
+export function useGraphBackfill(options: Options) {
+  const { graph, definition } = options
+
+  const { buildGraph } = useCustomCellBuilder()
+
+  watch([graph, definition], () => {
+    if (graph.value && definition.value) {
+      graph.value.fromJSON(buildGraph(definition.value))
+    }
+  })
+
+  return {}
 }

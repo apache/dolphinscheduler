@@ -22,12 +22,15 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ByChained;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -48,6 +51,12 @@ public abstract class TaskNodeForm {
         @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamVal;
+
+    @FindBys({
+        @FindBy(className = "pre_tasks-model"),
+        @FindBy(tagName = "input"),
+    })
+    private WebElement selectPreTasks;
 
     private final WorkflowForm parent;
 
@@ -80,6 +89,26 @@ public abstract class TaskNodeForm {
 
         inputParamKey().get(len).sendKeys(key);
         inputParamVal().get(len).sendKeys(val);
+
+        return this;
+    }
+
+    public TaskNodeForm preTask(String preTaskName) {
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
+
+        final By optionsLocator = By.className("option-pre-tasks");
+
+        new WebDriverWait(parent.driver(), 10)
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+        webElements.stream()
+                .filter(it -> it.getText().contains(preTaskName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
+                .click();
+
+        inputNodeName().click();
 
         return this;
     }

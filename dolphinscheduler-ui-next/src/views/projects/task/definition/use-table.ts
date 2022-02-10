@@ -78,14 +78,15 @@ export function useTable() {
             row.upstreamTaskMap.length < 1
               ? '-'
               : h(NSpace, null, {
-                default: () => row.upstreamTaskMap.map((item: string) => {
-                  return h(
-                    NTag,
-                    { type: 'info', size: 'small' },
-                    { default: () => item }
-                  )
+                  default: () =>
+                    row.upstreamTaskMap.map((item: string) => {
+                      return h(
+                        NTag,
+                        { type: 'info', size: 'small' },
+                        { default: () => item }
+                      )
+                    })
                 })
-              })
           )
       },
       {

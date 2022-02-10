@@ -44,7 +44,8 @@ import {
   SafetyOutlined,
   GroupOutlined,
   ContainerOutlined,
-  ApartmentOutlined
+  ApartmentOutlined,
+  BarsOutlined
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
 
@@ -184,6 +185,11 @@ export function useDataList() {
             label: t('menu.task_result'),
             key: `/data-quality/task-result`,
             icon: renderIcon(ApartmentOutlined)
+          },
+          {
+            label: t('menu.rule'),
+            key: `/data-quality/rule`,
+            icon: renderIcon(BarsOutlined)
           }
         ]
       },

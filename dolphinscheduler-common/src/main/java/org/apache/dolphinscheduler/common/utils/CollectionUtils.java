@@ -78,9 +78,6 @@ public class CollectionUtils {
      */
     public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList, Set<String> exclusionSet) {
         List<Map<String, Object>> instanceList = new ArrayList<>();
-        if (exclusionSet == null) {
-            exclusionSet = new HashSet<>();
-        }
         if (originList == null) {
             return instanceList;
         }
@@ -89,7 +86,7 @@ public class CollectionUtils {
             BeanMap beanMap = new BeanMap(instance);
             instanceMap = new LinkedHashMap<>(16, 0.75f, true);
             for (Map.Entry<Object, Object> entry : beanMap.entrySet()) {
-                if (exclusionSet.contains(entry.getKey())) {
+                if (exclusionSet != null && exclusionSet.contains(entry.getKey())) {
                     continue;
                 }
                 instanceMap.put((String) entry.getKey(), entry.getValue());
