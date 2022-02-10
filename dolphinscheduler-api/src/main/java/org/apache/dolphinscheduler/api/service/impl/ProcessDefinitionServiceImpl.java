@@ -581,12 +581,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition.equals(processDefinitionDeepCopy) && saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
             List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
             if (taskRelationList.size() == processTaskRelationLogList.size()) {
-                Map<Long, ProcessTaskRelationLog> taskRelationLogMap =
-                    taskRelationList.stream().collect(Collectors.toMap(ProcessTaskRelationLog::getPostTaskCode, processTaskRelationLog -> processTaskRelationLog));
-                for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
-                    if (!processTaskRelationLog.equals(taskRelationLogMap.get(processTaskRelationLog.getPostTaskCode()))) {
+                Set<ProcessTaskRelationLog> taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
+                Set<ProcessTaskRelationLog> processTaskRelationLogSet = processTaskRelationLogList.stream().collect(Collectors.toSet());
+                taskRelationSet.removeAll(processTaskRelationLogSet);
+                if (!taskRelationSet.isEmpty()) {
+                    isChange = true;
+                } else {
+                    taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
+                    processTaskRelationLogSet.removeAll(taskRelationSet);
+                    if (!processTaskRelationLogSet.isEmpty()) {
                         isChange = true;
-                        break;
                     }
                 }
             } else {
