@@ -56,7 +56,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
         }
     }
 
-    public void handleMasterEvent(Event event) {
+    private void handleMasterEvent(Event event) {
         final String path = event.path();
         switch (event.type()) {
             case ADD:
@@ -70,7 +70,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
         }
     }
 
-    public void handleWorkerEvent(Event event) {
+    private void handleWorkerEvent(Event event) {
         final String path = event.path();
         switch (event.type()) {
             case ADD:
