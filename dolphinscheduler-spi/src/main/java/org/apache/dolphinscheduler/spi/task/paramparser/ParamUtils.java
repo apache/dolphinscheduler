@@ -28,10 +28,7 @@ import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import com.google.common.base.Preconditions;
 
@@ -85,15 +82,14 @@ public class ParamUtils {
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskExecutionContext.getTaskInstanceId()));
 
-        if (globalParams != null && localParams != null) {
-            globalParams.putAll(localParams);
-        } else if (globalParams == null && localParams != null) {
-            globalParams = localParams;
-        }
-        if (varParams != null) {
-            varParams.putAll(globalParams);
-            globalParams = varParams;
-        }
+        varParams = Optional.ofNullable(varParams).orElse(new HashMap<>());
+        localParams = Optional.ofNullable(localParams).orElse(new HashMap<>());
+        globalParams = Optional.ofNullable(globalParams).orElse(new HashMap<>());
+
+        localParams.putAll(varParams);
+        localParams.putAll(globalParams);
+        globalParams = localParams;
+
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
