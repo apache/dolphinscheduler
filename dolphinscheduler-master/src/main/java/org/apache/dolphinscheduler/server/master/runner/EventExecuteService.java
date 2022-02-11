@@ -63,6 +63,7 @@ public class EventExecuteService extends Thread {
 
     private void eventHandler() {
         for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
+            logger.info("eventHandler execute");
             workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
         }
     }
