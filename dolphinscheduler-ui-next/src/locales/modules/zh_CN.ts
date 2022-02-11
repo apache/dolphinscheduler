@@ -366,6 +366,7 @@ const project = {
     workflow_publish_status: '工作流上线状态',
     schedule_publish_status: '定时状态',
     workflow_definition: '工作流定义',
+    workflow_instance: '工作流实例',
     id: '编号',
     status: '状态',
     create_time: '创建时间',

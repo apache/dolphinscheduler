@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs } from 'vue'
+import { defineComponent, onMounted, onUnmounted, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import {
@@ -33,6 +33,7 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'WorkflowInstanceList',
   setup() {
+    let setIntervalP: number
     const { variables, getTableData, batchDeleteInstance } = useTable()
 
     const requestData = () => {
@@ -61,6 +62,15 @@ export default defineComponent({
 
     onMounted(() => {
       requestData()
+
+      // Update timing list data
+      setIntervalP = setInterval(() => {
+        requestData()
+      }, 9000)
+    })
+
+    onUnmounted(() => {
+      clearInterval(setIntervalP)
     })
 
     return {
@@ -81,7 +91,7 @@ export default defineComponent({
             <ProcessInstanceCondition onHandleSearch={this.handleSearch} />
           </div>
         </Card>
-        <Card title={t('project.workflow.workflow_definition')}>
+        <Card title={t('project.workflow.workflow_instance')}>
           <NDataTable
             rowKey={(row) => row.id}
             columns={this.columns}
