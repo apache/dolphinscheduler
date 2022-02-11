@@ -23,7 +23,7 @@ A spark task type's example and dive into information of **PyDolphinScheduler**.
 Example
 -------
 
-.. literalinclude:: ../../../examples/task_spark_example.py
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/task_spark_example.py
    :start-after: [start workflow_declare]
    :end-before: [end workflow_declare]
 
