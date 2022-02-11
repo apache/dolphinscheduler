@@ -97,6 +97,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -104,6 +105,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -540,12 +542,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        List<TaskDefinitionLog> taskDefinitionLogsDuplicate = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogsDuplicate.stream().collect(
+            Collectors.collectingAndThen(
+                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingLong(TaskDefinitionLog::getCode))), ArrayList::new)
+        );
         Map<String, Object> checkTaskDefinitions = checkTaskDefinitionList(taskDefinitionLogs, taskDefinitionJson);
         if (checkTaskDefinitions.get(Constants.STATUS) != Status.SUCCESS) {
             return checkTaskDefinitions;
         }
-        List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+        List<ProcessTaskRelationLog> taskRelationListDuplicate = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+        List<ProcessTaskRelationLog> taskRelationList = taskRelationListDuplicate.stream().collect(
+            Collectors.collectingAndThen(
+                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(ProcessTaskRelationLog -> ProcessTaskRelationLog.getPreTaskCode() + ";" + ProcessTaskRelationLog.getPostTaskCode()))),
+                ArrayList::new)
+        );
         Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson, taskDefinitionLogs);
         if (checkRelationJson.get(Constants.STATUS) != Status.SUCCESS) {
             return checkRelationJson;

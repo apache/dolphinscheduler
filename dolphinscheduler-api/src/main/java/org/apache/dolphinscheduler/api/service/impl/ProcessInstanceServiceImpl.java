@@ -79,11 +79,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -471,7 +473,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout);
         List<TaskDefinitionLog> taskDefinitionLogsDuplicate = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogsDuplicate.stream().distinct().collect(Collectors.toList());
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogsDuplicate.stream().collect(
+            Collectors.collectingAndThen(
+                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingLong(TaskDefinitionLog::getCode))), ArrayList::new)
+        );
         if (taskDefinitionLogs.isEmpty()) {
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             return result;
@@ -489,7 +494,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         List<ProcessTaskRelationLog> taskRelationListDuplicate = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
-        List<ProcessTaskRelationLog> taskRelationList = taskRelationListDuplicate.stream().distinct().collect(Collectors.toList());
+        List<ProcessTaskRelationLog> taskRelationList = taskRelationListDuplicate.stream().collect(
+            Collectors.collectingAndThen(
+                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(ProcessTaskRelationLog -> ProcessTaskRelationLog.getPreTaskCode() + ";" + ProcessTaskRelationLog.getPostTaskCode()))),
+                ArrayList::new)
+        );
         //check workflow json is valid
         result = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
