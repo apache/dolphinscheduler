@@ -242,9 +242,9 @@
           this.scale = sx
         })
         // right click
-        this.graph.on('node:contextmenu', ({x, y, cell, e}) => {
-          const {x: pageX, y: pageY} = this.graph.localToPage(x, y)
-          this.$refs.contextMenu.show(pageX, pageY);
+        this.graph.on('node:contextmenu', ({ x, y, cell, e }) => {
+          const { x: pageX, y: pageY } = this.graph.localToPage(x, y)
+          this.$refs.contextMenu.show(pageX, pageY)
           this.$refs.contextMenu.setCurrentTask({
             name: cell.data.taskName,
             type: cell.data.taskType,
@@ -697,7 +697,7 @@
         })
           .then((res) => {
             const [code] = res
-            this.addNode(code, type, { x:  x - eX, y: y - eY })
+            this.addNode(code, type, { x: x - eX, y: y - eY })
             this.dagChart.openFormModel(code, type)
           })
           .catch((err) => {
