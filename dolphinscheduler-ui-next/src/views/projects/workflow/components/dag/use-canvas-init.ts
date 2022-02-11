@@ -132,6 +132,35 @@ export function useCanvasInit(options: Options) {
         edge.setSource(sourceNode)
       }
     })
+
+    // Add a node tool when the mouse entering
+    graph.value.on('node:mouseenter', ({ node }) => {
+      const nodeName = node.getData().taskName
+      node.addTools({
+        name: 'button',
+        args: {
+          markup: [
+            {
+              tagName: 'text',
+              textContent: nodeName,
+              attrs: {
+                fill: '#868686',
+                'font-size': 16,
+                'text-anchor': 'center'
+              }
+            }
+          ],
+          x: 0,
+          y: 0,
+          offset: { x: 0, y: -10 }
+        }
+      })
+    })
+
+    // Remove all tools when the mouse leaving
+    graph.value.on('node:mouseleave', ({ node }) => {
+      node.removeTool('button')
+    })
   })
 
   /**
