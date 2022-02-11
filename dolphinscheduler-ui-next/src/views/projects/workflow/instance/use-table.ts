@@ -21,19 +21,19 @@ import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import { TableColumns } from 'naive-ui/lib/data-table/src/interface'
+import { RowKey, TableColumns } from 'naive-ui/lib/data-table/src/interface'
 import {
   queryProcessInstanceListPaging,
-  deleteProcessInstanceById
+  deleteProcessInstanceById,
+  batchDeleteProcessInstanceByIds
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
-
 import TableAction from './components/table-action'
 import { runningType } from '@/utils/common'
-import styles from './index.module.scss'
 import { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import { ICountDownParam } from './types'
 import { ExecuteReq } from '@/service/modules/executors/types'
+import styles from './index.module.scss'
 
 export function useTable() {
   const { t } = useI18n()
@@ -193,6 +193,7 @@ export function useTable() {
 
   const variables = reactive({
     columns,
+    checkedRowKeys: [] as Array<RowKey>,
     tableData: [] as Array<IWorkflowInstance>,
     page: ref(1),
     pageSize: ref(10),
@@ -217,6 +218,31 @@ export function useTable() {
       .then(() => {
         window.$message.success(t('project.workflow.success'))
 
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message || '')
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+      })
+  }
+
+  const batchDeleteInstance = () => {
+    const data = {
+      processInstanceIds: _.join(variables.checkedRowKeys, ',')
+    }
+
+    batchDeleteProcessInstanceByIds(data, variables.projectCode)
+      .then(() => {
+        window.$message.success(t('project.workflow.success'))
+        variables.checkedRowKeys = []
         getTableData({
           pageSize: variables.pageSize,
           pageNo: variables.page,
@@ -311,6 +337,7 @@ export function useTable() {
 
   return {
     variables,
-    getTableData
+    getTableData,
+    batchDeleteInstance
   }
 }

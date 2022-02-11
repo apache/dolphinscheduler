@@ -34,7 +34,7 @@ interface ProcessInstanceListReq {
 
 interface BatchDeleteReq {
   processInstanceIds: string
-  projectName: string
+  projectName?: string
   alertGroup?: string
   createTime?: string
   email?: string

@@ -108,10 +108,11 @@ export default defineComponent({
                 type='info'
                 circle
                 disabled={
-                  state !== 'SUCCESS' &&
-                  state !== 'PAUSE' &&
-                  state !== 'FAILURE' &&
-                  state !== 'STOP'
+                  (state !== 'SUCCESS' &&
+                    state !== 'PAUSE' &&
+                    state !== 'FAILURE' &&
+                    state !== 'STOP') ||
+                  this.row?.disabled
                 }
                 onClick={this.handleEdit}
               >
@@ -189,7 +190,10 @@ export default defineComponent({
                 type='error'
                 circle
                 onClick={this.handleStop}
-                disabled={state !== 'RUNNING_EXECUTION' && state !== 'PAUSE'}
+                disabled={
+                  (state !== 'RUNNING_EXECUTION' && state !== 'PAUSE') ||
+                  this.row?.disabled
+                }
               >
                 <NIcon>
                   {state === 'STOP' ? (
@@ -214,7 +218,10 @@ export default defineComponent({
                 size='tiny'
                 type='warning'
                 circle
-                disabled={state !== 'RUNNING_EXECUTION' && state !== 'PAUSE'}
+                disabled={
+                  (state !== 'RUNNING_EXECUTION' && state !== 'PAUSE') ||
+                  this.row?.disabled
+                }
                 onClick={this.handleSuspend}
               >
                 <NIcon>
@@ -238,10 +245,11 @@ export default defineComponent({
                 type='error'
                 circle
                 disabled={
-                  state !== 'SUCCESS' &&
-                  state !== 'FAILURE' &&
-                  state !== 'STOP' &&
-                  state !== 'PAUSE'
+                  (state !== 'SUCCESS' &&
+                    state !== 'FAILURE' &&
+                    state !== 'STOP' &&
+                    state !== 'PAUSE') ||
+                  this.row?.disabled
                 }
               >
                 <NPopconfirm onPositiveClick={this.handleDeleteInstance}>
@@ -273,6 +281,7 @@ export default defineComponent({
                 type='info'
                 circle
                 /* TODO: Goto gantt*/
+                disabled={this.row?.disabled}
               >
                 <NIcon>
                   <ControlOutlined />

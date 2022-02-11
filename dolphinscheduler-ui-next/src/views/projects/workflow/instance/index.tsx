@@ -35,7 +35,7 @@ import { useTable } from './use-table'
 export default defineComponent({
   name: 'WorkflowInstanceList',
   setup() {
-    const { variables, getTableData } = useTable()
+    const { variables, getTableData, batchDeleteInstance } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -55,6 +55,10 @@ export default defineComponent({
       requestData()
     }
 
+    const handleBatchDelete = () => {
+      batchDeleteInstance()
+    }
+
     onMounted(() => {
       requestData()
     })
@@ -63,6 +67,7 @@ export default defineComponent({
       requestData,
       handleSearch,
       handleChangePageSize,
+      handleBatchDelete,
       ...toRefs(variables)
     }
   },
@@ -102,6 +107,7 @@ export default defineComponent({
             size={'small'}
             class={styles.table}
             scrollX={1800}
+            v-model:checked-row-keys={this.checkedRowKeys}
           />
           <div class={styles.pagination}>
             <NPagination
@@ -122,12 +128,15 @@ export default defineComponent({
                 <NButton
                   tag='div'
                   type='primary'
+                  disabled={this.checkedRowKeys.length <= 0}
                   style='position: absolute; bottom: 10px; left: 10px;'
                 >
-                  <NPopconfirm onPositiveClick={() => {}}>
-                    {t('project.workflow.delete_confirm')}
+                  <NPopconfirm onPositiveClick={this.handleBatchDelete}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => t('project.workflow.delete')
+                    }}
                   </NPopconfirm>
-                  {t('project.workflow.delete')}
                 </NButton>
               )
             }}

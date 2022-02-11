@@ -40,7 +40,7 @@ export function queryProcessInstanceListPaging(
 
 export function batchDeleteProcessInstanceByIds(
   data: BatchDeleteReq,
-  code: CodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-instances/batch-delete`,
