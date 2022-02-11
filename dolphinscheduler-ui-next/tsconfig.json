@@ -13,6 +13,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "skipLibCheck": true,
     "types": ["vite/client"],
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },

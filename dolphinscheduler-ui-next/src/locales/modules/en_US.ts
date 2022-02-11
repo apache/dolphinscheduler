@@ -496,7 +496,16 @@ const project = {
     dagre_layout: 'Dagre',
     rows: 'Rows',
     cols: 'Cols',
-    copy_success: 'Copy Success'
+    copy_success: 'Copy Success',
+    workflow_name: 'Workflow Name',
+    description: 'Description',
+    tenant: 'Tenant',
+    timeout_alert: 'Timeout Alert',
+    global_variables: 'Global Variables',
+    basic_info: 'Basic Information',
+    minute: 'Minute',
+    key: 'Key',
+    value: 'Value'
   },
   node: {
     current_node_settings: 'Current node settings',

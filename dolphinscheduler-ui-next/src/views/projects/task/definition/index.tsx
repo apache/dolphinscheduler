@@ -29,7 +29,7 @@ import {
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
-import { ALL_TASK_TYPES } from '@/views/projects/task/constants/task-type'
+import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import Card from '@/components/card'
 import VersionModal from './components/version-modal'
 import MoveModal from './components/move-modal'
@@ -113,7 +113,7 @@ const TaskDefinition = defineComponent({
               <NSelect
                 v-model={[this.taskType, 'value']}
                 size='small'
-                options={Object.keys(ALL_TASK_TYPES).map((item) => {
+                options={Object.keys(TASK_TYPES_MAP).map((item) => {
                   return { value: item, label: item }
                 })}
                 placeholder={t('project.task.task_type')}

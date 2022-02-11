@@ -495,7 +495,16 @@ const project = {
     dagre_layout: '层次布局',
     rows: '行数',
     cols: '列数',
-    copy_success: '复制成功'
+    copy_success: '复制成功',
+    workflow_name: '工作流名称',
+    description: '描述',
+    tenant: '租户',
+    timeout_alert: '超时告警',
+    global_variables: '全局变量',
+    basic_info: '基本信息',
+    minute: '分',
+    key: '键',
+    value: '值'
   },
   node: {
     current_node_settings: '当前节点设置',

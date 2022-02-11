@@ -15,19 +15,10 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  ref,
-  inject,
-  PropType,
-  onMounted,
-  watch,
-  computed
-} from 'vue'
-import type { Ref } from 'vue'
+import { defineComponent, ref, inject, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
-import { NTooltip, NIcon, NButton, NSelect, useMessage } from 'naive-ui'
+import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
 import {
   SearchOutlined,
   DownloadOutlined,
@@ -37,7 +28,7 @@ import {
   FormatPainterOutlined,
   CopyOutlined
 } from '@vicons/antd'
-import { useNodeSearch, useTextCopy, useCellQuery } from './dag-hooks'
+import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
 import { useRouter } from 'vue-router'
@@ -59,7 +50,7 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle'],
+  emits: ['versionToggle', 'saveModelToggle'],
   setup(props, context) {
     const { t } = useI18n()
 
@@ -302,6 +293,9 @@ export default defineComponent({
             type='info'
             secondary
             round
+            onClick={() => {
+              context.emit('saveModelToggle', true)
+            }}
           >
             {t('project.dag.save')}
           </NButton>
