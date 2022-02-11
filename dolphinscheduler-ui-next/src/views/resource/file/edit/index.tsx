@@ -67,7 +67,7 @@ export default defineComponent({
       <Card title={t('resource.file.file_details')}>
         <div class={styles['file-edit-content']}>
           <h2>
-            <span>{this.resourceViewRef?.value.alias}</span>
+            <span>{this.resourceViewRef.value?.alias}</span>
           </h2>
           <NForm
             rules={this.rules}
@@ -82,7 +82,7 @@ export default defineComponent({
                 }}
               >
                 <MonacoEditor
-                  v-model={[this.resourceViewRef?.value.content, 'value']}
+                  v-model={[this.resourceViewRef.value?.content, 'value']}
                 />
               </div>
             </NFormItem>

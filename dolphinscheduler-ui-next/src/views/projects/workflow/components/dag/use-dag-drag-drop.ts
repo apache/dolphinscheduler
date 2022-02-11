@@ -18,7 +18,6 @@
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
-import type { Dragged } from '.'
 import { genTaskCodeList } from '@/service/modules/task-definition'
 import { useCellUpdate } from './dag-hooks'
 import { useRoute } from 'vue-router'
@@ -26,6 +25,12 @@ import { useRoute } from 'vue-router'
 interface Options {
   readonly: Ref<boolean>
   graph: Ref<Graph | undefined>
+}
+
+interface Dragged {
+  x: number
+  y: number
+  type: string
 }
 
 /**
