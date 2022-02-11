@@ -15,4 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init examples package which provides users with pydolphinscheduler examples"""
+"""Init examples package which provides users with pydolphinscheduler examples."""
