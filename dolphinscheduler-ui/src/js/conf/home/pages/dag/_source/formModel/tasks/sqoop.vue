@@ -89,7 +89,7 @@
             size="small"
             v-model="sourceType"
             :disabled="isDetails"
-            @change="_handleSourceTypeChange">
+            @change="(val)=> _handleSourceTypeChange({label: val})">
             <el-option
               v-for="city in sourceTypeList"
               :key="city.code"
