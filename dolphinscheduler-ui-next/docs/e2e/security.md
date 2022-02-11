@@ -1,7 +1,6 @@
 ### security
 
 class:
-
 - [ ] tab-tenant-manage
 - [ ] tab-user-manage
 - [ ] tab-worker-group-manage
@@ -12,7 +11,6 @@ class:
 #### tenant manage
 
 class:
-
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -21,7 +19,6 @@ class:
 - [ ] delete
 
 id:
-
 - [ ] btnCreateTenant
 - [ ] inputTenantCode
 - [ ] selectQueue
@@ -32,7 +29,6 @@ id:
 #### user manage
 
 class:
-
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -41,7 +37,6 @@ class:
 - [ ] delete
 
 id:
-
 - [ ] btnCreateUser
 - [ ] inputUserName
 - [ ] inputUserPassword
@@ -57,17 +52,15 @@ id:
 #### worker group manage
 
 class:
-
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
-- [ ] vue-treeselect\_\_menu
+- [ ] vue-treeselect__menu
 - [ ] name
 - [ ] edit
 - [ ] delete
 
 id:
-
 - [ ] btnCreateWorkerGroup
 - [ ] inputWorkerGroupName
 - [ ] selectWorkerAddress
@@ -77,13 +70,11 @@ id:
 #### queue manage
 
 class:
-
 - [ ] items
 - [ ] queueName
 - [ ] edit
 
 id:
-
 - [ ] btnCreateQueue
 - [ ] inputQueueName
 - [ ] inputQueueValue
@@ -93,7 +84,6 @@ id:
 #### environment manage
 
 class:
-
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -102,7 +92,6 @@ class:
 - [ ] delete
 
 id:
-
 - [ ] btnCreateEnvironment
 - [ ] inputEnvironmentName
 - [ ] inputEnvironmentConfig
@@ -114,7 +103,6 @@ id:
 #### token manage
 
 class:
-
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -124,7 +112,6 @@ class:
 - [ ] delete
 
 id:
-
 - [ ] btnCreateToken
 - [ ] btnGenerateToken
 - [ ] btnSubmit

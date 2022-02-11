@@ -1,7 +1,6 @@
 ### project
 
 class:
-
 - [ ] items-project
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -9,7 +8,6 @@ class:
 - [ ] delete
 
 id:
-
 - [ ] btnCreateProject
 - [ ] inputProjectName
 - [ ] btnSubmit
@@ -17,7 +15,6 @@ id:
 #### detail
 
 class:
-
 - [ ] tab-process-definition
 - [ ] tab-process-instance
 - [ ] tab-task-instance
@@ -25,7 +22,6 @@ class:
 #### workflow save dialog
 
 class:
-
 - [ ] input-param-key
 - [ ] input-param-val
 - [ ] option-tenants
@@ -33,7 +29,6 @@ class:
 - [ ] add-dp
 
 id:
-
 - [ ] inputName
 - [ ] btnSubmit
 - [ ] selectTenant
@@ -41,13 +36,11 @@ id:
 #### workflow run dialog
 
 id:
-
 - [ ] btnSubmit
 
 #### workflow instance tab
 
 class:
-
 - [ ] items-workflow-instances
 - [ ] select-all
 - [ ] btn-delete-all
@@ -61,26 +54,22 @@ class:
 #### workflow format dialog
 
 class:
-
-- [ ] el-dialog\_\_wrapper
+- [ ] el-dialog__wrapper
 - [ ] el-button--primary
 
 #### workflow form
 
 class:
-
 - [ ] graph-format
 - [ ] task-item-`type`
 - [ ] dag-container
 
 id:
-
 - [ ] btnSave
 
 #### workflow definition tab
 
 class:
-
 - [ ] select-all
 - [ ] btn-delete-all
 - [ ] el-popconfirm
@@ -92,13 +81,11 @@ class:
 - [ ] btn-cancel-publish
 
 id:
-
 - [ ] btnCreateProcess
 
 #### task instance tab
 
 class:
-
 - [ ] items-task-instances
 - [ ] task-instance-state
 - [ ] task-instance-name
@@ -106,21 +93,18 @@ class:
 #### switch task form
 
 class:
-
 - [ ] switch-task
 - [ ] switch-else
-- [ ] el-input\_\_inner
+- [ ] el-input__inner
 - [ ] option-else-branches
 - [ ] option-if-branches
 
 id:
-
 - [ ] btnAddIfBranch
 
 #### switch task if branch
 
 class:
-
 - [ ] switch-task
 - [ ] switch-list
 - [ ] el-input
@@ -128,7 +112,6 @@ class:
 #### task node form
 
 class:
-
 - [ ] input-param-key
 - [ ] input-param-val
 - [ ] pre_tasks-model
@@ -138,6 +121,5 @@ class:
 - [ ] option-pre-tasks
 
 id:
-
 - [ ] inputNodeName
 - [ ] btnSubmit
