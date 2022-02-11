@@ -606,15 +606,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (taskRelationList.size() == processTaskRelationLogList.size()) {
                 Set<ProcessTaskRelationLog> taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
                 Set<ProcessTaskRelationLog> processTaskRelationLogSet = processTaskRelationLogList.stream().collect(Collectors.toSet());
-                taskRelationSet.removeAll(processTaskRelationLogSet);
-                if (!taskRelationSet.isEmpty()) {
-                    isChange = true;
-                } else {
-                    taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
-                    processTaskRelationLogSet.removeAll(taskRelationSet);
-                    if (!processTaskRelationLogSet.isEmpty()) {
+                if (taskRelationSet.size() == processTaskRelationLogSet.size()) {
+                    taskRelationSet.removeAll(processTaskRelationLogSet);
+                    if (!taskRelationSet.isEmpty()) {
                         isChange = true;
                     }
+                } else {
+                    isChange = true;
                 }
             } else {
                 isChange = true;
