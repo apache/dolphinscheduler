@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, onUnmounted, toRefs } from 'vue'
+import { defineComponent, onMounted, onUnmounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import {
@@ -34,7 +34,8 @@ export default defineComponent({
   name: 'WorkflowInstanceList',
   setup() {
     let setIntervalP: number
-    const { variables, getTableData, batchDeleteInstance } = useTable()
+    const { variables, createColumns, getTableData, batchDeleteInstance } =
+      useTable()
 
     const requestData = () => {
       getTableData()
@@ -61,12 +62,17 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      createColumns(variables)
       requestData()
 
       // Update timing list data
       setIntervalP = setInterval(() => {
         requestData()
       }, 9000)
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
     })
 
     onUnmounted(() => {
