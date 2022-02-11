@@ -490,7 +490,7 @@ public class WorkflowExecuteThread {
         if (!taskInstance.taskCanRetry()) {
             return;
         }
-        TaskInstance newTaskInstance =  cloneRetryTaskInstance(taskInstance);
+        TaskInstance newTaskInstance = cloneRetryTaskInstance(taskInstance);
         if (newTaskInstance == null) {
             logger.error("retry fail, new taskInstancce is null, task code:{}, task id:{}", taskInstance.getTaskCode(), taskInstance.getId());
             return;
@@ -573,10 +573,15 @@ public class WorkflowExecuteThread {
      * check if task instance exist by state event
      */
     public boolean checkTaskInstanceByStateEvent(StateEvent stateEvent) {
+        if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+            return true;
+        }
+
         if (stateEvent.getTaskInstanceId() == 0) {
             logger.error("task instance id null, state event:{}", stateEvent);
             return false;
         }
+
         if (!taskInstanceMap.containsKey(stateEvent.getTaskInstanceId())) {
             logger.error("mismatch task instance id, event:{}", stateEvent);
             return false;
