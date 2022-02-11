@@ -110,12 +110,11 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
                 command.getBody(), TaskExecuteRequestCommand.class);
 
-        logger.info("received command : {}", taskRequestCommand);
-
         if (taskRequestCommand == null) {
             logger.error("task execute request command is null");
             return;
         }
+        logger.info("task execute request command : {}", taskRequestCommand);
 
         String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);

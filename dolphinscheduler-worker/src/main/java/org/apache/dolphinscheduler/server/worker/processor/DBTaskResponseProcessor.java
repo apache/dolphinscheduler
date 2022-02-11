@@ -50,8 +50,11 @@ public class DBTaskResponseProcessor implements NettyRequestProcessor {
                 command.getBody(), DBTaskResponseCommand.class);
 
         if (taskResponseCommand == null) {
+            logger.error("dBTask Response  command is null");
             return;
         }
+        logger.info("dBTask Response command : {}", taskResponseCommand);
+
 
         if (taskResponseCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponseCache.get().removeResponseCache(taskResponseCommand.getTaskInstanceId());
