@@ -441,7 +441,7 @@ public class WorkflowExecuteThread {
             processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
-        } else if (taskInstance.taskCanRetry()) {
+        } else if (taskInstance.taskCanRetry() && processInstance.getState() != ExecutionStatus.READY_STOP) {
             // retry task
             retryTaskInstance(taskInstance);
         } else if (taskInstance.getState().typeIsFailure()) {
@@ -1437,13 +1437,9 @@ public class WorkflowExecuteThread {
     private ExecutionStatus getProcessInstanceState(ProcessInstance instance) {
         ExecutionStatus state = instance.getState();
 
-        if (activeTaskProcessorMaps.size() > 0 || hasRetryTaskInStandBy()) {
+        if ((activeTaskProcessorMaps.size() > 0 || hasRetryTaskInStandBy()) && state != ExecutionStatus.READY_STOP) {
             // active task and retry task exists
             return runningState(state);
-        }
-        // process failure
-        if (processFailed()) {
-            return ExecutionStatus.FAILURE;
         }
 
         // waiting thread
@@ -1460,13 +1456,20 @@ public class WorkflowExecuteThread {
         if (state == ExecutionStatus.READY_STOP) {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
+            List<TaskInstance> faillist = getCompleteTaskByState(ExecutionStatus.FAILURE);
             if (CollectionUtils.isNotEmpty(stopList)
                 || CollectionUtils.isNotEmpty(killList)
+                || CollectionUtils.isNotEmpty(faillist)
                 || !isComplementEnd()) {
                 return ExecutionStatus.STOP;
             } else {
                 return ExecutionStatus.SUCCESS;
             }
+        }
+
+        // process failure
+        if (processFailed()) {
+            return ExecutionStatus.FAILURE;
         }
 
         // success
@@ -1615,6 +1618,9 @@ public class WorkflowExecuteThread {
             }
             TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
             if (taskInstance == null || taskInstance.getState().typeIsFinished()) {
+                if (readyToSubmitTaskQueue.size() > 0) {
+                    readyToSubmitTaskQueue.clear();
+                }
                 continue;
             }
             taskProcessor.action(TaskAction.STOP);
