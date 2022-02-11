@@ -171,6 +171,7 @@ public class MasterSchedulerService extends Thread {
                     , stateWheelExecuteThread);
 
             this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
+            logger.info("scheduleProcessInstanceId: {}", processInstance.getId());
             if (processInstance.getTimeout() > 0) {
                 stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
