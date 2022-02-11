@@ -452,7 +452,22 @@ const project = {
     recover_serial_wait: '串行恢复',
     recovery_suspend: '恢复运行',
     recovery_failed: '恢复失败',
-    gantt: '甘特图'
+    gantt: '甘特图',
+    name: '名称',
+    all_status: '全部状态',
+    submit_success: '提交成功',
+    running: '正在运行',
+    ready_to_pause: '准备暂停',
+    ready_to_stop: '准备停止',
+    failed: '失败',
+    need_fault_tolerance: '需要容错',
+    kill: 'Kill',
+    waiting_for_thread: '等待线程',
+    waiting_for_dependence: '等待依赖',
+    waiting_for_dependency_to_complete: '等待依赖完成',
+    delay_execution: '延时执行',
+    forced_success: '强制成功',
+    serial_wait: '串行等待'
   },
   task: {
     task_name: '任务名称',

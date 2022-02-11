@@ -22,4 +22,13 @@ interface ICountDownParam extends ExecuteReq {
   buttonType: 'run' | 'store' | 'suspend'
 }
 
-export { ICountDownParam }
+interface IWorkflowInstanceSearch {
+  searchVal: string
+  executorName: string
+  host: string
+  stateType: string
+  startDate: string
+  endDate: string
+}
+
+export { ICountDownParam, IWorkflowInstanceSearch }

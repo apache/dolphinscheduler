@@ -102,3 +102,73 @@ export const runningType = (t: any) => [
     code: 'RECOVER_SERIAL_WAIT'
   }
 ]
+
+/**
+ * State code table
+ */
+export const stateType = (t: any) => [
+  {
+    value: '',
+    label: `${t('project.workflow.all_status')}`
+  },
+  {
+    value: 'SUBMITTED_SUCCESS',
+    label: `${t('project.workflow.submit_success')}`
+  },
+  {
+    value: 'RUNNING_EXECUTION',
+    label: `${t('project.workflow.running')}`
+  },
+  {
+    value: 'READY_PAUSE',
+    label: `${t('project.workflow.ready_to_pause')}`
+  },
+  {
+    value: 'PAUSE',
+    label: `${t('project.workflow.pause')}`
+  },
+  {
+    value: 'READY_STOP',
+    label: `${t('project.workflow.ready_to_stop')}`
+  },
+  {
+    value: 'STOP',
+    label: `${t('project.workflow.stop')}`
+  },
+  {
+    value: 'FAILURE',
+    label: `${t('project.workflow.failed')}`
+  },
+  {
+    value: 'SUCCESS',
+    label: `${t('project.workflow.success')}`
+  },
+  {
+    value: 'NEED_FAULT_TOLERANCE',
+    label: `${t('project.workflow.need_fault_tolerance')}`
+  },
+  {
+    value: 'KILL',
+    label: `${t('project.workflow.kill')}`
+  },
+  {
+    value: 'WAITING_THREAD',
+    label: `${t('project.workflow.waiting_for_thread')}`
+  },
+  {
+    value: 'WAITING_DEPEND',
+    label: `${t('project.workflow.waiting_for_dependency_to_complete')}`
+  },
+  {
+    value: 'DELAY_EXECUTION',
+    label: `${t('project.workflow.delay_execution')}`
+  },
+  {
+    value: 'FORCED_SUCCESS',
+    label: `${t('project.workflow.forced_success')}`
+  },
+  {
+    value: 'SERIAL_WAIT',
+    label: `${t('project.workflow.serial_wait')}`
+  }
+]

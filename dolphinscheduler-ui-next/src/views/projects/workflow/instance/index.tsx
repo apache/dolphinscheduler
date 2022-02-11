@@ -18,19 +18,17 @@
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import styles from './index.module.scss'
 import {
   NButton,
   NDataTable,
-  NIcon,
-  NInput,
   NPagination,
   NPopconfirm,
-  NSpace,
   NTooltip
 } from 'naive-ui'
-import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
+import ProcessInstanceCondition from './components/process-instance-condition'
+import { IWorkflowInstanceSearch } from './types'
+import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'WorkflowInstanceList',
@@ -38,14 +36,16 @@ export default defineComponent({
     const { variables, getTableData, batchDeleteInstance } = useTable()
 
     const requestData = () => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
+      getTableData()
     }
 
-    const handleSearch = () => {
+    const handleSearch = (params: IWorkflowInstanceSearch) => {
+      variables.searchVal = params.searchVal
+      variables.executorName = params.executorName
+      variables.host = params.host
+      variables.stateType = params.stateType
+      variables.startDate = params.startDate
+      variables.endDate = params.endDate
       variables.page = 1
       requestData()
     }
@@ -78,24 +78,7 @@ export default defineComponent({
       <div class={styles.content}>
         <Card class={styles.card}>
           <div class={styles.header}>
-            <NSpace></NSpace>
-            <div class={styles.right}>
-              <div class={styles.search}>
-                <div class={styles.list}>
-                  <NButton type='primary' onClick={this.handleSearch}>
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  </NButton>
-                </div>
-                <div class={styles.list}>
-                  <NInput
-                    placeholder={t('resource.function.enter_keyword_tips')}
-                    v-model={[this.searchVal, 'value']}
-                  />
-                </div>
-              </div>
-            </div>
+            <ProcessInstanceCondition onHandleSearch={this.handleSearch} />
           </div>
         </Card>
         <Card title={t('project.workflow.workflow_definition')}>

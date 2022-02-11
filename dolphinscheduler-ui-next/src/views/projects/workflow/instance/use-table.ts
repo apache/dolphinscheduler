@@ -197,12 +197,27 @@ export function useTable() {
     tableData: [] as Array<IWorkflowInstance>,
     page: ref(1),
     pageSize: ref(10),
-    searchVal: ref(),
     totalPage: ref(1),
+    searchVal: ref(),
+    executorName: ref(),
+    host: ref(),
+    stateType: ref(),
+    startDate: ref(),
+    endDate: ref(),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode))
   })
 
-  const getTableData = (params: any) => {
+  const getTableData = () => {
+    const params = {
+      pageNo: variables.page,
+      pageSize: variables.pageSize,
+      searchVal: variables.searchVal,
+      executorName: variables.executorName,
+      host: variables.host,
+      stateType: variables.stateType,
+      startDate: variables.startDate,
+      endDate: variables.endDate
+    }
     queryProcessInstanceListPaging({ ...params }, variables.projectCode).then(
       (res: any) => {
         variables.totalPage = res.totalPage
@@ -217,20 +232,11 @@ export function useTable() {
     deleteProcessInstanceById(id, variables.projectCode)
       .then(() => {
         window.$message.success(t('project.workflow.success'))
-
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
       .catch((error: any) => {
         window.$message.error(error.message || '')
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
   }
 
@@ -243,19 +249,11 @@ export function useTable() {
       .then(() => {
         window.$message.success(t('project.workflow.success'))
         variables.checkedRowKeys = []
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
       .catch((error: any) => {
         window.$message.error(error.message || '')
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
   }
 
@@ -267,19 +265,11 @@ export function useTable() {
       .then(() => {
         window.$message.success(t('project.workflow.success'))
 
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
       .catch((error: any) => {
         window.$message.error(error.message || '')
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
   }
 
@@ -318,20 +308,12 @@ export function useTable() {
         // forceUpdate
         window.$message.success(t('project.workflow.success'))
         _countDown(() => {
-          getTableData({
-            pageSize: variables.pageSize,
-            pageNo: variables.page,
-            searchVal: variables.searchVal
-          })
+          getTableData()
         }, index)
       })
       .catch((error: any) => {
         window.$message.error(error.message)
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+        getTableData()
       })
   }
 

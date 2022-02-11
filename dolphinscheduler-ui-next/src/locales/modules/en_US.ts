@@ -453,7 +453,22 @@ const project = {
     recover_serial_wait: 'Recover serial wait',
     recovery_suspend: 'Recovery Suspend',
     recovery_failed: 'Recovery Failed',
-    gantt: 'Gantt'
+    gantt: 'Gantt',
+    name: 'Name',
+    all_status: 'AllStatus',
+    submit_success: 'Submitted successfully',
+    running: 'Running',
+    ready_to_pause: 'Ready to pause',
+    ready_to_stop: 'Ready to stop',
+    failed: 'Failed',
+    need_fault_tolerance: 'Need fault tolerance',
+    kill: 'Kill',
+    waiting_for_thread: 'Waiting for thread',
+    waiting_for_dependence: 'Waiting for dependence',
+    waiting_for_dependency_to_complete: 'Waiting for dependency to complete',
+    delay_execution: 'Delay execution',
+    forced_success: 'Forced success',
+    serial_wait: 'Serial wait'
   },
   task: {
     task_name: 'Task Name',
