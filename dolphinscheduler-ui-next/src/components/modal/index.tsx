@@ -46,6 +46,10 @@ const props = {
   confirmLoading: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  autoFocus: {
+    type: Boolean as PropType<boolean>,
+    default: true
   }
 }
 
@@ -75,8 +79,13 @@ const Modal = defineComponent({
         v-model={[this.show, 'show']}
         class={styles.container}
         mask-closable={false}
+        auto-focus={this.autoFocus}
       >
-        <NCard title={this.title}>
+        <NCard
+          title={this.title}
+          class={styles['modal-card']}
+          contentStyle={{ overflowY: 'auto' }}
+        >
           {{
             default: () => renderSlot($slots, 'default'),
             footer: () => (

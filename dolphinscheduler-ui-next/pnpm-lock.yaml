@@ -18,6 +18,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@antv/layout': ^0.1.31
   '@antv/x6': ^1.29.5
   '@types/node': ^16.11.19
   '@types/nprogress': ^0.2.0
@@ -38,7 +39,7 @@ specifiers:
   eslint-plugin-vue: ^8.2.0
   lodash: ^4.17.21
   monaco-editor: ^0.31.1
-  naive-ui: 2.24.6
+  naive-ui: 2.25.1
   nprogress: ^0.2.0
   pinia: ^2.0.9
   pinia-plugin-persistedstate: ^1.0.3
@@ -57,6 +58,7 @@ specifiers:
   vue-tsc: ^0.28.10
 
 dependencies:
+  '@antv/layout': 0.1.31
   '@antv/x6': 1.29.5
   '@vueuse/core': 7.5.3_vue@3.2.26
   axios: 0.24.0
@@ -64,7 +66,7 @@ dependencies:
   echarts: 5.2.2
   lodash: 4.17.21
   monaco-editor: 0.31.1
-  naive-ui: 2.24.6_vue@3.2.26
+  naive-ui: 2.25.1_vue@3.2.26
   nprogress: 0.2.0
   pinia: 2.0.9_typescript@4.5.4+vue@3.2.26
   pinia-plugin-persistedstate: 1.0.3_pinia@2.0.9
@@ -98,6 +100,70 @@ devDependencies:
   vue-tsc: 0.28.10_typescript@4.5.4
 
 packages:
+  /@antv/g-webgpu-core/0.5.6:
+    resolution:
+      {
+        integrity: sha512-DPiH3GkAUiT0Q+LAKeImpI+IOQ/gP2w6HstYKivpFIpBPIvZ/9equM3icVrn1iDfDkZANVXQ1PppcO3xBv1ZTw==
+      }
+    dependencies:
+      eventemitter3: 4.0.7
+      gl-matrix: 3.4.3
+      inversify: 5.1.1
+      inversify-inject-decorators: 3.1.0
+      probe.gl: 3.5.0
+      reflect-metadata: 0.1.13
+    dev: false
+
+  /@antv/g-webgpu-engine/0.5.6:
+    resolution:
+      {
+        integrity: sha512-D311qYUefdEFwLayutIHqucrAY3cAGH3BdnXS37nq+0nsglrHcNP0Ab1YTinn9RihLoY3yXFTLzrYkJHJbZXDg==
+      }
+    dependencies:
+      '@antv/g-webgpu-core': 0.5.6
+      '@webgpu/glslang': 0.0.15
+      '@webgpu/types': 0.0.31
+      gl-matrix: 3.4.3
+      hammerjs: 2.0.8
+      inversify: 5.1.1
+      inversify-inject-decorators: 3.1.0
+      probe.gl: 3.5.0
+      reflect-metadata: 0.1.13
+      regl: 1.7.0
+    dev: false
+
+  /@antv/g-webgpu/0.5.5:
+    resolution:
+      {
+        integrity: sha512-TxtBniINFq1jFGEPo46xjJfrbJbUqkFd5wmsRs3tcg/7J7xoldOP1kEadpI3AJG9knMYdE92VpILw1VPd6DgzQ==
+      }
+    dependencies:
+      '@antv/g-webgpu-core': 0.5.6
+      '@antv/g-webgpu-engine': 0.5.6
+      '@webgpu/types': 0.0.31
+      gl-matrix: 3.4.3
+      gl-vec2: 1.3.0
+      hammerjs: 2.0.8
+      inversify: 5.1.1
+      inversify-inject-decorators: 3.1.0
+      polyline-miter-util: 1.0.1
+      polyline-normals: 2.0.2
+      probe.gl: 3.5.0
+      reflect-metadata: 0.1.13
+    dev: false
+
+  /@antv/layout/0.1.31:
+    resolution:
+      {
+        integrity: sha512-iz9i19dOJGiZr5xBWI5sfG+2K3QVMNAGOBrbjWKH2RGLvGpf2TSFySidhz0siDrcQA46cDsjLmGstezQdgeGzA==
+      }
+    dependencies:
+      '@antv/g-webgpu': 0.5.5
+      '@dagrejs/graphlib': 2.1.4
+      d3-force: 2.1.1
+      ml-matrix: 6.8.2
+    dev: false
+
   /@antv/x6/1.29.5:
     resolution:
       {
@@ -455,6 +521,16 @@ packages:
       - supports-color
     dev: true
 
+  /@babel/runtime/7.17.0:
+    resolution:
+      {
+        integrity: sha512-etcO/ohMNaNA2UBdaXBBSX/3aEzFMRrVfaPv8Ptc0k+cWpWW0QFiGZ2XnVqQZI1Cf734LbPGmqBKWESfW4x/dQ==
+      }
+    engines: { node: '>=6.9.0' }
+    dependencies:
+      regenerator-runtime: 0.13.9
+    dev: false
+
   /@babel/template/7.16.7:
     resolution:
       {
@@ -519,6 +595,15 @@ packages:
       vue: ^3.0.11
     dependencies:
       vue: 3.2.26
+    dev: false
+
+  /@dagrejs/graphlib/2.1.4:
+    resolution:
+      {
+        integrity: sha512-QCg9sL4uhjn468FDEsb/S9hS2xUZSrv/+dApb1Ze5VKO96pTXKNJZ6MGhIpgWkc1TVhbVGH9/7rq/Mf8/jWicw==
+      }
+    dependencies:
+      lodash: 4.17.21
     dev: false
 
   /@emmetio/abbreviation/2.2.2:
@@ -676,6 +761,34 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
     dev: true
+
+  /@probe.gl/env/3.5.0:
+    resolution:
+      {
+        integrity: sha512-YdlpZZshhyYxvWDBmZ5RIW2pTR14Pw4p9czMlt/v7F6HbFzWfAdmH7q6xVwFRYxUpQLwhWensWyv4aFysiWl4g==
+      }
+    dependencies:
+      '@babel/runtime': 7.17.0
+    dev: false
+
+  /@probe.gl/log/3.5.0:
+    resolution:
+      {
+        integrity: sha512-nW/qz2X1xY08WU/TsmJP6/6IPNcaY5fS/vLjpC4ahJuE2Mezga4hGM/R2X5JWE/nkPc+BsC5GnAnD13rwAxS7g==
+      }
+    dependencies:
+      '@babel/runtime': 7.17.0
+      '@probe.gl/env': 3.5.0
+    dev: false
+
+  /@probe.gl/stats/3.5.0:
+    resolution:
+      {
+        integrity: sha512-IH2M+F3c8HR1DTroBARePUFG7wIewumtKA0UFqx51Z7S4hKrD60wFbpMmg0AcF4FvHAXMBoC+kYi1UKW9XbAOw==
+      }
+    dependencies:
+      '@babel/runtime': 7.17.0
+    dev: false
 
   /@rollup/pluginutils/4.1.2:
     resolution:
@@ -1185,6 +1298,20 @@ packages:
       vue-demi: 0.12.1_vue@3.2.26
     dev: false
 
+  /@webgpu/glslang/0.0.15:
+    resolution:
+      {
+        integrity: sha512-niT+Prh3Aff8Uf1MVBVUsaNjFj9rJAKDXuoHIKiQbB+6IUP/3J3JIhBNyZ7lDhytvXxw6ppgnwKZdDJ08UMj4Q==
+      }
+    dev: false
+
+  /@webgpu/types/0.0.31:
+    resolution:
+      {
+        integrity: sha512-cvvCMSZBT4VsRNtt0lI6XQqvOIIWw6+NRUtnPUMDVDgsI4pCZColz3qzF5QcP9wIYOHEc3jssIBse8UWONKhlQ==
+      }
+    dev: false
+
   /acorn-jsx/5.3.2_acorn@8.7.0:
     resolution:
       {
@@ -1608,6 +1735,38 @@ packages:
     resolution:
       {
         integrity: sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA==
+      }
+    dev: false
+
+  /d3-dispatch/2.0.0:
+    resolution:
+      {
+        integrity: sha512-S/m2VsXI7gAti2pBoLClFFTMOO1HTtT0j99AuXLoGFKO6deHDdnv6ZGTxSTTUTgO1zVcv82fCOtDjYK4EECmWA==
+      }
+    dev: false
+
+  /d3-force/2.1.1:
+    resolution:
+      {
+        integrity: sha512-nAuHEzBqMvpFVMf9OX75d00OxvOXdxY+xECIXjW6Gv8BRrXu6gAWbv/9XKrvfJ5i5DCokDW7RYE50LRoK092ew==
+      }
+    dependencies:
+      d3-dispatch: 2.0.0
+      d3-quadtree: 2.0.0
+      d3-timer: 2.0.0
+    dev: false
+
+  /d3-quadtree/2.0.0:
+    resolution:
+      {
+        integrity: sha512-b0Ed2t1UUalJpc3qXzKi+cPGxeXRr4KU9YSlocN74aTzp6R/Ud43t79yLLqxHRWZfsvWXmbDWPpoENK1K539xw==
+      }
+    dev: false
+
+  /d3-timer/2.0.0:
+    resolution:
+      {
+        integrity: sha512-TO4VLh0/420Y/9dO3+f9abDEFYeCUr2WZRlxJvbp4HPTQcSylXNiL6yZa9FIUvV1yRiFufl1bszTCLDqv9PWNA==
       }
     dev: false
 
@@ -2295,6 +2454,13 @@ packages:
     engines: { node: '>=0.10.0' }
     dev: true
 
+  /eventemitter3/4.0.7:
+    resolution:
+      {
+        integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
+      }
+    dev: false
+
   /evtd/0.2.3:
     resolution:
       {
@@ -2469,6 +2635,20 @@ packages:
       has: 1.0.3
       has-symbols: 1.0.2
 
+  /gl-matrix/3.4.3:
+    resolution:
+      {
+        integrity: sha512-wcCp8vu8FT22BnvKVPjXa/ICBWRq/zjFfdofZy1WSpQZpphblv12/bOQLBC1rMM7SGOFS9ltVmKOHil5+Ml7gA==
+      }
+    dev: false
+
+  /gl-vec2/1.3.0:
+    resolution:
+      {
+        integrity: sha512-YiqaAuNsheWmUV0Sa8k94kBB0D6RWjwZztyO+trEYS8KzJ6OQB/4686gdrf59wld4hHFIvaxynO3nRxpk1Ij/A==
+      }
+    dev: false
+
   /glob-parent/5.1.2:
     resolution:
       {
@@ -2542,6 +2722,11 @@ packages:
         integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==
       }
     dev: true
+
+  /hammerjs/2.0.8:
+    resolution: { integrity: sha1-BO93hiz/K7edMPdpIJWTAiK/YPE= }
+    engines: { node: '>=0.8.0' }
+    dev: false
 
   /has-flag/3.0.0:
     resolution: { integrity: sha1-tdRU3CGZriJWmfNGfloH87lVuv0= }
@@ -2705,6 +2890,27 @@ packages:
         integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
       }
     dev: true
+
+  /inversify-inject-decorators/3.1.0:
+    resolution:
+      {
+        integrity: sha512-/seBlVp5bXrLQS3DpKEmlgeZL6C7Tf/QITd+IMQrbBBGuCbxb7k3hRAWu9XSreNpFzLgSboz3sClLSEmGwHphw==
+      }
+    dev: false
+
+  /inversify/5.1.1:
+    resolution:
+      {
+        integrity: sha512-j8grHGDzv1v+8T1sAQ+3boTCntFPfvxLCkNcxB1J8qA0lUN+fAlSyYd+RXKvaPRL4AGyPxViutBEJHNXOyUdFQ==
+      }
+    dev: false
+
+  /is-any-array/2.0.0:
+    resolution:
+      {
+        integrity: sha512-WdPV58rT3aOWXvvyuBydnCq4S2BM1Yz8shKxlEpk/6x+GX202XRvXOycEFtNgnHVLoc46hpexPFx8Pz1/sMS0w==
+      }
+    dev: false
 
   /is-binary-path/2.1.0:
     resolution:
@@ -3086,6 +3292,44 @@ packages:
     hasBin: true
     dev: true
 
+  /ml-array-max/1.2.4:
+    resolution:
+      {
+        integrity: sha512-BlEeg80jI0tW6WaPyGxf5Sa4sqvcyY6lbSn5Vcv44lp1I2GR6AWojfUvLnGTNsIXrZ8uqWmo8VcG1WpkI2ONMQ==
+      }
+    dependencies:
+      is-any-array: 2.0.0
+    dev: false
+
+  /ml-array-min/1.2.3:
+    resolution:
+      {
+        integrity: sha512-VcZ5f3VZ1iihtrGvgfh/q0XlMobG6GQ8FsNyQXD3T+IlstDv85g8kfV0xUG1QPRO/t21aukaJowDzMTc7j5V6Q==
+      }
+    dependencies:
+      is-any-array: 2.0.0
+    dev: false
+
+  /ml-array-rescale/1.3.7:
+    resolution:
+      {
+        integrity: sha512-48NGChTouvEo9KBctDfHC3udWnQKNKEWN0ziELvY3KG25GR5cA8K8wNVzracsqSW1QEkAXjTNx+ycgAv06/1mQ==
+      }
+    dependencies:
+      is-any-array: 2.0.0
+      ml-array-max: 1.2.4
+      ml-array-min: 1.2.3
+    dev: false
+
+  /ml-matrix/6.8.2:
+    resolution:
+      {
+        integrity: sha512-5o2gVLFyieDSgsStEU5mqty4MZqfeytYA/gJqBSw5/Xuob0X2UrFX/k7FDh+YAwjzG/1l8nYa0oDaJ0sGs/RlA==
+      }
+    dependencies:
+      ml-array-rescale: 1.3.7
+    dev: false
+
   /monaco-editor/0.31.1:
     resolution:
       {
@@ -3119,10 +3363,10 @@ packages:
     dev: true
     optional: true
 
-  /naive-ui/2.24.6_vue@3.2.26:
+  /naive-ui/2.25.1_vue@3.2.26:
     resolution:
       {
-        integrity: sha512-8eK9os7gruxBfhzvbXoUn8ok/jBc1T+PWhoW1Je0Ou446XsyHsZ9B5vZMQQ4w29C3dVc7OBfeIm/vTq5rLnVBw==
+        integrity: sha512-s/u0X8PO6AVj/XjCYVfYwPdXTyVDavvYOoIiBGBBpWZXuw5IcfRiSSYUHZOf4mdyLG7tafU9I8vpP1vdpBMNgQ==
       }
     peerDependencies:
       vue: ^3.0.0
@@ -3145,7 +3389,7 @@ packages:
       vfonts: 0.0.3
       vooks: 0.2.12_vue@3.2.26
       vue: 3.2.26
-      vueuc: 0.4.24_7fea039e05dc0d0bb67319189a00d1ad
+      vueuc: 0.4.25_vue@3.2.26
     dev: false
 
   /nanoid/3.1.30:
@@ -3336,6 +3580,18 @@ packages:
       vue-demi: 0.12.1_vue@3.2.26
     dev: false
 
+  /polyline-miter-util/1.0.1:
+    resolution: { integrity: sha1-tpPyOJ6g3tNqa89ezS7OS2kX2Vc= }
+    dependencies:
+      gl-vec2: 1.3.0
+    dev: false
+
+  /polyline-normals/2.0.2:
+    resolution: { integrity: sha1-oXN+ddjA3MsaWR+csn8J7vS30TU= }
+    dependencies:
+      polyline-miter-util: 1.0.1
+    dev: false
+
   /postcss-filter-plugins/3.0.1:
     resolution:
       {
@@ -3446,6 +3702,18 @@ packages:
       ansi-regex: 5.0.1
       ansi-styles: 5.2.0
       react-is: 17.0.2
+    dev: false
+
+  /probe.gl/3.5.0:
+    resolution:
+      {
+        integrity: sha512-KWj8u0PNytr/rVwcQFcN7O8SK7n/ITOsUZ91l4fSX95oHhKvVCI7eadrzFUzFRlXkFfBWpMWZXFHITsHHHUctw==
+      }
+    dependencies:
+      '@babel/runtime': 7.17.0
+      '@probe.gl/env': 3.5.0
+      '@probe.gl/log': 3.5.0
+      '@probe.gl/stats': 3.5.0
     dev: false
 
   /progress/2.0.3:
@@ -3639,6 +3907,20 @@ packages:
       picomatch: 2.3.1
     dev: true
 
+  /reflect-metadata/0.1.13:
+    resolution:
+      {
+        integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
+      }
+    dev: false
+
+  /regenerator-runtime/0.13.9:
+    resolution:
+      {
+        integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==
+      }
+    dev: false
+
   /regexpp/3.2.0:
     resolution:
       {
@@ -3646,6 +3928,13 @@ packages:
       }
     engines: { node: '>=8' }
     dev: true
+
+  /regl/1.7.0:
+    resolution:
+      {
+        integrity: sha512-bEAtp/qrtKucxXSJkD4ebopFZYP0q1+3Vb2WECWv/T8yQEgKxDxJ7ztO285tAMaYZVR6mM1GgI6CCn8FROtL1w==
+      }
+    dev: false
 
   /request-light/0.5.7:
     resolution:
@@ -4508,13 +4797,12 @@ packages:
       '@vue/shared': 3.2.26
     dev: false
 
-  /vueuc/0.4.24_7fea039e05dc0d0bb67319189a00d1ad:
+  /vueuc/0.4.25_vue@3.2.26:
     resolution:
       {
-        integrity: sha512-AocMRepM9x78GOZi6m/1WLHfarwtNbMQeFl4N/XQoft5iewUq0x2Tw/F0CbxMSrCVSKgBas47tZFabp4kYADmQ==
+        integrity: sha512-SkQCtJ0N+O24gCgDwc+TYNAptgoOb/+lCTlZ7s9I+eTLo7DiLvfHp0mWI04cGkP1elhH26xdkCN+TCQ0vwaL5g==
       }
     peerDependencies:
-      '@css-render/vue3-ssr': ^0.15.7
       vue: ^3.0.11
     dependencies:
       '@css-render/vue3-ssr': 0.15.8_vue@3.2.26

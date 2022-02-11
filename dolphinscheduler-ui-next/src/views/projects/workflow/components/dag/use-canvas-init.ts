@@ -16,10 +16,11 @@
  */
 
 import type { Node } from '@antv/x6'
-import { ref, onMounted, Ref, onUnmounted } from 'vue'
+import { ref, onMounted, Ref } from 'vue'
 import { Graph } from '@antv/x6'
 import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import { debounce } from 'lodash'
+import { useResizeObserver } from '@vueuse/core'
 
 interface Options {
   readonly: Ref<boolean>
@@ -136,18 +137,14 @@ export function useCanvasInit(options: Options) {
   /**
    * Redraw when the page is resized
    */
-  const paperResize = debounce(() => {
-    if (!container.value) return
-    const w = container.value.offsetWidth
-    const h = container.value.offsetHeight
-    graph.value?.resize(w, h)
+  const resize = debounce(() => {
+    if (container.value && true) {
+      const w = container.value.offsetWidth
+      const h = container.value.offsetHeight
+      graph.value?.resize(w, h)
+    }
   }, 200)
-  onMounted(() => {
-    window.addEventListener('resize', paperResize)
-  })
-  onUnmounted(() => {
-    window.removeEventListener('resize', paperResize)
-  })
+  useResizeObserver(container, resize)
 
   /**
    * Register custom cells

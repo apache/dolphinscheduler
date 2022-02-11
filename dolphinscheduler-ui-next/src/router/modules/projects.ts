@@ -60,11 +60,20 @@ export default {
       }
     },
     {
-      path: '/projects/:projectCode/workflow/definitions',
+      path: '/projects/:projectCode/workflow-definition',
       name: 'workflow-definition-list',
       component: components['projects-workflow-definition'],
       meta: {
         title: '工作流定义',
+        showSide: true
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-definition/timing/:definitionCode',
+      name: 'workflow-definition-timing',
+      component: components['projects-workflow-definition-timing'],
+      meta: {
+        title: '定时管理',
         showSide: true
       }
     },
@@ -106,7 +115,7 @@ export default {
     },
     {
       path: '/projects/:projectCode/task/definitions',
-      name: 'task-definition-list',
+      name: 'task-definition',
       component: components['projects-task-definition'],
       meta: {
         title: '任务定义',
@@ -115,7 +124,7 @@ export default {
     },
     {
       path: '/projects/:projectCode/task/instances',
-      name: 'task-instance-list',
+      name: 'task-instance',
       component: components['projects-task-instance'],
       meta: {
         title: '任务实例',

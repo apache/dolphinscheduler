@@ -14,34 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { Ref } from 'vue'
 import type {
   GridProps,
   FormProps,
   FormItemGiProps,
   FormItemRule,
   FormRules,
-  SelectOption
+  SelectOption,
+  TreeSelectOption
 } from 'naive-ui'
 
-type IType = 'input' | 'radio' | 'editor'
+type IType =
+  | 'input'
+  | 'radio'
+  | 'editor'
+  | 'custom-parameters'
+  | 'switch'
+  | 'input-number'
+  | 'select'
+  | 'checkbox'
+  | 'tree-select'
 
-type IOption = SelectOption
+interface IOption extends SelectOption, TreeSelectOption {
+  label: string
+}
 
-interface IFormItem extends FormItemGiProps {
+interface IFormItem extends Omit<FormItemGiProps, 'span'> {
   widget: any
+  span?: any
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
   elements?: IFormItem[]
   model: object
-}
-
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
 }
 
 interface IJsonItem {
@@ -53,6 +59,9 @@ interface IJsonItem {
   validate?: FormItemRule
   value?: any
   options?: IOption[]
+  children?: IJsonItem[]
+  slots?: object
+  span?: number | Ref<number>
 }
 
 export {
@@ -63,6 +72,5 @@ export {
   FormItemRule,
   FormRules,
   IFormItem,
-  GridProps,
-  IFieldParams
+  GridProps
 }

@@ -22,8 +22,8 @@ export function useForm() {
     formRef: ref()
   })
 
-  const validate = () => {
-    state.formRef.validate()
+  const validate = (...args: []) => {
+    state.formRef.validate(...args)
   }
 
   const setValues = (initialValues: { [field: string]: any }) => {
