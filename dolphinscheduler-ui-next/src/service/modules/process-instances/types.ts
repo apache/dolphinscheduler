@@ -82,6 +82,26 @@ interface ProcessInstanceReq {
   timeout?: string
 }
 
+interface IWorkflowInstance {
+  id: number
+  name: string
+  state: string
+  commandType: string
+  scheduleTime?: string
+  processDefinitionCode?: number
+  startTime: string
+  endTime: string
+  duration?: string
+  runTimes: number
+  recovery: string
+  dryRun: number
+  executorName: string
+  host: string
+  count?: number
+  disabled?: boolean
+  buttonType?: string
+}
+
 export {
   CodeReq,
   ProcessInstanceListReq,
@@ -90,5 +110,6 @@ export {
   TaskReq,
   LongestReq,
   IdReq,
-  ProcessInstanceReq
+  ProcessInstanceReq,
+  IWorkflowInstance
 }

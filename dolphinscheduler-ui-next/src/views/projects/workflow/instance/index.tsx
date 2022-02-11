@@ -15,11 +15,125 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, toRefs } from 'vue'
+import { useI18n } from 'vue-i18n'
+import Card from '@/components/card'
+import styles from './index.module.scss'
+import {
+  NButton,
+  NDataTable,
+  NIcon,
+  NInput,
+  NPagination,
+  NPopconfirm,
+  NSpace,
+  NTooltip
+} from 'naive-ui'
+import { SearchOutlined } from '@vicons/antd'
+import { useTable } from './use-table'
 
 export default defineComponent({
   name: 'WorkflowInstanceList',
   setup() {
-    return () => <div>WorkflowInstanceList</div>
+    const { variables, getTableData } = useTable()
+
+    const requestData = () => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    }
+
+    const handleSearch = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const handleChangePageSize = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    onMounted(() => {
+      requestData()
+    })
+
+    return {
+      requestData,
+      handleSearch,
+      handleChangePageSize,
+      ...toRefs(variables)
+    }
+  },
+  render() {
+    const { t } = useI18n()
+
+    return (
+      <div class={styles.content}>
+        <Card class={styles.card}>
+          <div class={styles.header}>
+            <NSpace></NSpace>
+            <div class={styles.right}>
+              <div class={styles.search}>
+                <div class={styles.list}>
+                  <NButton type='primary' onClick={this.handleSearch}>
+                    <NIcon>
+                      <SearchOutlined />
+                    </NIcon>
+                  </NButton>
+                </div>
+                <div class={styles.list}>
+                  <NInput
+                    placeholder={t('resource.function.enter_keyword_tips')}
+                    v-model={[this.searchVal, 'value']}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+        <Card title={t('project.workflow.workflow_definition')}>
+          <NDataTable
+            rowKey={(row) => row.id}
+            columns={this.columns}
+            data={this.tableData}
+            striped
+            size={'small'}
+            class={styles.table}
+            scrollX={1800}
+          />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              show-size-picker
+              page-sizes={[10, 30, 50]}
+              show-quick-jumper
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
+            />
+          </div>
+          <NTooltip>
+            {{
+              default: () => t('project.workflow.delete'),
+              trigger: () => (
+                <NButton
+                  tag='div'
+                  type='primary'
+                  style='position: absolute; bottom: 10px; left: 10px;'
+                >
+                  <NPopconfirm onPositiveClick={() => {}}>
+                    {t('project.workflow.delete_confirm')}
+                  </NPopconfirm>
+                  {t('project.workflow.delete')}
+                </NButton>
+              )
+            }}
+          </NTooltip>
+        </Card>
+      </div>
+    )
   }
 })

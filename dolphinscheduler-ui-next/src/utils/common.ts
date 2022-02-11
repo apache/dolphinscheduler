@@ -46,3 +46,59 @@ export const fileTypeArr = [
   'ini',
   'js'
 ]
+
+/**
+ * Operation type
+ * @desc tooltip
+ * @code identifier
+ */
+export const runningType = (t: any) => [
+  {
+    desc: `${t('project.workflow.start_process')}`,
+    code: 'START_PROCESS'
+  },
+  {
+    desc: `${t('project.workflow.execute_from_the_current_node')}`,
+    code: 'START_CURRENT_TASK_PROCESS'
+  },
+  {
+    desc: `${t('project.workflow.recover_tolerance_fault_process')}`,
+    code: 'RECOVER_TOLERANCE_FAULT_PROCESS'
+  },
+  {
+    desc: `${t('project.workflow.resume_the_suspension_process')}`,
+    code: 'RECOVER_SUSPENDED_PROCESS'
+  },
+  {
+    desc: `${t('project.workflow.execute_from_the_failed_nodes')}`,
+    code: 'START_FAILURE_TASK_PROCESS'
+  },
+  {
+    desc: `${t('project.workflow.complement_data')}`,
+    code: 'COMPLEMENT_DATA'
+  },
+  {
+    desc: `${t('project.workflow.scheduling_execution')}`,
+    code: 'SCHEDULER'
+  },
+  {
+    desc: `${t('project.workflow.rerun')}`,
+    code: 'REPEAT_RUNNING'
+  },
+  {
+    desc: `${t('project.workflow.pause')}`,
+    code: 'PAUSE'
+  },
+  {
+    desc: `${t('project.workflow.stop')}`,
+    code: 'STOP'
+  },
+  {
+    desc: `${t('project.workflow.recovery_waiting_thread')}`,
+    code: 'RECOVER_WAITING_THREAD'
+  },
+  {
+    desc: `${t('project.workflow.recover_serial_wait')}`,
+    code: 'RECOVER_SERIAL_WAIT'
+  }
+]

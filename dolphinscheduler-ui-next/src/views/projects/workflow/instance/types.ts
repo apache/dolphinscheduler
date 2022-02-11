@@ -15,40 +15,11 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import {
-  ExecuteReq,
-  ProjectCodeReq,
-  ProcessDefinitionCodeReq,
-  ProcessInstanceReq
-} from './types'
+import { ExecuteReq } from '@/service/modules/executors/types'
 
-export function execute(data: ExecuteReq, code: number): any {
-  return axios({
-    url: `/projects/${code}/executors/execute`,
-    method: 'post',
-    data
-  })
+interface ICountDownParam extends ExecuteReq {
+  index: number
+  buttonType: 'run' | 'store' | 'suspend'
 }
 
-export function startCheckProcessDefinition(
-  data: ProcessDefinitionCodeReq,
-  code: ProjectCodeReq
-): any {
-  return axios({
-    url: `/projects/${code}/executors/start-check`,
-    method: 'post',
-    data
-  })
-}
-
-export function startProcessInstance(
-  data: ProcessInstanceReq,
-  code: number
-): any {
-  return axios({
-    url: `/projects/${code}/executors/start-process-instance`,
-    method: 'post',
-    data
-  })
-}
+export { ICountDownParam }
