@@ -250,11 +250,19 @@ public class StateWheelExecuteThread extends Thread {
         if (taskInstanceRetryCheckList.isEmpty()) {
             return;
         }
+
         for (TaskInstanceKey taskInstanceKey : taskInstanceRetryCheckList) {
             int processInstanceId = taskInstanceKey.getProcessInstanceId();
             long taskCode = taskInstanceKey.getTaskCode();
 
             WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+
+//            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+//                taskInstanceRetryCheckList.remove(taskInstanceKey);
+//                continue;
+//            }
+
             if (workflowExecuteThread == null) {
                 logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
                         processInstanceId, taskCode);
