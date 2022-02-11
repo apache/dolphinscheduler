@@ -37,8 +37,8 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -433,9 +433,9 @@ public class WorkflowExecuteThread {
     private void taskFinished(TaskInstance taskInstance) {
         logger.info("work flow {} task id:{} code:{} state:{} ",
             processInstance.getId(),
-                taskInstance.getId(),
-                taskInstance.getTaskCode(),
-                taskInstance.getState());
+            taskInstance.getId(),
+            taskInstance.getTaskCode(),
+            taskInstance.getState());
 
         activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
         stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
@@ -470,6 +470,7 @@ public class WorkflowExecuteThread {
 
     /**
      * release task group
+     *
      * @param taskInstance
      */
     private void releaseTaskGroup(TaskInstance taskInstance) {
@@ -485,7 +486,7 @@ public class WorkflowExecuteThread {
                 } else {
                     ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
                     this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
-                            org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
+                        org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
                 }
             }
         }
@@ -493,13 +494,14 @@ public class WorkflowExecuteThread {
 
     /**
      * crate new task instance to retry, different objects from the original
+     *
      * @param taskInstance
      */
     private void retryTaskInstance(TaskInstance taskInstance) {
         if (!taskInstance.taskCanRetry()) {
             return;
         }
-        TaskInstance newTaskInstance =  cloneRetryTaskInstance(taskInstance);
+        TaskInstance newTaskInstance = cloneRetryTaskInstance(taskInstance);
         if (newTaskInstance == null) {
             logger.error("retry fail, new taskInstancce is null, task code:{}, task id:{}", taskInstance.getTaskCode(), taskInstance.getId());
             return;
@@ -507,12 +509,12 @@ public class WorkflowExecuteThread {
         waitToRetryTaskInstanceMap.put(newTaskInstance.getTaskCode(), newTaskInstance);
         if (!taskInstance.retryTaskIntervalOverTime()) {
             logger.info("failure task will be submitted: process id: {}, task instance code: {} state:{} retry times:{} / {}, interval:{}",
-                    processInstance.getId(),
-                    newTaskInstance.getTaskCode(),
-                    newTaskInstance.getState(),
-                    newTaskInstance.getRetryTimes(),
-                    newTaskInstance.getMaxRetryTimes(),
-                    newTaskInstance.getRetryInterval());
+                processInstance.getId(),
+                newTaskInstance.getTaskCode(),
+                newTaskInstance.getState(),
+                newTaskInstance.getRetryTimes(),
+                newTaskInstance.getMaxRetryTimes(),
+                newTaskInstance.getRetryInterval());
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, newTaskInstance);
             stateWheelExecuteThread.addTask4RetryCheck(processInstance, newTaskInstance);
         } else {
@@ -524,6 +526,7 @@ public class WorkflowExecuteThread {
 
     /**
      * handle task retry event
+     *
      * @param stateEvent
      * @return
      */
@@ -663,15 +666,18 @@ public class WorkflowExecuteThread {
 
     private boolean processBlockHandler(StateEvent stateEvent) {
         try {
-            TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+            TaskInstance task = getTaskInstance(stateEvent.getTaskInstanceId());
+            if (!checkTaskInstanceByStateEvent(stateEvent)) {
+                logger.error("task {} is not a blocking task", task.getTaskCode());
+                return false;
+            }
             BlockingParameters parameters = (BlockingParameters) TaskParametersUtils.getParameters(TaskType.BLOCKING.getDesc(),
-                    task.getTaskParams());
+                task.getTaskParams());
             if (parameters.isAlertWhenBlocking()) {
                 ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
                 processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
-                logger.info("block alert send successful!");
+                logger.info("processInstance {} block alert send successful!", processInstance.getId());
             }
-            taskStateChangeHandler(stateEvent);
         } catch (Exception e) {
             logger.error("sending blocking message error:", e);
         }
@@ -974,16 +980,20 @@ public class WorkflowExecuteThread {
             stateWheelExecuteThread.addTask4StateCheck(processInstance, taskInstance);
 
             if (taskProcessor.taskInstance().getState().typeIsFinished()) {
-                StateEvent stateEvent = new StateEvent();
-                stateEvent.setProcessInstanceId(this.processInstance.getId());
-                stateEvent.setTaskInstanceId(taskInstance.getId());
-                stateEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
                 if (processInstance.isBlocked()) {
-                    stateEvent.setType(StateEventType.PROCESS_BLOCKED);
-                } else {
-                    stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                    StateEvent processBlockEvent = new StateEvent();
+                    processBlockEvent.setProcessInstanceId(this.processInstance.getId());
+                    processBlockEvent.setTaskInstanceId(taskInstance.getId());
+                    processBlockEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
+                    processBlockEvent.setType(StateEventType.PROCESS_BLOCKED);
+                    this.stateEvents.add(processBlockEvent);
                 }
-                this.stateEvents.add(stateEvent);
+                StateEvent taskStateChangeEvent = new StateEvent();
+                taskStateChangeEvent.setProcessInstanceId(this.processInstance.getId());
+                taskStateChangeEvent.setTaskInstanceId(taskInstance.getId());
+                taskStateChangeEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
+                taskStateChangeEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                this.stateEvents.add(taskStateChangeEvent);
             }
             return taskInstance;
         } catch (Exception e) {
@@ -1044,6 +1054,7 @@ public class WorkflowExecuteThread {
 
     /**
      * clone a new taskInstance for retry and reset some logic fields
+     *
      * @return
      */
     public TaskInstance cloneRetryTaskInstance(TaskInstance taskInstance) {
@@ -1052,7 +1063,7 @@ public class WorkflowExecuteThread {
             logger.error("taskNode is null, code:{}", taskInstance.getTaskCode());
             return null;
         }
-        TaskInstance newTaskInstance =  newTaskInstance(processInstance, taskNode);
+        TaskInstance newTaskInstance = newTaskInstance(processInstance, taskNode);
         newTaskInstance.setTaskDefine(taskInstance.getTaskDefine());
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
@@ -1065,6 +1076,7 @@ public class WorkflowExecuteThread {
 
     /**
      * clone a new taskInstance for tolerant and reset some logic fields
+     *
      * @return
      */
     public TaskInstance cloneTolerantTaskInstance(TaskInstance taskInstance) {
@@ -1073,7 +1085,7 @@ public class WorkflowExecuteThread {
             logger.error("taskNode is null, code:{}", taskInstance.getTaskCode());
             return null;
         }
-        TaskInstance newTaskInstance =  newTaskInstance(processInstance, taskNode);
+        TaskInstance newTaskInstance = newTaskInstance(processInstance, taskNode);
         newTaskInstance.setTaskDefine(taskInstance.getTaskDefine());
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
@@ -1084,6 +1096,7 @@ public class WorkflowExecuteThread {
 
     /**
      * new a taskInstance
+     *
      * @param processInstance
      * @param taskNode
      * @return
@@ -1383,6 +1396,7 @@ public class WorkflowExecuteThread {
         if (state == ExecutionStatus.READY_STOP
             || state == ExecutionStatus.READY_PAUSE
             || state == ExecutionStatus.WAITING_THREAD
+            || state == ExecutionStatus.READY_BLOCK
             || state == ExecutionStatus.DELAY_EXECUTION) {
             // if the running task is not completed, the state remains unchanged
             return state;
@@ -1419,8 +1433,8 @@ public class WorkflowExecuteThread {
             }
             if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
                 return readyToSubmitTaskQueue.size() == 0
-                        && activeTaskProcessorMaps.size() == 0
-                        && waitToRetryTaskInstanceMap.size() == 0;
+                    && activeTaskProcessorMaps.size() == 0
+                    && waitToRetryTaskInstanceMap.size() == 0;
             }
         }
         return false;
@@ -1461,6 +1475,30 @@ public class WorkflowExecuteThread {
     }
 
     /**
+     * prepare for block
+     * if process has tasks still running, pause them
+     * if readyToSubmitTaskQueue is not empty, kill them
+     * else return block status directly
+     *
+     * @return ExecutionStatus
+     */
+    private ExecutionStatus processReadyBlock() {
+        if (activeTaskProcessorMaps.size() > 0) {
+            for (ITaskProcessor taskProcessor : activeTaskProcessorMaps.values()) {
+                if (!TaskType.BLOCKING.getDesc().equals(taskProcessor.getType())) {
+                    taskProcessor.action(TaskAction.PAUSE);
+                }
+            }
+        }
+        if (readyToSubmitTaskQueue.size() > 0) {
+            for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
+                iter.next().setState(ExecutionStatus.KILL);
+            }
+        }
+        return ExecutionStatus.BLOCK;
+    }
+
+    /**
      * generate the latest process instance status by the tasks state
      *
      * @return process instance execution status
@@ -1472,6 +1510,12 @@ public class WorkflowExecuteThread {
             // active task and retry task exists
             return runningState(state);
         }
+
+        // block
+        if (state == ExecutionStatus.READY_BLOCK) {
+            return processReadyBlock();
+        }
+
         // process failure
         if (processFailed()) {
             return ExecutionStatus.FAILURE;
@@ -1593,7 +1637,7 @@ public class WorkflowExecuteThread {
                 return;
             }
             logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
-                    taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
+                taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
             readyToSubmitTaskQueue.put(taskInstance);
         } catch (Exception e) {
             logger.error("add task instance to readyToSubmitTaskQueue, taskName:{}, task id:{}", taskInstance.getName(), taskInstance.getId(), e);
@@ -1835,6 +1879,7 @@ public class WorkflowExecuteThread {
 
     /**
      * check if had not fail task by taskCode and version
+     *
      * @param taskCode
      * @param version
      * @return

@@ -14,9 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.DependentRelation;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -31,6 +36,13 @@ import org.apache.dolphinscheduler.server.master.runner.task.BlockingTaskProcess
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,12 +50,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockingTaskTest {
@@ -80,15 +86,15 @@ public class BlockingTaskTest {
         // mock process instance
         processInstance = getProcessInstance();
         Mockito.when(processService
-                .findProcessInstanceById(processInstance.getId()))
-                .thenReturn(processInstance);
+            .findProcessInstanceById(processInstance.getId()))
+            .thenReturn(processInstance);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L,1))
-                .thenReturn(taskDefinition);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+            .thenReturn(taskDefinition);
     }
 
     private ProcessInstance getProcessInstance() {
@@ -114,10 +120,10 @@ public class BlockingTaskTest {
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setFirstSubmitTime(new Date());
         Mockito.when(processService
-                .submitTaskWithRetry(Mockito.any(ProcessInstance.class)
-                        , Mockito.any(TaskInstance.class)
-                        , Mockito.any(Integer.class), Mockito.any(Integer.class)))
-                .thenReturn(taskInstance);
+            .submitTaskWithRetry(Mockito.any(ProcessInstance.class)
+                , Mockito.any(TaskInstance.class)
+                , Mockito.any(Integer.class), Mockito.any(Integer.class)))
+            .thenReturn(taskInstance);
         return taskInstance;
     }
 
@@ -150,7 +156,7 @@ public class BlockingTaskTest {
         // build relation
         DependentTaskModel dependentTaskModel = new DependentTaskModel();
         dependentTaskModel.setDependItemList(Stream.of(dependentItemA, dependentItemB, dependentItemC)
-                .collect(Collectors.toList()));
+            .collect(Collectors.toList()));
         dependentTaskModel.setRelation(DependentRelation.AND);
 
         DependentParameters dependentParameters = new DependentParameters();
@@ -171,31 +177,31 @@ public class BlockingTaskTest {
 
     private TaskInstance testBasicInit(String blockingCondition, ExecutionStatus... expectResults) {
 
-        TaskInstance taskInstance = getTaskInstance(getTaskNode(blockingCondition),processInstance);
+        TaskInstance taskInstance = getTaskInstance(getTaskNode(blockingCondition), processInstance);
 
         Mockito.when(processService
-                .submitTask(processInstance, taskInstance))
-                .thenReturn(taskInstance);
+            .submitTask(processInstance, taskInstance))
+            .thenReturn(taskInstance);
 
         Mockito.when(processService
-                .findTaskInstanceById(taskInstance.getId()))
-                .thenReturn(taskInstance);
+            .findTaskInstanceById(taskInstance.getId()))
+            .thenReturn(taskInstance);
 
         // for BlockingTaskExecThread.initTaskParameters
         Mockito.when(processService
-                .saveTaskInstance(taskInstance))
-                .thenReturn(true);
+            .saveTaskInstance(taskInstance))
+            .thenReturn(true);
 
         // for BlockingTaskExecThread.updateTaskState
         Mockito.when(processService
-                .updateTaskInstance(taskInstance))
-                .thenReturn(true);
+            .updateTaskInstance(taskInstance))
+            .thenReturn(true);
 
         // for BlockingTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = getTaskInstanceForValidTaskList(expectResults);
         Mockito.when(processService.
-                findValidTaskListByProcessId(processInstance.getId()))
-                .thenReturn(conditions);
+            findValidTaskListByProcessId(processInstance.getId()))
+            .thenReturn(conditions);
         return taskInstance;
     }
 
@@ -217,7 +223,7 @@ public class BlockingTaskTest {
     @Test
     public void testBlockingTaskSubmit() {
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
-                ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
+            ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         boolean res = blockingTaskProcessor.action(TaskAction.SUBMIT);
@@ -227,7 +233,7 @@ public class BlockingTaskTest {
     @Test
     public void testPauseTask() {
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
-                ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
+            ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         blockingTaskProcessor.action(TaskAction.SUBMIT);
@@ -239,19 +245,19 @@ public class BlockingTaskTest {
     @Test
     public void testBlocking() {
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
-                ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
+            ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         ExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(ExecutionStatus.READY_PAUSE, status);
+        Assert.assertEquals(ExecutionStatus.READY_BLOCK, status);
     }
 
     @Test
     public void testNoneBlocking() {
         TaskInstance taskInstance = testBasicInit("BlockingOnSuccess",
-                ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS);
+            ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS);
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         blockingTaskProcessor.action(TaskAction.SUBMIT);
