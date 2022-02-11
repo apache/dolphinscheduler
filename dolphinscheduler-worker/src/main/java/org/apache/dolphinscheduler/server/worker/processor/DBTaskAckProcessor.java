@@ -46,8 +46,10 @@ public class DBTaskAckProcessor implements NettyRequestProcessor {
                 command.getBody(), DBTaskAckCommand.class);
 
         if (taskAckCommand == null){
+            logger.error("dBTask ACK request command is null");
             return;
         }
+        logger.info("dBTask ACK request command : {}", taskAckCommand);
 
         if (taskAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()){
             ResponseCache.get().removeAckCache(taskAckCommand.getTaskInstanceId());
