@@ -67,6 +67,7 @@ const login = defineComponent({
                 path='userName'
               >
                 <NInput
+                  class='input-user-name'
                   type='text'
                   size='large'
                   v-model={[this.loginForm.userName, 'value']}
@@ -81,6 +82,7 @@ const login = defineComponent({
                 path='userPassword'
               >
                 <NInput
+                  class='input-password'
                   type='password'
                   size='large'
                   v-model={[this.loginForm.userPassword, 'value']}
@@ -90,6 +92,7 @@ const login = defineComponent({
               </NFormItem>
             </NForm>
             <NButton
+              class='btn-login'
               round
               type='info'
               disabled={
