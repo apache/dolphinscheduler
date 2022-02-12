@@ -84,6 +84,10 @@ public class SwitchParameters extends AbstractParameters {
             List<String> nextNodeList = new ArrayList<>();
             nextNodeList.add(String.valueOf(nextNode));
             this.nextNode = nextNodeList;
+        } else if (nextNode instanceof Number) {
+            List<String> nextNodeList = new ArrayList<>();
+            nextNodeList.add(nextNode.toString());
+            this.nextNode = nextNodeList;
         } else {
             this.nextNode = (ArrayList) nextNode;
         }

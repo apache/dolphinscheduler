@@ -17,53 +17,33 @@
 
 import { defineComponent, ref, inject } from 'vue'
 import Styles from './dag.module.scss'
-import type { PropType, Ref } from 'vue'
-import type { Dragged } from './dag'
-import { useCanvasInit, useCellActive, useCanvasDrop } from './dag-hooks'
-import { useRoute } from 'vue-router'
-
-const props = {
-  dragged: {
-    type: Object as PropType<Ref<Dragged>>,
-    default: ref({
-      x: 0,
-      y: 0,
-      type: ''
-    })
-  }
-}
+import { useCanvasInit, useCellActive } from './dag-hooks'
 
 export default defineComponent({
   name: 'workflow-dag-canvas',
-  props,
+  emits: ['drop'],
   setup(props, context) {
     const readonly = inject('readonly', ref(false))
     const graph = inject('graph', ref())
-    const route = useRoute()
-    const projectCode = route.params.projectCode as string
 
     const { paper, minimap, container } = useCanvasInit({ readonly, graph })
 
     // Change the style on cell hover and select
     useCellActive({ graph })
-
-    // Drop sidebar item in canvas
-    const { onDrop, onDragenter, onDragover, onDragleave } = useCanvasDrop({
-      readonly,
-      dragged: props.dragged,
-      graph,
-      container,
-      projectCode
-    })
+    const preventDefault = (e: DragEvent) => {
+      e.preventDefault()
+    }
 
     return () => (
       <div
         ref={container}
         class={Styles.canvas}
-        onDrop={onDrop}
-        onDragenter={onDragenter}
-        onDragover={onDragover}
-        onDragleave={onDragleave}
+        onDrop={(e) => {
+          context.emit('drop', e)
+        }}
+        onDragenter={preventDefault}
+        onDragover={preventDefault}
+        onDragleave={preventDefault}
       >
         <div ref={paper} class={Styles.paper}></div>
         <div ref={minimap} class={Styles.minimap}></div>

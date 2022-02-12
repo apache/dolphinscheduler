@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, watch, onBeforeMount } from 'vue'
+import { ref, watch, onBeforeMount, computed } from 'vue'
 import { NSpace, NTooltip, NButton, NIcon, NTag } from 'naive-ui'
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import { queryUserList } from '@/service/modules/users'
@@ -28,115 +28,117 @@ type UseTableProps = {
 
 function useColumns({ onEdit, onDelete }: UseTableProps) {
   const { t } = useI18n()
-  const columns: any[] = [
-    {
-      title: t('security.user.index'),
-      key: 'index',
-      width: 80,
-      render: (rowData: any, rowIndex: number) => rowIndex + 1
-    },
-    {
-      title: t('security.user.username'),
-      key: 'userName'
-    },
-    {
-      title: t('security.user.tenant_code'),
-      key: 'tenantCode'
-    },
-    {
-      title: t('security.user.queue'),
-      key: 'queue'
-    },
-    {
-      title: t('security.user.email'),
-      key: 'email'
-    },
-    {
-      title: t('security.user.phone'),
-      key: 'phone'
-    },
-    {
-      title: t('security.user.state'),
-      key: 'state',
-      render: (rowData: any, rowIndex: number) => {
-        return rowData.state === 1 ? (
-          <NTag type='success'>启用</NTag>
-        ) : (
-          <NTag type='error'>停用</NTag>
-        )
+  const columns = computed(() =>
+    [
+      {
+        title: t('security.user.index'),
+        key: 'index',
+        width: 80,
+        render: (rowData: any, rowIndex: number) => rowIndex + 1
+      },
+      {
+        title: t('security.user.username'),
+        key: 'userName'
+      },
+      {
+        title: t('security.user.tenant_code'),
+        key: 'tenantCode'
+      },
+      {
+        title: t('security.user.queue'),
+        key: 'queue'
+      },
+      {
+        title: t('security.user.email'),
+        key: 'email'
+      },
+      {
+        title: t('security.user.phone'),
+        key: 'phone'
+      },
+      {
+        title: t('security.user.state'),
+        key: 'state',
+        render: (rowData: any, rowIndex: number) => {
+          return rowData.state === 1 ? (
+            <NTag type='success'>{t('security.user.state_enabled')}</NTag>
+          ) : (
+            <NTag type='error'>{t('security.user.state_disabled')}</NTag>
+          )
+        }
+      },
+      {
+        title: t('security.user.create_time'),
+        key: 'createTime',
+        width: 200
+      },
+      {
+        title: t('security.user.update_time'),
+        key: 'updateTime',
+        width: 200
+      },
+      {
+        title: t('security.user.operation'),
+        key: 'operation',
+        fixed: 'right',
+        width: 120,
+        render: (rowData: any, rowIndex: number) => {
+          return (
+            <NSpace>
+              <NTooltip trigger='hover'>
+                {{
+                  trigger: () => (
+                    <NButton
+                      circle
+                      type='info'
+                      size='small'
+                      onClick={() => {
+                        onEdit(rowData)
+                      }}
+                    >
+                      {{
+                        icon: () => (
+                          <NIcon>
+                            <EditOutlined />
+                          </NIcon>
+                        )
+                      }}
+                    </NButton>
+                  ),
+                  default: () => t('security.user.edit')
+                }}
+              </NTooltip>
+              <NTooltip trigger='hover'>
+                {{
+                  trigger: () => (
+                    <NButton
+                      circle
+                      type='error'
+                      size='small'
+                      onClick={() => {
+                        onDelete(rowData)
+                      }}
+                    >
+                      {{
+                        icon: () => (
+                          <NIcon>
+                            <DeleteOutlined />
+                          </NIcon>
+                        )
+                      }}
+                    </NButton>
+                  ),
+                  default: () => t('security.user.delete')
+                }}
+              </NTooltip>
+            </NSpace>
+          )
+        }
       }
-    },
-    {
-      title: t('security.user.create_time'),
-      key: 'createTime',
-      width: 200
-    },
-    {
-      title: t('security.user.update_time'),
-      key: 'updateTime',
-      width: 200
-    },
-    {
-      title: t('security.user.operation'),
-      key: 'operation',
-      fixed: 'right',
-      width: 120,
-      render: (rowData: any, rowIndex: number) => {
-        return (
-          <NSpace>
-            <NTooltip trigger='hover'>
-              {{
-                trigger: () => (
-                  <NButton
-                    circle
-                    type='info'
-                    size='small'
-                    onClick={() => {
-                      onEdit(rowData)
-                    }}
-                  >
-                    {{
-                      icon: () => (
-                        <NIcon>
-                          <EditOutlined />
-                        </NIcon>
-                      )
-                    }}
-                  </NButton>
-                ),
-                default: () => t('security.user.edit')
-              }}
-            </NTooltip>
-            <NTooltip trigger='hover'>
-              {{
-                trigger: () => (
-                  <NButton
-                    circle
-                    type='error'
-                    size='small'
-                    onClick={() => {
-                      onDelete(rowData)
-                    }}
-                  >
-                    {{
-                      icon: () => (
-                        <NIcon>
-                          <DeleteOutlined />
-                        </NIcon>
-                      )
-                    }}
-                  </NButton>
-                ),
-                default: () => t('security.user.delete')
-              }}
-            </NTooltip>
-          </NSpace>
-        )
-      }
-    }
-  ].map((d: any) => ({ ...d, width: d.width || 160 }))
+    ].map((d: any) => ({ ...d, width: d.width || 160 }))
+  )
 
-  const scrollX = columns.reduce((p, c) => p + c.width, 0)
+  const scrollX = columns.value.reduce((p, c) => p + c.width, 0)
 
   return {
     columns,

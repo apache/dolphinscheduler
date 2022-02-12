@@ -50,7 +50,7 @@ public final class SlackSender {
     private final String botName;
 
     public SlackSender(Map<String, String> slackAlertParam) {
-        webHookUrl = slackAlertParam.get(SlackParamsConstants.SLACK_WEN_HOOK_URL_NAME);
+        webHookUrl = slackAlertParam.get(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME);
         botName = slackAlertParam.get(SlackParamsConstants.SLACK_BOT_NAME);
         Preconditions.checkArgument(!Objects.isNull(webHookUrl), "SlackWebHookURL can not be null");
         Preconditions.checkArgument(webHookUrl.startsWith("https://hooks.slack.com/services/"), "SlackWebHookURL invalidate");

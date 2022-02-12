@@ -46,6 +46,7 @@
                 and group_id = #{groupId}
             </if>
         </where>
+        order by update_time desc
     </select>
 
     <select id="queryByStatus" resultMap="TaskGroupQueueMap" resultType="map">
@@ -149,6 +150,7 @@
                 #{i.code}
             </foreach>
         </if>
+        order by queue.update_time desc
     </select>
 
 </mapper>

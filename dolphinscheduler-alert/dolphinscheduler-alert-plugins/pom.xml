@@ -37,6 +37,7 @@
         <module>dolphinscheduler-alert-slack</module>
         <module>dolphinscheduler-alert-pagerduty</module>
         <module>dolphinscheduler-alert-webexteams</module>
+        <module>dolphinscheduler-alert-telegram</module>
     </modules>
 
     <dependencies>
