@@ -278,16 +278,13 @@
         this.progress = 0
         this.definitionUpdateDialog = false
       },
-
       onArchiveDefinition () {
         this.isUpdate = true
       },
-
       closeDefinition () {
         this.progress = 0
         this.definitionUpdateDialog = false
       },
-
       onProgressFileUpdate (val) {
         this.progress = val
       },
@@ -300,8 +297,12 @@
       },
       onUploadFile () {
         let self = this
-        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        findComponentDownward(self.$root, 'resource-list-index-FILE')._updateList()
         this.isUpdate = false
+        this.progress = 0
+        this.fileUploadDialog = false
+      },
+      closeFileUpload () {
         this.progress = 0
         this.fileUploadDialog = false
       },
@@ -348,7 +349,6 @@
         this.progress = 0
         this.fileChildUpdateDialog = false
       },
-
       _resourceChildUpdate (type, data) {
         if (this.progress) {
           this._toggleArchive()
@@ -375,10 +375,6 @@
         this.progress = 0
         this.resourceChildUpdateDialog = false
       },
-      closeFileUpload () {
-        this.progress = 0
-        this.fileUploadDialog = false
-      },
       /**
        * Upload popup layer display
        */
@@ -395,7 +391,6 @@
        * Language switching
        */
       _toggleLanguage (language) {
-        console.log(language)
         cookies.set('language', language, { path: '/' })
         setTimeout(() => {
           window.location.reload()

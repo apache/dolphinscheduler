@@ -138,11 +138,8 @@
               this.$refs.popup.spinnerLoading = false
             }
           } else {
-            console.log(this.currentDir)
             const params = { fullName: this.currentDir + this.name, type: 'FILE' }
-            console.log(params)
             this.store.dispatch('resource/resourceVerifyName', params).then(res => {
-              console.log(res)
               const isLt1024M = this.file.size / 1024 / 1024 < 1024
               if (isLt1024M) {
                 this._formDataUpdate().then(res => {

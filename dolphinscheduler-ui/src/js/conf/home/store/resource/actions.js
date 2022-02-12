@@ -64,7 +64,6 @@ export default {
    * Verify that the upload name exists
    */
   resourceVerifyName ({ state }, payload) {
-    console.log('..')
     return new Promise((resolve, reject) => {
       io.get('resources/verify-name', payload, res => {
         resolve(res)
