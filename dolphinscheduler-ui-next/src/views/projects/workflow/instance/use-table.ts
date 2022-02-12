@@ -277,6 +277,10 @@ export function useTable() {
     deleteProcessInstanceById(id, variables.projectCode)
       .then(() => {
         window.$message.success(t('project.workflow.success'))
+        if (variables.tableData.length === 1 && variables.page > 1) {
+          variables.page -= 1
+        }
+
         getTableData()
       })
       .catch((error: any) => {
@@ -293,6 +297,14 @@ export function useTable() {
     batchDeleteProcessInstanceByIds(data, variables.projectCode)
       .then(() => {
         window.$message.success(t('project.workflow.success'))
+
+        if (
+          variables.tableData.length === variables.checkedRowKeys.length &&
+          variables.page > 1
+        ) {
+          variables.page -= 1
+        }
+
         variables.checkedRowKeys = []
         getTableData()
       })
