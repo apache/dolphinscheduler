@@ -127,8 +127,7 @@
         }
       },
       _reUploadFile (item) {
-        console.log(item)
-        findComponentDownward(this.$root, 'roof-nav')._fileReUpload('FILE', 1)
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload(item)
       },
       _downloadFile (item) {
         downloadFile(`resources/${item.id}/download`)

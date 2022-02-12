@@ -177,12 +177,15 @@
     </el-dialog>
 
     <el-dialog
-      :visible.sync="fileReUploadDialog"
+      :visible.sync="fileUploadDialog"
       append-to-body="true"
       width="auto">
-      <m-file-re-upload> :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateResourceChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeResourceChildUpdate="closeReUpload"></m-file-re-upload>
+      <m-file-upload
+        :originalFileData="originalFileData"
+        @onUploadFile="onUploadFile"
+        @closeFileUpload="closeFileUpload">
+      </m-file-upload>
     </el-dialog>
-
   </div>
 </template>
 <script>
@@ -194,7 +197,7 @@
   import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
   import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
-  import mFileReUpload from '@/module/components/fileUpdate/fileReUpload'
+  import mFileUpload from '@/module/components/fileUpdate/fileReUpload'
   import mProgressBar from '@/module/components/progressBar/progressBar'
   import { findLocale, localeList } from '@/module/i18n/config'
 
@@ -223,8 +226,11 @@
         fileUpdateDialog: false,
         fileChildUpdateDialog: false,
         id: null,
+        fileName: '',
+        description: '',
+        originalFileData: {},
         resourceChildUpdateDialog: false,
-        fileReUploadDialog: false
+        fileUploadDialog: false
       }
     },
 
@@ -292,6 +298,13 @@
         this.progress = 0
         this.fileUpdateDialog = false
       },
+      onUploadFile () {
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileUploadDialog = false
+      },
       onArchiveFileUpdate () {
         this.isUpdate = true
       },
@@ -299,7 +312,6 @@
         this.progress = 0
         this.fileUpdateDialog = false
       },
-
       _fileChildUpdate (type, data) {
         if (this.progress) {
           this._toggleArchive()
@@ -309,14 +321,13 @@
         this.id = data
         this.fileChildUpdateDialog = true
       },
-      _fileReUpload (type, data) {
+      _fileReUpload (item) {
         if (this.progress) {
           this._toggleArchive()
           return
         }
-        this.type = type
-        this.id = data
-        this.fileReUploadDialog = true
+        this.originalFileData = item
+        this.fileUploadDialog = true
       },
       onProgressFileChildUpdate (val) {
         this.progress = val
@@ -364,6 +375,10 @@
         this.progress = 0
         this.resourceChildUpdateDialog = false
       },
+      closeFileUpload () {
+        this.progress = 0
+        this.fileUploadDialog = false
+      },
       /**
        * Upload popup layer display
        */
@@ -395,7 +410,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate, mFileReUpload }
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate, mFileUpload }
   }
 </script>
 
