@@ -755,6 +755,7 @@ export default {
   webHook: 'Web钩子',
   Keyword: '关键词',
   Secret: '密钥',
+  MsgType: '消息类型',
   AtMobiles: '@手机号',
   AtUserIds: '@用户ID',
   IsAtAll: '@所有人',
@@ -900,10 +901,5 @@ export default {
   Last7DayFluctuation: '最近7天波动',
   Last30DayFluctuation: '最近30天波动',
   SrcTableTotalRows: '源表总行数',
-  TargetTableTotalRows: '目标表总行数',
-  'Alert When Blocking': '阻断时告警',
-  'Blocking Condition': '阻断时机',
-  'Blocking on Failed': '自定义参数失败时阻断',
-  'Blocking on Success': '自定义参数成功时阻断',
-  'Do not Alert': '不告警'
+  TargetTableTotalRows: '目标表总行数'
 }
