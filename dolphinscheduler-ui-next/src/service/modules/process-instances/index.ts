@@ -29,7 +29,7 @@ import {
 
 export function queryProcessInstanceListPaging(
   params: ProcessInstanceListReq,
-  code: CodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-instances`,
@@ -40,7 +40,7 @@ export function queryProcessInstanceListPaging(
 
 export function batchDeleteProcessInstanceByIds(
   data: BatchDeleteReq,
-  code: CodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-instances/batch-delete`,
@@ -101,7 +101,7 @@ export function updateProcessInstance(
   })
 }
 
-export function deleteProcessInstanceById(id: IdReq, code: CodeReq): any {
+export function deleteProcessInstanceById(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}`,
     method: 'delete'
