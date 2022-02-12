@@ -331,7 +331,6 @@ export function useTable() {
         if ($count > 0 && $count <= TIME_COUNT) {
           $count--
           variables.tableData[index].count = $count
-          // this.$forceUpdate()
         } else {
           fn()
           clearInterval(timer)
@@ -350,7 +349,6 @@ export function useTable() {
     execute(param, variables.projectCode)
       .then(() => {
         variables.tableData[index].disabled = true
-        // forceUpdate
         window.$message.success(t('project.workflow.success'))
         _countDown(() => {
           getTableData()
