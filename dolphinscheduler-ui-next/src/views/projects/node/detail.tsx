@@ -65,7 +65,7 @@ const NodeDetail = defineComponent({
         layout={{
           xGap: 10
         }}
-      ></Form>
+      />
     )
   }
 })
