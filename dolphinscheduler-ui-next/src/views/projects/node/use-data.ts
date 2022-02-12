@@ -37,7 +37,6 @@ export function useData({
       data.backfill = formatBackfill(taskDefinition, nodeData.taskType)
       data.isCreate = false
     }
-  } else {
   }
 
   return {
