@@ -15,6 +15,25 @@
  * limitations under the License.
  */
 
+import {
+  SettingFilled,
+  SettingOutlined,
+  CloseCircleOutlined,
+  PauseCircleOutlined,
+  CheckCircleOutlined,
+  EditOutlined,
+  MinusCircleOutlined,
+  CheckCircleFilled,
+  LoadingOutlined,
+  PauseCircleFilled,
+  ClockCircleOutlined,
+  StopFilled,
+  StopOutlined,
+  GlobalOutlined,
+  IssuesCloseOutlined
+} from '@vicons/antd'
+import { ITaskState } from './types'
+
 /**
  * Intelligent display kb m
  */
@@ -172,3 +191,126 @@ export const stateType = (t: any) => [
     label: `${t('project.workflow.serial_wait')}`
   }
 ]
+
+/**
+ * Task status
+ * @id id
+ * @desc tooltip
+ * @color color
+ * @icon icon
+ * @isSpin is loading (Need to execute the code block to write if judgment)
+ */
+// TODO: Looking for a more suitable icon
+export const tasksState = (t: any): ITaskState => ({
+  SUBMITTED_SUCCESS: {
+    id: 0,
+    desc: `${t('project.workflow.submit_success')}`,
+    color: '#A9A9A9',
+    icon: IssuesCloseOutlined,
+    isSpin: false,
+    classNames: 'submitted'
+  },
+  RUNNING_EXECUTION: {
+    id: 1,
+    desc: `${t('project.workflow.executing')}`,
+    color: '#0097e0',
+    icon: SettingFilled,
+    isSpin: true,
+    classNames: 'executing'
+  },
+  READY_PAUSE: {
+    id: 2,
+    desc: `${t('project.workflow.ready_to_pause')}`,
+    color: '#07b1a3',
+    icon: SettingOutlined,
+    isSpin: false,
+    classNames: 'submitted'
+  },
+  PAUSE: {
+    id: 3,
+    desc: `${t('project.workflow.pause')}`,
+    color: '#057c72',
+    icon: PauseCircleOutlined,
+    isSpin: false,
+    classNames: 'pause'
+  },
+  READY_STOP: {
+    id: 4,
+    desc: `${t('project.workflow.ready_to_stop')}`,
+    color: '#FE0402',
+    icon: StopFilled,
+    isSpin: false
+  },
+  STOP: {
+    id: 5,
+    desc: `${t('project.workflow.stop')}`,
+    color: '#e90101',
+    icon: StopOutlined,
+    isSpin: false
+  },
+  FAILURE: {
+    id: 6,
+    desc: `${t('project.workflow.failed')}`,
+    color: '#000000',
+    icon: CloseCircleOutlined,
+    isSpin: false,
+    classNames: 'failed'
+  },
+  SUCCESS: {
+    id: 7,
+    desc: `${t('project.workflow.success')}`,
+    color: '#33cc00',
+    icon: CheckCircleOutlined,
+    isSpin: false,
+    classNames: 'success'
+  },
+  NEED_FAULT_TOLERANCE: {
+    id: 8,
+    desc: `${t('project.workflow.need_fault_tolerance')}`,
+    color: '#FF8C00',
+    icon: EditOutlined,
+    isSpin: false
+  },
+  KILL: {
+    id: 9,
+    desc: `${t('project.workflow.kill')}`,
+    color: '#a70202',
+    icon: MinusCircleOutlined,
+    isSpin: false
+  },
+  WAITING_THREAD: {
+    id: 10,
+    desc: `${t('project.workflow.waiting_for_thread')}`,
+    color: '#912eed',
+    icon: ClockCircleOutlined,
+    isSpin: false
+  },
+  WAITING_DEPEND: {
+    id: 11,
+    desc: `${t('project.workflow.waiting_for_dependence')}`,
+    color: '#5101be',
+    icon: GlobalOutlined,
+    isSpin: false
+  },
+  DELAY_EXECUTION: {
+    id: 12,
+    desc: `${t('project.workflow.delay_execution')}`,
+    color: '#5102ce',
+    icon: PauseCircleFilled,
+    isSpin: false
+  },
+  FORCED_SUCCESS: {
+    id: 13,
+    desc: `${t('project.workflow.forced_success')}`,
+    color: '#5102ce',
+    icon: CheckCircleFilled,
+    isSpin: false
+  },
+  SERIAL_WAIT: {
+    id: 14,
+    desc: `${t('project.workflow.serial_wait')}`,
+    color: '#5102ce',
+    icon: LoadingOutlined,
+    isSpin: false
+  }
+})

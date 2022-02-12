@@ -21,6 +21,7 @@ import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
+import { NTooltip, NIcon, NSpin } from 'naive-ui'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
 import {
   queryProcessInstanceListPaging,
@@ -29,7 +30,7 @@ import {
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
-import { runningType } from '@/utils/common'
+import { runningType, tasksState } from '@/utils/common'
 import { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import { ICountDownParam } from './types'
 import { ExecuteReq } from '@/service/modules/executors/types'
@@ -38,6 +39,8 @@ import styles from './index.module.scss'
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
+
+  const taskStateIcon = tasksState(t)
 
   const variables = reactive({
     columns: [],
@@ -91,7 +94,45 @@ export function useTable() {
       },
       {
         title: t('project.workflow.status'),
-        key: 'state'
+        key: 'state',
+        render: (_row: IWorkflowInstance) => {
+          const stateIcon = taskStateIcon[_row.state]
+          const iconElement = h(
+            NIcon,
+            {
+              size: '18px',
+              style: 'position: relative; top: 7.5px; left: 7.5px'
+            },
+            {
+              default: () =>
+                h(stateIcon.icon, {
+                  color: stateIcon.color
+                })
+            }
+          )
+          return h(
+            NTooltip,
+            {},
+            {
+              trigger: () => {
+                if (stateIcon.isSpin) {
+                  return h(
+                    NSpin,
+                    {
+                      small: 'small'
+                    },
+                    {
+                      icon: () => iconElement
+                    }
+                  )
+                } else {
+                  return iconElement
+                }
+              },
+              default: () => stateIcon!.desc
+            }
+          )
+        }
       },
       {
         title: t('project.workflow.run_type'),

@@ -469,7 +469,8 @@ const project = {
     waiting_for_dependency_to_complete: 'Waiting for dependency to complete',
     delay_execution: 'Delay execution',
     forced_success: 'Forced success',
-    serial_wait: 'Serial wait'
+    serial_wait: 'Serial wait',
+    executing: 'Executing'
   },
   task: {
     task_name: 'Task Name',

@@ -468,7 +468,8 @@ const project = {
     waiting_for_dependency_to_complete: '等待依赖完成',
     delay_execution: '延时执行',
     forced_success: '强制成功',
-    serial_wait: '串行等待'
+    serial_wait: '串行等待',
+    executing: '正在执行'
   },
   task: {
     task_name: '任务名称',
