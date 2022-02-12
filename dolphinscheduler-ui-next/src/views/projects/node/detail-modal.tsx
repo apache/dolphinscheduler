@@ -70,7 +70,7 @@ const NodeDetailModal = defineComponent({
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
         confirmLoading={false}
-        onCancel={() => void onCancel()}
+        onCancel={onCancel}
       >
         <Detail ref='detailRef' taskType='SHELL' projectCode={111} />
       </Modal>
