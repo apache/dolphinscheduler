@@ -200,16 +200,16 @@ public class WorkerServer implements IStoppable {
             this.alertClientService.close();
             this.springApplicationContext.close();
             logger.info("springApplicationContext close");
-        } catch (Exception e) {
-            logger.error("worker server stop exception ", e);
-        } finally {
             try {
                 // thread sleep 60 seconds for quietly stop
                 Thread.sleep(60000L);
             } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
-            System.exit(1);
+            Runtime.getRuntime().halt(0);
+        } catch (Exception e) {
+            logger.error("worker server stop exception ", e);
+            Runtime.getRuntime().halt(1);
         }
     }
 
