@@ -18,6 +18,7 @@
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
 import type { IFormItem, IJsonItem } from '@/components/form/types'
+import type { TaskType } from '@/views/projects/task/constants/task-type'
 
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
@@ -46,27 +47,10 @@ interface ITimeout {
   timeout?: number
   strategy?: string
 }
-type ITaskType =
-  | 'SHELL'
-  | 'SUB_PROCESS'
-  | 'PROCEDURE'
-  | 'SQL'
-  | 'SPARK'
-  | 'FLINK'
-  | 'MapReduce'
-  | 'PYTHON'
-  | 'DEPENDENT'
-  | 'HTTP'
-  | 'DataX'
-  | 'PIGEON'
-  | 'SQOOP'
-  | 'CONDITIONS'
-  | 'DATA_QUALITY'
-  | 'SWITCH'
-  | 'SEATUNNEL'
+type ITaskType = TaskType
 
 interface ITask {
-  code?: string
+  code: number
   timeoutNotifyStrategy?: string
   taskParams: ITaskParams
   description?: string
