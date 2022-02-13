@@ -70,9 +70,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         logger.info("received command : {}", command);
 
-        /**
-         * reuqest task log command type
-         */
+        //request task log command type
         final CommandType commandType = command.getType();
         switch (commandType) {
             case GET_LOG_BYTES_REQUEST:
@@ -96,7 +94,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
-                    builder.append(line + "\r\n");
+                    builder.append(line).append("\r\n");
                 }
                 RollViewLogResponseCommand rollViewLogRequestResponse = new RollViewLogResponseCommand(builder.toString());
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
@@ -108,7 +106,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 String taskLogPath = removeTaskLogRequest.getPath();
 
                 File taskLogFile = new File(taskLogPath);
-                Boolean status = true;
+                boolean status = true;
                 try {
                     if (taskLogFile.exists()) {
                         status = taskLogFile.delete();
@@ -130,11 +128,10 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     }
 
     /**
-     * get files content bytes，for down load file
+     * get files content bytes for download file
      *
      * @param filePath file path
      * @return byte array of file
-     * @throws Exception exception
      */
     private byte[] getFileContentBytes(String filePath) {
         try (InputStream in = new FileInputStream(filePath);
