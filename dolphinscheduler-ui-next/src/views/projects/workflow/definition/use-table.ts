@@ -68,7 +68,7 @@ export function useTable() {
         render: (row) =>
           h(
             NEllipsis,
-            { style: 'max-width: 200px; color: white' },
+            { style: 'max-width: 200px; color: #2080f0' },
             {
               default: () =>
                 h(
