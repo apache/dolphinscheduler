@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef } from 'vue'
+import { defineComponent, Ref, toRefs, onMounted, toRef, watch } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -34,7 +34,7 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'function-manage',
   setup() {
-    const { variables, getTableData } = useTable()
+    const { variables, createColumns, getTableData } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -68,7 +68,12 @@ export default defineComponent({
       handleShowModal(toRef(variables, 'showRef'))
     }
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     onMounted(() => {
+      createColumns(variables)
       requestData()
     })
 

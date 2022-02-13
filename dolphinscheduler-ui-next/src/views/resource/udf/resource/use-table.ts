@@ -49,151 +49,8 @@ export function useTable() {
   const router: Router = useRouter()
   const fileStore = useFileStore()
 
-  const columns: TableColumns<any> = [
-    {
-      title: t('resource.udf.id'),
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('resource.udf.udf_source_name'),
-      key: 'alias',
-      render: (row) => {
-        if (!row.directory) {
-          return row.alias
-        } else {
-          return h(
-            'a',
-            {
-              href: 'javascript:',
-              class: styles.links,
-              onClick: () => goSubFolder(router, row)
-            },
-            {
-              default: () => {
-                return row.alias
-              }
-            }
-          )
-        }
-      }
-    },
-    {
-      title: t('resource.udf.whether_directory'),
-      key: 'whether_directory',
-      render: (row) =>
-        row.directory ? t('resource.file.yes') : t('resource.file.no')
-    },
-    {
-      title: t('resource.udf.file_name'),
-      key: 'fileName'
-    },
-    {
-      title: t('resource.udf.file_size'),
-      key: 'size',
-      render: (row) => bytesToSize(row.size)
-    },
-    {
-      title: t('resource.udf.description'),
-      key: 'description'
-    },
-    {
-      title: t('resource.udf.create_time'),
-      key: 'createTime'
-    },
-    {
-      title: t('resource.udf.update_time'),
-      key: 'updateTime'
-    },
-    {
-      title: t('resource.udf.operation'),
-      key: 'operation',
-      render: (row) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NTooltip,
-              {},
-              {
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      circle: true,
-                      type: 'info',
-                      size: 'tiny',
-                      onClick: () => {
-                        handleEdit(row)
-                      }
-                    },
-                    {
-                      icon: () => h(EditOutlined)
-                    }
-                  ),
-                default: () => t('resource.udf.edit')
-              }
-            ),
-            h(
-              NTooltip,
-              {},
-              {
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      circle: true,
-                      type: 'info',
-                      size: 'tiny',
-                      disabled: row?.directory ? true : false,
-                      onClick: () => downloadResource(row.id)
-                    },
-                    {
-                      icon: () => h(DownloadOutlined)
-                    }
-                  ),
-                default: () => t('resource.udf.download')
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleDelete(row.id)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'error',
-                            size: 'tiny'
-                          },
-                          {
-                            icon: () => h(DeleteOutlined)
-                          }
-                        ),
-                      default: () => t('resource.udf.delete')
-                    }
-                  ),
-                default: () => t('resource.udf.delete_confirm')
-              }
-            )
-          ]
-        })
-      }
-    }
-  ]
-
   const variables = reactive({
-    columns,
+    columns: [],
     row: {},
     tableData: [],
     breadList: [],
@@ -205,6 +62,154 @@ export function useTable() {
     folderShowRef: ref(false),
     uploadShowRef: ref(false)
   })
+
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: t('resource.udf.id'),
+        key: 'id',
+        width: 50,
+        render: (_row, index) => index + 1
+      },
+      {
+        title: t('resource.udf.udf_source_name'),
+        key: 'alias',
+        render: (row) => {
+          if (!row.directory) {
+            return row.alias
+          } else {
+            return h(
+              'a',
+              {
+                href: 'javascript:',
+                class: styles.links,
+                onClick: () => goSubFolder(router, row)
+              },
+              {
+                default: () => {
+                  return row.alias
+                }
+              }
+            )
+          }
+        }
+      },
+      {
+        title: t('resource.udf.whether_directory'),
+        key: 'whether_directory',
+        render: (row) =>
+          row.directory ? t('resource.file.yes') : t('resource.file.no')
+      },
+      {
+        title: t('resource.udf.file_name'),
+        key: 'fileName'
+      },
+      {
+        title: t('resource.udf.file_size'),
+        key: 'size',
+        render: (row) => bytesToSize(row.size)
+      },
+      {
+        title: t('resource.udf.description'),
+        key: 'description'
+      },
+      {
+        title: t('resource.udf.create_time'),
+        key: 'createTime'
+      },
+      {
+        title: t('resource.udf.update_time'),
+        key: 'updateTime'
+      },
+      {
+        title: t('resource.udf.operation'),
+        key: 'operation',
+        render: (row) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        tag: 'div',
+                        circle: true,
+                        type: 'info',
+                        size: 'tiny',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () => h(EditOutlined)
+                      }
+                    ),
+                  default: () => t('resource.udf.edit')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        tag: 'div',
+                        circle: true,
+                        type: 'info',
+                        size: 'tiny',
+                        disabled: row?.directory ? true : false,
+                        onClick: () => downloadResource(row.id)
+                      },
+                      {
+                        icon: () => h(DownloadOutlined)
+                      }
+                    ),
+                  default: () => t('resource.udf.download')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row.id)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              tag: 'div',
+                              circle: true,
+                              type: 'error',
+                              size: 'tiny'
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('resource.udf.delete')
+                      }
+                    ),
+                  default: () => t('resource.udf.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ] as TableColumns<any>
+  }
 
   const getTableData = (params: IUdfResourceParam) => {
     const { state } = useAsyncState(
@@ -272,6 +277,7 @@ export function useTable() {
 
   return {
     variables,
+    createColumns,
     getTableData,
     goUdfManage,
     goBread

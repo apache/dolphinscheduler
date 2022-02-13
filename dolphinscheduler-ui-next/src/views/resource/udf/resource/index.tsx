@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef } from 'vue'
+import { defineComponent, Ref, toRefs, onMounted, toRef, watch } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -37,7 +37,8 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'resource-manage',
   setup() {
-    const { variables, getTableData, goUdfManage, goBread } = useTable()
+    const { variables, createColumns, getTableData, goUdfManage, goBread } =
+      useTable()
 
     const requestData = () => {
       getTableData({
@@ -85,7 +86,12 @@ export default defineComponent({
       goBread(breadName)
     }
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     onMounted(() => {
+      createColumns(variables)
       requestData()
     })
 
