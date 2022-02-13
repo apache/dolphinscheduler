@@ -25,7 +25,7 @@ import {
   NPagination,
   NSpace
 } from 'naive-ui'
-import { defineComponent, onMounted, toRefs } from 'vue'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import ImportModal from './components/import-modal'
@@ -43,7 +43,7 @@ export default defineComponent({
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
 
-    const { variables, getTableData } = useTable()
+    const { variables, createColumns, getTableData } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -73,7 +73,12 @@ export default defineComponent({
       })
     }
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     onMounted(() => {
+      createColumns(variables)
       requestData()
     })
 

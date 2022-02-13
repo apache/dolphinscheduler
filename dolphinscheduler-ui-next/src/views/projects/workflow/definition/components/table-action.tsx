@@ -131,6 +131,7 @@ export default defineComponent({
               <NButton
                 size='tiny'
                 type='primary'
+                tag='div'
                 circle
                 onClick={this.handleStartWorkflow}
                 disabled={releaseState === 'OFFLINE'}
@@ -168,6 +169,7 @@ export default defineComponent({
               <NButton
                 size='tiny'
                 type={releaseState === 'ONLINE' ? 'warning' : 'error'}
+                tag='div'
                 circle
                 onClick={this.handleReleaseWorkflow}
               >
@@ -227,6 +229,7 @@ export default defineComponent({
               <NButton
                 size='tiny'
                 type='error'
+                tag='div'
                 circle
                 disabled={releaseState === 'ONLINE'}
               >
