@@ -19,37 +19,71 @@ import { defineComponent, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import Detail from './detail'
-import type { IDataNode, ITask } from './types'
+import type { NodeData } from '@/views/projects/workflow/components/dag/types'
 
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  nodeData: {
-    type: Object as PropType<IDataNode>,
-    default: {
-      taskType: 'SHELL'
-    }
-  },
-  type: {
-    type: String as PropType<string>,
-    default: ''
-  },
   taskDefinition: {
-    type: Object as PropType<ITask>
+    type: Object as PropType<NodeData>,
+    default: { code: 0, taskType: 'SHELL', name: '' }
+  },
+  projectCode: {
+    type: Number as PropType<number>,
+    required: true
+  },
+  readonly: {
+    type: Boolean as PropType<boolean>,
+    default: false
   }
 }
 
 const NodeDetailModal = defineComponent({
   name: 'NodeDetailModal',
   props,
-  emits: ['cancel', 'update'],
+  emits: ['cancel', 'submit'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const detailRef = ref()
+
+    // TODO
+    const mapFormToTaskDefinition = (form: any) => {
+      return {
+        // "code": form.code,
+        name: form.name,
+        description: form.desc,
+        taskType: 'SHELL',
+        taskParams: {
+          resourceList: [],
+          localParams: form.localParams,
+          rawScript: form.shell,
+          dependence: {},
+          conditionResult: {
+            successNode: [],
+            failedNode: []
+          },
+          waitStartTimeout: {},
+          switchResult: {}
+        },
+        flag: form.runFlag,
+        taskPriority: 'MEDIUM',
+        workerGroup: form.workerGroup,
+        failRetryTimes: '0',
+        failRetryInterval: '1',
+        timeoutFlag: 'CLOSE',
+        timeoutNotifyStrategy: '',
+        timeout: 0,
+        delayTime: '0',
+        environmentCode: form.environmentCode
+      }
+    }
     const onConfirm = () => {
-      detailRef.value.onSubmit()
+      emit('submit', {
+        formRef: detailRef.value.formRef,
+        form: mapFormToTaskDefinition(detailRef.value.form)
+      })
     }
     const onCancel = () => {
       emit('cancel')
@@ -63,7 +97,15 @@ const NodeDetailModal = defineComponent({
     }
   },
   render() {
-    const { t, show, onConfirm, onCancel } = this
+    const {
+      t,
+      show,
+      onConfirm,
+      onCancel,
+      projectCode,
+      taskDefinition,
+      readonly
+    } = this
     return (
       <Modal
         show={show}
@@ -72,7 +114,11 @@ const NodeDetailModal = defineComponent({
         confirmLoading={false}
         onCancel={onCancel}
       >
-        <Detail ref='detailRef' taskType='SHELL' projectCode={111} />
+        <Detail
+          ref='detailRef'
+          taskType={taskDefinition.taskType}
+          projectCode={projectCode}
+        />
       </Modal>
     )
   }

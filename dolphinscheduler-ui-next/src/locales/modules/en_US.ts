@@ -545,7 +545,8 @@ const project = {
     basic_info: 'Basic Information',
     minute: 'Minute',
     key: 'Key',
-    value: 'Value'
+    value: 'Value',
+    success: 'Success'
   },
   node: {
     current_node_settings: 'Current node settings',
