@@ -33,104 +33,8 @@ export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const columns: TableColumns<any> = [
-    {
-      title: t('resource.function.id'),
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('resource.function.udf_function_name'),
-      key: 'funcName'
-    },
-    {
-      title: t('resource.function.class_name'),
-      key: 'className'
-    },
-    {
-      title: t('resource.function.type'),
-      key: 'type'
-    },
-    {
-      title: t('resource.function.description'),
-      key: 'description'
-    },
-    {
-      title: t('resource.function.jar_package'),
-      key: 'resourceName'
-    },
-    {
-      title: t('resource.function.update_time'),
-      key: 'updateTime'
-    },
-    {
-      title: t('resource.function.operation'),
-      key: 'operation',
-      render: (row) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NTooltip,
-              {},
-              {
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      circle: true,
-                      type: 'info',
-                      size: 'tiny',
-                      onClick: () => {
-                        handleEdit(row)
-                      }
-                    },
-                    {
-                      icon: () => h(EditOutlined)
-                    }
-                  ),
-                default: () => t('resource.function.edit')
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleDelete(row.id)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'error',
-                            size: 'tiny'
-                          },
-                          {
-                            icon: () => h(DeleteOutlined)
-                          }
-                        ),
-                      default: () => t('resource.function.delete')
-                    }
-                  ),
-                default: () => t('resource.function.delete_confirm')
-              }
-            )
-          ]
-        })
-      }
-    }
-  ]
-
   const variables = reactive({
-    columns,
+    columns: [],
     row: {},
     tableData: [],
     id: ref(Number(router.currentRoute.value.params.id) || -1),
@@ -140,6 +44,104 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false)
   })
+
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: t('resource.function.id'),
+        key: 'id',
+        width: 50,
+        render: (_row, index) => index + 1
+      },
+      {
+        title: t('resource.function.udf_function_name'),
+        key: 'funcName'
+      },
+      {
+        title: t('resource.function.class_name'),
+        key: 'className'
+      },
+      {
+        title: t('resource.function.type'),
+        key: 'type'
+      },
+      {
+        title: t('resource.function.description'),
+        key: 'description'
+      },
+      {
+        title: t('resource.function.jar_package'),
+        key: 'resourceName'
+      },
+      {
+        title: t('resource.function.update_time'),
+        key: 'updateTime'
+      },
+      {
+        title: t('resource.function.operation'),
+        key: 'operation',
+        render: (row) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'tiny',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () => h(EditOutlined)
+                      }
+                    ),
+                  default: () => t('resource.function.edit')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row.id)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'tiny'
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('resource.function.delete')
+                      }
+                    ),
+                  default: () => t('resource.function.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ] as TableColumns<any>
+  }
 
   const getTableData = (params: IUdfFunctionParam) => {
     const { state } = useAsyncState(
@@ -177,6 +179,7 @@ export function useTable() {
 
   return {
     variables,
+    createColumns,
     getTableData
   }
 }
