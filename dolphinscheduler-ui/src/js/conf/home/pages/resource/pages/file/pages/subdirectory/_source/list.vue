@@ -50,8 +50,11 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="150">
+        <el-table-column :label="$t('Operation')" width="180">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('ReUpload File')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="_reUploadFile(scope.row)" v-show="scope.row.directory? false: true" circle></el-button></span>
+            </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
             </el-tooltip>
@@ -90,6 +93,7 @@
   import { mapActions } from 'vuex'
   import { filtTypeArr } from '../../_source/common'
   import { bytesToSize } from '@/module/util/util'
+  import { findComponentDownward } from '@/module/util/'
   import { downloadFile } from '@/module/download'
   import localStore from '@/module/util/localStorage'
 
@@ -121,6 +125,9 @@
         } else {
           this.$router.push({ path: `/resource/file/list/${item.id}` })
         }
+      },
+      _reUploadFile (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload(item)
       },
       _downloadFile (item) {
         downloadFile(`resources/${item.id}/download`)
