@@ -18,9 +18,7 @@
 import type { Node, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import utils from '@/utils'
-import { WorkflowDefinition } from './types'
-
-export type Coordinate = { x: number; y: number }
+import { WorkflowDefinition, Coordinate } from './types'
 
 export function useCustomCellBuilder() {
   /**
@@ -110,7 +108,7 @@ export function useCustomCellBuilder() {
 
     tasks.forEach((task) => {
       const location = locations.find((l) => l.taskCode === task.code) || {}
-      const node = buildNode(task.code, task.taskType, task.name, {
+      const node = buildNode(task.code + '', task.taskType, task.name, {
         x: location.x,
         y: location.y
       })

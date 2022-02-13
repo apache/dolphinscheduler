@@ -16,7 +16,7 @@
  */
 
 import { useCanvasInit } from './use-canvas-init'
-import { useCellQuery } from './use-cell-query'
+import { useBusinessMapper } from './use-business-mapper'
 import { useCellActive } from './use-cell-active'
 import { useCellUpdate } from './use-cell-update'
 import { useNodeSearch } from './use-node-search'
@@ -25,10 +25,11 @@ import { useTextCopy } from './use-text-copy'
 import { useCustomCellBuilder } from './use-custom-cell-builder'
 import { useGraphBackfill } from './use-graph-backfill'
 import { useDagDragAndDrop } from './use-dag-drag-drop'
+import { useTaskEdit } from './use-task-edit'
 
 export {
   useCanvasInit,
-  useCellQuery,
+  useBusinessMapper,
   useCellActive,
   useNodeSearch,
   useGraphAutoLayout,
@@ -36,5 +37,6 @@ export {
   useCustomCellBuilder,
   useGraphBackfill,
   useCellUpdate,
-  useDagDragAndDrop
+  useDagDragAndDrop,
+  useTaskEdit
 }

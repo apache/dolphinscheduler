@@ -543,7 +543,8 @@ const project = {
     basic_info: '基本信息',
     minute: '分',
     key: '键',
-    value: '值'
+    value: '值',
+    success: '成功'
   },
   node: {
     current_node_settings: '当前节点设置',

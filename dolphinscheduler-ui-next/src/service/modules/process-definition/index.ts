@@ -39,11 +39,11 @@ export function queryListPaging(params: PageReq & ListReq, code: number): any {
 }
 
 export function createProcessDefinition(
-  data: ProcessDefinitionReq & NameReq,
-  code: CodeReq
+  data: ProcessDefinitionReq,
+  projectCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition`,
+    url: `/projects/${projectCode}/process-definition`,
     method: 'post',
     data
   })

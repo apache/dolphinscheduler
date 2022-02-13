@@ -53,7 +53,8 @@ interface ListReq extends PageReq {
   userId?: number
 }
 
-interface ProcessDefinitionReq extends NameReq {
+interface ProcessDefinitionReq {
+  name: string
   locations: string
   taskDefinitionJson: string
   taskRelationJson: string

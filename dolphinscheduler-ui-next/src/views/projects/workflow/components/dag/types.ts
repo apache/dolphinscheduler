@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+import { TaskType } from '@/views/projects/task/constants/task-type'
+
 export interface ProcessDefinition {
   id: number
   code: number
@@ -41,37 +43,37 @@ export interface ProcessDefinition {
   warningGroupId: number
 }
 
-export interface ProcessTaskRelationList {
-  id: number
+export interface Connect {
+  id?: number
   name: string
-  processDefinitionVersion: number
-  projectCode: any
-  processDefinitionCode: any
+  processDefinitionVersion?: number
+  projectCode?: number
+  processDefinitionCode?: number
   preTaskCode: number
   preTaskVersion: number
-  postTaskCode: any
+  postTaskCode: number
   postTaskVersion: number
   conditionType: string
   conditionParams: any
-  createTime: string
-  updateTime: string
+  createTime?: string
+  updateTime?: string
 }
 
-export interface TaskDefinitionList {
+export interface TaskDefinition {
   id: number
-  code: any
+  code: number
   name: string
   version: number
   description: string
   projectCode: any
   userId: number
-  taskType: string
+  taskType: TaskType
   taskParams: any
   taskParamList: any[]
   taskParamMap: any
   flag: string
   taskPriority: string
-  userName?: any
+  userName: any
   projectName?: any
   workerGroup: string
   environmentCode: number
@@ -84,12 +86,49 @@ export interface TaskDefinitionList {
   resourceIds: string
   createTime: string
   updateTime: string
-  modifyBy?: any
+  modifyBy: any
   dependence: string
 }
 
+export type NodeData = {
+  code: number
+  taskType: TaskType
+  name: string
+} & Partial<TaskDefinition>
+
 export interface WorkflowDefinition {
   processDefinition: ProcessDefinition
-  processTaskRelationList: ProcessTaskRelationList[]
-  taskDefinitionList: TaskDefinitionList[]
+  processTaskRelationList: Connect[]
+  taskDefinitionList: TaskDefinition[]
+}
+
+export interface Dragged {
+  x: number
+  y: number
+  type: TaskType
+}
+
+export interface Coordinate {
+  x: number
+  y: number
+}
+
+export interface GlobalParam {
+  key: string
+  value: string
+}
+
+export interface SaveForm {
+  name: string
+  description: string
+  tenantCode: string
+  timeoutFlag: boolean
+  timeout: number
+  globalParams: GlobalParam[]
+}
+
+export interface Location {
+  taskCode: number
+  x: number
+  y: number
 }

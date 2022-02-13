@@ -28,6 +28,7 @@ import {
   NDynamicInput
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
+import { SaveForm } from './types'
 import './x6-style.scss'
 
 const props = {
@@ -67,7 +68,7 @@ export default defineComponent({
       })
     })
 
-    const formValue = ref({
+    const formValue = ref<SaveForm>({
       name: '',
       description: '',
       tenantCode: 'default',

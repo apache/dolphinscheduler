@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref, toRefs } from 'vue'
+import { defineComponent, PropType, ref, toRef, toRefs } from 'vue'
 import Form from '@/components/form'
 import { useTask } from './use-task'
 import { useDetail } from './use-detail'
@@ -40,14 +40,15 @@ const NodeDetail = defineComponent({
     const { taskType, projectCode } = props
 
     const { json, model } = useTask({ taskType, projectCode })
-    const { state, onSubmit } = useDetail()
+    const { state } = useDetail()
 
     const jsonRef = ref(json)
 
     const { rules, elements } = getElementByJson(jsonRef.value, model)
 
     expose({
-      onSubmit: () => void onSubmit(model)
+      formRef: toRef(state, 'formRef'),
+      form: model
     })
 
     return { rules, elements, model, ...toRefs(state) }

@@ -19,39 +19,33 @@ import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
 import { genTaskCodeList } from '@/service/modules/task-definition'
-import { useCellUpdate } from './dag-hooks'
+import { Dragged } from './types'
+import { TaskType } from '@/views/projects/task/constants/task-type'
 import { useRoute } from 'vue-router'
 
 interface Options {
   readonly: Ref<boolean>
   graph: Ref<Graph | undefined>
-}
-
-interface Dragged {
-  x: number
-  y: number
-  type: string
+  appendTask: (code: number, type: TaskType, coor: Coordinate) => void
 }
 
 /**
  * Sidebar item drag && drop in canvas
  */
 export function useDagDragAndDrop(options: Options) {
-  const { readonly, graph } = options
+  const { readonly, graph, appendTask } = options
 
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
-
-  const { addNode } = useCellUpdate({ graph })
 
   // The element currently being dragged up
   const dragged = ref<Dragged>({
     x: 0,
     y: 0,
-    type: ''
+    type: 'SHELL'
   })
 
-  function onDragStart(e: DragEvent, type: string) {
+  function onDragStart(e: DragEvent, type: TaskType) {
     if (readonly.value) {
       e.preventDefault()
       return
@@ -75,8 +69,7 @@ export function useDagDragAndDrop(options: Options) {
       const genNums = 1
       genTaskCodeList(genNums, projectCode).then((res) => {
         const [code] = res
-        addNode(code + '', type, { x: x - eX, y: y - eY })
-        // openTaskConfigModel(code, type)
+        appendTask(code, type, { x: x - eX, y: y - eY })
       })
     }
   }

@@ -17,7 +17,6 @@
 
 import type { Graph } from '@antv/x6'
 import { ref, Ref } from 'vue'
-import { useCellQuery } from './dag-hooks'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -40,12 +39,12 @@ export function useNodeSearch(options: Options) {
   /**
    * Search dropdown control
    */
-  const { getNodes } = useCellQuery({ graph })
   const nodesDropdown = ref<{ label: string; value: string }[]>([])
   const reQueryNodes = () => {
-    nodesDropdown.value = getNodes().map((node) => ({
-      label: node.name,
-      value: node.code
+    const nodes = graph.value?.getNodes() || []
+    nodesDropdown.value = nodes.map((node) => ({
+      label: node.getData().taskName,
+      value: node.id
     }))
   }
 
