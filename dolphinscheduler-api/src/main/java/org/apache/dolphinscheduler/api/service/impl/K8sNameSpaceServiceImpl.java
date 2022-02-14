@@ -303,9 +303,9 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
             cpuStr = k8sNamespace.getLimitsCpu() + "";
         }
 
-        String MemoryStr = null;
+        String memoryStr = null;
         if (k8sNamespace.getLimitsMemory() != null) {
-            MemoryStr = k8sNamespace.getLimitsMemory() + "Gi";
+            memoryStr = k8sNamespace.getLimitsMemory() + "Gi";
         }
 
         String result = resourceYaml.replace("${name}", name)
@@ -316,10 +316,10 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
             result = result.replace("${limitCpu}", "limits.cpu: '" + cpuStr + "'");
         }
 
-        if (MemoryStr == null) {
+        if (memoryStr == null) {
             result = result.replace("${limitMemory}", "");
         } else {
-            result = result.replace("${limitMemory}", "limits.memory: " + MemoryStr);
+            result = result.replace("${limitMemory}", "limits.memory: " + memoryStr);
         }
         return result;
     }
