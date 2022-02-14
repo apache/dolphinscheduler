@@ -38,7 +38,7 @@ const router = createRouter({
 
 interface metaData {
   title?: string
-  showSide?: boolean,
+  showSide?: boolean
   auth?: Array<string>
 }
 
@@ -56,13 +56,17 @@ router.beforeEach(
     const userStore = useUserStore()
     const metaData: metaData = to.meta
     menuStore.setShowSideStatus(metaData.showSide || false)
-    if (metaData.auth?.includes('ADMIN_USER') && (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' && menuStore.getMenuKey === 'security') {
+    if (
+      metaData.auth?.includes('ADMIN_USER') &&
+      (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' &&
+      menuStore.getMenuKey === 'security'
+    ) {
       to.fullPath = '/security/token-manage'
-      next({name: 'token-manage'})
+      next({ name: 'token-manage' })
     } else {
       next()
     }
-    
+
     NProgress.done()
   }
 )

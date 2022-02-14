@@ -112,7 +112,8 @@ export function useColumns(onCallback: Function) {
                     NButton,
                     {
                       circle: true,
-                      type: 'error'
+                      type: 'error',
+                      class: 'btn-delete'
                     },
                     {
                       default: () =>
