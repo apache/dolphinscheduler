@@ -229,16 +229,17 @@ public class MasterServer implements IStoppable {
             // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
             springApplicationContext.close();
             logger.info("springApplicationContext close");
-        } catch (Exception e) {
-            logger.error("master server stop exception ", e);
-        } finally {
             try {
                 // thread sleep 60 seconds for quietly stop
                 Thread.sleep(60000L);
             } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
-            System.exit(1);
+            // Since close will be executed in hook, so we can't use System.exit here.
+            Runtime.getRuntime().halt(0);
+        } catch (Exception e) {
+            logger.error("master server stop exception ", e);
+            Runtime.getRuntime().halt(1);
         }
     }
 
