@@ -115,12 +115,15 @@ public abstract class AbstractParameters implements IParameters {
             return;
         }
         Map<String, String> taskResult = getMapByString(result);
-        if (taskResult == null || taskResult.size() == 0) {
+        if (taskResult.size() == 0) {
             return;
         }
         for (Property info : outProperty) {
-            info.setValue(taskResult.get(info.getProp()));
-            varPool.add(info);
+            String propValue = taskResult.get(info.getProp());
+            if (StringUtils.isNotEmpty(propValue)) {
+                info.setValue(propValue);
+                varPool.add(info);
+            }
         }
     }
 
