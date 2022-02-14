@@ -122,6 +122,7 @@ public abstract class AbstractParameters implements IParameters {
             String propValue = taskResult.get(info.getProp());
             if (StringUtils.isNotEmpty(propValue)) {
                 info.setValue(propValue);
+                varPool.add(info);
             }
         }
     }
