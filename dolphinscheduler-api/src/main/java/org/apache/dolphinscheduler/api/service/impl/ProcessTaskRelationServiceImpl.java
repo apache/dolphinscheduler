@@ -214,7 +214,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<Long> downstreamList = Lists.newArrayList();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() == taskCode) {
                 downstreamList.add(processTaskRelation.getPostTaskCode());
             }
