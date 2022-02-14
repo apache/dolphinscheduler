@@ -773,7 +773,7 @@
             (def) => def.id === processDefinitionId
           )
           this.$emit('onSubProcess', {
-            subProcessCode: process.code,
+            subProcessCode: this.backfillItem.params.processDefinitionCode,
             fromThis: this
           })
         }
