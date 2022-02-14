@@ -390,6 +390,11 @@ public class WorkflowExecuteThread {
     }
 
     private boolean taskStateChangeHandler(StateEvent stateEvent) {
+        if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+            this.updateProcessInstanceState();
+            return true;
+        }
+
         if (!checkTaskInstanceByStateEvent(stateEvent)) {
             return true;
         }
@@ -573,10 +578,6 @@ public class WorkflowExecuteThread {
      * check if task instance exist by state event
      */
     public boolean checkTaskInstanceByStateEvent(StateEvent stateEvent) {
-        if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
-            return true;
-        }
-
         if (stateEvent.getTaskInstanceId() == 0) {
             logger.error("task instance id null, state event:{}", stateEvent);
             return false;
