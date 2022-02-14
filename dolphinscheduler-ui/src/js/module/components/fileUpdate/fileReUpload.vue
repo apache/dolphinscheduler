@@ -1,26 +1,27 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
   <m-popup
-          ref="popup"
-          :ok-text="$t('Upload')"
-          :nameText="$t('ReUpload File')"
-          @ok="_ok"
-          :disabled="progress === 0 ? false : true">
+    ref="popup"
+    :ok-text="$t('Upload')"
+    :nameText="$t('ReUpload File')"
+    @ok="_ok"
+    @close="_close"
+    :disabled="progress === 0 ? false : true">
     <template slot="content">
       <form name="files" enctype="multipart/form-data" method="post">
         <div class="file-update-model"
@@ -44,11 +45,11 @@
             <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
             <template slot="content">
               <el-input
-                      type="input"
-                      size="small"
-                      v-model="name"
-                      :disabled="progress !== 0"
-                      :placeholder="$t('Please enter name')">
+                type="input"
+                size="small"
+                v-model="name"
+                :disabled="true"
+                :placeholder="$t('Please enter name')">
               </el-input>
             </template>
           </m-list-box-f>
@@ -56,11 +57,11 @@
             <template slot="name">{{$t('Description')}}</template>
             <template slot="content">
               <el-input
-                      type="textarea"
-                      size="small"
-                      v-model="description"
-                      :disabled="progress !== 0"
-                      :placeholder="$t('Please enter description')">
+                type="textarea"
+                size="small"
+                v-model="description"
+                :disabled="progress !== 0"
+                :placeholder="$t('Please enter description')">
               </el-input>
             </template>
           </m-list-box-f>
@@ -92,7 +93,7 @@
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
   export default {
-    name: 'file-update',
+    name: 'file-upload',
     data () {
       return {
         store,
@@ -105,6 +106,7 @@
         // file
         file: null,
         currentDir: '/',
+        id: null,
         // Whether to drag upload
         dragOver: false
       }
@@ -112,10 +114,7 @@
     watch: {
     },
     props: {
-      type: String,
-      fileName: String,
-      desc: String,
-      id: Number
+      originalFileData: Object
     },
     methods: {
       /**
@@ -124,7 +123,7 @@
       _ok () {
         this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
-          if (this.fileName === this.name) {
+          if (this.originalFileData.fileName === this.name) {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
             if (isLt1024M) {
               this._formDataUpdate().then(res => {
@@ -139,10 +138,8 @@
               this.$refs.popup.spinnerLoading = false
             }
           } else {
-            this.store.dispatch('resource/resourceVerifyName', {
-              fullName: '/' + this.name,
-              type: this.type
-            }).then(res => {
+            const params = { fullName: this.currentDir + this.name, type: 'FILE' }
+            this.store.dispatch('resource/resourceVerifyName', params).then(res => {
               const isLt1024M = this.file.size / 1024 / 1024 < 1024
               if (isLt1024M) {
                 this._formDataUpdate().then(res => {
@@ -165,6 +162,9 @@
           this.$refs.popup.spinnerLoading = false
         }
       },
+      _close () {
+        this.$emit('closeFileUpload')
+      },
       /**
        * validation
        */
@@ -186,19 +186,19 @@
         return new Promise((resolve, reject) => {
           let self = this
           let formData = new FormData()
+
           formData.append('file', this.file)
           formData.append('name', this.name)
           formData.append('description', this.description)
-          formData.append('id', this.id)
-          formData.append('type', this.type)
-          io.post('resources/update', res => {
+          formData.append('type', 'FILE')
+          io.put('resources/' + this.id, res => {
             this.$message.success(res.msg)
             resolve()
-            self.$emit('onUpdate')
+            self.$emit('onUploadFile')
             this.reset()
           }, e => {
             reject(e)
-            self.$emit('close')
+            self.$emit('closeFileUpload')
             this.$message.error(e.msg || '')
             this.reset()
           }, {
@@ -247,8 +247,13 @@
       }
     },
     mounted () {
-      this.name = this.fileName
-      this.description = this.desc
+      this.reset()
+      this.id = this.originalFileData.id
+      this.name = this.originalFileData.fileName
+      if (this.originalFileData.desc) {
+        this.description = this.originalFileData.desc
+      }
+      this.currentDir = this.originalFileData.fullName.substring(0, this.originalFileData.fullName.length - this.originalFileData.fileName.length)
     },
     components: { mPopup, mListBoxF, mProgressBar }
   }

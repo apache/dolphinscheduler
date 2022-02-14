@@ -15,40 +15,8 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue'
-import type { Graph } from '@antv/x6'
-import { TaskType } from '../../../task/constants/task-type'
-
-interface Options {
-  graph: Ref<Graph | undefined>
+interface ITaskState {
+  [key: string]: any
 }
 
-/**
- * Expose some cell-related query methods and refs
- * @param {Options} options
- */
-export function useCellQuery(options: Options) {
-  const { graph } = options
-
-  /**
-   * Get all nodes
-   */
-  function getNodes() {
-    const nodes = graph.value?.getNodes()
-    if (!nodes) return []
-    return nodes.map((node) => {
-      const position = node.getPosition()
-      const data = node.getData()
-      return {
-        code: node.id,
-        position: position,
-        name: data.taskName as string,
-        type: data.taskType as TaskType
-      }
-    })
-  }
-
-  return {
-    getNodes
-  }
-}
+export { ITaskState }

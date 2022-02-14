@@ -15,26 +15,20 @@
  * limitations under the License.
  */
 
-$borderDark: rgba(255, 255, 255, 0.09);
-$borderLight: rgb(239, 239, 245);
-$bgDark: rgb(24, 24, 28);
-$bgLight: #ffffff;
+import { ExecuteReq } from '@/service/modules/executors/types'
 
-.container {
-  width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-  height: calc(100vh - 100px);
-  overflow: hidden;
-  display: block;
+interface ICountDownParam extends ExecuteReq {
+  index: number
+  buttonType: 'run' | 'store' | 'suspend'
 }
 
-.dark {
-  border: solid 1px $borderDark;
-  background-color: $bgDark;
+interface IWorkflowInstanceSearch {
+  searchVal: string
+  executorName: string
+  host: string
+  stateType: string
+  startDate: string
+  endDate: string
 }
 
-.light {
-  border: solid 1px $borderLight;
-  background-color: $bgLight;
-}
+export { ICountDownParam, IWorkflowInstanceSearch }
