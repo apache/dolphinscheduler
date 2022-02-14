@@ -60,6 +60,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * task definition controller
  */
@@ -121,7 +123,7 @@ public class TaskDefinitionController extends BaseController {
                                           @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
                                           @RequestParam(value = "taskDefinitionJsonObj", required = true) String taskDefinitionJsonObj,
                                           @RequestParam(value = "upstreamCodes", required = false) String upstreamCodes) {
-        Map<String, Object> result = taskDefinitionService.createTaskBindsWorkFlow(loginUser, projectCode, processDefinitionCode, taskDefinitionJsonObj, upstreamCodes);
+        Map<String, Object> result = taskDefinitionService.createTaskBindsWorkFlow(loginUser, projectCode, processDefinitionCode, taskDefinitionJsonObj, StringUtils.defaultString(upstreamCodes));
         return returnDataList(result);
     }
 
