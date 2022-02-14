@@ -23,7 +23,9 @@ from typing import Any, Generator
 path_code_tasks = Path(__file__).parent.parent.parent.joinpath(
     "src", "pydolphinscheduler", "tasks"
 )
-path_example = Path(__file__).parent.parent.parent.joinpath("examples")
+path_example = Path(__file__).parent.parent.parent.joinpath(
+    "src", "pydolphinscheduler", "examples"
+)
 path_doc_tasks = Path(__file__).parent.parent.parent.joinpath("docs", "source", "tasks")
 
 

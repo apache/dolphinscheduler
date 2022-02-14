@@ -29,7 +29,7 @@ Overview of Tutorial
 Here have an overview of our tutorial, and it look a little complex but do not
 worry about that because we explain this example below as detailed as possible.
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :start-after: [start tutorial]
    :end-before: [end tutorial]
 
@@ -41,7 +41,7 @@ like other Python package. We just create a minimum demo here, so we just import
 :class:`pydolphinscheduler.core.process_definition` and
 :class:`pydolphinscheduler.tasks.shell`.
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :start-after: [start package_import]
    :end-before: [end package_import]
 
@@ -60,7 +60,7 @@ interval and schedule start_time, and argument `tenant` which changing workflow'
 task running user in the worker, :ref:`section tenant <concept:tenant>` in *PyDolphinScheduler*
 :doc:`concept` page have more detail information.
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :start-after: [start workflow_declare]
    :end-before: [end workflow_declare]
 
@@ -77,7 +77,7 @@ Here we declare four tasks, and bot of them are simple task of
 Beside the argument `command`, we also need setting argument `name` for each task *(not
 only shell task, `name` is required for each type of task)*.
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :dedent: 0
    :start-after: [start task_declare]
    :end-before: [end task_declare]
@@ -99,7 +99,7 @@ In this example, we set task `task_parent` is the upstream task of task
 `task_child_one` and `task_child_two`, and task `task_union` is the downstream
 task of both these two task.
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :dedent: 0
    :start-after: [start task_relation_declare]
    :end-before: [end task_relation_declare]
@@ -124,7 +124,7 @@ to the daemon, and set the schedule time we just declare in `process definition 
 Now, we could run the Python code like other Python script, for the basic usage run
 :code:`python tutorial.py` to trigger and run it.
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :dedent: 0
    :start-after: [start submit_or_run]
    :end-before: [end submit_or_run]
@@ -142,7 +142,7 @@ After we run the tutorial code, you could login Apache DolphinScheduler web UI,
 go and see the `DolphinScheduler project page`_. they is a new process definition be
 created and named "Tutorial". It create by *PyDolphinScheduler* and the DAG graph as below
 
-.. literalinclude:: ../../examples/tutorial.py
+.. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :language: text
    :lines: 24-28
 

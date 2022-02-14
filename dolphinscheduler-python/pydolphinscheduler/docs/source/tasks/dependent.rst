@@ -23,7 +23,7 @@ A dependent task type's example and dive into information of **PyDolphinSchedule
 Example
 -------
 
-.. literalinclude:: ../../../examples/task_dependent_example.py
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/task_dependent_example.py
    :start-after: [start workflow_declare]
    :end-before: [end workflow_declare]
 
