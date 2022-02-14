@@ -48,10 +48,13 @@ import {
   BarsOutlined
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useDataList() {
   const { t } = useI18n()
   const menuStore = useMenuStore()
+  const userStore = useUserStore()
 
   const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
@@ -82,14 +85,12 @@ export function useDataList() {
       {
         label: t('menu.home'),
         key: 'home',
-        icon: renderIcon(HomeOutlined),
-        isShowSide: false
+        icon: renderIcon(HomeOutlined)
       },
       {
         label: t('menu.project'),
         key: 'projects',
         icon: renderIcon(ProfileOutlined),
-        isShowSide: false,
         children: [
           {
             label: t('menu.project_overview'),
@@ -136,7 +137,6 @@ export function useDataList() {
         label: t('menu.resources'),
         key: 'resource',
         icon: renderIcon(FolderOutlined),
-        isShowSide: true,
         children: [
           {
             label: t('menu.file_manage'),
@@ -179,7 +179,6 @@ export function useDataList() {
         label: t('menu.data_quality'),
         key: 'data-quality',
         icon: renderIcon(ContainerOutlined),
-        isShowSide: true,
         children: [
           {
             label: t('menu.task_result'),
@@ -197,14 +196,12 @@ export function useDataList() {
         label: t('menu.datasource'),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
-        isShowSide: false,
         children: []
       },
       {
         label: t('menu.monitor'),
         key: 'monitor',
         icon: renderIcon(DesktopOutlined),
-        isShowSide: true,
         children: [
           {
             label: t('menu.service_manage'),
@@ -246,8 +243,8 @@ export function useDataList() {
         label: t('menu.security'),
         key: 'security',
         icon: renderIcon(SafetyCertificateOutlined),
-        isShowSide: true,
-        children: [
+        children: 
+        (userStore.getUserInfo as UserInfoRes).userType === 'ADMIN_USER' ? [
           {
             label: t('menu.tenant_manage'),
             key: `/security/tenant-manage`,
@@ -283,6 +280,12 @@ export function useDataList() {
             key: `/security/environment-manage`,
             icon: renderIcon(EnvironmentOutlined)
           },
+          {
+            label: t('menu.token_manage'),
+            key: `/security/token-manage`,
+            icon: renderIcon(SafetyOutlined)
+          }
+        ] : [
           {
             label: t('menu.token_manage'),
             key: `/security/token-manage`,

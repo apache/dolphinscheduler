@@ -24,6 +24,8 @@ import {
 import routes from './routes'
 
 import { useMenuStore } from '@/store/menu/menu'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 // NProgress
 import NProgress from 'nprogress'
@@ -36,7 +38,8 @@ const router = createRouter({
 
 interface metaData {
   title?: string
-  showSide?: boolean
+  showSide?: boolean,
+  auth?: Array<string>
 }
 
 /**
@@ -50,9 +53,16 @@ router.beforeEach(
   ) => {
     NProgress.start()
     const menuStore = useMenuStore()
+    const userStore = useUserStore()
     const metaData: metaData = to.meta
     menuStore.setShowSideStatus(metaData.showSide || false)
-    next()
+    if (metaData.auth?.includes('ADMIN_USER') && (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' && menuStore.getMenuKey === 'security') {
+      to.fullPath = '/security/token-manage'
+      next({name: 'token-manage'})
+    } else {
+      next()
+    }
+    
     NProgress.done()
   }
 )

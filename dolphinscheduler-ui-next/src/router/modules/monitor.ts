@@ -35,7 +35,8 @@ export default {
       component: components['monitor-servers-master'],
       meta: {
         title: '服务管理-Master',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -44,7 +45,8 @@ export default {
       component: components['monitor-servers-worker'],
       meta: {
         title: '服务管理-Worker',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -53,7 +55,8 @@ export default {
       component: components['monitor-servers-db'],
       meta: {
         title: '服务管理-DB',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -62,7 +65,8 @@ export default {
       component: components['monitor-statistics-statistics'],
       meta: {
         title: '统计管理-Statistics',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -71,7 +75,8 @@ export default {
       component: components['monitor-statistics-audit-log'],
       meta: {
         title: '审计日志-AuditLog',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     }
   ]
