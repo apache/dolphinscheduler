@@ -15,28 +15,20 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import { ExecuteReq } from '@/service/modules/executors/types'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
-
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '',
-      name: 'datasource-list',
-      component: components['datasource-list'],
-      meta: {
-        title: '数据源中心',
-        showSide: false,
-        auth: []
-      }
-    }
-  ]
+interface ICountDownParam extends ExecuteReq {
+  index: number
+  buttonType: 'run' | 'store' | 'suspend'
 }
+
+interface IWorkflowInstanceSearch {
+  searchVal: string
+  executorName: string
+  host: string
+  stateType: string
+  startDate: string
+  endDate: string
+}
+
+export { ICountDownParam, IWorkflowInstanceSearch }

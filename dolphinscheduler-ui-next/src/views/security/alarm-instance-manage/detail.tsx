@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch, onMounted, ref } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  watch,
+  onMounted,
+  ref,
+  Ref
+} from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import Modal from '@/components/modal'
 import Form from '@/components/form'
@@ -24,6 +32,10 @@ import { useForm } from './use-form'
 import { useDetail } from './use-detail'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import type { IRecord, FormRules, IFormItem } from './types'
+
+interface IElements extends Omit<Ref, 'value'> {
+  value: IFormItem[]
+}
 
 const props = {
   show: {
@@ -35,7 +47,6 @@ const props = {
     default: {}
   }
 }
-
 const DetailModal = defineComponent({
   name: 'DetailModal',
   props,
@@ -44,7 +55,7 @@ const DetailModal = defineComponent({
     const { t } = useI18n()
 
     const rules = ref<FormRules>({})
-    const elements = ref<IFormItem[]>([])
+    const elements = ref<IFormItem[]>([]) as IElements
 
     const {
       meta,
@@ -60,6 +71,8 @@ const DetailModal = defineComponent({
 
     const onCancel = () => {
       resetForm()
+      rules.value = {}
+      elements.value = []
       ctx.emit('cancel')
     }
 
@@ -71,7 +84,6 @@ const DetailModal = defineComponent({
         ctx.emit('update')
       }
     }
-
     const onChangePlugin = changePlugin
 
     watch(
@@ -83,7 +95,7 @@ const DetailModal = defineComponent({
     watch(
       () => state.json,
       () => {
-        if (state.json?.length) return
+        if (!state.json?.length) return
         state.json.forEach((item) => {
           item.name = t('security.alarm_instance' + '.' + item.field)
         })

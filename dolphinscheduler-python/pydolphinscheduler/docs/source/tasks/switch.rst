@@ -23,7 +23,7 @@ A switch task type's example and dive into information of **PyDolphinScheduler**
 Example
 -------
 
-.. literalinclude:: ../../../examples/task_switch_example.py
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/task_switch_example.py
    :start-after: [start workflow_declare]
    :end-before: [end workflow_declare]
 

@@ -42,16 +42,8 @@ const Content = defineComponent({
     } = useDataList()
     const sideKeyRef = ref()
 
-    locale.value = localesStore.getLocales
-
     onMounted(() => {
-      changeMenuOption(state)
-      changeHeaderMenuOptions(state)
-      getSideMenu(state)
-      changeUserDropdown(state)
-    })
-
-    watch(useI18n().locale, () => {
+      locale.value = localesStore.getLocales
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       getSideMenu(state)
@@ -71,12 +63,18 @@ const Content = defineComponent({
       getSideMenu(state)
     }
 
+    watch(useI18n().locale, () => {
+      changeMenuOption(state)
+      changeHeaderMenuOptions(state)
+      getSideMenu(state)
+      changeUserDropdown(state)
+    })
+
     watch(
       () => route.path,
       () => {
         if (route.path !== '/login') {
           state.isShowSide = menuStore.getShowSideStatus
-          route.matched[1].path.includes(':projectCode')
           if (route.matched[1].path === '/projects/:projectCode') {
             changeMenuOption(state)
             getSideMenu(state)

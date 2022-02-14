@@ -16,7 +16,10 @@
  */
 
 import { defineComponent } from 'vue'
-import { TASK_TYPES_MAP, TaskType } from '../../../task/constants/task-type'
+import {
+  TaskType,
+  TASK_TYPES_MAP
+} from '@/views/projects/task/constants/task-type'
 import Styles from './dag.module.scss'
 
 export default defineComponent({
@@ -35,7 +38,7 @@ export default defineComponent({
             class={Styles.draggable}
             draggable='true'
             onDragstart={(e) => {
-              context.emit('dragStart', e, task.type)
+              context.emit('dragStart', e, task.type as TaskType)
             }}
           >
             <em
