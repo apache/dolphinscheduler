@@ -23,7 +23,7 @@ A shell task type's example and dive into information of **PyDolphinScheduler**.
 Example
 -------
 
-.. literalinclude:: ../../../examples/tutorial.py
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/tutorial.py
    :start-after: [start workflow_declare]
    :end-before: [end task_relation_declare]
 
