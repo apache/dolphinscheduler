@@ -39,6 +39,14 @@ const props = {
   confirmText: {
     type: String as PropType<string>
   },
+  confirmClassName: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  cancelClassName: {
+    type: String as PropType<string>,
+    default: ''
+  },
   confirmDisabled: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -91,13 +99,19 @@ const Modal = defineComponent({
             footer: () => (
               <NSpace justify='end'>
                 {this.cancelShow && (
-                  <NButton quaternary size='small' onClick={onCancel}>
+                  <NButton
+                    class={this.cancelClassName}
+                    quaternary
+                    size='small'
+                    onClick={onCancel}
+                  >
                     {this.cancelText || t('modal.cancel')}
                   </NButton>
                 )}
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
                 <NButton
+                  class={this.confirmClassName}
                   type='info'
                   size='small'
                   onClick={onConfirm}
