@@ -78,7 +78,6 @@
                 <appender-ref ref="STDOUT"/>
             </then>
         </if>
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="STANDALONELOGFILE"/>
         <appender-ref ref="TASKLOGFILE"/>
     </root>
