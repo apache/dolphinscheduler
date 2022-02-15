@@ -319,8 +319,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jetty-util-ajax 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util-ajax/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jetty-webapp 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-webapp/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jetty-xml 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-xml/9.4.44.v20210927, Apache 2.0 and EPL 1.0
-    jna 4.5.2: https://mvnrepository.com/artifact/net.java.dev.jna/jna/4.5.2,  Apache 2.0 and LGPL 2.1
-    jna-platform 4.5.2: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/4.5.2, Apache 2.0 and LGPL 2.1
+    jna 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.10.0,  Apache 2.0 and LGPL 2.1
+    jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
@@ -461,7 +461,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aspectjweaver 1.9.7:https://mvnrepository.com/artifact/org.aspectj/aspectjweaver/1.9.7, EPL 1.0
     logback-classic 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic/1.2.3, EPL 1.0 and LGPL 2.1
     logback-core 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-core/1.2.3, EPL 1.0 and LGPL 2.1
-    oshi-core 3.9.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.9.1, EPL 1.0
     h2-1.4.200 https://github.com/h2database/h2database/blob/master/LICENSE.txt, MPL 2.0 or EPL 1.0
 
 ========================================================================
@@ -478,6 +477,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     checker-compat-qual 2.0.0 https://mvnrepository.com/artifact/org.checkerframework/checker-compat-qual/2.0.0, MIT + GPLv2
     checker-qual 3.10.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.10.0, MIT + GPLv2
     Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
+    oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
 
 ========================================================================
 MPL 1.1 licenses
