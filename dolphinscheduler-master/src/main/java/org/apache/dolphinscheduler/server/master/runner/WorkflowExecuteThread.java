@@ -1637,6 +1637,11 @@ public class WorkflowExecuteThread {
     private void killAllTasks() {
         logger.info("kill called on process instance id: {}, num: {}", processInstance.getId(),
             activeTaskProcessorMaps.size());
+
+        if (readyToSubmitTaskQueue.size() > 0) {
+            readyToSubmitTaskQueue.clear();
+        }
+
         for (long taskCode : activeTaskProcessorMaps.keySet()) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskCode);
             Integer taskInstanceId = validTaskMap.get(taskCode);
@@ -1645,9 +1650,6 @@ public class WorkflowExecuteThread {
             }
             TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
             if (taskInstance == null || taskInstance.getState().typeIsFinished()) {
-                if (readyToSubmitTaskQueue.size() > 0) {
-                    readyToSubmitTaskQueue.clear();
-                }
                 continue;
             }
             taskProcessor.action(TaskAction.STOP);
