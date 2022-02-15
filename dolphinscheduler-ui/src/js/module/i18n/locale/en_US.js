@@ -755,6 +755,7 @@ export default {
   webHook: 'WebHook',
   Keyword: 'Keyword',
   Secret: 'Secret',
+  MsgType: 'MsgType',
   AtMobiles: '@Mobiles',
   AtUserIds: '@UserIds',
   IsAtAll: '@All',
@@ -900,5 +901,19 @@ export default {
   Last7DayFluctuation: 'Last7DayFluctuation',
   Last30DayFluctuation: 'Last30DayFluctuation',
   SrcTableTotalRows: 'SrcTableTotalRows',
-  TargetTableTotalRows: 'TargetTableTotalRows'
+  TargetTableTotalRows: 'TargetTableTotalRows',
+  // k8s
+  'Create namespace': 'Create namespace',
+  'Edit namespace': 'Edit namespace',
+  'Namespace manage': 'K8s namespace manage',
+  'K8s Namespace': 'k8s Namespace',
+  'Limits Cpu': 'Limit Cpu',
+  'Limits Memory': 'Limit Memory',
+  'K8s Cluster': 'k8s',
+  'Namespace Owner': 'Owner',
+  'Please enter k8s cluster': 'Please enter k8s cluster',
+  'Please enter namespace': 'Please enter namespace',
+  'Please enter namespace tag': 'Please enter namespace tag can null',
+  'Please enter owner': 'Please enter owner can null',
+  'K8s Tag': 'tag'
 }

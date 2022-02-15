@@ -39,11 +39,11 @@ export function queryListPaging(params: PageReq & ListReq, code: number): any {
 }
 
 export function createProcessDefinition(
-  data: ProcessDefinitionReq & NameReq,
-  code: CodeReq
+  data: ProcessDefinitionReq,
+  projectCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition`,
+    url: `/projects/${projectCode}/process-definition`,
     method: 'post',
     data
   })
@@ -132,7 +132,7 @@ export function queryProcessDefinitionByName(
   })
 }
 
-export function querySimpleList(code: CodeReq): any {
+export function querySimpleList(code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/simple-list`,
     method: 'get'
@@ -148,11 +148,11 @@ export function verifyName(params: NameReq, code: CodeReq): any {
 }
 
 export function queryProcessDefinitionByCode(
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  projectCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}`,
+    url: `/projects/${projectCode}/process-definition/${code}`,
     method: 'get'
   })
 }

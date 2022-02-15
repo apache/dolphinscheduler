@@ -755,6 +755,7 @@ export default {
   webHook: 'Web钩子',
   Keyword: '关键词',
   Secret: '密钥',
+  MsgType: '消息类型',
   AtMobiles: '@手机号',
   AtUserIds: '@用户ID',
   IsAtAll: '@所有人',
@@ -900,5 +901,19 @@ export default {
   Last7DayFluctuation: '最近7天波动',
   Last30DayFluctuation: '最近30天波动',
   SrcTableTotalRows: '源表总行数',
-  TargetTableTotalRows: '目标表总行数'
+  TargetTableTotalRows: '目标表总行数',
+  // k8s
+  'Create namespace': '创建命名空间',
+  'Edit namespace': '编辑命名空间',
+  'Namespace manage': 'k8s命名空间 管理',
+  'K8s Namespace': 'k8s命名空间',
+  'Limits Cpu': '最大Cpu',
+  'Limits Memory': '最大内存',
+  'K8s Cluster': 'k8s集群',
+  'Namespace Owner': '负责人',
+  'Please enter k8s cluster': '请输入k8s集群值',
+  'Please enter namespace': '请输入命名空间',
+  'Please enter namespace tag': '请输入命名空间标签可空',
+  'Please enter owner': '请输入owner可空',
+  'K8s Tag': '标签'
 }

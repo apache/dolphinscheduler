@@ -23,11 +23,17 @@ export function renderInputNumber(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field } = item
+  const { props, field, slots = {} } = item
 
-  return h(NInputNumber, {
-    ...props,
-    value: fields[field],
-    onUpdateValue: (value) => void (fields[field] = value)
-  })
+  return h(
+    NInputNumber,
+    {
+      ...props,
+      value: fields[field],
+      onUpdateValue: (value) => void (fields[field] = value)
+    },
+    {
+      ...slots
+    }
+  )
 }

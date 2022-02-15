@@ -39,6 +39,14 @@ const props = {
   confirmText: {
     type: String as PropType<string>
   },
+  confirmClassName: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  cancelClassName: {
+    type: String as PropType<string>,
+    default: ''
+  },
   confirmDisabled: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -46,6 +54,10 @@ const props = {
   confirmLoading: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  autoFocus: {
+    type: Boolean as PropType<boolean>,
+    default: true
   }
 }
 
@@ -75,20 +87,31 @@ const Modal = defineComponent({
         v-model={[this.show, 'show']}
         class={styles.container}
         mask-closable={false}
+        auto-focus={this.autoFocus}
       >
-        <NCard title={this.title}>
+        <NCard
+          title={this.title}
+          class={styles['modal-card']}
+          contentStyle={{ overflowY: 'auto' }}
+        >
           {{
             default: () => renderSlot($slots, 'default'),
             footer: () => (
               <NSpace justify='end'>
                 {this.cancelShow && (
-                  <NButton quaternary size='small' onClick={onCancel}>
+                  <NButton
+                    class={this.cancelClassName}
+                    quaternary
+                    size='small'
+                    onClick={onCancel}
+                  >
                     {this.cancelText || t('modal.cancel')}
                   </NButton>
                 )}
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
                 <NButton
+                  class={this.confirmClassName}
                   type='info'
                   size='small'
                   onClick={onConfirm}
