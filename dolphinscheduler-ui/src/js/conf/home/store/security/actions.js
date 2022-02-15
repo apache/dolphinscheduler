@@ -710,5 +710,68 @@ export default {
         reject(e)
       })
     })
+  },
+
+  /**
+   * create namespace
+   */
+  createNamespace ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('k8s-namespace', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update namespace
+   */
+  updateNamespace ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.put(`k8s-namespace/${payload.id}`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update namespace k8s
+   */
+  verifyNamespaceK8s ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('k8s-namespace/verify', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * delete namespace
+   * @param "id":int
+   */
+  deleteNamespace ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('k8s-namespace/delete', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get namespace list pages
+   */
+  getNamespaceListP ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('k8s-namespace', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

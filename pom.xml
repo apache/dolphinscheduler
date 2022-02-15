@@ -127,6 +127,7 @@
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <janino.version>3.1.6</janino.version>
+        <kubernetes.version>5.8.0</kubernetes.version>
 
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
@@ -901,6 +902,12 @@
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${error_prone_annotations.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${kubernetes.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -52,6 +52,9 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(className = "tab-token-manage")
     private WebElement menuTokenManage;
 
+    @FindBy(className = "tab-namespace-manage")
+    private WebElement menuNamespaceManage;
+
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
     }
@@ -87,6 +90,10 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
         if (tab == TokenPage.class) {
             menuTokenManage().click();
             return tab.cast(new TokenPage(driver));
+        }
+        if (tab == NamespacePage.class) {
+            menuNamespaceManage().click();
+            return tab.cast(new NamespacePage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
