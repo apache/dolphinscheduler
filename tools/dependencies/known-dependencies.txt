@@ -134,8 +134,8 @@ jetty-util-ajax-9.4.44.v20210927.jar
 jetty-webapp-9.4.44.v20210927.jar
 jetty-xml-9.4.44.v20210927.jar
 jline-0.9.94.jar
-jna-4.5.2.jar
-jna-platform-4.5.2.jar
+jna-5.10.0.jar
+jna-platform-5.10.0.jar
 joda-time-2.10.13.jar
 jpam-1.1.jar
 jsch-0.1.42.jar
@@ -166,7 +166,7 @@ mybatis-spring-2.0.2.jar
 netty-3.6.2.Final.jar
 netty-all-4.1.53.Final.jar
 opencsv-2.3.jar
-oshi-core-3.9.1.jar
+oshi-core-6.1.1.jar
 paranamer-2.3.jar
 parquet-hadoop-bundle-1.8.1.jar
 poi-4.1.2.jar
