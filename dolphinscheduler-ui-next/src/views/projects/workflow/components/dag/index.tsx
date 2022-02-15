@@ -33,7 +33,7 @@ import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
-import TaskModal from '@/views/projects/node/detail-modal'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import './x6-style.scss'
 
 const props = {
@@ -167,7 +167,7 @@ export default defineComponent({
         <TaskModal
           show={taskModalVisible.value}
           projectCode={props.projectCode}
-          taskDefinition={currTask.value}
+          data={currTask.value}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />
