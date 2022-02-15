@@ -16,17 +16,18 @@
  */
 
 import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export function useDescription() {
+export function useDelayTime(): IJsonItem {
   const { t } = useI18n()
   return {
-    type: 'input',
-    field: 'desc',
-    name: t('project.node.description'),
-    props: {
-      placeholder: t('project.node.description_tips'),
-      rows: 2,
-      type: 'textarea'
-    }
+    type: 'input-number',
+    field: 'delayTime',
+    name: t('project.node.delay_execution_time'),
+    span: 12,
+    slots: {
+      suffix: () => t('project.node.minute')
+    },
+    value: 0
   }
 }

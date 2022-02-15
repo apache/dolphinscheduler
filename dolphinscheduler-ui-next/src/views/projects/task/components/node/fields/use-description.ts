@@ -16,27 +16,18 @@
  */
 
 import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export function useFailed() {
+export function useDescription(): IJsonItem {
   const { t } = useI18n()
-  return [
-    {
-      type: 'input-number',
-      field: 'maxRetryTimes',
-      name: t('project.node.number_of_failed_retries'),
-      span: 12,
-      slots: {
-        suffix: () => t('project.node.times')
-      }
-    },
-    {
-      type: 'input-number',
-      field: 'retryInterval',
-      name: t('project.node.failed_retry_interval'),
-      span: 12,
-      slots: {
-        suffix: () => t('project.node.minute')
-      }
+  return {
+    type: 'input',
+    field: 'description',
+    name: t('project.node.description'),
+    props: {
+      placeholder: t('project.node.description_tips'),
+      rows: 2,
+      type: 'textarea'
     }
-  ]
+  }
 }

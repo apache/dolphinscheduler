@@ -17,42 +17,49 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import { IJsonItem } from '../types'
+import type { IJsonItem, INodeData } from '../types'
 
 export function useShell({
-  isCreate,
-  projectCode
+  projectCode,
+  from = 0,
+  readonly
 }: {
-  isCreate: boolean
   projectCode: number
+  from?: number
+  readonly?: boolean
 }) {
   const model = reactive({
     name: '',
-    runFlag: 'YES',
-    desc: '',
-    enable: false,
+    flag: 'YES',
+    description: '',
+    timeoutFlag: false,
     localParams: [],
     environmentCode: null,
-    workerGroup: 'default'
-  } as {
-    name: string
-    runFlag: string
-    desc: string
-    workerGroup: string
-    taskGroupId: string
-    enable: boolean
-    localParams: []
-    environmentCode: string | null
-  })
+    failRetryInterval: 1,
+    failRetryTimes: 0,
+    workerGroup: 'default',
+    delayTime: 0,
+    timeout: 30,
+    rawScript: ''
+  } as INodeData)
+
+  let extra: IJsonItem[] = []
+  if (from === 1) {
+    extra = [
+      Fields.useTaskType(model, readonly),
+      Fields.useProcessName(projectCode, !model.id)
+    ]
+  }
 
   return {
     json: [
       Fields.useName(),
+      ...extra,
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, isCreate),
+      Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(),

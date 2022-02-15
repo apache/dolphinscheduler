@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
+import { h, unref } from 'vue'
 import { NTreeSelect } from 'naive-ui'
 import type { IJsonItem } from '../types'
 
@@ -28,6 +28,6 @@ export function renderTreeSelect(
     ...props,
     value: fields[field],
     onUpdateValue: (value) => void (fields[field] = value),
-    options
+    options: unref(options)
   })
 }

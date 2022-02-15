@@ -16,23 +16,22 @@
  */
 
 import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export function useRunFlag() {
+export function useName(): IJsonItem {
   const { t } = useI18n()
-  const options = [
-    {
-      label: t('project.node.normal'),
-      value: 'YES'
-    },
-    {
-      label: t('project.node.prohibition_execution'),
-      value: 'NO'
-    }
-  ]
   return {
-    type: 'radio',
-    field: 'runFlag',
-    name: t('project.node.run_flag'),
-    options: options
+    type: 'input',
+    field: 'name',
+    name: t('project.node.name'),
+    props: {
+      placeholder: t('project.node.name_tips'),
+      maxLength: 100
+    },
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      message: t('project.node.name_tips')
+    }
   }
 }

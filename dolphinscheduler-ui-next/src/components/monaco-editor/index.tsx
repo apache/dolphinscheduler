@@ -109,19 +109,13 @@ export default defineComponent({
       await nextTick()
       const dom = editorRef.value
       if (dom) {
-        editor = monaco.editor.create(
-          dom,
-          {
-            ...props.options,
-            readOnly:
-              formItem.mergedDisabledRef.value || props.options?.readOnly
-          },
-          {
-            value: props.defaultValue ?? props.value,
-            language: props.language,
-            automaticLayout: true
-          }
-        )
+        editor = monaco.editor.create(dom, {
+          ...props.options,
+          readOnly: formItem.mergedDisabledRef.value || props.options?.readOnly,
+          value: props.defaultValue ?? props.value,
+          language: props.language,
+          automaticLayout: true
+        })
         editor.onDidChangeModelContent(() => {
           const { onUpdateValue, 'onUpdate:value': _onUpdateValue } = props
           const value = editor?.getValue() || ''

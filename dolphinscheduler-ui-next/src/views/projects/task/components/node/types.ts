@@ -35,45 +35,48 @@ interface ILocalParam {
   type: string
   value?: string
 }
-interface ITaskParams {
-  conditionResult?: string
-  switchResult?: string
-  delayTime?: string
-  dependence?: string
-  waitStartTimeout?: string
-}
-interface ITimeout {
-  enable: boolean
-  timeout?: number
-  strategy?: string
-}
 type ITaskType = TaskType
 
-interface ITask {
-  code: number
-  timeoutNotifyStrategy?: string
-  taskParams: ITaskParams
-  description?: string
-  id: number
-  delayTime?: number
-  failRetryTimes?: number
-  name: string
-  params?: object
-  failRetryInterval?: number
-  flag: string
-  taskPriority?: number
-  timeout: ITimeout
-  timeoutFlag: 'CLOSE' | 'OPEN'
+interface INodeData {
+  id?: string
   taskType?: ITaskType
-  workerGroup?: string
-  environmentCode?: string
-  taskGroupId?: string
+  processCode?: string
+  delayTime?: number
+  description?: string
+  environmentCode?: number | null
+  failRetryInterval?: number
+  failRetryTimes?: number
+  flag?: 'YES' | 'NO'
+  taskGroupId?: number
   taskGroupPriority?: number
+  localParams?: ILocalParam[]
+  rawScript?: string
+  taskPriority?: string
+  timeout?: number
+  timeoutFlag?: boolean
+  timeoutNotifyStrategy?: string[]
+  workerGroup?: string
+  resourceList?: number[]
+  code?: number
+  name?: string
 }
 
-interface IDataNode {
-  id?: string
-  taskType: ITaskType
+interface ITaskData
+  extends Omit<
+    INodeData,
+    'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
+  > {
+  name?: string
+  processName?: number
+  taskPriority?: number
+  timeoutFlag: 'OPEN' | 'CLOSE'
+  timeoutNotifyStrategy?: string | []
+  taskParams: {
+    resourceList: []
+    rawScript: string
+    localParams: ILocalParam[]
+  }
+  preTasks?: []
 }
 
 export {
@@ -81,8 +84,8 @@ export {
   IEnvironmentNameOption,
   ILocalParam,
   ITaskType,
-  ITask,
-  IDataNode,
+  ITaskData,
+  INodeData,
   IFormItem,
   IJsonItem
 }

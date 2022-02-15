@@ -14,3 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { useShell } from './tasks/use-shell'
+import { IJsonItem, ITaskType, INodeData } from './types'
+
+export function useTask({
+  taskType = 'SHELL',
+  projectCode,
+  from,
+  readonly
+}: {
+  taskType?: ITaskType
+  from?: number
+  projectCode?: number
+  readonly?: boolean
+}): { json: IJsonItem[]; model: INodeData } {
+  console.log(taskType, 'taskType')
+  let node = {} as { json: IJsonItem[]; model: INodeData }
+  if (taskType === 'SHELL' && projectCode) {
+    node = useShell({ projectCode, from, readonly })
+  }
+  return node
+}

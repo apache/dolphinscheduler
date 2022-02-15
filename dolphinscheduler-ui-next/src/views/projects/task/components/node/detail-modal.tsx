@@ -15,19 +15,28 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  ref,
+  reactive,
+  toRefs,
+  watch,
+  nextTick
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import Detail from './detail'
-import type { NodeData } from '@/views/projects/workflow/components/dag/types'
+import { formatModel } from './format-data'
+import type { ITaskData } from './types'
 
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  taskDefinition: {
-    type: Object as PropType<NodeData>,
+  data: {
+    type: Object as PropType<ITaskData>,
     default: { code: 0, taskType: 'SHELL', name: '' }
   },
   projectCode: {
@@ -37,6 +46,10 @@ const props = {
   readonly: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  from: {
+    type: Number as PropType<number>,
+    default: 0
   }
 }
 
@@ -46,78 +59,52 @@ const NodeDetailModal = defineComponent({
   emits: ['cancel', 'submit'],
   setup(props, { emit }) {
     const { t } = useI18n()
-    const detailRef = ref()
+    const state = reactive({
+      saving: false,
+      detailRef: ref()
+    })
 
-    // TODO
-    const mapFormToTaskDefinition = (form: any) => {
-      return {
-        // "code": form.code,
-        name: form.name,
-        description: form.desc,
-        taskType: 'SHELL',
-        taskParams: {
-          resourceList: [],
-          localParams: form.localParams,
-          rawScript: form.shell,
-          dependence: {},
-          conditionResult: {
-            successNode: [],
-            failedNode: []
-          },
-          waitStartTimeout: {},
-          switchResult: {}
-        },
-        flag: form.runFlag,
-        taskPriority: 'MEDIUM',
-        workerGroup: form.workerGroup,
-        failRetryTimes: '0',
-        failRetryInterval: '1',
-        timeoutFlag: 'CLOSE',
-        timeoutNotifyStrategy: '',
-        timeout: 0,
-        delayTime: '0',
-        environmentCode: form.environmentCode
-      }
-    }
-    const onConfirm = () => {
-      emit('submit', {
-        formRef: detailRef.value.formRef,
-        form: mapFormToTaskDefinition(detailRef.value.form)
-      })
+    const onConfirm = async () => {
+      await state.detailRef.form.validate()
+      emit('submit', { data: state.detailRef.form.getValues() })
     }
     const onCancel = () => {
       emit('cancel')
     }
 
+    watch(
+      () => props.data,
+      async () => {
+        await nextTick()
+        state.detailRef.form.setValues(formatModel(props.data))
+      }
+    )
+
     return {
       t,
-      detailRef,
+      ...toRefs(state),
       onConfirm,
       onCancel
     }
   },
   render() {
-    const {
-      t,
-      show,
-      onConfirm,
-      onCancel,
-      projectCode,
-      taskDefinition,
-      readonly
-    } = this
+    const { t, show, onConfirm, onCancel, projectCode, data, readonly, from } =
+      this
     return (
       <Modal
         show={show}
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
         confirmLoading={false}
+        confirmDisabled={readonly}
         onCancel={onCancel}
       >
         <Detail
           ref='detailRef'
-          taskType={taskDefinition.taskType}
+          data={data}
           projectCode={projectCode}
+          readonly={readonly}
+          from={from}
         />
       </Modal>
     )

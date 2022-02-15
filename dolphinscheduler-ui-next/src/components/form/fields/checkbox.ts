@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
+import { h, unref } from 'vue'
 import { NCheckbox, NCheckboxGroup, NSpace } from 'naive-ui'
 import type { IJsonItem } from '../types'
 
@@ -24,7 +24,7 @@ export function renderCheckbox(
   fields: { [field: string]: any }
 ) {
   const { props, field, options } = item
-  if (!options || options.length === 0) {
+  if (!options) {
     return h(NCheckbox, {
       ...props,
       value: fields[field],
@@ -39,7 +39,7 @@ export function renderCheckbox(
     },
     () =>
       h(NSpace, null, () =>
-        options.map((option: object) => h(NCheckbox, { ...option }))
+        unref(options).map((option: object) => h(NCheckbox, { ...option }))
       )
   )
 }

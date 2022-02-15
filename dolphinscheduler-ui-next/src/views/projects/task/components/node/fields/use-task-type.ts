@@ -15,45 +15,34 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
+import type { IJsonItem } from '../types'
 
-export function useWorkerGroup() {
+export function useTaskType(
+  model: { [field: string]: any },
+  readonly?: boolean
+): IJsonItem {
   const { t } = useI18n()
 
-  const options = ref([] as { label: string; value: string }[])
-  const loading = ref(false)
-
-  const getWorkerGroups = async () => {
-    if (loading.value) return
-    loading.value = true
-    try {
-      const res = await queryAllWorkerGroups()
-      options.value = res.map((item: string) => ({ label: item, value: item }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
-  }
-
-  onMounted(() => {
-    getWorkerGroups()
-  })
+  const options = Object.keys(TASK_TYPES_MAP).map((option: string) => ({
+    label: option,
+    value: option
+  }))
   return {
     type: 'select',
-    field: 'workerGroup',
-    span: 12,
-    name: t('project.node.worker_group'),
+    field: 'taskType',
+    span: 24,
+    name: t('project.node.task_type'),
     props: {
-      loading: loading
+      disabled: readonly || ['CONDITIONS', 'SWITCH'].includes(model.taskType)
     },
     options: options,
     validate: {
       trigger: ['input', 'blur'],
       required: true,
-      message: t('project.node.worker_group_tips')
+      message: t('project.node.task_type_tips')
     },
-    value: 'default'
+    value: 'SHELL'
   }
 }

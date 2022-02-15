@@ -60,7 +60,7 @@ interface IJsonItem {
   type?: IType
   validate?: FormItemRule
   value?: any
-  options?: IOption[]
+  options?: IOption[] | Ref<IOption[]>
   children?: IJsonItem[]
   slots?: object
   span?: number | Ref<number>

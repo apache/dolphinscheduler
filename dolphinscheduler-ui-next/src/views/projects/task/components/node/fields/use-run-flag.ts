@@ -15,15 +15,25 @@
  * limitations under the License.
  */
 
-export { useName } from './use-name'
-export { useRunFlag } from './use-run-flag'
-export { useDescription } from './use-description'
-export { useTaskPriority } from './use-task-priority'
-export { useWorkerGroup } from './use-worker-group'
-export { useEnvironmentName } from './use-environment-name'
-export { useTaskGroup } from './use-task-group'
-export { useFailed } from './use-failed'
-export { useDelayTime } from './use-delay-time'
-export { useTimeoutAlarm } from './use-timeout-alarm'
-export { usePreTasks } from './use-pre-tasks'
-export { useShell } from './use-shell'
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
+
+export function useRunFlag(): IJsonItem {
+  const { t } = useI18n()
+  const options = [
+    {
+      label: t('project.node.normal'),
+      value: 'YES'
+    },
+    {
+      label: t('project.node.prohibition_execution'),
+      value: 'NO'
+    }
+  ]
+  return {
+    type: 'radio',
+    field: 'flag',
+    name: t('project.node.run_flag'),
+    options: options
+  }
+}
