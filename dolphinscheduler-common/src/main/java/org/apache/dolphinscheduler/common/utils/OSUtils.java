@@ -139,7 +139,6 @@ public class OSUtils {
         long[] preTicks = processor.getSystemCpuLoadTicks();
         Util.sleep(1000);
         double cpuUsage =  processor.getSystemCpuLoadBetweenTicks(preTicks);
-        logger.info("cpuUsage:{}",cpuUsage);
         if (Double.isNaN(cpuUsage)) {
             return NEGATIVE_ONE;
         }
