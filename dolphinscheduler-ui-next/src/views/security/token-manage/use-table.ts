@@ -81,6 +81,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -111,7 +112,8 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small'
+                              size: 'small',
+                              class: 'delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)
