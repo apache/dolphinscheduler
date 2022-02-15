@@ -24,7 +24,8 @@ import {
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
-  VersionReq
+  VersionReq,
+  ISingleSaveReq
 } from './types'
 
 export function queryTaskDefinitionListPaging(
@@ -60,8 +61,8 @@ export function genTaskCodeList(num: number, projectCode: number) {
 }
 
 export function queryTaskDefinitionByCode(
-  code: CodeReq,
-  projectCode: ProjectCodeReq
+  code: number,
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
@@ -134,5 +135,25 @@ export function deleteVersion(
   return axios({
     url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions/${version.version}`,
     method: 'delete'
+  })
+}
+
+export function saveSingle(projectCode: number, data: ISingleSaveReq) {
+  return axios({
+    url: `/projects/${projectCode}/task-definition/save-single`,
+    method: 'post',
+    data
+  })
+}
+
+export function updateWithUpstream(
+  projectCode: number,
+  code: number,
+  data: ISingleSaveReq
+) {
+  return axios({
+    url: `/projects/${projectCode}/task-definition/${code}/with-upstream`,
+    method: 'put',
+    data
   })
 }

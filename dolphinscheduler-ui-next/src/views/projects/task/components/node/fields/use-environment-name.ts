@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
-import type { IEnvironmentNameOption } from '../types'
+import type { IEnvironmentNameOption, IJsonItem } from '../types'
 
 export function useEnvironmentName(
   model: { [field: string]: any },
   isCreate: boolean
-) {
+): IJsonItem {
   const { t } = useI18n()
 
   let environmentList = [] as IEnvironmentNameOption[]

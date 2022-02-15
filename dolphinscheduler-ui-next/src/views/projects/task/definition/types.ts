@@ -14,19 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useShell } from './tasks/use-shell'
-import { IJsonItem, ITaskType } from './types'
 
-export function useTask({
-  taskType,
-  projectCode
-}: {
-  taskType: ITaskType
-  projectCode?: number
-}): { json: IJsonItem[]; model: object } {
-  let node = {} as { json: IJsonItem[]; model: object }
-  if (taskType === 'SHELL' && projectCode) {
-    node = useShell({ isCreate: true, projectCode: projectCode })
-  }
-  return node
+export type { ITaskData, INodeData } from '../components/node/types'
+export type { ISingleSaveReq } from '@/service/modules/task-definition/types'
+
+interface IRecord {
+  processDefinitionCode: number
+  taskCode: number
+  taskName: string
 }
+
+export { IRecord }

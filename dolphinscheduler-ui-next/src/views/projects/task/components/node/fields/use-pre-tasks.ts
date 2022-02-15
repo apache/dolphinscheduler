@@ -15,22 +15,28 @@
  * limitations under the License.
  */
 
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export function useName() {
+export function usePreTasks(): IJsonItem {
   const { t } = useI18n()
+
+  const options = ref([])
+  const loading = ref(false)
+
+  onMounted(() => {})
+
   return {
-    type: 'input',
-    field: 'name',
-    name: t('project.node.name'),
+    type: 'select',
+    field: 'preTasks',
+    span: 24,
+    name: t('project.node.pre_tasks'),
     props: {
-      placeholder: t('project.node.name_tips'),
-      maxLength: 100
+      loading,
+      multiple: true,
+      filterable: true
     },
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.name_tips')
-    }
+    options
   }
 }

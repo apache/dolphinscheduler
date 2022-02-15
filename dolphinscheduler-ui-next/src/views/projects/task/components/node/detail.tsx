@@ -15,21 +15,31 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref, toRef, toRefs } from 'vue'
+import { defineComponent, PropType, ref, watch } from 'vue'
 import Form from '@/components/form'
 import { useTask } from './use-task'
-import { useDetail } from './use-detail'
-import type { ITaskType } from './types'
 import getElementByJson from '@/components/form/get-elements-by-json'
+import type { ITaskData } from './types'
 
 const props = {
   projectCode: {
     type: Number as PropType<number>
   },
-  taskType: {
-    type: String as PropType<ITaskType>,
-    default: 'SHELL',
-    required: true
+  data: {
+    type: Object as PropType<ITaskData>,
+    default: { taskType: 'SHELL' }
+  },
+  readonly: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  loading: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  from: {
+    type: Number as PropType<number>,
+    default: 0
   }
 }
 
@@ -37,23 +47,34 @@ const NodeDetail = defineComponent({
   name: 'NodeDetail',
   props,
   setup(props, { expose }) {
-    const { taskType, projectCode } = props
+    const { data, projectCode, from, readonly } = props
 
-    const { json, model } = useTask({ taskType, projectCode })
-    const { state } = useDetail()
+    const { json, model } = useTask({
+      taskType: data.taskType,
+      projectCode,
+      from,
+      readonly
+    })
 
     const jsonRef = ref(json)
+    const formRef = ref()
 
     const { rules, elements } = getElementByJson(jsonRef.value, model)
 
     expose({
-      formRef: toRef(state, 'formRef'),
-      form: model
+      form: formRef
     })
 
-    return { rules, elements, model, ...toRefs(state) }
+    watch(
+      () => model.taskType,
+      (taskType) => {
+        // TODO: Change task type
+      }
+    )
+
+    return { rules, elements, model, formRef }
   },
-  render() {
+  render(props: { readonly: boolean; loading: boolean }) {
     const { rules, elements, model } = this
     return (
       <Form
@@ -61,8 +82,10 @@ const NodeDetail = defineComponent({
         meta={{
           model,
           rules,
-          elements
+          elements,
+          disabled: props.readonly
         }}
+        loading={props.loading}
         layout={{
           xGap: 10
         }}
