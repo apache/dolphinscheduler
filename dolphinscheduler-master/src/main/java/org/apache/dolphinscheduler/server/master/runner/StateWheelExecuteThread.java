@@ -268,7 +268,7 @@ public class StateWheelExecuteThread extends Thread {
             ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
 
             if (processInstance.getState() == ExecutionStatus.READY_STOP) {
-                addTaskStopEvent(taskInstance);
+                addProcessStopEvent(processInstance);
                 taskInstanceRetryCheckList.remove(taskInstanceKey);
                 break;
             }
@@ -331,12 +331,10 @@ public class StateWheelExecuteThread extends Thread {
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 
-    private void addTaskStopEvent(TaskInstance taskInstance) {
+    private void addProcessStopEvent(ProcessInstance processInstance) {
         StateEvent stateEvent = new StateEvent();
-        stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-        stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
-        stateEvent.setTaskInstanceId(taskInstance.getId());
-        stateEvent.setTaskCode(taskInstance.getTaskCode());
+        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(processInstance.getId());
         stateEvent.setExecutionStatus(ExecutionStatus.STOP);
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }

@@ -390,11 +390,6 @@ public class WorkflowExecuteThread {
     }
 
     private boolean taskStateChangeHandler(StateEvent stateEvent) {
-        if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
-            this.updateProcessInstanceState();
-            return true;
-        }
-
         if (!checkTaskInstanceByStateEvent(stateEvent)) {
             return true;
         }
@@ -642,6 +637,12 @@ public class WorkflowExecuteThread {
     private boolean processStateChangeHandler(StateEvent stateEvent) {
         try {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
+
+            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+                this.updateProcessInstanceState(stateEvent);
+                return true;
+            }
+
             if (processComplementData()) {
                 return true;
             }
@@ -1540,6 +1541,26 @@ public class WorkflowExecuteThread {
             stateEvent.setProcessInstanceId(this.processInstance.getId());
             stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
             this.processStateChangeHandler(stateEvent);
+        }
+    }
+
+    /**
+     * stateEvent's execution status as process instance state
+     */
+    private void updateProcessInstanceState(StateEvent stateEvent) {
+        ExecutionStatus state = stateEvent.getExecutionStatus();
+        if (processInstance.getState() != state) {
+            logger.info(
+                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
+                    processInstance.getId(), processInstance.getName(),
+                    processInstance.getState(), state,
+                    processInstance.getCommandType());
+
+            processInstance.setState(state);
+            if (state.typeIsFinished()) {
+                processInstance.setEndTime(new Date());
+            }
+            processService.updateProcessInstance(processInstance);
         }
     }
 
