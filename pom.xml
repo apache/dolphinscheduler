@@ -801,14 +801,9 @@
                         <artifactId>junit-jupiter-api</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-simple</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.hamcrest</groupId>
                         <artifactId>hamcrest</artifactId>
                     </exclusion>
-
                 </exclusions>
             </dependency>
 
