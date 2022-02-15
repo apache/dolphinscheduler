@@ -139,6 +139,8 @@ const TokenModal = defineComponent({
           confirmDisabled={
             !this.model.userId || !this.model.expireTime || !this.model.token
           }
+          confirmClassName='btn-submit'
+          cancelClassName='btn-cancel'
         >
           {{
             default: () => (
@@ -163,6 +165,7 @@ const TokenModal = defineComponent({
                   'GENERAL_USER' && (
                   <NFormItem label={t('security.token.user')} path='userId'>
                     <NSelect
+                      class='username'
                       filterable
                       placeholder={t('security.token.user_tips')}
                       options={this.model.generalOptions}
@@ -173,12 +176,14 @@ const TokenModal = defineComponent({
                 <NFormItem label={t('security.token.token')} path='token'>
                   <NSpace>
                     <NInput
+                      class='token'
                       style={{ width: '504px' }}
                       disabled
                       placeholder={t('security.token.token_tips')}
                       v-model={[this.model.token, 'value']}
                     />
                     <NButton
+                      class='btn-generate-token'
                       strong
                       secondary
                       circle

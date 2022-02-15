@@ -102,17 +102,16 @@ id:
 
 #### token manage
 
-class:
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] userName
-- [ ] token
-- [ ] edit
-- [ ] delete
-
-id:
-- [ ] btnCreateToken
-- [ ] btnGenerateToken
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class               |
+|--------------------|---------------------|
+| :white_check_mark: | items               |
+|  | el-popconfirm       |
+|  | el-button--primary  |
+| :white_check_mark: | username            |
+| :white_check_mark: | token               |
+| :white_check_mark: | edit                |
+| :white_check_mark: | delete              |
+| :white_check_mark: | btn-create-token    |
+| :white_check_mark: | btn-generate-token  |
+| :white_check_mark: | btn-submit          |
+| :white_check_mark: | btn-cancel          |
