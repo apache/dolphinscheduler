@@ -14,20 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { reactive, ref } from 'vue'
 
-export function useDetail() {
-  const state = reactive({
-    formRef: ref(),
-    loading: false,
-    saving: false
-  })
+export { useName } from './use-name'
+export { useRunFlag } from './use-run-flag'
+export { useDescription } from './use-description'
+export { useTaskPriority } from './use-task-priority'
+export { useWorkerGroup } from './use-worker-group'
+export { useEnvironmentName } from './use-environment-name'
+export { useTaskGroup } from './use-task-group'
+export { useFailed } from './use-failed'
+export { useDelayTime } from './use-delay-time'
+export { useTimeoutAlarm } from './use-timeout-alarm'
+export { usePreTasks } from './use-pre-tasks'
+export { useTaskType } from './use-task-type'
+export { useProcessName } from './use-process-name'
 
-  const onSubmit = async (model: object) => {
-    await state.formRef.validate()
-  }
-  return {
-    state,
-    onSubmit
-  }
-}
+export { useShell } from './use-shell'

@@ -17,8 +17,9 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
+import type { IJsonItem } from '../types'
 
-export function useShell(model: { [field: string]: any }) {
+export function useShell(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const options = ref([])
 
@@ -44,7 +45,7 @@ export function useShell(model: { [field: string]: any }) {
   return [
     {
       type: 'editor',
-      field: 'shell',
+      field: 'rawScript',
       name: t('project.node.script'),
       validate: {
         trigger: ['input', 'trigger'],

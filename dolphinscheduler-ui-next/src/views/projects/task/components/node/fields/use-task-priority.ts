@@ -19,9 +19,9 @@ import { h, markRaw, VNode, VNodeChild } from 'vue'
 import { NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@vicons/antd'
-import type { ITaskPriorityOption } from '../types'
+import type { ITaskPriorityOption, IJsonItem } from '../types'
 
-export function useTaskPriority() {
+export function useTaskPriority(): IJsonItem {
   const { t } = useI18n()
   const options = markRaw([
     {
@@ -78,7 +78,7 @@ export function useTaskPriority() {
     })
   return {
     type: 'select',
-    field: 'taskInstancePriority',
+    field: 'taskPriority',
     name: t('project.node.task_priority'),
     options,
     validate: {

@@ -17,25 +17,44 @@
 
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import type { IJsonItem } from '../types'
 
-export function usePreTasks() {
+export function useWorkerGroup(): IJsonItem {
   const { t } = useI18n()
 
-  const options = ref([])
+  const options = ref([] as { label: string; value: string }[])
   const loading = ref(false)
 
-  onMounted(() => {})
+  const getWorkerGroups = async () => {
+    if (loading.value) return
+    loading.value = true
+    try {
+      const res = await queryAllWorkerGroups()
+      options.value = res.map((item: string) => ({ label: item, value: item }))
+      loading.value = false
+    } catch (err) {
+      loading.value = false
+    }
+  }
 
+  onMounted(() => {
+    getWorkerGroups()
+  })
   return {
     type: 'select',
-    field: 'preTasks',
-    span: 24,
-    name: t('project.node.pre_tasks'),
+    field: 'workerGroup',
+    span: 12,
+    name: t('project.node.worker_group'),
     props: {
-      loading,
-      multiple: true,
-      filterable: true
+      loading: loading
     },
-    options
+    options: options,
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      message: t('project.node.worker_group_tips')
+    },
+    value: 'default'
   }
 }

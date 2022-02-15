@@ -17,10 +17,11 @@
 
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export function useTimeoutAlarm(model: { [field: string]: any }) {
+export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-  const span = computed(() => (model.enable ? 12 : 0))
+  const span = computed(() => (model.timeoutFlag ? 12 : 0))
 
   const strategyOptions = [
     {
@@ -33,29 +34,29 @@ export function useTimeoutAlarm(model: { [field: string]: any }) {
     }
   ]
   watch(
-    () => model.enable,
-    (enable) => {
-      model.strategy = enable ? ['WARN'] : []
-      model.interval = enable ? 30 : null
+    () => model.timeoutFlag,
+    (timeoutFlag) => {
+      model.strategy = timeoutFlag ? ['WARN'] : []
+      model.interval = timeoutFlag ? 30 : null
     }
   )
 
   return [
     {
       type: 'switch',
-      field: 'enable',
+      field: 'timeoutFlag',
       name: t('project.node.timeout_alarm')
     },
     {
       type: 'checkbox',
-      field: 'strategy',
+      field: 'timeoutNotifyStrategy',
       name: t('project.node.timeout_strategy'),
       options: strategyOptions,
       span: span,
       validate: {
         trigger: ['input'],
         validator(validate: any, value: []) {
-          if (model.enable && !value.length) {
+          if (model.timeoutFlag && !value.length) {
             return new Error(t('project.node.timeout_strategy_tips'))
           }
         }
@@ -64,7 +65,7 @@ export function useTimeoutAlarm(model: { [field: string]: any }) {
     },
     {
       type: 'input-number',
-      field: 'interval',
+      field: 'timeout',
       name: t('project.node.timeout_period'),
       span,
       props: {
@@ -76,11 +77,12 @@ export function useTimeoutAlarm(model: { [field: string]: any }) {
       validate: {
         trigger: ['input'],
         validator(validate: any, value: number) {
-          if (model.enable && !/^[1-9]\d*$/.test(String(value))) {
+          if (model.timeoutFlag && !/^[1-9]\d*$/.test(String(value))) {
             return new Error(t('project.node.timeout_period_tips'))
           }
         }
-      }
+      },
+      value: 30
     }
   ]
 }
