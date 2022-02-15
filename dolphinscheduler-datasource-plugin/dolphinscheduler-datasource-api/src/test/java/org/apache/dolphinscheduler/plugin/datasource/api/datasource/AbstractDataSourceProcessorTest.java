@@ -24,11 +24,6 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-/**
- * @author: zhuxuetong
- * @date: 2022/2/8 16:06
- * @Description:
- */
 public class AbstractDataSourceProcessorTest {
 
     @Test
