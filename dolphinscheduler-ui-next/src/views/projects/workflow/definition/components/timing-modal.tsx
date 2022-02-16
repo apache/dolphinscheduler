@@ -34,10 +34,12 @@ import {
   NInputGroup,
   NList,
   NListItem,
-  NThing
+  NThing,
+  NPopover
 } from 'naive-ui'
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { timezoneList } from '@/utils/timezone'
+import Crontab from '@/components/crontab'
 
 const props = {
   row: {
@@ -59,6 +61,7 @@ export default defineComponent({
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
+    const crontabRef = ref()
     const parallelismRef = ref(false)
     const { t } = useI18n()
     const { timingState } = useForm()
@@ -175,6 +178,7 @@ export default defineComponent({
 
     return {
       t,
+      crontabRef,
       parallelismRef,
       hideModal,
       handleTiming,
@@ -216,10 +220,25 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('project.workflow.timing')} path='crontab'>
             <NInputGroup>
-              <NInput
-                style={{ width: '80%' }}
-                v-model:value={this.timingForm.crontab}
-              ></NInput>
+              <NPopover
+                trigger='click'
+                showArrow={false}
+                placement='bottom'
+                style={{ width: '500px' }}
+              >
+                {{
+                  trigger: () => (
+                    <NInput
+                      style={{ width: '80%' }}
+                      readonly={true}
+                      v-model:value={this.timingForm.crontab}
+                    ></NInput>
+                  ),
+                  default: () => (
+                    <Crontab v-model:value={this.timingForm.crontab} />
+                  )
+                }}
+              </NPopover>
               <NButton type='primary' ghost onClick={this.handlePreview}>
                 {t('project.workflow.execute_time')}
               </NButton>
