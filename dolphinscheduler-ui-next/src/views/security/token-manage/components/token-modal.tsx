@@ -165,7 +165,7 @@ const TokenModal = defineComponent({
                   'GENERAL_USER' && (
                   <NFormItem label={t('security.token.user')} path='userId'>
                     <NSelect
-                      class='username'
+                      class='input-username'
                       filterable
                       placeholder={t('security.token.user_tips')}
                       options={this.model.generalOptions}
@@ -176,7 +176,7 @@ const TokenModal = defineComponent({
                 <NFormItem label={t('security.token.token')} path='token'>
                   <NSpace>
                     <NInput
-                      class='token'
+                      class='input-token'
                       style={{ width: '504px' }}
                       disabled
                       placeholder={t('security.token.token_tips')}
