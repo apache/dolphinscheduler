@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, ref, watch, PropType, onMounted } from 'vue'
+import { computed, defineComponent, ref, watch, PropType } from 'vue'
 import { NTabPane, NTabs } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import CrontabTime from './modules/time'
@@ -34,13 +34,14 @@ export default defineComponent({
   props,
   emits: ['update:value'],
   setup(props, ctx) {
-    const secondRef = ref('*')
-    const minuteRef = ref('*')
-    const hourRef = ref('*')
-    const dayRef = ref('*')
-    const weekRef = ref('?')
-    const monthRef = ref('*')
-    const yearRef = ref('*')
+    const cron = props.value.split(' ')
+    const secondRef = ref(cron[0])
+    const minuteRef = ref(cron[1])
+    const hourRef = ref(cron[2])
+    const dayRef = ref(cron[3])
+    const monthRef = ref(cron[4])
+    const weekRef = ref(cron[5])
+    const yearRef = ref(cron[6])
 
     const crontabValue = computed(
       () =>
@@ -48,14 +49,14 @@ export default defineComponent({
     )
 
     const reset = () => {
-      const str = props.value.split(' ')
-      secondRef.value = str[0]
-      minuteRef.value = str[1]
-      hourRef.value = str[2]
-      dayRef.value = str[3]
-      monthRef.value = str[4]
-      weekRef.value = str[5]
-      yearRef.value = str[6]
+      const cron = props.value.split(' ')
+      secondRef.value = cron[0]
+      minuteRef.value = cron[1]
+      hourRef.value = cron[2]
+      dayRef.value = cron[3]
+      monthRef.value = cron[4]
+      weekRef.value = cron[5]
+      yearRef.value = cron[6]
     }
 
     watch(
@@ -71,10 +72,6 @@ export default defineComponent({
         reset()
       }
     )
-
-    onMounted(() => {
-      reset()
-    })
 
     return {
       secondRef,

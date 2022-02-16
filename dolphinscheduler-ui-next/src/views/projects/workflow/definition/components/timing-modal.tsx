@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, h, onMounted, ref } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  h,
+  onMounted,
+  ref,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
@@ -175,6 +183,25 @@ export default defineComponent({
       getAlertGroups()
       getEnvironmentList()
     })
+
+    watch(
+      () => props.row,
+      () => {
+        timingState.timingForm.startEndTime = [
+          new Date(props.row.startTime),
+          new Date(props.row.endTime)
+        ]
+        timingState.timingForm.crontab = props.row.crontab
+        timingState.timingForm.timezoneId = props.row.timezoneId
+        timingState.timingForm.failureStrategy = props.row.failureStrategy
+        timingState.timingForm.warningType = props.row.warningType
+        timingState.timingForm.processInstancePriority =
+          props.row.processInstancePriority
+        timingState.timingForm.warningGroupId = props.row.warningGroupId
+        timingState.timingForm.workerGroup = props.row.workerGroup
+        timingState.timingForm.environmentCode = props.row.environmentCode
+      }
+    )
 
     return {
       t,
