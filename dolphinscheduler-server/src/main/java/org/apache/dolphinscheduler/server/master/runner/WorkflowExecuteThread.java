@@ -378,7 +378,7 @@ public class WorkflowExecuteThread implements Runnable {
                 processInstance.getId(),
                 task.getId(),
                 task.getState());
-        if (task.taskCanRetry()) {
+        if (task.taskCanRetry() && processInstance.getState() != ExecutionStatus.READY_STOP) {
             addTaskToStandByList(task);
             if (!task.retryTaskIntervalOverTime()) {
                 logger.info("failure task will be submitted: process id: {}, task instance id: {} state:{} retry times:{} / {}, interval:{}",
@@ -435,12 +435,20 @@ public class WorkflowExecuteThread implements Runnable {
         try {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
             processInstance = processService.findProcessInstanceById(this.processInstance.getId());
+
+            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+                this.updateProcessInstanceState(stateEvent);
+                return true;
+            }
+
             if (processComplementData()) {
                 return true;
             }
+
             if (stateEvent.getExecutionStatus().typeIsFinished()) {
                 endProcess();
             }
+
             if (processInstance.getState() == ExecutionStatus.READY_STOP) {
                 killAllTasks();
             }
@@ -1095,10 +1103,6 @@ public class WorkflowExecuteThread implements Runnable {
             // active task and retry task exists
             return runningState(state);
         }
-        // process failure
-        if (processFailed()) {
-            return ExecutionStatus.FAILURE;
-        }
 
         // waiting thread
         if (hasWaitingThreadTask()) {
@@ -1114,13 +1118,20 @@ public class WorkflowExecuteThread implements Runnable {
         if (state == ExecutionStatus.READY_STOP) {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
+            List<TaskInstance> failList = getCompleteTaskByState(ExecutionStatus.FAILURE);
             if (CollectionUtils.isNotEmpty(stopList)
                     || CollectionUtils.isNotEmpty(killList)
+                    || CollectionUtils.isNotEmpty(failList)
                     || !isComplementEnd()) {
                 return ExecutionStatus.STOP;
             } else {
                 return ExecutionStatus.SUCCESS;
             }
+        }
+
+        // process failure
+        if (processFailed()) {
+            return ExecutionStatus.FAILURE;
         }
 
         // success
@@ -1183,6 +1194,26 @@ public class WorkflowExecuteThread implements Runnable {
             stateEvent.setProcessInstanceId(this.processInstance.getId());
             stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
             this.processStateChangeHandler(stateEvent);
+        }
+    }
+
+    /**
+     * stateEvent's execution status as process instance state
+     */
+    private void updateProcessInstanceState(StateEvent stateEvent) {
+        ExecutionStatus state = stateEvent.getExecutionStatus();
+        if (processInstance.getState() != state) {
+            logger.info(
+                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
+                    processInstance.getId(), processInstance.getName(),
+                    processInstance.getState(), state,
+                    processInstance.getCommandType());
+
+            processInstance.setState(state);
+            if (state.typeIsFinished()) {
+                processInstance.setEndTime(new Date());
+            }
+            processService.updateProcessInstance(processInstance);
         }
     }
 
@@ -1272,6 +1303,11 @@ public class WorkflowExecuteThread implements Runnable {
     private void killAllTasks() {
         logger.info("kill called on process instance id: {}, num: {}", processInstance.getId(),
                 activeTaskProcessorMaps.size());
+
+        if (readyToSubmitTaskQueue.size() > 0) {
+            readyToSubmitTaskQueue.clear();
+        }
+
         for (int taskId : activeTaskProcessorMaps.keySet()) {
             TaskInstance taskInstance = processService.findTaskInstanceById(taskId);
             if (taskInstance == null || taskInstance.getState().typeIsFinished()) {

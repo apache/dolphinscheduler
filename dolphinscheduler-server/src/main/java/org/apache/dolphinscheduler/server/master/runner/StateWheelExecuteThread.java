@@ -134,6 +134,14 @@ public class StateWheelExecuteThread extends Thread {
         }
 
         for (TaskInstance taskInstance : this.taskInstanceRetryCheckList.values()) {
+            ProcessInstance processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
+
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                addProcessStopEvent(processInstance);
+                taskInstanceRetryCheckList.remove(taskInstance.getId());
+                break;
+            }
+
             if (!taskInstance.getState().typeIsFinished() && (taskInstance.isSubProcess() || taskInstance.isDependTask())) {
                 addTaskStateChangeEvent(taskInstance);
             } else if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
@@ -165,6 +173,14 @@ public class StateWheelExecuteThread extends Thread {
         stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         addEvent(stateEvent);
         return true;
+    }
+
+    private void addProcessStopEvent(ProcessInstance processInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(processInstance.getId());
+        stateEvent.setExecutionStatus(ExecutionStatus.STOP);
+        addEvent(stateEvent);
     }
 
     private boolean addTaskTimeoutEvent(TaskInstance taskInstance) {
