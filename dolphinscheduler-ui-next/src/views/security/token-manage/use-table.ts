@@ -46,11 +46,13 @@ export function useTable() {
       },
       {
         title: t('security.token.user'),
-        key: 'userName'
+        key: 'userName',
+        className: 'username'
       },
       {
         title: t('security.token.token'),
-        key: 'token'
+        key: 'token',
+        className: 'token'
       },
       {
         title: t('security.token.expiration_time'),
