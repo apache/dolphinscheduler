@@ -1463,10 +1463,10 @@ public class WorkflowExecuteThread {
         if (state == ExecutionStatus.READY_STOP) {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
-            List<TaskInstance> faillist = getCompleteTaskByState(ExecutionStatus.FAILURE);
+            List<TaskInstance> failList = getCompleteTaskByState(ExecutionStatus.FAILURE);
             if (CollectionUtils.isNotEmpty(stopList)
                 || CollectionUtils.isNotEmpty(killList)
-                || CollectionUtils.isNotEmpty(faillist)
+                || CollectionUtils.isNotEmpty(failList)
                 || !isComplementEnd()) {
                 return ExecutionStatus.STOP;
             } else {
