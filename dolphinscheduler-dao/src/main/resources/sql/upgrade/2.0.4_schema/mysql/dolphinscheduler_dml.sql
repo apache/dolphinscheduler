@@ -29,10 +29,11 @@ DELETE FROM t_ds_process_task_relation_log WHERE id IN
              (
                  SELECT
                      a.process_definition_code
-                      ,max(b.process_definition_name) as process_definition_name
-                      ,MIN(a.id) as min_id
+                      ,MAX(a.id) as min_id
                       ,a.pre_task_code
+                      ,a.pre_task_version
                       ,a.post_task_code
+                      ,a.post_task_version
                       ,a.process_definition_version
                       ,COUNT(*) cnt
                  FROM
@@ -40,7 +41,6 @@ DELETE FROM t_ds_process_task_relation_log WHERE id IN
                          JOIN (
                          SELECT
                              code
-                              ,MAX(`name`) as process_definition_name
                          FROM
                              t_ds_process_definition
                          GROUP BY code
@@ -48,6 +48,8 @@ DELETE FROM t_ds_process_task_relation_log WHERE id IN
                  WHERE 1=1
                  GROUP BY a.pre_task_code
                         ,a.post_task_code
+                        ,a.pre_task_version
+                        ,a.post_task_version
                         ,a.process_definition_code
                         ,a.process_definition_version
                  HAVING COUNT(*) > 1
@@ -55,6 +57,8 @@ DELETE FROM t_ds_process_task_relation_log WHERE id IN
                  AND bb.pre_task_code = aa.pre_task_code
                  AND bb.post_task_code = aa.post_task_code
                  AND bb.process_definition_version = aa.process_definition_version
+                 AND bb.pre_task_version = aa.pre_task_version
+                 AND bb.post_task_version = aa.post_task_version
                  AND bb.min_id != aa.id
      )x
 )
@@ -76,7 +80,7 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
                        code
                         ,name
                         ,version
-                        ,MIN(id) AS min_id
+                        ,MAX(id) AS min_id
                    FROM
                        t_ds_task_definition_log
                    GROUP BY code
