@@ -327,6 +327,7 @@
       } else {
         this.workerGroup = this.timingData.item.workerGroup
       }
+      this.environmentCode = this.timingData.item.environmentCode
       if (this.timingData.item.crontab !== null) {
         this.crontab = this.timingData.item.crontab
       }
