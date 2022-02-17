@@ -653,13 +653,8 @@
               this.$message.error(e.msg || '')
             })
         } else {
-          const processDefinitionId =
-            this.backfillItem.params.processDefinitionId
-          const process = this.processListS.find(
-            (def) => def.id === processDefinitionId
-          )
           this.$emit('onSubProcess', {
-            subProcessCode: process.code,
+            subProcessCode: this.backfillItem.params.processDefinitionCode,
             fromThis: this
           })
         }
