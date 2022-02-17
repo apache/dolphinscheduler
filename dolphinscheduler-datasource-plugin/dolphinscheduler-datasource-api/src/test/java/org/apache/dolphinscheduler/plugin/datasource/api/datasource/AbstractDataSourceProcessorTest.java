@@ -30,9 +30,8 @@ public class AbstractDataSourceProcessorTest {
     public void checkOtherTest() {
         AbstractDataSourceProcessor mock = mock(AbstractDataSourceProcessor.class);
         Map<String, String> other = new HashMap<>();
-        other.put("arg0", "1Aa-_/@.");
-        mock.checkOther(other);
-        verify(mock, times(1)).checkOther(other);
+        other.put("principal", "hadoop/_HOST@TEST.COM");
+        doNothing().when(mock).checkOther(other);
     }
 
     @Test
