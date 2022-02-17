@@ -28,17 +28,17 @@ public class AbstractDataSourceProcessorTest {
 
     @Test
     public void checkOtherTest() {
-        AbstractDataSourceProcessor mock = mock(AbstractDataSourceProcessor.class);
+        AbstractDataSourceProcessor mockDataSourceProcessor = mock(AbstractDataSourceProcessor.class);
         Map<String, String> other = new HashMap<>();
         other.put("principal", "hadoop/_HOST@TEST.COM");
-        doNothing().when(mock).checkOther(other);
+        doNothing().when(mockDataSourceProcessor).checkOther(other);
     }
 
     @Test
     public void checkOtherExceptionTest() {
-        AbstractDataSourceProcessor mock = mock(AbstractDataSourceProcessor.class);
+        AbstractDataSourceProcessor mockDataSourceProcessor = mock(AbstractDataSourceProcessor.class);
         Map<String, String> other = new HashMap<>();
         other.put("arg0", "%");
-        doThrow(new IllegalArgumentException()).when(mock).checkOther(other);
+        doThrow(new IllegalArgumentException()).when(mockDataSourceProcessor).checkOther(other);
     }
 }
