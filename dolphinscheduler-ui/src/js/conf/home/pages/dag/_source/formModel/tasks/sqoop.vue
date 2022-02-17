@@ -754,11 +754,11 @@
       _handleModelTypeChange (a) {
         this._getSourceTypeList(a)
         this.sourceType = this.sourceTypeList[0].code
-        this._handleSourceTypeChange({ label: this.sourceType, value: this.sourceType })
+        this._handleSourceTypeChange(this.sourceType)
       },
 
       _handleSourceTypeChange (a) {
-        this._getTargetTypeList(a.label)
+        this._getTargetTypeList(a)
         this.targetType = this.targetTypeList[0].code
       },
 
