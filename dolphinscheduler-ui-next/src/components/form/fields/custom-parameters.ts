@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-import { defineComponent, h, renderSlot } from 'vue'
+import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
-import { NFormItemGi, NSpace, NButton, NIcon, NGrid } from 'naive-ui'
-import { PlusCircleOutlined, DeleteOutlined } from '@vicons/antd'
-import { omit } from 'lodash'
+import { NFormItemGi, NSpace, NButton, NGrid, NGridItem } from 'naive-ui'
+import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import getField from './get-field'
 import { formatValidate } from '../utils'
 import type { IJsonItem, FormItemRule } from '../types'
@@ -43,13 +42,15 @@ const CustomParameters = defineComponent({
           h(
             NButton,
             {
-              tertiary: true,
               circle: true,
+              size: 'small',
               type: 'info',
               disabled,
               onClick: onAdd
             },
-            () => h(NIcon, { size: 24 }, () => h(PlusCircleOutlined))
+            {
+              icon: () => h(PlusOutlined)
+            }
           )
         ]
       }
@@ -76,9 +77,8 @@ export function renderCustomParameters(
         NFormItemGi,
         {
           showLabel: false,
-          ...omit(item, ['field', 'type', 'props', 'options']),
           path: `${field}[${i}].${child.field}`,
-          span: 6
+          span: unref(child.span)
         },
         () => getField(child, item)
       )
@@ -88,18 +88,27 @@ export function renderCustomParameters(
       return h(NGrid, { xGap: 10 }, () => [
         ...getChild(item, i),
         h(
-          NButton,
+          NGridItem,
           {
-            tertiary: true,
-            circle: true,
-            type: 'error',
-            disabled,
-            onClick: () => {
-              fields[field].splice(i, 1)
-              rules.splice(i, 1)
-            }
+            span: 2
           },
-          () => h(NIcon, { size: 24 }, () => h(DeleteOutlined))
+          () =>
+            h(
+              NButton,
+              {
+                circle: true,
+                type: 'error',
+                size: 'small',
+                disabled,
+                onClick: () => {
+                  fields[field].splice(i, 1)
+                  rules.splice(i, 1)
+                }
+              },
+              {
+                icon: () => h(DeleteOutlined)
+              }
+            )
         )
       ])
     })

@@ -112,6 +112,12 @@
       }
     },
     watch: {
+      originalFileData: {
+        deep: true,
+        handler () {
+          this._init()
+        }
+      }
     },
     props: {
       originalFileData: Object
@@ -244,16 +250,21 @@
         this.file = file
         this.name = file.name
         this.$refs.file.value = null
+      },
+      _init () {
+        if (this.originalFileData) {
+          this.id = this.originalFileData.id
+          this.name = this.originalFileData.fileName
+          if (this.originalFileData.desc) {
+            this.description = this.originalFileData.desc
+          }
+          this.currentDir = this.originalFileData.fullName.substring(0, this.originalFileData.fullName.length - this.originalFileData.fileName.length)
+        }
       }
     },
     mounted () {
       this.reset()
-      this.id = this.originalFileData.id
-      this.name = this.originalFileData.fileName
-      if (this.originalFileData.desc) {
-        this.description = this.originalFileData.desc
-      }
-      this.currentDir = this.originalFileData.fullName.substring(0, this.originalFileData.fullName.length - this.originalFileData.fileName.length)
+      this._init()
     },
     components: { mPopup, mListBoxF, mProgressBar }
   }

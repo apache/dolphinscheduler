@@ -83,36 +83,36 @@ id:
 
 #### environment manage
 
-class:
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] environmentName
-- [ ] edit
-- [ ] delete
-
-id:
-- [ ] btnCreateEnvironment
-- [ ] inputEnvironmentName
-- [ ] inputEnvironmentConfig
-- [ ] inputEnvironmentDesc
-- [ ] inputEnvironmentWorkerGroup
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class                          |
+|--------------------|--------------------------------|
+| :white_check_mark: | items                          |
+|  | el-popconfirm                  |
+|  | el-button--primary             |
+| :white_check_mark: | environment-name               |
+| :white_check_mark: | edit                           |
+| :white_check_mark: | delete                         |
+| :white_check_mark: | btn-create-environment         |
+| :white_check_mark: | input-environment-name         |
+| :white_check_mark: | input-environment-config       |
+| :white_check_mark: | input-environment-desc         |
+| :white_check_mark: | input-environment-worker-group |
+| :white_check_mark: | btn-submit                     |
+| :white_check_mark: | btn-cancel                     |
 
 #### token manage
 
-class:
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] userName
-- [ ] token
-- [ ] edit
-- [ ] delete
-
-id:
-- [ ] btnCreateToken
-- [ ] btnGenerateToken
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class              |
+|--------------------|--------------------|
+| :white_check_mark: | items              |
+|  | el-popconfirm      |
+|  | el-button--primary |
+| :white_check_mark: | username           |
+| :white_check_mark: | token              |
+| :white_check_mark: | input-username     |
+| :white_check_mark: | input-token        |
+| :white_check_mark: | edit               |
+| :white_check_mark: | delete             |
+| :white_check_mark: | btn-create-token   |
+| :white_check_mark: | btn-generate-token |
+| :white_check_mark: | btn-submit         |
+| :white_check_mark: | btn-cancel         |

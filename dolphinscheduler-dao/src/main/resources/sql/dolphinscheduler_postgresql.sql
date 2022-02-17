@@ -1851,3 +1851,40 @@ CREATE TABLE t_ds_audit_log (
     resource_id int NOT NULL,
     PRIMARY KEY (id)
 );
+
+--
+-- Table structure for table t_ds_k8s
+--
+
+DROP TABLE IF EXISTS t_ds_k8s;
+CREATE TABLE t_ds_k8s (
+   id serial NOT NULL,
+   k8s_name    VARCHAR(100) DEFAULT NULL ,
+   k8s_config  text ,
+   create_time timestamp DEFAULT NULL ,
+   update_time timestamp DEFAULT NULL ,
+   PRIMARY KEY (id)
+);
+
+--
+-- Table structure for table t_ds_k8s_namespace
+--
+
+DROP TABLE IF EXISTS t_ds_k8s_namespace;
+CREATE TABLE t_ds_k8s_namespace (
+   id serial NOT NULL,
+   limits_memory      int DEFAULT NULL ,
+   namespace          varchar(100) DEFAULT NULL ,
+   online_job_num     int DEFAULT '0' ,
+   owner              varchar(100) DEFAULT NULL,
+   pod_replicas       int DEFAULT NULL,
+   pod_request_cpu    NUMERIC(13,4) NULL,
+   pod_request_memory int DEFAULT NULL,
+   tag                varchar(100) DEFAULT NULL,
+   limits_cpu         NUMERIC(13,4) NULL,
+   k8s                varchar(100) DEFAULT NULL,
+   create_time        timestamp DEFAULT NULL ,
+   update_time        timestamp DEFAULT NULL ,
+   PRIMARY KEY (id) ,
+   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+);
