@@ -67,7 +67,7 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
    FROM
        (
            SELECT
-               aa.id
+               a.id
            FROM
                t_ds_task_definition_log a
                    JOIN
