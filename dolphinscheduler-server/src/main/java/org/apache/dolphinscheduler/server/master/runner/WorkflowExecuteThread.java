@@ -484,12 +484,10 @@ public class WorkflowExecuteThread implements Runnable {
 
         }
 
-        this.taskInstanceHashMap.clear();
-
         //the next process complement
         int create = this.createComplementDataCommand(scheduleDate);
         if (create > 0) {
-            logger.info("create complement data command successfully.");
+            logger.info("create complement data command successfully. process id: {}", processInstance.getId());
         }
 
         return true;
