@@ -36,14 +36,12 @@ public class StandaloneServer {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
 
-        new LoggerServer().start();
-
         new SpringApplicationBuilder(
             ApiApplicationServer.class,
             MasterServer.class,
             WorkerServer.class,
             AlertServer.class,
             PythonGatewayServer.class
-        ).profiles("master", "worker", "api", "alert", "logger", "python-gateway", "h2", "standalone").run(args);
+        ).profiles("master", "worker", "api", "alert", "python-gateway", "h2", "standalone").run(args);
     }
 }

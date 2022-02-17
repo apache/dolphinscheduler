@@ -105,14 +105,15 @@ public class TaskResponsePersistThread implements Runnable {
                                 taskResponseEvent.getExecutePath(),
                                 taskResponseEvent.getLogPath(),
                                 taskResponseEvent.getTaskInstanceId());
-                        logger.info("changeTaskState in ACK , changed in meta:{} ,task instance state:{}, task " +
+                        logger.debug("changeTaskState in ACK , changed in meta:{} ,task instance state:{}, task " +
                                         "response event state:{}, taskInstance id:{},taskInstance host:{}",
                                 result, taskInstance.getState(), taskResponseEvent.getState(), taskInstance.getId(), taskInstance.getHost());
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so ack success
                     DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
                     channel.writeAndFlush(taskAckCommand.convert2Command());
-                    logger.info("worker ack master success, taskInstance id:{},taskInstance host:{}", taskInstance.getId(), taskInstance.getHost());
+                    logger.debug("worker ack master success, taskInstance id:{},taskInstance host:{}",
+                            taskInstance.getId(), taskInstance.getHost());
                 } catch (Exception e) {
                     result = false;
                     logger.error("worker ack master error", e);
