@@ -45,7 +45,8 @@ import {
   GroupOutlined,
   ContainerOutlined,
   ApartmentOutlined,
-  BarsOutlined
+  BarsOutlined,
+  CloudServerOutlined
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
 import { useUserStore } from '@/store/user/user'
@@ -280,6 +281,11 @@ export function useDataList() {
                   label: t('menu.environment_manage'),
                   key: `/security/environment-manage`,
                   icon: renderIcon(EnvironmentOutlined)
+                },
+                {
+                  label: t('menu.k8s_namespace_manage'),
+                  key: `/security/k8s-namespace-manage`,
+                  icon: renderIcon(CloudServerOutlined)
                 },
                 {
                   label: t('menu.token_manage'),

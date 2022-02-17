@@ -108,6 +108,16 @@ export default {
         showSide: true,
         auth: ['ADMIN_USER']
       }
+    },
+    {
+      path: '/security/k8s-namespace-manage',
+      name: 'k8s-namespace-manage',
+      component: components['security-k8s-namespace-manage'],
+      meta: {
+        title: 'K8S命名空间管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
+      }
     }
   ]
 }
