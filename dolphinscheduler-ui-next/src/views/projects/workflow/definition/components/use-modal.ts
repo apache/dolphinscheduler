@@ -160,7 +160,8 @@ export function useModal(
       schedule: JSON.stringify({
         startTime: start,
         endTime: end,
-        crontab: state.timingForm.crontab
+        crontab: state.timingForm.crontab,
+        timezoneId: state.timingForm.timezoneId
       }),
       failureStrategy: state.timingForm.failureStrategy,
       warningType: state.timingForm.warningType,
@@ -169,7 +170,7 @@ export function useModal(
         state.timingForm.warningGroupId === ''
           ? 0
           : state.timingForm.warningGroupId,
-      workerGroup: state.timingForm.workerGroups,
+      workerGroup: state.timingForm.workerGroup,
       environmentCode: state.timingForm.environmentCode
     }
     return data
