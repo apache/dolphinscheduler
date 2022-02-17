@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.server.log.LoggerServer;
 import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
