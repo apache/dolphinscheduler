@@ -93,6 +93,8 @@ const YarnQueueModal = defineComponent({
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
           confirmDisabled={!this.model.queueName || !this.model.queue}
+          confirmClassName='btn-submit'
+          cancelClassName='btn-cancel'
         >
           {{
             default: () => (
@@ -106,6 +108,7 @@ const YarnQueueModal = defineComponent({
                   path='queueName'
                 >
                   <NInput
+                    class='input-queue-name'
                     placeholder={t('security.yarn_queue.queue_name_tips')}
                     v-model={[this.model.queueName, 'value']}
                   />
@@ -115,6 +118,7 @@ const YarnQueueModal = defineComponent({
                   path='queue'
                 >
                   <NInput
+                    class='input-queue-value'
                     placeholder={t('security.yarn_queue.queue_value_tips')}
                     v-model={[this.model.queue, 'value']}
                   />
