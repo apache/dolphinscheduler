@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.util;
 
 import org.apache.dolphinscheduler.plugin.task.api.ShellExecutor;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
@@ -38,6 +39,15 @@ public class OSUtils {
      */
     public static String getSudoCmd(String tenantCode, String command) {
         return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
+    }
+
+    /**
+     * use sudo or not
+     *
+     * @return true is use sudo
+     */
+    public static boolean isSudoEnable() {
+        return PropertyUtils.getBoolean("sudo.enable", Boolean.TRUE);
     }
 
     /**
