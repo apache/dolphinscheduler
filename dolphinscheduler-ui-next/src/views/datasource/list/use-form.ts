@@ -205,5 +205,11 @@ const datasourceType: IDataBaseOptionKeys = {
   }
 }
 
-export const datasourceTypeList: IDataBaseOption[] =
-  Object.values(datasourceType)
+console.log(Object.values(datasourceType))
+
+export const datasourceTypeList: IDataBaseOption[] = Object.values(
+  datasourceType
+).map((item) => {
+  item.class = 'options-datasource-type'
+  return item
+})
