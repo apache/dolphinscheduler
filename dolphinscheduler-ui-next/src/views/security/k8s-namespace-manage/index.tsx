@@ -22,17 +22,18 @@ import {
   NDataTable,
   NIcon,
   NInput,
-  NPagination
+  NPagination,
+  NSpace
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
-import EnvironmentModal from './components/environment-modal'
+import K8sNamespaceModal from './components/k8s-namespace-modal'
 import styles from './index.module.scss'
 
-const environmentManage = defineComponent({
-  name: 'environment-manage',
+const k8sNamespaceManage = defineComponent({
+  name: 'k8s-namespace-manage',
   setup() {
     const { t } = useI18n()
     const { variables, getTableData, createColumns } = useTable()
@@ -105,21 +106,16 @@ const environmentManage = defineComponent({
         <NCard>
           <div class={styles['search-card']}>
             <div>
-              <NButton
-                size='small'
-                type='primary'
-                onClick={handleModalChange}
-                class='btn-create-environment'
-              >
-                {t('security.environment.create_environment')}
+              <NButton size='small' type='primary' onClick={handleModalChange}>
+                {t('security.k8s_namespace.create_namespace')}
               </NButton>
             </div>
-            <div class={styles.box}>
+            <NSpace>
               <NInput
                 size='small'
                 clearable
                 v-model={[this.searchVal, 'value']}
-                placeholder={t('security.environment.search_tips')}
+                placeholder={t('security.k8s_namespace.search_tips')}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 {{
@@ -130,15 +126,11 @@ const environmentManage = defineComponent({
                   )
                 }}
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable
-            row-class-name='items'
-            columns={this.columns}
-            data={this.tableData}
-          />
+          <NDataTable columns={this.columns} data={this.tableData} />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}
@@ -152,7 +144,7 @@ const environmentManage = defineComponent({
             />
           </div>
         </Card>
-        <EnvironmentModal
+        <K8sNamespaceModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
           row={this.row}
@@ -164,4 +156,4 @@ const environmentManage = defineComponent({
   }
 })
 
-export default environmentManage
+export default k8sNamespaceManage
