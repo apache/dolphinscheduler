@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, inject, PropType } from 'vue'
+import { defineComponent, ref, inject, PropType, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
 import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
@@ -26,13 +26,15 @@ import {
   FullscreenExitOutlined,
   InfoCircleOutlined,
   FormatPainterOutlined,
-  CopyOutlined
+  CopyOutlined,
+  DeleteOutlined
 } from '@vicons/antd'
 import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
+import type { Graph } from '@antv/x6'
 
 const props = {
   layoutToggle: {
@@ -50,13 +52,13 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle', 'saveModelToggle'],
+  emits: ['versionToggle', 'saveModelToggle', 'removeTasks'],
   setup(props, context) {
     const { t } = useI18n()
 
     const themeStore = useThemeStore()
 
-    const graph = inject('graph', ref())
+    const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
 
     /**
@@ -123,6 +125,22 @@ export default defineComponent({
      *  Copy workflow name
      */
     const { copy } = useTextCopy()
+
+    /**
+     * Delete selected edges and nodes
+     */
+    const removeCells = () => {
+      if (graph.value) {
+        const cells = graph.value.getSelectedCells()
+        if (cells) {
+          graph.value?.removeCells(cells)
+          const codes = cells
+            .filter((cell) => cell.isNode())
+            .map((cell) => +cell.id)
+          context.emit('removeTasks', codes)
+        }
+      }
+    }
 
     return () => (
       <div
@@ -207,6 +225,29 @@ export default defineComponent({
                 />
               ),
               default: () => t('project.dag.download_png')
+            }}
+          ></NTooltip>
+          {/* Delete */}
+          <NTooltip
+            v-slots={{
+              trigger: () => (
+                <NButton
+                  class={Styles['toolbar-right-item']}
+                  strong
+                  secondary
+                  circle
+                  type='info'
+                  onClick={() => removeCells()}
+                  v-slots={{
+                    icon: () => (
+                      <NIcon>
+                        <DeleteOutlined />
+                      </NIcon>
+                    )
+                  }}
+                />
+              ),
+              default: () => t('project.dag.delete_cell')
             }}
           ></NTooltip>
           {/* Toggle fullscreen */}

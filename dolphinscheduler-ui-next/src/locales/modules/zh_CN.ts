@@ -545,7 +545,9 @@ const project = {
     minute: '分',
     key: '键',
     value: '值',
-    success: '成功'
+    success: '成功',
+    delete_cell: '删除选中的线或节点',
+    online_directly: '是否上线流程定义'
   },
   node: {
     current_node_settings: '当前节点设置',

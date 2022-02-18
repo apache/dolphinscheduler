@@ -547,7 +547,9 @@ const project = {
     minute: 'Minute',
     key: 'Key',
     value: 'Value',
-    success: 'Success'
+    success: 'Success',
+    delete_cell: 'Delete selected edges and nodes',
+    online_directly: 'Whether to go online the process definition'
   },
   node: {
     current_node_settings: 'Current node settings',

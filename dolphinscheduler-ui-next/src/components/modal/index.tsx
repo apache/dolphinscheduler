@@ -89,8 +89,15 @@ const Modal = defineComponent({
     return { t, onCancel, onConfirm, onJumpLink }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading, onJumpLink } =
-      this
+    const {
+      $slots,
+      t,
+      onCancel,
+      onConfirm,
+      confirmDisabled,
+      confirmLoading,
+      onJumpLink
+    } = this
 
     return (
       <NModal
@@ -109,16 +116,12 @@ const Modal = defineComponent({
             'header-extra': () => (
               <NSpace justify='end'>
                 {this.linkEventShow && (
-                  <NButton
-                    text
-                    onClick={onJumpLink}
-                  >
+                  <NButton text onClick={onJumpLink}>
                     {this.linkEventText}
                   </NButton>
                 )}
               </NSpace>
-            )
-            ,
+            ),
             footer: () => (
               <NSpace justify='end'>
                 {this.cancelShow && (

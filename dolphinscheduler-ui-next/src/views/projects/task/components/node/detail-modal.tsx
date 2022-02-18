@@ -64,7 +64,7 @@ const NodeDetailModal = defineComponent({
       detailRef: ref(),
       linkEventShowRef: ref(),
       linkEventTextRef: ref(),
-      linkUrlRef: ref(),
+      linkUrlRef: ref()
     })
 
     const onConfirm = async () => {
@@ -103,8 +103,17 @@ const NodeDetailModal = defineComponent({
     }
   },
   render() {
-    const { t, show, onConfirm, onCancel, projectCode, data, readonly, from, onJumpLink } =
-      this
+    const {
+      t,
+      show,
+      onConfirm,
+      onCancel,
+      projectCode,
+      data,
+      readonly,
+      from,
+      onJumpLink
+    } = this
     return (
       <Modal
         show={show}

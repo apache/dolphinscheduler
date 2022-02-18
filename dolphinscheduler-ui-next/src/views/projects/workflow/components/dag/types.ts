@@ -79,7 +79,7 @@ export interface TaskDefinition {
   environmentCode: number
   failRetryTimes: number
   failRetryInterval: number
-  timeoutFlag: string
+  timeoutFlag: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy: string
   timeout: number
   delayTime: number
@@ -125,6 +125,7 @@ export interface SaveForm {
   timeoutFlag: boolean
   timeout: number
   globalParams: GlobalParam[]
+  release: boolean
 }
 
 export interface Location {

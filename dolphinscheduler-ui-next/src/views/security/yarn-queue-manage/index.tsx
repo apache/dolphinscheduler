@@ -106,7 +106,12 @@ const yarnQueueManage = defineComponent({
         <NCard>
           <div class={styles['search-card']}>
             <div>
-              <NButton size='small' type='primary' onClick={handleModalChange} class='btn-create-queue'>
+              <NButton
+                size='small'
+                type='primary'
+                onClick={handleModalChange}
+                class='btn-create-queue'
+              >
                 {t('security.yarn_queue.create_queue')}
               </NButton>
             </div>
@@ -130,7 +135,11 @@ const yarnQueueManage = defineComponent({
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable row-class-name='items' columns={this.columns} data={this.tableData} />
+          <NDataTable
+            row-class-name='items'
+            columns={this.columns}
+            data={this.tableData}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

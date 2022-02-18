@@ -68,7 +68,7 @@ interface ITaskData
   > {
   name?: string
   processName?: number
-  taskPriority?: number
+  taskPriority?: string
   timeoutFlag: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams: {
