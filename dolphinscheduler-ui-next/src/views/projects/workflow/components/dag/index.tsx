@@ -82,8 +82,9 @@ export default defineComponent({
       currTask,
       taskCancel,
       appendTask,
-      taskDefinitions
-    } = useTaskEdit({ graph })
+      taskDefinitions,
+      removeTasks
+    } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -144,6 +145,7 @@ export default defineComponent({
           definition={props.definition}
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
+          onRemoveTasks={removeTasks}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -163,11 +165,11 @@ export default defineComponent({
             onUpdateList={refreshDetail}
           />
         )}
-        <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} />
+        <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} definition={props.definition} />
         <TaskModal
           show={taskModalVisible.value}
           projectCode={props.projectCode}
-          data={currTask.value}
+          data={currTask.value as any}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />

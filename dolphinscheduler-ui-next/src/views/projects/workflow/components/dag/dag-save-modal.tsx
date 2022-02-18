@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref, computed, onMounted } from 'vue'
+import { defineComponent, PropType, ref, computed, onMounted, watch } from 'vue'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import {
@@ -25,17 +25,23 @@ import {
   NSelect,
   NSwitch,
   NInputNumber,
-  NDynamicInput
+  NDynamicInput,
+  NCheckbox
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
-import { SaveForm } from './types'
+import { SaveForm, WorkflowDefinition } from './types'
 import './x6-style.scss'
 
 const props = {
   visible: {
     type: Boolean as PropType<boolean>,
     default: false
-  }
+  },
+  // If this prop is passed, it means from definition detail
+  definition: {
+    type: Object as PropType<WorkflowDefinition>,
+    default: undefined
+  },
 }
 
 interface Tenant {
@@ -74,7 +80,8 @@ export default defineComponent({
       tenantCode: 'default',
       timeoutFlag: false,
       timeout: 0,
-      globalParams: []
+      globalParams: [],
+      release: false
     })
     const formRef = ref()
     const rule = {
@@ -88,6 +95,20 @@ export default defineComponent({
     const onCancel = () => {
       context.emit('update:show', false)
     }
+
+    watch(() => props.definition, () => {
+      const process = props.definition?.processDefinition;
+      if (process) {
+        formValue.value.name = process.name;
+        formValue.value.description = process.description;
+        formValue.value.tenantCode = process.tenantCode;
+        if (process.timeout && process.timeout > 0) {
+          formValue.value.timeoutFlag = true
+          formValue.value.timeout = process.timeout
+        }
+        formValue.value.globalParams = process.globalParamList.map((param) => ({ key: param.prop, value: param.value }))
+      }
+    })
 
     return () => (
       <Modal
@@ -146,6 +167,13 @@ export default defineComponent({
               value-placeholder={t('project.dag.value')}
             />
           </NFormItem>
+          {
+            props.definition && (
+              <NFormItem label=" " path='timeoutFlag'>
+                <NCheckbox v-model:checked={formValue.value.release}>{t('project.dag.online_directly')}</NCheckbox>
+              </NFormItem>
+            )
+          }
         </NForm>
       </Modal>
     )
