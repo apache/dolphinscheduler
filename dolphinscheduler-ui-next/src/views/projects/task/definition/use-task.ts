@@ -64,7 +64,10 @@ export function useTask(projectCode: number) {
             formatParams({ ...data, code: data.code })
           ))
       } else {
+        console.log('onTaskSave...')
         const taskCode = await getTaskCode()
+        console.log(taskCode)
+        console.log(data)
         await saveSingle(projectCode, formatParams({ ...data, code: taskCode }))
       }
 

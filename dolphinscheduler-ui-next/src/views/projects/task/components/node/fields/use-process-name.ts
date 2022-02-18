@@ -22,6 +22,7 @@ import type { IJsonItem } from '../types'
 
 export function useProcessName(
   projectCode: number,
+  processCode: string | undefined,
   isCreate: boolean
 ): IJsonItem {
   const { t } = useI18n()
@@ -44,6 +45,9 @@ export function useProcessName(
     }
   }
 
+  console.log('useProcessName')
+  console.log(processCode)
+
   onMounted(() => {
     getProcessList()
   })
@@ -57,6 +61,7 @@ export function useProcessName(
       loading: loading,
       disabled: !isCreate
     },
-    options: options
+    options: options,
+    value: processCode
   }
 }

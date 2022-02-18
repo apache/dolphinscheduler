@@ -49,6 +49,10 @@ const NodeDetail = defineComponent({
   setup(props, { expose }) {
     const { data, projectCode, from, readonly } = props
 
+    console.log('detail...')
+    console.log(data)
+    console.log(props)
+
     const { json, model } = useTask({
       taskType: data.taskType,
       projectCode,

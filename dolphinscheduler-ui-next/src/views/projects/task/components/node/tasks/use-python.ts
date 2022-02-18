@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 
-export function useShell({
+export function usePython({
   projectCode,
   from = 0,
   readonly
@@ -30,6 +30,7 @@ export function useShell({
 }) {
   const model = reactive({
     name: '',
+    taskType: 'PYTHON',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -43,12 +44,16 @@ export function useShell({
     rawScript: ''
   } as INodeData)
 
+  console.log('python...')
+
   let extra: IJsonItem[] = []
   if (from === 1) {
+    console.log(model)
     extra = [
       Fields.useTaskType(model, readonly),
       Fields.useProcessName(projectCode, model.processCode, !model.id)
     ]
+    console.log(extra)
   }
 
   return {

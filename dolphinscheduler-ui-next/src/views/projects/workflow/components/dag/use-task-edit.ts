@@ -68,6 +68,7 @@ export function useTaskEdit(options: Options) {
    * @param from
    */
   function taskConfirm({ formRef, form }: any) {
+    console.log(formRef)
     formRef.validate((errors: any) => {
       if (!errors) {
         // override target config
