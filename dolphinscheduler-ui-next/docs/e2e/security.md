@@ -51,21 +51,19 @@ id:
 
 #### worker group manage
 
-class:
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] vue-treeselect__menu
-- [ ] name
-- [ ] edit
-- [ ] delete
-
-id:
-- [ ] btnCreateWorkerGroup
-- [ ] inputWorkerGroupName
-- [ ] selectWorkerAddress
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class                          |
+|--------------------|--------------------------------|
+| :white_check_mark: | items                          |
+|  | el-popconfirm                  |
+|  | el-button--primary             |
+| :white_check_mark: | name                           |
+| :white_check_mark: | edit                           |
+| :white_check_mark: | delete                         |
+| :white_check_mark: | btn-create-worker-group        |
+| :white_check_mark: | input-worker-group-name        |
+| :white_check_mark: | select-worker-address          |
+| :white_check_mark: | btn-submit                     |
+| :white_check_mark: | btn-cancel                     |
 
 #### queue manage
 
