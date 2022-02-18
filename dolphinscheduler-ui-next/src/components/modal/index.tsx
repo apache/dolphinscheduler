@@ -39,6 +39,14 @@ const props = {
   confirmText: {
     type: String as PropType<string>
   },
+  confirmClassName: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  cancelClassName: {
+    type: String as PropType<string>,
+    default: ''
+  },
   confirmDisabled: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -50,13 +58,19 @@ const props = {
   autoFocus: {
     type: Boolean as PropType<boolean>,
     default: true
+  },
+  linkEventShow: {
+    type: Boolean as PropType<boolean>
+  },
+  linkEventText: {
+    type: String as PropType<string>
   }
 }
 
 const Modal = defineComponent({
   name: 'Modal',
   props,
-  emits: ['cancel', 'confirm'],
+  emits: ['cancel', 'confirm', 'jumpLink'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -68,10 +82,14 @@ const Modal = defineComponent({
       ctx.emit('confirm')
     }
 
-    return { t, onCancel, onConfirm }
+    const onJumpLink = () => {
+      ctx.emit('jumpLink')
+    }
+
+    return { t, onCancel, onConfirm, onJumpLink }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading } =
+    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading, onJumpLink } =
       this
 
     return (
@@ -88,16 +106,35 @@ const Modal = defineComponent({
         >
           {{
             default: () => renderSlot($slots, 'default'),
+            'header-extra': () => (
+              <NSpace justify='end'>
+                {this.linkEventShow && (
+                  <NButton
+                    text
+                    onClick={onJumpLink}
+                  >
+                    {this.linkEventText}
+                  </NButton>
+                )}
+              </NSpace>
+            )
+            ,
             footer: () => (
               <NSpace justify='end'>
                 {this.cancelShow && (
-                  <NButton quaternary size='small' onClick={onCancel}>
+                  <NButton
+                    class={this.cancelClassName}
+                    quaternary
+                    size='small'
+                    onClick={onCancel}
+                  >
                     {this.cancelText || t('modal.cancel')}
                   </NButton>
                 )}
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
                 <NButton
+                  class={this.confirmClassName}
                   type='info'
                   size='small'
                   onClick={onConfirm}

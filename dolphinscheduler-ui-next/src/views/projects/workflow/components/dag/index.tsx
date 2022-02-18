@@ -25,12 +25,15 @@ import DagAutoLayoutModal from './dag-auto-layout-modal'
 import {
   useGraphAutoLayout,
   useGraphBackfill,
-  useDagDragAndDrop
+  useDagDragAndDrop,
+  useTaskEdit,
+  useBusinessMapper
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import './x6-style.scss'
 
 const props = {
@@ -42,13 +45,17 @@ const props = {
   readonly: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  projectCode: {
+    type: Number as PropType<number>,
+    default: 0
   }
 }
 
 export default defineComponent({
   name: 'workflow-dag',
   props,
-  emits: ['refresh'],
+  emits: ['refresh', 'save'],
   setup(props, context) {
     const theme = useThemeStore()
 
@@ -68,9 +75,20 @@ export default defineComponent({
       cancel
     } = useGraphAutoLayout({ graph })
 
+    // Edit task
+    const {
+      taskConfirm,
+      taskModalVisible,
+      currTask,
+      taskCancel,
+      appendTask,
+      taskDefinitions
+    } = useTaskEdit({ graph })
+
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
-      readonly: toRef(props, 'readonly')
+      readonly: toRef(props, 'readonly'),
+      appendTask
     })
 
     // backfill
@@ -99,9 +117,19 @@ export default defineComponent({
         saveModalShow.value = !versionModalShow.value
       }
     }
-    const onSave = (form: any) => {
-      // TODO
-      console.log(form)
+    const { getConnects, getLocations } = useBusinessMapper()
+    const onSave = (saveForm: any) => {
+      const edges = graph.value?.getEdges() || []
+      const nodes = graph.value?.getNodes() || []
+      const connects = getConnects(nodes, edges, taskDefinitions.value as any)
+      const locations = getLocations(nodes)
+      context.emit('save', {
+        taskDefinitions: taskDefinitions.value,
+        saveForm,
+        connects,
+        locations
+      })
+      saveModelToggle(false)
     }
 
     return () => (
@@ -136,6 +164,13 @@ export default defineComponent({
           />
         )}
         <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} />
+        <TaskModal
+          show={taskModalVisible.value}
+          projectCode={props.projectCode}
+          data={currTask.value}
+          onSubmit={taskConfirm}
+          onCancel={taskCancel}
+        />
       </div>
     )
   }

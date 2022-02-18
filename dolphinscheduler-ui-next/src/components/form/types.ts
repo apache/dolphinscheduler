@@ -18,7 +18,6 @@ import { Ref } from 'vue'
 import type {
   GridProps,
   FormProps,
-  FormItemGiProps,
   FormItemRule,
   FormRules,
   SelectOption,
@@ -40,9 +39,12 @@ interface IOption extends SelectOption, TreeSelectOption {
   label: string
 }
 
-interface IFormItem extends Omit<FormItemGiProps, 'span'> {
+interface IFormItem {
+  showLabel?: boolean
+  path: string
+  label?: string
   widget: any
-  span?: any
+  span?: number | Ref<number>
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
@@ -58,7 +60,7 @@ interface IJsonItem {
   type?: IType
   validate?: FormItemRule
   value?: any
-  options?: IOption[]
+  options?: IOption[] | Ref<IOption[]>
   children?: IJsonItem[]
   slots?: object
   span?: number | Ref<number>

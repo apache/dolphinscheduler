@@ -26,8 +26,7 @@ export default {
   path: '/projects',
   name: 'projects',
   meta: {
-    title: '项目管理',
-    showSide: false
+    title: '项目管理'
   },
   redirect: { name: 'projects-list' },
   component: () => import('@/layouts/content'),
@@ -38,7 +37,8 @@ export default {
       component: components['projects-list'],
       meta: {
         title: '项目',
-        showSide: false
+        showSide: false,
+        auth: []
       }
     },
     {
@@ -47,7 +47,8 @@ export default {
       component: components['projects-overview'],
       meta: {
         title: '项目概览',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -56,7 +57,8 @@ export default {
       component: components['projects-workflow-relation'],
       meta: {
         title: '工作流关系',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -65,7 +67,8 @@ export default {
       component: components['projects-workflow-definition'],
       meta: {
         title: '工作流定义',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -74,7 +77,8 @@ export default {
       component: components['projects-workflow-definition-timing'],
       meta: {
         title: '定时管理',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -83,7 +87,8 @@ export default {
       component: components['projects-workflow-definition-create'],
       meta: {
         title: '创建工作流定义',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -92,7 +97,8 @@ export default {
       component: components['projects-workflow-definition-detail'],
       meta: {
         title: '工作流定义详情',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -101,7 +107,8 @@ export default {
       component: components['projects-workflow-instance'],
       meta: {
         title: '工作流实例',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -110,7 +117,8 @@ export default {
       component: components['projects-workflow-instance-detail'],
       meta: {
         title: '工作流实例详情',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -119,7 +127,8 @@ export default {
       component: components['projects-task-definition'],
       meta: {
         title: '任务定义',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -128,7 +137,8 @@ export default {
       component: components['projects-task-instance'],
       meta: {
         title: '任务实例',
-        showSide: true
+        showSide: true,
+        auth: []
       }
     }
   ]

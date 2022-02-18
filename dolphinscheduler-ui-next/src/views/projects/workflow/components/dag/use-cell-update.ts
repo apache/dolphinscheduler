@@ -18,9 +18,9 @@
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
 import type { TaskType } from '@/views/projects/task/constants/task-type'
+import type { Coordinate } from './types'
 import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import { useCustomCellBuilder } from './dag-hooks'
-import type { Coordinate } from './use-custom-cell-builder'
 import utils from '@/utils'
 
 interface Options {
@@ -59,13 +59,14 @@ export function useCellUpdate(options: Options) {
   function addNode(
     id: string,
     type: string,
+    name: string,
     coordinate: Coordinate = { x: 100, y: 100 }
   ) {
     if (!TASK_TYPES_MAP[type as TaskType]) {
       console.warn(`taskType:${type} is invalid!`)
       return
     }
-    const node = buildNode(id, type, '', coordinate)
+    const node = buildNode(id, type, name, coordinate)
     graph.value?.addNode(node)
   }
 

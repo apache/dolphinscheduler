@@ -247,18 +247,29 @@ public class StateWheelExecuteThread extends Thread {
         if (taskInstanceRetryCheckList.isEmpty()) {
             return;
         }
+
         for (TaskInstanceKey taskInstanceKey : taskInstanceRetryCheckList) {
             int processInstanceId = taskInstanceKey.getProcessInstanceId();
             long taskCode = taskInstanceKey.getTaskCode();
 
             WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+
             if (workflowExecuteThread == null) {
                 logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
                         processInstanceId, taskCode);
                 taskInstanceRetryCheckList.remove(taskInstanceKey);
                 continue;
             }
+
             TaskInstance taskInstance = workflowExecuteThread.getRetryTaskInstanceByTaskCode(taskCode);
+            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                addProcessStopEvent(processInstance);
+                taskInstanceRetryCheckList.remove(taskInstanceKey);
+                break;
+            }
+
             if (taskInstance == null) {
                 logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
                         processInstanceId, taskCode);
@@ -314,6 +325,14 @@ public class StateWheelExecuteThread extends Thread {
         stateEvent.setTaskInstanceId(taskInstance.getId());
         stateEvent.setTaskCode(taskInstance.getTaskCode());
         stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+        workflowExecuteThreadPool.submitStateEvent(stateEvent);
+    }
+
+    private void addProcessStopEvent(ProcessInstance processInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(processInstance.getId());
+        stateEvent.setExecutionStatus(ExecutionStatus.STOP);
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 
