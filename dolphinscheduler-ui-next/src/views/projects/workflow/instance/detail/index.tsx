@@ -42,7 +42,7 @@ export default defineComponent({
       })
     }
 
-    const save = () => { }
+    const save = () => {}
 
     onMounted(() => {
       if (!id || !projectCode) return

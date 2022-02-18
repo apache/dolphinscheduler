@@ -165,7 +165,11 @@ export default defineComponent({
             onUpdateList={refreshDetail}
           />
         )}
-        <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} definition={props.definition} />
+        <DagSaveModal
+          v-model:show={saveModalShow.value}
+          onSave={onSave}
+          definition={props.definition}
+        />
         <TaskModal
           show={taskModalVisible.value}
           projectCode={props.projectCode}

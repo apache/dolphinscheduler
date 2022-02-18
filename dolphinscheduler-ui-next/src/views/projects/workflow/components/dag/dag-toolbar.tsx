@@ -39,7 +39,7 @@ import type { Graph } from '@antv/x6'
 const props = {
   layoutToggle: {
     type: Function as PropType<(bool?: boolean) => void>,
-    default: () => { }
+    default: () => {}
   },
   // If this prop is passed, it means from definition detail
   definition: {
@@ -134,7 +134,9 @@ export default defineComponent({
         const cells = graph.value.getSelectedCells()
         if (cells) {
           graph.value?.removeCells(cells)
-          const codes = cells.filter(cell => cell.isNode()).map(cell => +cell.id)
+          const codes = cells
+            .filter((cell) => cell.isNode())
+            .map((cell) => +cell.id)
           context.emit('removeTasks', codes)
         }
       }
@@ -190,8 +192,9 @@ export default defineComponent({
             }}
           ></NTooltip>
           <div
-            class={`${Styles['toolbar-right-item']} ${Styles['node-selector']
-              } ${searchInputVisible.value ? Styles['visible'] : ''}`}
+            class={`${Styles['toolbar-right-item']} ${
+              Styles['node-selector']
+            } ${searchInputVisible.value ? Styles['visible'] : ''}`}
           >
             <NSelect
               size='small'

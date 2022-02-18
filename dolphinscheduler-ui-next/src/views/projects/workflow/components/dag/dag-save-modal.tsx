@@ -41,7 +41,7 @@ const props = {
   definition: {
     type: Object as PropType<WorkflowDefinition>,
     default: undefined
-  },
+  }
 }
 
 interface Tenant {
@@ -96,19 +96,24 @@ export default defineComponent({
       context.emit('update:show', false)
     }
 
-    watch(() => props.definition, () => {
-      const process = props.definition?.processDefinition;
-      if (process) {
-        formValue.value.name = process.name;
-        formValue.value.description = process.description;
-        formValue.value.tenantCode = process.tenantCode;
-        if (process.timeout && process.timeout > 0) {
-          formValue.value.timeoutFlag = true
-          formValue.value.timeout = process.timeout
+    watch(
+      () => props.definition,
+      () => {
+        const process = props.definition?.processDefinition
+        if (process) {
+          formValue.value.name = process.name
+          formValue.value.description = process.description
+          formValue.value.tenantCode = process.tenantCode
+          if (process.timeout && process.timeout > 0) {
+            formValue.value.timeoutFlag = true
+            formValue.value.timeout = process.timeout
+          }
+          formValue.value.globalParams = process.globalParamList.map(
+            (param) => ({ key: param.prop, value: param.value })
+          )
         }
-        formValue.value.globalParams = process.globalParamList.map((param) => ({ key: param.prop, value: param.value }))
       }
-    })
+    )
 
     return () => (
       <Modal
@@ -167,13 +172,13 @@ export default defineComponent({
               value-placeholder={t('project.dag.value')}
             />
           </NFormItem>
-          {
-            props.definition && (
-              <NFormItem label=" " path='timeoutFlag'>
-                <NCheckbox v-model:checked={formValue.value.release}>{t('project.dag.online_directly')}</NCheckbox>
-              </NFormItem>
-            )
-          }
+          {props.definition && (
+            <NFormItem label=' ' path='timeoutFlag'>
+              <NCheckbox v-model:checked={formValue.value.release}>
+                {t('project.dag.online_directly')}
+              </NCheckbox>
+            </NFormItem>
+          )}
         </NForm>
       </Modal>
     )

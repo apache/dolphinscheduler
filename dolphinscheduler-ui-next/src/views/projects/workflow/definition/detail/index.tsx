@@ -21,7 +21,10 @@ import { useThemeStore } from '@/store/theme/theme'
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Dag from '../../components/dag'
-import { queryProcessDefinitionByCode, updateProcessDefinition } from '@/service/modules/process-definition'
+import {
+  queryProcessDefinitionByCode,
+  updateProcessDefinition
+} from '@/service/modules/process-definition'
 import {
   WorkflowDefinition,
   SaveForm,
@@ -30,7 +33,6 @@ import {
   Location
 } from '../../components/dag/types'
 import Styles from './index.module.scss'
-
 
 interface SaveData {
   saveForm: SaveForm

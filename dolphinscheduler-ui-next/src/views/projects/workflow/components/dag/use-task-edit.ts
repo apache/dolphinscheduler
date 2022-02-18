@@ -62,10 +62,12 @@ export function useTaskEdit(options: Options) {
 
   /**
    * Remove task
-   * @param {number} code 
+   * @param {number} code
    */
   function removeTasks(codes: number[]) {
-    taskDefinitions.value = taskDefinitions.value.filter(task => !codes.includes(task.code))
+    taskDefinitions.value = taskDefinitions.value.filter(
+      (task) => !codes.includes(task.code)
+    )
   }
 
   function openTaskModal(task: NodeData) {
@@ -79,7 +81,7 @@ export function useTaskEdit(options: Options) {
    * @param from
    */
   function taskConfirm({ data }: any) {
-    const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData;
+    const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
     // override target config
     taskDefinitions.value = taskDefinitions.value.map((task) => {
       if (task.code === currTask.value?.code) {
