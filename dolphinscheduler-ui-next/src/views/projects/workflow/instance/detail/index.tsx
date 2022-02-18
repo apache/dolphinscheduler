@@ -15,11 +15,54 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { useThemeStore } from '@/store/theme/theme'
+import Dag from '../../components/dag'
+// import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
+import { queryProcessInstanceById } from '@/service/modules/process-instances'
+import { WorkflowDefinition } from '../../components/dag/types'
+import Styles from './index.module.scss'
 
 export default defineComponent({
   name: 'WorkflowInstanceDetails',
   setup() {
-    return () => <div>WorkflowInstanceDetails</div>
+    const theme = useThemeStore()
+    const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+    const id = Number(route.params.id)
+
+    const definition = ref<WorkflowDefinition>()
+
+    const refresh = () => {
+      queryProcessInstanceById(id, projectCode).then((res: any) => {
+        if (res.dagData) {
+          definition.value = res.dagData
+        }
+      })
+    }
+
+    const save = () => {}
+
+    onMounted(() => {
+      if (!id || !projectCode) return
+      refresh()
+    })
+
+    return () => (
+      <div
+        class={[
+          Styles.container,
+          theme.darkTheme ? Styles['dark'] : Styles['light']
+        ]}
+      >
+        <Dag
+          definition={definition.value}
+          onRefresh={refresh}
+          projectCode={projectCode}
+          onSave={save}
+        />
+      </div>
+    )
   }
 })
