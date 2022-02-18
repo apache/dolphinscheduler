@@ -69,17 +69,16 @@ id:
 
 #### queue manage
 
-class:
-- [ ] items
-- [ ] queueName
-- [ ] edit
-
-id:
-- [ ] btnCreateQueue
-- [ ] inputQueueName
-- [ ] inputQueueValue
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class                          |
+|--------------------|--------------------------------|
+| :white_check_mark: | items                          |
+| :white_check_mark: | queue-name                     |
+| :white_check_mark: | edit                           |
+| :white_check_mark: | btn-create-queue               |
+| :white_check_mark: | input-queue-name               |
+| :white_check_mark: | input-queue-value              |
+| :white_check_mark: | btn-submit                     |
+| :white_check_mark: | btn-cancel                     |
 
 #### environment manage
 
