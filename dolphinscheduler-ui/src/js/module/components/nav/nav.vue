@@ -163,6 +163,17 @@
       width="auto">
       <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateResourceChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeResourceChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="fileUploadDialog"
+      append-to-body="true"
+      width="auto">
+      <m-file-upload
+        :originalFileData="originalFileData"
+        @onUploadFile="onUploadFile"
+        @closeFileUpload="closeFileUpload">
+      </m-file-upload>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -174,6 +185,7 @@
   import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
   import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
+  import mFileUpload from '@/module/components/fileUpdate/fileReUpload'
   import mProgressBar from '@/module/components/progressBar/progressBar'
   import { findLocale, localeList } from '@/module/i18n/config'
 
@@ -202,7 +214,11 @@
         fileUpdateDialog: false,
         fileChildUpdateDialog: false,
         id: null,
-        resourceChildUpdateDialog: false
+        fileName: '',
+        description: '',
+        originalFileData: {},
+        resourceChildUpdateDialog: false,
+        fileUploadDialog: false
       }
     },
 
@@ -250,16 +266,13 @@
         this.progress = 0
         this.definitionUpdateDialog = false
       },
-
       onArchiveDefinition () {
         this.isUpdate = true
       },
-
       closeDefinition () {
         this.progress = 0
         this.definitionUpdateDialog = false
       },
-
       onProgressFileUpdate (val) {
         this.progress = val
       },
@@ -270,6 +283,17 @@
         this.progress = 0
         this.fileUpdateDialog = false
       },
+      onUploadFile () {
+        let self = this
+        findComponentDownward(self.$root, 'resource-list-index-FILE')._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileUploadDialog = false
+      },
+      closeFileUpload () {
+        this.progress = 0
+        this.fileUploadDialog = false
+      },
       onArchiveFileUpdate () {
         this.isUpdate = true
       },
@@ -277,7 +301,6 @@
         this.progress = 0
         this.fileUpdateDialog = false
       },
-
       _fileChildUpdate (type, data) {
         if (this.progress) {
           this._toggleArchive()
@@ -287,7 +310,14 @@
         this.id = data
         this.fileChildUpdateDialog = true
       },
-
+      _fileReUpload (item) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        this.originalFileData = item
+        this.fileUploadDialog = true
+      },
       onProgressFileChildUpdate (val) {
         this.progress = val
       },
@@ -307,7 +337,6 @@
         this.progress = 0
         this.fileChildUpdateDialog = false
       },
-
       _resourceChildUpdate (type, data) {
         if (this.progress) {
           this._toggleArchive()
@@ -350,7 +379,6 @@
        * Language switching
        */
       _toggleLanguage (language) {
-        console.log(language)
         cookies.set('language', language, { path: '/' })
         setTimeout(() => {
           window.location.reload()
@@ -365,7 +393,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate }
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate, mFileUpload }
   }
 </script>
 

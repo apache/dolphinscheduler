@@ -122,10 +122,12 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
 
-        // setting up user to run commands
-        command.add("sudo");
-        command.add("-u");
-        command.add(taskRequest.getTenantCode());
+        // if sudo.enable=true,setting up user to run commands
+        if (OSUtils.isSudoEnable()) {
+            command.add("sudo");
+            command.add("-u");
+            command.add(taskRequest.getTenantCode());
+        }
         command.add(commandInterpreter());
         command.addAll(Collections.emptyList());
         command.add(commandFile);
