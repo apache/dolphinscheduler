@@ -38,102 +38,132 @@ export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const columns: TableColumns<any> = [
-    {
-      title: t('project.workflow.id'),
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('project.workflow.workflow_name'),
-      key: 'name',
-      width: 200,
-      render: (_row) =>
-        h(
-          NEllipsis,
-          { style: 'max-width: 200px' },
-          {
-            default: () => _row.name
-          }
-        )
-    },
-    {
-      title: t('project.workflow.status'),
-      key: 'releaseState',
-      render: (_row) =>
-        _row.releaseState === 'ONLINE'
-          ? t('project.workflow.up_line')
-          : t('project.workflow.down_line')
-    },
-    {
-      title: t('project.workflow.create_time'),
-      key: 'createTime',
-      width: 150
-    },
-    {
-      title: t('project.workflow.update_time'),
-      key: 'updateTime',
-      width: 150
-    },
-    {
-      title: t('project.workflow.description'),
-      key: 'description'
-    },
-    {
-      title: t('project.workflow.create_user'),
-      key: 'userName'
-    },
-    {
-      title: t('project.workflow.modify_user'),
-      key: 'modifyBy'
-    },
-    {
-      title: t('project.workflow.schedule_publish_status'),
-      key: 'scheduleReleaseState',
-      render: (_row) => {
-        if (_row.scheduleReleaseState === 'ONLINE') {
-          return h(
-            NTag,
-            { type: 'success', size: 'small' },
-            {
-              default: () => t('project.workflow.up_line')
-            }
-          )
-        } else if (_row.scheduleReleaseState === 'OFFLINE') {
-          return h(
-            NTag,
-            { type: 'warning', size: 'small' },
-            {
-              default: () => t('project.workflow.down_line')
-            }
-          )
-        } else {
-          return '-'
-        }
-      }
-    },
-    {
-      title: t('project.workflow.operation'),
-      key: 'operation',
-      width: 300,
-      fixed: 'right',
-      className: styles.operation,
-      render: (row) =>
-        h(TableAction, {
-          row,
-          onStartWorkflow: () => startWorkflow(row),
-          onTimingWorkflow: () => timingWorkflow(row),
-          onVersionWorkflow: () => versionWorkflow(row),
-          onDeleteWorkflow: () => deleteWorkflow(row),
-          onReleaseWorkflow: () => releaseWorkflow(row),
-          onCopyWorkflow: () => copyWorkflow(row),
-          onExportWorkflow: () => exportWorkflow(row),
-          onGotoTimingManage: () => gotoTimingManage(row)
-        })
-    }
-  ]
+  const variables = reactive({
+    columns: [],
+    row: {},
+    tableData: [],
+    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
+    page: ref(1),
+    pageSize: ref(10),
+    searchVal: ref(),
+    totalPage: ref(1),
+    showRef: ref(false),
+    startShowRef: ref(false),
+    timingShowRef: ref(false),
+    versionShowRef: ref(false)
+  })
 
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: t('project.workflow.id'),
+        key: 'id',
+        width: 50,
+        render: (row, index) => index + 1
+      },
+      {
+        title: t('project.workflow.workflow_name'),
+        key: 'name',
+        width: 200,
+        render: (row) =>
+          h(
+            NEllipsis,
+            { style: 'max-width: 200px; color: #2080f0' },
+            {
+              default: () =>
+                h(
+                  'a',
+                  {
+                    href: 'javascript:',
+                    class: styles.links,
+                    onClick: () =>
+                      router.push({
+                        name: 'workflow-definition-detail',
+                        params: { code: row.code }
+                      })
+                  },
+                  row.name
+                ),
+              tooltip: () => row.name
+            }
+          )
+      },
+      {
+        title: t('project.workflow.status'),
+        key: 'releaseState',
+        render: (row) =>
+          row.releaseState === 'ONLINE'
+            ? t('project.workflow.up_line')
+            : t('project.workflow.down_line')
+      },
+      {
+        title: t('project.workflow.create_time'),
+        key: 'createTime',
+        width: 150
+      },
+      {
+        title: t('project.workflow.update_time'),
+        key: 'updateTime',
+        width: 150
+      },
+      {
+        title: t('project.workflow.description'),
+        key: 'description'
+      },
+      {
+        title: t('project.workflow.create_user'),
+        key: 'userName'
+      },
+      {
+        title: t('project.workflow.modify_user'),
+        key: 'modifyBy'
+      },
+      {
+        title: t('project.workflow.schedule_publish_status'),
+        key: 'scheduleReleaseState',
+        render: (row) => {
+          if (row.scheduleReleaseState === 'ONLINE') {
+            return h(
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('project.workflow.up_line')
+              }
+            )
+          } else if (row.scheduleReleaseState === 'OFFLINE') {
+            return h(
+              NTag,
+              { type: 'warning', size: 'small' },
+              {
+                default: () => t('project.workflow.down_line')
+              }
+            )
+          } else {
+            return '-'
+          }
+        }
+      },
+      {
+        title: t('project.workflow.operation'),
+        key: 'operation',
+        width: 300,
+        fixed: 'right',
+        className: styles.operation,
+        render: (row) =>
+          h(TableAction, {
+            row,
+            onStartWorkflow: () => startWorkflow(row),
+            onTimingWorkflow: () => timingWorkflow(row),
+            onVersionWorkflow: () => versionWorkflow(row),
+            onDeleteWorkflow: () => deleteWorkflow(row),
+            onReleaseWorkflow: () => releaseWorkflow(row),
+            onCopyWorkflow: () => copyWorkflow(row),
+            onExportWorkflow: () => exportWorkflow(row),
+            onGotoTimingManage: () => gotoTimingManage(row)
+          })
+      }
+    ] as TableColumns<any>
+  }
   const startWorkflow = (row: any) => {
     variables.startShowRef = true
     variables.row = row
@@ -251,21 +281,6 @@ export function useTable() {
     })
   }
 
-  const variables = reactive({
-    columns,
-    row: {},
-    tableData: [],
-    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
-    page: ref(1),
-    pageSize: ref(10),
-    searchVal: ref(),
-    totalPage: ref(1),
-    showRef: ref(false),
-    startShowRef: ref(false),
-    timingShowRef: ref(false),
-    versionShowRef: ref(false)
-  })
-
   const getTableData = (params: IDefinitionParam) => {
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
@@ -281,6 +296,7 @@ export function useTable() {
 
   return {
     variables,
+    createColumns,
     getTableData
   }
 }

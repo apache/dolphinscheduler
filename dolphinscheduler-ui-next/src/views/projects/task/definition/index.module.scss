@@ -26,7 +26,8 @@
     align-items: center;
     width: 300px;
 
-    button, input {
+    button,
+    input {
       margin-left: 10px;
     }
   }
@@ -39,5 +40,15 @@
     margin-top: 20px;
     display: flex;
     justify-content: center;
+  }
+}
+
+.links {
+  color: dodgerblue;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
   }
 }

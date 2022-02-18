@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, h } from 'vue'
+import { defineComponent, PropType, toRefs, h, unref } from 'vue'
 import { NSpin, NGrid, NForm, NFormItemGi } from 'naive-ui'
 import { useForm } from './use-form'
 import type { GridProps, IMeta } from './types'
@@ -54,8 +54,13 @@ const Form = defineComponent({
           <NGrid {...layout}>
             {elements.map((element) => {
               const { span = 24, path, widget, ...formItemProps } = element
+
               return (
-                <NFormItemGi {...formItemProps} span={span} path={path}>
+                <NFormItemGi
+                  {...formItemProps}
+                  span={unref(span) === void 0 ? 24 : unref(span)}
+                  path={path}
+                >
                   {h(widget)}
                 </NFormItemGi>
               )

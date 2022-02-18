@@ -15,11 +15,133 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, onUnmounted, toRefs, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import Card from '@/components/card'
+import {
+  NButton,
+  NDataTable,
+  NPagination,
+  NPopconfirm,
+  NTooltip
+} from 'naive-ui'
+import { useTable } from './use-table'
+import ProcessInstanceCondition from './components/process-instance-condition'
+import { IWorkflowInstanceSearch } from './types'
+import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'WorkflowInstanceList',
   setup() {
-    return () => <div>WorkflowInstanceList</div>
+    let setIntervalP: number
+    const { variables, createColumns, getTableData, batchDeleteInstance } =
+      useTable()
+
+    const requestData = () => {
+      getTableData()
+    }
+
+    const handleSearch = (params: IWorkflowInstanceSearch) => {
+      variables.searchVal = params.searchVal
+      variables.executorName = params.executorName
+      variables.host = params.host
+      variables.stateType = params.stateType
+      variables.startDate = params.startDate
+      variables.endDate = params.endDate
+      variables.page = 1
+      requestData()
+    }
+
+    const handleChangePageSize = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const handleBatchDelete = () => {
+      batchDeleteInstance()
+    }
+
+    onMounted(() => {
+      createColumns(variables)
+      requestData()
+
+      // Update timing list data
+      setIntervalP = setInterval(() => {
+        requestData()
+      }, 9000)
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
+    onUnmounted(() => {
+      clearInterval(setIntervalP)
+    })
+
+    return {
+      requestData,
+      handleSearch,
+      handleChangePageSize,
+      handleBatchDelete,
+      ...toRefs(variables)
+    }
+  },
+  render() {
+    const { t } = useI18n()
+
+    return (
+      <div class={styles.content}>
+        <Card class={styles.card}>
+          <div class={styles.header}>
+            <ProcessInstanceCondition onHandleSearch={this.handleSearch} />
+          </div>
+        </Card>
+        <Card title={t('project.workflow.workflow_instance')}>
+          <NDataTable
+            rowKey={(row) => row.id}
+            columns={this.columns}
+            data={this.tableData}
+            striped
+            size={'small'}
+            class={styles.table}
+            scrollX={1800}
+            v-model:checked-row-keys={this.checkedRowKeys}
+          />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              show-size-picker
+              page-sizes={[10, 30, 50]}
+              show-quick-jumper
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
+            />
+          </div>
+          <NTooltip>
+            {{
+              default: () => t('project.workflow.delete'),
+              trigger: () => (
+                <NButton
+                  tag='div'
+                  type='primary'
+                  disabled={this.checkedRowKeys.length <= 0}
+                  style='position: absolute; bottom: 10px; left: 10px;'
+                >
+                  <NPopconfirm onPositiveClick={this.handleBatchDelete}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => t('project.workflow.delete')
+                    }}
+                  </NPopconfirm>
+                </NButton>
+              )
+            }}
+          </NTooltip>
+        </Card>
+      </div>
+    )
   }
 })

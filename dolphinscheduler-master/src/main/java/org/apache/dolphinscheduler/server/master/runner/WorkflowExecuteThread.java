@@ -441,7 +441,7 @@ public class WorkflowExecuteThread {
             processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
-        } else if (taskInstance.taskCanRetry()) {
+        } else if (taskInstance.taskCanRetry() && processInstance.getState() != ExecutionStatus.READY_STOP) {
             // retry task
             retryTaskInstance(taskInstance);
         } else if (taskInstance.getState().typeIsFailure()) {
@@ -490,7 +490,7 @@ public class WorkflowExecuteThread {
         if (!taskInstance.taskCanRetry()) {
             return;
         }
-        TaskInstance newTaskInstance =  cloneRetryTaskInstance(taskInstance);
+        TaskInstance newTaskInstance = cloneRetryTaskInstance(taskInstance);
         if (newTaskInstance == null) {
             logger.error("retry fail, new taskInstancce is null, task code:{}, task id:{}", taskInstance.getTaskCode(), taskInstance.getId());
             return;
@@ -577,6 +577,7 @@ public class WorkflowExecuteThread {
             logger.error("task instance id null, state event:{}", stateEvent);
             return false;
         }
+
         if (!taskInstanceMap.containsKey(stateEvent.getTaskInstanceId())) {
             logger.error("mismatch task instance id, event:{}", stateEvent);
             return false;
@@ -636,6 +637,12 @@ public class WorkflowExecuteThread {
     private boolean processStateChangeHandler(StateEvent stateEvent) {
         try {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
+
+            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+                this.updateProcessInstanceState(stateEvent);
+                return true;
+            }
+
             if (processComplementData()) {
                 return true;
             }
@@ -1441,10 +1448,6 @@ public class WorkflowExecuteThread {
             // active task and retry task exists
             return runningState(state);
         }
-        // process failure
-        if (processFailed()) {
-            return ExecutionStatus.FAILURE;
-        }
 
         // waiting thread
         if (hasWaitingThreadTask()) {
@@ -1460,13 +1463,20 @@ public class WorkflowExecuteThread {
         if (state == ExecutionStatus.READY_STOP) {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
+            List<TaskInstance> failList = getCompleteTaskByState(ExecutionStatus.FAILURE);
             if (CollectionUtils.isNotEmpty(stopList)
                 || CollectionUtils.isNotEmpty(killList)
+                || CollectionUtils.isNotEmpty(failList)
                 || !isComplementEnd()) {
                 return ExecutionStatus.STOP;
             } else {
                 return ExecutionStatus.SUCCESS;
             }
+        }
+
+        // process failure
+        if (processFailed()) {
+            return ExecutionStatus.FAILURE;
         }
 
         // success
@@ -1531,6 +1541,26 @@ public class WorkflowExecuteThread {
             stateEvent.setProcessInstanceId(this.processInstance.getId());
             stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
             this.processStateChangeHandler(stateEvent);
+        }
+    }
+
+    /**
+     * stateEvent's execution status as process instance state
+     */
+    private void updateProcessInstanceState(StateEvent stateEvent) {
+        ExecutionStatus state = stateEvent.getExecutionStatus();
+        if (processInstance.getState() != state) {
+            logger.info(
+                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
+                    processInstance.getId(), processInstance.getName(),
+                    processInstance.getState(), state,
+                    processInstance.getCommandType());
+
+            processInstance.setState(state);
+            if (state.typeIsFinished()) {
+                processInstance.setEndTime(new Date());
+            }
+            processService.updateProcessInstance(processInstance);
         }
     }
 
@@ -1607,6 +1637,11 @@ public class WorkflowExecuteThread {
     private void killAllTasks() {
         logger.info("kill called on process instance id: {}, num: {}", processInstance.getId(),
             activeTaskProcessorMaps.size());
+
+        if (readyToSubmitTaskQueue.size() > 0) {
+            readyToSubmitTaskQueue.clear();
+        }
+
         for (long taskCode : activeTaskProcessorMaps.keySet()) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskCode);
             Integer taskInstanceId = validTaskMap.get(taskCode);

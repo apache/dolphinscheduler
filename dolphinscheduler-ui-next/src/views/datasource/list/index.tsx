@@ -95,10 +95,13 @@ const list = defineComponent({
           {{
             default: () => (
               <div class={styles['conditions']}>
-                <NButton onClick={onCreate} type='primary'>{`${t(
-                  'datasource.create_datasource'
-                )}`}</NButton>
-
+                <NButton
+                  onClick={onCreate}
+                  type='primary'
+                  class='btn-create-data-source'
+                >
+                  {t('datasource.create_datasource')}
+                </NButton>
                 <NSpace
                   class={styles['conditions-search']}
                   justify='end'
@@ -122,6 +125,7 @@ const list = defineComponent({
         </Card>
         <Card title='' class={styles['mt-8']}>
           <NDataTable
+            row-class-name='data-source-items'
             columns={columnsRef}
             data={list}
             loading={loading}

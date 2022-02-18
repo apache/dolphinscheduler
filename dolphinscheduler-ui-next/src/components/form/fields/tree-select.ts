@@ -15,33 +15,19 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue'
-import type { Dragged } from './dag'
+import { h, unref } from 'vue'
+import { NTreeSelect } from 'naive-ui'
+import type { IJsonItem } from '../types'
 
-interface Options {
-  readonly: Ref<boolean>
-  dragged: Ref<Dragged>
-}
-
-/**
- * Sidebar drag
- */
-export function useSidebarDrag(options: Options) {
-  const { readonly, dragged } = options
-
-  const onDragStart = (e: DragEvent, type: string) => {
-    if (readonly.value) {
-      e.preventDefault()
-      return
-    }
-    dragged.value = {
-      x: e.offsetX,
-      y: e.offsetY,
-      type: type
-    }
-  }
-
-  return {
-    onDragStart
-  }
+export function renderTreeSelect(
+  item: IJsonItem,
+  fields: { [field: string]: any }
+) {
+  const { props = {}, field, options = [] } = item
+  return h(NTreeSelect, {
+    ...props,
+    value: fields[field],
+    onUpdateValue: (value) => void (fields[field] = value),
+    options: unref(options)
+  })
 }

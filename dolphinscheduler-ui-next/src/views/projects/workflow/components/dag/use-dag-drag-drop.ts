@@ -15,42 +15,61 @@
  * limitations under the License.
  */
 
+import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
-import type { Dragged } from './dag'
 import { genTaskCodeList } from '@/service/modules/task-definition'
-import { useGraphOperations } from './dag-hooks'
+import { Dragged } from './types'
+import { TaskType } from '@/views/projects/task/constants/task-type'
+import { useRoute } from 'vue-router'
 
 interface Options {
   readonly: Ref<boolean>
   graph: Ref<Graph | undefined>
-  container: Ref<HTMLElement | undefined>
-  dragged: Ref<Dragged>
-  projectCode: string
+  appendTask: (code: number, type: TaskType, coor: Coordinate) => void
 }
 
 /**
- * Drop sidebar item in canvas
+ * Sidebar item drag && drop in canvas
  */
-export function useCanvasDrop(options: Options) {
-  const { readonly, graph, container, dragged, projectCode } = options
+export function useDagDragAndDrop(options: Options) {
+  const { readonly, graph, appendTask } = options
 
-  const { addNode } = useGraphOperations({ graph })
+  const route = useRoute()
+  const projectCode = Number(route.params.projectCode)
 
-  const onDrop = (e: DragEvent) => {
+  // The element currently being dragged up
+  const dragged = ref<Dragged>({
+    x: 0,
+    y: 0,
+    type: 'SHELL'
+  })
+
+  function onDragStart(e: DragEvent, type: TaskType) {
+    if (readonly.value) {
+      e.preventDefault()
+      return
+    }
+    dragged.value = {
+      x: e.offsetX,
+      y: e.offsetY,
+      type: type
+    }
+  }
+
+  function onDrop(e: DragEvent) {
     e.stopPropagation()
     e.preventDefault()
     if (readonly.value) {
       return
     }
-    if (dragged.value && graph.value && container.value && projectCode) {
+    if (dragged.value && graph.value && projectCode) {
       const { type, x: eX, y: eY } = dragged.value
       const { x, y } = graph.value.clientToLocal(e.clientX, e.clientY)
       const genNums = 1
-      genTaskCodeList(genNums, Number(projectCode)).then((res) => {
+      genTaskCodeList(genNums, projectCode).then((res) => {
         const [code] = res
-        addNode(code + '', type, { x: x - eX, y: y - eY })
-        // openTaskConfigModel(code, type)
+        appendTask(code, type, { x: x - eX, y: y - eY })
       })
     }
   }
@@ -60,6 +79,7 @@ export function useCanvasDrop(options: Options) {
   }
 
   return {
+    onDragStart,
     onDrop,
     onDragenter: preventDefault,
     onDragover: preventDefault,

@@ -16,7 +16,7 @@
  */
 
 import type { Node } from '@antv/x6'
-import { ref, onMounted, Ref, onUnmounted } from 'vue'
+import { ref, onMounted, Ref } from 'vue'
 import { Graph } from '@antv/x6'
 import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import { debounce } from 'lodash'
@@ -131,6 +131,35 @@ export function useCanvasInit(options: Options) {
         const sourceNode = edge.getSourceNode() as Node
         edge.setSource(sourceNode)
       }
+    })
+
+    // Add a node tool when the mouse entering
+    graph.value.on('node:mouseenter', ({ node }) => {
+      const nodeName = node.getData().taskName
+      node.addTools({
+        name: 'button',
+        args: {
+          markup: [
+            {
+              tagName: 'text',
+              textContent: nodeName,
+              attrs: {
+                fill: '#868686',
+                'font-size': 16,
+                'text-anchor': 'center'
+              }
+            }
+          ],
+          x: 0,
+          y: 0,
+          offset: { x: 0, y: -10 }
+        }
+      })
+    })
+
+    // Remove all tools when the mouse leaving
+    graph.value.on('node:mouseleave', ({ node }) => {
+      node.removeTool('button')
     })
   })
 

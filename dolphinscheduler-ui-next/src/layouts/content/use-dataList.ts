@@ -44,13 +44,18 @@ import {
   SafetyOutlined,
   GroupOutlined,
   ContainerOutlined,
-  ApartmentOutlined
+  ApartmentOutlined,
+  BarsOutlined,
+  CloudServerOutlined
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useDataList() {
   const { t } = useI18n()
   const menuStore = useMenuStore()
+  const userStore = useUserStore()
 
   const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
@@ -81,14 +86,12 @@ export function useDataList() {
       {
         label: t('menu.home'),
         key: 'home',
-        icon: renderIcon(HomeOutlined),
-        isShowSide: false
+        icon: renderIcon(HomeOutlined)
       },
       {
         label: t('menu.project'),
         key: 'projects',
         icon: renderIcon(ProfileOutlined),
-        isShowSide: false,
         children: [
           {
             label: t('menu.project_overview'),
@@ -135,7 +138,6 @@ export function useDataList() {
         label: t('menu.resources'),
         key: 'resource',
         icon: renderIcon(FolderOutlined),
-        isShowSide: true,
         children: [
           {
             label: t('menu.file_manage'),
@@ -178,12 +180,16 @@ export function useDataList() {
         label: t('menu.data_quality'),
         key: 'data-quality',
         icon: renderIcon(ContainerOutlined),
-        isShowSide: true,
         children: [
           {
             label: t('menu.task_result'),
             key: `/data-quality/task-result`,
             icon: renderIcon(ApartmentOutlined)
+          },
+          {
+            label: t('menu.rule'),
+            key: `/data-quality/rule`,
+            icon: renderIcon(BarsOutlined)
           }
         ]
       },
@@ -191,14 +197,12 @@ export function useDataList() {
         label: t('menu.datasource'),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
-        isShowSide: false,
         children: []
       },
       {
         label: t('menu.monitor'),
         key: 'monitor',
         icon: renderIcon(DesktopOutlined),
-        isShowSide: true,
         children: [
           {
             label: t('menu.service_manage'),
@@ -240,49 +244,62 @@ export function useDataList() {
         label: t('menu.security'),
         key: 'security',
         icon: renderIcon(SafetyCertificateOutlined),
-        isShowSide: true,
-        children: [
-          {
-            label: t('menu.tenant_manage'),
-            key: `/security/tenant-manage`,
-            icon: renderIcon(UsergroupAddOutlined)
-          },
-          {
-            label: t('menu.user_manage'),
-            key: `/security/user-manage`,
-            icon: renderIcon(UserAddOutlined)
-          },
-          {
-            label: t('menu.alarm_group_manage'),
-            key: `/security/alarm-group-manage`,
-            icon: renderIcon(WarningOutlined)
-          },
-          {
-            label: t('menu.alarm_instance_manage'),
-            key: `/security/alarm-instance-manage`,
-            icon: renderIcon(InfoCircleOutlined)
-          },
-          {
-            label: t('menu.worker_group_manage'),
-            key: `/security/worker-group-manage`,
-            icon: renderIcon(ControlOutlined)
-          },
-          {
-            label: t('menu.yarn_queue_manage'),
-            key: `/security/yarn-queue-manage`,
-            icon: renderIcon(SlackOutlined)
-          },
-          {
-            label: t('menu.environment_manage'),
-            key: `/security/environment-manage`,
-            icon: renderIcon(EnvironmentOutlined)
-          },
-          {
-            label: t('menu.token_manage'),
-            key: `/security/token-manage`,
-            icon: renderIcon(SafetyOutlined)
-          }
-        ]
+        children:
+          (userStore.getUserInfo as UserInfoRes).userType === 'ADMIN_USER'
+            ? [
+                {
+                  label: t('menu.tenant_manage'),
+                  key: `/security/tenant-manage`,
+                  icon: renderIcon(UsergroupAddOutlined)
+                },
+                {
+                  label: t('menu.user_manage'),
+                  key: `/security/user-manage`,
+                  icon: renderIcon(UserAddOutlined)
+                },
+                {
+                  label: t('menu.alarm_group_manage'),
+                  key: `/security/alarm-group-manage`,
+                  icon: renderIcon(WarningOutlined)
+                },
+                {
+                  label: t('menu.alarm_instance_manage'),
+                  key: `/security/alarm-instance-manage`,
+                  icon: renderIcon(InfoCircleOutlined)
+                },
+                {
+                  label: t('menu.worker_group_manage'),
+                  key: `/security/worker-group-manage`,
+                  icon: renderIcon(ControlOutlined)
+                },
+                {
+                  label: t('menu.yarn_queue_manage'),
+                  key: `/security/yarn-queue-manage`,
+                  icon: renderIcon(SlackOutlined)
+                },
+                {
+                  label: t('menu.environment_manage'),
+                  key: `/security/environment-manage`,
+                  icon: renderIcon(EnvironmentOutlined)
+                },
+                {
+                  label: t('menu.k8s_namespace_manage'),
+                  key: `/security/k8s-namespace-manage`,
+                  icon: renderIcon(CloudServerOutlined)
+                },
+                {
+                  label: t('menu.token_manage'),
+                  key: `/security/token-manage`,
+                  icon: renderIcon(SafetyOutlined)
+                }
+              ]
+            : [
+                {
+                  label: t('menu.token_manage'),
+                  key: `/security/token-manage`,
+                  icon: renderIcon(SafetyOutlined)
+                }
+              ]
       }
     ]
   }

@@ -30,12 +30,14 @@ import {
   deleteTaskDefinition
 } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
+import styles from './index.module.scss'
 import type {
   TaskDefinitionItem,
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
+import type { IRecord } from './types'
 
-export function useTable() {
+export function useTable(onEdit: Function) {
   const { t } = useI18n()
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
@@ -48,7 +50,22 @@ export function useTable() {
       },
       {
         title: t('project.task.task_name'),
-        key: 'taskName'
+        key: 'taskName',
+        render: (row: IRecord) =>
+          h(
+            'a',
+            {
+              class: styles.links,
+              onClick: () => {
+                onEdit(row, true)
+              }
+            },
+            {
+              default: () => {
+                return row.taskName
+              }
+            }
+          )
       },
       {
         title: t('project.task.workflow_name'),
@@ -78,14 +95,15 @@ export function useTable() {
             row.upstreamTaskMap.length < 1
               ? '-'
               : h(NSpace, null, {
-                default: () => row.upstreamTaskMap.map((item: string) => {
-                  return h(
-                    NTag,
-                    { type: 'info', size: 'small' },
-                    { default: () => item }
-                  )
+                  default: () =>
+                    row.upstreamTaskMap.map((item: string) => {
+                      return h(
+                        NTag,
+                        { type: 'info', size: 'small' },
+                        { default: () => item }
+                      )
+                    })
                 })
-              })
           )
       },
       {
@@ -115,10 +133,10 @@ export function useTable() {
                         size: 'small',
                         disabled:
                           ['CONDITIONS', 'SWITCH'].includes(row.taskType) ||
-                          (row.processDefinitionCode &&
+                          (!!row.processDefinitionCode &&
                             row.processReleaseState === 'ONLINE'),
                         onClick: () => {
-                          // handleEdit(row)
+                          onEdit(row, false)
                         }
                       },
                       {
@@ -140,7 +158,7 @@ export function useTable() {
                         type: 'info',
                         size: 'small',
                         disabled:
-                          row.processDefinitionCode &&
+                          !!row.processDefinitionCode &&
                           row.processReleaseState === 'ONLINE',
                         onClick: () => {
                           variables.showMoveModalRef = true
@@ -198,7 +216,7 @@ export function useTable() {
                               type: 'error',
                               size: 'small',
                               disabled:
-                                row.processDefinitionCode &&
+                                !!row.processDefinitionCode &&
                                 row.processReleaseState === 'ONLINE'
                             },
                             {

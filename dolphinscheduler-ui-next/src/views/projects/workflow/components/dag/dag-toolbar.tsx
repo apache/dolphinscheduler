@@ -25,9 +25,10 @@ import {
   FullscreenOutlined,
   FullscreenExitOutlined,
   InfoCircleOutlined,
-  FormatPainterOutlined
+  FormatPainterOutlined,
+  CopyOutlined
 } from '@vicons/antd'
-import { useNodeSearch } from './dag-hooks'
+import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
 import { useRouter } from 'vue-router'
@@ -37,12 +38,19 @@ const props = {
   layoutToggle: {
     type: Function as PropType<(bool?: boolean) => void>,
     default: () => {}
+  },
+  // If this prop is passed, it means from definition detail
+  definition: {
+    // The same as the structure responsed by the queryProcessDefinitionByCode api
+    type: Object as PropType<any>,
+    default: null
   }
 }
 
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
+  emits: ['versionToggle', 'saveModelToggle'],
   setup(props, context) {
     const { t } = useI18n()
 
@@ -55,11 +63,11 @@ export default defineComponent({
      * Node search and navigate
      */
     const {
-      searchNode,
-      getAllNodes,
-      allNodes,
+      navigateTo,
       toggleSearchInput,
-      searchInputVisible
+      searchInputVisible,
+      reQueryNodes,
+      nodesDropdown
     } = useNodeSearch({ graph })
 
     /**
@@ -94,7 +102,7 @@ export default defineComponent({
      * Open workflow version modal
      */
     const openVersionModal = () => {
-      //TODO, same as the version popup in the workflow list page
+      context.emit('versionToggle', true)
     }
 
     /**
@@ -111,6 +119,11 @@ export default defineComponent({
       router.go(-1)
     }
 
+    /**
+     *  Copy workflow name
+     */
+    const { copy } = useTextCopy()
+
     return () => (
       <div
         class={[
@@ -118,7 +131,24 @@ export default defineComponent({
           Styles[themeStore.darkTheme ? 'toolbar-dark' : 'toolbar-light']
         ]}
       >
-        <span class={Styles['workflow-name']}>{t('project.dag.create')}</span>
+        <div>
+          <span class={Styles['workflow-name']}>
+            {props.definition?.processDefinition?.name ||
+              t('project.dag.create')}
+          </span>
+          {props.definition?.processDefinition?.name && (
+            <NButton
+              quaternary
+              circle
+              onClick={() => copy(props.definition?.processDefinition?.name)}
+              class={Styles['copy-btn']}
+            >
+              <NIcon>
+                <CopyOutlined />
+              </NIcon>
+            </NButton>
+          )}
+        </div>
         <div class={Styles['toolbar-right-part']}>
           {/* Search node */}
           <NTooltip
@@ -150,9 +180,9 @@ export default defineComponent({
           >
             <NSelect
               size='small'
-              options={allNodes.value}
-              onFocus={getAllNodes}
-              onUpdateValue={searchNode}
+              options={nodesDropdown.value}
+              onFocus={reQueryNodes}
+              onUpdateValue={navigateTo}
               filterable
             />
           </div>
@@ -233,34 +263,39 @@ export default defineComponent({
             }}
           ></NTooltip>
           {/* Version info */}
-          <NTooltip
-            v-slots={{
-              trigger: () => (
-                <NButton
-                  class={Styles['toolbar-right-item']}
-                  strong
-                  secondary
-                  circle
-                  type='info'
-                  onClick={openVersionModal}
-                  v-slots={{
-                    icon: () => (
-                      <NIcon>
-                        <InfoCircleOutlined />
-                      </NIcon>
-                    )
-                  }}
-                />
-              ),
-              default: () => t('project.workflow.version_info')
-            }}
-          ></NTooltip>
+          {!!props.definition && (
+            <NTooltip
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    class={Styles['toolbar-right-item']}
+                    strong
+                    secondary
+                    circle
+                    type='info'
+                    onClick={openVersionModal}
+                    v-slots={{
+                      icon: () => (
+                        <NIcon>
+                          <InfoCircleOutlined />
+                        </NIcon>
+                      )
+                    }}
+                  />
+                ),
+                default: () => t('project.workflow.version_info')
+              }}
+            ></NTooltip>
+          )}
           {/* Save workflow */}
           <NButton
             class={Styles['toolbar-right-item']}
             type='info'
             secondary
             round
+            onClick={() => {
+              context.emit('saveModelToggle', true)
+            }}
           >
             {t('project.dag.save')}
           </NButton>

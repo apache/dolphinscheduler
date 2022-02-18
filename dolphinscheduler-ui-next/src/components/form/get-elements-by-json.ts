@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
+import { toRef, Ref } from 'vue'
 import { formatValidate } from './utils'
 import getField from './fields/get-field'
 import { omit } from 'lodash'
 import type { FormRules } from 'naive-ui'
-import type { IJsonItem } from './types'
+import type { IFormItem, IJsonItem } from './types'
 
 export default function getElementByJson(
   json: IJsonItem[],
@@ -27,21 +28,23 @@ export default function getElementByJson(
 ) {
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
-  const elements = []
+  const elements: IFormItem[] = []
   for (let item of json) {
-    const { name, value, field, children, validate, ...rest } = item
-    if (value) {
+    const { name, value, field, span = 24, children, validate, ...rest } = item
+    if (value || value === 0) {
       fields[field] = value
       initialValues[field] = value
     }
     if (validate) rules[field] = formatValidate(validate)
-    elements.push({
+    const element: IFormItem = {
       showLabel: !!name,
       ...omit(rest, ['type', 'props', 'options']),
       label: name,
       path: !children ? field : '',
-      widget: () => getField(item, fields, rules)
-    })
+      widget: () => getField(item, fields, rules),
+      span: toRef(item, 'span') as Ref<number>
+    }
+    elements.push(element)
   }
   return { rules, elements, initialValues }
 }

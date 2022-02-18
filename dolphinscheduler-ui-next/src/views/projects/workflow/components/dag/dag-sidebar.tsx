@@ -15,37 +15,20 @@
  * limitations under the License.
  */
 
-import type { PropType, Ref } from 'vue'
-import type { Dragged } from './index'
-import { defineComponent, ref, inject } from 'vue'
-import { ALL_TASK_TYPES } from '../../../task/constants/task-type'
-import { useSidebarDrag } from './dag-hooks'
+import { defineComponent } from 'vue'
+import {
+  TaskType,
+  TASK_TYPES_MAP
+} from '@/views/projects/task/constants/task-type'
 import Styles from './dag.module.scss'
-
-const props = {
-  dragged: {
-    type: Object as PropType<Ref<Dragged>>,
-    default: ref({
-      x: 0,
-      y: 0,
-      type: ''
-    })
-  }
-}
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
-  props,
-  setup(props) {
-    const readonly = inject('readonly', ref(false))
-    const dragged = props.dragged
-    const { onDragStart } = useSidebarDrag({
-      readonly,
-      dragged
-    })
-    const allTaskTypes = Object.keys(ALL_TASK_TYPES).map((type) => ({
+  emits: ['dragStart'],
+  setup(props, context) {
+    const allTaskTypes = Object.keys(TASK_TYPES_MAP).map((type) => ({
       type,
-      ...ALL_TASK_TYPES[type]
+      ...TASK_TYPES_MAP[type as TaskType]
     }))
 
     return () => (
@@ -54,7 +37,9 @@ export default defineComponent({
           <div
             class={Styles.draggable}
             draggable='true'
-            onDragstart={(e) => onDragStart(e, task.type)}
+            onDragstart={(e) => {
+              context.emit('dragStart', e, task.type as TaskType)
+            }}
           >
             <em
               class={[

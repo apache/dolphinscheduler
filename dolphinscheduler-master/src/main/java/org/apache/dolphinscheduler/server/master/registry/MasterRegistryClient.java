@@ -122,6 +122,7 @@ public class MasterRegistryClient {
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             logger.error("master start up exception", e);
+            throw new RuntimeException("master start up error", e);
         } finally {
             registryClient.releaseLock(nodeLock);
         }

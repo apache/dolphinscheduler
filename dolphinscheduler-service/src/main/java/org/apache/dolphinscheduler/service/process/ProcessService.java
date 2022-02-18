@@ -275,7 +275,7 @@ public class ProcessService {
         }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
-        //if the processDefination is serial
+        //if the processDefinition is serial
         ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
         if (processDefinition.getExecutionType().typeIsSerial()) {
             saveSerialProcess(processInstance, processDefinition);
@@ -1162,7 +1162,7 @@ public class ProcessService {
                 logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql failed", e);
+                logger.error("task commit to db failed", e);
             }
             retryTimes += 1;
         }

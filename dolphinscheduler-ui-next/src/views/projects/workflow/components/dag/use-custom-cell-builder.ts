@@ -15,24 +15,25 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue'
-import type { Node, Graph, Edge } from '@antv/x6'
+import type { Node, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
-import { ALL_TASK_TYPES } from '../../../task/constants/task-type'
 import utils from '@/utils'
+import { WorkflowDefinition, Coordinate } from './types'
 
-interface Options {
-  graph: Ref<Graph | undefined>
-}
-
-type Coordinate = { x: number; y: number }
-
-/**
- * Expose some graph operation methods
- * @param {Options} options
- */
-export function useGraphOperations(options: Options) {
-  const { graph } = options
+export function useCustomCellBuilder() {
+  /**
+   * Convert locationStr to JSON
+   * @param {string} locationStr
+   * @returns
+   */
+  function parseLocationStr(locationStr: string) {
+    let locations = null
+    if (!locationStr) return locations
+    try {
+      locations = JSON.parse(locationStr)
+    } catch (error) {}
+    return Array.isArray(locations) ? locations : null
+  }
 
   /**
    * Build edge metadata
@@ -40,7 +41,7 @@ export function useGraphOperations(options: Options) {
    * @param {string} targetId
    * @param {string} label
    */
-  function buildEdgeMetadata(
+  function buildEdge(
     sourceId: string,
     targetId: string,
     label: string = ''
@@ -63,7 +64,7 @@ export function useGraphOperations(options: Options) {
    * @param {string} taskType
    * @param {Coordinate} coordinate Default is { x: 100, y: 100 }
    */
-  function buildNodeMetadata(
+  function buildNode(
     id: string,
     type: string,
     taskName: string,
@@ -92,74 +93,43 @@ export function useGraphOperations(options: Options) {
   }
 
   /**
-   * Add a node to the graph
-   * @param {string} id
-   * @param {string} taskType
-   * @param {Coordinate} coordinate Default is { x: 100, y: 100 }
+   * Build graph JSON
+   * @param {WorkflowDefinition} definition
+   * @returns
    */
-  function addNode(
-    id: string,
-    type: string,
-    coordinate: Coordinate = { x: 100, y: 100 }
-  ) {
-    if (!ALL_TASK_TYPES[type]) {
-      console.warn(`taskType:${type} is invalid!`)
-      return
-    }
-    const node = buildNodeMetadata(id, type, '', coordinate)
-    graph.value?.addNode(node)
-  }
+  function buildGraph(definition: WorkflowDefinition) {
+    const nodes: Node.Metadata[] = []
+    const edges: Edge.Metadata[] = []
 
-  /**
-   * Set node name by id
-   * @param {string} id
-   * @param {string} name
-   */
-  function setNodeName(id: string, newName: string) {
-    const node = graph.value?.getCellById(id)
-    if (node) {
-      const truncation = utils.truncateText(newName, 18)
-      node.attr('title/text', truncation)
-      node.setData({ taskName: newName })
-    }
-  }
+    const locations =
+      parseLocationStr(definition.processDefinition.locations) || []
+    const tasks = definition.taskDefinitionList
+    const connects = definition.processTaskRelationList
 
-  /**
-   * Get nodes
-   */
-  function getNodes() {
-    const nodes = graph.value?.getNodes()
-    if (!nodes) return []
-    return nodes.map((node) => {
-      const position = node.getPosition()
-      const data = node.getData()
-      return {
-        code: node.id,
-        position: position,
-        name: data.taskName,
-        type: data.taskType
-      }
+    tasks.forEach((task) => {
+      const location = locations.find((l) => l.taskCode === task.code) || {}
+      const node = buildNode(task.code + '', task.taskType, task.name, {
+        x: location.x,
+        y: location.y
+      })
+      nodes.push(node)
     })
-  }
 
-  /**
-   * Navigate to cell
-   * @param {string} code
-   */
-  function navigateTo(code: string) {
-    if (!graph.value) return
-    const cell = graph.value.getCellById(code)
-    graph.value.scrollToCell(cell, { animation: { duration: 600 } })
-    graph.value.cleanSelection()
-    graph.value.select(cell)
+    connects
+      .filter((r) => !!r.preTaskCode)
+      .forEach((c) => {
+        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode, c.name)
+        edges.push(edge)
+      })
+    return {
+      nodes,
+      edges
+    }
   }
 
   return {
-    buildEdgeMetadata,
-    buildNodeMetadata,
-    addNode,
-    setNodeName,
-    getNodes,
-    navigateTo
+    buildNode,
+    buildEdge,
+    buildGraph
   }
 }

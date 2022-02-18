@@ -42,16 +42,8 @@ const Content = defineComponent({
     } = useDataList()
     const sideKeyRef = ref()
 
-    locale.value = localesStore.getLocales
-
     onMounted(() => {
-      changeMenuOption(state)
-      changeHeaderMenuOptions(state)
-      getSideMenu(state)
-      changeUserDropdown(state)
-    })
-
-    watch(useI18n().locale, () => {
+      locale.value = localesStore.getLocales
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       getSideMenu(state)
@@ -71,21 +63,29 @@ const Content = defineComponent({
       getSideMenu(state)
     }
 
+    watch(useI18n().locale, () => {
+      changeMenuOption(state)
+      changeHeaderMenuOptions(state)
+      getSideMenu(state)
+      changeUserDropdown(state)
+    })
+
     watch(
       () => route.path,
       () => {
-        state.isShowSide = menuStore.getShowSideStatus
-        route.matched[1].path.includes(':projectCode')
-        if (route.matched[1].path === '/projects/:projectCode') {
-          changeMenuOption(state)
-          getSideMenu(state)
+        if (route.path !== '/login') {
+          state.isShowSide = menuStore.getShowSideStatus
+          if (route.matched[1].path === '/projects/:projectCode') {
+            changeMenuOption(state)
+            getSideMenu(state)
+          }
+          sideKeyRef.value = route.matched[1].path.includes(':projectCode')
+            ? route.matched[1].path.replace(
+                ':projectCode',
+                menuStore.getProjectCode
+              )
+            : route.matched[1].path
         }
-        sideKeyRef.value = route.matched[1].path.includes(':projectCode')
-          ? route.matched[1].path.replace(
-              ':projectCode',
-              menuStore.getProjectCode
-            )
-          : route.matched[1].path
       },
       { immediate: true }
     )

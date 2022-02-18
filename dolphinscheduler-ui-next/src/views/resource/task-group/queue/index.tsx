@@ -193,7 +193,7 @@ const taskGroupQueue = defineComponent({
         </NCard>
         <Card
           class={styles['table-card']}
-          title={t('resource.task_group_option.option')}
+          title={t('resource.task_group_queue.queue')}
         >
           <div>
             <NDataTable
