@@ -45,7 +45,6 @@ import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
-import oshi.util.Util;
 
 /**
  * os utils
@@ -64,6 +63,8 @@ public class OSUtils {
     public static final double NEGATIVE_ONE = -1;
 
     private static final HardwareAbstractionLayer hal = SI.getHardware();
+    private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
+    private static long prevTickTime = System.currentTimeMillis();
 
     private OSUtils() {
         throw new UnsupportedOperationException("Construct OSUtils");
@@ -136,9 +137,16 @@ public class OSUtils {
     public static double cpuUsage() {
         CentralProcessor processor = hal.getProcessor();
 
-        long[] preTicks = processor.getSystemCpuLoadTicks();
-        Util.sleep(1000);
-        double cpuUsage =  processor.getSystemCpuLoadBetweenTicks(preTicks);
+        double cpuUsage =  processor.getSystemCpuLoadBetweenTicks(prevTicks);
+
+        // Check if > ~ 0.95 seconds since last tick count.
+        long now = System.currentTimeMillis();
+        if (now - prevTickTime > 950) {
+            // Enough time has elapsed.
+            prevTickTime = now;
+            prevTicks = processor.getSystemCpuLoadTicks();
+        }
+
         if (Double.isNaN(cpuUsage)) {
             return NEGATIVE_ONE;
         }
