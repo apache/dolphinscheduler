@@ -74,7 +74,12 @@ const NodeDetail = defineComponent({
         // TODO: Change task type
         if (taskType === 'SUB_PROCESS') {
           // TODO: add linkUrl
-          emit('linkEventText', true, `${t('project.node.enter_child_node')}`, '')
+          emit(
+            'linkEventText',
+            true,
+            `${t('project.node.enter_child_node')}`,
+            ''
+          )
         } else {
           emit('linkEventText', false, '', '')
         }
