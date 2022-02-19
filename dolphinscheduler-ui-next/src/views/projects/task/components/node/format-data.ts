@@ -28,9 +28,9 @@ export function formatParams(data: INodeData): {
     taskParams.programType = data.programType
     taskParams.sparkVersion = data.sparkVersion
     taskParams.mainClass = data.mainClass
-    taskParams.mainJar = data.mainJar?.length
-      ? data.mainJar.map((id: number) => ({ id }))
-      : []
+    if (data.mainJar) {
+      taskParams.mainJar = { id: data.mainJar }
+    }
     taskParams.deployMode = data.deployMode
     taskParams.appName = data.appName
     taskParams.driverCores = data.driverCores
@@ -38,6 +38,16 @@ export function formatParams(data: INodeData): {
     taskParams.numExecutors = data.numExecutors
     taskParams.executorMemory = data.executorMemory
     taskParams.executorCores = data.executorCores
+    taskParams.mainArgs = data.mainArgs
+    taskParams.others = data.others
+  }
+  if (data.taskType === 'MR') {
+    taskParams.programType = data.programType
+    taskParams.mainClass = data.mainClass
+    if (data.mainJar) {
+      taskParams.mainJar = { id: data.mainJar }
+    }
+    taskParams.appName = data.appName
     taskParams.mainArgs = data.mainArgs
     taskParams.others = data.others
   }
@@ -109,9 +119,7 @@ export function formatModel(data: ITaskData) {
     )
   }
   if (data.taskParams?.mainJar) {
-    params.mainJar = data.taskParams.mainJar.map(
-      (item: { id: number }) => item.id
-    )
+    params.mainJar = data.taskParams?.mainJar.id
   }
   return params
 }

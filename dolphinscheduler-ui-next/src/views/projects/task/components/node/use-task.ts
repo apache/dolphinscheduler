@@ -19,6 +19,7 @@ import { useShell } from './tasks/use-shell'
 import { useSubProcess } from './tasks/use-sub-process'
 import { usePython } from './tasks/use-python'
 import { useSpark } from './tasks/use-spark'
+import { useMr } from './tasks/use-mr'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -60,6 +61,14 @@ export function useTask({
   }
   if (taskType === 'SPARK') {
     node = useSpark({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'MR') {
+    node = useMr({
       projectCode,
       from,
       readonly,
