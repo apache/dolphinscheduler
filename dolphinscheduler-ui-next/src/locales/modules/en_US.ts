@@ -612,7 +612,31 @@ const project = {
     prop_tips: 'prop(required)',
     prop_repeat: 'prop is repeat',
     value_tips: 'value(optional)',
-    pre_tasks: 'Pre tasks'
+    pre_tasks: 'Pre tasks',
+    program_type: 'Program Type',
+    spark_version: 'Spark Version',
+    main_class: 'Main Class',
+    main_class_tips: 'Please enter main class',
+    main_package: 'Main Package',
+    main_package_tips: 'Please enter main package',
+    deploy_mode: 'Deploy Mode',
+    app_name: 'App Name',
+    app_name_tips: 'Please enter app name(optional)',
+    driver_cores: 'Driver Cores',
+    driver_cores_tips: 'Please enter Driver cores',
+    driver_memory: 'Driver Memory',
+    driver_memory_tips: 'Please enter Driver memory',
+    executor_number: 'Executor Number',
+    executor_number_tips: 'Please enter Executor number',
+    executor_memory: 'Executor Memory',
+    executor_memory_tips: 'Please enter Executor memory',
+    executor_cores: 'Executor Cores',
+    executor_cores_tips: 'Please enter Executor cores',
+    main_arguments: 'Main Arguments',
+    main_arguments_tips: 'Please enter main arguments',
+    option_parameters: 'Option Parameters',
+    option_parameters_tips: 'Please enter option parameters',
+    positive_integer_tips: 'should be a positive integer'
   }
 }
 
