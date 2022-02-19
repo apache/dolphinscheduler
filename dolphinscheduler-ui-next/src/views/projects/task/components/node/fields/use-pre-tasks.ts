@@ -15,17 +15,29 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function usePreTasks(): IJsonItem {
+export function usePreTasks(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([])
-  const loading = ref(false)
 
-  onMounted(() => {})
+  const getOptions = () => {
+    if (!model.preTaskOptions?.length) return []
+    return model.preTaskOptions.map((task: { code: number; name: string }) => ({
+      value: task.code,
+      label: task.name
+    }))
+  }
+
+  watch(
+    () => model.preTaskOptions,
+    () => {
+      options.value = getOptions()
+    }
+  )
 
   return {
     type: 'select',
@@ -33,7 +45,6 @@ export function usePreTasks(): IJsonItem {
     span: 24,
     name: t('project.node.pre_tasks'),
     props: {
-      loading,
       multiple: true,
       filterable: true
     },
