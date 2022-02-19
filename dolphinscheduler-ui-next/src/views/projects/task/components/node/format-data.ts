@@ -24,32 +24,38 @@ export function formatParams(data: INodeData): {
   taskDefinitionJsonObj: object
 } {
   const taskParams: ITaskParams = {}
-  if (data.taskType === 'SPARK') {
+  if (
+    data.taskType === 'SPARK' ||
+    data.taskType === 'MR' ||
+    data.taskType === 'FLINK'
+  ) {
     taskParams.programType = data.programType
-    taskParams.sparkVersion = data.sparkVersion
     taskParams.mainClass = data.mainClass
     if (data.mainJar) {
       taskParams.mainJar = { id: data.mainJar }
     }
     taskParams.deployMode = data.deployMode
     taskParams.appName = data.appName
+    taskParams.mainArgs = data.mainArgs
+    taskParams.others = data.others
+  }
+
+  if (data.taskType === 'SPARK') {
+    taskParams.sparkVersion = data.sparkVersion
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors
     taskParams.executorMemory = data.executorMemory
     taskParams.executorCores = data.executorCores
-    taskParams.mainArgs = data.mainArgs
-    taskParams.others = data.others
   }
-  if (data.taskType === 'MR') {
-    taskParams.programType = data.programType
-    taskParams.mainClass = data.mainClass
-    if (data.mainJar) {
-      taskParams.mainJar = { id: data.mainJar }
-    }
-    taskParams.appName = data.appName
-    taskParams.mainArgs = data.mainArgs
-    taskParams.others = data.others
+
+  if (data.taskType === 'FLINK') {
+    taskParams.flinkVersion = data.flinkVersion
+    taskParams.jobManagerMemory = data.jobManagerMemory
+    taskParams.taskManagerMemory = data.taskManagerMemory
+    taskParams.slot = data.slot
+    taskParams.taskManager = data.taskManager
+    taskParams.parallelism = data.parallelism
   }
 
   const params = {
