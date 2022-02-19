@@ -17,6 +17,7 @@
 
 import { useShell } from './tasks/use-shell'
 import { usePython } from './tasks/use-python'
+import { useSql } from './tasks/use-sql'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -42,6 +43,14 @@ export function useTask({
   }
   if (taskType === 'PYTHON') {
     node = usePython({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'SQL') {
+    node = useSql({
       projectCode,
       from,
       readonly,
