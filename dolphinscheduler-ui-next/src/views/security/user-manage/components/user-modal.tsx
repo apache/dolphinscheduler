@@ -57,6 +57,8 @@ export const UserModal = defineComponent({
         onCancel={this.onModalCancel}
         confirmLoading={this.confirmLoading}
         onConfirm={this.onConfirm}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
       >
         {{
           default: () => {
@@ -78,6 +80,7 @@ export const UserModal = defineComponent({
               >
                 <NFormItem label={t('security.user.username')} path='userName'>
                   <NInput
+                    class='input-username'
                     inputProps={{ autocomplete: 'off' }}
                     v-model:value={this.formValues.userName}
                   />
@@ -87,6 +90,7 @@ export const UserModal = defineComponent({
                   path='userPassword'
                 >
                   <NInput
+                    class='input-password'
                     inputProps={{ autocomplete: 'off' }}
                     type='password'
                     v-model:value={this.formValues.userPassword}
@@ -97,27 +101,39 @@ export const UserModal = defineComponent({
                   path='tenantId'
                 >
                   <NSelect
+                    class='select-tenant'
                     options={this.tenants}
                     v-model:value={this.formValues.tenantId}
                   />
                 </NFormItem>
                 <NFormItem label={t('security.user.queue')} path='queue'>
                   <NSelect
+                    class='select-queue'
                     options={this.queues}
                     v-model:value={this.formValues.queue}
                   />
                 </NFormItem>
                 <NFormItem label={t('security.user.email')} path='email'>
-                  <NInput v-model:value={this.formValues.email} />
+                  <NInput
+                    class='input-email'
+                    v-model:value={this.formValues.email}
+                  />
                 </NFormItem>
                 <NFormItem label={t('security.user.phone')} path='phone'>
-                  <NInput v-model:value={this.formValues.phone} />
+                  <NInput
+                    class='input-phone'
+                    v-model:value={this.formValues.phone}
+                  />
                 </NFormItem>
                 <NFormItem label={t('security.user.state')} path='state'>
                   <NRadioGroup v-model:value={this.formValues.state}>
                     <NSpace>
-                      <NRadio value={1}>启用</NRadio>
-                      <NRadio value={0}>停用</NRadio>
+                      <NRadio value={1} class='radio-state-enable'>
+                        启用
+                      </NRadio>
+                      <NRadio value={0} class='radio-state-disable'>
+                        停用
+                      </NRadio>
                     </NSpace>
                   </NRadioGroup>
                 </NFormItem>
