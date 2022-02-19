@@ -605,7 +605,31 @@ const project = {
     prop_tips: 'prop(必填)',
     prop_repeat: 'prop中有重复',
     value_tips: 'value(选填)',
-    pre_tasks: '前置任务'
+    pre_tasks: '前置任务',
+    program_type: '程序类型',
+    spark_version: 'Spark版本',
+    main_class: '主函数的Class',
+    main_class_tips: '请填写主函数的Class',
+    main_package: '主程序包',
+    main_package_tips: '请选择主程序包',
+    deploy_mode: '部署方式',
+    app_name: '任务名称',
+    app_name_tips: '请输入任务名称(选填)',
+    driver_cores: 'Driver核心数',
+    driver_cores_tips: '请输入Driver核心数',
+    driver_memory: 'Driver内存数',
+    driver_memory_tips: '请输入Driver内存数',
+    executor_number: 'Executor数量',
+    executor_number_tips: '请输入Executor数量',
+    executor_memory: 'Executor内存数',
+    executor_memory_tips: '请输入Executor内存数',
+    executor_cores: 'Executor核心数',
+    executor_cores_tips: '请输入Executor核心数',
+    main_arguments: '主程序参数',
+    main_arguments_tips: '请输入主程序参数',
+    option_parameters: '选项参数',
+    option_parameters_tips: '请输入选项参数',
+    positive_integer_tips: '应为正整数'
   }
 }
 

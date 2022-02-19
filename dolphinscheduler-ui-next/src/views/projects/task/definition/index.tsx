@@ -77,7 +77,6 @@ const TaskDefinition = defineComponent({
       requestData()
     }
     const onCreate = () => {
-      task.taskReadonly = false
       onToggleShow(true)
     }
     const onTaskCancel = () => {
