@@ -17,13 +17,29 @@
 
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { querySimpleList } from '@/service/modules/process-definition'
+import { uniqBy } from 'lodash'
+import {
+  querySimpleList,
+  queryProcessDefinitionByCode
+} from '@/service/modules/process-definition'
 import type { IJsonItem } from '../types'
+import { number } from 'echarts'
 
-export function useProcessName(
-  projectCode: number,
+export function useProcessName({
+  model,
+  projectCode,
+  isCreate,
+  from,
+  processName,
+  code
+}: {
+  model: { [field: string]: any }
+  projectCode: number
   isCreate: boolean
-): IJsonItem {
+  from?: number
+  processName?: number
+  code?: number
+}): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
@@ -43,19 +59,83 @@ export function useProcessName(
       loading.value = false
     }
   }
+  const getProcessListByCode = async (processCode: number) => {
+    if (!processCode) return
+    try {
+      const res = await queryProcessDefinitionByCode(processCode, projectCode)
+      getTaskOptions(res)
+    } catch (err) {}
+  }
+  const getTaskOptions = (processDefinition: {
+    processTaskRelationList: []
+    taskDefinitionList: []
+  }) => {
+    const { processTaskRelationList = [], taskDefinitionList = [] } =
+      processDefinition
+
+    const preTaskOptions: { code: number; name: string }[] = []
+    const tasks: { [field: number]: string } = {}
+    taskDefinitionList.forEach(
+      (task: { code: number; taskType: string; name: string }) => {
+        tasks[task.code] = task.name
+        if (task.code === code) return
+        if (
+          task.taskType === 'CONDITIONS' &&
+          processTaskRelationList.filter(
+            (relation: { preTaskCode: number }) =>
+              relation.preTaskCode === task.code
+          ).length >= 2
+        ) {
+          return
+        }
+        preTaskOptions.push({
+          code: task.code,
+          name: task.name
+        })
+      }
+    )
+    model.preTaskOptions = uniqBy(preTaskOptions, 'code')
+
+    if (!code) return
+    const preTasks: number[] = []
+    const postTaskOptions: { code: number; name: string }[] = []
+    processTaskRelationList.forEach(
+      (relation: { preTaskCode: number; postTaskCode: number }) => {
+        if (relation.preTaskCode === code) {
+          postTaskOptions.push({
+            code: relation.postTaskCode,
+            name: tasks[relation.postTaskCode]
+          })
+        }
+        if (relation.postTaskCode === code && relation.preTaskCode !== 0) {
+          preTasks.push(relation.preTaskCode)
+        }
+      }
+    )
+    model.preTasks = preTasks
+    model.postTaskOptions = postTaskOptions
+  }
+
+  const onChange = (code: number) => {
+    getProcessListByCode(code)
+  }
 
   onMounted(() => {
+    if (from === 1 && processName) {
+      getProcessListByCode(processName)
+    }
     getProcessList()
   })
 
   return {
     type: 'select',
-    field: 'processCode',
+    field: 'processName',
     span: 24,
     name: t('project.node.process_name'),
     props: {
       loading: loading,
-      disabled: !isCreate
+      disabled: !isCreate,
+      'on-update:value': onChange
     },
     options: options
   }
