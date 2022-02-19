@@ -1297,6 +1297,14 @@ public class WorkflowExecuteThread implements Runnable {
         return false;
     }
 
+    private void addProcessStopEvent(ProcessInstance processInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(processInstance.getId());
+        stateEvent.setExecutionStatus(ExecutionStatus.STOP);
+        this.addStateEvent(stateEvent);
+    }
+
     /**
      * close the on going tasks
      */
@@ -1322,6 +1330,11 @@ public class WorkflowExecuteThread implements Runnable {
                         this.processInstance.getId());
                 taskResponseService.addResponse(taskResponseEvent);
             }
+        }
+
+        if (taskRetryCheckList.size() > 0) {
+            this.taskRetryCheckList.clear();
+            this.addProcessStopEvent(processInstance);
         }
     }
 
