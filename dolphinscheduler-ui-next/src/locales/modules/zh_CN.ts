@@ -560,6 +560,7 @@ const project = {
     task_type: '任务类型',
     task_type_tips: '请选择任务类型(必选)',
     process_name: '工作流名称',
+    process_name_tips: '请选择工作流(必选)',
     child_node: '子节点',
     enter_child_node: '进入该子节点',
     run_flag: '运行标志',

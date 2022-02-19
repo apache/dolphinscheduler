@@ -23,7 +23,6 @@ import {
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
 import type { IJsonItem } from '../types'
-import { number } from 'echarts'
 
 export function useProcessName({
   model,
@@ -136,6 +135,15 @@ export function useProcessName({
       loading: loading,
       disabled: !isCreate,
       'on-update:value': onChange
+    },
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      validator(validate: any, value: string) {
+        if (!value) {
+          return new Error(t('project.node.process_name_tips'))
+        }
+      }
     },
     options: options
   }

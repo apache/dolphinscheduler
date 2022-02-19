@@ -562,6 +562,7 @@ const project = {
     task_type: 'Task Type',
     task_type_tips: 'Please select a task type (required)',
     process_name: 'Process Name',
+    process_name_tips: 'Please select a process (required)',
     child_node: 'Child Node',
     enter_child_node: 'Enter child node',
     run_flag: 'Run flag',
