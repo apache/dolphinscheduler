@@ -63,6 +63,13 @@ interface ITaskParams {
   executorCores?: number
   mainArgs?: string
   others?: string
+  httpMethod?: string
+  httpCheckCondition?: string
+  httpParams?: []
+  url?: string
+  condition?: string
+  connectTimeout?: number
+  socketTimeout?: number
 }
 
 type ITaskType = TaskType
@@ -91,6 +98,7 @@ interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   postTaskOptions?: []
   resourceList?: number[]
   mainJar?: number
+  timeoutSetting?: boolean
 }
 
 interface ITaskData

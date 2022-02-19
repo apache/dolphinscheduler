@@ -57,6 +57,15 @@ export function formatParams(data: INodeData): {
     taskParams.taskManager = data.taskManager
     taskParams.parallelism = data.parallelism
   }
+  if (data.taskType === 'HTTP') {
+    taskParams.httpMethod = data.httpMethod
+    taskParams.httpCheckCondition = data.httpCheckCondition
+    taskParams.httpParams = data.httpParams
+    taskParams.url = data.url
+    taskParams.condition = data.condition
+    taskParams.connectTimeout = data.connectTimeout
+    taskParams.socketTimeout = data.socketTimeout
+  }
 
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
@@ -123,6 +132,12 @@ export function formatModel(data: ITaskData) {
     params.resourceList = data.taskParams.resourceList.map(
       (item: { id: number }) => item.id
     )
+  }
+  if (
+    data.taskParams?.connectTimeout !== 60000 ||
+    data.taskParams?.socketTimeout !== 60000
+  ) {
+    params.timeoutSetting = true
   }
   if (data.taskParams?.mainJar) {
     params.mainJar = data.taskParams?.mainJar.id

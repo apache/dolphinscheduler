@@ -606,6 +606,7 @@ const project = {
     prop_tips: 'prop(必填)',
     prop_repeat: 'prop中有重复',
     value_tips: 'value(选填)',
+    value_required_tips: 'value(必填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
     spark_version: 'Spark版本',
@@ -645,7 +646,23 @@ const project = {
     parallelism_complement_tips:
       '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
     task_manager_number: 'TaskManager数量',
-    task_manager_number_tips: '请输入TaskManager数量'
+    task_manager_number_tips: '请输入TaskManager数量',
+    http_url: '请求地址',
+    http_url_tips: '请填写请求地址(必填)',
+    http_method: '请求类型',
+    http_parameters: '请求参数',
+    http_check_condition: '校验条件',
+    http_condition: '校验内容',
+    http_condition_tips: '请填写校验内容',
+    timeout_settings: '超时设置',
+    connect_timeout: '连接超时',
+    ms: '毫秒',
+    socket_timeout: 'Socket超时',
+    status_code_default: '默认响应码200',
+    status_code_custom: '自定义响应码',
+    body_contains: '内容包含',
+    body_not_contains: '内容不包含',
+    http_parameters_position: '参数位置'
   }
 }
 
