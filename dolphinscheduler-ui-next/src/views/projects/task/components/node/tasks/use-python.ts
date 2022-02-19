@@ -18,15 +18,18 @@
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
+import { ITaskData } from '../types'
 
 export function usePython({
   projectCode,
   from = 0,
-  readonly
+  readonly,
+  data
 }: {
   projectCode: number
   from?: number
   readonly?: boolean
+  data?: ITaskData
 }) {
   const model = reactive({
     name: '',
@@ -48,7 +51,14 @@ export function usePython({
   if (from === 1) {
     extra = [
       Fields.useTaskType(model, readonly),
-      Fields.useProcessName(projectCode, model.processCode, !model.id)
+      Fields.useProcessName({
+        model,
+        projectCode,
+        isCreate: !data?.id,
+        from,
+        processName: data?.processName,
+        code: data?.code
+      })
     ]
   }
 
@@ -66,7 +76,7 @@ export function usePython({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useShell(model),
-      Fields.usePreTasks()
+      Fields.usePreTasks(model)
     ] as IJsonItem[],
     model
   }

@@ -123,7 +123,7 @@ interface TaskDefinitionVersionRes {
 }
 
 interface ISingleSaveReq {
-  processDefinitionCode: string
+  processDefinitionCode?: string
   upstreamCodes: string
   taskDefinitionJsonObj: string
 }

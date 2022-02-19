@@ -24,11 +24,10 @@ export function formatParams(data: INodeData): {
   taskDefinitionJsonObj: object
 } {
   const params = {
-    processDefinitionCode: data.processCode ? String(data.processCode) : '',
-    upstreamCodes: '',
+    processDefinitionCode: data.processName ? String(data.processName) : '',
+    upstreamCodes: data?.preTasks?.join(','),
     taskDefinitionJsonObj: {
       ...omit(data, [
-        'processCode',
         'delayTime',
         'environmentCode',
         'failRetryTimes',
@@ -37,7 +36,11 @@ export function formatParams(data: INodeData): {
         'localParams',
         'timeoutFlag',
         'timeoutNotifyStrategy',
-        'resourceList'
+        'resourceList',
+        'postTaskOptions',
+        'preTaskOptions',
+        'preTasks',
+        'processName'
       ]),
       code: data.code,
       delayTime: data.delayTime ? String(data.delayTime) : '0',
@@ -46,7 +49,7 @@ export function formatParams(data: INodeData): {
       failRetryInterval: data.failRetryTimes
         ? String(data.failRetryTimes)
         : '0',
-      taskGroupId: data.taskGroupId || '',
+      taskGroupId: data.taskGroupId || 0,
       taskParams: {
         localParams: data.localParams,
         rawScript: data.rawScript,
@@ -86,11 +89,10 @@ export function formatModel(data: ITaskData) {
     delayTime: data.delayTime,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: [data.timeoutNotifyStrategy] || [],
-    resourceList: data.taskParams.resourceList,
+    resourceList: data.taskParams?.resourceList || [],
     timeout: data.timeout,
-    rawScript: data.taskParams.rawScript,
-    localParams: data.taskParams.localParams,
-    preTasks: [],
+    rawScript: data.taskParams?.rawScript,
+    localParams: data.taskParams?.localParams || [],
     id: data.id,
     code: data.code
   } as {
@@ -100,7 +102,7 @@ export function formatModel(data: ITaskData) {
   if (data.timeoutNotifyStrategy === 'WARNFAILED') {
     params.timeoutNotifyStrategy = ['WARN', 'FAILED']
   }
-  if (data.taskParams.resourceList) {
+  if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
       (item: { id: number }) => item.id
     )
