@@ -16,49 +16,62 @@
  */
 
 import { omit } from 'lodash'
-import type { INodeData, ITaskData } from './types'
+import type { INodeData, ITaskData, ITaskParams } from './types'
 
 export function formatParams(data: INodeData): {
   processDefinitionCode: string
   upstreamCodes: string
   taskDefinitionJsonObj: object
 } {
+  const taskParams: ITaskParams = {}
+  if (data.taskType === 'SPARK') {
+    taskParams.programType = data.programType
+    taskParams.sparkVersion = data.sparkVersion
+    taskParams.mainClass = data.mainClass
+    taskParams.mainJar = data.mainJar?.length
+      ? data.mainJar.map((id: number) => ({ id }))
+      : []
+    taskParams.deployMode = data.deployMode
+    taskParams.appName = data.appName
+    taskParams.driverCores = data.driverCores
+    taskParams.driverMemory = data.driverMemory
+    taskParams.numExecutors = data.numExecutors
+    taskParams.executorMemory = data.executorMemory
+    taskParams.executorCores = data.executorCores
+    taskParams.mainArgs = data.mainArgs
+    taskParams.others = data.others
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
     taskDefinitionJsonObj: {
-      ...omit(data, [
-        'delayTime',
-        'environmentCode',
-        'failRetryTimes',
-        'failRetryInterval',
-        'taskGroupId',
-        'localParams',
-        'timeoutFlag',
-        'timeoutNotifyStrategy',
-        'resourceList',
-        'postTaskOptions',
-        'preTaskOptions',
-        'preTasks',
-        'processName'
-      ]),
       code: data.code,
       delayTime: data.delayTime ? String(data.delayTime) : '0',
+      description: data.description,
       environmentCode: data.environmentCode || -1,
-      failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
-      failRetryInterval: data.failRetryTimes
-        ? String(data.failRetryTimes)
+      failRetryInterval: data.failRetryInterval
+        ? String(data.failRetryInterval)
         : '0',
+      failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
+      flag: data.flag,
+      name: data.name,
       taskGroupId: data.taskGroupId || 0,
+      taskGroupPriority: data.taskGroupPriority,
       taskParams: {
         localParams: data.localParams,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
           ? data.resourceList.map((id: number) => ({ id }))
-          : []
+          : [],
+        ...taskParams
       },
+      taskPriority: data.taskPriority,
+      taskType: data.taskType,
+      timeout: data.timeout,
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
-      timeoutNotifyStrategy: data.timeoutNotifyStrategy?.join('')
+      timeoutNotifyStrategy: data.timeoutNotifyStrategy?.join(''),
+      workerGroup: data.workerGroup
     }
   } as {
     processDefinitionCode: string
@@ -69,41 +82,34 @@ export function formatParams(data: INodeData): {
     params.taskDefinitionJsonObj.timeout = 0
     params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
   }
+
   return params
 }
 
 export function formatModel(data: ITaskData) {
   const params = {
-    name: data.name,
-    taskType: data.taskType,
-    processName: data.processName,
-    flag: data.flag,
-    description: data.description,
-    taskPriority: data.taskPriority,
-    workerGroup: data.workerGroup,
+    ...omit(data, [
+      'environmentCode',
+      'timeoutFlag',
+      'timeoutNotifyStrategy',
+      'taskParams'
+    ]),
+    ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
-    taskGroupId: data.taskGroupId,
-    taskGroupPriority: data.taskGroupPriority,
-    failRetryTimes: data.failRetryTimes,
-    failRetryInterval: data.failRetryInterval,
-    delayTime: data.delayTime,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: [data.timeoutNotifyStrategy] || [],
-    resourceList: data.taskParams?.resourceList || [],
-    timeout: data.timeout,
-    rawScript: data.taskParams?.rawScript,
-    localParams: data.taskParams?.localParams || [],
-    id: data.id,
-    code: data.code
-  } as {
-    timeoutNotifyStrategy: string[]
-    resourceList: number[]
-  }
+    localParams: data.taskParams?.localParams || []
+  } as INodeData
   if (data.timeoutNotifyStrategy === 'WARNFAILED') {
     params.timeoutNotifyStrategy = ['WARN', 'FAILED']
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
+      (item: { id: number }) => item.id
+    )
+  }
+  if (data.taskParams?.mainJar) {
+    params.mainJar = data.taskParams.mainJar.map(
       (item: { id: number }) => item.id
     )
   }

@@ -28,6 +28,6 @@ export function useDelayTime(model: { [field: string]: any }): IJsonItem {
     slots: {
       suffix: () => t('project.node.minute')
     },
-    value: model.delayExecutionTime ? model.delayExecutionTime : 0
+    value: model.delayTime || 0
   }
 }

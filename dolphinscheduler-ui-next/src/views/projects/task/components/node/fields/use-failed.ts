@@ -28,8 +28,7 @@ export function useFailed(): IJsonItem[] {
       span: 12,
       slots: {
         suffix: () => t('project.node.times')
-      },
-      value: 0
+      }
     },
     {
       type: 'input-number',
@@ -38,8 +37,7 @@ export function useFailed(): IJsonItem[] {
       span: 12,
       slots: {
         suffix: () => t('project.node.minute')
-      },
-      value: 1
+      }
     }
   ]
 }
