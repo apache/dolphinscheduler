@@ -605,7 +605,9 @@ const project = {
     prop_tips: 'prop(必填)',
     prop_repeat: 'prop中有重复',
     value_tips: 'value(选填)',
-    pre_tasks: '前置任务'
+    pre_tasks: '前置任务',
+    datasource_type: '数据源类型',
+    datasource: '数据源实例',
   }
 }
 

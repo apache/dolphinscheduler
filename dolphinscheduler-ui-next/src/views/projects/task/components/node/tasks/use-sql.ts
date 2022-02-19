@@ -44,8 +44,16 @@ export function useSql({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    type: data?.taskParams?.type? data?.taskParams?.type : 'MYSQL',
+    datasource: data?.taskParams?.datasource,
+    sql: data?.taskParams?.sql,
+    sqlType: data?.taskParams?.sqlType,
+    preStatements: data?.taskParams?.preStatements? data?.taskParams?.preStatements : [],
+    postStatements: data?.taskParams?.postStatements? data?.taskParams?.preStatements : [],
   } as INodeData)
+
+  console.log('use-sql...')
+  console.log(data)
 
   let extra: IJsonItem[] = []
   if (from === 1) {
@@ -75,6 +83,8 @@ export function useSql({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
+      Fields.useDatasourceType(model),
+      Fields.useDatasource(model),
       ...Fields.useShell(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],

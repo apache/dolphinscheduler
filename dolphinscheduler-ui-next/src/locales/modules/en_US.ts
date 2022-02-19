@@ -612,7 +612,9 @@ const project = {
     prop_tips: 'prop(required)',
     prop_repeat: 'prop is repeat',
     value_tips: 'value(optional)',
-    pre_tasks: 'Pre tasks'
+    pre_tasks: 'Pre tasks',
+    datasource_type: 'Datasource types',
+    datasource: 'Datasource instances',
   }
 }
 

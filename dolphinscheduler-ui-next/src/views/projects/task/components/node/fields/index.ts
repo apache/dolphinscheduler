@@ -28,5 +28,7 @@ export { useTimeoutAlarm } from './use-timeout-alarm'
 export { usePreTasks } from './use-pre-tasks'
 export { useTaskType } from './use-task-type'
 export { useProcessName } from './use-process-name'
+export { useDatasourceType } from './use-datasource-type'
+export { useDatasource } from './use-datasource'
 
 export { useShell } from './use-shell'

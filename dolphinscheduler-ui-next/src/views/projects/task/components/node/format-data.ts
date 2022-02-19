@@ -94,7 +94,11 @@ export function formatModel(data: ITaskData) {
     rawScript: data.taskParams?.rawScript,
     localParams: data.taskParams?.localParams || [],
     id: data.id,
-    code: data.code
+    code: data.code,
+    type: data.taskParams?.type,
+    datasource: data.taskParams?.datasource,
+    sql: data.taskParams?.sql,
+    sqlType: data.taskParams?.sqlType,
   } as {
     timeoutNotifyStrategy: string[]
     resourceList: number[]
@@ -107,5 +111,6 @@ export function formatModel(data: ITaskData) {
       (item: { id: number }) => item.id
     )
   }
+  console.log(params)
   return params
 }

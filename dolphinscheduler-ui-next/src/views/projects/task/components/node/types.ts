@@ -75,8 +75,14 @@ interface ITaskData
   timeoutNotifyStrategy?: string | []
   taskParams?: {
     resourceList: []
-    rawScript: string
+    rawScript?: string
     localParams: ILocalParam[]
+    type?: string
+    datasource?: string
+    sql?: string
+    sqlType?: string
+    preStatements?: string[]
+    postStatements?: string[]
   }
 }
 
