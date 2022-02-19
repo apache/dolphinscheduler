@@ -11,23 +11,20 @@ class:
 
 #### tenant manage
 
-class:
-
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] tenantCode
-- [ ] edit
-- [ ] delete
-
-id:
-
-- [ ] btnCreateTenant
-- [ ] inputTenantCode
-- [ ] selectQueue
-- [ ] inputDescription
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class              |
+| ------------------ |--------------------|
+| :white_check_mark: | items              |
+|                    | el-popconfirm      |
+|                    | el-button--primary |
+| :white_check_mark: | tenant-code        |
+| :white_check_mark: | edit               |
+| :white_check_mark: | delete             |
+| :white_check_mark: | btn-create-tenant  |
+| :white_check_mark: | input-tenant-code  |
+| :white_check_mark: | select-queue       |
+| :white_check_mark: | input-description  |
+| :white_check_mark: | btn-submit         |
+| :white_check_mark: | btn-cancel         |
 
 #### user manage
 

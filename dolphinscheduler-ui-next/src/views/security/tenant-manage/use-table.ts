@@ -55,7 +55,8 @@ export function useTable() {
       },
       {
         title: t('security.tenant.tenant_code'),
-        key: 'tenantCode'
+        key: 'tenantCode',
+        className: 'tenant-code'
       },
       {
         title: t('security.tenant.description'),
@@ -90,6 +91,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -120,7 +122,8 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small'
+                              size: 'small',
+                              class: 'delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)
