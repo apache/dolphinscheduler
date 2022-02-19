@@ -38,7 +38,8 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
       },
       {
         title: t('security.user.username'),
-        key: 'userName'
+        key: 'userName',
+        className: 'name'
       },
       {
         title: t('security.user.tenant_code'),
@@ -92,6 +93,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
                       circle
                       type='info'
                       size='small'
+                      class='edit'
                       onClick={() => {
                         onEdit(rowData)
                       }}
@@ -115,6 +117,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
                       circle
                       type='error'
                       size='small'
+                      class='delete'
                       onClick={() => {
                         onDelete(rowData)
                       }}
