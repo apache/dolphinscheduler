@@ -28,5 +28,6 @@ export { useTimeoutAlarm } from './use-timeout-alarm'
 export { usePreTasks } from './use-pre-tasks'
 export { useTaskType } from './use-task-type'
 export { useProcessName } from './use-process-name'
+export { useChildNode } from './use-child-node'
 
 export { useShell } from './use-shell'
