@@ -637,7 +637,23 @@ const project = {
     main_arguments_tips: 'Please enter main arguments',
     option_parameters: 'Option Parameters',
     option_parameters_tips: 'Please enter option parameters',
-    positive_integer_tips: 'should be a positive integer'
+    positive_integer_tips: 'should be a positive integer',
+    flink_version: 'Flink Version',
+    job_manager_memory: 'JobManager Memory',
+    job_manager_memory_tips: 'Please enter JobManager memory',
+    task_manager_memory: 'TaskManager Memory',
+    task_manager_memory_tips: 'Please enter TaskManager memory',
+    slot_number: 'Slot Number',
+    slot_number_tips: 'Please enter Slot number',
+    parallelism: 'Parallelism',
+    custom_parallelism: 'Configure parallelism',
+    parallelism_tips: 'Please enter Parallelism',
+    parallelism_number_tips: 'Parallelism number should be positive integer',
+    parallelism_complement_tips:
+      'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
+      'set the complement task thread to a reasonable value to avoid too large impact on the server.',
+    task_manager_number: 'TaskManager Number',
+    task_manager_number_tips: 'Please enter TaskManager number'
   }
 }
 

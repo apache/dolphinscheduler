@@ -630,7 +630,22 @@ const project = {
     main_arguments_tips: '请输入主程序参数',
     option_parameters: '选项参数',
     option_parameters_tips: '请输入选项参数',
-    positive_integer_tips: '应为正整数'
+    positive_integer_tips: '应为正整数',
+    flink_version: 'Flink版本',
+    job_manager_memory: 'JobManager内存数',
+    job_manager_memory_tips: '请输入JobManager内存数',
+    task_manager_memory: 'TaskManager内存数',
+    task_manager_memory_tips: '请输入TaskManager内存数',
+    slot_number: 'Slot数量',
+    slot_number_tips: '请输入Slot数量',
+    parallelism: '并行度',
+    custom_parallelism: '自定义并行度',
+    parallelism_tips: '请输入并行度',
+    parallelism_number_tips: '并行度必须为正整数',
+    parallelism_complement_tips:
+      '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
+    task_manager_number: 'TaskManager数量',
+    task_manager_number_tips: '请输入TaskManager数量'
   }
 }
 

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { useFlink } from './tasks/use-flink'
 import { useShell } from './tasks/use-shell'
 import { useSubProcess } from './tasks/use-sub-process'
 import { usePython } from './tasks/use-python'
@@ -69,6 +70,14 @@ export function useTask({
   }
   if (taskType === 'MR') {
     node = useMr({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'FLINK') {
+    node = useFlink({
       projectCode,
       from,
       readonly,

@@ -47,6 +47,12 @@ interface ITaskParams {
   rawScript?: string
   programType?: string
   sparkVersion?: string
+  flinkVersion?: string
+  jobManagerMemory?: string
+  taskManagerMemory?: string
+  slot?: number
+  taskManager?: number
+  parallelism?: number
   mainClass?: string
   deployMode?: string
   appName?: string

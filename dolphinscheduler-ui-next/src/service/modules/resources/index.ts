@@ -118,7 +118,9 @@ export function onlineCreateResource(
   })
 }
 
-export function queryResourceByProgramType(params: ResourceTypeReq): any {
+export function queryResourceByProgramType(
+  params: ResourceTypeReq & ProgramTypeReq
+): any {
   return axios({
     url: '/resources/query-by-type',
     method: 'get',
