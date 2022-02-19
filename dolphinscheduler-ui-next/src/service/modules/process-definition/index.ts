@@ -157,13 +157,13 @@ export function queryProcessDefinitionByCode(
   })
 }
 
-export function update(
-  data: ProcessDefinitionReq & NameReq & ReleaseStateReq,
-  code: CodeReq,
-  processCode: CodeReq
+export function updateProcessDefinition(
+  data: ProcessDefinitionReq & ReleaseStateReq,
+  code: number,
+  projectCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}`,
+    url: `/projects/${projectCode}/process-definition/${code}`,
     method: 'put',
     data
   })

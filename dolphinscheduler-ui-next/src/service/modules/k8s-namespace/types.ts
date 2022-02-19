@@ -15,18 +15,38 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+interface K8SReq {
+  namespace: string
+  k8s: string
+  owner?: string
+  tag?: string
+  limitsCpu?: number | string
+  limitsMemory?: number | string
 }
+
+interface NamespaceItem extends K8SReq {
+  id: number
+  createTime: string
+  updateTime: string
+  podRequestCpu?: any
+  podRequestMemory?: any
+  podReplicas?: any
+  onlineJobNum?: any
+}
+
+interface NamespaceListRes {
+  totalList: NamespaceItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { ListReq, K8SReq, NamespaceItem, NamespaceListRes }

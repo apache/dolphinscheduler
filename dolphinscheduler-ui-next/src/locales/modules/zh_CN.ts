@@ -73,6 +73,7 @@ const menu = {
   worker_group_manage: 'Worker分组管理',
   yarn_queue_manage: 'Yarn队列管理',
   environment_manage: '环境管理',
+  k8s_namespace_manage: 'K8S命名空间管理',
   token_manage: '令牌管理',
   task_group_manage: '任务组管理',
   task_group_option: '任务组配置',
@@ -544,7 +545,9 @@ const project = {
     minute: '分',
     key: '键',
     value: '值',
-    success: '成功'
+    success: '成功',
+    delete_cell: '删除选中的线或节点',
+    online_directly: '是否上线流程定义'
   },
   node: {
     current_node_settings: '当前节点设置',
@@ -796,6 +799,29 @@ const security = {
     botToken: '机器人Token',
     chatId: '频道ID',
     parseMode: '解析类型'
+  },
+  k8s_namespace: {
+    create_namespace: '创建命名空间',
+    edit_namespace: '编辑命名空间',
+    search_tips: '请输入关键词',
+    k8s_namespace: 'K8S命名空间',
+    k8s_namespace_tips: '请输入k8s命名空间',
+    k8s_cluster: 'K8S集群',
+    k8s_cluster_tips: '请输入k8s集群',
+    owner: '负责人',
+    owner_tips: '请输入负责人',
+    tag: '标签',
+    tag_tips: '请输入标签',
+    limit_cpu: '最大CPU',
+    limit_cpu_tips: '请输入最大CPU',
+    limit_memory: '最大内存',
+    limit_memory_tips: '请输入最大内存',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    delete_confirm: '确定删除吗?'
   }
 }
 

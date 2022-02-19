@@ -19,17 +19,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
-
-    button {
-      margin-left: 10px;
-    }
-  }
 }
 
 .table-card {

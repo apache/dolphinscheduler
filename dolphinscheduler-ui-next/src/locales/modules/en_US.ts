@@ -73,6 +73,7 @@ const menu = {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',
+  k8s_namespace_manage: 'K8S Namespace Manage',
   token_manage: 'Token Manage',
   task_group_manage: 'Task Group Manage',
   task_group_option: 'Task Group Option',
@@ -546,7 +547,9 @@ const project = {
     minute: 'Minute',
     key: 'Key',
     value: 'Value',
-    success: 'Success'
+    success: 'Success',
+    delete_cell: 'Delete selected edges and nodes',
+    online_directly: 'Whether to go online the process definition'
   },
   node: {
     current_node_settings: 'Current node settings',
@@ -805,6 +808,29 @@ const security = {
     botToken: 'Bot Token',
     chatId: 'Channel Chat Id',
     parseMode: 'Parse Mode'
+  },
+  k8s_namespace: {
+    create_namespace: 'Create Namespace',
+    edit_namespace: 'Edit Namespace',
+    search_tips: 'Please enter keywords',
+    k8s_namespace: 'K8S Namespace',
+    k8s_namespace_tips: 'Please enter k8s namespace',
+    k8s_cluster: 'K8S Cluster',
+    k8s_cluster_tips: 'Please enter k8s cluster',
+    owner: 'Owner',
+    owner_tips: 'Please enter owner',
+    tag: 'Tag',
+    tag_tips: 'Please enter tag',
+    limit_cpu: 'Limit CPU',
+    limit_cpu_tips: 'Please enter limit CPU',
+    limit_memory: 'Limit Memory',
+    limit_memory_tips: 'Please enter limit memory',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?'
   }
 }
 

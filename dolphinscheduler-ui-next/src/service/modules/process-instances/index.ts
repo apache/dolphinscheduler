@@ -82,9 +82,12 @@ export function queryTopNLongestRunningProcessInstance(
   })
 }
 
-export function queryProcessInstanceById(id: IdReq, code: CodeReq): any {
+export function queryProcessInstanceById(
+  instanceId: number,
+  projectCode: number
+): any {
   return axios({
-    url: `/projects/${code}/process-instances/${id}`,
+    url: `/projects/${projectCode}/process-instances/${instanceId}`,
     method: 'get'
   })
 }

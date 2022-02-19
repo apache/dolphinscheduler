@@ -1,6 +1,7 @@
 ### security
 
 class:
+
 - [ ] tab-tenant-manage
 - [ ] tab-user-manage
 - [ ] tab-worker-group-manage
@@ -11,6 +12,7 @@ class:
 #### tenant manage
 
 class:
+
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -19,6 +21,7 @@ class:
 - [ ] delete
 
 id:
+
 - [ ] btnCreateTenant
 - [ ] inputTenantCode
 - [ ] selectQueue
@@ -29,6 +32,7 @@ id:
 #### user manage
 
 class:
+
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
@@ -37,6 +41,7 @@ class:
 - [ ] delete
 
 id:
+
 - [ ] btnCreateUser
 - [ ] inputUserName
 - [ ] inputUserPassword
@@ -51,43 +56,40 @@ id:
 
 #### worker group manage
 
-class:
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] vue-treeselect__menu
-- [ ] name
-- [ ] edit
-- [ ] delete
-
-id:
-- [ ] btnCreateWorkerGroup
-- [ ] inputWorkerGroupName
-- [ ] selectWorkerAddress
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class                   |
+| ------------------ | ----------------------- |
+| :white_check_mark: | items                   |
+|                    | el-popconfirm           |
+|                    | el-button--primary      |
+| :white_check_mark: | name                    |
+| :white_check_mark: | edit                    |
+| :white_check_mark: | delete                  |
+| :white_check_mark: | btn-create-worker-group |
+| :white_check_mark: | input-worker-group-name |
+| :white_check_mark: | select-worker-address   |
+| :white_check_mark: | btn-submit              |
+| :white_check_mark: | btn-cancel              |
 
 #### queue manage
 
-class:
-- [ ] items
-- [ ] queueName
-- [ ] edit
-
-id:
-- [ ] btnCreateQueue
-- [ ] inputQueueName
-- [ ] inputQueueValue
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class             |
+| ------------------ | ----------------- |
+| :white_check_mark: | items             |
+| :white_check_mark: | queue-name        |
+| :white_check_mark: | edit              |
+| :white_check_mark: | btn-create-queue  |
+| :white_check_mark: | input-queue-name  |
+| :white_check_mark: | input-queue-value |
+| :white_check_mark: | btn-submit        |
+| :white_check_mark: | btn-cancel        |
 
 #### environment manage
 
 | check              | class                          |
-|--------------------|--------------------------------|
+| ------------------ | ------------------------------ |
 | :white_check_mark: | items                          |
-|  | el-popconfirm                  |
-|  | el-button--primary             |
+|                    | el-popconfirm                  |
+|                    | el-button--primary             |
 | :white_check_mark: | environment-name               |
 | :white_check_mark: | edit                           |
 | :white_check_mark: | delete                         |
@@ -102,10 +104,10 @@ id:
 #### token manage
 
 | check              | class              |
-|--------------------|--------------------|
+| ------------------ | ------------------ |
 | :white_check_mark: | items              |
-|  | el-popconfirm      |
-|  | el-button--primary |
+|                    | el-popconfirm      |
+|                    | el-button--primary |
 | :white_check_mark: | username           |
 | :white_check_mark: | token              |
 | :white_check_mark: | input-username     |

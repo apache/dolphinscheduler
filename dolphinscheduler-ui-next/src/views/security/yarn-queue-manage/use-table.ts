@@ -40,7 +40,8 @@ export function useTable() {
       },
       {
         title: t('security.yarn_queue.queue_name'),
-        key: 'queueName'
+        key: 'queueName',
+        className: 'queue-name'
       },
       {
         title: t('security.yarn_queue.queue_value'),
@@ -69,6 +70,7 @@ export function useTable() {
                     circle: true,
                     type: 'info',
                     size: 'small',
+                    class: 'edit',
                     onClick: () => {
                       handleEdit(row)
                     }

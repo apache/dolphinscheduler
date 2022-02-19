@@ -17,25 +17,39 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+import { format } from 'date-fns'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
-  queryAllWorkerGroupsPaging,
-  deleteById
-} from '@/service/modules/worker-groups'
+  queryNamespaceListPaging,
+  delNamespaceById
+} from '@/service/modules/k8s-namespace'
 import type {
-  WorkerGroupRes,
-  WorkerGroupItem
-} from '@/service/modules/worker-groups/types'
+  NamespaceListRes,
+  NamespaceItem
+} from '@/service/modules/k8s-namespace/types'
 
 export function useTable() {
   const { t } = useI18n()
 
-  const handleEdit = (row: any) => {
+  const handleEdit = (row: NamespaceItem) => {
     variables.showModalRef = true
     variables.statusRef = 1
     variables.row = row
+  }
+
+  const handleDelete = (row: NamespaceItem) => {
+    delNamespaceById(row.id).then(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo:
+          variables.tableData.length === 1 && variables.page > 1
+            ? variables.page - 1
+            : variables.page,
+        searchVal: variables.searchVal
+      })
+    })
   }
 
   const createColumns = (variables: any) => {
@@ -45,43 +59,41 @@ export function useTable() {
         key: 'index'
       },
       {
-        title: t('security.worker_group.group_name'),
-        key: 'name',
-        className: 'name'
+        title: t('security.k8s_namespace.k8s_namespace'),
+        key: 'namespace'
       },
       {
-        title: t('security.worker_group.worker_addresses'),
-        key: 'addrList',
-        render: (row: WorkerGroupItem) =>
-          h(NSpace, null, {
-            default: () =>
-              row.addrList
-                .split(',')
-                .map((item: string) =>
-                  h(
-                    NTag,
-                    { type: 'success', size: 'small' },
-                    { default: () => item }
-                  )
-                )
-          })
+        title: t('security.k8s_namespace.k8s_cluster'),
+        key: 'k8s'
       },
       {
-        title: t('security.worker_group.create_time'),
+        title: t('security.k8s_namespace.owner'),
+        key: 'owner'
+      },
+      {
+        title: t('security.k8s_namespace.tag'),
+        key: 'tag'
+      },
+      {
+        title: t('security.k8s_namespace.limit_cpu'),
+        key: 'limitsCpu'
+      },
+      {
+        title: t('security.k8s_namespace.limit_memory'),
+        key: 'limitsMemory'
+      },
+      {
+        title: t('security.k8s_namespace.create_time'),
         key: 'createTime'
       },
       {
-        title: t('security.worker_group.update_time'),
+        title: t('security.k8s_namespace.update_time'),
         key: 'updateTime'
       },
       {
-        title: t('security.worker_group.operation'),
+        title: t('security.k8s_namespace.operation'),
         key: 'operation',
-        render(row: any) {
-          if (row.systemDefault) {
-            return false
-          }
-
+        render(row: NamespaceItem) {
           return h(NSpace, null, {
             default: () => [
               h(
@@ -95,7 +107,6 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
-                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -104,7 +115,7 @@ export function useTable() {
                         icon: () => h(EditOutlined)
                       }
                     ),
-                  default: () => t('security.worker_group.edit')
+                  default: () => t('security.k8s_namespace.edit')
                 }
               ),
               h(
@@ -126,17 +137,16 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small',
-                              class: 'delete'
+                              size: 'small'
                             },
                             {
                               icon: () => h(DeleteOutlined)
                             }
                           ),
-                        default: () => t('security.worker_group.delete')
+                        default: () => t('security.k8s_namespace.delete')
                       }
                     ),
-                  default: () => t('security.worker_group.delete_confirm')
+                  default: () => t('security.k8s_namespace.delete_confirm')
                 }
               )
             ]
@@ -158,23 +168,18 @@ export function useTable() {
     row: {}
   })
 
-  const handleDelete = (row: any) => {
-    deleteById({ id: row.id }).then(() => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo:
-          variables.tableData.length === 1 && variables.page > 1
-            ? variables.page - 1
-            : variables.page,
-        searchVal: variables.searchVal
-      })
-    })
-  }
-
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
-      queryAllWorkerGroupsPaging({ ...params }).then((res: WorkerGroupRes) => {
+      queryNamespaceListPaging({ ...params }).then((res: NamespaceListRes) => {
         variables.tableData = res.totalList.map((item, index) => {
+          item.createTime = format(
+            new Date(item.createTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          item.updateTime = format(
+            new Date(item.updateTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
           return {
             index: index + 1,
             ...item

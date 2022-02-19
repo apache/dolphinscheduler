@@ -46,7 +46,8 @@ const TaskDefinition = defineComponent({
     const projectCode = Number(route.params.projectCode)
     const { t } = useI18n()
 
-    const { task, onToggleShow, onTaskSave, onEditTask } = useTask(projectCode)
+    const { task, onToggleShow, onTaskSave, onEditTask, onInitTask } =
+      useTask(projectCode)
 
     const { variables, getTableData, createColumns } = useTable(onEditTask)
 
@@ -76,10 +77,12 @@ const TaskDefinition = defineComponent({
       requestData()
     }
     const onCreate = () => {
+      task.taskReadonly = false
       onToggleShow(true)
     }
     const onTaskCancel = () => {
       onToggleShow(false)
+      onInitTask()
     }
     const onTaskSubmit = async (params: { data: INodeData }) => {
       const result = await onTaskSave(params.data)

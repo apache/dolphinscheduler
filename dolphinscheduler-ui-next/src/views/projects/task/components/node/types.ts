@@ -40,7 +40,7 @@ type ITaskType = TaskType
 interface INodeData {
   id?: string
   taskType?: ITaskType
-  processCode?: string
+  processName?: number
   delayTime?: number
   description?: string
   environmentCode?: number | null
@@ -59,6 +59,9 @@ interface INodeData {
   resourceList?: number[]
   code?: number
   name?: string
+  preTasks?: []
+  preTaskOptions?: []
+  postTaskOptions?: []
 }
 
 interface ITaskData
@@ -67,16 +70,14 @@ interface ITaskData
     'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
   > {
   name?: string
-  processName?: number
-  taskPriority?: number
+  taskPriority?: string
   timeoutFlag: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
-  taskParams: {
+  taskParams?: {
     resourceList: []
     rawScript: string
     localParams: ILocalParam[]
   }
-  preTasks?: []
 }
 
 export {

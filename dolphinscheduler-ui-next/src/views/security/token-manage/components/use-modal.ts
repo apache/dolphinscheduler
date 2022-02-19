@@ -64,7 +64,6 @@ export function useModal(
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          console.log(variables.model.expireTime)
           if (!variables.model.expireTime) {
             return new Error(t('security.token.expiration_time_tips'))
           }
