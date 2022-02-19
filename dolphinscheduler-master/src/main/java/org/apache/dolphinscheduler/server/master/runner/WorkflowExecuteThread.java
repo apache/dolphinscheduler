@@ -1662,6 +1662,18 @@ public class WorkflowExecuteThread {
                 this.addStateEvent(stateEvent);
             }
         }
+
+        if (this.stateWheelExecuteThread.clearTaskRetryList()) {
+            this.addProcessStopEvent(processInstance);
+        }
+    }
+
+    private void addProcessStopEvent(ProcessInstance processInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(processInstance.getId());
+        stateEvent.setExecutionStatus(ExecutionStatus.STOP);
+        this.addStateEvent(stateEvent);
     }
 
     public boolean workFlowFinish() {

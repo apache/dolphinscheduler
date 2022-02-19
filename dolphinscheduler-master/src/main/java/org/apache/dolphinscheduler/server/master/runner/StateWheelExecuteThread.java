@@ -191,6 +191,14 @@ public class StateWheelExecuteThread extends Thread {
         taskInstanceRetryCheckList.remove(taskInstanceKey);
     }
 
+    public boolean clearTaskRetryList() {
+        if (taskInstanceRetryCheckList.size() > 0) {
+            taskInstanceRetryCheckList.remove();
+            return true;
+        }
+        return false;
+    }
+
     public void addTask4StateCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
         if (taskInstanceKey == null) {
@@ -265,13 +273,6 @@ public class StateWheelExecuteThread extends Thread {
             }
 
             TaskInstance taskInstance = workflowExecuteThread.getRetryTaskInstanceByTaskCode(taskCode);
-            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
-
-            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
-                addProcessStopEvent(processInstance);
-                taskInstanceRetryCheckList.remove(taskInstanceKey);
-                break;
-            }
 
             if (taskInstance == null) {
                 logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
@@ -328,14 +329,6 @@ public class StateWheelExecuteThread extends Thread {
         stateEvent.setTaskInstanceId(taskInstance.getId());
         stateEvent.setTaskCode(taskInstance.getTaskCode());
         stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-        workflowExecuteThreadPool.submitStateEvent(stateEvent);
-    }
-
-    private void addProcessStopEvent(ProcessInstance processInstance) {
-        StateEvent stateEvent = new StateEvent();
-        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
-        stateEvent.setProcessInstanceId(processInstance.getId());
-        stateEvent.setExecutionStatus(ExecutionStatus.STOP);
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 
