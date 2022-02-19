@@ -613,6 +613,7 @@ const project = {
     prop_tips: 'prop(required)',
     prop_repeat: 'prop is repeat',
     value_tips: 'value(optional)',
+    value_required_tips: 'value(required)',
     pre_tasks: 'Pre tasks',
     program_type: 'Program Type',
     spark_version: 'Spark Version',
@@ -653,7 +654,23 @@ const project = {
       'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
       'set the complement task thread to a reasonable value to avoid too large impact on the server.',
     task_manager_number: 'TaskManager Number',
-    task_manager_number_tips: 'Please enter TaskManager number'
+    task_manager_number_tips: 'Please enter TaskManager number',
+    http_url: 'Http Url',
+    http_url_tips: 'Please Enter Http Url',
+    http_method: 'Http Method',
+    http_parameters: 'Http Parameters',
+    http_check_condition: 'Http Check Condition',
+    http_condition: 'Http Condition',
+    http_condition_tips: 'Please Enter Http Condition',
+    timeout_settings: 'Timeout Settings',
+    connect_timeout: 'Connect Timeout',
+    ms: 'ms',
+    socket_timeout: 'Socket Timeout',
+    status_code_default: 'Default response code 200',
+    status_code_custom: 'Custom response code',
+    body_contains: 'Content includes',
+    body_not_contains: 'Content does not contain',
+    http_parameters_position: 'Http Parameters Position'
   }
 }
 
