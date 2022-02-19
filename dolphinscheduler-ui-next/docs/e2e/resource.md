@@ -3,11 +3,13 @@
 #### file manage
 
 class:
+
 - [ ] items
 - [ ] el-popconfirm
 - [ ] el-button--primary
 
 id:
+
 - [ ] btnCreateDirectory
 - [ ] btnCreateFile
 - [ ] btnUploadFile
@@ -19,6 +21,7 @@ id:
 ##### create directory
 
 id:
+
 - [ ] inputDirectoryName
 - [ ] inputDescription
 - [ ] btnSubmit
@@ -27,6 +30,7 @@ id:
 ##### rename directory
 
 id:
+
 - [ ] inputName
 - [ ] inputDescription
 - [ ] btnSubmit
@@ -35,6 +39,7 @@ id:
 ##### create file
 
 id:
+
 - [ ] inputFileName
 - [ ] btnSubmit
 - [ ] btnCancel
@@ -42,6 +47,7 @@ id:
 ##### upload file
 
 id:
+
 - [ ] btnUpload
 - [ ] btnSubmit
 - [ ] btnCancel
@@ -49,11 +55,13 @@ id:
 #### function manage
 
 class:
+
 - [ ] udf-function-items
 - [ ] el-popconfirm
 - [ ] el-button--primary
 
 id:
+
 - [ ] btnCreateUdfFunction
 - [ ] btnRename
 - [ ] btnDelete
@@ -61,9 +69,11 @@ id:
 ##### create unf function
 
 class:
-- [ ] vue-treeselect__menu
+
+- [ ] vue-treeselect\_\_menu
 
 id:
+
 - [ ] inputFunctionName
 - [ ] inputClassName
 - [ ] btnUdfResourceDropDown
@@ -74,6 +84,7 @@ id:
 ##### rename udf function
 
 id:
+
 - [ ] inputFunctionName
 - [ ] inputClassName
 - [ ] inputDescription
@@ -83,6 +94,7 @@ id:
 #### resource
 
 class:
+
 - [ ] tab-file-manage
 - [ ] tab-udf-resource-manage
 - [ ] tab-function-resource-manage
@@ -90,11 +102,13 @@ class:
 #### udf manage
 
 class:
+
 - [ ] udf-items
 - [ ] el-popconfirm
 - [ ] el-button--primary
 
 id:
+
 - [ ] btnCreateDirectory
 - [ ] btnUploadUdf
 - [ ] btnDownload
@@ -104,6 +118,7 @@ id:
 ##### rename directory
 
 id:
+
 - [ ] inputName
 - [ ] inputDescription
 - [ ] btnSubmit
@@ -112,6 +127,7 @@ id:
 ##### upload file
 
 id:
+
 - [ ] btnUpload
 - [ ] btnSubmit
 - [ ] btnCancel
@@ -119,6 +135,7 @@ id:
 ##### create directory
 
 id:
+
 - [ ] inputDirectoryName
 - [ ] inputDescription
 - [ ] btnSubmit

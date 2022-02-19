@@ -43,6 +43,6 @@ export function useTaskType(
       required: true,
       message: t('project.node.task_type_tips')
     },
-    value: 'SHELL'
+    value: model.taskType ? model.taskType : 'SHELL'
   }
 }

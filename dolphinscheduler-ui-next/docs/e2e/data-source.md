@@ -1,10 +1,10 @@
 ### data source
 
 | check              | class                          |
-|--------------------|--------------------------------|
+| ------------------ | ------------------------------ |
 | :white_check_mark: | data-source-items              |
-|  | el-popconfirm                  |
-|  | el-button--primary             |
+|                    | el-popconfirm                  |
+|                    | el-button--primary             |
 | :white_check_mark: | options-datasource-type        |
 | :white_check_mark: | btn-create-data-source         |
 | :white_check_mark: | dialog-create-data-source      |

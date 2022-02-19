@@ -106,7 +106,12 @@ const workerGroupManage = defineComponent({
         <NCard>
           <div class={styles['search-card']}>
             <div>
-              <NButton size='small' type='primary' onClick={handleModalChange} class='btn-create-worker-group'>
+              <NButton
+                size='small'
+                type='primary'
+                onClick={handleModalChange}
+                class='btn-create-worker-group'
+              >
                 {t('security.worker_group.create_worker_group')}
               </NButton>
             </div>
@@ -130,7 +135,11 @@ const workerGroupManage = defineComponent({
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable row-class-name='items' columns={this.columns} data={this.tableData} />
+          <NDataTable
+            row-class-name='items'
+            columns={this.columns}
+            data={this.tableData}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

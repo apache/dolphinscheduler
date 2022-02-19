@@ -43,7 +43,7 @@ export function formatParams(data: INodeData): {
         'processName'
       ]),
       code: data.code,
-      delayTime: data.delayTime ? '0' : String(data.delayTime),
+      delayTime: data.delayTime ? String(data.delayTime) : '0',
       environmentCode: data.environmentCode || -1,
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       failRetryInterval: data.failRetryTimes
