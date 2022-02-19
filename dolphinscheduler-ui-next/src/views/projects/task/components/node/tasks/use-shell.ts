@@ -62,7 +62,7 @@ export function useShell({
       Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
-      Fields.useDelayTime(),
+      Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useShell(model),
       Fields.usePreTasks()

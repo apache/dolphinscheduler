@@ -545,7 +545,9 @@ const project = {
     minute: '分',
     key: '键',
     value: '值',
-    success: '成功'
+    success: '成功',
+    delete_cell: '删除选中的线或节点',
+    online_directly: '是否上线流程定义'
   },
   node: {
     current_node_settings: '当前节点设置',
@@ -558,6 +560,8 @@ const project = {
     task_type: '任务类型',
     task_type_tips: '请选择任务类型(必选)',
     process_name: '工作流名称',
+    child_node: '子节点',
+    enter_child_node: '进入该子节点',
     run_flag: '运行标志',
     normal: '正常',
     prohibition_execution: '禁止执行',

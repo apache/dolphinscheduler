@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
 import type { Coordinate, NodeData } from './types'
 import { TaskType } from '@/views/projects/task/constants/task-type'
+import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
+import { WorkflowDefinition } from './types'
 
 interface Options {
   graph: Ref<Graph | undefined>
+  definition: Ref<WorkflowDefinition | undefined>
 }
 
 /**
@@ -32,7 +35,7 @@ interface Options {
  * @returns
  */
 export function useTaskEdit(options: Options) {
-  const { graph } = options
+  const { graph, definition } = options
 
   const { addNode, setNodeName } = useCellUpdate({ graph })
 
@@ -57,6 +60,16 @@ export function useTaskEdit(options: Options) {
     openTaskModal({ code, taskType: type, name: '' })
   }
 
+  /**
+   * Remove task
+   * @param {number} code
+   */
+  function removeTasks(codes: number[]) {
+    taskDefinitions.value = taskDefinitions.value.filter(
+      (task) => !codes.includes(task.code)
+    )
+  }
+
   function openTaskModal(task: NodeData) {
     currTask.value = task
     taskModalVisible.value = true
@@ -67,26 +80,21 @@ export function useTaskEdit(options: Options) {
    * @param formRef
    * @param from
    */
-  function taskConfirm({ formRef, form }: any) {
-    console.log(formRef)
-    formRef.validate((errors: any) => {
-      if (!errors) {
-        // override target config
-        taskDefinitions.value = taskDefinitions.value.map((task) => {
-          if (task.code === currTask.value?.code) {
-            setNodeName(task.code + '', form.name)
-            console.log(form)
-            console.log(JSON.stringify(form))
-            return {
-              code: task.code,
-              ...form
-            }
-          }
-          return task
-        })
-        taskModalVisible.value = false
+  function taskConfirm({ data }: any) {
+    const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
+    // override target config
+    taskDefinitions.value = taskDefinitions.value.map((task) => {
+      if (task.code === currTask.value?.code) {
+        setNodeName(task.code + '', taskDef.name)
+        return {
+          ...taskDef,
+          code: task.code,
+          taskType: currTask.value.taskType
+        }
       }
+      return task
     })
+    taskModalVisible.value = false
   }
 
   /**
@@ -109,12 +117,17 @@ export function useTaskEdit(options: Options) {
     }
   })
 
+  watch(definition, () => {
+    taskDefinitions.value = definition.value?.taskDefinitionList || []
+  })
+
   return {
     currTask,
     taskModalVisible,
     taskConfirm,
     taskCancel,
     appendTask,
-    taskDefinitions
+    taskDefinitions,
+    removeTasks
   }
 }

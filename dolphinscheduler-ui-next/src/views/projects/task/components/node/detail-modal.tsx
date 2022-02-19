@@ -61,7 +61,10 @@ const NodeDetailModal = defineComponent({
     const { t } = useI18n()
     const state = reactive({
       saving: false,
-      detailRef: ref()
+      detailRef: ref(),
+      linkEventShowRef: ref(),
+      linkEventTextRef: ref(),
+      linkUrlRef: ref()
     })
 
     const onConfirm = async () => {
@@ -70,6 +73,16 @@ const NodeDetailModal = defineComponent({
     }
     const onCancel = () => {
       emit('cancel')
+    }
+
+    const onJumpLink = () => {
+      // TODO: onJumpLink
+    }
+
+    const getLinkEventText = (status: boolean, text: string, url: 'string') => {
+      state.linkEventShowRef = status
+      state.linkEventTextRef = text
+      state.linkUrlRef = url
     }
 
     watch(
@@ -83,13 +96,24 @@ const NodeDetailModal = defineComponent({
     return {
       t,
       ...toRefs(state),
+      getLinkEventText,
       onConfirm,
-      onCancel
+      onCancel,
+      onJumpLink
     }
   },
   render() {
-    const { t, show, onConfirm, onCancel, projectCode, data, readonly, from } =
-      this
+    const {
+      t,
+      show,
+      onConfirm,
+      onCancel,
+      projectCode,
+      data,
+      readonly,
+      from,
+      onJumpLink
+    } = this
     return (
       <Modal
         show={show}
@@ -98,6 +122,9 @@ const NodeDetailModal = defineComponent({
         confirmLoading={false}
         confirmDisabled={readonly}
         onCancel={onCancel}
+        linkEventShow={this.linkEventShowRef}
+        linkEventText={this.linkEventTextRef}
+        onJumpLink={onJumpLink}
       >
         <Detail
           ref='detailRef'
@@ -105,6 +132,7 @@ const NodeDetailModal = defineComponent({
           projectCode={projectCode}
           readonly={readonly}
           from={from}
+          onLinkEventText={this.getLinkEventText}
         />
       </Modal>
     )

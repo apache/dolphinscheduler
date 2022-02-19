@@ -15,34 +15,26 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
-import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
-import type { IJsonItem } from '../types'
+$borderDark: rgba(255, 255, 255, 0.09);
+$borderLight: rgb(239, 239, 245);
+$bgDark: rgb(24, 24, 28);
+$bgLight: #ffffff;
 
-export function useTaskType(
-  model: { [field: string]: any },
-  readonly?: boolean
-): IJsonItem {
-  const { t } = useI18n()
+.container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  height: calc(100vh - 100px);
+  overflow: hidden;
+  display: block;
+}
 
-  const options = Object.keys(TASK_TYPES_MAP).map((option: string) => ({
-    label: option,
-    value: option
-  }))
-  return {
-    type: 'select',
-    field: 'taskType',
-    span: 24,
-    name: t('project.node.task_type'),
-    props: {
-      disabled: readonly || ['CONDITIONS', 'SWITCH'].includes(model.taskType)
-    },
-    options: options,
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.task_type_tips')
-    },
-    value: model.taskType ? model.taskType : 'SHELL'
-  }
+.dark {
+  border: solid 1px $borderDark;
+  background-color: $bgDark;
+}
+
+.light {
+  border: solid 1px $borderLight;
+  background-color: $bgLight;
 }

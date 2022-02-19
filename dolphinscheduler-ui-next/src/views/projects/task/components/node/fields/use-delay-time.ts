@@ -18,9 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function useDelayTime(
-    model: { [field: string]: any },
-): IJsonItem {
+export function useDelayTime(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
   return {
     type: 'input-number',
@@ -30,6 +28,6 @@ export function useDelayTime(
     slots: {
       suffix: () => t('project.node.minute')
     },
-    value: model.delayExecutionTime? model.delayExecutionTime : 0
+    value: model.delayExecutionTime ? model.delayExecutionTime : 0
   }
 }

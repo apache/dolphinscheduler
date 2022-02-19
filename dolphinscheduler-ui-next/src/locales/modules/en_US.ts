@@ -547,7 +547,9 @@ const project = {
     minute: 'Minute',
     key: 'Key',
     value: 'Value',
-    success: 'Success'
+    success: 'Success',
+    delete_cell: 'Delete selected edges and nodes',
+    online_directly: 'Whether to go online the process definition'
   },
   node: {
     current_node_settings: 'Current node settings',
@@ -560,6 +562,8 @@ const project = {
     task_type: 'Task Type',
     task_type_tips: 'Please select a task type (required)',
     process_name: 'Process Name',
+    child_node: 'Child Node',
+    enter_child_node: 'Enter child node',
     run_flag: 'Run flag',
     normal: 'Normal',
     prohibition_execution: 'Prohibition execution',
