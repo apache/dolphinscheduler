@@ -17,16 +17,18 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData } from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
 export function useSubProcess({
   projectCode,
   from = 0,
-  readonly
+  readonly,
+  data
 }: {
   projectCode: number
   from?: number
   readonly?: boolean
+  data?: ITaskData
 }) {
   const model = reactive({
     name: '',
@@ -47,7 +49,14 @@ export function useSubProcess({
   if (from === 1) {
     extra = [
       Fields.useTaskType(model, readonly),
-      Fields.useProcessName(projectCode, !model.id)
+      Fields.useProcessName({
+        model,
+        projectCode,
+        isCreate: !data?.id,
+        from,
+        processName: data?.processName,
+        code: data?.code
+      })
     ]
   }
 
@@ -59,11 +68,18 @@ export function useSubProcess({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !model.id),
+      Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useChildNode(projectCode, !model.id),
-      Fields.usePreTasks(),
+      Fields.useChildNode({
+        model,
+        projectCode,
+        isCreate: !data?.id,
+        from,
+        processName: data?.processName,
+        code: data?.code
+      }),
+      Fields.usePreTasks(model)
     ] as IJsonItem[],
     model
   }
