@@ -46,11 +46,13 @@ export function useTable() {
       },
       {
         title: t('security.token.user'),
-        key: 'userName'
+        key: 'userName',
+        className: 'username'
       },
       {
         title: t('security.token.token'),
-        key: 'token'
+        key: 'token',
+        className: 'token'
       },
       {
         title: t('security.token.expiration_time'),
@@ -81,6 +83,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -111,7 +114,8 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small'
+                              size: 'small',
+                              class: 'delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)

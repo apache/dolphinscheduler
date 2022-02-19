@@ -33,7 +33,7 @@ import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
-import TaskModal from '@/views/projects/node/detail-modal'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import './x6-style.scss'
 
 const props = {
@@ -82,8 +82,9 @@ export default defineComponent({
       currTask,
       taskCancel,
       appendTask,
-      taskDefinitions
-    } = useTaskEdit({ graph })
+      taskDefinitions,
+      removeTasks
+    } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -144,6 +145,7 @@ export default defineComponent({
           definition={props.definition}
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
+          onRemoveTasks={removeTasks}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -163,11 +165,15 @@ export default defineComponent({
             onUpdateList={refreshDetail}
           />
         )}
-        <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} />
+        <DagSaveModal
+          v-model:show={saveModalShow.value}
+          onSave={onSave}
+          definition={props.definition}
+        />
         <TaskModal
           show={taskModalVisible.value}
           projectCode={props.projectCode}
-          taskDefinition={currTask.value}
+          data={currTask.value as any}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />

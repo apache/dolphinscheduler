@@ -122,6 +122,12 @@ interface TaskDefinitionVersionRes {
   start: number
 }
 
+interface ISingleSaveReq {
+  processDefinitionCode?: string
+  upstreamCodes: string
+  taskDefinitionJsonObj: string
+}
+
 export {
   PageReq,
   ListReq,
@@ -135,5 +141,6 @@ export {
   TaskDefinitionItem,
   TaskDefinitionRes,
   TaskDefinitionVersionItem,
-  TaskDefinitionVersionRes
+  TaskDefinitionVersionRes,
+  ISingleSaveReq
 }

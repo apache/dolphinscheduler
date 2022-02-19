@@ -105,7 +105,12 @@ const tokenManage = defineComponent({
         <NCard>
           <div class={styles['search-card']}>
             <div>
-              <NButton size='small' type='primary' onClick={handleModalChange}>
+              <NButton
+                class='btn-create-token'
+                size='small'
+                type='primary'
+                onClick={handleModalChange}
+              >
                 {t('security.token.create_token')}
               </NButton>
             </div>
@@ -129,7 +134,11 @@ const tokenManage = defineComponent({
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            row-class-name='items'
+            columns={this.columns}
+            data={this.tableData}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

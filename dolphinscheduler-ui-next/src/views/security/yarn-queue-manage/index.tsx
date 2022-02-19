@@ -22,7 +22,8 @@ import {
   NDataTable,
   NIcon,
   NInput,
-  NPagination
+  NPagination,
+  NSpace
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
@@ -105,11 +106,16 @@ const yarnQueueManage = defineComponent({
         <NCard>
           <div class={styles['search-card']}>
             <div>
-              <NButton size='small' type='primary' onClick={handleModalChange}>
+              <NButton
+                size='small'
+                type='primary'
+                onClick={handleModalChange}
+                class='btn-create-queue'
+              >
                 {t('security.yarn_queue.create_queue')}
               </NButton>
             </div>
-            <div class={styles.box}>
+            <NSpace>
               <NInput
                 size='small'
                 clearable
@@ -125,11 +131,15 @@ const yarnQueueManage = defineComponent({
                   )
                 }}
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            row-class-name='items'
+            columns={this.columns}
+            data={this.tableData}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}
