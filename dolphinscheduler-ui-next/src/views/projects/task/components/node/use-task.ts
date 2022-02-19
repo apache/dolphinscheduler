@@ -16,6 +16,7 @@
  */
 
 import { useShell } from './tasks/use-shell'
+import { usePython } from './tasks/use-python'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -33,6 +34,14 @@ export function useTask({
   let node = {} as { json: IJsonItem[]; model: INodeData }
   if (taskType === 'SHELL') {
     node = useShell({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'PYTHON') {
+    node = usePython({
       projectCode,
       from,
       readonly,
