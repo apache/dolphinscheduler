@@ -16,6 +16,7 @@
  */
 
 import { useShell } from './tasks/use-shell'
+import { useSubProcess } from './tasks/use-sub-process'
 import { IJsonItem, ITaskType, INodeData } from './types'
 
 export function useTask({
@@ -33,6 +34,8 @@ export function useTask({
   let node = {} as { json: IJsonItem[]; model: INodeData }
   if (taskType === 'SHELL' && projectCode) {
     node = useShell({ projectCode, from, readonly })
+  } else if (taskType === 'SUB_PROCESS' && projectCode) {
+    node = useSubProcess({ projectCode, from, readonly })
   }
   return node
 }
