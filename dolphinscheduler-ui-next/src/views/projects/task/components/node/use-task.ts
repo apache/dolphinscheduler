@@ -31,14 +31,12 @@ export function useTask({
   readonly?: boolean
 }): { json: IJsonItem[]; model: INodeData } {
   console.log(taskType, 'taskType')
-  taskType = 'PYTHON'
   let node = {} as { json: IJsonItem[]; model: INodeData }
   if (taskType === 'SHELL' && projectCode) {
     node = useShell({ projectCode, from, readonly })
   }
   if (taskType === 'PYTHON' && projectCode) {
     node = usePython({ projectCode, from, readonly })
-    console.log(node)
   }
 
   return node

@@ -45,9 +45,6 @@ export function useProcessName(
     }
   }
 
-  console.log('useProcessName')
-  console.log(processCode)
-
   onMounted(() => {
     getProcessList()
   })
