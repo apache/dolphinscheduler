@@ -85,7 +85,8 @@ export function useSql({
       ...Fields.useTimeoutAlarm(model),
       Fields.useDatasourceType(model),
       Fields.useDatasource(model),
-      ...Fields.useShell(model),
+      Fields.useSqlType(model),
+      ...Fields.useSql(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

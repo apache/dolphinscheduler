@@ -615,6 +615,14 @@ const project = {
     pre_tasks: 'Pre tasks',
     datasource_type: 'Datasource types',
     datasource: 'Datasource instances',
+    sql_type: 'SQL Type',
+    sql_type_query: 'Query',
+    sql_type_non_query: 'Non Query',
+    sql_statement: 'SQL Statement',
+    pre_sql_statement: 'Pre SQL Statement',
+    post_sql_statement: 'Post SQL Statement',
+    sql_input_placeholder: 'Please enter non-query sql.',
+    sql_empty_tips: 'The sql can not be empty.'
   }
 }
 

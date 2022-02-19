@@ -17,24 +17,30 @@
 
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryDataSourceList } from '@/service/modules/data-source'
 import type { IJsonItem } from '../types'
-import { IDataBase, TypeReq } from "@/service/modules/data-source/types";
 
-export function useDatasource(datasourceType: IDataBase): IJsonItem {
+export function useSqlType(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
   const loading = ref(false)
 
-  const getDatasources = async () => {
+  const sqlTypes = [
+    {
+      id: '0',
+      code: t('project.node.sql_type_query')
+    },
+    {
+      id: '1',
+      code: t('project.node.sql_type_non_query')
+    }
+  ]
+
+  const getSqlTypes = async () => {
     if (loading.value) return
     loading.value = true
     try {
-      const params = { type: datasourceType } as TypeReq
-      const res = await queryDataSourceList(params)
-      console.log(res)
-      options.value = res.map((item: string) => ({ label: item, value: item }))
+      options.value = sqlTypes.map(item => ({ label: item.code, value: item.id }))
       loading.value = false
     } catch (err) {
       loading.value = false
@@ -42,22 +48,22 @@ export function useDatasource(datasourceType: IDataBase): IJsonItem {
   }
 
   onMounted(() => {
-    getDatasources()
+    getSqlTypes()
   })
+
   return {
     type: 'select',
-    field: 'datasource',
+    field: 'sqlType',
     span: 12,
-    name: t('project.node.datasource'),
+    name: t('project.node.sql_type'),
     props: {
       loading: loading
     },
     options: options,
     validate: {
       trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.worker_group_tips')
+      required: true
     },
-    value: 'default'
+    value: '0'
   }
 }
