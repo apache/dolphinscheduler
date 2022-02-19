@@ -42,7 +42,7 @@ interface ISourceItem {
 
 interface ITaskParams {
   resourceList?: ISourceItem[]
-  mainJar?: ISourceItem[]
+  mainJar?: ISourceItem
   localParams?: ILocalParam[]
   rawScript?: string
   programType?: string
@@ -84,7 +84,7 @@ interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   preTaskOptions?: []
   postTaskOptions?: []
   resourceList?: number[]
-  mainJar?: number[]
+  mainJar?: number
 }
 
 interface ITaskData
