@@ -21,6 +21,7 @@ import { useSubProcess } from './tasks/use-sub-process'
 import { usePython } from './tasks/use-python'
 import { useSpark } from './tasks/use-spark'
 import { useMr } from './tasks/use-mr'
+import { useHttp } from './tasks/use-http'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -78,6 +79,14 @@ export function useTask({
   }
   if (taskType === 'FLINK') {
     node = useFlink({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'HTTP') {
+    node = useHttp({
       projectCode,
       from,
       readonly,
