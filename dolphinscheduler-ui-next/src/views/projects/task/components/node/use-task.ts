@@ -16,23 +16,28 @@
  */
 
 import { useShell } from './tasks/use-shell'
-import { IJsonItem, ITaskType, INodeData } from './types'
+import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
-  taskType = 'SHELL',
+  data,
   projectCode,
   from,
   readonly
 }: {
-  taskType?: ITaskType
+  data: ITaskData
+  projectCode: number
   from?: number
-  projectCode?: number
   readonly?: boolean
 }): { json: IJsonItem[]; model: INodeData } {
-  console.log(taskType, 'taskType')
+  const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
-  if (taskType === 'SHELL' && projectCode) {
-    node = useShell({ projectCode, from, readonly })
+  if (taskType === 'SHELL') {
+    node = useShell({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
   }
   return node
 }
