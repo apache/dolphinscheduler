@@ -1013,11 +1013,11 @@ const data_quality = {
     table_count_check: '表行数校验',
     all: '全部',
     FixValue: '固定值',
-    DailyFluctuation: '日波动',
-    WeeklyFluctuation: '周波动',
-    MonthlyFluctuation: '月波动',
-    Last7DayFluctuation: '最近7天波动',
-    Last30DayFluctuation: '最近30天波动',
+    DailyAvg: '日均值',
+    WeeklyAvg: '周均值',
+    MonthlyAvg: '月均值',
+    Last7DayAvg: '最近7天均值',
+    Last30DayAvg: '最近30天均值',
     SrcTableTotalRows: '源表总行数',
     TargetTableTotalRows: '目标表总行数'
   }

@@ -1027,11 +1027,11 @@ const data_quality = {
     table_count_check: 'TableCountCheck',
     All: 'All',
     FixValue: 'FixValue',
-    DailyFluctuation: 'DailyFluctuation',
-    WeeklyFluctuation: 'WeeklyFluctuation',
-    MonthlyFluctuation: 'MonthlyFluctuation',
-    Last7DayFluctuation: 'Last7DayFluctuation',
-    Last30DayFluctuation: 'Last30DayFluctuation',
+    DailyAvg: 'DailyAvg',
+    WeeklyAvg: 'WeeklyAvg',
+    MonthlyAvg: 'MonthlyAvg',
+    Last7DayAvg: 'Last7DayAvg',
+    Last30DayAvg: 'Last30DayAvg',
     SrcTableTotalRows: 'SrcTableTotalRows',
     TargetTableTotalRows: 'TargetTableTotalRows'
   }
