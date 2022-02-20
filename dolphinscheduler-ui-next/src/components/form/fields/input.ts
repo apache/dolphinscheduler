@@ -21,6 +21,10 @@ import type { IJsonItem } from '../types'
 
 export function renderInput(item: IJsonItem, fields: { [field: string]: any }) {
   const { props, field } = item
+  console.log('renderInput')
+  console.log(field)
+  console.log(fields)
+  console.log(fields[field])
   return h(NInput, {
     ...props,
     value: fields[field],

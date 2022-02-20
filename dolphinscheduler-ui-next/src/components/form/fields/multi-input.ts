@@ -17,14 +17,14 @@
 
 import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
-import { NFormItemGi, NSpace, NButton, NGrid, NGridItem } from 'naive-ui'
+import {NFormItemGi, NSpace, NButton, NGrid, NGridItem, NInput} from 'naive-ui'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import getField from './get-field'
 import { formatValidate } from '../utils'
 import type { IJsonItem, FormItemRule } from '../types'
 
-const InputGroup = defineComponent({
-  name: 'InputGroup',
+const MultiInput = defineComponent({
+  name: 'MultiInput',
   emits: ['add'],
   setup(props, ctx) {
     const formItem = useFormItem({})
@@ -62,55 +62,43 @@ const InputGroup = defineComponent({
   }
 })
 
-export function renderInputGroup(
+export function renderMultiInput(
   item: IJsonItem,
   fields: { [field: string]: any },
   rules: { [key: string]: FormItemRule }[]
 ) {
-  const { field, children = [] } = item
-  let defaultValue: { [field: string]: any } = {}
   let ruleItem: { [key: string]: FormItemRule } = {}
 
+  // the fields is the data of the task definition.
+  // the item is the options of this component in the form.
   console.log('input group...')
-  console.log(children)
   console.log('item...')
   console.log(item)
   console.log('fields...')
   console.log(fields)
-  console.log('field')
-  console.log(field)
 
-  children.forEach((child) => {
-    console.log('child')
-    console.log(child)
-    console.log({...child})
-    defaultValue[child.field] = {...child} || null
-    console.log('default..')
-    console.log(defaultValue)
-    if (child.validate) ruleItem[child.field] = formatValidate(child.validate)
-  })
-
-  console.log('defaultValue')
-  console.log(defaultValue)
-
-  const getChild = (item: object, i: number) =>
-    children.map((child: IJsonItem) => {
-      return h(
+  const getChild = (value: string, i: number) => {
+    return h(
         NFormItemGi,
         {
           showLabel: false,
-          path: `${field}[${i}].${child.field}`,
-          span: unref(child.span)
+          path: `${item.field}[${i}]`,
+          span: unref(item.span)
         },
-        () => getField(child, item)
-      )
-    })
+        () => h(NInput, {
+          ...item.props,
+          value: value,
+          onUpdateValue: (value: string) => void (fields[item.field][i] = value)
+        })
+    )
+  }
+
+  //initialize the component by using data
   const getChildren = ({ disabled }: { disabled: boolean }) =>
-    fields[field].map((item: object, i: number) => {
+    fields[item.field].map((value: string, i: number) => {
       console.log('getChildren....')
-      console.log(...getChild(item, i))
       return h(NGrid, { xGap: 10 }, () => [
-        ...getChild(item, i),
+        getChild(value, i),
         h(
           NGridItem,
           {
@@ -125,7 +113,7 @@ export function renderInputGroup(
                 size: 'small',
                 disabled,
                 onClick: () => {
-                  fields[field].splice(i, 1)
+                  fields[item.field].splice(i, 1)
                   rules.splice(i, 1)
                 }
               },
@@ -138,15 +126,13 @@ export function renderInputGroup(
     })
 
   return h(
-    InputGroup,
+    MultiInput,
     {
       onAdd: () => {
         console.log('add....')
-        console.log(defaultValue)
         // rules.push(ruleItem)
         console.log('push...')
-        console.log(fields[field])
-        fields[field].push({ ...defaultValue })
+        fields[item.field].push('')
       }
     },
     {

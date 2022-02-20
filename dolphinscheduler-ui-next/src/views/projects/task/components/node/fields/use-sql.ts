@@ -127,18 +127,41 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       ]
     },
     {
-      type: 'input-group',
+      type: 'multi-input',
       field: 'preStatements',
       name: t('project.node.pre_sql_statement'),
+      span: 22,
+      props: {
+        placeholder: t('project.node.sql_input_placeholder'),
+        type: 'textarea',
+        autosize: {minRows:1}
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(validate: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.prop_tips'))
+          }
+
+          const sameItems = model.localParams.filter(
+              (item: { prop: string }) => item.prop === value
+          )
+
+          if (sameItems.length > 1) {
+            return new Error(t('project.node.prop_repeat'))
+          }
+        }
+      },
       children: [
         {
           type: 'input',
           field: 'preStatement',
           span: 22,
           props: {
-            placeholder: t('project.node.prop_tips'),
+            placeholder: t('project.node.sql_input_placeholder'),
             type: 'textarea',
-            autosize: '{minRows:1}'
+            autosize: {minRows:1}
           },
           validate: {
             trigger: ['input', 'blur'],

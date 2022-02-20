@@ -34,7 +34,7 @@ type IType =
   | 'select'
   | 'checkbox'
   | 'tree-select'
-  | 'input-group'
+  | 'multi-input'
 
 interface IOption extends SelectOption, TreeSelectOption {
   label: string
