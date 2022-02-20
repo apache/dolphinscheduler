@@ -59,6 +59,8 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -205,6 +207,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             queue = "";
         }
         user.setQueue(queue);
+        String defaultTimeZone = ZoneId.systemDefault().getRules().getOffset(Instant.now()).getId();
+        user.setTimeZone("GMT" + defaultTimeZone);
 
         // save user
         userMapper.insert(user);
@@ -349,6 +353,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param tenantId tenant id
      * @param phone phone
      * @param queue queue
+     * @param state state
+     * @param timeZone timeZone
      * @return update result code
      * @throws Exception exception
      */
@@ -360,7 +366,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws IOException {
+                                          int state,
+                                          String timeZone) throws IOException {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
@@ -411,6 +418,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (state == 0 && user.getState() != state && loginUser.getId() == user.getId()) {
             putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
             return result;
+        }
+
+        if (StringUtils.isNotEmpty(timeZone)) {
+            if (!CheckUtils.checkTimeZone(timeZone)) {
+                putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
+                return result;
+            }
+            user.setTimeZone(timeZone);
         }
 
         user.setPhone(phone);

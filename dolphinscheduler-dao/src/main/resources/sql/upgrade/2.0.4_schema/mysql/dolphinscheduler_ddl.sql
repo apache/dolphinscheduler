@@ -14,3 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(4) COMMENT 'time zone, e.g. +8' AFTER `state`;
