@@ -35,7 +35,11 @@ const InputGroup = defineComponent({
   },
   render() {
     const { disabled, $slots, onAdd } = this
-    return h(NSpace, null, {
+
+    console.log('reander')
+    console.log($slots)
+
+    return h(NSpace, {vertical: true, style:{width: '100%'}}, {
       default: () => {
         return [
           renderSlot($slots, 'default', { disabled }),
@@ -77,9 +81,18 @@ export function renderInputGroup(
   console.log(field)
 
   children.forEach((child) => {
-    defaultValue[child.field] = child.value || null
+    console.log('child')
+    console.log(child)
+    console.log({...child})
+    defaultValue[child.field] = {...child} || null
+    console.log('default..')
+    console.log(defaultValue)
     if (child.validate) ruleItem[child.field] = formatValidate(child.validate)
   })
+
+  console.log('defaultValue')
+  console.log(defaultValue)
+
   const getChild = (item: object, i: number) =>
     children.map((child: IJsonItem) => {
       return h(
@@ -94,6 +107,8 @@ export function renderInputGroup(
     })
   const getChildren = ({ disabled }: { disabled: boolean }) =>
     fields[field].map((item: object, i: number) => {
+      console.log('getChildren....')
+      console.log(...getChild(item, i))
       return h(NGrid, { xGap: 10 }, () => [
         ...getChild(item, i),
         h(
@@ -127,9 +142,10 @@ export function renderInputGroup(
     {
       onAdd: () => {
         console.log('add....')
-        console.log(ruleItem)
         console.log(defaultValue)
-        rules.push(ruleItem)
+        // rules.push(ruleItem)
+        console.log('push...')
+        console.log(fields[field])
         fields[field].push({ ...defaultValue })
       }
     },
