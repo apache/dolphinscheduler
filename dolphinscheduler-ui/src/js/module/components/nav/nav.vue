@@ -86,7 +86,7 @@
           <em class="el-icon-user-solid"></em>{{userInfo.userName}}<em class="el-icon-arrow-down"></em>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="user">
+          <el-dropdown-item command="user" class="userDropdown">
             <em class="el-icon-user"></em>
             <span>{{$t('User Information')}}</span>
           </el-dropdown-item>
