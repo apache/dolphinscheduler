@@ -52,12 +52,12 @@
           <template slot-scope="scope">
             <el-tooltip :content="$t('Authorize')" placement="top">
               <el-dropdown trigger="click">
-                <el-button type="warning" size="mini" icon="el-icon-user" circle></el-button>
+                <el-button type="warning" size="mini" icon="el-icon-user" circle class="authorize"></el-button>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item @click.native="_authProject(scope.row,scope.$index)">{{$t('Project')}}</el-dropdown-item>
-                  <el-dropdown-item @click.native="_authFile(scope.row,scope.$index)">{{$t('Resources')}}</el-dropdown-item>
-                  <el-dropdown-item @click.native="_authDataSource(scope.row,scope.$index)">{{$t('Datasource')}}</el-dropdown-item>
-                  <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.$index)">{{$t('UDF Function')}}</el-dropdown-item>
+                  <el-dropdown-item class="authProject" @click.native="_authProject(scope.row,scope.$index)">{{$t('Project')}}</el-dropdown-item>
+                  <el-dropdown-item class="authFile" @click.native="_authFile(scope.row,scope.$index)">{{$t('Resources')}}</el-dropdown-item>
+                  <el-dropdown-item class="authDataSource" @click.native="_authDataSource(scope.row,scope.$index)">{{$t('Datasource')}}</el-dropdown-item>
+                  <el-dropdown-item class="authUdfFunc" @click.native="_authUdfFunc(scope.row,scope.$index)">{{$t('UDF Function')}}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-tooltip>

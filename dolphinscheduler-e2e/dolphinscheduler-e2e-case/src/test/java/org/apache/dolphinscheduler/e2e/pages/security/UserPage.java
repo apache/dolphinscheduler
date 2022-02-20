@@ -40,6 +40,9 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     @FindBy(className = "items")
     private List<WebElement> userList;
 
+    @FindBy(className = "select-list-box")
+    private List<WebElement> selectList;
+
     @FindBys({
         @FindBy(className = "el-popconfirm"),
         @FindBy(className = "el-button--primary"),
@@ -48,7 +51,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
     private final UserForm createUserForm = new UserForm();
     private final UserForm editUserForm = new UserForm();
-
+    private final UserAuthorizeForm authorizeUserForm = new UserAuthorizeForm();
 
     public UserPage(RemoteWebDriver driver) {
         super(driver);
@@ -109,6 +112,89 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .click();
 
         return this;
+    }
+
+    public UserPage authorizeProject(String user, String projectName) {
+        userList()
+            .stream()
+            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
+            .flatMap(it -> it.findElements(By.className("authorize")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No authorize button in user list"))
+            .click();
+
+        UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
+        userAuthorizeForm.buttonAuthProject().click();
+
+        selectList()
+            .stream()
+            .filter(it -> it.findElement(By.className("selectName")).getAttribute("innerHTML").contains(projectName))
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No project in project list"))
+            .click();
+
+        userAuthorizeForm.buttonSubmit().click();
+
+        return this;
+    }
+
+    public UserPage authorizeDataSource(String user, String dataSourceName) {
+        userList()
+            .stream()
+            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
+            .flatMap(it -> it.findElements(By.className("authorize")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No authorize button in user list"))
+            .click();
+
+        UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
+        userAuthorizeForm.buttonAuthDataSource().click();
+
+        selectList()
+            .stream()
+            .filter(it -> it.findElement(By.className("selectName")).getAttribute("innerHTML").contains(dataSourceName))
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No dataSource in dataSource list"))
+            .click();
+
+        userAuthorizeForm.buttonSubmit().click();
+
+        return this;
+    }
+
+    @Getter
+    public class UserAuthorizeForm {
+        UserAuthorizeForm() {
+            PageFactory.initElements(driver, this);
+        }
+
+        @FindBy(className = "authorize")
+        private WebElement buttonAuthorize;
+
+        @FindBy(className = "authProject")
+        private WebElement buttonAuthProject;
+
+        @FindBy(className = "authFile")
+        private WebElement buttonAuthFile;
+
+        @FindBy(className = "authDataSource")
+        private WebElement buttonAuthDataSource;
+
+        @FindBy(className = "btnAuthUdfFunc")
+        private WebElement buttonAuthUdfFunc;
+
+        @FindBy(className = "selectName")
+        private WebElement selectName;
+
+        @FindBy(id = "btnSubmit")
+        private WebElement buttonSubmit;
+
+        @FindBy(id = "btnCancel")
+        private WebElement buttonCancel;
     }
 
     @Getter

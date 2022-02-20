@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Submit')" :nameText="transferData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
+  <m-popup okId="btnSubmit" cancelId="btnCancel" :ok-text="$t('Submit')" :nameText="transferData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model">
         <div class="select-list-box">
@@ -26,7 +26,7 @@
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
-                <span>{{item.name}}</span>
+                <span class="selectName">{{item.name}}</span>
                 <a href="javascript:"></a>
               </li>
             </ul>

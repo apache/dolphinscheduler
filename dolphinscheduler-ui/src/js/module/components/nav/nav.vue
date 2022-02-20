@@ -92,7 +92,7 @@
           </el-dropdown-item>
           <el-dropdown-item  command="logout">
             <em class="el-icon-switch-button"></em>
-            <span>{{$t('Logout')}}</span>
+            <span class="logout">{{$t('Logout')}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>

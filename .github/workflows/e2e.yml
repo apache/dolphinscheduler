@@ -73,6 +73,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
           - name: User
             class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
+          - name: UserAuthorize
+            class: org.apache.dolphinscheduler.e2e.cases.UserAuthorizeE2ETest
           - name: WorkerGroup
             class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
           - name: Project
