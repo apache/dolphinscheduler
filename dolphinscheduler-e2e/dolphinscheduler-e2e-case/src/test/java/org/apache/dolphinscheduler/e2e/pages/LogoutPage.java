@@ -29,7 +29,7 @@ import lombok.Getter;
 
 @Getter
 public final class LogoutPage extends NavBarPage {
-    @FindBy(className = "el-dropdown-link")
+    @FindBy(className = "el-icon-arrow-down")
     private WebElement buttonDropDown;
 
     @FindBy(className = "logout")
