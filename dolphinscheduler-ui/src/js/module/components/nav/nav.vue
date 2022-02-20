@@ -81,12 +81,12 @@
           </el-dropdown-menu>
         </el-dropdown>
       </span>
-      <el-dropdown @command="_toggleUser">
+      <el-dropdown class="userDropdown" @command="_toggleUser">
         <span class="el-dropdown-link">
           <em class="el-icon-user-solid"></em>{{userInfo.userName}}<em class="el-icon-arrow-down"></em>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="user" class="userDropdown">
+          <el-dropdown-item command="user">
             <em class="el-icon-user"></em>
             <span>{{$t('User Information')}}</span>
           </el-dropdown-item>
