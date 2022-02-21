@@ -18,10 +18,13 @@
 import { useFlink } from './tasks/use-flink'
 import { useShell } from './tasks/use-shell'
 import { useSubProcess } from './tasks/use-sub-process'
+import { usePigeon } from './tasks/use-pigeon'
 import { usePython } from './tasks/use-python'
 import { useSpark } from './tasks/use-spark'
 import { useMr } from './tasks/use-mr'
 import { useHttp } from './tasks/use-http'
+import { useSql } from './tasks/use-sql'
+import { useProcedure } from './tasks/use-procedure'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -87,6 +90,30 @@ export function useTask({
   }
   if (taskType === 'HTTP') {
     node = useHttp({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'PIGEON') {
+    node = usePigeon({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'SQL') {
+    node = useSql({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'PROCEDURE') {
+    node = useProcedure({
       projectCode,
       from,
       readonly,
