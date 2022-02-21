@@ -63,6 +63,9 @@ public class OSUtils {
     public static final double NEGATIVE_ONE = -1;
 
     private static final HardwareAbstractionLayer hal = SI.getHardware();
+    private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
+    private static long prevTickTime = 0L;
+    private static double cpuUsage = 0.0D;
 
     private OSUtils() {
         throw new UnsupportedOperationException("Construct OSUtils");
@@ -117,7 +120,7 @@ public class OSUtils {
             loadAverage = osBean.getSystemLoadAverage();
         } catch (Exception e) {
             logger.error("get operation system load average exception, try another method ", e);
-            loadAverage = hal.getProcessor().getSystemLoadAverage();
+            loadAverage = hal.getProcessor().getSystemLoadAverage(1)[0];
             if (Double.isNaN(loadAverage)) {
                 return NEGATIVE_ONE;
             }
@@ -134,7 +137,16 @@ public class OSUtils {
      */
     public static double cpuUsage() {
         CentralProcessor processor = hal.getProcessor();
-        double cpuUsage = processor.getSystemCpuLoad();
+
+        // Check if > ~ 0.95 seconds since last tick count.
+        long now = System.currentTimeMillis();
+        if (now - prevTickTime > 950) {
+            // Enough time has elapsed.
+            cpuUsage =  processor.getSystemCpuLoadBetweenTicks(prevTicks);
+            prevTickTime = System.currentTimeMillis();
+            prevTicks = processor.getSystemCpuLoadTicks();
+        }
+
         if (Double.isNaN(cpuUsage)) {
             return NEGATIVE_ONE;
         }
