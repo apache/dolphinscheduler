@@ -24,7 +24,8 @@ import { useI18n } from 'vue-i18n'
 
 const props = {
   projectCode: {
-    type: Number as PropType<number>
+    type: Number as PropType<number>,
+    default: 0
   },
   data: {
     type: Object as PropType<ITaskData>,
@@ -53,7 +54,7 @@ const NodeDetail = defineComponent({
     const { t } = useI18n()
 
     const { json, model } = useTask({
-      taskType: data.taskType,
+      data,
       projectCode,
       from,
       readonly
@@ -74,7 +75,12 @@ const NodeDetail = defineComponent({
         // TODO: Change task type
         if (taskType === 'SUB_PROCESS') {
           // TODO: add linkUrl
-          emit('linkEventText', true, `${t('project.node.enter_child_node')}`, '')
+          emit(
+            'linkEventText',
+            true,
+            `${t('project.node.enter_child_node')}`,
+            ''
+          )
         } else {
           emit('linkEventText', false, '', '')
         }

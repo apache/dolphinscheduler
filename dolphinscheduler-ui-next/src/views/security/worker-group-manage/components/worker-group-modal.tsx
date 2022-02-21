@@ -100,6 +100,8 @@ const WorkerGroupModal = defineComponent({
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
           confirmDisabled={!this.model.name || this.model.addrList.length < 1}
+          confirmClassName='btn-submit'
+          cancelClassName='btn-cancel'
         >
           {{
             default: () => (
@@ -113,6 +115,7 @@ const WorkerGroupModal = defineComponent({
                   path='name'
                 >
                   <NInput
+                    class='input-worker-group-name'
                     placeholder={t('security.worker_group.group_name_tips')}
                     v-model={[this.model.name, 'value']}
                   />
@@ -122,6 +125,7 @@ const WorkerGroupModal = defineComponent({
                   path='addrList'
                 >
                   <NSelect
+                    class='select-worker-address'
                     multiple
                     placeholder={t(
                       'security.worker_group.worker_addresses_tips'

@@ -26,19 +26,26 @@ import { formatParams as formatData } from '../components/node/format-data'
 import type { ITaskData, INodeData, ISingleSaveReq, IRecord } from './types'
 
 export function useTask(projectCode: number) {
+  const initalTask = {
+    taskType: 'SHELL'
+  } as ITaskData
   const task = reactive({
     taskShow: false,
-    taskData: {
-      taskType: 'SHELL'
-    },
+    taskData: { ...initalTask },
     taskSaving: false,
     taskReadonly: false
   } as { taskShow: boolean; taskData: ITaskData; taskSaving: boolean; taskReadonly: boolean })
 
-  const formatParams = (data: INodeData): ISingleSaveReq => {
+  const formatParams = (data: INodeData, isCreate: boolean): ISingleSaveReq => {
     const params = formatData(data)
+    if (isCreate) {
+      return {
+        processDefinitionCode: params.processDefinitionCode,
+        upstreamCodes: params.upstreamCodes,
+        taskDefinitionJsonObj: JSON.stringify(params.taskDefinitionJsonObj)
+      }
+    }
     return {
-      processDefinitionCode: params.processDefinitionCode,
       upstreamCodes: params.upstreamCodes,
       taskDefinitionJsonObj: JSON.stringify(params.taskDefinitionJsonObj)
     }
@@ -61,11 +68,14 @@ export function useTask(projectCode: number) {
           (await updateWithUpstream(
             projectCode,
             data.code,
-            formatParams({ ...data, code: data.code })
+            formatParams({ ...data, code: data.code }, false)
           ))
       } else {
         const taskCode = await getTaskCode()
-        await saveSingle(projectCode, formatParams({ ...data, code: taskCode }))
+        await saveSingle(
+          projectCode,
+          formatParams({ ...data, code: taskCode }, true)
+        )
       }
 
       task.taskSaving = false
@@ -88,10 +98,16 @@ export function useTask(projectCode: number) {
     }
   }
 
+  const onInitTask = () => {
+    task.taskData = { ...initalTask }
+    task.taskReadonly = false
+  }
+
   return {
     task,
     onToggleShow,
     onTaskSave,
-    onEditTask
+    onEditTask,
+    onInitTask
   }
 }

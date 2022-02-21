@@ -15,24 +15,83 @@
  * limitations under the License.
  */
 
+import { useFlink } from './tasks/use-flink'
 import { useShell } from './tasks/use-shell'
-import { IJsonItem, ITaskType, INodeData } from './types'
+import { useSubProcess } from './tasks/use-sub-process'
+import { usePython } from './tasks/use-python'
+import { useSpark } from './tasks/use-spark'
+import { useMr } from './tasks/use-mr'
+import { useHttp } from './tasks/use-http'
+import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
-  taskType = 'SHELL',
+  data,
   projectCode,
   from,
   readonly
 }: {
-  taskType?: ITaskType
+  data: ITaskData
+  projectCode: number
   from?: number
-  projectCode?: number
   readonly?: boolean
 }): { json: IJsonItem[]; model: INodeData } {
-  console.log(taskType, 'taskType')
+  const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
-  if (taskType === 'SHELL' && projectCode) {
-    node = useShell({ projectCode, from, readonly })
+  if (taskType === 'SHELL') {
+    node = useShell({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'SUB_PROCESS') {
+    node = useSubProcess({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'PYTHON') {
+    node = usePython({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'SPARK') {
+    node = useSpark({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'MR') {
+    node = useMr({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'FLINK') {
+    node = useFlink({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'HTTP') {
+    node = useHttp({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
   }
   return node
 }
