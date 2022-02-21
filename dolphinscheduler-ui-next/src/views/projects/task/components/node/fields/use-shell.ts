@@ -129,7 +129,7 @@ export function useShell(model: { [field: string]: any }): IJsonItem[] {
   ]
 }
 
-function removeUselessChildren(list: { children?: [] }[]) {
+export function removeUselessChildren(list: { children?: [] }[]) {
   if (!list.length) return
   list.forEach((item) => {
     if (!item.children) return

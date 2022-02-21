@@ -20,10 +20,12 @@ import Form from '@/components/form'
 import { useTask } from './use-task'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import type { ITaskData } from './types'
+import { useI18n } from 'vue-i18n'
 
 const props = {
   projectCode: {
-    type: Number as PropType<number>
+    type: Number as PropType<number>,
+    default: 0
   },
   data: {
     type: Object as PropType<ITaskData>,
@@ -46,11 +48,13 @@ const props = {
 const NodeDetail = defineComponent({
   name: 'NodeDetail',
   props,
-  setup(props, { expose }) {
+  emits: ['linkEventText'],
+  setup(props, { expose, emit }) {
     const { data, projectCode, from, readonly } = props
+    const { t } = useI18n()
 
     const { json, model } = useTask({
-      taskType: data.taskType,
+      data,
       projectCode,
       from,
       readonly
@@ -69,6 +73,17 @@ const NodeDetail = defineComponent({
       () => model.taskType,
       (taskType) => {
         // TODO: Change task type
+        if (taskType === 'SUB_PROCESS') {
+          // TODO: add linkUrl
+          emit(
+            'linkEventText',
+            true,
+            `${t('project.node.enter_child_node')}`,
+            ''
+          )
+        } else {
+          emit('linkEventText', false, '', '')
+        }
       }
     )
 

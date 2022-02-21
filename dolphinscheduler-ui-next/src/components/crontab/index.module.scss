@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
- .crontab-list {
-   display: flex;
-   .crontab-list-item {
+.crontab-list {
+  display: flex;
+  .crontab-list-item {
     display: flex;
     vertical-align: middle;
     align-items: center;
@@ -25,5 +25,5 @@
     > div {
       margin: 5px;
     }
-   }
- }
+  }
+}

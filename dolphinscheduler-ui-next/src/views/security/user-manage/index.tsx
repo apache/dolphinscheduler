@@ -86,7 +86,11 @@ const UsersManage = defineComponent({
           <NGridItem>
             <NCard>
               <NSpace justify='space-between'>
-                <NButton onClick={this.onAddUser} type='primary'>
+                <NButton
+                  onClick={this.onAddUser}
+                  type='primary'
+                  class='btn-create-user'
+                >
                   {t('security.user.create_user')}
                 </NButton>
                 <NInputGroup>
@@ -112,10 +116,11 @@ const UsersManage = defineComponent({
           <NGridItem>
             <NCard>
               {userListLoading ? (
-                <NSkeleton text repeat={6}></NSkeleton>
+                <NSkeleton text repeat={6} />
               ) : (
                 <NSpace v-show={!userListLoading} vertical size={20}>
                   <NDataTable
+                    row-class-name='items'
                     columns={this.columns}
                     data={this.userList}
                     scrollX={this.scrollX}

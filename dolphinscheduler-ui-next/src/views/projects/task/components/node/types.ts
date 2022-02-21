@@ -35,12 +35,49 @@ interface ILocalParam {
   type: string
   value?: string
 }
+
+interface ISourceItem {
+  id: number
+}
+
+interface ITaskParams {
+  resourceList?: ISourceItem[]
+  mainJar?: ISourceItem
+  localParams?: ILocalParam[]
+  rawScript?: string
+  programType?: string
+  sparkVersion?: string
+  flinkVersion?: string
+  jobManagerMemory?: string
+  taskManagerMemory?: string
+  slot?: number
+  taskManager?: number
+  parallelism?: number
+  mainClass?: string
+  deployMode?: string
+  appName?: string
+  driverCores?: number
+  driverMemory?: string
+  numExecutors?: number
+  executorMemory?: string
+  executorCores?: number
+  mainArgs?: string
+  others?: string
+  httpMethod?: string
+  httpCheckCondition?: string
+  httpParams?: []
+  url?: string
+  condition?: string
+  connectTimeout?: number
+  socketTimeout?: number
+}
+
 type ITaskType = TaskType
 
-interface INodeData {
+interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   id?: string
   taskType?: ITaskType
-  processCode?: string
+  processName?: number
   delayTime?: number
   description?: string
   environmentCode?: number | null
@@ -49,16 +86,19 @@ interface INodeData {
   flag?: 'YES' | 'NO'
   taskGroupId?: number
   taskGroupPriority?: number
-  localParams?: ILocalParam[]
-  rawScript?: string
   taskPriority?: string
   timeout?: number
   timeoutFlag?: boolean
   timeoutNotifyStrategy?: string[]
   workerGroup?: string
-  resourceList?: number[]
   code?: number
   name?: string
+  preTasks?: []
+  preTaskOptions?: []
+  postTaskOptions?: []
+  resourceList?: number[]
+  mainJar?: number
+  timeoutSetting?: boolean
 }
 
 interface ITaskData
@@ -67,16 +107,10 @@ interface ITaskData
     'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
   > {
   name?: string
-  processName?: number
-  taskPriority?: number
+  taskPriority?: string
   timeoutFlag: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
-  taskParams: {
-    resourceList: []
-    rawScript: string
-    localParams: ILocalParam[]
-  }
-  preTasks?: []
+  taskParams?: ITaskParams
 }
 
 export {
@@ -87,5 +121,6 @@ export {
   ITaskData,
   INodeData,
   IFormItem,
-  IJsonItem
+  IJsonItem,
+  ITaskParams
 }
