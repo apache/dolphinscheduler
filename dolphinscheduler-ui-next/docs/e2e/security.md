@@ -12,7 +12,7 @@ class:
 #### tenant manage
 
 | check              | class              |
-| ------------------ |--------------------|
+| ------------------ | ------------------ |
 | :white_check_mark: | items              |
 |                    | el-popconfirm      |
 |                    | el-button--primary |
@@ -29,7 +29,7 @@ class:
 #### user manage
 
 | check              | class               |
-| ------------------ |---------------------|
+| ------------------ | ------------------- |
 | :white_check_mark: | items               |
 |                    | el-popconfirm       |
 |                    | el-button--primary  |

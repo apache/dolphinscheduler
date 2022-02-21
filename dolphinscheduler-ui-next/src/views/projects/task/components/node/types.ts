@@ -70,6 +70,12 @@ interface ITaskParams {
   condition?: string
   connectTimeout?: number
   socketTimeout?: number
+  type?: string
+  datasource?: string
+  sql?: string
+  sqlType?: string
+  preStatements?: string[]
+  postStatements?: string[]
 }
 
 type ITaskType = TaskType
@@ -99,6 +105,12 @@ interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   resourceList?: number[]
   mainJar?: number
   timeoutSetting?: boolean
+  type?: string
+  datasource?: string
+  sql?: string
+  sqlType?: string
+  preStatements?: string[]
+  postStatements?: string[]
 }
 
 interface ITaskData
