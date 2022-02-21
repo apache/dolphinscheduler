@@ -670,7 +670,9 @@ const project = {
     status_code_custom: 'Custom response code',
     body_contains: 'Content includes',
     body_not_contains: 'Content does not contain',
-    http_parameters_position: 'Http Parameters Position'
+    http_parameters_position: 'Http Parameters Position',
+    target_task_name: 'Target Task Name',
+    target_task_name_tips: 'Please enter the Pigeon task name'
   }
 }
 
