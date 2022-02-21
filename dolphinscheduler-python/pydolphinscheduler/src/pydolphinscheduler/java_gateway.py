@@ -26,14 +26,23 @@ from pydolphinscheduler.constants import JavaGatewayDefault
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException
 
 
-def launch_gateway() -> JavaGateway:
+def launch_gateway(
+    address: Optional[str] = None,
+    port: Optional[int] = None,
+    auto_convert: Optional[bool] = True,
+) -> JavaGateway:
     """Launch java gateway to pydolphinscheduler.
 
     TODO Note that automatic conversion makes calling Java methods slightly less efficient because
     in the worst case, Py4J needs to go through all registered converters for all parameters.
     This is why automatic conversion is disabled by default.
     """
-    gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+    gateway_parameters = GatewayParameters(
+        address=address or JavaGatewayDefault.SERVER_ADDRESS,
+        port=port or JavaGatewayDefault.SERVER_PORT,
+        auto_convert=auto_convert or JavaGatewayDefault.AUTO_CONVERT,
+    )
+    gateway = JavaGateway(gateway_parameters=gateway_parameters)
     return gateway
 
 

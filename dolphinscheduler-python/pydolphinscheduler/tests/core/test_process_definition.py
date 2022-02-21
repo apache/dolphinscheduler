@@ -19,6 +19,7 @@
 
 from datetime import datetime
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from freezegun import freeze_time
@@ -30,10 +31,12 @@ from pydolphinscheduler.constants import (
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 from pydolphinscheduler.utils.date import conv_to_schedule
 from tests.testing.task import Task
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
+TEST_TASK_TYPE = "test-task-type"
 
 
 @pytest.mark.parametrize("func", ["run", "submit", "start"])
@@ -149,6 +152,80 @@ def test__parse_datetime_not_support_type(val: Any):
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         with pytest.raises(PyDSParamException, match="Do not support value type.*?"):
             pd._parse_datetime(val)
+
+
+@pytest.mark.parametrize(
+    "param, expect",
+    [
+        (
+            None,
+            [],
+        ),
+        (
+            {},
+            [],
+        ),
+        (
+            {"key1": "val1"},
+            [
+                {
+                    "prop": "key1",
+                    "direct": "IN",
+                    "type": "VARCHAR",
+                    "value": "val1",
+                }
+            ],
+        ),
+        (
+            {
+                "key1": "val1",
+                "key2": "val2",
+            },
+            [
+                {
+                    "prop": "key1",
+                    "direct": "IN",
+                    "type": "VARCHAR",
+                    "value": "val1",
+                },
+                {
+                    "prop": "key2",
+                    "direct": "IN",
+                    "type": "VARCHAR",
+                    "value": "val2",
+                },
+            ],
+        ),
+    ],
+)
+def test_property_param_json(param, expect):
+    """Test ProcessDefinition's property param_json."""
+    pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, param=param)
+    assert pd.param_json == expect
+
+
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test__pre_submit_check_switch_without_param(mock_code_version):
+    """Test :func:`_pre_submit_check` if process definition with switch but without attribute param."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        parent = Task(name="parent", task_type=TEST_TASK_TYPE)
+        switch_child_1 = Task(name="switch_child_1", task_type=TEST_TASK_TYPE)
+        switch_child_2 = Task(name="switch_child_2", task_type=TEST_TASK_TYPE)
+        switch_condition = SwitchCondition(
+            Branch(condition="${var} > 1", task=switch_child_1),
+            Default(task=switch_child_2),
+        )
+
+        switch = Switch(name="switch", condition=switch_condition)
+        parent >> switch
+        with pytest.raises(
+            PyDSParamException,
+            match="Parameter param must be provider if task Switch in process definition.",
+        ):
+            pd._pre_submit_check()
 
 
 def test_process_definition_get_define_without_task():

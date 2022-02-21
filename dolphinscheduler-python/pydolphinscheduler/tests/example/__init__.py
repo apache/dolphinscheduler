@@ -15,8 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init root of pydolphinscheduler."""
-
-from pkg_resources import get_distribution
-
-__version__ = get_distribution("apache-dolphinscheduler").version
+"""Init example package tests."""

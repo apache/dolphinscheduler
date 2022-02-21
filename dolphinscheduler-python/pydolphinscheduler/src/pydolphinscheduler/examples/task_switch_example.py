@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 r"""
 A example workflow for task switch.
 
@@ -34,16 +35,7 @@ from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 
 with ProcessDefinition(
-    name="task_switch_example",
-    tenant="tenant_exists",
-    param=[
-        {
-            "prop": "var",
-            "direct": "IN",
-            "type": "VARCHAR",
-            "value": "1"
-        }
-    ]
+    name="task_switch_example", tenant="tenant_exists", param={"var": "1"}
 ) as pd:
     parent = Shell(name="parent", command="echo parent")
     switch_child_1 = Shell(name="switch_child_1", command="echo switch_child_1")
@@ -56,3 +48,4 @@ with ProcessDefinition(
     switch = Switch(name="switch", condition=switch_condition)
     parent >> switch
     pd.submit()
+# [end workflow_declare]
