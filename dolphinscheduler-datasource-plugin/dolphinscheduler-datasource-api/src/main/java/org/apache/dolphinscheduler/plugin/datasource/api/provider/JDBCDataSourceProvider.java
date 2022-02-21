@@ -100,7 +100,7 @@ public class JDBCDataSourceProvider {
                 throw new RuntimeException("Jdbc driver loading error.");
             }
             //Compatible historical version data source connection information
-            if (dbType.equals(DbType.MYSQL) && driver.getMajorVersion() <= 8) {
+            if (dbType.equals(DbType.MYSQL) && driver.getMajorVersion() < 8) {
                 properties.setDriverClassName(Constants.COM_MYSQL_JDBC_DRIVER);
             } else {
                 properties.setDriverClassName(drv);
