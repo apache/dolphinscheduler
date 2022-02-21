@@ -33,6 +33,7 @@ export { useTargetTaskName } from './use-target-task-name'
 export { useDatasourceType } from './use-datasource-type'
 export { useDatasource } from './use-datasource'
 export { useSqlType } from './use-sql-type'
+export { useProcedure } from './use-procedure'
 
 export { useShell } from './use-shell'
 export { useSpark } from './use-spark'

@@ -76,6 +76,7 @@ interface ITaskParams {
   sqlType?: string
   preStatements?: string[]
   postStatements?: string[]
+  method?: string
 }
 
 type ITaskType = TaskType
@@ -111,6 +112,7 @@ interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   sqlType?: string
   preStatements?: string[]
   postStatements?: string[]
+  method?: string
 }
 
 interface ITaskData

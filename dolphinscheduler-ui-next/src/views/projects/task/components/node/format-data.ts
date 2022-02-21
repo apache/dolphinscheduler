@@ -76,6 +76,12 @@ export function formatParams(data: INodeData): {
     taskParams.postStatements = data.postStatements
   }
 
+  if (data.taskType === 'PROCEDURE') {
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+    taskParams.method = data.method
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -152,5 +158,10 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.mainJar) {
     params.mainJar = data.taskParams?.mainJar.id
   }
+
+  if (data.taskParams?.method) {
+    params.method = data.taskParams?.method
+  }
+
   return params
 }
