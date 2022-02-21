@@ -129,7 +129,7 @@ export function useChildNode({
 
   return {
     type: 'select',
-    field: 'processName',
+    field: 'processDefinitionCode',
     span: 24,
     name: t('project.node.child_node'),
     props: {
