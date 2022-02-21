@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
 import java.text.MessageFormat;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -119,6 +120,20 @@ public class CheckUtils {
      */
     public static boolean checkPhone(String phone) {
         return StringUtils.isEmpty(phone) || phone.length() == 11;
+    }
+
+    /**
+     * check time zone parameter
+     * @param timeZone timeZone
+     * @return true if timeZone is valid, otherwise return false
+     */
+    public static boolean checkTimeZone(String timeZone) {
+        try {
+            ZoneId.of(timeZone);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
