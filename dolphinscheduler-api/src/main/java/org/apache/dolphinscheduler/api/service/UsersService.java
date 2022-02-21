@@ -130,7 +130,7 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws IOException;
+                                   int tenantId, String phone, String queue, int state, String timeZone) throws IOException;
 
     /**
      * delete user

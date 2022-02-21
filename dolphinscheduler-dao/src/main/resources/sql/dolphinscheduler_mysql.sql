@@ -911,6 +911,7 @@ CREATE TABLE `t_ds_user` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue',
   `state` tinyint(4) DEFAULT '1' COMMENT 'state 0:disable 1:enable',
+  `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -964,7 +965,7 @@ VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', 
 -- Records of t_ds_user
 -- ----------------------------
 INSERT INTO `t_ds_user`
-VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
+VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1, null);
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
