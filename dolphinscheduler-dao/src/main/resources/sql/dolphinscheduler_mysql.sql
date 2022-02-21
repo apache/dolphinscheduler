@@ -911,7 +911,7 @@ CREATE TABLE `t_ds_user` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue',
   `state` tinyint(4) DEFAULT '1' COMMENT 'state 0:disable 1:enable',
-  `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone, e.g. Asia/Shanghai',
+  `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
