@@ -16,61 +16,96 @@
  */
 
 import { omit } from 'lodash'
-import type { INodeData, ITaskData } from './types'
+import type { INodeData, ITaskData, ITaskParams } from './types'
 
 export function formatParams(data: INodeData): {
   processDefinitionCode: string
   upstreamCodes: string
   taskDefinitionJsonObj: object
 } {
+  const taskParams: ITaskParams = {}
+  if (
+    data.taskType === 'SPARK' ||
+    data.taskType === 'MR' ||
+    data.taskType === 'FLINK'
+  ) {
+    taskParams.programType = data.programType
+    taskParams.mainClass = data.mainClass
+    if (data.mainJar) {
+      taskParams.mainJar = { id: data.mainJar }
+    }
+    taskParams.deployMode = data.deployMode
+    taskParams.appName = data.appName
+    taskParams.mainArgs = data.mainArgs
+    taskParams.others = data.others
+  }
+
+  if (data.taskType === 'SPARK') {
+    taskParams.sparkVersion = data.sparkVersion
+    taskParams.driverCores = data.driverCores
+    taskParams.driverMemory = data.driverMemory
+    taskParams.numExecutors = data.numExecutors
+    taskParams.executorMemory = data.executorMemory
+    taskParams.executorCores = data.executorCores
+  }
+
+  if (data.taskType === 'FLINK') {
+    taskParams.flinkVersion = data.flinkVersion
+    taskParams.jobManagerMemory = data.jobManagerMemory
+    taskParams.taskManagerMemory = data.taskManagerMemory
+    taskParams.slot = data.slot
+    taskParams.taskManager = data.taskManager
+    taskParams.parallelism = data.parallelism
+  }
+  if (data.taskType === 'HTTP') {
+    taskParams.httpMethod = data.httpMethod
+    taskParams.httpCheckCondition = data.httpCheckCondition
+    taskParams.httpParams = data.httpParams
+    taskParams.url = data.url
+    taskParams.condition = data.condition
+    taskParams.connectTimeout = data.connectTimeout
+    taskParams.socketTimeout = data.socketTimeout
+  }
+
+  if (data.taskType === 'SQL') {
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+    taskParams.sql = data.sql
+    taskParams.sqlType = data.sqlType
+    taskParams.preStatements = data.preStatements
+    taskParams.postStatements = data.postStatements
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
     taskDefinitionJsonObj: {
-      ...omit(data, [
-        'delayTime',
-        'environmentCode',
-        'failRetryTimes',
-        'failRetryInterval',
-        'taskGroupId',
-        'localParams',
-        'timeoutFlag',
-        'timeoutNotifyStrategy',
-        'resourceList',
-        'postTaskOptions',
-        'preTaskOptions',
-        'preTasks',
-        'processName',
-        'type',
-        'datasource',
-        'sql',
-        'sqlType',
-        'preStatements',
-        'postStatements'
-      ]),
       code: data.code,
       delayTime: data.delayTime ? String(data.delayTime) : '0',
+      description: data.description,
       environmentCode: data.environmentCode || -1,
-      failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
-      failRetryInterval: data.failRetryTimes
-        ? String(data.failRetryTimes)
+      failRetryInterval: data.failRetryInterval
+        ? String(data.failRetryInterval)
         : '0',
+      failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
+      flag: data.flag,
+      name: data.name,
       taskGroupId: data.taskGroupId || 0,
+      taskGroupPriority: data.taskGroupPriority,
       taskParams: {
         localParams: data.localParams,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
           ? data.resourceList.map((id: number) => ({ id }))
           : [],
-        type: data.type,
-        datasource: data.datasource,
-        sql: data.sql,
-        sqlType: data.sqlType,
-        preStatements: data.preStatements,
-        postStatements: data.postStatements
+        ...taskParams
       },
+      taskPriority: data.taskPriority,
+      taskType: data.taskType,
+      timeout: data.timeout,
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
-      timeoutNotifyStrategy: data.timeoutNotifyStrategy?.join('')
+      timeoutNotifyStrategy: data.timeoutNotifyStrategy?.join(''),
+      workerGroup: data.workerGroup
     }
   } as {
     processDefinitionCode: string
@@ -81,40 +116,25 @@ export function formatParams(data: INodeData): {
     params.taskDefinitionJsonObj.timeout = 0
     params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
   }
+
   return params
 }
 
 export function formatModel(data: ITaskData) {
   const params = {
-    name: data.name,
-    taskType: data.taskType,
-    processName: data.processName,
-    flag: data.flag,
-    description: data.description,
-    taskPriority: data.taskPriority,
-    workerGroup: data.workerGroup,
+    ...omit(data, [
+      'environmentCode',
+      'timeoutFlag',
+      'timeoutNotifyStrategy',
+      'taskParams'
+    ]),
+    ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
-    taskGroupId: data.taskGroupId,
-    taskGroupPriority: data.taskGroupPriority,
-    failRetryTimes: data.failRetryTimes,
-    failRetryInterval: data.failRetryInterval,
-    delayTime: data.delayTime,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: [data.timeoutNotifyStrategy] || [],
-    resourceList: data.taskParams?.resourceList || [],
-    timeout: data.timeout,
-    rawScript: data.taskParams?.rawScript,
-    localParams: data.taskParams?.localParams || [],
-    id: data.id,
-    code: data.code,
-    type: data.taskParams?.type,
-    datasource: data.taskParams?.datasource,
-    sql: data.taskParams?.sql,
-    sqlType: data.taskParams?.sqlType
-  } as {
-    timeoutNotifyStrategy: string[]
-    resourceList: number[]
-  }
+    localParams: data.taskParams?.localParams || []
+  } as INodeData
+
   if (data.timeoutNotifyStrategy === 'WARNFAILED') {
     params.timeoutNotifyStrategy = ['WARN', 'FAILED']
   }
@@ -122,6 +142,15 @@ export function formatModel(data: ITaskData) {
     params.resourceList = data.taskParams.resourceList.map(
       (item: { id: number }) => item.id
     )
+  }
+  if (
+    data.taskParams?.connectTimeout !== 60000 ||
+    data.taskParams?.socketTimeout !== 60000
+  ) {
+    params.timeoutSetting = true
+  }
+  if (data.taskParams?.mainJar) {
+    params.mainJar = data.taskParams?.mainJar.id
   }
   return params
 }

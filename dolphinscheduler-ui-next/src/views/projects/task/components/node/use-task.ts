@@ -15,8 +15,14 @@
  * limitations under the License.
  */
 
+import { useFlink } from './tasks/use-flink'
 import { useShell } from './tasks/use-shell'
+import { useSubProcess } from './tasks/use-sub-process'
+import { usePigeon } from './tasks/use-pigeon'
 import { usePython } from './tasks/use-python'
+import { useSpark } from './tasks/use-spark'
+import { useMr } from './tasks/use-mr'
+import { useHttp } from './tasks/use-http'
 import { useSql } from './tasks/use-sql'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
@@ -33,7 +39,6 @@ export function useTask({
 }): { json: IJsonItem[]; model: INodeData } {
   const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
-
   if (taskType === 'SHELL') {
     node = useShell({
       projectCode,
@@ -42,8 +47,56 @@ export function useTask({
       data
     })
   }
+  if (taskType === 'SUB_PROCESS') {
+    node = useSubProcess({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
   if (taskType === 'PYTHON') {
     node = usePython({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'SPARK') {
+    node = useSpark({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'MR') {
+    node = useMr({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'FLINK') {
+    node = useFlink({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'HTTP') {
+    node = useHttp({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'PIGEON') {
+    node = usePigeon({
       projectCode,
       from,
       readonly,

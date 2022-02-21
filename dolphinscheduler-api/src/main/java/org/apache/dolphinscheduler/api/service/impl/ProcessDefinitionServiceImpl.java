@@ -2133,8 +2133,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
-                scheduleObj.setReleaseState(ReleaseState.ONLINE);
-                scheduleMapper.updateById(scheduleObj);
+                schedulerService.setScheduleState(loginUser, projectCode, scheduleObj.getId(), ReleaseState.ONLINE);
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);

@@ -63,6 +63,8 @@ public class CheckUtilsTest {
     public void testCheckEmail() {
         assertTrue(CheckUtils.checkEmail("test01@gmail.com"));
         assertFalse(CheckUtils.checkEmail("test01@gmail"));
+        assertFalse(CheckUtils.checkEmail("test01@gmail."));
+        assertTrue(CheckUtils.checkEmail("test01@gmail.edu.cn"));
     }
 
     /**

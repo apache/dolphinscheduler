@@ -23,8 +23,9 @@ import {
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
 import type { IJsonItem } from '../types'
+import { number } from 'echarts'
 
-export function useProcessName({
+export function useChildNode({
   model,
   projectCode,
   isCreate,
@@ -128,22 +129,13 @@ export function useProcessName({
 
   return {
     type: 'select',
-    field: 'processName',
+    field: 'processDefinitionCode',
     span: 24,
-    name: t('project.node.process_name'),
+    name: t('project.node.child_node'),
     props: {
       loading: loading,
       disabled: !isCreate,
       'on-update:value': onChange
-    },
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      validator(validate: any, value: string) {
-        if (!value) {
-          return new Error(t('project.node.process_name_tips'))
-        }
-      }
     },
     options: options
   }

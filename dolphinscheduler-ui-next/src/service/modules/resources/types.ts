@@ -21,6 +21,7 @@ interface FileReq {
 
 interface ResourceTypeReq {
   type: 'FILE' | 'UDF'
+  programType?: string
 }
 
 interface UdfTypeReq {

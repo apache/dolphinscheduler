@@ -35,9 +35,52 @@ interface ILocalParam {
   type: string
   value?: string
 }
+
+interface ISourceItem {
+  id: number
+}
+
+interface ITaskParams {
+  resourceList?: ISourceItem[]
+  mainJar?: ISourceItem
+  localParams?: ILocalParam[]
+  rawScript?: string
+  programType?: string
+  sparkVersion?: string
+  flinkVersion?: string
+  jobManagerMemory?: string
+  taskManagerMemory?: string
+  slot?: number
+  taskManager?: number
+  parallelism?: number
+  mainClass?: string
+  deployMode?: string
+  appName?: string
+  driverCores?: number
+  driverMemory?: string
+  numExecutors?: number
+  executorMemory?: string
+  executorCores?: number
+  mainArgs?: string
+  others?: string
+  httpMethod?: string
+  httpCheckCondition?: string
+  httpParams?: []
+  url?: string
+  condition?: string
+  connectTimeout?: number
+  socketTimeout?: number
+  type?: string
+  datasource?: string
+  sql?: string
+  sqlType?: string
+  preStatements?: string[]
+  postStatements?: string[]
+}
+
 type ITaskType = TaskType
 
-interface INodeData {
+interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -49,19 +92,19 @@ interface INodeData {
   flag?: 'YES' | 'NO'
   taskGroupId?: number
   taskGroupPriority?: number
-  localParams?: ILocalParam[]
-  rawScript?: string
   taskPriority?: string
   timeout?: number
   timeoutFlag?: boolean
   timeoutNotifyStrategy?: string[]
   workerGroup?: string
-  resourceList?: number[]
   code?: number
   name?: string
   preTasks?: []
   preTaskOptions?: []
   postTaskOptions?: []
+  resourceList?: number[]
+  mainJar?: number
+  timeoutSetting?: boolean
   type?: string
   datasource?: string
   sql?: string
@@ -79,17 +122,7 @@ interface ITaskData
   taskPriority?: string
   timeoutFlag: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
-  taskParams?: {
-    resourceList: []
-    rawScript?: string
-    localParams: ILocalParam[]
-    type?: string
-    datasource?: string
-    sql?: string
-    sqlType?: string
-    preStatements?: string[]
-    postStatements?: string[]
-  }
+  taskParams?: ITaskParams
 }
 
 export {
@@ -100,5 +133,6 @@ export {
   ITaskData,
   INodeData,
   IFormItem,
-  IJsonItem
+  IJsonItem,
+  ITaskParams
 }

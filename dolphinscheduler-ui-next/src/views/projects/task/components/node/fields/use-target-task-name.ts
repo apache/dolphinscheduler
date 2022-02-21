@@ -18,26 +18,15 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function useFailed(): IJsonItem[] {
+export function useTargetTaskName(): IJsonItem {
   const { t } = useI18n()
-  return [
-    {
-      type: 'input-number',
-      field: 'failRetryTimes',
-      name: t('project.node.number_of_failed_retries'),
-      span: 12,
-      slots: {
-        suffix: () => t('project.node.times')
-      }
-    },
-    {
-      type: 'input-number',
-      field: 'failRetryInterval',
-      name: t('project.node.failed_retry_interval'),
-      span: 12,
-      slots: {
-        suffix: () => t('project.node.minute')
-      }
+  return {
+    type: 'input',
+    field: 'targetJobName',
+    name: t('project.node.target_task_name'),
+    props: {
+      placeholder: t('project.node.target_task_name_tips'),
+      maxLength: 100
     }
-  ]
+  }
 }

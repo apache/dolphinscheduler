@@ -11,48 +11,42 @@ class:
 
 #### tenant manage
 
-class:
-
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] tenantCode
-- [ ] edit
-- [ ] delete
-
-id:
-
-- [ ] btnCreateTenant
-- [ ] inputTenantCode
-- [ ] selectQueue
-- [ ] inputDescription
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class              |
+| ------------------ | ------------------ |
+| :white_check_mark: | items              |
+|                    | el-popconfirm      |
+|                    | el-button--primary |
+| :white_check_mark: | tenant-code        |
+| :white_check_mark: | edit               |
+| :white_check_mark: | delete             |
+| :white_check_mark: | btn-create-tenant  |
+| :white_check_mark: | input-tenant-code  |
+| :white_check_mark: | select-queue       |
+| :white_check_mark: | input-description  |
+| :white_check_mark: | btn-submit         |
+| :white_check_mark: | btn-cancel         |
 
 #### user manage
 
-class:
-
-- [ ] items
-- [ ] el-popconfirm
-- [ ] el-button--primary
-- [ ] name
-- [ ] edit
-- [ ] delete
-
-id:
-
-- [ ] btnCreateUser
-- [ ] inputUserName
-- [ ] inputUserPassword
-- [ ] selectTenant
-- [ ] selectQueue
-- [ ] inputEmail
-- [ ] inputPhone
-- [ ] radioStateEnable
-- [ ] radioStateDisable
-- [ ] btnSubmit
-- [ ] btnCancel
+| check              | class               |
+| ------------------ | ------------------- |
+| :white_check_mark: | items               |
+|                    | el-popconfirm       |
+|                    | el-button--primary  |
+| :white_check_mark: | name                |
+| :white_check_mark: | edit                |
+| :white_check_mark: | delete              |
+| :white_check_mark: | btn-create-user     |
+| :white_check_mark: | input-username      |
+| :white_check_mark: | input-password      |
+| :white_check_mark: | select-tenant       |
+| :white_check_mark: | select-queue        |
+| :white_check_mark: | input-email         |
+| :white_check_mark: | input-phone         |
+| :white_check_mark: | radio-state-enable  |
+| :white_check_mark: | radio=state-disable |
+| :white_check_mark: | btn-submit          |
+| :white_check_mark: | btn-cancel          |
 
 #### worker group manage
 
