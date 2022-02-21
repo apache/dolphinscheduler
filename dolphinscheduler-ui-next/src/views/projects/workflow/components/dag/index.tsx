@@ -27,13 +27,15 @@ import {
   useGraphBackfill,
   useDagDragAndDrop,
   useTaskEdit,
-  useBusinessMapper
+  useBusinessMapper,
+  useCellRightClick
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
+import ContextMenuItem from './dag-context-menu'
 import './x6-style.scss'
 
 const props = {
@@ -85,6 +87,11 @@ export default defineComponent({
       taskDefinitions,
       removeTasks
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
+
+    // Right click cell
+    const { pageX, pageY, menuVisible, menuHide } = useCellRightClick({
+      graph
+    })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -176,6 +183,12 @@ export default defineComponent({
           data={currTask.value as any}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
+        />
+        <ContextMenuItem
+          visible={menuVisible.value}
+          left={pageX.value}
+          top={pageY.value}
+          onHide={menuHide}
         />
       </div>
     )
