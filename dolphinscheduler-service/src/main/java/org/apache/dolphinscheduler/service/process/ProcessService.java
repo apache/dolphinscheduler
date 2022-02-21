@@ -2323,7 +2323,7 @@ public class ProcessService {
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
         int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
         processDefinitionLog.setVersion(insertVersion);
-        processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
+        processDefinitionLog.setReleaseState(!isFromProcessDefine || processDefinitionLog.getReleaseState() == ReleaseState.ONLINE ? ReleaseState.ONLINE : ReleaseState.OFFLINE);
         processDefinitionLog.setOperator(operator.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
         int insertLog = processDefineLogMapper.insert(processDefinitionLog);
