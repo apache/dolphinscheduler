@@ -29,6 +29,7 @@ export { usePreTasks } from './use-pre-tasks'
 export { useTaskType } from './use-task-type'
 export { useProcessName } from './use-process-name'
 export { useChildNode } from './use-child-node'
+export { useTargetTaskName } from './use-target-task-name'
 
 export { useShell } from './use-shell'
 export { useSpark } from './use-spark'
