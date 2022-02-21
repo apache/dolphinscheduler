@@ -34,6 +34,12 @@ prod = [
     "py4j~=0.10",
 ]
 
+build = [
+    "build",
+    "setuptools>=42",
+    "wheel",
+]
+
 doc = [
     "sphinx>=4.3",
     "sphinx_rtd_theme>=1.0",
@@ -52,7 +58,7 @@ style = [
     "isort>=5.10",
 ]
 
-dev = style + test + doc
+dev = style + test + doc + build
 
 all_dep = prod + dev
 # End package required
@@ -124,5 +130,6 @@ setup(
         "style": style,
         "test": test,
         "doc": doc,
+        "build": build,
     },
 )
