@@ -67,6 +67,15 @@ export function formatParams(data: INodeData): {
     taskParams.socketTimeout = data.socketTimeout
   }
 
+  if (data.taskType === 'SQL') {
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+    taskParams.sql = data.sql
+    taskParams.sqlType = data.sqlType
+    taskParams.preStatements = data.preStatements
+    taskParams.postStatements = data.postStatements
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -125,6 +134,7 @@ export function formatModel(data: ITaskData) {
     timeoutNotifyStrategy: [data.timeoutNotifyStrategy] || [],
     localParams: data.taskParams?.localParams || []
   } as INodeData
+
   if (data.timeoutNotifyStrategy === 'WARNFAILED') {
     params.timeoutNotifyStrategy = ['WARN', 'FAILED']
   }
