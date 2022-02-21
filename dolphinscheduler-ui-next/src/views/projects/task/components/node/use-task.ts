@@ -24,6 +24,7 @@ import { useSpark } from './tasks/use-spark'
 import { useMr } from './tasks/use-mr'
 import { useHttp } from './tasks/use-http'
 import { useSql } from './tasks/use-sql'
+import { useProcedure } from './tasks/use-procedure'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -105,6 +106,14 @@ export function useTask({
   }
   if (taskType === 'SQL') {
     node = useSql({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'PROCEDURE') {
+    node = useProcedure({
       projectCode,
       from,
       readonly,

@@ -682,7 +682,9 @@ const project = {
     pre_sql_statement: 'Pre SQL Statement',
     post_sql_statement: 'Post SQL Statement',
     sql_input_placeholder: 'Please enter non-query sql.',
-    sql_empty_tips: 'The sql can not be empty.'
+    sql_empty_tips: 'The sql can not be empty.',
+    procedure_method: 'SQL Statement',
+    procedure_method_tips: 'Please enter the procedure script'
   }
 }
 
