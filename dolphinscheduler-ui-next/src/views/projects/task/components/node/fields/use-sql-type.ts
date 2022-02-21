@@ -40,7 +40,10 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem {
     if (loading.value) return
     loading.value = true
     try {
-      options.value = sqlTypes.map(item => ({ label: item.code, value: item.id }))
+      options.value = sqlTypes.map((item) => ({
+        label: item.code,
+        value: item.id
+      }))
       loading.value = false
     } catch (err) {
       loading.value = false

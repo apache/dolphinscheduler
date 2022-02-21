@@ -62,6 +62,12 @@ interface INodeData {
   preTasks?: []
   preTaskOptions?: []
   postTaskOptions?: []
+  type?: string
+  datasource?: string
+  sql?: string
+  sqlType?: string
+  preStatements?: string[]
+  postStatements?: string[]
 }
 
 interface ITaskData

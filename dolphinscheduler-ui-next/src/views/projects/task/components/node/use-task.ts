@@ -33,6 +33,7 @@ export function useTask({
 }): { json: IJsonItem[]; model: INodeData } {
   const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
+
   if (taskType === 'SHELL') {
     node = useShell({
       projectCode,

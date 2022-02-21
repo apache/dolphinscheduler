@@ -134,54 +134,19 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.sql_input_placeholder'),
         type: 'textarea',
-        autosize: {minRows:1}
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.prop_tips'))
-          }
-
-          const sameItems = model.localParams.filter(
-              (item: { prop: string }) => item.prop === value
-          )
-
-          if (sameItems.length > 1) {
-            return new Error(t('project.node.prop_repeat'))
-          }
-        }
-      },
-      children: [
-        {
-          type: 'input',
-          field: 'preStatement',
-          span: 22,
-          props: {
-            placeholder: t('project.node.sql_input_placeholder'),
-            type: 'textarea',
-            autosize: {minRows:1}
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true,
-            validator(validate: any, value: string) {
-              if (!value) {
-                return new Error(t('project.node.prop_tips'))
-              }
-
-              const sameItems = model.localParams.filter(
-                  (item: { prop: string }) => item.prop === value
-              )
-
-              if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
-              }
-            }
-          }
-        }
-      ]
+        autosize: { minRows: 1 }
+      }
+    },
+    {
+      type: 'multi-input',
+      field: 'postStatements',
+      name: t('project.node.post_sql_statement'),
+      span: 22,
+      props: {
+        placeholder: t('project.node.sql_input_placeholder'),
+        type: 'textarea',
+        autosize: { minRows: 1 }
+      }
     }
   ]
 }

@@ -40,7 +40,13 @@ export function formatParams(data: INodeData): {
         'postTaskOptions',
         'preTaskOptions',
         'preTasks',
-        'processName'
+        'processName',
+        'type',
+        'datasource',
+        'sql',
+        'sqlType',
+        'preStatements',
+        'postStatements'
       ]),
       code: data.code,
       delayTime: data.delayTime ? String(data.delayTime) : '0',
@@ -55,7 +61,13 @@ export function formatParams(data: INodeData): {
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
           ? data.resourceList.map((id: number) => ({ id }))
-          : []
+          : [],
+        type: data.type,
+        datasource: data.datasource,
+        sql: data.sql,
+        sqlType: data.sqlType,
+        preStatements: data.preStatements,
+        postStatements: data.postStatements
       },
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
       timeoutNotifyStrategy: data.timeoutNotifyStrategy?.join('')
@@ -98,7 +110,7 @@ export function formatModel(data: ITaskData) {
     type: data.taskParams?.type,
     datasource: data.taskParams?.datasource,
     sql: data.taskParams?.sql,
-    sqlType: data.taskParams?.sqlType,
+    sqlType: data.taskParams?.sqlType
   } as {
     timeoutNotifyStrategy: string[]
     resourceList: number[]
@@ -111,6 +123,5 @@ export function formatModel(data: ITaskData) {
       (item: { id: number }) => item.id
     )
   }
-  console.log(params)
   return params
 }

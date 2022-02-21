@@ -615,7 +615,7 @@ const project = {
     pre_sql_statement: '前置SQL语句',
     post_sql_statement: '后置SQL语句',
     sql_input_placeholder: '请输入非查询SQL语句',
-    sql_empty_tips: '语句不能为空',
+    sql_empty_tips: '语句不能为空'
   }
 }
 

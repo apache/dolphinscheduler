@@ -15,33 +15,56 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryDataSourceList } from '@/service/modules/data-source'
 import type { IJsonItem } from '../types'
-import { TypeReq } from "@/service/modules/data-source/types";
+import { TypeReq } from '@/service/modules/data-source/types'
+import { find } from 'lodash'
 
 export function useDatasource(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
   const loading = ref(false)
+  const defaultValue = ref(null)
 
   const getDatasources = async () => {
     if (loading.value) return
     loading.value = true
     try {
-      console.log(model.type)
-      const params = { type: model.type } as TypeReq
-      const res = await queryDataSourceList(params)
-      console.log(res)
-      console.log(model.datasource)
-      options.value = res.map((item: any) => ({ label: item.name, value: item.id }))
+      await refreshOptions()
       loading.value = false
     } catch (err) {
       loading.value = false
     }
   }
+
+  const refreshOptions = async () => {
+    const params = { type: model.type } as TypeReq
+    const res = await queryDataSourceList(params)
+    defaultValue.value = null
+    options.value = []
+
+    res.map((item: any) => {
+      options.value.push({ label: item.name, value: String(item.id) })
+    })
+    if (options.value && model.datasource) {
+      let item = find(options.value, { value: String(model.datasource) })
+      if (!item) {
+        model.datasource = null
+      }
+    }
+  }
+
+  watch(
+    () => model.type,
+    () => {
+      if (model.type) {
+        refreshOptions()
+      }
+    }
+  )
 
   onMounted(() => {
     getDatasources()
@@ -58,7 +81,6 @@ export function useDatasource(model: { [field: string]: any }): IJsonItem {
     validate: {
       trigger: ['input', 'blur'],
       required: true
-    },
-    value: model.datasource
+    }
   }
 }

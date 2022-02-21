@@ -18,6 +18,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
+import { number } from 'echarts'
 
 export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
@@ -77,11 +78,17 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
     if (loading.value) return
     loading.value = true
     try {
-      options.value = datasourceTypes.filter(item => !item.disabled).map(item => ({ label: item.code, value: String(item.id) }))
+      options.value = datasourceTypes
+        .filter((item) => !item.disabled)
+        .map((item) => ({ label: item.code, value: item.code }))
       loading.value = false
     } catch (err) {
       loading.value = false
     }
+  }
+
+  const onChange = (type: string) => {
+    model.type = type
   }
 
   onMounted(() => {
@@ -93,7 +100,8 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
     span: 12,
     name: t('project.node.datasource_type'),
     props: {
-      loading: loading
+      loading: loading,
+      'on-update:value': onChange
     },
     options: options,
     validate: {

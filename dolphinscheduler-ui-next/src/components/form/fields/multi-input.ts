@@ -17,10 +17,15 @@
 
 import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
-import {NFormItemGi, NSpace, NButton, NGrid, NGridItem, NInput} from 'naive-ui'
+import {
+  NFormItemGi,
+  NSpace,
+  NButton,
+  NGrid,
+  NGridItem,
+  NInput
+} from 'naive-ui'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
-import getField from './get-field'
-import { formatValidate } from '../utils'
 import type { IJsonItem, FormItemRule } from '../types'
 
 const MultiInput = defineComponent({
@@ -28,7 +33,6 @@ const MultiInput = defineComponent({
   emits: ['add'],
   setup(props, ctx) {
     const formItem = useFormItem({})
-
     const onAdd = () => void ctx.emit('add')
 
     return { onAdd, disabled: formItem.mergedDisabledRef }
@@ -36,29 +40,30 @@ const MultiInput = defineComponent({
   render() {
     const { disabled, $slots, onAdd } = this
 
-    console.log('reander')
-    console.log($slots)
-
-    return h(NSpace, {vertical: true, style:{width: '100%'}}, {
-      default: () => {
-        return [
-          renderSlot($slots, 'default', { disabled }),
-          h(
-            NButton,
-            {
-              circle: true,
-              size: 'small',
-              type: 'info',
-              disabled,
-              onClick: onAdd
-            },
-            {
-              icon: () => h(PlusOutlined)
-            }
-          )
-        ]
+    return h(
+      NSpace,
+      { vertical: true, style: { width: '100%' } },
+      {
+        default: () => {
+          return [
+            renderSlot($slots, 'default', { disabled }),
+            h(
+              NButton,
+              {
+                circle: true,
+                size: 'small',
+                type: 'info',
+                disabled,
+                onClick: onAdd
+              },
+              {
+                icon: () => h(PlusOutlined)
+              }
+            )
+          ]
+        }
       }
-    })
+    )
   }
 })
 
@@ -71,21 +76,17 @@ export function renderMultiInput(
 
   // the fields is the data of the task definition.
   // the item is the options of this component in the form.
-  console.log('input group...')
-  console.log('item...')
-  console.log(item)
-  console.log('fields...')
-  console.log(fields)
 
   const getChild = (value: string, i: number) => {
     return h(
-        NFormItemGi,
-        {
-          showLabel: false,
-          path: `${item.field}[${i}]`,
-          span: unref(item.span)
-        },
-        () => h(NInput, {
+      NFormItemGi,
+      {
+        showLabel: false,
+        path: `${item.field}[${i}]`,
+        span: unref(item.span)
+      },
+      () =>
+        h(NInput, {
           ...item.props,
           value: value,
           onUpdateValue: (value: string) => void (fields[item.field][i] = value)
@@ -96,7 +97,6 @@ export function renderMultiInput(
   //initialize the component by using data
   const getChildren = ({ disabled }: { disabled: boolean }) =>
     fields[item.field].map((value: string, i: number) => {
-      console.log('getChildren....')
       return h(NGrid, { xGap: 10 }, () => [
         getChild(value, i),
         h(
@@ -114,7 +114,6 @@ export function renderMultiInput(
                 disabled,
                 onClick: () => {
                   fields[item.field].splice(i, 1)
-                  rules.splice(i, 1)
                 }
               },
               {
@@ -128,10 +127,8 @@ export function renderMultiInput(
   return h(
     MultiInput,
     {
+      name: item.field,
       onAdd: () => {
-        console.log('add....')
-        // rules.push(ruleItem)
-        console.log('push...')
         fields[item.field].push('')
       }
     },
