@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -59,11 +60,17 @@ public class CheckUtils {
      * @return true if email regex valid, otherwise return false
      */
     public static boolean checkEmail(String email) {
-        if (StringUtils.isEmpty(email)) {
+        if (StringUtils.isBlank(email)) {
             return false;
         }
-
-        return email.length() > 5 && email.length() <= 40 && regexChecks(email, Constants.REGEX_MAIL_NAME);
+        EmailValidator emailValidator = new EmailValidator();
+        if (!emailValidator.isValid(email, null)) {
+            return false;
+        }
+        //Email is at least a second-level domain name
+        int indexDomain = email.lastIndexOf("@");
+        String domainString = email.substring(indexDomain);
+        return domainString.contains(".");
     }
 
     /**
