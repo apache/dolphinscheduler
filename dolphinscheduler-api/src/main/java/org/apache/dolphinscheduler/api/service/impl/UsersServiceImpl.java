@@ -207,8 +207,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             queue = "";
         }
         user.setQueue(queue);
-        String defaultTimeZone = ZoneId.systemDefault().getRules().getOffset(Instant.now()).getId();
-        user.setTimeZone("GMT" + defaultTimeZone);
 
         // save user
         userMapper.insert(user);
