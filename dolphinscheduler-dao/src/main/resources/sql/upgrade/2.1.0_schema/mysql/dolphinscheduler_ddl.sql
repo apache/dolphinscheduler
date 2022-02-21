@@ -27,7 +27,7 @@ alter table t_ds_task_definition_log add `task_group_priority` int(11) DEFAULT N
 alter table t_ds_task_definition add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
 alter table t_ds_task_definition add `task_group_priority` int(11) DEFAULT '0' COMMENT 'task group id' AFTER `task_group_id`;
 
-ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone, e.g. GMT+08:00';
+ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone, e.g. Asia/Shanghai';
 
 --
 -- Table structure for table `t_ds_dq_comparison_type`
