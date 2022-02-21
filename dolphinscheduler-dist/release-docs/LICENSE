@@ -405,6 +405,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     protostuff-collectionschema 1.7.2: https://github.com/protostuff/protostuff/protostuff-collectionschema Apache-2.0
     prometheus client_java(simpleclient) 0.12.0: https://github.com/prometheus/client_java, Apache 2.0
     snowflake snowflake-2010: https://github.com/twitter-archive/snowflake/tree/snowflake-2010, Apache 2.0
+    hibernate-validator  6.2.2.Final https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator/6.2.2.Final, Apache 2.0
+    jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0
+    jboss-logging:jar 3.4.2.Final https://mvnrepository.com/artifact/org.jboss.logging/jboss-logging/3.4.2.Final, Apache 2.0
 
 ========================================================================
 BSD licenses

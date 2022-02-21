@@ -129,6 +129,7 @@
         <jacoco.skip>false</jacoco.skip>
         <netty.version>4.1.53.Final</netty.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
     </properties>
 
     <dependencyManagement>
@@ -819,8 +820,14 @@
                 <artifactId>activation</artifactId>
                 <version>1.1</version>
             </dependency>
+     <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate.validator.version}</version>
+        </dependency>
 
-            <dependency>
+        <dependency>
                 <groupId>com.sun.mail</groupId>
                 <artifactId>javax.mail</artifactId>
                 <version>1.6.2</version>
