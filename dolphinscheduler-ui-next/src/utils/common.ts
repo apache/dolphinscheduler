@@ -314,3 +314,20 @@ export const tasksState = (t: any): ITaskState => ({
     isSpin: false
   }
 })
+
+/**
+ * A simple uuid generator, support prefix and template pattern.
+ *
+ * @example
+ *
+ *  uuid('v-') // -> v-xxx
+ *  uuid('v-ani-%{s}-translate')  // -> v-ani-xxx
+ */
+export function uuid(prefix: string) {
+  const id = Math.floor(Math.random() * 10000).toString(36)
+  return prefix
+    ? ~prefix.indexOf('%{s}')
+      ? prefix.replace(/%\{s\}/g, id)
+      : prefix + id
+    : id
+}

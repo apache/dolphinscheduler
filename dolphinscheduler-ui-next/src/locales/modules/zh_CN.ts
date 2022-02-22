@@ -676,7 +676,11 @@ const project = {
     sql_input_placeholder: '请输入非查询SQL语句',
     sql_empty_tips: '语句不能为空',
     procedure_method: 'SQL语句',
-    procedure_method_tips: '请输入存储脚本'
+    procedure_method_tips: '请输入存储脚本',
+    start: '运行',
+    edit: '编辑',
+    copy: '复制节点',
+    delete: '删除'
   }
 }
 
