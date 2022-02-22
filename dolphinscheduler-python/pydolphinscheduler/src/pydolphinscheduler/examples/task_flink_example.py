@@ -15,13 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# testting
-pytest~=6.2.5
-freezegun
-# Test coverage
-coverage
-# code linting and formatting
-flake8
-flake8-docstrings
-flake8-black
-isort
+# [start workflow_declare]
+"""A example workflow for task flink."""
+
+from pydolphinscheduler.core.process_definition import ProcessDefinition
+from pydolphinscheduler.tasks.flink import DeployMode, Flink, ProgramType
+
+with ProcessDefinition(name="task_flink_example", tenant="tenant_exists") as pd:
+    task = Flink(
+        name="task_flink",
+        main_class="org.apache.flink.streaming.examples.wordcount.WordCount",
+        main_package="WordCount.jar",
+        program_type=ProgramType.JAVA,
+        deploy_mode=DeployMode.LOCAL,
+    )
+    pd.run()
+# [end workflow_declare]

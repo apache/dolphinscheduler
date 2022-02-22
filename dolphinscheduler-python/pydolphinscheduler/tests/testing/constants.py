@@ -15,4 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-py4j~=0.10.9.2
+"""Constants variables for test module."""
+
+# Record some task without example in directory `example`. Some of them maybe can not write example,
+# but most of them just without adding by mistake, and we should add it later.
+task_without_example = {
+    "sql",
+    "http",
+    "sub_process",
+    "python",
+    "procedure",
+}

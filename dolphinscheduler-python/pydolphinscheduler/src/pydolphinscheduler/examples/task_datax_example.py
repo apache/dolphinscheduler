@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# [start workflow_declare]
 """
 A example workflow for task datax.
 
@@ -23,7 +24,6 @@ This example will create a workflow named `task_datax`.
 You can create data sources `first_mysql` and `first_mysql` through UI.
 It creates a task to synchronize datax from the source database to the target database.
 """
-
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.datax import CustomDataX, DataX
@@ -38,24 +38,15 @@ JSON_TEMPLATE = {
                     "parameter": {
                         "username": "usr",
                         "password": "pwd",
-                        "column": [
-                            "id",
-                            "name",
-                            "code",
-                            "description"
-                        ],
+                        "column": ["id", "name", "code", "description"],
                         "splitPk": "id",
                         "connection": [
                             {
-                                "table": [
-                                    "source_table"
-                                ],
-                                "jdbcUrl": [
-                                    "jdbc:mysql://127.0.0.1:3306/source_db"
-                                ]
+                                "table": ["source_table"],
+                                "jdbcUrl": ["jdbc:mysql://127.0.0.1:3306/source_db"],
                             }
-                        ]
-                    }
+                        ],
+                    },
                 },
                 "writer": {
                     "name": "mysqlwriter",
@@ -63,31 +54,32 @@ JSON_TEMPLATE = {
                         "writeMode": "insert",
                         "username": "usr",
                         "password": "pwd",
-                        "column": [
-                            "id",
-                            "name"
-                        ],
+                        "column": ["id", "name"],
                         "connection": [
                             {
                                 "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/target_db",
-                                "table": [
-                                    "target_table"
-                                ]
+                                "table": ["target_table"],
                             }
-                        ]
-                    }
-                }
+                        ],
+                    },
+                },
             }
-        ]
+        ],
+        "setting": {
+            "errorLimit": {"percentage": 0, "record": 0},
+            "speed": {"channel": 1, "record": 1000},
+        },
     }
 }
 
 with ProcessDefinition(
-    name="task_datax_1",
+    name="task_datax_example",
     tenant="tenant_exists",
 ) as pd:
     # This task synchronizes the data in `t_ds_project`
     # of `first_mysql` database to `target_project` of `second_mysql` database.
+    # You have to make sure data source named `first_mysql` and `second_mysql` exists
+    # in your environment.
     task1 = DataX(
         name="task_datax",
         datasource_name="first_mysql",
@@ -96,7 +88,8 @@ with ProcessDefinition(
         target_table="target_table",
     )
 
-    # you can custom json_template of datax to sync data. This task create job
-    # same as task1 do
+    # You can custom json_template of datax to sync data. This task create a new
+    # datax job same as task1, transfer record from `first_mysql` to `second_mysql`
     task2 = CustomDataX(name="task_custom_datax", json=str(JSON_TEMPLATE))
     pd.run()
+# [end workflow_declare]

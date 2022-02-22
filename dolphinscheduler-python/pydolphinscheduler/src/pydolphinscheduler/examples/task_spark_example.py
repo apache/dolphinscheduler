@@ -15,8 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init root of pydolphinscheduler."""
+# [start workflow_declare]
+"""A example workflow for task spark."""
 
-from pkg_resources import get_distribution
+from pydolphinscheduler.core.process_definition import ProcessDefinition
+from pydolphinscheduler.tasks.spark import DeployMode, ProgramType, Spark
 
-__version__ = get_distribution("apache-dolphinscheduler").version
+with ProcessDefinition(name="task_spark_example", tenant="tenant_exists") as pd:
+    task = Spark(
+        name="task_spark",
+        main_class="org.apache.spark.examples.SparkPi",
+        main_package="spark-examples_2.12-3.2.0.jar",
+        program_type=ProgramType.JAVA,
+        deploy_mode=DeployMode.LOCAL,
+    )
+    pd.run()
+# [end workflow_declare]
