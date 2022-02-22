@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function useShell({
+export function useSqoop({
   projectCode,
   from = 0,
   readonly,
@@ -31,7 +31,7 @@ export function useShell({
   data?: ITaskData
 }) {
   const model = reactive({
-    taskType: 'SHELL',
+    taskType: 'SQOOP',
     name: '',
     flag: 'YES',
     description: '',
@@ -43,7 +43,26 @@ export function useShell({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    isCustomTask: false,
+    hadoopCustomParams: [],
+    sqoopAdvancedParams: [],
+    mapColumnHive: [],
+    mapColumnJava: [],
+    modelType: 'import',
+    sourceType: 'MYSQL',
+    srcQueryType: '1',
+    srcColumnType: '0',
+    targetType: 'HDFS',
+    sourceMysqlType: 'MYSQL',
+    targetHdfsDeleteTargetDir: true,
+    targetHdfsCompressionCodec: 'snappy',
+    targetHdfsFileType: '--as-avrodatafile',
+    targetMysqlType: 'MYSQL',
+    targetMysqlUpdateMode: 'allowinsert',
+    targetHiveCreateTable: false,
+    targetHiveDropDelimiter: false,
+    targetHiveOverWrite: true,
+    concurrency: 1
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -74,7 +93,7 @@ export function useShell({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useSqoop(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model
