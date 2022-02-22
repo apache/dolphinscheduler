@@ -369,4 +369,9 @@ public class TaskConstants {
      * data.quality.error.output.path
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
+
+    /**
+     * aws config
+     */
+    public static final String AWS_NAMED_PROFILES_PATH = "aws.named.profiles.path";
 }

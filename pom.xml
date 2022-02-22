@@ -129,7 +129,7 @@
         <janino.version>3.1.6</janino.version>
         <kubernetes.version>5.8.0</kubernetes.version>
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
-
+        <awsjavasdk.version>1.12.162</awsjavasdk.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
@@ -494,6 +494,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-seatunnel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-task-emr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -929,6 +934,12 @@
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate.validator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-emr</artifactId>
+                <version>${awsjavasdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
