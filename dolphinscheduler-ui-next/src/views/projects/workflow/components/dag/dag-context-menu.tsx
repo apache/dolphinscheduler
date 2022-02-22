@@ -15,11 +15,19 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType } from 'vue'
+import { genTaskCodeList } from '@/service/modules/task-definition'
+import type { Cell } from '@antv/x6'
+import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
+import { uuid } from '@/utils/common'
 
 const props = {
+  cell: {
+    type: Object as PropType<Cell>,
+    require: true
+  },
   visible: {
     type: Boolean as PropType<boolean>,
     default: true
@@ -37,10 +45,42 @@ const props = {
 export default defineComponent({
   name: 'dag-context-menu',
   props,
-  emits: ['hide'],
+  emits: ['hide', 'start', 'edit', 'copyTask', 'removeTasks'],
   setup(props, ctx) {
+    const graph = inject('graph', ref())
+    const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+
     const hide = () => {
       ctx.emit('hide', false)
+    }
+
+    const startRunning = () => {
+      ctx.emit('start')
+    }
+
+    const handleEdit = () => {
+      ctx.emit('edit', Number(props.cell?.id))
+    }
+
+    const handleCopy = () => {
+      const genNums = 1
+      const type = props.cell?.data.taskType
+      const taskName = uuid(props.cell?.data.taskName + '_')
+      const targetCode = Number(props.cell?.id)
+
+      genTaskCodeList(genNums, projectCode).then((res) => {
+        const [code] = res
+        ctx.emit('copyTask', taskName, code, targetCode, type, {
+          x: props.left + 100,
+          y: props.top + 100
+        })
+      })
+    }
+
+    const handleDelete = () => {
+      graph.value?.removeCell(props.cell)
+      ctx.emit('removeTasks', [Number(props.cell?.id)])
     }
 
     onMounted(() => {
@@ -48,6 +88,13 @@ export default defineComponent({
         hide()
       })
     })
+
+    return {
+      startRunning,
+      handleEdit,
+      handleCopy,
+      handleDelete
+    }
   },
   render() {
     const { t } = useI18n()
@@ -58,11 +105,19 @@ export default defineComponent({
           class={styles['dag-context-menu']}
           style={{ left: `${this.left}px`, top: `${this.top}px` }}
         >
-          <div class={styles['menu-item']}> {t('project.node.start')}</div>
-          <div class={styles['menu-item']}> {t('project.node.edit')}</div>
-          <div class={styles['menu-item']}> {t('project.node.copy')}</div>
-          <div class={styles['menu-item']}> {t('project.node.delete')}</div>
-          <div class={styles['menu-item']}> {t('project.node.view_log')}</div>
+          <div class={styles['menu-item']} onClick={this.startRunning}>
+            {t('project.node.start')}
+          </div>
+          <div class={styles['menu-item']} onClick={this.handleEdit}>
+            {t('project.node.edit')}
+          </div>
+          <div class={styles['menu-item']} onClick={this.handleCopy}>
+            {t('project.node.copy')}
+          </div>
+          <div class={styles['menu-item']} onClick={this.handleDelete}>
+            {t('project.node.delete')}
+          </div>
+          {/* TODO: view log */}
         </div>
       )
     )

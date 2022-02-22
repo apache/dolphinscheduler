@@ -26,7 +26,7 @@ import { useCustomCellBuilder } from './use-custom-cell-builder'
 import { useGraphBackfill } from './use-graph-backfill'
 import { useDagDragAndDrop } from './use-dag-drag-drop'
 import { useTaskEdit } from './use-task-edit'
-import { useCellRightClick } from './use-cell-right-click'
+import { useNodeMenu } from './use-node-menu'
 
 export {
   useCanvasInit,
@@ -40,5 +40,5 @@ export {
   useCellUpdate,
   useDagDragAndDrop,
   useTaskEdit,
-  useCellRightClick
+  useNodeMenu
 }

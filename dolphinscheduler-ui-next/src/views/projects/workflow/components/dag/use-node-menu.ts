@@ -17,7 +17,7 @@
 
 import type { Ref } from 'vue'
 import { onMounted, ref } from 'vue'
-import type { Graph } from '@antv/x6'
+import type { Graph, Cell } from '@antv/x6'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -26,11 +26,13 @@ interface Options {
 /**
  * Get position of the right-clicked Cell.
  */
-export function useCellRightClick(options: Options) {
+export function useNodeMenu(options: Options) {
   const { graph } = options
+  const startModalShow = ref(false)
   const menuVisible = ref(false)
   const pageX = ref()
   const pageY = ref()
+  const menuCell = ref<Cell>()
 
   const menuHide = () => {
     menuVisible.value = false
@@ -39,10 +41,15 @@ export function useCellRightClick(options: Options) {
     graph.value?.unlockScroller()
   }
 
+  const menuStart = () => {
+    startModalShow.value = true
+  }
+
   onMounted(() => {
     if (graph.value) {
       // contextmenu
-      graph.value.on('cell:contextmenu', ({ x, y }) => {
+      graph.value.on('node:contextmenu', ({ cell, x, y }) => {
+        menuCell.value = cell
         const data = graph.value?.localToPage(x, y)
         pageX.value = data?.x
         pageY.value = data?.y
@@ -59,7 +66,10 @@ export function useCellRightClick(options: Options) {
   return {
     pageX,
     pageY,
+    startModalShow,
     menuVisible,
-    menuHide
+    menuCell,
+    menuHide,
+    menuStart
   }
 }

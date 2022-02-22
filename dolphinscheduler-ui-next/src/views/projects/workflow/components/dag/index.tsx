@@ -28,13 +28,14 @@ import {
   useDagDragAndDrop,
   useTaskEdit,
   useBusinessMapper,
-  useCellRightClick
+  useNodeMenu
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
+import StartModal from '@/views/projects/workflow/definition/components/start-modal'
 import ContextMenuItem from './dag-context-menu'
 import './x6-style.scss'
 
@@ -84,12 +85,22 @@ export default defineComponent({
       currTask,
       taskCancel,
       appendTask,
+      editTask,
+      copyTask,
       taskDefinitions,
       removeTasks
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     // Right click cell
-    const { pageX, pageY, menuVisible, menuHide } = useCellRightClick({
+    const {
+      menuCell,
+      pageX,
+      pageY,
+      menuVisible,
+      startModalShow,
+      menuHide,
+      menuStart
+    } = useNodeMenu({
       graph
     })
 
@@ -185,11 +196,22 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
+          cell={menuCell.value}
           visible={menuVisible.value}
           left={pageX.value}
           top={pageY.value}
           onHide={menuHide}
+          onStart={menuStart}
+          onEdit={editTask}
+          onCopyTask={copyTask}
+          onRemoveTasks={removeTasks}
         />
+        {!!props.definition && (
+          <StartModal
+            v-model:row={props.definition.processDefinition}
+            v-model:show={startModalShow.value}
+          />
+        )}
       </div>
     )
   }
