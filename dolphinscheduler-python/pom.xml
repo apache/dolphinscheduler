@@ -132,6 +132,21 @@
                                 </configuration>
                             </execution>
                             <execution>
+                                <id>python-api-clean</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>python3</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>setup.py</argument>
+                                        <argument>pre_clean</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>python-api-build</id>
                                 <phase>prepare-package</phase>
                                 <goals>
