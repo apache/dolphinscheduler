@@ -98,9 +98,13 @@ public class EmrTask extends AbstractTaskExecutor {
             calculateExitStatusCode(clusterStatus);
 
             logger.info("emr task finished with status:{}", clusterStatus);
+        } catch (InterruptedException e){
+            logger.error("emr task interrupted",e);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
-            exitStatusCode = EXIT_CODE_FAILURE;
             logger.error("emr task submit failed with error", e);
+            exitStatusCode = EXIT_CODE_FAILURE;
+
         }
     }
 
