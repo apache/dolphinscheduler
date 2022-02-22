@@ -684,7 +684,11 @@ const project = {
     sql_input_placeholder: 'Please enter non-query sql.',
     sql_empty_tips: 'The sql can not be empty.',
     procedure_method: 'SQL Statement',
-    procedure_method_tips: 'Please enter the procedure script'
+    procedure_method_tips: 'Please enter the procedure script',
+    start: 'Start',
+    edit: 'Edit',
+    copy: 'Copy',
+    delete: 'Delete'
   }
 }
 
