@@ -205,7 +205,7 @@ public class WorkerServer implements IStoppable {
                 logger.warn("thread sleep exception", e);
             }
 
-            this.killAllRunningYarnTasks();
+            this.killAllRunningTasks();
 
             // close
             this.nettyRemotingServer.close();
@@ -223,9 +223,9 @@ public class WorkerServer implements IStoppable {
     }
 
     /**
-     * kill all yarn tasks which are running
+     * kill all tasks which are running
      */
-    public void killAllRunningYarnTasks() {
+    public void killAllRunningTasks() {
         Collection<TaskRequest> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
         logger.info("ready to kill all cache job, job size:{}", taskRequests.size());
 
@@ -235,8 +235,10 @@ public class WorkerServer implements IStoppable {
 
         for (TaskRequest taskRequest : taskRequests) {
             // kill yarn task if not finish
-            // don't need to kill shell here because when the task got processId, it was finished.
             ProcessUtils.killYarnJob(JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class));
+
+            // kill task when it's not finished yet
+            org.apache.dolphinscheduler.plugin.task.api.ProcessUtils.kill(taskRequest);
         }
     }
 }
