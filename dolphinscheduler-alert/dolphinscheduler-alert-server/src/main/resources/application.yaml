@@ -18,6 +18,9 @@
 spring:
   application:
     name: alert-server
+  jackson:
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   main:
     banner-mode: off
   datasource:

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -56,7 +57,12 @@ public final class DateUtils {
      * @return local datetime
      */
     private static LocalDateTime date2LocalDateTime(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        ZoneId zoneId = ZoneId.systemDefault();
+        if (StringUtils.isNotEmpty(timezone)) {
+            zoneId = ZoneId.of(timezone);
+        }
+        return LocalDateTime.ofInstant(date.toInstant(), zoneId);
     }
 
     /**
@@ -66,7 +72,12 @@ public final class DateUtils {
      * @return date
      */
     private static Date localDateTime2Date(LocalDateTime localDateTime) {
-        Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+        String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        ZoneId zoneId = ZoneId.systemDefault();
+        if (StringUtils.isNotEmpty(timezone)) {
+            zoneId = ZoneId.of(timezone);
+        }
+        Instant instant = localDateTime.atZone(zoneId).toInstant();
         return Date.from(instant);
     }
 
