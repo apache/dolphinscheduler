@@ -34,7 +34,7 @@ export function createProject(data: ProjectsReq): any {
   })
 }
 
-export function queryAuthorizedProject(params: UserIdReq): any {
+export function queryAuthorizedProject(params: UserIdReq) {
   return axios({
     url: '/projects/authed-project',
     method: 'get',
@@ -56,7 +56,7 @@ export function queryAllProjectList(): any {
   })
 }
 
-export function queryUnauthorizedProject(params: UserIdReq): any {
+export function queryUnauthorizedProject(params: UserIdReq) {
   return axios({
     url: '/projects/unauth-project',
     method: 'get',

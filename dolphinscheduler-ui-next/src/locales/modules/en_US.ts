@@ -801,6 +801,16 @@ const security = {
     delete_confirm: 'Are you sure to delete?',
     delete_confirm_tip:
       'Deleting user is a dangerous operation，please be careful',
+    project: 'Project',
+    resource: 'Resource',
+    file_resource: 'File Resource',
+    udf_resource: 'UDF Resource',
+    datasource: 'Datasource',
+    udf: 'UDF Function',
+    authorize_project: 'Project Authorize',
+    authorize_resource: 'Resource Authorize',
+    authorize_datasource: 'Datasource Authorize',
+    authorize_udf: 'UDF Function Authorize',
     index: 'Index',
     username: 'Username',
     username_exists: 'The username already exists',
@@ -824,8 +834,11 @@ const security = {
     operation: 'Operation',
     edit: 'Edit',
     delete: 'Delete',
+    authorize: 'Authorize',
     save_error_msg: 'Failed to save, please retry',
-    delete_error_msg: 'Failed to delete, please retry'
+    delete_error_msg: 'Failed to delete, please retry',
+    auth_error_msg: 'Failed to authorize, please retry',
+    auth_success_msg: 'Authorize succeeded'
   },
   alarm_instance: {
     search_input_tips: 'Please input the keywords',
