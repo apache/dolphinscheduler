@@ -15,34 +15,36 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
         <version>2.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dolphinscheduler-task-plugin</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dolphinscheduler-task-emr</artifactId>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>dolphinscheduler-task-api</module>
-        <module>dolphinscheduler-task-shell</module>
-        <module>dolphinscheduler-task-datax</module>
-        <module>dolphinscheduler-task-flink</module>
-        <module>dolphinscheduler-task-http</module>
-        <module>dolphinscheduler-task-mr</module>
-        <module>dolphinscheduler-task-python</module>
-        <module>dolphinscheduler-task-spark</module>
-        <module>dolphinscheduler-task-sql</module>
-        <module>dolphinscheduler-task-sqoop</module>
-        <module>dolphinscheduler-task-procedure</module>
-        <module>dolphinscheduler-task-pigeon</module>
-        <module>dolphinscheduler-task-dataquality</module>
-        <module>dolphinscheduler-task-seatunnel</module>
-        <module>dolphinscheduler-task-emr</module>
-    </modules>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-emr</artifactId>
+        </dependency>
+    </dependencies>
 </project>

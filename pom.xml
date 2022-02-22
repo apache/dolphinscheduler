@@ -129,6 +129,8 @@
         <janino.version>3.1.6</janino.version>
         <kubernetes.version>5.8.0</kubernetes.version>
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
+        <aws.sdk.version>1.12.160</aws.sdk.version>
+        <joda-time.version>2.10.13</joda-time.version>
 
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
@@ -494,6 +496,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-seatunnel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-task-emr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -929,6 +936,17 @@
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate.validator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-emr</artifactId>
+                <version>${aws.sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
