@@ -45,7 +45,7 @@ export function createDataSource(data: IDataSource): any {
   })
 }
 
-export function authedDatasource(params: UserIdReq): any {
+export function authedDatasource(params: UserIdReq) {
   return axios({
     url: '/datasources/authed-datasource',
     method: 'get',
@@ -80,7 +80,7 @@ export function queryDataSourceList(params: TypeReq): any {
   })
 }
 
-export function unAuthDatasource(params: UserIdReq): any {
+export function unAuthDatasource(params: UserIdReq) {
   return axios({
     url: '/datasources/unauth-datasource',
     method: 'get',

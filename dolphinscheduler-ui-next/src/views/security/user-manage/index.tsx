@@ -45,9 +45,9 @@ const UsersManage = defineComponent({
     const { t } = useI18n()
     const { show, mode, user } = useSharedUserModalState()
     const tableState = useTable({
-      onEdit: (u) => {
+      onEdit: (u, m: Mode) => {
         show.value = true
-        mode.value = 'edit'
+        mode.value = m
         user.value = u
       },
       onDelete: (u) => {
@@ -58,10 +58,10 @@ const UsersManage = defineComponent({
     })
 
     const onSuccess = (mode: Mode) => {
-      if (mode === 'add') {
-        tableState.resetPage()
+      if (!mode.startsWith('auth')) {
+        mode === 'add' && tableState.resetPage()
+        tableState.getUserList()
       }
-      tableState.getUserList()
     }
 
     const onAddUser = () => {
