@@ -180,6 +180,9 @@ management:
 audit:
   enabled: true
 
+metrics:
+  enabled: true
+
 # Override by profile
 ---
 spring:
