@@ -19,6 +19,16 @@ import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
 import type { IFormItem, IJsonItem } from '@/components/form/types'
 import type { TaskType } from '@/views/projects/task/constants/task-type'
+import type { IDataBase } from '@/service/modules/data-source/types'
+
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
+type ModelType = 'import' | 'export'
+
+interface IOption {
+  label: string
+  value: string | number
+}
 
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
@@ -29,15 +39,101 @@ interface IEnvironmentNameOption {
   value: string
   workerGroups?: string[]
 }
+
 interface ILocalParam {
   prop: string
-  direct: string
-  type: string
+  direct?: string
+  type?: string
   value?: string
 }
 
 interface ISourceItem {
   id: number
+}
+
+interface ISqoopTargetData {
+  targetHiveDatabase?: string
+  targetHiveTable?: string
+  targetHiveCreateTable?: boolean
+  targetHiveDropDelimiter?: boolean
+  targetHiveOverWrite?: boolean
+  targetHiveTargetDir?: string
+  targetHiveReplaceDelimiter?: string
+  targetHivePartitionKey?: string
+  targetHivePartitionValue?: string
+  targetHdfsTargetPath?: string
+  targetHdfsDeleteTargetDir?: boolean
+  targetHdfsCompressionCodec?: string
+  targetHdfsFileType?: string
+  targetHdfsFieldsTerminated?: string
+  targetHdfsLinesTerminated?: string
+  targetMysqlType?: string
+  targetMysqlDatasource?: string
+  targetMysqlTable?: string
+  targetMysqlColumns?: string
+  targetMysqlFieldsTerminated?: string
+  targetMysqlLinesTerminated?: string
+  targetMysqlIsUpdate?: string
+  targetMysqlTargetUpdateKey?: string
+  targetMysqlUpdateMode?: string
+}
+
+interface ISqoopSourceData {
+  srcQueryType?: '1' | '0'
+  srcTable?: string
+  srcColumnType?: '1' | '0'
+  srcColumns?: string
+  sourceMysqlSrcQuerySql?: string
+  sourceMysqlType?: string
+  sourceMysqlDatasource?: string
+  mapColumnHive?: ILocalParam[]
+  mapColumnJava?: ILocalParam[]
+  sourceHdfsExportDir?: string
+  sourceHiveDatabase?: string
+  sourceHiveTable?: string
+  sourceHivePartitionKey?: string
+  sourceHivePartitionValue?: string
+}
+
+interface ISqoopTargetParams {
+  hiveDatabase?: string
+  hiveTable?: string
+  createHiveTable?: boolean
+  dropDelimiter?: boolean
+  hiveOverWrite?: boolean
+  hiveTargetDir?: string
+  replaceDelimiter?: string
+  hivePartitionKey?: string
+  hivePartitionValue?: string
+  targetPath?: string
+  deleteTargetDir?: boolean
+  compressionCodec?: string
+  fileType?: string
+  fieldsTerminated?: string
+  linesTerminated?: string
+  targetType?: string
+  targetDatasource?: string
+  targetTable?: string
+  targetColumns?: string
+  isUpdate?: string
+  targetUpdateKey?: string
+  targetUpdateMode?: string
+}
+interface ISqoopSourceParams {
+  srcTable?: string
+  srcColumnType?: '1' | '0'
+  srcColumns?: string
+  srcQuerySql?: string
+  srcQueryType?: '1' | '0'
+  srcType?: string
+  srcDatasource?: string
+  mapColumnHive?: ILocalParam[]
+  mapColumnJava?: ILocalParam[]
+  exportDir?: string
+  hiveDatabase?: string
+  hiveTable?: string
+  hivePartitionKey?: string
+  hivePartitionValue?: string
 }
 
 interface ITaskParams {
@@ -77,11 +173,28 @@ interface ITaskParams {
   preStatements?: string[]
   postStatements?: string[]
   method?: string
+  jobType?: 'CUSTOM' | 'TEMPLATE'
+  customShell?: string
+  jobName?: string
+  hadoopCustomParams?: ILocalParam[]
+  sqoopAdvancedParams?: ILocalParam[]
+  concurrency?: number
+  modelType?: ModelType
+  sourceType?: SourceType
+  targetType?: SourceType
+  targetParams?: string
+  sourceParams?: string
 }
 
 type ITaskType = TaskType
 
-interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
+interface INodeData
+  extends Omit<
+      ITaskParams,
+      'resourceList' | 'mainJar' | 'targetParams' | 'sourceParams'
+    >,
+    ISqoopTargetData,
+    ISqoopSourceData {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -106,13 +219,7 @@ interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   resourceList?: number[]
   mainJar?: number
   timeoutSetting?: boolean
-  type?: string
-  datasource?: string
-  sql?: string
-  sqlType?: string
-  preStatements?: string[]
-  postStatements?: string[]
-  method?: string
+  isCustomTask?: boolean
 }
 
 interface ITaskData
@@ -136,5 +243,12 @@ export {
   INodeData,
   IFormItem,
   IJsonItem,
-  ITaskParams
+  ITaskParams,
+  IOption,
+  IDataBase,
+  ProgramType,
+  ModelType,
+  SourceType,
+  ISqoopSourceParams,
+  ISqoopTargetParams
 }

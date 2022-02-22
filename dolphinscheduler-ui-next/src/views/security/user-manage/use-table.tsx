@@ -16,13 +16,14 @@
  */
 
 import { ref, watch, onBeforeMount, computed } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon, NTag } from 'naive-ui'
-import { EditOutlined, DeleteOutlined } from '@vicons/antd'
+import { NSpace, NTooltip, NButton, NIcon, NTag, NDropdown } from 'naive-ui'
+import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
 import { queryUserList } from '@/service/modules/users'
 import { useI18n } from 'vue-i18n'
+import { Mode } from './components/use-modal'
 
 type UseTableProps = {
-  onEdit: (user: any) => void
+  onEdit: (user: any, mode: Mode) => void
   onDelete: (user: any) => void
 }
 
@@ -82,10 +83,47 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
         title: t('security.user.operation'),
         key: 'operation',
         fixed: 'right',
-        width: 120,
+        width: 140,
         render: (rowData: any, rowIndex: number) => {
           return (
             <NSpace>
+              <NDropdown
+                trigger='click'
+                options={[
+                  { label: t('security.user.project'), key: 'auth_project' },
+                  { label: t('security.user.resource'), key: 'auth_resource' },
+                  {
+                    label: t('security.user.datasource'),
+                    key: 'auth_datasource'
+                  },
+                  { label: t('security.user.udf'), key: 'auth_udf' }
+                ]}
+                onSelect={(key) => {
+                  onEdit(rowData, key)
+                }}
+              >
+                <NTooltip trigger='hover'>
+                  {{
+                    trigger: () => (
+                      <NButton
+                        circle
+                        type="warning"
+                        size='small'
+                        class='authorize'
+                      >
+                        {{
+                          icon: () => (
+                            <NIcon>
+                              <UserOutlined />
+                            </NIcon>
+                          )
+                        }}
+                      </NButton>
+                    ),
+                    default: () => t('security.user.authorize')
+                  }}
+                </NTooltip>
+              </NDropdown>
               <NTooltip trigger='hover'>
                 {{
                   trigger: () => (
@@ -95,7 +133,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
                       size='small'
                       class='edit'
                       onClick={() => {
-                        onEdit(rowData)
+                        onEdit(rowData, 'edit')
                       }}
                     >
                       {{
