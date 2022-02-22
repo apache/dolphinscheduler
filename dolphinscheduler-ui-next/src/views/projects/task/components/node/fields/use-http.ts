@@ -16,6 +16,7 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 
 export function useHttp(model: { [field: string]: any }): IJsonItem[] {
@@ -190,48 +191,11 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    {
-      type: 'custom-parameters',
+    ...useCustomParams({
+      model,
       field: 'localParams',
-      name: t('project.node.custom_parameters'),
-      children: [
-        {
-          type: 'input',
-          field: 'prop',
-          span: 6,
-          props: {
-            placeholder: t('project.node.prop_tips'),
-            maxLength: 256
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true,
-            validator(validate: any, value: string) {
-              if (!value) {
-                return new Error(t('project.node.prop_tips'))
-              }
-
-              const sameItems = model.localParams.filter(
-                (item: { prop: string }) => item.prop === value
-              )
-
-              if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
-              }
-            }
-          }
-        },
-        {
-          type: 'input',
-          field: 'value',
-          span: 6,
-          props: {
-            placeholder: t('project.node.value_tips'),
-            maxLength: 256
-          }
-        }
-      ]
-    }
+      isSimple: true
+    })
   ]
 }
 

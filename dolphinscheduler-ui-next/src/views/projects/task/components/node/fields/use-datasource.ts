@@ -73,7 +73,7 @@ export function useDatasource(model: { [field: string]: any }): IJsonItem {
     type: 'select',
     field: 'datasource',
     span: 12,
-    name: t('project.node.datasource'),
+    name: t('project.node.datasource_instances'),
     props: {
       loading: loading
     },

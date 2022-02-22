@@ -35,6 +35,7 @@ type IType =
   | 'checkbox'
   | 'tree-select'
   | 'multi-input'
+  | 'custom'
 
 interface IOption extends SelectOption, TreeSelectOption {
   label: string
@@ -46,6 +47,7 @@ interface IFormItem {
   label?: string
   widget: any
   span?: number | Ref<number>
+  type?: 'custom'
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
@@ -65,6 +67,7 @@ interface IJsonItem {
   children?: IJsonItem[]
   slots?: object
   span?: number | Ref<number>
+  widget?: any
 }
 
 export {
