@@ -46,5 +46,6 @@ header:
     - '.github/actions/lable-on-issue/**'
     - '.github/actions/reviewdog-setup/**'
     - '.github/actions/translate-on-issue/**'
+    - '**/.gitkeep'
 
   comment: on-failure
