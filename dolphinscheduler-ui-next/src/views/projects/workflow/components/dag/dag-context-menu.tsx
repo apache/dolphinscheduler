@@ -17,7 +17,14 @@
 
 import { genTaskCodeList } from '@/service/modules/task-definition'
 import type { Cell } from '@antv/x6'
-import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  PropType,
+  inject,
+  ref,
+  computed
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
@@ -39,6 +46,10 @@ const props = {
   top: {
     type: Number as PropType<number>,
     default: 0
+  },
+  releaseState: {
+    type: String as PropType<string>,
+    default: 'OFFLINE'
   }
 }
 
@@ -50,6 +61,12 @@ export default defineComponent({
     const graph = inject('graph', ref())
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
+
+    const startAvailable = computed(
+      () =>
+        route.name === 'workflow-definition-detail' &&
+        props.releaseState !== 'NOT_RELEASE'
+    )
 
     const hide = () => {
       ctx.emit('hide', false)
@@ -90,6 +107,7 @@ export default defineComponent({
     })
 
     return {
+      startAvailable,
       startRunning,
       handleEdit,
       handleCopy,
@@ -105,16 +123,36 @@ export default defineComponent({
           class={styles['dag-context-menu']}
           style={{ left: `${this.left}px`, top: `${this.top}px` }}
         >
-          <div class={styles['menu-item']} onClick={this.startRunning}>
+          <div
+            class={`${styles['menu-item']} ${
+              !this.startAvailable ? styles['disabled'] : ''
+            } `}
+            onClick={this.startRunning}
+          >
             {t('project.node.start')}
           </div>
-          <div class={styles['menu-item']} onClick={this.handleEdit}>
+          <div
+            class={`${styles['menu-item']} ${
+              this.releaseState === 'ONLINE' ? styles['disabled'] : ''
+            } `}
+            onClick={this.handleEdit}
+          >
             {t('project.node.edit')}
           </div>
-          <div class={styles['menu-item']} onClick={this.handleCopy}>
+          <div
+            class={`${styles['menu-item']} ${
+              this.releaseState === 'ONLINE' ? styles['disabled'] : ''
+            } `}
+            onClick={this.handleCopy}
+          >
             {t('project.node.copy')}
           </div>
-          <div class={styles['menu-item']} onClick={this.handleDelete}>
+          <div
+            class={`${styles['menu-item']} ${
+              this.releaseState === 'ONLINE' ? styles['disabled'] : ''
+            } `}
+            onClick={this.handleDelete}
+          >
             {t('project.node.delete')}
           </div>
           {/* TODO: view log */}

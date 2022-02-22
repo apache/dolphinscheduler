@@ -200,6 +200,7 @@ export default defineComponent({
           visible={menuVisible.value}
           left={pageX.value}
           top={pageY.value}
+          releaseState={props.definition?.processDefinition.releaseState}
           onHide={menuHide}
           onStart={menuStart}
           onEdit={editTask}
