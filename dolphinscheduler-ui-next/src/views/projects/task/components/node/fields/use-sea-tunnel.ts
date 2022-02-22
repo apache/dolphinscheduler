@@ -18,6 +18,7 @@ import {ref, onMounted, watch, computed} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import type { IJsonItem } from '../types'
+import { find } from 'lodash'
 
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -66,10 +67,13 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   const loading = ref(false)
 
+  let resourceFiles = [] as any
+
   const getResourceList = async () => {
     if (loading.value) return
     loading.value = true
     try {
+      resourceFiles = []
       const res = await queryResourceList({ type: 'FILE' })
       removeUselessChildren(res)
       options.value = res || []
@@ -79,6 +83,22 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     }
   }
 
+  function removeUselessChildren(list: { children?: [], fullName: string, id:number }[]) {
+    if (!list.length) return
+    list.forEach((item) => {
+      if (!item.children) {
+        return
+      }
+      if (item.children.length === 0) {
+        resourceFiles.push({id: item.id, fullName: item.fullName})
+        delete item.children
+        return
+      }
+      removeUselessChildren(item.children)
+    })
+  }
+
+
   onMounted(() => {
     getResourceList()
   })
@@ -86,30 +106,46 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const masterSpan = computed(() => (model.deployMode === 'local' ? 0 : 12))
   const queueSpan = computed(() => (model.deployMode === 'local' || model.master != 'yarn' ? 0 : 12))
   const masterUrlSpan =  computed(() => (model.deployMode === 'local' || (model.master != 'spark://' && model.master != 'mesos://') ? 0 : 12))
-  //
-  // const buildRawScript = () => {
-  //   if (data.deployMode === 'local') {
-  //     data.master = 'local'
-  //     data.masterUrl = ''
-  //     data.deployMode = 'client'
-  //   }
-  //   let localParams = ''
-  //   data?.localParams?.forEach(v => {
-  //     localParams = localParams + ' --variable ' + v.prop + '=' + v.value
-  //   })
-  //
-  //   let rawScript = ''
-  //   const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
-  //   data.resourceList?.forEach(v => {
-  //     rawScript = rawScript + baseScript +
-  //         ' --master ' + data. master + data.masterUrl +
-  //         ' --deploy-mode ' + data.deployMode +
-  //         ' --queue ' + data.queue +
-  //         ' --config ' + v +
-  //         localParams + ' \n'
-  //   })
-  //   data.rawScript = rawScript? rawScript : ''
-  // }
+
+  const buildRawScript = () => {
+    console.log('build')
+    let master = model.master
+    let masterUrl = model.masterUrl
+    let deployMode = model.deployMode
+    let queue = model.queue
+
+    if (model.deployMode === 'local') {
+      master = 'local'
+      masterUrl = ''
+      deployMode = 'client'
+    }
+    let localParams = ''
+    model?.localParams?.forEach((param : any) => {
+      localParams = localParams + ' --variable ' + param.prop + '=' + param.value
+    })
+
+    let rawScript = ''
+    const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
+    model.resourceList?.forEach((id: any) => {
+      let item = find(resourceFiles, {id:id})
+
+      rawScript = rawScript + baseScript +
+          ' --master ' + master + masterUrl +
+          ' --deploy-mode ' + deployMode +
+          ' --queue ' + queue +
+          ' --config ' + item.fullName +
+          localParams + ' \n'
+    })
+    model.rawScript = rawScript? rawScript : ''
+    console.log(model.rawScript)
+  }
+
+  watch(
+    () => [model.resourceList, model.localParams, model.master, model.queue, model.masterUrl, model.deployMode],
+    () => {
+      buildRawScript()
+    }
+  )
 
   return [
     {
@@ -220,18 +256,6 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       ]
     }
   ]
-}
-
-function removeUselessChildren(list: { children?: [] }[]) {
-  if (!list.length) return
-  list.forEach((item) => {
-    if (!item.children) return
-    if (item.children.length === 0) {
-      delete item.children
-      return
-    }
-    removeUselessChildren(item.children)
-  })
 }
 
 export const TYPE_LIST = [
