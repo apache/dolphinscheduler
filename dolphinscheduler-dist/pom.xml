@@ -95,6 +95,22 @@
                                 </configuration>
                             </execution>
 
+                            <execution>
+                                <id>python</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Make final directory with simple name `python`, and without any addtion information -->
+                                    <finalName>python</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-python-api.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+
                         </executions>
                     </plugin>
 
