@@ -82,6 +82,30 @@ export function formatParams(data: INodeData): {
     taskParams.method = data.method
   }
 
+  if (data.taskType === 'SEATUNNEL') {
+    if (data.deployMode === 'local') {
+      data.master = 'local'
+      data.masterUrl = ''
+      data.deployMode = 'client'
+    }
+    let localParams = ''
+    data?.localParams?.forEach(v => {
+      localParams = localParams + ' --variable ' + v.prop + '=' + v.value
+    })
+
+    let rawScript = ''
+    const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
+    data.resourceList?.forEach(v => {
+      rawScript = rawScript + baseScript +
+          ' --master ' + data. master + data.masterUrl +
+          ' --deploy-mode ' + data.deployMode +
+          ' --queue ' + data.queue +
+          ' --config ' + v +
+          localParams + ' \n'
+    })
+    data.rawScript = rawScript? rawScript : ''
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),

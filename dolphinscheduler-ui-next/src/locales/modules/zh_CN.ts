@@ -470,7 +470,7 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
-    executing: '正在执行'
+    executing: '正在执行',
   },
   task: {
     task_name: '任务名称',
@@ -676,7 +676,12 @@ const project = {
     sql_input_placeholder: '请输入非查询SQL语句',
     sql_empty_tips: '语句不能为空',
     procedure_method: 'SQL语句',
-    procedure_method_tips: '请输入存储脚本'
+    procedure_method_tips: '请输入存储脚本',
+    sea_tunnel_deploy_mode: '部署方式',
+    sea_tunnel_master: 'Master',
+    sea_tunnel_master_url: 'Master URL',
+    sea_tunnel_queue: '队列',
+    sea_tunnel_master_url_tips: '请直接填写地址,例如:127.0.0.1:7077',
   }
 }
 

@@ -18,7 +18,6 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
-import { number } from 'echarts'
 
 export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()

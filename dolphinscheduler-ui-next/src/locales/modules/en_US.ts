@@ -684,7 +684,12 @@ const project = {
     sql_input_placeholder: 'Please enter non-query sql.',
     sql_empty_tips: 'The sql can not be empty.',
     procedure_method: 'SQL Statement',
-    procedure_method_tips: 'Please enter the procedure script'
+    procedure_method_tips: 'Please enter the procedure script',
+    sea_tunnel_deploy_mode: 'Deploy Mode',
+    sea_tunnel_master: 'Master',
+    sea_tunnel_master_url: 'Master URL',
+    sea_tunnel_queue: 'Queue',
+    sea_tunnel_master_url_tips: 'Please enter the master url, e.g., 127.0.0.1:7077',
   }
 }
 

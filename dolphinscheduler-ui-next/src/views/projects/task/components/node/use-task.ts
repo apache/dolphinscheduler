@@ -25,6 +25,7 @@ import { useMr } from './tasks/use-mr'
 import { useHttp } from './tasks/use-http'
 import { useSql } from './tasks/use-sql'
 import { useProcedure } from './tasks/use-procedure'
+import { useSeaTunnel } from './tasks/use-sea-tunnel'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -38,6 +39,7 @@ export function useTask({
   from?: number
   readonly?: boolean
 }): { json: IJsonItem[]; model: INodeData } {
+  data.taskType = 'SEATUNNEL'
   const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
   if (taskType === 'SHELL') {
@@ -114,6 +116,15 @@ export function useTask({
   }
   if (taskType === 'PROCEDURE') {
     node = useProcedure({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'SEATUNNEL') {
+    node = useSeaTunnel({
       projectCode,
       from,
       readonly,
