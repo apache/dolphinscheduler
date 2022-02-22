@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>21</version>
+        <version>25</version>
     </parent>
 
     <properties>
@@ -128,6 +128,7 @@
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <janino.version>3.1.6</janino.version>
         <kubernetes.version>5.8.0</kubernetes.version>
+        <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
 
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
@@ -922,6 +923,12 @@
                 <groupId>io.fabric8</groupId>
                 <artifactId>kubernetes-client</artifactId>
                 <version>${kubernetes.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

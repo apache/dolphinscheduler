@@ -13,4 +13,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
+
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
+
+export function useTargetTaskName(): IJsonItem {
+  const { t } = useI18n()
+  return {
+    type: 'input',
+    field: 'targetJobName',
+    name: t('project.node.target_task_name'),
+    props: {
+      placeholder: t('project.node.target_task_name_tips'),
+      maxLength: 100
+    }
+  }
+}
