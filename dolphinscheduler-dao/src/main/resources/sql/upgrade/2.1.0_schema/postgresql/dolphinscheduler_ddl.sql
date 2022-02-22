@@ -38,6 +38,8 @@ EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_log_idx_project_code_p
 EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_code_version"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_code_version ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("code","version")';
 
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_user ADD COLUMN IF NOT EXISTS "time_zone" varchar(32) DEFAULT NULL';
+
 EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_dq_comparison_type" (
         id serial NOT NULL,
         "type" varchar NOT NULL,

@@ -662,7 +662,25 @@ const project = {
     status_code_custom: '自定义响应码',
     body_contains: '内容包含',
     body_not_contains: '内容不包含',
-    http_parameters_position: '参数位置'
+    http_parameters_position: '参数位置',
+    target_task_name: '目标任务名',
+    target_task_name_tips: '请输入Pigeon任务名',
+    datasource_type: '数据源类型',
+    datasource: '数据源实例',
+    sql_type: 'SQL类型',
+    sql_type_query: '查询',
+    sql_type_non_query: '非查询',
+    sql_statement: 'SQL语句',
+    pre_sql_statement: '前置SQL语句',
+    post_sql_statement: '后置SQL语句',
+    sql_input_placeholder: '请输入非查询SQL语句',
+    sql_empty_tips: '语句不能为空',
+    procedure_method: 'SQL语句',
+    procedure_method_tips: '请输入存储脚本',
+    start: '运行',
+    edit: '编辑',
+    copy: '复制节点',
+    delete: '删除'
   }
 }
 

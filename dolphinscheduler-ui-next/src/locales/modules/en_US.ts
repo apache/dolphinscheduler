@@ -670,7 +670,25 @@ const project = {
     status_code_custom: 'Custom response code',
     body_contains: 'Content includes',
     body_not_contains: 'Content does not contain',
-    http_parameters_position: 'Http Parameters Position'
+    http_parameters_position: 'Http Parameters Position',
+    target_task_name: 'Target Task Name',
+    target_task_name_tips: 'Please enter the Pigeon task name',
+    datasource_type: 'Datasource types',
+    datasource: 'Datasource instances',
+    sql_type: 'SQL Type',
+    sql_type_query: 'Query',
+    sql_type_non_query: 'Non Query',
+    sql_statement: 'SQL Statement',
+    pre_sql_statement: 'Pre SQL Statement',
+    post_sql_statement: 'Post SQL Statement',
+    sql_input_placeholder: 'Please enter non-query sql.',
+    sql_empty_tips: 'The sql can not be empty.',
+    procedure_method: 'SQL Statement',
+    procedure_method_tips: 'Please enter the procedure script',
+    start: 'Start',
+    edit: 'Edit',
+    copy: 'Copy',
+    delete: 'Delete'
   }
 }
 
