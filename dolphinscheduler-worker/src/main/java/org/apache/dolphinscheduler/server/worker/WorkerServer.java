@@ -21,10 +21,12 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
@@ -37,7 +39,13 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -197,6 +205,8 @@ public class WorkerServer implements IStoppable {
                 logger.warn("thread sleep exception", e);
             }
 
+            this.killAllRunningYarnTasks();
+
             // close
             this.nettyRemotingServer.close();
             this.workerRegistryClient.unRegistry();
@@ -210,5 +220,23 @@ public class WorkerServer implements IStoppable {
     @Override
     public void stop(String cause) {
         close(cause);
+    }
+
+    /**
+     * kill all yarn tasks which are running
+     */
+    public void killAllRunningYarnTasks() {
+        Collection<TaskRequest> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
+        logger.info("ready to kill all cache job, job size:{}", taskRequests.size());
+
+        if (CollectionUtils.isEmpty(taskRequests)) {
+            return;
+        }
+
+        for (TaskRequest taskRequest : taskRequests) {
+            // kill yarn task if not finish
+            // don't need to kill shell here because when the task got processId, it was finished.
+            ProcessUtils.killYarnJob(JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class));
+        }
     }
 }
