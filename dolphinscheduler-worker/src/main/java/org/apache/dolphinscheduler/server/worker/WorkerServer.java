@@ -202,12 +202,15 @@ public class WorkerServer implements IStoppable {
                 logger.warn("thread sleep exception", e);
             }
 
-            this.killAllRunningTasks();
-
             // close
             this.nettyRemotingServer.close();
             this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
+
+            // kill running tasks
+            this.killAllRunningTasks();
+
+            // close the application context
             this.springApplicationContext.close();
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
