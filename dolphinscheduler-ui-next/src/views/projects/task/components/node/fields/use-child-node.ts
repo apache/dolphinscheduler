@@ -28,14 +28,12 @@ import { number } from 'echarts'
 export function useChildNode({
   model,
   projectCode,
-  isCreate,
   from,
   processName,
   code
 }: {
   model: { [field: string]: any }
   projectCode: number
-  isCreate: boolean
   from?: number
   processName?: number
   code?: number
@@ -134,7 +132,6 @@ export function useChildNode({
     name: t('project.node.child_node'),
     props: {
       loading: loading,
-      disabled: !isCreate,
       'on-update:value': onChange
     },
     options: options
