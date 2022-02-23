@@ -474,7 +474,9 @@ const project = {
     serial_wait: 'Serial wait',
     executing: 'Executing',
     startup_type: 'Startup Type',
-    complement_range: 'Complement Range'
+    complement_range: 'Complement Range',
+    global_parameters: 'Global parameters',
+    local_parameters: 'Local parameters'
   },
   task: {
     task_name: 'Task Name',
