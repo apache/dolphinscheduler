@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.derby.iapi.sql.depend.Dependent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.model.DependentItem;
@@ -26,7 +25,6 @@ import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * dependent process definition

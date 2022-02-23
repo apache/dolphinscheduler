@@ -67,11 +67,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -642,7 +640,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 // dependent process definition
                 List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
 
-                if (schedules.size() == 0 || complementDependentMode == ComplementDependentMode.OFF_MODE) {
+                if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
                     logger.info("process code: {} complement dependent in off mode or schedule's size is 0, skip "
                             + "dependent complement data", command.getProcessDefinitionCode());
                 } else {
@@ -693,7 +691,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                         processService.createCommand(command);
 
-                        if (schedules.size() == 0 || complementDependentMode == ComplementDependentMode.OFF_MODE) {
+                        if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
                             logger.info("process code: {} complement dependent in off mode or schedule's size is 0, skip "
                                     + "dependent complement data", command.getProcessDefinitionCode());
                         } else {
