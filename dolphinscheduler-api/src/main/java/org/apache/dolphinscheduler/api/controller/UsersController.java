@@ -185,8 +185,9 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "tenantId") int tenantId,
                              @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state) throws Exception {
-        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state);
+                             @RequestParam(value = "state", required = false) int state,
+                             @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state, timeZone);
         return returnDataList(result);
     }
 

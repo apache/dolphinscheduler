@@ -10,13 +10,15 @@
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\""
   },
   "dependencies": {
+    "@antv/layout": "^0.1.31",
+    "@antv/x6": "^1.29.5",
     "@vueuse/core": "^7.5.3",
     "axios": "^0.24.0",
     "date-fns": "^2.27.0",
     "echarts": "^5.2.2",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.31.1",
-    "naive-ui": "2.23.2",
+    "naive-ui": "2.25.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.9",
     "pinia-plugin-persistedstate": "^1.0.3",

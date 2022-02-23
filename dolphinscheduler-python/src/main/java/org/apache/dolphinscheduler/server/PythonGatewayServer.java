@@ -53,8 +53,11 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.server.config.PythonGatewayConfig;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +134,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
+
+    @Autowired
+    private PythonGatewayConfig pythonGatewayConfig;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -477,7 +483,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     /**
      * Get resource by given program type and full name. It return map contain resource id, name.
-     * Useful in Python API create flink task which need processDefinition information.
+     * Useful in Python API create flink or spark task which need processDefinition information.
      *
      * @param programType program type one of SCALA, JAVA and PYTHON
      * @param fullName    full name of the resource
@@ -501,10 +507,26 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     @PostConstruct
     public void run() {
-        GatewayServer server = new GatewayServer(this);
-        GatewayServer.turnLoggingOn();
-        // Start server to accept python client socket
-        server.start();
+        GatewayServer server;
+        try {
+            InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfig.getGatewayServerAddress());
+            InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfig.getPythonAddress());
+            server = new GatewayServer(
+                this,
+                pythonGatewayConfig.getGatewayServerPort(),
+                pythonGatewayConfig.getPythonPort(),
+                gatewayHost,
+                pythonHost,
+                pythonGatewayConfig.getConnectTimeout(),
+                pythonGatewayConfig.getReadTimeout(),
+                null
+            );
+            GatewayServer.turnLoggingOn();
+            logger.info("PythonGatewayServer started on: " + gatewayHost.toString());
+            server.start();
+        } catch (UnknownHostException e) {
+            logger.error("exception occurred while constructing PythonGatewayServer().", e);
+        }
     }
 
     public static void main(String[] args) {

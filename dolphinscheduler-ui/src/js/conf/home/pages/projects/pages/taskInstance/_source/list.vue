@@ -17,9 +17,9 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items-task-instances">
         <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="name" :label="$t('Name')"></el-table-column>
+        <el-table-column prop="name" :label="$t('Name')" class-name="task-instance-name"></el-table-column>
         <el-table-column :label="$t('Process Instance')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
@@ -32,7 +32,7 @@
         </el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
         <el-table-column prop="taskType" :label="$t('Node Type')"></el-table-column>
-        <el-table-column :label="$t('State')" width="50">
+        <el-table-column :label="$t('State')" width="50" class-name="task-instance-state">
           <template slot-scope="scope">
             <span v-html="_rtState(scope.row.state)" style="cursor: pointer;"></span>
           </template>

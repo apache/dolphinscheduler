@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -59,6 +60,12 @@ import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
+import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -81,6 +88,12 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
@@ -102,6 +115,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
@@ -111,9 +125,11 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,7 +149,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -198,6 +214,24 @@ public class ProcessService {
     private ProjectMapper projectMapper;
 
     @Autowired
+    private DqExecuteResultMapper dqExecuteResultMapper;
+
+    @Autowired
+    private DqRuleMapper dqRuleMapper;
+
+    @Autowired
+    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+
+    @Autowired
+    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
+
+    @Autowired
+    private DqComparisonTypeMapper dqComparisonTypeMapper;
+
+    @Autowired
+    private DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper;
+
+    @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
@@ -241,7 +275,7 @@ public class ProcessService {
         }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
-        //if the processDefination is serial
+        //if the processDefinition is serial
         ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
         if (processDefinition.getExecutionType().typeIsSerial()) {
             saveSerialProcess(processInstance, processDefinition);
@@ -1128,7 +1162,7 @@ public class ProcessService {
                 logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql failed", e);
+                logger.error("task commit to db failed", e);
             }
             retryTimes += 1;
         }
@@ -1378,30 +1412,11 @@ public class ProcessService {
      */
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
-
-        if (taskInstance.getState().typeIsFailure()) {
-            if (taskInstance.isSubProcess()) {
-                taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-            } else {
-                if (processInstanceState != ExecutionStatus.READY_STOP
-                        && processInstanceState != ExecutionStatus.READY_PAUSE) {
-                    // failure task set invalid
-                    taskInstance.setFlag(Flag.NO);
-                    updateTaskInstance(taskInstance);
-                    // crate new task instance
-                    if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-                    }
-                    taskInstance.setSubmitTime(null);
-                    taskInstance.setLogPath(null);
-                    taskInstance.setExecutePath(null);
-                    taskInstance.setStartTime(null);
-                    taskInstance.setEndTime(null);
-                    taskInstance.setFlag(Flag.YES);
-                    taskInstance.setHost(null);
-                    taskInstance.setId(0);
-                }
-            }
+        if (processInstanceState.typeIsFinished()
+                || processInstanceState == ExecutionStatus.READY_PAUSE
+                || processInstanceState == ExecutionStatus.READY_STOP) {
+            logger.warn("processInstance {} was {}, skip submit task", processInstance.getProcessDefinitionCode(), processInstanceState);
+            return null;
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
@@ -1549,10 +1564,23 @@ public class ProcessService {
      * find task instance by id
      *
      * @param taskId task id
-     * @return task intance
+     * @return task instance
      */
     public TaskInstance findTaskInstanceById(Integer taskId) {
         return taskInstanceMapper.selectById(taskId);
+    }
+
+    /**
+     * find task instance list by id list
+     *
+     * @param idList task id list
+     * @return task instance list
+     */
+    public List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return new ArrayList<>();
+        }
+        return taskInstanceMapper.selectBatchIds(idList);
     }
 
     /**
@@ -1755,7 +1783,10 @@ public class ProcessService {
      * @param executePath executePath
      * @param logPath logPath
      */
-    public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
+    public void changeTaskState(TaskInstance taskInstance,
+                                ExecutionStatus state,
+                                Date startTime,
+                                String host,
                                 String executePath,
                                 String logPath) {
         taskInstance.setState(state);
@@ -2219,7 +2250,7 @@ public class ProcessService {
         if (result > 0) {
             result = switchProcessTaskRelationVersion(processDefinitionLog);
             if (result <= 0) {
-                return Constants.DEFINITION_FAILURE;
+                return Constants.EXIT_CODE_FAILURE;
             }
         }
         return result;
@@ -2231,7 +2262,36 @@ public class ProcessService {
             processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         }
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        return processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+        int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+        if (batchInsert == 0) {
+            return Constants.EXIT_CODE_FAILURE;
+        } else {
+            int result = 0;
+            for (ProcessTaskRelationLog taskRelationLog : processTaskRelationLogList) {
+                int switchResult = switchTaskDefinitionVersion(taskRelationLog.getPostTaskCode(), taskRelationLog.getPostTaskVersion());
+                if (switchResult != Constants.EXIT_CODE_FAILURE) {
+                    result++;
+                }
+            }
+            return result;
+        }
+    }
+
+    public int switchTaskDefinitionVersion(long taskCode, int taskVersion) {
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition == null) {
+            return Constants.EXIT_CODE_FAILURE;
+        }
+        if (taskDefinition.getVersion() == taskVersion) {
+            return Constants.EXIT_CODE_SUCCESS;
+        }
+        TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskVersion);
+        if (taskDefinitionUpdate == null) {
+            return Constants.EXIT_CODE_FAILURE;
+        }
+        taskDefinitionUpdate.setUpdateTime(new Date());
+        taskDefinitionUpdate.setId(taskDefinition.getId());
+        return taskDefinitionMapper.updateById(taskDefinitionUpdate);
     }
 
     /**
@@ -2328,7 +2388,7 @@ public class ProcessService {
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
         int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
         processDefinitionLog.setVersion(insertVersion);
-        processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
+        processDefinitionLog.setReleaseState(!isFromProcessDefine || processDefinitionLog.getReleaseState() == ReleaseState.ONLINE ? ReleaseState.ONLINE : ReleaseState.OFFLINE);
         processDefinitionLog.setOperator(operator.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
         int insertLog = processDefineLogMapper.insert(processDefinitionLog);
@@ -2570,6 +2630,65 @@ public class ProcessService {
             processTaskMap.put(fatherProcess, fatherTask);
         }
         return processTaskMap;
+    }
+
+    public DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId) {
+        return dqExecuteResultMapper.getExecuteResultById(taskInstanceId);
+    }
+
+    public int updateDqExecuteResultUserId(int taskInstanceId) {
+        DqExecuteResult dqExecuteResult =
+                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq(TASK_INSTANCE_ID,taskInstanceId));
+        if (dqExecuteResult == null) {
+            return -1;
+        }
+
+        ProcessInstance processInstance = processInstanceMapper.selectById(dqExecuteResult.getProcessInstanceId());
+        if (processInstance == null) {
+            return -1;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+        if (processDefinition == null) {
+            return -1;
+        }
+
+        dqExecuteResult.setProcessDefinitionId(processDefinition.getId());
+        dqExecuteResult.setUserId(processDefinition.getUserId());
+        dqExecuteResult.setState(DqTaskState.DEFAULT.getCode());
+        return dqExecuteResultMapper.updateById(dqExecuteResult);
+    }
+
+    public int updateDqExecuteResultState(DqExecuteResult dqExecuteResult) {
+        return dqExecuteResultMapper.updateById(dqExecuteResult);
+    }
+
+    public int deleteDqExecuteResultByTaskInstanceId(int taskInstanceId) {
+        return dqExecuteResultMapper.delete(
+                new QueryWrapper<DqExecuteResult>()
+                        .eq(TASK_INSTANCE_ID,taskInstanceId));
+    }
+
+    public int deleteTaskStatisticsValueByTaskInstanceId(int taskInstanceId) {
+        return dqTaskStatisticsValueMapper.delete(
+                new QueryWrapper<DqTaskStatisticsValue>()
+                        .eq(TASK_INSTANCE_ID,taskInstanceId));
+    }
+
+    public DqRule getDqRule(int ruleId) {
+        return dqRuleMapper.selectById(ruleId);
+    }
+
+    public List<DqRuleInputEntry> getRuleInputEntry(int ruleId) {
+        return DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(ruleId));
+    }
+
+    public List<DqRuleExecuteSql> getDqExecuteSql(int ruleId) {
+        return dqRuleExecuteSqlMapper.getExecuteSqlList(ruleId);
+    }
+
+    public DqComparisonType getComparisonTypeById(int id) {
+        return dqComparisonTypeMapper.selectById(id);
     }
 
     /**

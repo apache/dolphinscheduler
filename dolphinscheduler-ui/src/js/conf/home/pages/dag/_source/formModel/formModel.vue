@@ -206,16 +206,10 @@
         <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS'">
           <div slot="text">{{ $t("Number of failed retries") }}</div>
           <div slot="content">
-            <m-select-input
-              v-model="maxRetryTimes"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="maxRetryTimes" size="small" style="width: 150px;" />
             <span>({{ $t("Times") }})</span>
             <span class="text-b">{{ $t("Failed retry interval") }}</span>
-            <m-select-input
-              v-model="retryInterval"
-              :list="[]"
-            ></m-select-input>
+            <el-input v-model.number="retryInterval" size="small" style="width: 150px;" />
             <span>({{ $t("Minute") }})</span>
           </div>
         </m-list-box>
@@ -456,6 +450,13 @@
             :prev-tasks="prevTasks"
           >
           </m-conditions>
+          <m-data-quality
+            v-if="nodeData.taskType === 'DATA_QUALITY'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="DATA_QUALITY"
+            :backfill-item="backfillItem">
+          </m-data-quality>
           <m-switch
             v-if="nodeData.taskType === 'SWITCH'"
             ref="SWITCH"
@@ -517,6 +518,7 @@
   import mDatax from './tasks/datax'
   import mPigeon from './tasks/pigeon'
   import mConditions from './tasks/conditions'
+  import mDataQuality from './tasks/dataquality'
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
@@ -765,13 +767,8 @@
               this.$message.error(e.msg || '')
             })
         } else {
-          const processDefinitionId =
-            this.backfillItem.params.processDefinitionId
-          const process = this.processListS.find(
-            (def) => def.id === processDefinitionId
-          )
           this.$emit('onSubProcess', {
-            subProcessCode: process.code,
+            subProcessCode: this.backfillItem.params.processDefinitionCode,
             fromThis: this
           })
         }
@@ -1182,6 +1179,7 @@
       mPigeon,
       mSqoop,
       mConditions,
+      mDataQuality,
       mSwitch,
       mSelectInput,
       mTimeoutAlarm,

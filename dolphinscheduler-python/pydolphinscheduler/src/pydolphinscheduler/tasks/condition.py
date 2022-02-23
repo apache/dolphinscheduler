@@ -154,7 +154,7 @@ class Or(ConditionOperator):
         super().__init__(*args)
 
 
-class Conditions(Task):
+class Condition(Task):
     """Task condition object, declare behavior for condition task to dolphinscheduler."""
 
     def __init__(

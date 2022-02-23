@@ -30,6 +30,12 @@ declare global {
   }
 }
 
+declare global {
+  interface Navigator {
+    msSaveBlob?: (blob: any, defaultName?: string) => boolean
+  }
+}
+
 declare namespace jquery {}
 
 declare module '*.png'

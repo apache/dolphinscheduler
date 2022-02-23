@@ -31,20 +31,29 @@ interface InstanceNameReq {
   alertInstanceName: string
 }
 
-interface IdReq {
-  id: number
-}
-
 interface UpdatePluginInstanceReq {
   alertPluginInstanceId: number
   instanceName: string
   pluginInstanceParams: string
 }
 
+interface AlertPluginItem {
+  id: number
+  pluginDefineId: number
+  instanceName: string
+  pluginInstanceParams: string
+  createTime: string
+  updateTime: string
+  alertPluginName: string
+}
+
+type IdReq = number
+
 export {
   ListReq,
   PluginInstanceReq,
   InstanceNameReq,
   IdReq,
-  UpdatePluginInstanceReq
+  UpdatePluginInstanceReq,
+  AlertPluginItem
 }

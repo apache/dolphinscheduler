@@ -129,10 +129,12 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
 
-        // setting up user to run commands
-        command.add("sudo");
-        command.add("-u");
-        command.add(taskRequest.getTenantCode());
+        // if sudo.enable=true,setting up user to run commands
+        if (OSUtils.isSudoEnable()) {
+            command.add("sudo");
+            command.add("-u");
+            command.add(taskRequest.getTenantCode());
+        }
         command.add(commandInterpreter());
         command.addAll(Collections.emptyList());
         command.add(commandFile);
@@ -319,7 +321,6 @@ public abstract class AbstractCommandExecutor {
         getOutputLogService.submit(() -> {
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
-                logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(")) {
                         varPool.append(findVarPool(line));

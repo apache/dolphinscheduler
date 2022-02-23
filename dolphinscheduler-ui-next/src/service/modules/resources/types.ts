@@ -21,6 +21,7 @@ interface FileReq {
 
 interface ResourceTypeReq {
   type: 'FILE' | 'UDF'
+  programType?: string
 }
 
 interface UdfTypeReq {
@@ -83,7 +84,7 @@ interface ResourceIdReq {
   resourceId: number
 }
 
-interface UdfFuncReq extends UdfTypeReq, DescriptionReq {
+interface UdfFuncReq extends UdfTypeReq, DescriptionReq, ResourceIdReq {
   className: string
   funcName: string
   argTypes?: string

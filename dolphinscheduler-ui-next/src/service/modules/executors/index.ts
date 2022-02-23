@@ -23,7 +23,7 @@ import {
   ProcessInstanceReq
 } from './types'
 
-export function execute(data: ExecuteReq, code: ProjectCodeReq): any {
+export function execute(data: ExecuteReq, code: number): any {
   return axios({
     url: `/projects/${code}/executors/execute`,
     method: 'post',
@@ -44,7 +44,7 @@ export function startCheckProcessDefinition(
 
 export function startProcessInstance(
   data: ProcessInstanceReq,
-  code: ProjectCodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/executors/start-process-instance`,

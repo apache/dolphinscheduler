@@ -71,7 +71,8 @@ const menu = {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
           id: 2,
-          enabled: true
+          enabled: true,
+          classNames: 'tab-task-instance'
         },
         {
           name: `${i18n.$t('Task record')}`,
@@ -86,6 +87,26 @@ const menu = {
           enabled: config.recordSwitch
         }
       ]
+    }
+  ],
+  dataQuality: [
+    {
+      name: `${i18n.$t('DataQuality Result')}`,
+      id: 0,
+      path: 'data-quality-result',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-s-grid',
+      children: []
+    },
+    {
+      name: `${i18n.$t('DataQuality Rule')}`,
+      id: 1,
+      path: 'data-quality-rule',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-document',
+      children: []
     }
   ],
   security: [
@@ -162,9 +183,20 @@ const menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
+      enabled: true,
       icon: 'el-icon-document',
       children: [],
-      enabled: true
+      classNames: 'tab-token-manage'
+    },
+    {
+      name: `${i18n.$t('K8s Namespace')}`,
+      id: 2,
+      path: 'namespace',
+      isOpen: true,
+      icon: 'el-icon-s-grid',
+      children: [],
+      enabled: true,
+      classNames: 'tab-namespace-manage'
     }
   ],
   resource: [
@@ -297,6 +329,12 @@ const menu = {
           name: 'Statistics',
           path: 'statistics',
           id: 0,
+          enabled: true
+        },
+        {
+          name: 'Audit Log',
+          path: 'audit-log',
+          id: 1,
           enabled: true
         }
       ]

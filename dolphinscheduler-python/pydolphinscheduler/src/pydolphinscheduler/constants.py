@@ -78,6 +78,8 @@ class TaskType(str):
     CONDITIONS = "CONDITIONS"
     SWITCH = "SWITCH"
     FLINK = "FLINK"
+    SPARK = "SPARK"
+    MR = "MR"
 
 
 class DefaultTaskCodeNum(str):
@@ -96,6 +98,10 @@ class JavaGatewayDefault(str):
     RESULT_STATUS_SUCCESS = "SUCCESS"
 
     RESULT_DATA = "data"
+
+    SERVER_ADDRESS = "127.0.0.1"
+    SERVER_PORT = 25333
+    AUTO_CONVERT = True
 
 
 class Delimiter(str):

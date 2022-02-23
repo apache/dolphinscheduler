@@ -30,9 +30,7 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
@@ -45,6 +43,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -53,30 +53,22 @@ import io.netty.channel.Channel;
 /**
  * task kill processor
  */
+@Component
 public class TaskKillProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
     /**
-     * worker config
-     */
-    private final WorkerConfig workerConfig;
-
-    /**
      * task callback service
      */
-    private final TaskCallbackService taskCallbackService;
+    @Autowired
+    private TaskCallbackService taskCallbackService;
 
-    /*
+    /**
      * task execute manager
      */
-    private final WorkerManagerThread workerManager;
-
-    public TaskKillProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
-    }
+    @Autowired
+    private WorkerManagerThread workerManager;
 
     /**
      * task kill process
@@ -88,7 +80,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
-        logger.info("received kill command : {}", killCommand);
+        if (killCommand == null){
+            logger.error("task kill request command is null");
+            return;
+        }
+        logger.info("task kill command : {}", killCommand);
 
         Pair<Boolean, List<String>> result = doKill(killCommand);
 
