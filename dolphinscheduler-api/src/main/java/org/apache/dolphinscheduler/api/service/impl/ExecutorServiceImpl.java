@@ -72,6 +72,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -618,7 +619,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode
      * @return
      */
-    @SuppressWarnings("checkstyle:OperatorWrap")
     private int createComplementCommandList(Date start, Date end, RunMode runMode, Command command,
                                             Integer expectedParallelismNumber, ComplementDependentMode complementDependentMode) {
         int createCount = 0;
@@ -713,7 +713,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * create complement dependent command
      */
-    @SuppressWarnings("checkstyle:OperatorWrap")
     private int createComplementDependentCommand(List<Schedule> schedules, Command command) {
         int dependentProcessDefinitionCreateCount = 0;
         Command dependentCommand;
@@ -746,18 +745,34 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * get complement dependent process definition list
      */
-    @SuppressWarnings("checkstyle:OperatorWrap")
     private List<DependentProcessDefinition> getComplementDependentDefinitionList(long processDefinitionCode,
                                                                                CycleEnum processDefinitionCycle,
                                                                                String workerGroup) {
-        List<DependentProcessDefinition> validDependentProcessDefinitionList = new ArrayList<>();
-
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
 
+        return checkDependentProcessDefinitionValid(dependentProcessDefinitionList,processDefinitionCycle,workerGroup);
+    }
+
+    /**
+     *  Check whether the dependency cycle of the dependent node is consistent with the schedule cycle of
+     *  the dependent process definition and if there is no worker group in the schedule, use the complement selection's
+     *  worker group
+     */
+    private List<DependentProcessDefinition> checkDependentProcessDefinitionValid(List<DependentProcessDefinition> dependentProcessDefinitionList,
+                                                                             CycleEnum processDefinitionCycle,
+                                                                             String workerGroup) {
+        List<DependentProcessDefinition> validDependentProcessDefinitionList = new ArrayList<>();
+
+        List<Long> processDefinitionCodeList = dependentProcessDefinitionList.stream()
+                .map(DependentProcessDefinition::getProcessDefinitionCode)
+                .collect(Collectors.toList());
+
+        Map<Long, String> processDefinitionWorkerGroupMap = processService.queryWorkerGroupByProcessDefinitionCodes(processDefinitionCodeList);
+
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
             if (dependentProcessDefinition.getDependentCycle() == processDefinitionCycle) {
-                if (dependentProcessDefinition.getWorkerGroup() == null) {
+                if (processDefinitionWorkerGroupMap.get(dependentProcessDefinition.getProcessDefinitionCode()) == null) {
                     dependentProcessDefinition.setWorkerGroup(workerGroup);
                 }
 

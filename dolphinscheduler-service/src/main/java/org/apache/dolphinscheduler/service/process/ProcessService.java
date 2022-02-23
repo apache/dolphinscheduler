@@ -144,6 +144,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -1903,6 +1904,18 @@ public class ProcessService {
      */
     public List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode) {
         return scheduleMapper.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
+    }
+
+    /**
+     * query Schedule by processDefinitionCode
+     *
+     * @param processDefinitionCodeList processDefinitionCodeList
+     * @see Schedule
+     */
+    public Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList) {
+        List<Schedule> processDefinitionScheduleList = scheduleMapper.querySchedulesByProcessDefinitionCodes(processDefinitionCodeList);
+        return processDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
+                Schedule::getWorkerGroup));
     }
 
     /**
