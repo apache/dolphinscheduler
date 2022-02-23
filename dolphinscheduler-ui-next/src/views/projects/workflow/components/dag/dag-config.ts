@@ -200,7 +200,12 @@ export const NODE = {
         group: X6_PORT_OUT_NAME
       }
     ]
-  }
+  },
+  tools: [
+    {
+      name: 'contextmenu'
+    }
+  ]
 }
 
 export const NODE_HOVER = {
