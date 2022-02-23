@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { omit } from 'lodash'
+import { find, omit } from 'lodash'
 import type {
   INodeData,
   ITaskData,
@@ -72,6 +72,7 @@ export function formatParams(data: INodeData): {
     taskParams.connectTimeout = data.connectTimeout
     taskParams.socketTimeout = data.socketTimeout
   }
+
   if (data.taskType === 'SQOOP') {
     taskParams.jobType = data.isCustomTask ? 'CUSTOM' : 'TEMPLATE'
     taskParams.localParams = data.localParams
@@ -181,6 +182,15 @@ export function formatParams(data: INodeData): {
     taskParams.method = data.method
   }
 
+  if (data.taskType === 'SEATUNNEL') {
+    if (data.deployMode === 'local') {
+      data.master = 'local'
+      data.masterUrl = ''
+      data.deployMode = 'client'
+    }
+    buildRawScript(data)
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -261,6 +271,7 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.method) {
     params.method = data.taskParams?.method
   }
+
   if (data.taskParams?.targetParams) {
     const targetParams: ISqoopTargetParams = JSON.parse(
       data.taskParams.targetParams
@@ -310,5 +321,55 @@ export function formatModel(data: ITaskData) {
     params.sourceHivePartitionValue = sourceParams.hivePartitionValue
   }
 
+  if (data.taskParams?.rawScript) {
+    params.rawScript = data.taskParams?.rawScript
+  }
+
   return params
+}
+
+const buildRawScript = (model: INodeData) => {
+  const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
+  if (!model.resourceList) return
+
+  let master = model.master
+  let masterUrl = model?.masterUrl ? model?.masterUrl : ''
+  let deployMode = model.deployMode
+  let queue = model.queue
+
+  if (model.deployMode === 'local') {
+    master = 'local'
+    masterUrl = ''
+    deployMode = 'client'
+  }
+
+  if (master === 'yarn' || master === 'local') {
+    masterUrl = ''
+  }
+
+  let localParams = ''
+  model?.localParams?.forEach((param: any) => {
+    localParams = localParams + ' --variable ' + param.prop + '=' + param.value
+  })
+
+  let rawScript = ''
+  model.resourceList?.forEach((id: number) => {
+    let item = find(model.resourceFiles, { id: id })
+
+    rawScript =
+      rawScript +
+      baseScript +
+      ' --master ' +
+      master +
+      masterUrl +
+      ' --deploy-mode ' +
+      deployMode +
+      ' --queue ' +
+      queue
+    if (item && item.fullName) {
+      rawScript = rawScript + ' --config ' + item.fullName
+    }
+    rawScript = rawScript + localParams + ' \n'
+  })
+  model.rawScript = rawScript ? rawScript : ''
 }

@@ -107,7 +107,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
                     trigger: () => (
                       <NButton
                         circle
-                        type="warning"
+                        type='warning'
                         size='small'
                         class='authorize'
                       >
