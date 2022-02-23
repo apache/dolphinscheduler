@@ -750,7 +750,13 @@ const project = {
     only_update: 'OnlyUpdate',
     allow_insert: 'AllowInsert',
     concurrency: 'Concurrency',
-    concurrency_tips: 'Please enter Concurrency'
+    concurrency_tips: 'Please enter Concurrency',
+    sea_tunnel_deploy_mode: 'Deploy Mode',
+    sea_tunnel_master: 'Master',
+    sea_tunnel_master_url: 'Master URL',
+    sea_tunnel_queue: 'Queue',
+    sea_tunnel_master_url_tips:
+      'Please enter the master url, e.g., 127.0.0.1:7077'
   }
 }
 
