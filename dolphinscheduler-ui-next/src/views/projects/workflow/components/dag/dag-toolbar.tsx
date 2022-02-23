@@ -18,7 +18,7 @@
 import { defineComponent, ref, inject, PropType, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
-import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
+import { NTooltip, NIcon, NButton, NSelect, NPopover, NText } from 'naive-ui'
 import {
   SearchOutlined,
   DownloadOutlined,
@@ -27,14 +27,17 @@ import {
   InfoCircleOutlined,
   FormatPainterOutlined,
   CopyOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  RightCircleOutlined,
+  FundViewOutlined
 } from '@vicons/antd'
 import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
 import type { Graph } from '@antv/x6'
+import StartParam from './dag-startup-param'
 
 const props = {
   layoutToggle: {
@@ -42,6 +45,10 @@ const props = {
     default: () => {}
   },
   // If this prop is passed, it means from definition detail
+  instance: {
+    type: Object as PropType<any>,
+    default: null
+  },
   definition: {
     // The same as the structure responsed by the queryProcessDefinitionByCode api
     type: Object as PropType<any>,
@@ -56,10 +63,13 @@ export default defineComponent({
   setup(props, context) {
     const { t } = useI18n()
 
+    const startupPopover = ref(false)
+
     const themeStore = useThemeStore()
 
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
+    const route = useRoute()
 
     /**
      * Node search and navigate
@@ -142,6 +152,10 @@ export default defineComponent({
       }
     }
 
+    // const handleUpdateShow = () => {
+    //   startupPopover.value
+    // }
+
     return () => (
       <div
         class={[
@@ -165,6 +179,50 @@ export default defineComponent({
                 <CopyOutlined />
               </NIcon>
             </NButton>
+          )}
+          {route.name === 'workflow-instance-detail' && (
+            <>
+              <NButton
+                quaternary
+                circle
+                onClick={() => copy(props.definition?.processDefinition?.name)}
+                class={Styles['copy-btn']}
+              >
+                <NIcon>
+                  <FundViewOutlined />
+                </NIcon>
+              </NButton>
+              <NPopover
+                show={startupPopover.value}
+                placement='bottom'
+                trigger='manual'
+              >
+                {{
+                  trigger: () => (
+                    <NButton
+                      quaternary
+                      circle
+                      onClick={() =>
+                        (startupPopover.value = !startupPopover.value)
+                      }
+                      class={Styles['copy-btn']}
+                    >
+                      <NIcon>
+                        <RightCircleOutlined />
+                      </NIcon>
+                    </NButton>
+                  ),
+                  header: () => (
+                    <NText strong depth={1}>
+                      {t('project.workflow.startup_parameter')}
+                    </NText>
+                  ),
+                  default: () => (
+                    <StartParam startupParam={props.instance.value} />
+                  )
+                }}
+              </NPopover>
+            </>
           )}
         </div>
         <div class={Styles['toolbar-right-part']}>

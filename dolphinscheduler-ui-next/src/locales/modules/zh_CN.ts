@@ -470,7 +470,9 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
-    executing: '正在执行'
+    executing: '正在执行',
+    startup_type: '启动类型',
+    complement_range: '补数范围'
   },
   task: {
     task_name: '任务名称',
