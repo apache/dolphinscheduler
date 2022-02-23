@@ -145,7 +145,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (complementDependentMode == null) {
-            complementDependentMode = ComplementDependentMode.ALL_DEPENDENT;
+            complementDependentMode = ComplementDependentMode.OFF_MODE;
         }
 
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
