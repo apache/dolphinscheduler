@@ -668,6 +668,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+                    
                     // Distribute the number of tasks equally to each command.
                     // The last command with insufficient quantity will be assigned to the remaining tasks.
                     int itemsPerCommand = (listDateSize / createCount);
