@@ -25,6 +25,7 @@ import { useMr } from './tasks/use-mr'
 import { useHttp } from './tasks/use-http'
 import { useSql } from './tasks/use-sql'
 import { useProcedure } from './tasks/use-procedure'
+import { useSqoop } from './tasks/use-sqoop'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -120,5 +121,14 @@ export function useTask({
       data
     })
   }
+  if (taskType === 'SQOOP') {
+    node = useSqoop({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
   return node
 }
