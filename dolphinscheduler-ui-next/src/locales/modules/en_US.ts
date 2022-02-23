@@ -472,7 +472,9 @@ const project = {
     delay_execution: 'Delay execution',
     forced_success: 'Forced success',
     serial_wait: 'Serial wait',
-    executing: 'Executing'
+    executing: 'Executing',
+    startup_type: 'Startup Type',
+    complement_range: 'Complement Range'
   },
   task: {
     task_name: 'Task Name',
