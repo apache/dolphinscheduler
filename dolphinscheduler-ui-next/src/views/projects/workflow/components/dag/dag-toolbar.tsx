@@ -202,7 +202,7 @@ export default defineComponent({
                   ),
                   header: () => (
                     <NText strong depth={1}>
-                      {t('project.workflow.startup_parameter')}
+                      {t('project.workflow.parameters_variables')}
                     </NText>
                   ),
                   default: () => <VariablesView onCopy={copy} />

@@ -475,6 +475,7 @@ const project = {
     executing: 'Executing',
     startup_type: 'Startup Type',
     complement_range: 'Complement Range',
+    parameters_variables: 'Parameters variables',
     global_parameters: 'Global parameters',
     local_parameters: 'Local parameters'
   },
