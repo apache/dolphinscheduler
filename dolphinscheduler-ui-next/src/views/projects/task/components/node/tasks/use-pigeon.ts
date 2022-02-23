@@ -35,14 +35,13 @@ export function usePigeon({
     flag: 'YES',
     description: '',
     timeoutFlag: false,
-    localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    targetJobName: ''
   } as INodeData)
 
   let extra: IJsonItem[] = []
