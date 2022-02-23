@@ -33,9 +33,11 @@ export default defineComponent({
     const id = Number(route.params.id)
 
     const definition = ref<WorkflowDefinition>()
+    const instance = ref<any>()
 
     const refresh = () => {
       queryProcessInstanceById(id, projectCode).then((res: any) => {
+        instance.value = res
         if (res.dagData) {
           definition.value = res.dagData
         }
@@ -57,6 +59,7 @@ export default defineComponent({
         ]}
       >
         <Dag
+          instance={instance}
           definition={definition.value}
           onRefresh={refresh}
           projectCode={projectCode}

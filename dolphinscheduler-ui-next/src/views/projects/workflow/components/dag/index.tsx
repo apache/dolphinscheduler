@@ -41,6 +41,10 @@ import './x6-style.scss'
 
 const props = {
   // If this prop is passed, it means from definition detail
+  instance: {
+    type: Object as PropType<any>,
+    default: undefined
+  },
   definition: {
     type: Object as PropType<WorkflowDefinition>,
     default: undefined
@@ -160,6 +164,7 @@ export default defineComponent({
       >
         <DagToolbar
           layoutToggle={layoutToggle}
+          instance={props.instance}
           definition={props.definition}
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
