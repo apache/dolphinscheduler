@@ -32,6 +32,12 @@ BEGIN
 EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_idx_project_code_process_definition_code"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_idx_project_code_process_definition_code ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("project_code","process_definition_code")';
 
+EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_idx_pre_task_code_version"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_idx_pre_task_code_version ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("pre_task_code","pre_task_version")';
+
+EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_idx_post_task_code_version"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_idx_post_task_code_version ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("post_task_code","post_task_version")';
+
 EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_log_idx_project_code_process_definition_code"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_log_idx_project_code_process_definition_code ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation_log USING Btree("project_code","process_definition_code")';
 
