@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import _ from 'lodash'
 import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
@@ -61,6 +62,28 @@ export function useTaskEdit(options: Options) {
   }
 
   /**
+   * Copy a task
+   */
+  function copyTask(
+    name: string,
+    code: number,
+    targetCode: number,
+    type: TaskType,
+    coordinate: Coordinate
+  ) {
+    addNode(code + '', type, name, coordinate)
+    const definition = taskDefinitions.value.find((t) => t.code === targetCode)
+
+    const newDefinition = {
+      ...definition,
+      code,
+      name
+    } as NodeData
+
+    taskDefinitions.value.push(newDefinition)
+  }
+
+  /**
    * Remove task
    * @param {number} code
    */
@@ -72,6 +95,18 @@ export function useTaskEdit(options: Options) {
 
   function openTaskModal(task: NodeData) {
     currTask.value = task
+    taskModalVisible.value = true
+  }
+
+  /**
+   * Edit task
+   * @param {number} code
+   */
+  function editTask(code: number) {
+    const definition = taskDefinitions.value.find((t) => t.code === code)
+    if (definition) {
+      currTask.value = definition
+    }
     taskModalVisible.value = true
   }
 
@@ -108,11 +143,7 @@ export function useTaskEdit(options: Options) {
     if (graph.value) {
       graph.value.on('cell:dblclick', ({ cell }) => {
         const code = Number(cell.id)
-        const definition = taskDefinitions.value.find((t) => t.code === code)
-        if (definition) {
-          currTask.value = definition
-        }
-        taskModalVisible.value = true
+        editTask(code)
       })
     }
   })
@@ -127,6 +158,8 @@ export function useTaskEdit(options: Options) {
     taskConfirm,
     taskCancel,
     appendTask,
+    editTask,
+    copyTask,
     taskDefinitions,
     removeTasks
   }

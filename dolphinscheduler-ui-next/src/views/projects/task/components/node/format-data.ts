@@ -15,8 +15,14 @@
  * limitations under the License.
  */
 
-import {find, omit} from 'lodash'
-import type { INodeData, ITaskData, ITaskParams } from './types'
+import { find, omit } from 'lodash'
+import type {
+  INodeData,
+  ITaskData,
+  ITaskParams,
+  ISqoopTargetParams,
+  ISqoopSourceParams
+} from './types'
 
 export function formatParams(data: INodeData): {
   processDefinitionCode: string
@@ -65,6 +71,100 @@ export function formatParams(data: INodeData): {
     taskParams.condition = data.condition
     taskParams.connectTimeout = data.connectTimeout
     taskParams.socketTimeout = data.socketTimeout
+  }
+
+  if (data.taskType === 'SQOOP') {
+    taskParams.jobType = data.isCustomTask ? 'CUSTOM' : 'TEMPLATE'
+    taskParams.localParams = data.localParams
+    if (data.isCustomTask) {
+      taskParams.customShell = data.customShell
+    } else {
+      taskParams.jobName = data.jobName
+      taskParams.hadoopCustomParams = data.hadoopCustomParams
+      taskParams.sqoopAdvancedParams = data.sqoopAdvancedParams
+      taskParams.concurrency = data.concurrency
+      taskParams.modelType = data.modelType
+      taskParams.sourceType = data.sourceType
+      taskParams.targetType = data.targetType
+      let targetParams: ISqoopTargetParams = {}
+      let sourceParams: ISqoopSourceParams = {}
+      switch (data.targetType) {
+        case 'HIVE':
+          targetParams = {
+            hiveDatabase: data.targetHiveDatabase,
+            hiveTable: data.targetHiveTable,
+            createHiveTable: data.targetHiveCreateTable,
+            dropDelimiter: data.targetHiveDropDelimiter,
+            hiveOverWrite: data.targetHiveOverWrite,
+            hiveTargetDir: data.targetHiveTargetDir,
+            replaceDelimiter: data.targetHiveReplaceDelimiter,
+            hivePartitionKey: data.targetHivePartitionKey,
+            hivePartitionValue: data.targetHivePartitionValue
+          }
+          break
+        case 'HDFS':
+          targetParams = {
+            targetPath: data.targetHdfsTargetPath,
+            deleteTargetDir: data.targetHdfsDeleteTargetDir,
+            compressionCodec: data.targetHdfsCompressionCodec,
+            fileType: data.targetHdfsFileType,
+            fieldsTerminated: data.targetHdfsFieldsTerminated,
+            linesTerminated: data.targetHdfsLinesTerminated
+          }
+          break
+        case 'MYSQL':
+          targetParams = {
+            targetType: data.targetMysqlType,
+            targetDatasource: data.targetMysqlDatasource,
+            targetTable: data.targetMysqlTable,
+            targetColumns: data.targetMysqlColumns,
+            fieldsTerminated: data.targetMysqlFieldsTerminated,
+            linesTerminated: data.targetMysqlLinesTerminated,
+            isUpdate: data.targetMysqlIsUpdate,
+            targetUpdateKey: data.targetMysqlTargetUpdateKey,
+            targetUpdateMode: data.targetMysqlUpdateMode
+          }
+          break
+        default:
+          break
+      }
+      switch (data.sourceType) {
+        case 'MYSQL':
+          sourceParams = {
+            srcTable: data.srcQueryType === '1' ? '' : data.srcTable,
+            srcColumnType: data.srcQueryType === '1' ? '0' : data.srcColumnType,
+            srcColumns:
+              data.srcQueryType === '1' || data.srcColumnType === '0'
+                ? ''
+                : data.srcColumns,
+            srcQuerySql:
+              data.srcQueryType === '0' ? '' : data.sourceMysqlSrcQuerySql,
+            srcQueryType: data.srcQueryType,
+            srcType: data.sourceMysqlType,
+            srcDatasource: data.sourceMysqlDatasource,
+            mapColumnHive: data.mapColumnHive,
+            mapColumnJava: data.mapColumnJava
+          }
+          break
+        case 'HDFS':
+          sourceParams = {
+            exportDir: data.sourceHdfsExportDir
+          }
+          break
+        case 'HIVE':
+          sourceParams = {
+            hiveDatabase: data.sourceHiveDatabase,
+            hiveTable: data.sourceHiveTable,
+            hivePartitionKey: data.sourceHivePartitionKey,
+            hivePartitionValue: data.sourceHivePartitionValue
+          }
+          break
+        default:
+          break
+      }
+      taskParams.targetParams = JSON.stringify(targetParams)
+      taskParams.sourceParams = JSON.stringify(sourceParams)
+    }
   }
 
   if (data.taskType === 'SQL') {
@@ -172,6 +272,55 @@ export function formatModel(data: ITaskData) {
     params.method = data.taskParams?.method
   }
 
+  if (data.taskParams?.targetParams) {
+    const targetParams: ISqoopTargetParams = JSON.parse(
+      data.taskParams.targetParams
+    )
+    params.targetHiveDatabase = targetParams.hiveDatabase
+    params.targetHiveTable = targetParams.hiveTable
+    params.targetHiveCreateTable = targetParams.createHiveTable
+    params.targetHiveDropDelimiter = targetParams.dropDelimiter
+    params.targetHiveOverWrite = targetParams.hiveOverWrite
+    params.targetHiveTargetDir = targetParams.hiveTargetDir
+    params.targetHiveReplaceDelimiter = targetParams.replaceDelimiter
+    params.targetHivePartitionKey = targetParams.hivePartitionKey
+    params.targetHivePartitionValue = targetParams.hivePartitionValue
+    params.targetHdfsTargetPath = targetParams.targetPath
+    params.targetHdfsDeleteTargetDir = targetParams.deleteTargetDir
+    params.targetHdfsCompressionCodec = targetParams.compressionCodec
+    params.targetHdfsFileType = targetParams.fileType
+    params.targetHdfsFieldsTerminated = targetParams.fieldsTerminated
+    params.targetHdfsLinesTerminated = targetParams.linesTerminated
+    params.targetMysqlType = targetParams.targetType
+    params.targetMysqlDatasource = targetParams.targetDatasource
+    params.targetMysqlTable = targetParams.targetTable
+    params.targetMysqlColumns = targetParams.targetColumns
+    params.targetMysqlFieldsTerminated = targetParams.fieldsTerminated
+    params.targetMysqlLinesTerminated = targetParams.linesTerminated
+    params.targetMysqlIsUpdate = targetParams.isUpdate
+    params.targetMysqlTargetUpdateKey = targetParams.targetUpdateKey
+    params.targetMysqlUpdateMode = targetParams.targetUpdateMode
+  }
+  if (data.taskParams?.sourceParams) {
+    const sourceParams: ISqoopSourceParams = JSON.parse(
+      data.taskParams.sourceParams
+    )
+    params.srcTable = sourceParams.srcTable
+    params.srcColumnType = sourceParams.srcColumnType
+    params.srcColumns = sourceParams.srcColumns
+    params.sourceMysqlSrcQuerySql = sourceParams.srcQuerySql
+    params.srcQueryType = sourceParams.srcQueryType
+    params.sourceMysqlType = sourceParams.srcType
+    params.sourceMysqlDatasource = sourceParams.srcDatasource
+    params.mapColumnHive = sourceParams.mapColumnHive
+    params.mapColumnJava = sourceParams.mapColumnJava
+    params.sourceHdfsExportDir = sourceParams.exportDir
+    params.sourceHiveDatabase = sourceParams.hiveDatabase
+    params.sourceHiveTable = sourceParams.hiveTable
+    params.sourceHivePartitionKey = sourceParams.hivePartitionKey
+    params.sourceHivePartitionValue = sourceParams.hivePartitionValue
+  }
+
   if (data.taskParams?.rawScript) {
     params.rawScript = data.taskParams?.rawScript
   }
@@ -184,7 +333,7 @@ const buildRawScript = (model: INodeData) => {
   if (!model.resourceList) return
 
   let master = model.master
-  let masterUrl = model?.masterUrl? model?.masterUrl: ''
+  let masterUrl = model?.masterUrl ? model?.masterUrl : ''
   let deployMode = model.deployMode
   let queue = model.queue
 
@@ -199,23 +348,28 @@ const buildRawScript = (model: INodeData) => {
   }
 
   let localParams = ''
-  model?.localParams?.forEach((param : any) => {
+  model?.localParams?.forEach((param: any) => {
     localParams = localParams + ' --variable ' + param.prop + '=' + param.value
   })
 
   let rawScript = ''
   model.resourceList?.forEach((id: number) => {
-    let item = find(model.resourceFiles, {id:id})
+    let item = find(model.resourceFiles, { id: id })
 
-    rawScript = rawScript + baseScript +
-        ' --master ' + master + masterUrl +
-        ' --deploy-mode ' + deployMode +
-        ' --queue ' + queue
+    rawScript =
+      rawScript +
+      baseScript +
+      ' --master ' +
+      master +
+      masterUrl +
+      ' --deploy-mode ' +
+      deployMode +
+      ' --queue ' +
+      queue
     if (item && item.fullName) {
       rawScript = rawScript + ' --config ' + item.fullName
     }
     rawScript = rawScript + localParams + ' \n'
   })
-  model.rawScript = rawScript? rawScript : ''
+  model.rawScript = rawScript ? rawScript : ''
 }
-

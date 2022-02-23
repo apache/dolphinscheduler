@@ -26,6 +26,9 @@ const getField = (
 ) => {
   const { type = 'input' } = item
   const renderTypeName = `render${upperFirst(camelCase(type))}`
+  if (type === 'custom') {
+    return item.widget || null
+  }
   // TODO Support other widgets later
   if (type === 'custom-parameters') {
     let fieldRules: { [key: string]: FormItemRule }[] = []

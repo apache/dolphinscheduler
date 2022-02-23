@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ref, onMounted, watch, computed} from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import type { IJsonItem } from '../types'
@@ -35,7 +35,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     {
       label: 'local',
       value: 'local'
-    },
+    }
   ]
 
   const masterTypeOptions = [
@@ -80,14 +80,16 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     }
   }
 
-  function removeUselessChildren(list: { children?: [], fullName: string, id:number }[]) {
+  function removeUselessChildren(
+    list: { children?: []; fullName: string; id: number }[]
+  ) {
     if (!list.length) return
     list.forEach((item) => {
       if (!item.children) {
         return
       }
       if (item.children.length === 0) {
-        model.resourceFiles.push({id: item.id, fullName: item.fullName})
+        model.resourceFiles.push({ id: item.id, fullName: item.fullName })
         delete item.children
         return
       }
@@ -100,29 +102,36 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   })
 
   const masterSpan = computed(() => (model.deployMode === 'local' ? 0 : 12))
-  const queueSpan = computed(() => (model.deployMode === 'local' || model.master != 'yarn' ? 0 : 12))
-  const masterUrlSpan =  computed(() => (model.deployMode === 'local' || (model.master != 'spark://' && model.master != 'mesos://') ? 0 : 12))
+  const queueSpan = computed(() =>
+    model.deployMode === 'local' || model.master != 'yarn' ? 0 : 12
+  )
+  const masterUrlSpan = computed(() =>
+    model.deployMode === 'local' ||
+    (model.master != 'spark://' && model.master != 'mesos://')
+      ? 0
+      : 12
+  )
 
   const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
 
   const parseRawScript = () => {
-    if(model.rawScript) {
+    if (model.rawScript) {
       model.rawScript.split('\n').forEach((script: string) => {
-        let params = script.replace(baseScript,'').split('--')
+        let params = script.replace(baseScript, '').split('--')
         params?.forEach((param: string) => {
           let pair = param.split(' ')
-          if (pair && pair.length>=2) {
-            if(pair[0] === 'master') {
-              let prefix = pair[1].substring(0,8)
+          if (pair && pair.length >= 2) {
+            if (pair[0] === 'master') {
+              let prefix = pair[1].substring(0, 8)
               if (pair[1] && (prefix === 'mesos://' || prefix === 'spark://')) {
                 model.master = prefix
-                model.masterUrl = pair[1].substring(8,pair[1].length)
+                model.masterUrl = pair[1].substring(8, pair[1].length)
               } else {
                 model.master = pair[1]
               }
-            } else if(pair[0] === 'deploy-mode') {
+            } else if (pair[0] === 'deploy-mode') {
               model.deployMode = pair[1]
-            } else if(pair[0] === 'queue') {
+            } else if (pair[0] === 'queue') {
               model.queue = pair[1]
             }
           }
@@ -144,7 +153,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       field: 'deployMode',
       name: t('project.node.sea_tunnel_deploy_mode'),
       options: deployModeOptions,
-      value: model.deployMode,
+      value: model.deployMode
     },
     {
       type: 'select',
@@ -161,7 +170,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       value: model.masterUrl,
       span: masterUrlSpan,
       props: {
-        placeholder: t('project.node.sea_tunnel_master_url_tips'),
+        placeholder: t('project.node.sea_tunnel_master_url_tips')
       }
     },
     {

@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function usePigeon({
+export function useSqoop({
   projectCode,
   from = 0,
   readonly,
@@ -31,17 +31,38 @@ export function usePigeon({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'SQOOP',
     name: '',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
+    localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    targetJobName: ''
+    isCustomTask: false,
+    hadoopCustomParams: [],
+    sqoopAdvancedParams: [],
+    mapColumnHive: [],
+    mapColumnJava: [],
+    modelType: 'import',
+    sourceType: 'MYSQL',
+    srcQueryType: '1',
+    srcColumnType: '0',
+    targetType: 'HDFS',
+    sourceMysqlType: 'MYSQL',
+    targetHdfsDeleteTargetDir: true,
+    targetHdfsCompressionCodec: 'snappy',
+    targetHdfsFileType: '--as-avrodatafile',
+    targetMysqlType: 'MYSQL',
+    targetMysqlUpdateMode: 'allowinsert',
+    targetHiveCreateTable: false,
+    targetHiveDropDelimiter: false,
+    targetHiveOverWrite: true,
+    concurrency: 1
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -72,7 +93,7 @@ export function usePigeon({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useTargetTaskName(),
+      ...Fields.useSqoop(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

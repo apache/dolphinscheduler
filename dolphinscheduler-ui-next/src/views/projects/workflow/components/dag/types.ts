@@ -133,3 +133,13 @@ export interface Location {
   x: number
   y: number
 }
+
+export interface IStartupParam {
+  commandType: string
+  commandParam: string
+  failureStrategy: string
+  processInstancePriority: string
+  workerGroup: string
+  warningType: string
+  warningGroupId: number
+}

@@ -31,6 +31,7 @@ export function useShell({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'SHELL',
     name: '',
     flag: 'YES',
     description: '',

@@ -24,8 +24,11 @@ import {
   NSelect,
   NRadio,
   NRadioGroup,
+  NRadioButton,
   NSpace,
-  NAlert
+  NAlert,
+  NTransfer,
+  NTreeSelect
 } from 'naive-ui'
 
 import Modal from '@/components/modal'
@@ -55,6 +58,7 @@ export const UserModal = defineComponent({
         show={this.show}
         title={this.titleMap?.[this.mode || 'add']}
         onCancel={this.onModalCancel}
+        confirmDisabled={this.optionsLoading}
         confirmLoading={this.confirmLoading}
         onConfirm={this.onConfirm}
         confirmClassName='btn-submit'
@@ -67,6 +71,62 @@ export const UserModal = defineComponent({
                 <NAlert type='error' title={t('security.user.delete_confirm')}>
                   {t('security.user.delete_confirm_tip')}
                 </NAlert>
+              )
+            }
+            if (this.mode === 'auth_project') {
+              return (
+                <NTransfer
+                  virtualScroll
+                  options={this.projects}
+                  filterable
+                  v-model:value={this.authorizedProjects}
+                  style={{ margin: '0 auto' }}
+                />
+              )
+            }
+            if (this.mode === 'auth_datasource') {
+              return (
+                <NTransfer
+                  virtualScroll
+                  options={this.datasource}
+                  filterable
+                  v-model:value={this.authorizedDatasource}
+                  style={{ margin: '0 auto' }}
+                />
+              )
+            }
+            if (this.mode === 'auth_udf') {
+              return (
+                <NTransfer
+                  virtualScroll
+                  options={this.UDFs}
+                  filterable
+                  v-model:value={this.authorizedUDF}
+                  style={{ margin: '0 auto' }}
+                />
+              )
+            }
+            if (this.mode === 'auth_resource') {
+              return (
+                <NSpace vertical>
+                  <NRadioGroup v-model:value={this.resourceType}>
+                    <NRadioButton key='file' value='file'>
+                      {t('security.user.file_resource')}
+                    </NRadioButton>
+                    <NRadioButton key='udf' value='udf'>
+                      {t('security.user.udf_resource')}
+                    </NRadioButton>
+                  </NRadioGroup>
+                  <NTreeSelect
+                    multiple
+                    cascade
+                    checkable
+                    checkStrategy='child'
+                    defaultExpandAll
+                    options={this.resourceTree}
+                    v-model:value={this.authorizedFiles}
+                  />
+                </NSpace>
               )
             }
             return (
