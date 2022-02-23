@@ -184,6 +184,8 @@ interface ITaskParams {
   targetType?: SourceType
   targetParams?: string
   sourceParams?: string
+  queue?: string
+  master?: string
 }
 
 type ITaskType = TaskType
@@ -220,6 +222,9 @@ interface INodeData
   mainJar?: number
   timeoutSetting?: boolean
   isCustomTask?: boolean
+  method?: string
+  masterUrl?: string
+  resourceFiles?: { id: number; fullName: string }[] | null
 }
 
 interface ITaskData

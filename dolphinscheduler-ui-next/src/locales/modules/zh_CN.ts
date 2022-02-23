@@ -742,7 +742,12 @@ const project = {
     only_update: '只更新',
     allow_insert: '无更新便插入',
     concurrency: '并发度',
-    concurrency_tips: '请输入并发度'
+    concurrency_tips: '请输入并发度',
+    sea_tunnel_deploy_mode: '部署方式',
+    sea_tunnel_master: 'Master',
+    sea_tunnel_master_url: 'Master URL',
+    sea_tunnel_queue: '队列',
+    sea_tunnel_master_url_tips: '请直接填写地址,例如:127.0.0.1:7077'
   }
 }
 
