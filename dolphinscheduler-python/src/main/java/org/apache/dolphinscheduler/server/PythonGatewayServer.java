@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -92,6 +93,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
     private static final int DEFAULT_DRY_RUN = 0;
+    private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -331,7 +333,8 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             timeout,
             null,
             null,
-            DEFAULT_DRY_RUN
+            DEFAULT_DRY_RUN,
+            COMPLEMENT_DEPENDENT_MODE
         );
     }
 
