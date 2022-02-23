@@ -115,7 +115,8 @@ interface INodeData extends Omit<ITaskParams, 'resourceList' | 'mainJar'> {
   preStatements?: string[]
   postStatements?: string[]
   method?: string
-  masterUrl: string
+  masterUrl?: string
+  resourceFiles?: {id: number, fullName: string}[] | null
 }
 
 interface ITaskData

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { omit } from 'lodash'
+import {find, omit} from 'lodash'
 import type { INodeData, ITaskData, ITaskParams } from './types'
 
 export function formatParams(data: INodeData): {
@@ -88,22 +88,7 @@ export function formatParams(data: INodeData): {
       data.masterUrl = ''
       data.deployMode = 'client'
     }
-    let localParams = ''
-    data?.localParams?.forEach(v => {
-      localParams = localParams + ' --variable ' + v.prop + '=' + v.value
-    })
-
-    let rawScript = ''
-    const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
-    data.resourceList?.forEach(v => {
-      rawScript = rawScript + baseScript +
-          ' --master ' + data. master + data.masterUrl +
-          ' --deploy-mode ' + data.deployMode +
-          ' --queue ' + data.queue +
-          ' --config ' + v +
-          localParams + ' \n'
-    })
-    data.rawScript = rawScript? rawScript : ''
+    buildRawScript(data)
   }
 
   const params = {
@@ -187,5 +172,50 @@ export function formatModel(data: ITaskData) {
     params.method = data.taskParams?.method
   }
 
+  if (data.taskParams?.rawScript) {
+    params.rawScript = data.taskParams?.rawScript
+  }
+
   return params
 }
+
+const buildRawScript = (model: INodeData) => {
+  const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
+  if (!model.resourceList) return
+
+  let master = model.master
+  let masterUrl = model?.masterUrl? model?.masterUrl: ''
+  let deployMode = model.deployMode
+  let queue = model.queue
+
+  if (model.deployMode === 'local') {
+    master = 'local'
+    masterUrl = ''
+    deployMode = 'client'
+  }
+
+  if (master === 'yarn' || master === 'local') {
+    masterUrl = ''
+  }
+
+  let localParams = ''
+  model?.localParams?.forEach((param : any) => {
+    localParams = localParams + ' --variable ' + param.prop + '=' + param.value
+  })
+
+  let rawScript = ''
+  model.resourceList?.forEach((id: number) => {
+    let item = find(model.resourceFiles, {id:id})
+
+    rawScript = rawScript + baseScript +
+        ' --master ' + master + masterUrl +
+        ' --deploy-mode ' + deployMode +
+        ' --queue ' + queue
+    if (item && item.fullName) {
+      rawScript = rawScript + ' --config ' + item.fullName
+    }
+    rawScript = rawScript + localParams + ' \n'
+  })
+  model.rawScript = rawScript? rawScript : ''
+}
+
