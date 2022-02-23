@@ -62,6 +62,17 @@ public final class DateUtils {
         if (StringUtils.isNotEmpty(timezone)) {
             zoneId = ZoneId.of(timezone);
         }
+        return date2LocalDateTime(date, zoneId);
+    }
+
+    /**
+     * date to local datetime
+     *
+     * @param date date
+     * @param zoneId zoneId
+     * @return local datetime
+     */
+    private static LocalDateTime date2LocalDateTime(Date date, ZoneId zoneId) {
         return LocalDateTime.ofInstant(date.toInstant(), zoneId);
     }
 
@@ -77,6 +88,16 @@ public final class DateUtils {
         if (StringUtils.isNotEmpty(timezone)) {
             zoneId = ZoneId.of(timezone);
         }
+        return localDateTime2Date(localDateTime, zoneId);
+    }
+
+    /**
+     * local datetime to date
+     *
+     * @param localDateTime local datetime
+     * @return date
+     */
+    private static Date localDateTime2Date(LocalDateTime localDateTime, ZoneId zoneId) {
         Instant instant = localDateTime.atZone(zoneId).toInstant();
         return Date.from(instant);
     }
@@ -107,8 +128,11 @@ public final class DateUtils {
      * @param format e.g. yyyy-MM-dd HH:mm:ss
      * @return date string
      */
-    public static String format(Date date, String format) {
-        return format(date2LocalDateTime(date), format);
+    public static String format(Date date, String format, String timezone) {
+        if (StringUtils.isEmpty(timezone)) {
+            return format(date2LocalDateTime(date), format);
+        }
+        return format(date2LocalDateTime(date, ZoneId.of(timezone)), format);
     }
 
     /**
@@ -129,7 +153,18 @@ public final class DateUtils {
      * @return date string
      */
     public static String dateToString(Date date) {
-        return format(date, Constants.YYYY_MM_DD_HH_MM_SS);
+        return format(date, Constants.YYYY_MM_DD_HH_MM_SS, null);
+    }
+
+    /**
+     * convert time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param date date
+     * @param timezone timezone
+     * @return date string
+     */
+    public static String dateToString(Date date, String timezone) {
+        return format(date, Constants.YYYY_MM_DD_HH_MM_SS, timezone);
     }
 
     /**
@@ -137,12 +172,16 @@ public final class DateUtils {
      *
      * @param date   date
      * @param format format
+     * @param timezone timezone, if null, use system default timezone
      * @return date
      */
-    public static Date parse(String date, String format) {
+    public static Date parse(String date, String format, String timezone) {
         try {
             LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
-            return localDateTime2Date(ldt);
+            if (StringUtils.isEmpty(timezone)) {
+                return localDateTime2Date(ldt);
+            }
+            return localDateTime2Date(ldt, ZoneId.of(timezone));
         } catch (Exception e) {
             logger.error("error while parse date:" + date, e);
         }
@@ -152,11 +191,22 @@ public final class DateUtils {
     /**
      * convert date str to yyyy-MM-dd HH:mm:ss format
      *
-     * @param str date string
+     * @param date date string
      * @return yyyy-MM-dd HH:mm:ss format
      */
-    public static Date stringToDate(String str) {
-        return parse(str, Constants.YYYY_MM_DD_HH_MM_SS);
+    public static Date stringToDate(String date) {
+        return parse(date, Constants.YYYY_MM_DD_HH_MM_SS, null);
+    }
+
+    /**
+     * convert date str to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param date date string
+     * @param timezone
+     * @return yyyy-MM-dd HH:mm:ss format
+     */
+    public static Date stringToDate(String date, String timezone) {
+        return parse(date, Constants.YYYY_MM_DD_HH_MM_SS, timezone);
     }
 
     /**
@@ -442,8 +492,7 @@ public final class DateUtils {
      * @return current date
      */
     public static Date getCurrentDate() {
-        return DateUtils.parse(DateUtils.getCurrentTime(),
-            Constants.YYYY_MM_DD_HH_MM_SS);
+        return DateUtils.parse(DateUtils.getCurrentTime(), Constants.YYYY_MM_DD_HH_MM_SS, null);
     }
 
     /**

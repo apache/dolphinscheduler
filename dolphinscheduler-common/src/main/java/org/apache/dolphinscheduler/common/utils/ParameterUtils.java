@@ -66,7 +66,7 @@ public class ParameterUtils {
         if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
             //Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
-            cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME);
+            cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME, null);
         } else {
             cronTime = new Date();
         }
