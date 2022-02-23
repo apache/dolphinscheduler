@@ -39,6 +39,12 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
@@ -141,7 +147,7 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService, taskPluginManager));
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE_ACK,new TaskKillAckProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE_ACK, new TaskKillAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, new HostUpdateProcessor());
@@ -198,6 +204,11 @@ public class WorkerServer implements IStoppable {
             this.nettyRemotingServer.close();
             this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
+
+            // kill running tasks
+            this.killAllRunningTasks();
+
+            // close the application context
             this.springApplicationContext.close();
             logger.info("springApplicationContext close");
             try {
@@ -216,5 +227,22 @@ public class WorkerServer implements IStoppable {
     @Override
     public void stop(String cause) {
         close(cause);
+    }
+
+    /**
+     * kill all tasks which are running
+     */
+    public void killAllRunningTasks() {
+        Collection<TaskRequest> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
+        logger.info("ready to kill all cache job, job size:{}", taskRequests.size());
+
+        if (CollectionUtils.isEmpty(taskRequests)) {
+            return;
+        }
+
+        for (TaskRequest taskRequest : taskRequests) {
+            // kill task when it's not finished yet
+            org.apache.dolphinscheduler.plugin.task.api.ProcessUtils.kill(taskRequest);
+        }
     }
 }
