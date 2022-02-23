@@ -37,7 +37,8 @@ import { useFullscreen } from '@vueuse/core'
 import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
 import type { Graph } from '@antv/x6'
-import StartParam from './dag-startup-param'
+import StartupParam from './dag-startup-param'
+import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 
 const props = {
   layoutToggle: {
@@ -63,7 +64,8 @@ export default defineComponent({
   setup(props, context) {
     const { t } = useI18n()
 
-    const startupPopover = ref(false)
+    const startupPopoverRef = ref(false)
+    const paramPopoverRef = ref(false)
 
     const themeStore = useThemeStore()
 
@@ -152,10 +154,6 @@ export default defineComponent({
       }
     }
 
-    // const handleUpdateShow = () => {
-    //   startupPopover.value
-    // }
-
     return () => (
       <div
         class={[
@@ -173,7 +171,7 @@ export default defineComponent({
               quaternary
               circle
               onClick={() => copy(props.definition?.processDefinition?.name)}
-              class={Styles['copy-btn']}
+              class={Styles['toolbar-btn']}
             >
               <NIcon>
                 <CopyOutlined />
@@ -182,18 +180,8 @@ export default defineComponent({
           )}
           {route.name === 'workflow-instance-detail' && (
             <>
-              <NButton
-                quaternary
-                circle
-                onClick={() => copy(props.definition?.processDefinition?.name)}
-                class={Styles['copy-btn']}
-              >
-                <NIcon>
-                  <FundViewOutlined />
-                </NIcon>
-              </NButton>
               <NPopover
-                show={startupPopover.value}
+                show={paramPopoverRef.value}
                 placement='bottom'
                 trigger='manual'
               >
@@ -203,9 +191,38 @@ export default defineComponent({
                       quaternary
                       circle
                       onClick={() =>
-                        (startupPopover.value = !startupPopover.value)
+                        (paramPopoverRef.value = !paramPopoverRef.value)
                       }
-                      class={Styles['copy-btn']}
+                      class={Styles['toolbar-btn']}
+                    >
+                      <NIcon>
+                        <FundViewOutlined />
+                      </NIcon>
+                    </NButton>
+                  ),
+                  header: () => (
+                    <NText strong depth={1}>
+                      {t('project.workflow.parameters_variables')}
+                    </NText>
+                  ),
+                  default: () => <VariablesView onCopy={copy} />
+                }}
+              </NPopover>
+
+              <NPopover
+                show={startupPopoverRef.value}
+                placement='bottom'
+                trigger='manual'
+              >
+                {{
+                  trigger: () => (
+                    <NButton
+                      quaternary
+                      circle
+                      onClick={() =>
+                        (startupPopoverRef.value = !startupPopoverRef.value)
+                      }
+                      class={Styles['toolbar-btn']}
                     >
                       <NIcon>
                         <RightCircleOutlined />
@@ -218,7 +235,7 @@ export default defineComponent({
                     </NText>
                   ),
                   default: () => (
-                    <StartParam startupParam={props.instance.value} />
+                    <StartupParam startupParam={props.instance.value} />
                   )
                 }}
               </NPopover>

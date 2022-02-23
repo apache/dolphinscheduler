@@ -472,7 +472,10 @@ const project = {
     serial_wait: '串行等待',
     executing: '正在执行',
     startup_type: '启动类型',
-    complement_range: '补数范围'
+    complement_range: '补数范围',
+    parameters_variables: '参数变量',
+    global_parameters: '全局参数',
+    local_parameters: '局部参数'
   },
   task: {
     task_name: '任务名称',

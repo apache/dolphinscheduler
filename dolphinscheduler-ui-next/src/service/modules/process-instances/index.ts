@@ -125,7 +125,7 @@ export function vieGanttTree(id: IdReq, code: CodeReq): any {
   })
 }
 
-export function viewVariables(id: IdReq, code: CodeReq): any {
+export function viewVariables(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-variables`,
     method: 'get'
