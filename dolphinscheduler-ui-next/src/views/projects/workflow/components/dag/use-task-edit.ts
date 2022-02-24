@@ -37,10 +37,11 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-
   const { addNode, setNodeName } = useCellUpdate({ graph })
 
-  const taskDefinitions = ref<NodeData[]>([])
+  const taskDefinitions = ref<NodeData[]>(
+    definition.value?.taskDefinitionList || []
+  )
   const currTask = ref<NodeData>({
     taskType: 'SHELL',
     code: 0,
