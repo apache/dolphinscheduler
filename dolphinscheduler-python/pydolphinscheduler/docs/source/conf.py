@@ -55,6 +55,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
     "sphinx_rtd_theme",
+    # Documenting command line interface
+    "sphinx_click.ext",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
