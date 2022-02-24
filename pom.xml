@@ -133,6 +133,8 @@
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
+        <docker.build.skip>true</docker.build.skip>
+        <docker.push.skip>true</docker.push.skip>
     </properties>
 
     <dependencyManagement>
@@ -1002,6 +1004,7 @@
                                 <goal>exec</goal>
                             </goals>
                             <configuration>
+                                <skip>${docker.build.skip}</skip>
                                 <environmentVariables>
                                     <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
                                 </environmentVariables>
@@ -1026,6 +1029,7 @@
                                 <goal>exec</goal>
                             </goals>
                             <configuration>
+                                <skip>${docker.push.skip}</skip>
                                 <environmentVariables>
                                     <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
                                 </environmentVariables>
@@ -1232,6 +1236,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <docker.build.skip>false</docker.build.skip>
+                <docker.push.skip>false</docker.push.skip>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <!--
