@@ -29,7 +29,7 @@ import lombok.Getter;
 
 @Getter
 public final class LogoutPage extends NavBarPage {
-    @FindBy(className = "userDropdown")
+    @FindBy(id = "userDropdown")
     private WebElement buttonDropDown;
 
     @FindBy(className = "logout")
