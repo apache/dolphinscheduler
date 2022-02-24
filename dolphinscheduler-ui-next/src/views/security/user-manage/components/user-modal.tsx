@@ -121,7 +121,7 @@ export const UserModal = defineComponent({
                     multiple
                     cascade
                     checkable
-                    checkStrategy="child"
+                    checkStrategy='child'
                     defaultExpandAll
                     options={this.resourceTree}
                     v-model:value={this.authorizedFiles}

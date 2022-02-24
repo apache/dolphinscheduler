@@ -17,9 +17,10 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData, ITaskData } from '../types'
+import type { IJsonItem, INodeData } from '../types'
+import { ITaskData } from '../types'
 
-export function usePigeon({
+export function useSeaTunnel({
   projectCode,
   from = 0,
   readonly,
@@ -32,16 +33,22 @@ export function usePigeon({
 }) {
   const model = reactive({
     name: '',
+    taskType: 'SEATUNNEL',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
+    localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    targetJobName: ''
+    deployMode: 'client',
+    queue: 'default',
+    master: 'yarn',
+    masterUrl: '',
+    resourceFiles: []
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -67,12 +74,12 @@ export function usePigeon({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useTargetTaskName(),
+      ...Fields.useSeaTunnel(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

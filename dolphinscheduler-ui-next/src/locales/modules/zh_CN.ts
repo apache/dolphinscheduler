@@ -470,7 +470,16 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
-    executing: '正在执行'
+    executing: '正在执行',
+    startup_type: '启动类型',
+    complement_range: '补数范围',
+    parameters_variables: '参数变量',
+    global_parameters: '全局参数',
+    local_parameters: '局部参数',
+    type: '类型',
+    retry_count: '重试次数',
+    submit_time: '提交时间',
+    refresh_status_succeeded: '刷新状态成功'
   },
   task: {
     task_name: '任务名称',
@@ -530,6 +539,7 @@ const project = {
     save: '保存',
     close: '关闭',
     format: '格式化',
+    refresh_dag_status: '刷新DAG状态',
     layout_type: '布局类型',
     grid_layout: '网格布局',
     dagre_layout: '层次布局',
@@ -737,7 +747,12 @@ const project = {
     only_update: '只更新',
     allow_insert: '无更新便插入',
     concurrency: '并发度',
-    concurrency_tips: '请输入并发度'
+    concurrency_tips: '请输入并发度',
+    sea_tunnel_deploy_mode: '部署方式',
+    sea_tunnel_master: 'Master',
+    sea_tunnel_master_url: 'Master URL',
+    sea_tunnel_queue: '队列',
+    sea_tunnel_master_url_tips: '请直接填写地址,例如:127.0.0.1:7077'
   }
 }
 

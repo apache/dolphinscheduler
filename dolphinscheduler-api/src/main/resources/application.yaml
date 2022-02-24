@@ -104,6 +104,9 @@ registry:
 audit:
   enabled: false
 
+metrics:
+  enabled: true
+
 # Override by profile
 
 ---

@@ -539,7 +539,9 @@ CREATE TABLE `t_ds_process_task_relation` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `idx_code` (`project_code`,`process_definition_code`)
+  KEY `idx_code` (`project_code`,`process_definition_code`),
+  KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`),
+  KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -959,7 +961,7 @@ INSERT INTO `t_ds_version` VALUES ('1', '2.0.2');
 -- Records of t_ds_alertgroup
 -- ----------------------------
 INSERT INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- ----------------------------
 -- Records of t_ds_user

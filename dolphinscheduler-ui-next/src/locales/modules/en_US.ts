@@ -472,7 +472,16 @@ const project = {
     delay_execution: 'Delay execution',
     forced_success: 'Forced success',
     serial_wait: 'Serial wait',
-    executing: 'Executing'
+    executing: 'Executing',
+    startup_type: 'Startup Type',
+    complement_range: 'Complement Range',
+    parameters_variables: 'Parameters variables',
+    global_parameters: 'Global parameters',
+    local_parameters: 'Local parameters',
+    type: 'Type',
+    retry_count: 'Retry Count',
+    submit_time: 'Submit Time',
+    refresh_status_succeeded: 'Refresh status succeeded'
   },
   task: {
     task_name: 'Task Name',
@@ -532,6 +541,7 @@ const project = {
     save: 'Save',
     close: 'Close',
     format: 'Format',
+    refresh_dag_status: 'Refresh DAG status',
     layout_type: 'Layout Type',
     grid_layout: 'Grid',
     dagre_layout: 'Dagre',
@@ -745,7 +755,13 @@ const project = {
     only_update: 'OnlyUpdate',
     allow_insert: 'AllowInsert',
     concurrency: 'Concurrency',
-    concurrency_tips: 'Please enter Concurrency'
+    concurrency_tips: 'Please enter Concurrency',
+    sea_tunnel_deploy_mode: 'Deploy Mode',
+    sea_tunnel_master: 'Master',
+    sea_tunnel_master_url: 'Master URL',
+    sea_tunnel_queue: 'Queue',
+    sea_tunnel_master_url_tips:
+      'Please enter the master url, e.g., 127.0.0.1:7077'
   }
 }
 

@@ -331,3 +331,22 @@ export function uuid(prefix: string) {
       : prefix + id
     : id
 }
+
+export const warningTypeList = [
+  {
+    id: 'NONE',
+    code: 'project.workflow.none_send'
+  },
+  {
+    id: 'SUCCESS',
+    code: 'project.workflow.success_send'
+  },
+  {
+    id: 'FAILURE',
+    code: 'project.workflow.failure_send'
+  },
+  {
+    id: 'ALL',
+    code: 'project.workflow.all_send'
+  }
+]

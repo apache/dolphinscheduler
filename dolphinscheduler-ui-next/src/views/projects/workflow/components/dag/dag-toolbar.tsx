@@ -18,7 +18,7 @@
 import { defineComponent, ref, inject, PropType, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
-import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
+import { NTooltip, NIcon, NButton, NSelect, NPopover, NText } from 'naive-ui'
 import {
   SearchOutlined,
   DownloadOutlined,
@@ -27,14 +27,19 @@ import {
   InfoCircleOutlined,
   FormatPainterOutlined,
   CopyOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  RightCircleOutlined,
+  FundViewOutlined,
+  SyncOutlined
 } from '@vicons/antd'
 import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
 import type { Graph } from '@antv/x6'
+import StartupParam from './dag-startup-param'
+import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 
 const props = {
   layoutToggle: {
@@ -42,6 +47,10 @@ const props = {
     default: () => {}
   },
   // If this prop is passed, it means from definition detail
+  instance: {
+    type: Object as PropType<any>,
+    default: null
+  },
   definition: {
     // The same as the structure responsed by the queryProcessDefinitionByCode api
     type: Object as PropType<any>,
@@ -52,14 +61,18 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle', 'saveModelToggle', 'removeTasks'],
+  emits: ['versionToggle', 'saveModelToggle', 'removeTasks', 'refresh'],
   setup(props, context) {
     const { t } = useI18n()
+
+    const startupPopoverRef = ref(false)
+    const paramPopoverRef = ref(false)
 
     const themeStore = useThemeStore()
 
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
+    const route = useRoute()
 
     /**
      * Node search and navigate
@@ -159,12 +172,75 @@ export default defineComponent({
               quaternary
               circle
               onClick={() => copy(props.definition?.processDefinition?.name)}
-              class={Styles['copy-btn']}
+              class={Styles['toolbar-btn']}
             >
               <NIcon>
                 <CopyOutlined />
               </NIcon>
             </NButton>
+          )}
+          {route.name === 'workflow-instance-detail' && (
+            <>
+              <NPopover
+                show={paramPopoverRef.value}
+                placement='bottom'
+                trigger='manual'
+              >
+                {{
+                  trigger: () => (
+                    <NButton
+                      quaternary
+                      circle
+                      onClick={() =>
+                        (paramPopoverRef.value = !paramPopoverRef.value)
+                      }
+                      class={Styles['toolbar-btn']}
+                    >
+                      <NIcon>
+                        <FundViewOutlined />
+                      </NIcon>
+                    </NButton>
+                  ),
+                  header: () => (
+                    <NText strong depth={1}>
+                      {t('project.workflow.parameters_variables')}
+                    </NText>
+                  ),
+                  default: () => <VariablesView onCopy={copy} />
+                }}
+              </NPopover>
+
+              <NPopover
+                show={startupPopoverRef.value}
+                placement='bottom'
+                trigger='manual'
+              >
+                {{
+                  trigger: () => (
+                    <NButton
+                      quaternary
+                      circle
+                      onClick={() =>
+                        (startupPopoverRef.value = !startupPopoverRef.value)
+                      }
+                      class={Styles['toolbar-btn']}
+                    >
+                      <NIcon>
+                        <RightCircleOutlined />
+                      </NIcon>
+                    </NButton>
+                  ),
+                  header: () => (
+                    <NText strong depth={1}>
+                      {t('project.workflow.startup_parameter')}
+                    </NText>
+                  ),
+                  default: () => (
+                    <StartupParam startupParam={props.instance.value} />
+                  )
+                }}
+              </NPopover>
+            </>
           )}
         </div>
         <div class={Styles['toolbar-right-part']}>
@@ -227,6 +303,33 @@ export default defineComponent({
               default: () => t('project.dag.download_png')
             }}
           ></NTooltip>
+          {/* Refresh */}
+          {props.instance && (
+            <NTooltip
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    class={Styles['toolbar-right-item']}
+                    strong
+                    secondary
+                    circle
+                    type='info'
+                    onClick={() => {
+                      context.emit('refresh')
+                    }}
+                    v-slots={{
+                      icon: () => (
+                        <NIcon>
+                          <SyncOutlined />
+                        </NIcon>
+                      )
+                    }}
+                  />
+                ),
+                default: () => t('project.dag.refresh_dag_status')
+              }}
+            ></NTooltip>
+          )}
           {/* Delete */}
           <NTooltip
             v-slots={{
