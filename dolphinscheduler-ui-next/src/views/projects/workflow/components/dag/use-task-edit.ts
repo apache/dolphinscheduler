@@ -70,9 +70,10 @@ export function useTaskEdit(options: Options) {
     code: number,
     targetCode: number,
     type: TaskType,
+    flag: string,
     coordinate: Coordinate
   ) {
-    addNode(code + '', type, name, coordinate)
+    addNode(code + '', type, name, flag, coordinate)
     const definition = taskDefinitions.value.find((t) => t.code === targetCode)
 
     const newDefinition = {

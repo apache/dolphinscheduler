@@ -85,10 +85,11 @@ export default defineComponent({
       const type = props.cell?.data.taskType
       const taskName = uuid(props.cell?.data.taskName + '_')
       const targetCode = Number(props.cell?.id)
+      const flag = props.cell?.data.flag
 
       genTaskCodeList(genNums, projectCode).then((res) => {
         const [code] = res
-        ctx.emit('copyTask', taskName, code, targetCode, type, {
+        ctx.emit('copyTask', taskName, code, targetCode, type, flag, {
           x: props.left + 100,
           y: props.top + 100
         })
