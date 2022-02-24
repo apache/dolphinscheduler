@@ -53,7 +53,6 @@ public class BusinessTimeUtils {
                 if (runTime == null) {
                     return result;
                 }
-                break;
             case START_PROCESS:
             case START_CURRENT_TASK_PROCESS:
             case RECOVER_TOLERANCE_FAULT_PROCESS:
