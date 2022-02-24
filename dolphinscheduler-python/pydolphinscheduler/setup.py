@@ -31,12 +31,14 @@ version = "0.1.0"
 
 # Start package required
 prod = [
+    "click>=8.0.0",
     "py4j~=0.10",
 ]
 
 doc = [
     "sphinx>=4.3",
     "sphinx_rtd_theme>=1.0",
+    "sphinx-click>=3.0",
 ]
 
 test = [
@@ -124,5 +126,10 @@ setup(
         "style": style,
         "test": test,
         "doc": doc,
+    },
+    entry_points={
+        "console_scripts": [
+            "pydolphinscheduler = pydolphinscheduler.cli.commands:cli",
+        ],
     },
 )
