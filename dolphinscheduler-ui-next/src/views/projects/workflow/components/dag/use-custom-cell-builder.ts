@@ -68,6 +68,7 @@ export function useCustomCellBuilder() {
     id: string,
     type: string,
     taskName: string,
+    flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
   ): Node.Metadata {
     const truncation = taskName ? utils.truncateText(taskName, 18) : id
@@ -78,7 +79,8 @@ export function useCustomCellBuilder() {
       y: coordinate.y,
       data: {
         taskType: type,
-        taskName: taskName || id
+        taskName: taskName || id,
+        flag: flag
       },
       attrs: {
         image: {
@@ -87,6 +89,9 @@ export function useCustomCellBuilder() {
         },
         title: {
           text: truncation
+        },
+        rect: {
+          fill: flag === 'NO' ? '#f3f3f5' : '#ffffff'
         }
       }
     }
@@ -108,10 +113,16 @@ export function useCustomCellBuilder() {
 
     tasks.forEach((task) => {
       const location = locations.find((l) => l.taskCode === task.code) || {}
-      const node = buildNode(task.code + '', task.taskType, task.name, {
-        x: location.x,
-        y: location.y
-      })
+      const node = buildNode(
+        task.code + '',
+        task.taskType,
+        task.name,
+        task.flag,
+        {
+          x: location.x,
+          y: location.y
+        }
+      )
       nodes.push(node)
     })
 
