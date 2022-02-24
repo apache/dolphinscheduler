@@ -224,7 +224,7 @@ public class EmrTask extends AbstractTaskExecutor {
     public void cancelApplication(boolean status) throws Exception {
         super.cancelApplication(status);
 
-        logger.info("trying terminate job flow ");
+        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", taskId, clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
         logger.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
