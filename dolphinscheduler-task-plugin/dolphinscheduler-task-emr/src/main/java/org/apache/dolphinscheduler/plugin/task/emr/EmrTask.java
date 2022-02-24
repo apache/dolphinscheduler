@@ -143,12 +143,10 @@ public class EmrTask extends AbstractTaskExecutor {
 
         } catch (EmrTaskException | SdkBaseException e) {
             logger.error("emr task submit failed with error", e);
-            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
         } finally {
-            if (clusterStatus != null) {
-                calculateExitStatusCode(clusterStatus);
-                logger.info("emr task finished with cluster status : {}", clusterStatus);
-            }
+            final int exitStatusCode = calculateExitStatusCode(clusterStatus);
+            setExitStatusCode(exitStatusCode);
+            logger.info("emr task finished with cluster status : {}", clusterStatus);
         }
     }
 
@@ -173,30 +171,31 @@ public class EmrTask extends AbstractTaskExecutor {
      * calculate task exitStatusCode
      *
      * @param clusterStatus aws emr cluster status
+     * @return exitStatusCode
      */
-    private void calculateExitStatusCode(ClusterStatus clusterStatus) {
-        String state = clusterStatus.getState();
-        ClusterStateChangeReason stateChangeReason = clusterStatus.getStateChangeReason();
-        ClusterState clusterState = ClusterState.valueOf(state);
-        int exitStatusCode;
-        switch (clusterState) {
-            case TERMINATED:
-            case TERMINATING:
-                String code = stateChangeReason.getCode();
-                if (code != null && code.equalsIgnoreCase(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED.toString())) {
-                    exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
-                } else {
-                    exitStatusCode = TaskConstants.EXIT_CODE_KILL;
-                }
-                break;
-            case TERMINATED_WITH_ERRORS:
-                exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
-                break;
-            default:
-                exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
-                break;
+    private int calculateExitStatusCode(ClusterStatus clusterStatus) {
+        if (clusterStatus == null) {
+            return TaskConstants.EXIT_CODE_FAILURE;
+        } else {
+            String state = clusterStatus.getState();
+            ClusterStateChangeReason stateChangeReason = clusterStatus.getStateChangeReason();
+            ClusterState clusterState = ClusterState.valueOf(state);
+            switch (clusterState) {
+                case TERMINATED:
+                case TERMINATING:
+                    String code = stateChangeReason.getCode();
+                    if (code != null && code.equalsIgnoreCase(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED.toString())) {
+                        return TaskConstants.EXIT_CODE_SUCCESS;
+                    } else {
+                        return TaskConstants.EXIT_CODE_KILL;
+                    }
+                case TERMINATED_WITH_ERRORS:
+                    return TaskConstants.EXIT_CODE_FAILURE;
+                default:
+                    return TaskConstants.EXIT_CODE_SUCCESS;
+            }
         }
-        setExitStatusCode(exitStatusCode);
+
     }
 
     private ClusterStatus getClusterStatus() {
@@ -217,7 +216,7 @@ public class EmrTask extends AbstractTaskExecutor {
     }
 
     /**
-     * create emr client from aws named profiles file
+     * create emr client from BasicAWSCredentials
      *
      * @return AmazonElasticMapReduce
      */
