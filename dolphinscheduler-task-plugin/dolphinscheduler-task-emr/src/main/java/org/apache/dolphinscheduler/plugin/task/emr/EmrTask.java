@@ -96,13 +96,14 @@ public class EmrTask extends AbstractTaskExecutor {
 
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
-
     }
 
     @Override
     public void init() {
-        logger.info("emr task params:{}", taskExecutionContext.getTaskParams());
-        emrParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), EmrParameters.class);
+
+        final String taskParams = taskExecutionContext.getTaskParams();
+        logger.info("emr task params:{}", taskParams);
+        emrParameters = JSONUtils.parseObject(taskParams, EmrParameters.class);
         if (emrParameters == null || !emrParameters.checkParameters()) {
             throw new EmrTaskException("emr task params is not valid");
         }
@@ -119,6 +120,7 @@ public class EmrTask extends AbstractTaskExecutor {
             RunJobFlowResult result = emrClient.runJobFlow(runJobFlowRequest);
 
             clusterId = result.getJobFlowId();
+            setAppIds(clusterId);
 
             clusterStatus = getClusterStatus();
 
@@ -223,12 +225,10 @@ public class EmrTask extends AbstractTaskExecutor {
     @Override
     public void cancelApplication(boolean status) throws Exception {
         super.cancelApplication(status);
-
-        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", taskId, clusterId);
+        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId() , clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
         logger.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
-
     }
 
 }
