@@ -52,6 +52,9 @@ management:
 alert:
   port: 50052
 
+metrics:
+  enabled: true
+
 # Override by profile
 
 ---
