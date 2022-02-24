@@ -124,7 +124,8 @@ public class ShellTask extends AbstractTaskExecutor {
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
-        Path path = new File(fileName).toPath();
+        File file = new File(fileName);
+        Path path = file.toPath();
 
         if (Files.exists(path)) {
             return fileName;
@@ -143,6 +144,9 @@ public class ShellTask extends AbstractTaskExecutor {
         if (OSUtils.isWindows()) {
             Files.createFile(path);
         } else {
+            if (!file.getParentFile().exists()){
+                file.getParentFile().mkdirs();
+            }
             Files.createFile(path, attr);
         }
 
