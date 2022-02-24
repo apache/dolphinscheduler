@@ -16,7 +16,15 @@
  */
 
 import type { Graph } from '@antv/x6'
-import { defineComponent, ref, provide, PropType, toRef } from 'vue'
+import {
+  defineComponent,
+  ref,
+  provide,
+  PropType,
+  toRef,
+  onMounted,
+  watch
+} from 'vue'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
@@ -28,7 +36,8 @@ import {
   useDagDragAndDrop,
   useTaskEdit,
   useBusinessMapper,
-  useNodeMenu
+  useNodeMenu,
+  useNodeStatus
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
@@ -108,6 +117,8 @@ export default defineComponent({
       graph
     })
 
+    const { refreshTaskStatus } = useNodeStatus({ graph })
+
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
       readonly: toRef(props, 'readonly'),
@@ -154,6 +165,15 @@ export default defineComponent({
       })
       saveModelToggle(false)
     }
+
+    onMounted(() => {
+      refreshTaskStatus()
+    })
+
+    watch(
+      () => props.definition,
+      () => refreshTaskStatus()
+    )
 
     return () => (
       <div

@@ -477,7 +477,10 @@ const project = {
     complement_range: 'Complement Range',
     parameters_variables: 'Parameters variables',
     global_parameters: 'Global parameters',
-    local_parameters: 'Local parameters'
+    local_parameters: 'Local parameters',
+    type: 'Type',
+    retry_count: 'Retry Count',
+    submit_time: 'Submit Time'
   },
   task: {
     task_name: 'Task Name',
