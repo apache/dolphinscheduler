@@ -22,7 +22,6 @@ import {
   provide,
   PropType,
   toRef,
-  onMounted,
   watch,
   onBeforeUnmount
 } from 'vue'
@@ -194,6 +193,7 @@ export default defineComponent({
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
           onRemoveTasks={removeTasks}
+          onRefresh={refreshTaskStatus}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />

@@ -541,6 +541,7 @@ const project = {
     save: 'Save',
     close: 'Close',
     format: 'Format',
+    refresh_dag_status: 'Refresh DAG status',
     layout_type: 'Layout Type',
     grid_layout: 'Grid',
     dagre_layout: 'Dagre',

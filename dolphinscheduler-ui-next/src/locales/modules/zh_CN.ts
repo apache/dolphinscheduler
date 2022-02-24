@@ -539,6 +539,7 @@ const project = {
     save: '保存',
     close: '关闭',
     format: '格式化',
+    refresh_dag_status: '刷新DAG状态',
     layout_type: '布局类型',
     grid_layout: '网格布局',
     dagre_layout: '层次布局',
