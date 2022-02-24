@@ -63,7 +63,7 @@ public class LogUtils {
             .map(TaskLogDiscriminator::getLogBase)
             .map(e -> Paths.get(e)
                 .toAbsolutePath()
-                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD))
+                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD, null))
                 .resolve(taskLogFileName))
             .map(Path::toString)
             .orElse("");

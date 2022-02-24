@@ -24,8 +24,6 @@ import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * RuleInputEntry
  */
@@ -98,12 +96,10 @@ public class DqRuleInputEntry implements Serializable {
     /**
      * create_time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     /**
      * update_time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public int getId() {

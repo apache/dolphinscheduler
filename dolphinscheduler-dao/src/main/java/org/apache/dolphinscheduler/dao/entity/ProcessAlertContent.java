@@ -56,10 +56,8 @@ public class ProcessAlertContent implements Serializable {
     private Flag recovery;
     @JsonProperty("runTimes")
     private Integer runTimes;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("processStartTime")
     private Date processStartTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("processEndTime")
     private Date processEndTime;
     @JsonProperty("processHost")
@@ -78,10 +76,8 @@ public class ProcessAlertContent implements Serializable {
     private Integer retryTimes;
     @JsonProperty("taskState")
     private ExecutionStatus taskState;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("taskStartTime")
     private Date taskStartTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("taskEndTime")
     private Date taskEndTime;
     @JsonProperty("taskHost")

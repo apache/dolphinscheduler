@@ -274,7 +274,8 @@
             schedule: JSON.stringify({
               startTime: this.scheduleTime[0],
               endTime: this.scheduleTime[1],
-              crontab: this.crontab
+              crontab: this.crontab,
+              timezoneId: this.timezoneId
             })
           }
 

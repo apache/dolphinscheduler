@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
+
+import javax.management.timer.Timer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -205,5 +208,21 @@ public class DateUtilsTest {
     public void testGetTimezone() {
         Assert.assertNull(DateUtils.getTimezone(null));
         Assert.assertEquals(TimeZone.getTimeZone("MST"), DateUtils.getTimezone("MST"));
+    }
+
+    @Test
+    public void testTimezone() {
+        String time = "2019-01-28 00:00:00";
+        ThreadLocalContext.timezoneThreadLocal.set("UTC");
+        Date utcDate = DateUtils.stringToDate(time);
+
+        Assert.assertEquals(time, DateUtils.dateToString(utcDate));
+
+        ThreadLocalContext.timezoneThreadLocal.set("Asia/Shanghai");
+        Date shanghaiDate = DateUtils.stringToDate(time);
+
+        Assert.assertEquals(time, DateUtils.dateToString(shanghaiDate));
+
+        Assert.assertEquals(Timer.ONE_HOUR * 8, utcDate.getTime() - shanghaiDate.getTime());
     }
 }

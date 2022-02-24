@@ -337,14 +337,14 @@ public class TimePlaceholderUtils {
 
                 Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
 
-                String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
+                String dateStr = DateUtils.format(entry.getKey(), entry.getValue(), null);
 
-                Date timestamp = DateUtils.parse(dateStr, Constants.PARAMETER_FORMAT_TIME);
+                Date timestamp = DateUtils.parse(dateStr, Constants.PARAMETER_FORMAT_TIME, null);
 
                 value = String.valueOf(timestamp.getTime() / 1000);
             } else {
                 Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
-                value = DateUtils.format(entry.getKey(), entry.getValue());
+                value = DateUtils.format(entry.getKey(), entry.getValue(), null);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

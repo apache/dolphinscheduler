@@ -37,6 +37,8 @@ import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import java.util.TimeZone;
+
 import javax.annotation.PostConstruct;
 
 import org.quartz.Scheduler;
@@ -44,6 +46,7 @@ import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -101,6 +104,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private LoggerRequestProcessor loggerRequestProcessor;
 
+    @Value("${spring.jackson.time-zone:UTC}")
+    private String timezone;
+
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         SpringApplication.run(MasterServer.class);
@@ -111,6 +117,8 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run() throws SchedulerException {
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
+
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());

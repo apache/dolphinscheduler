@@ -24,6 +24,9 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 
+import org.apache.dolphinscheduler.data.quality.Constants;
+
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -49,7 +52,8 @@ public class JsonUtils {
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .configure(FAIL_ON_EMPTY_BEANS,false)
-            .setTimeZone(TimeZone.getDefault());
+            .setTimeZone(TimeZone.getDefault())
+            .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JsonUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");

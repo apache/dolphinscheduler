@@ -45,10 +45,8 @@ public class TaskAlertContent implements Serializable {
     private String processInstanceName;
     @JsonProperty("state")
     private ExecutionStatus state;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("startTime")
     private Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("endTime")
     private Date endTime;
     @JsonProperty("host")
