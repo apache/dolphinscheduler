@@ -219,6 +219,7 @@ export default defineComponent({
           definition={props.definition}
         />
         <TaskModal
+          readonly={props.readonly}
           show={taskModalVisible.value}
           projectCode={props.projectCode}
           data={currTask.value as any}
