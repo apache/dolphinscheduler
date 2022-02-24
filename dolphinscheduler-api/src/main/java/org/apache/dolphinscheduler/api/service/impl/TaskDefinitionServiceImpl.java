@@ -202,6 +202,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 return result;
             }
         }
+        List<ProcessTaskRelationLog> processTaskRelationLogList = Lists.newArrayList();
         if (StringUtils.isNotBlank(upstreamCodes)) {
             Set<Long> upstreamTaskCodes = Arrays.stream(upstreamCodes.split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
             List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper.queryByCodeList(upstreamTaskCodes);
@@ -212,7 +213,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 putMsg(result, Status.TASK_DEFINE_NOT_EXIST, StringUtils.join(diffCode, Constants.COMMA));
                 return result;
             }
-            List<ProcessTaskRelationLog> processTaskRelationLogList = Lists.newArrayList();
             for (TaskDefinition upstreamTask : upstreamTaskDefinitionList) {
                 ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
                 processTaskRelationLog.setPreTaskCode(upstreamTask.getCode());
@@ -227,13 +227,23 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             if (!processTaskRelationList.isEmpty()) {
                 processTaskRelationLogList.addAll(processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList()));
             }
-            int insertResult = processService.saveTaskRelation(loginUser, projectCode, processDefinition.getCode(), processDefinition.getVersion(),
-                    processTaskRelationLogList, Lists.newArrayList(), Boolean.TRUE);
-            if (insertResult != Constants.EXIT_CODE_SUCCESS) {
-                putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-                throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-            }
+        } else {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setPreTaskCode(0);
+            processTaskRelationLog.setPreTaskVersion(0);
+            processTaskRelationLog.setPostTaskCode(taskCode);
+            processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
+            processTaskRelationLog.setConditionType(ConditionType.NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogList.add(processTaskRelationLog);
         }
+        int insertResult = processService.saveTaskRelation(loginUser, projectCode, processDefinition.getCode(), processDefinition.getVersion(),
+            processTaskRelationLogList, Lists.newArrayList(), Boolean.TRUE);
+        if (insertResult != Constants.EXIT_CODE_SUCCESS) {
+            putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+        }
+
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, Lists.newArrayList(taskDefinition), Boolean.TRUE);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
