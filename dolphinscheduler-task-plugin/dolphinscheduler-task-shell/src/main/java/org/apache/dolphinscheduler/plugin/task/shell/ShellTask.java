@@ -145,7 +145,7 @@ public class ShellTask extends AbstractTaskExecutor {
             Files.createFile(path);
         } else {
             if (!file.getParentFile().exists()){
-                file.getParentFile().mkdir();
+                file.getParentFile().mkdirs();
             }
             Files.createFile(path, attr);
         }
