@@ -52,8 +52,6 @@ import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.google.common.collect.Sets;
 
 public class EmrTask extends AbstractTaskExecutor {
@@ -78,28 +76,16 @@ public class EmrTask extends AbstractTaskExecutor {
 
     /**
      * config ObjectMapper features and propertyNamingStrategy
-     * support capital letters parse
+     * use UpperCamelCaseStrategy support capital letters parse
+     * @see PropertyNamingStrategy.UpperCamelCaseStrategy
      */
     private static final ObjectMapper objectMapper = new ObjectMapper()
         .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
         .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
         .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
         .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-        .setPropertyNamingStrategy(new PropertyNamingStrategy() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String nameForSetterMethod(MapperConfig<?> config,
-                                              AnnotatedMethod method, String defaultName) {
-                return method.getName().substring(3);
-            }
-
-            @Override
-            public String nameForGetterMethod(MapperConfig<?> config,
-                                              AnnotatedMethod method, String defaultName) {
-                return method.getName().substring(3);
-            }
-        }).setTimeZone(TimeZone.getDefault());
+        .setTimeZone(TimeZone.getDefault())
+        .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     /**
      * constructor
@@ -181,6 +167,8 @@ public class EmrTask extends AbstractTaskExecutor {
             ClusterStateChangeReason stateChangeReason = clusterStatus.getStateChangeReason();
             ClusterState clusterState = ClusterState.valueOf(state);
             switch (clusterState) {
+                case WAITING:
+                    return TaskConstants.EXIT_CODE_SUCCESS;
                 case TERMINATED:
                 case TERMINATING:
                     String code = stateChangeReason.getCode();
@@ -189,10 +177,8 @@ public class EmrTask extends AbstractTaskExecutor {
                     } else {
                         return TaskConstants.EXIT_CODE_KILL;
                     }
-                case TERMINATED_WITH_ERRORS:
-                    return TaskConstants.EXIT_CODE_FAILURE;
                 default:
-                    return TaskConstants.EXIT_CODE_SUCCESS;
+                    return TaskConstants.EXIT_CODE_FAILURE;
             }
         }
 

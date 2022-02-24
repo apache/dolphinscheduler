@@ -28,6 +28,7 @@ public class EmrParameters extends AbstractParameters {
 
     /**
      * job flow define in json format
+     * @see <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples">API_RunJobFlow_Examples</a>
      */
     private String jobFlowDefineJson;
 
