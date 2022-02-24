@@ -475,7 +475,10 @@ const project = {
     complement_range: '补数范围',
     parameters_variables: '参数变量',
     global_parameters: '全局参数',
-    local_parameters: '局部参数'
+    local_parameters: '局部参数',
+    type: '类型',
+    retry_count: '重试次数',
+    submit_time: '提交时间'
   },
   task: {
     task_name: '任务名称',
