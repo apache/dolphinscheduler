@@ -29,7 +29,8 @@ import {
   CopyOutlined,
   DeleteOutlined,
   RightCircleOutlined,
-  FundViewOutlined
+  FundViewOutlined,
+  SyncOutlined
 } from '@vicons/antd'
 import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
@@ -60,7 +61,7 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle', 'saveModelToggle', 'removeTasks'],
+  emits: ['versionToggle', 'saveModelToggle', 'removeTasks', 'refresh'],
   setup(props, context) {
     const { t } = useI18n()
 
@@ -302,6 +303,33 @@ export default defineComponent({
               default: () => t('project.dag.download_png')
             }}
           ></NTooltip>
+          {/* Refresh */}
+          {props.instance && (
+            <NTooltip
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    class={Styles['toolbar-right-item']}
+                    strong
+                    secondary
+                    circle
+                    type='info'
+                    onClick={() => {
+                      context.emit('refresh')
+                    }}
+                    v-slots={{
+                      icon: () => (
+                        <NIcon>
+                          <SyncOutlined />
+                        </NIcon>
+                      )
+                    }}
+                  />
+                ),
+                default: () => t('project.dag.refresh_dag_status')
+              }}
+            ></NTooltip>
+          )}
           {/* Delete */}
           <NTooltip
             v-slots={{

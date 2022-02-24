@@ -480,7 +480,8 @@ const project = {
     local_parameters: 'Local parameters',
     type: 'Type',
     retry_count: 'Retry Count',
-    submit_time: 'Submit Time'
+    submit_time: 'Submit Time',
+    refresh_status_succeeded: 'Refresh status succeeded'
   },
   task: {
     task_name: 'Task Name',
@@ -540,6 +541,7 @@ const project = {
     save: 'Save',
     close: 'Close',
     format: 'Format',
+    refresh_dag_status: 'Refresh DAG status',
     layout_type: 'Layout Type',
     grid_layout: 'Grid',
     dagre_layout: 'Dagre',
