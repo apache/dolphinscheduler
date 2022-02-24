@@ -175,9 +175,9 @@ public class EmrTaskTest {
     }
 
     @Test
-    public void testRunJobFlowRequestNull() throws Exception {
+    public void testCanNotParseJson() throws Exception {
         mockStatic(JSONUtils.class);
-        when(JSONUtils.parseObject(any())).thenReturn(null);
+        when(emrTask, "createRunJobFlowRequest").thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
         emrTask.handle();
         Assert.assertEquals(EXIT_CODE_FAILURE, emrTask.getExitStatusCode());
     }
