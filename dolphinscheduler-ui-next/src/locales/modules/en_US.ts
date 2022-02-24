@@ -480,7 +480,8 @@ const project = {
     local_parameters: 'Local parameters',
     type: 'Type',
     retry_count: 'Retry Count',
-    submit_time: 'Submit Time'
+    submit_time: 'Submit Time',
+    refresh_status_succeeded: 'Refresh status succeeded'
   },
   task: {
     task_name: 'Task Name',

@@ -478,7 +478,8 @@ const project = {
     local_parameters: '局部参数',
     type: '类型',
     retry_count: '重试次数',
-    submit_time: '提交时间'
+    submit_time: '提交时间',
+    refresh_status_succeeded: '刷新状态成功'
   },
   task: {
     task_name: '任务名称',

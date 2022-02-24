@@ -65,7 +65,7 @@ export function useNodeStatus(options: Options) {
     const instanceId = Number(route.params.id)
 
     queryTaskListByProcessId(instanceId, projectCode).then((res: any) => {
-      window.$message.success(t('project.workflow.success'))
+      window.$message.success(t('project.workflow.refresh_status_succeeded'))
       const { taskList } = res
       if (taskList) {
         taskList.forEach((taskInstance: any) => {
