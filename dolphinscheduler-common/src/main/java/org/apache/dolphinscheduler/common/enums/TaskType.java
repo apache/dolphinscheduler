@@ -60,7 +60,8 @@ public enum TaskType {
     SWITCH(14, "SWITCH"),
     PIGEON(15, "PIGEON"),
     DATA_QUALITY(16, "DATA_QUALITY"),
-    EMR(17, "EMR");
+    EMR(17, "EMR"),
+    ;
 
     TaskType(int code, String desc) {
         this.code = code;
