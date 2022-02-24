@@ -1346,9 +1346,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             // query resource relation
             relationResources = queryResourceList(userId, 0);
         }
+        // filter by resource type
+        List<Resource> relationTypeResources =
+                relationResources.stream().filter(rs -> rs.getType() == type).collect(Collectors.toList());
 
         List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        ownResourceList.addAll(relationResources);
+        ownResourceList.addAll(relationTypeResources);
 
         return ownResourceList;
     }
