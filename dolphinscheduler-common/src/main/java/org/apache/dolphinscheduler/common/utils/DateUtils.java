@@ -492,7 +492,7 @@ public final class DateUtils {
      * @return current date
      */
     public static Date getCurrentDate() {
-        return DateUtils.parse(DateUtils.getCurrentTime(), Constants.YYYY_MM_DD_HH_MM_SS, null);
+        return new Date();
     }
 
     /**

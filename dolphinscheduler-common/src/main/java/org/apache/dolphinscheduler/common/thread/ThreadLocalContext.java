@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.common.thread;
  */
 public class ThreadLocalContext {
 
-    public static ThreadLocal<String> timezoneThreadLocal = new ThreadLocal<>();
+    public static final ThreadLocal<String> timezoneThreadLocal = new ThreadLocal<>();
 
     public static ThreadLocal<String> getTimezoneThreadLocal() {
         return timezoneThreadLocal;
