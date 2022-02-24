@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DependResult;
@@ -63,15 +61,15 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,11 +85,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 
 /**
  * master exec thread,split dag
@@ -438,7 +440,6 @@ public class WorkflowExecuteThread {
 
         if (taskInstance.getState().typeIsSuccess()) {
             completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-            processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
         } else if (taskInstance.taskCanRetry() && processInstance.getState() != ExecutionStatus.READY_STOP) {
@@ -453,6 +454,41 @@ public class WorkflowExecuteThread {
                 errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                     killAllTasks();
+                }
+            }
+        }
+        if(taskInstance.isSubProcess()) {
+            String thisTaskInstanceVarPool = taskInstance.getVarPool();
+            if(StringUtils.isNotEmpty(thisTaskInstanceVarPool)) {
+                SubTaskProcessor subProcessProcessor = (SubTaskProcessor) activeTaskProcessorMaps.get(taskInstance.getTaskCode());
+                String subProcessInstanceVarPool = null;
+                if (subProcessProcessor != null && subProcessProcessor.getSubProcessInstance() != null) {
+                    subProcessInstanceVarPool = subProcessProcessor.getSubProcessInstance().getVarPool();
+                } else {
+                    ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+                    if (subProcessInstance != null) {
+                        subProcessInstanceVarPool = subProcessInstance.getVarPool();
+                    }
+                }
+                if (StringUtils.isNotEmpty(subProcessInstanceVarPool)) {
+                    List<Property> varPoolProperties = JSONUtils.toList(thisTaskInstanceVarPool, Property.class);
+                    Map<String, Object> taskParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+                    Object localParams = taskParams.get(LOCAL_PARAMS);
+                    if (localParams != null) {
+                        List<Property> properties = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+                        Map<String, String> subProcessParam = JSONUtils.toList(subProcessInstanceVarPool, Property.class).stream()
+                                .collect(Collectors.toMap(Property::getProp, Property::getValue));
+                        List<Property> outProperties = properties.stream().filter(r -> Direct.OUT == r.getDirect()).collect(Collectors.toList());
+                        for (Property info : outProperties) {
+                            info.setValue(subProcessParam.get(info.getProp()));
+                            varPoolProperties.add(info);
+                        }
+                        taskInstance.setVarPool(JSONUtils.toJsonString(varPoolProperties));
+                        //deal with localParam for show in the page
+                        processService.changeOutParam(taskInstance);
+                        this.processService.updateTaskInstance(taskInstance);
+                    }
                 }
             }
         }
@@ -1229,6 +1265,24 @@ public class WorkflowExecuteThread {
             }
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
             taskInstances.add(task);
+        }
+        //the end node of the branch of the dag
+        if (StringUtils.isNotEmpty(parentNodeCode)&&dag.getEndNode().contains(parentNodeCode)){
+            TaskInstance endTaskInstance = taskInstanceMap.get(completeTaskMap.get(NumberUtils.toLong(parentNodeCode)));
+            String taskInstanceVarPool = endTaskInstance.getVarPool();
+            if(StringUtils.isNotEmpty(taskInstanceVarPool)) {
+                Set<Property> taskProperties = JSONUtils.toList(taskInstanceVarPool, Property.class)
+                        .stream().collect(Collectors.toSet());
+                String processInstanceVarPool = processInstance.getVarPool();
+                if (StringUtils.isNotEmpty(processInstanceVarPool)) {
+                    Set<Property> properties = JSONUtils.toList(processInstanceVarPool, Property.class)
+                            .stream().collect(Collectors.toSet());
+                    properties.addAll(taskProperties);
+                    processInstance.setVarPool(JSONUtils.toJsonString(properties));
+                }else{
+                    processInstance.setVarPool(JSONUtils.toJsonString(taskProperties));
+                }
+            }
         }
 
         // if previous node success , post node submit

@@ -179,4 +179,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     public String getType() {
         return TaskType.SUB_PROCESS.getDesc();
     }
+
+    public ProcessInstance getSubProcessInstance() {
+        return subProcessInstance;
+    }
 }
