@@ -22,8 +22,8 @@ import {
   provide,
   PropType,
   toRef,
-  onMounted,
-  watch
+  watch,
+  onBeforeUnmount
 } from 'vue'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
@@ -117,6 +117,7 @@ export default defineComponent({
       graph
     })
 
+    const statusTimerRef = ref()
     const { refreshTaskStatus } = useNodeStatus({ graph })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
@@ -166,14 +167,17 @@ export default defineComponent({
       saveModelToggle(false)
     }
 
-    onMounted(() => {
-      refreshTaskStatus()
-    })
-
     watch(
       () => props.definition,
-      () => refreshTaskStatus()
+      () => {
+        if (props.instance) {
+          refreshTaskStatus()
+          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 9000)
+        }
+      }
     )
+
+    onBeforeUnmount(() => clearInterval(statusTimerRef.value))
 
     return () => (
       <div
@@ -189,6 +193,7 @@ export default defineComponent({
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
           onRemoveTasks={removeTasks}
+          onRefresh={refreshTaskStatus}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />

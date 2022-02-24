@@ -21,7 +21,7 @@ import styles from './status.module.scss'
 
 const props = {
   t: {
-    type: Object as PropType<any>,
+    type: Function as PropType<any>,
     require: true
   },
   taskInstance: {
