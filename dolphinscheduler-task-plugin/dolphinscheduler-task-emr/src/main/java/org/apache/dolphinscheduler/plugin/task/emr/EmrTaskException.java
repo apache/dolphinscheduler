@@ -30,4 +30,7 @@ public class EmrTaskException extends RuntimeException {
         super(message);
     }
 
+    public EmrTaskException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

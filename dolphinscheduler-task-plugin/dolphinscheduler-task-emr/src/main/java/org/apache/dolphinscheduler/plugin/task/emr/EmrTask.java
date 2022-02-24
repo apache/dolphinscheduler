@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.emr;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
@@ -25,6 +30,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.HashSet;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.amazonaws.SdkBaseException;
@@ -43,6 +49,11 @@ import com.amazonaws.services.elasticmapreduce.model.RunJobFlowRequest;
 import com.amazonaws.services.elasticmapreduce.model.RunJobFlowResult;
 import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsRequest;
 import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.google.common.collect.Sets;
 
 public class EmrTask extends AbstractTaskExecutor {
@@ -65,6 +76,30 @@ public class EmrTask extends AbstractTaskExecutor {
         ClusterState.RUNNING.toString()
     );
 
+    /**
+     * config ObjectMapper features and propertyNamingStrategy
+     * support capital letters parse
+     */
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+        .setPropertyNamingStrategy(new PropertyNamingStrategy() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String nameForSetterMethod(MapperConfig<?> config,
+                                              AnnotatedMethod method, String defaultName) {
+                return method.getName().substring(3);
+            }
+
+            @Override
+            public String nameForGetterMethod(MapperConfig<?> config,
+                                              AnnotatedMethod method, String defaultName) {
+                return method.getName().substring(3);
+            }
+        }).setTimeZone(TimeZone.getDefault());
 
     /**
      * constructor
@@ -123,10 +158,14 @@ public class EmrTask extends AbstractTaskExecutor {
      * @return RunJobFlowRequest
      */
     private RunJobFlowRequest createRunJobFlowRequest() {
-        RunJobFlowRequest runJobFlowRequest = JSONUtils.parseObject(emrParameters.getJobFlowDefineJson(), RunJobFlowRequest.class);
-        if (runJobFlowRequest == null) {
-            throw new EmrTaskException("can not parse RunJobFlowRequest from json");
+
+        final RunJobFlowRequest runJobFlowRequest;
+        try {
+            runJobFlowRequest = objectMapper.readValue(emrParameters.getJobFlowDefineJson(), RunJobFlowRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new EmrTaskException("can not parse RunJobFlowRequest from json", e);
         }
+
         return runJobFlowRequest;
     }
 
