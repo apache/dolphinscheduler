@@ -90,9 +90,9 @@
             <em class="el-icon-user"></em>
             <span>{{$t('User Information')}}</span>
           </el-dropdown-item>
-          <el-dropdown-item  command="logout">
+          <el-dropdown-item  class="logout" command="logout">
             <em class="el-icon-switch-button"></em>
-            <span class="logout">{{$t('Logout')}}</span>
+            <span>{{$t('Logout')}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
