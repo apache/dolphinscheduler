@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import { reactive} from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
@@ -43,7 +43,10 @@ export function useSwitch({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    rawScript: '',
+    switchResult: {},
+    dependTaskList: [],
+    nextNode: 0
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -74,7 +77,7 @@ export function useSwitch({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useSwitch(model, projectCode),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

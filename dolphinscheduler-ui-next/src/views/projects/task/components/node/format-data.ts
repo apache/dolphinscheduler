@@ -325,6 +325,12 @@ export function formatModel(data: ITaskData) {
     params.rawScript = data.taskParams?.rawScript
   }
 
+  if (data.taskParams?.switchResult) {
+    params.switchResult = data.taskParams.switchResult
+    params.dependTaskList = data.taskParams.switchResult?.dependTaskList? data.taskParams.switchResult?.dependTaskList: []
+    params.nextNode = data.taskParams.switchResult?.nextNode
+  }
+
   return params
 }
 

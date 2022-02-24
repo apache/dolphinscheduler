@@ -14,75 +14,90 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, onMounted } from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryResourceList } from '@/service/modules/resources'
-import { useCustomParams } from './use-custom-params'
 import type { IJsonItem } from '../types'
+import { queryProcessDefinitionByCode } from "@/service/modules/process-definition";
 
-export function useSwitch(model: { [field: string]: any }): IJsonItem[] {
+export function useSwitch(
+    model: { [field: string]: any },
+    projectCode: number
+): IJsonItem[] {
+
+
   const { t } = useI18n()
-  const options = ref([])
+  const branchFlowOptions = ref([] as any)
 
   const loading = ref(false)
 
-  const getResourceList = async () => {
+  const getOtherTaskDefinitionList = async () => {
     if (loading.value) return
     loading.value = true
+    branchFlowOptions.value = []
     try {
-      const res = await queryResourceList({ type: 'FILE' })
-      removeUselessChildren(res)
-      options.value = res || []
+      const res = await queryProcessDefinitionByCode(model.processName, projectCode)
+      res?.taskDefinitionList.forEach((item: any) => {
+        if (item.code != model.code ) {
+          branchFlowOptions.value.push({ label: item.name, value: item.code })
+        }
+      })
       loading.value = false
     } catch (err) {
       loading.value = false
     }
   }
 
-  onMounted(() => {
-    getResourceList()
-  })
+  watch(
+      () => [model.processName, model.nextCode],
+      () => {
+        if (model.processName) {
+          getOtherTaskDefinitionList()
+        }
+      }
+  )
 
   return [
     {
-      type: 'editor',
-      field: 'rawScript',
-      name: t('project.node.script'),
+      type: 'multi-condition',
+      field: 'dependTaskList',
+      name: t('project.node.switch_condition'),
       validate: {
-        trigger: ['input', 'trigger'],
-        required: true,
-        message: t('project.node.script_tips')
-      }
+        required: true
+      },
+      children: [
+        {
+          type: 'input',
+          field: 'condition',
+          span: 24,
+          props: {
+            loading: loading,
+            type: 'textarea',
+            autosize: { minRows: 2 }
+          }
+        },
+        {
+          type: 'select',
+          field: 'nextNode',
+          span: 18,
+          name: t('project.node.switch_branch_flow'),
+          options: branchFlowOptions,
+          props: {
+            loading: loading,
+            type: 'textarea',
+            autosize: { minRows: 2 }
+          }
+        }
+      ]
     },
     {
-      type: 'tree-select',
-      field: 'resourceList',
-      name: t('project.node.resources'),
-      options,
+      type: 'select',
+      field: 'nextNode',
+      span: 24,
+      name: t('project.node.switch_branch_flow'),
       props: {
-        multiple: true,
-        checkable: true,
-        cascade: true,
-        showPath: true,
-        checkStrategy: 'child',
-        placeholder: t('project.node.resources_tips'),
-        keyField: 'id',
-        labelField: 'name',
-        loading
-      }
-    },
-    ...useCustomParams({ model, field: 'localParams', isSimple: true })
-  ]
-}
-
-export function removeUselessChildren(list: { children?: [] }[]) {
-  if (!list.length) return
-  list.forEach((item) => {
-    if (!item.children) return
-    if (item.children.length === 0) {
-      delete item.children
-      return
+        loading: loading
+      },
+      options: branchFlowOptions
     }
-    removeUselessChildren(item.children)
-  })
+  ]
 }
