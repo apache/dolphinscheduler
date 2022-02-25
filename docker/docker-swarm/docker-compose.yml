@@ -44,7 +44,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-api:
-    image: apache/dolphinscheduler:2.0.3
+    image: apache/dolphinscheduler:2.0.4
     command: api-server
     ports:
     - 12345:12345
@@ -68,7 +68,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-alert:
-    image: apache/dolphinscheduler:2.0.3
+    image: apache/dolphinscheduler:2.0.4
     command: alert-server
     environment:
       TZ: Asia/Shanghai
@@ -87,7 +87,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-master:
-    image: apache/dolphinscheduler:2.0.3
+    image: apache/dolphinscheduler:2.0.4
     command: master-server
     environment:
       TZ: Asia/Shanghai
@@ -108,7 +108,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-worker:
-    image: apache/dolphinscheduler:2.0.3
+    image: apache/dolphinscheduler:2.0.4
     command: worker-server
     environment:
       TZ: Asia/Shanghai
