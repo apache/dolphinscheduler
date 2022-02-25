@@ -129,7 +129,7 @@ export function useCustomCellBuilder() {
     connects
       .filter((r) => !!r.preTaskCode)
       .forEach((c) => {
-        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode, c.name)
+        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode + '', c.name)
         edges.push(edge)
       })
     return {
