@@ -71,6 +71,10 @@ public final class Constants {
      */
     public static final String FS_S3A_SECRET_KEY = "fs.s3a.secret.key";
 
+    /**
+     * fs s3a path style access
+     */
+    public static final String FS_S3A_PATH_STYLE_ACCESS = "fs.s3a.path.style.access";
 
     /**
      * hadoop configuration

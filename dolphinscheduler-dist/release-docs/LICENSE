@@ -223,6 +223,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     audience-annotations 0.5.0: https://mvnrepository.com/artifact/org.apache.yetus/audience-annotations/0.5.0, Apache 2.0
     avro 1.7.4: https://github.com/apache/avro, Apache 2.0
     aws-sdk-java 1.7.4: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk/1.7.4, Apache 2.0
+    aws-java-sdk-core 1.10.6: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.10.6, Apache 2.0
+    aws-java-sdk-kms 1.10.6: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.10.6, Apache 2.0
+    aws-java-sdk-s3 1.10.6: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.10.6, Apache 2.0
     bonecp 0.8.0.RELEASE: https://github.com/wwadge/bonecp, Apache 2.0
     byte-buddy 1.9.16: https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy/1.9.16, Apache 2.0
     caffeine 2.9.2: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine/2.9.2, Apache 2.0
@@ -262,21 +265,22 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     guava-retrying 2.0.0: https://mvnrepository.com/artifact/com.github.rholder/guava-retrying/2.0.0, Apache 2.0
     guice 3.0: https://mvnrepository.com/artifact/com.google.inject/guice/3.0, Apache 2.0
     guice-servlet 3.0: https://mvnrepository.com/artifact/com.google.inject.extensions/guice-servlet/3.0, Apache 2.0
-    hadoop-annotations 2.7.3:https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-annotations/2.7.3, Apache 2.0
-    hadoop-auth 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-auth/2.7.3, Apache 2.0
-    hadoop-aws 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-aws/2.7.3, Apache 2.0
-    hadoop-client 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client/2.7.3, Apache 2.0
-    hadoop-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common/2.7.3, Apache 2.0
-    hadoop-hdfs 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-app 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-app/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-common/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-core 2.7.3: https://mvnrepository.com/artifact/io.hops/hadoop-mapreduce-client-core/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-jobclient 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-jobclient/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-shuffle 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-shuffle/2.7.3, Apache 2.0
-    hadoop-yarn-api 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-api/2.7.3, Apache 2.0
-    hadoop-yarn-client 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-client/2.7.3, Apache 2.0
-    hadoop-yarn-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-common/2.7.3, Apache 2.0
-    hadoop-yarn-server-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-common/2.7.3, Apache 2.0
+    hadoop-annotations 2.8.5:https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-annotations/2.8.5, Apache 2.0
+    hadoop-auth 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-auth/2.8.5, Apache 2.0
+    hadoop-aws 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-aws/2.8.5, Apache 2.0
+    hadoop-client 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client/2.8.5, Apache 2.0
+    hadoop-common 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common/2.8.5, Apache 2.0
+    hadoop-hdfs 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs/2.8.5, Apache 2.0
+    hadoop-hdfs-client 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs-client/2.8.5, Apache 2.0
+    hadoop-mapreduce-client-app 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-app/2.8.5, Apache 2.0
+    hadoop-mapreduce-client-common 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-common/2.8.5, Apache 2.0
+    hadoop-mapreduce-client-core 2.8.5: https://mvnrepository.com/artifact/io.hops/hadoop-mapreduce-client-core/2.8.5, Apache 2.0
+    hadoop-mapreduce-client-jobclient 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-jobclient/2.8.5, Apache 2.0
+    hadoop-mapreduce-client-shuffle 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-shuffle/2.8.5, Apache 2.0
+    hadoop-yarn-api 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-api/2.8.5, Apache 2.0
+    hadoop-yarn-client 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-client/2.8.5, Apache 2.0
+    hadoop-yarn-common 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-common/2.8.5, Apache 2.0
+    hadoop-yarn-server-common 2.8.5: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-common/2.8.5, Apache 2.0
     HikariCP 4.0.3: https://mvnrepository.com/artifact/com.zaxxer/HikariCP/4.0.3, Apache 2.0
     hive-common 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-common/2.1.0, Apache 2.0
     hive-jdbc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc/2.1.0, Apache 2.0
@@ -287,6 +291,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hive-service-rpc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-service-rpc/2.1.0, Apache 2.0
     hive-storage-api 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-storage-api/2.1.0, Apache 2.0
     htrace-core 3.1.0-incubating: https://mvnrepository.com/artifact/org.apache.htrace/htrace-core/3.1.0-incubating, Apache 2.0
+    htrace-core4 4.0.1-incubating: https://mvnrepository.com/artifact/org.apache.htrace/htrace-core4/4.0.1-incubating, Apache 2.0
     httpclient 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.4.1, Apache 2.0
     httpcore 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore/4.4.1, Apache 2.0
     httpmime 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime/4.5.13, Apache 2.0
@@ -303,6 +308,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     javax.inject 1: https://mvnrepository.com/artifact/javax.inject/javax.inject/1, Apache 2.0
     javax.jdo-3.2.0-m3: https://mvnrepository.com/artifact/org.datanucleus/javax.jdo/3.2.0-m3, Apache 2.0
     java-xmlbuilder 0.4 : https://mvnrepository.com/artifact/com.jamesmurty.utils/java-xmlbuilder/0.4, Apache 2.0
+    jcip-annotations 1.0-1 : https://mvnrepository.com/artifact/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache 2.0
     jdo-api 3.0.1: https://mvnrepository.com/artifact/javax.jdo/jdo-api/3.0.1, Apache 2.0
     jets3t 0.9.0: https://mvnrepository.com/artifact/net.java.dev.jets3t/jets3t/0.9.0, Apache 2.0
     jettison 1.1: https://github.com/jettison-json/jettison, Apache 2.0
@@ -313,6 +319,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jetty-security 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-security/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jetty-server 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jetty-servlet 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-servlet/9.4.44.v20210927, Apache 2.0 and EPL 1.0
+    jetty-sslengine 6.1.26: https://mvnrepository.com/artifact/org.mortbay.jetty/jetty-sslengine/6.1.26, Apache 2.0
     jetty-servlets 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-servlets/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jetty-util 6.1.26: https://mvnrepository.com/artifact/org.mortbay.jetty/jetty-util/6.1.26, Apache 2.0 and EPL 1.0
     jetty-util 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util/9.4.44.v20210927, Apache 2.0 and EPL 1.0
@@ -321,6 +328,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jetty-xml 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-xml/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jna 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.10.0,  Apache 2.0 and LGPL 2.1
     jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
+    joda-time 2.9.4: https://github.com/JodaOrg/joda-time, Apache 2.0
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
@@ -343,6 +351,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     mybatis-spring 2.0.2: https://mvnrepository.com/artifact/org.mybatis/mybatis-spring/2.0.2, Apache 2.0
     netty 3.6.2.Final: https://github.com/netty/netty, Apache 2.0
     netty 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
+    nimbus-jose-jwt 9.10.1: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.10.1, Apache 2.0
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
     parquet-hadoop-bundle 1.8.1: https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop-bundle/1.8.1, Apache 2.0
     poi 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi/4.1.2, Apache 2.0
@@ -430,7 +439,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     generex 1.0.2 https://mvnrepository.com/artifact/com.github.mifmif/generex/1.0.2, Apache 2.0
     jackson-dataformat-yaml 2.12.5 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.12.5, Apache 2.0
     logging-interceptor 3.14.9 https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor/3.14.9, Apache 2.0
+    okhttp 2.4.0 https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/2.4.0, Apache 2.0
     okhttp 3.14.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp/3.14.3, Apache 2.0
+    okio 1.4.0 https://mvnrepository.com/artifact/com.squareup.okio/okio/1.4.0, Apache 2.0
     okio 1.17.2 https://mvnrepository.com/artifact/com.squareup.okio/okio/1.17.2, Apache 2.0
     hibernate-validator  6.2.2.Final https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator/6.2.2.Final, Apache 2.0
     jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0
@@ -447,7 +458,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     curvesapi 1.06: https://mvnrepository.com/artifact/com.github.virtuald/curvesapi/1.06, BSD 3-clause
     javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD
     jline 0.9.94: https://github.com/jline/jline3, BSD
-    jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
+    jsch 0.1.54: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.54, BSD
     leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
     postgresql 42.2.5: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.2.5, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
