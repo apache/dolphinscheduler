@@ -36,9 +36,10 @@ export function useEnvironmentName(
     loading.value = true
     try {
       const res = await queryAllEnvironmentList()
-      environmentList = res.map((item: { code: string; name: string }) => ({
+      environmentList = res.map((item: { code: string; name: string; workerGroups: string[] }) => ({
         label: item.name,
-        value: item.code
+        value: item.code,
+        workerGroups: item.workerGroups
       }))
       options.value = environmentList.filter((option: IEnvironmentNameOption) =>
         filterByWorkerGroup(option)
