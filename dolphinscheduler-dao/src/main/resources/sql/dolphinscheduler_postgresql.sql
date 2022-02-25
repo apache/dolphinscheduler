@@ -933,7 +933,7 @@ INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('2.0.3');
+INSERT INTO t_ds_version(version) VALUES ('2.0.4');
 
 --
 -- Table structure for table t_ds_plugin_define
