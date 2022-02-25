@@ -40,8 +40,11 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     @FindBy(className = "items")
     private List<WebElement> userList;
 
-    @FindBy(className = "select-list-box")
+    @FindBy(id = "select-list")
     private List<WebElement> selectList;
+
+    @FindBy(id = "selected-list")
+    private List<WebElement> selectedList;
 
     @FindBys({
         @FindBy(className = "el-popconfirm"),
@@ -114,7 +117,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage authorizeProject(String user, String projectName) {
+    public UserPage clickAuthorize(String user) {
         userList()
             .stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
@@ -123,6 +126,19 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No authorize button in user list"))
             .click();
+
+        return this;
+    }
+
+    public UserPage closeAuthorize() {
+        UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
+        userAuthorizeForm.buttonCancel().click();
+
+        return this;
+    }
+
+    public UserPage authorizeProject(String user, String projectName) {
+        clickAuthorize(user);
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthProject().click();
@@ -141,14 +157,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     }
 
     public UserPage authorizeDataSource(String user, String dataSourceName) {
-        userList()
-            .stream()
-            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
-            .flatMap(it -> it.findElements(By.className("authorize")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No authorize button in user list"))
-            .click();
+        clickAuthorize(user);
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthDataSource().click();
@@ -189,6 +198,9 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         @FindBy(className = "selectName")
         private WebElement selectName;
+
+        @FindBy(className = "selectedName")
+        private WebElement selectedName;
 
         @FindBy(id = "btnSubmit")
         private WebElement buttonSubmit;

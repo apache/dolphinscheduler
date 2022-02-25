@@ -18,7 +18,7 @@
   <m-popup okId="btnSubmit" cancelId="btnCancel" :ok-text="$t('Submit')" :nameText="transferData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model">
-        <div class="select-list-box">
+        <div class="select-list-box" id="select-list">
           <div class="tf-header">
             <div class="title">{{transferData.type.name}}{{$t('List')}}</div>
             <div class="count">（{{cacheSourceList.length}}）</div>
@@ -33,14 +33,14 @@
           </div>
         </div>
         <div class="select-oper-box">&nbsp;</div>
-        <div class="select-list-box">
+        <div class="select-list-box" id="selected-list">
           <div class="tf-header">
             <div class="title">{{$t('Selected')}}{{transferData.type.name}}</div>
             <div class="count">（{{cacheTargetList.length}}）</div>
           </div>
           <div class="scrollbar tf-content">
             <ul>
-              <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span>{{item.name}}</span></li>
+              <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span class="selectedName">{{item.name}}</span></li>
             </ul>
           </div>
         </div>

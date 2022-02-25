@@ -82,7 +82,7 @@
         </el-dropdown>
       </span>
       <el-dropdown @command="_toggleUser">
-        <span class="el-dropdown-link" id="userDropdown">
+        <span class="el-dropdown-link">
           <em class="el-icon-user-solid"></em>{{userInfo.userName}}<em class="el-icon-arrow-down"></em>
         </span>
         <el-dropdown-menu slot="dropdown">
@@ -90,7 +90,7 @@
             <em class="el-icon-user"></em>
             <span>{{$t('User Information')}}</span>
           </el-dropdown-item>
-          <el-dropdown-item  class="logout" command="logout">
+          <el-dropdown-item command="logout">
             <em class="el-icon-switch-button"></em>
             <span>{{$t('Logout')}}</span>
           </el-dropdown-item>

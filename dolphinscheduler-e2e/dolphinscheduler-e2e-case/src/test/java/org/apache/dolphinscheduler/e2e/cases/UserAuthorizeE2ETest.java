@@ -24,13 +24,13 @@ import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
-import org.apache.dolphinscheduler.e2e.pages.LogoutPage;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,15 +40,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 @DolphinScheduler(composeFiles = "docker/datasource-mysql/docker-compose.yaml")
 public class UserAuthorizeE2ETest {
     private static final String tenant = System.getProperty("user.name");
-    private static final String user01 = "test_user01";
-    private static final String password01 = "test_user01123";
-    private static final String email01 = "test_user01@gmail.com";
-    private static final String phone01 = "15800000000";
-
-    private static final String user02 = "test_user02";
-    private static final String password02 = "test_user02123";
-    private static final String email02 = "test_user02@gamil.com";
-    private static final String phone02 = "13900000000";
+    private static final String user = "test_user";
+    private static final String password = "test_user123";
+    private static final String email = "test_user@gmail.com";
+    private static final String phone = "15800000000";
 
     private static final String project = "test_project";
 
@@ -79,67 +74,50 @@ public class UserAuthorizeE2ETest {
 
         tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class)
-            .create(user01, password01, email01, phone01)
-            .create(user02, password02, email02, phone02);
-
-        new LogoutPage(browser)
-            .logout("admin");
-
-        new LoginPage(browser)
-            .login(user01, password01)
+            .create(user, password, email, phone)
             .goToNav(ProjectPage.class).create(project)
             .goToNav(DataSourcePage.class)
-            .createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams);
-
-        new LogoutPage(browser)
-            .logout(user01);
-
-        new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
+            .createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams)
             .goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
-
     }
 
     @Test
     @Order(10)
     void testAuthorizeProject() {
-        final UserPage userPage = new UserPage(browser);
+        final UserPage page = new UserPage(browser);
 
-        userPage.authorizeProject(user01, project);
+        page.authorizeProject(user, project);
+        page.clickAuthorize(user);
 
-        new LogoutPage(browser)
-            .logout(user01);
+        await().untilAsserted(() -> {
 
-        ProjectPage projectPage = new LoginPage(browser)
-            .login(user02, password02)
-            .goToNav(ProjectPage.class);
+            assertThat(page.selectedList())
+                .as("Selected project list should contain newly-authorized project")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(project));
+        });
 
-        await().untilAsserted(() -> assertThat(projectPage.projectList())
-            .as("Project list should contain newly-authorized project")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(project)));
-
+        page.closeAuthorize();
     }
 
     @Test
     @Order(20)
     void testAuthorizeDataSource() {
-        final UserPage userPage = new UserPage(browser);
+        final UserPage page = new UserPage(browser);
 
-        userPage.authorizeDataSource(user01, dataSourceName);
+        page.authorizeDataSource(user, dataSourceName);
+        page.clickAuthorize(user);
 
-        new LogoutPage(browser)
-            .logout(user01);
+        await().untilAsserted(() -> {
 
-        DataSourcePage dataSourcePage = new LoginPage(browser)
-            .login(user02, password02)
-            .goToNav(DataSourcePage.class);
+            assertThat(page.selectedList())
+                .as("Selected dataSource list should contain newly-authorized dataSource")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(dataSourceName));
+        });
 
-        await().untilAsserted(() -> assertThat(dataSourcePage.dataSourceItemsList())
-            .as("DataSource list should contain newly-authorized database")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(dataSourceName)));
+        page.closeAuthorize();
     }
 
 }
