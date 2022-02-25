@@ -566,6 +566,8 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+create index `idx_process_code_version` on `t_ds_process_task_relation_log` (`process_definition_code`, `process_definition_version`);
+
 -- ----------------------------
 -- Table structure for t_ds_process_instance
 -- ----------------------------
