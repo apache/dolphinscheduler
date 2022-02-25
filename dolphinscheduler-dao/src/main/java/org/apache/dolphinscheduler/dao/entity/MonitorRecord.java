@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * monitor record for database

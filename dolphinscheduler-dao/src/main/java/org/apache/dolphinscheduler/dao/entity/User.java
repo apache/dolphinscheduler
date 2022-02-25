@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

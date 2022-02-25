@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * RuleExecuteSql

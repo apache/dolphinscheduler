@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.dto.gantt;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 import java.util.LinkedList;

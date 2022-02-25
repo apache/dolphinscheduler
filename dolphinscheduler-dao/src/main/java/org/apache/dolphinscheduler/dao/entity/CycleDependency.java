@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 
 import java.util.Date;

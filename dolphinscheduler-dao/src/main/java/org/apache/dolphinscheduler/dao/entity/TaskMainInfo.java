@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import java.util.Date;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * task main info
