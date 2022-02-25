@@ -36,6 +36,7 @@ type IType =
   | 'tree-select'
   | 'multi-input'
   | 'custom'
+  | 'multi-condition'
 
 interface IOption extends SelectOption, TreeSelectOption {
   label: string

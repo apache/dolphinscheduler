@@ -47,6 +47,16 @@ interface ILocalParam {
   value?: string
 }
 
+interface IDependTask {
+  condition: string
+  nextNode: number
+}
+
+interface ISwitchResult {
+  dependTaskList?: IDependTask[]
+  nextNode?: number
+}
+
 interface ISourceItem {
   id: number
 }
@@ -186,6 +196,9 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  switchResult?: ISwitchResult
+  dependTaskList?: IDependTask[]
+  nextNode?: number
 }
 
 type ITaskType = TaskType
