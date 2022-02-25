@@ -162,32 +162,38 @@ export default defineComponent({
           Styles[themeStore.darkTheme ? 'toolbar-dark' : 'toolbar-light']
         ]}
       >
-        <div>
-          <span class={Styles['workflow-name']}>
-            {props.definition?.processDefinition?.name ||
+        <span class={Styles['workflow-name']}>
+          {route.name === 'workflow-instance-detail'
+            ? props.instance?.name
+            : props.definition?.processDefinition?.name ||
               t('project.dag.create')}
-          </span>
-          {props.definition?.processDefinition?.name && (
-            <NTooltip
-              v-slots={{
-                trigger: () => (
-                  <NButton
-                    quaternary
-                    circle
-                    onClick={() =>
-                      copy(props.definition?.processDefinition?.name)
-                    }
-                    class={Styles['toolbar-btn']}
-                  >
-                    <NIcon>
-                      <CopyOutlined />
-                    </NIcon>
-                  </NButton>
-                ),
-                default: () => t('project.dag.copy_name')
-              }}
-            ></NTooltip>
-          )}
+        </span>
+        {props.definition?.processDefinition?.name && (
+          <NTooltip
+            v-slots={{
+              trigger: () => (
+                <NButton
+                  quaternary
+                  circle
+                  onClick={() => {
+                    const name =
+                      route.name === 'workflow-instance-detail'
+                        ? props.instance?.name
+                        : props.definition?.processDefinition?.name
+                    copy(name)
+                  }}
+                  class={Styles['toolbar-btn']}
+                >
+                  <NIcon>
+                    <CopyOutlined />
+                  </NIcon>
+                </NButton>
+              ),
+              default: () => t('project.dag.copy_name')
+            }}
+          ></NTooltip>
+        )}
+        <div class={Styles['toolbar-left-part']}>
           {route.name === 'workflow-instance-detail' && (
             <>
               <NTooltip
@@ -255,7 +261,7 @@ export default defineComponent({
                           </NText>
                         ),
                         default: () => (
-                          <StartupParam startupParam={props.instance.value} />
+                          <StartupParam startupParam={props.instance} />
                         )
                       }}
                     </NPopover>
