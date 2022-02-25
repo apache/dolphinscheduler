@@ -53,7 +53,7 @@ export function useTaskEdit(options: Options) {
    * Append a new task
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
-    addNode(code + '', type, '', coordinate)
+    addNode(code + '', type, '', 'YES', coordinate)
     taskDefinitions.value.push({
       code,
       taskType: type,
