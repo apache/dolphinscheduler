@@ -59,7 +59,7 @@ export default defineComponent({
         ]}
       >
         <Dag
-          instance={instance}
+          instance={instance.value}
           definition={definition.value}
           onRefresh={refresh}
           projectCode={projectCode}
