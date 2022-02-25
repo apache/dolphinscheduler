@@ -168,78 +168,101 @@ export default defineComponent({
               t('project.dag.create')}
           </span>
           {props.definition?.processDefinition?.name && (
-            <NButton
-              quaternary
-              circle
-              onClick={() => copy(props.definition?.processDefinition?.name)}
-              class={Styles['toolbar-btn']}
-            >
-              <NIcon>
-                <CopyOutlined />
-              </NIcon>
-            </NButton>
+            <NTooltip
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    quaternary
+                    circle
+                    onClick={() =>
+                      copy(props.definition?.processDefinition?.name)
+                    }
+                    class={Styles['toolbar-btn']}
+                  >
+                    <NIcon>
+                      <CopyOutlined />
+                    </NIcon>
+                  </NButton>
+                ),
+                default: () => t('project.dag.copy_name')
+              }}
+            ></NTooltip>
           )}
           {route.name === 'workflow-instance-detail' && (
             <>
-              <NPopover
-                show={paramPopoverRef.value}
-                placement='bottom'
-                trigger='manual'
-              >
-                {{
+              <NTooltip
+                v-slots={{
                   trigger: () => (
-                    <NButton
-                      quaternary
-                      circle
-                      onClick={() =>
-                        (paramPopoverRef.value = !paramPopoverRef.value)
-                      }
-                      class={Styles['toolbar-btn']}
+                    <NPopover
+                      show={paramPopoverRef.value}
+                      placement='bottom'
+                      trigger='manual'
                     >
-                      <NIcon>
-                        <FundViewOutlined />
-                      </NIcon>
-                    </NButton>
+                      {{
+                        trigger: () => (
+                          <NButton
+                            quaternary
+                            circle
+                            onClick={() =>
+                              (paramPopoverRef.value = !paramPopoverRef.value)
+                            }
+                            class={Styles['toolbar-btn']}
+                          >
+                            <NIcon>
+                              <FundViewOutlined />
+                            </NIcon>
+                          </NButton>
+                        ),
+                        header: () => (
+                          <NText strong depth={1}>
+                            {t('project.workflow.parameters_variables')}
+                          </NText>
+                        ),
+                        default: () => <VariablesView onCopy={copy} />
+                      }}
+                    </NPopover>
                   ),
-                  header: () => (
-                    <NText strong depth={1}>
-                      {t('project.workflow.parameters_variables')}
-                    </NText>
-                  ),
-                  default: () => <VariablesView onCopy={copy} />
+                  default: () => t('project.dag.view_variables')
                 }}
-              </NPopover>
-
-              <NPopover
-                show={startupPopoverRef.value}
-                placement='bottom'
-                trigger='manual'
-              >
-                {{
+              ></NTooltip>
+              <NTooltip
+                v-slots={{
                   trigger: () => (
-                    <NButton
-                      quaternary
-                      circle
-                      onClick={() =>
-                        (startupPopoverRef.value = !startupPopoverRef.value)
-                      }
-                      class={Styles['toolbar-btn']}
+                    <NPopover
+                      show={startupPopoverRef.value}
+                      placement='bottom'
+                      trigger='manual'
                     >
-                      <NIcon>
-                        <RightCircleOutlined />
-                      </NIcon>
-                    </NButton>
+                      {{
+                        trigger: () => (
+                          <NButton
+                            quaternary
+                            circle
+                            onClick={() =>
+                              (startupPopoverRef.value =
+                                !startupPopoverRef.value)
+                            }
+                            class={Styles['toolbar-btn']}
+                          >
+                            <NIcon>
+                              <RightCircleOutlined />
+                            </NIcon>
+                          </NButton>
+                        ),
+                        header: () => (
+                          <NText strong depth={1}>
+                            {t('project.workflow.startup_parameter')}
+                          </NText>
+                        ),
+                        default: () => (
+                          <StartupParam startupParam={props.instance.value} />
+                        )
+                      }}
+                    </NPopover>
                   ),
-                  header: () => (
-                    <NText strong depth={1}>
-                      {t('project.workflow.startup_parameter')}
-                    </NText>
-                  ),
-                  default: () => (
-                    <StartupParam startupParam={props.instance.value} />
-                  )
+                  default: () => t('project.dag.startup_parameter')
                 }}
-              </NPopover>
+              ></NTooltip>
             </>
           )}
         </div>
