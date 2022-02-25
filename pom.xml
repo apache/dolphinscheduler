@@ -101,6 +101,7 @@
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+        <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
         <jacoco.version>0.8.7</jacoco.version>
         <jcip.version>1.0</jcip.version>
@@ -1002,6 +1003,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${maven-dependency-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
