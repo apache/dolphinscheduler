@@ -25,6 +25,7 @@ import {
   watch,
   onBeforeUnmount
 } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
@@ -73,6 +74,7 @@ export default defineComponent({
   props,
   emits: ['refresh', 'save'],
   setup(props, context) {
+    const { t } = useI18n()
     const theme = useThemeStore()
 
     // Whether the graph can be operated
@@ -156,6 +158,11 @@ export default defineComponent({
     const onSave = (saveForm: any) => {
       const edges = graph.value?.getEdges() || []
       const nodes = graph.value?.getNodes() || []
+      if (!nodes.length) {
+        window.$message.error(t('project.dag.node_not_created'))
+        saveModelToggle(false)
+        return
+      }
       const connects = getConnects(nodes, edges, taskDefinitions.value as any)
       const locations = getLocations(nodes)
       context.emit('save', {
