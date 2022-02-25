@@ -333,7 +333,9 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.switchResult) {
     params.switchResult = data.taskParams.switchResult
-    params.dependTaskList = data.taskParams.switchResult?.dependTaskList? data.taskParams.switchResult?.dependTaskList: []
+    params.dependTaskList = data.taskParams.switchResult?.dependTaskList
+      ? data.taskParams.switchResult?.dependTaskList
+      : []
     params.nextNode = data.taskParams.switchResult?.nextNode
   }
 

@@ -764,7 +764,6 @@ const project = {
       'Please enter the master url, e.g., 127.0.0.1:7077',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow'
-
   }
 }
 

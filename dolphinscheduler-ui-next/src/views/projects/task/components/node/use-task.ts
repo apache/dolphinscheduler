@@ -41,7 +41,6 @@ export function useTask({
   from?: number
   readonly?: boolean
 }): { json: IJsonItem[]; model: INodeData } {
-  data.taskType = 'SWITCH'
   const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
   if (taskType === 'SHELL') {

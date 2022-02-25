@@ -14,17 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {onMounted, ref, watch} from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
-import { queryProcessDefinitionByCode } from "@/service/modules/process-definition";
+import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
 
 export function useSwitch(
-    model: { [field: string]: any },
-    projectCode: number
+  model: { [field: string]: any },
+  projectCode: number
 ): IJsonItem[] {
-
-
   const { t } = useI18n()
   const branchFlowOptions = ref([] as any)
 
@@ -35,9 +33,12 @@ export function useSwitch(
     loading.value = true
     branchFlowOptions.value = []
     try {
-      const res = await queryProcessDefinitionByCode(model.processName, projectCode)
+      const res = await queryProcessDefinitionByCode(
+        model.processName,
+        projectCode
+      )
       res?.taskDefinitionList.forEach((item: any) => {
-        if (item.code != model.code ) {
+        if (item.code != model.code) {
           branchFlowOptions.value.push({ label: item.name, value: item.code })
         }
       })
@@ -48,12 +49,12 @@ export function useSwitch(
   }
 
   watch(
-      () => [model.processName, model.nextCode],
-      () => {
-        if (model.processName) {
-          getOtherTaskDefinitionList()
-        }
+    () => [model.processName, model.nextCode],
+    () => {
+      if (model.processName) {
+        getOtherTaskDefinitionList()
       }
+    }
   )
 
   return [

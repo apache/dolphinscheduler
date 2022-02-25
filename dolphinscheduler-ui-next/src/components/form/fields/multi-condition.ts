@@ -23,12 +23,13 @@ import {
   NButton,
   NGrid,
   NGridItem,
-  NInput, NSelect
+  NInput,
+  NSelect
 } from 'naive-ui'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import type { IJsonItem, FormItemRule } from '../types'
-import getField from "@/components/form/fields/get-field";
-import {formatValidate} from "@/components/form/utils";
+import getField from '@/components/form/fields/get-field'
+import { formatValidate } from '@/components/form/utils'
 
 const MultiCondition = defineComponent({
   name: 'MultiCondition',
@@ -87,18 +88,18 @@ export function renderMultiCondition(
   })
 
   const getChild = (item: object, i: number) =>
-      children.map((child: IJsonItem) => {
-        return h(
-            NFormItemGi,
-            {
-              showLabel: child.name? true : false,
-              label: child.name? child.name : '',
-              path: `${fields[field]}[${i}].${child.field}`,
-              span: unref(child.span)
-            },
-            () => getField(child, fields[field][i])
-        )
-      })
+    children.map((child: IJsonItem) => {
+      return h(
+        NFormItemGi,
+        {
+          showLabel: child.name ? true : false,
+          label: child.name ? child.name : '',
+          path: `${fields[field]}[${i}].${child.field}`,
+          span: unref(child.span)
+        },
+        () => getField(child, fields[field][i])
+      )
+    })
 
   //initialize the component by using data
   const getChildren = ({ disabled }: { disabled: boolean }) =>
@@ -132,7 +133,7 @@ export function renderMultiCondition(
     })
 
   return h(
-     MultiCondition,
+    MultiCondition,
     {
       name: field,
       onAdd: () => {
