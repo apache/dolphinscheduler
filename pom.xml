@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>2.0.5-SNAPSHOT</version>
+    <version>2.0.4</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>https://dolphinscheduler.apache.org</url>
@@ -38,7 +38,7 @@
         <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
         <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
         <url>https://github.com/apache/dolphinscheduler</url>
-        <tag>HEAD</tag>
+        <tag>2.0.4</tag>
     </scm>
     <mailingLists>
         <mailingList>
