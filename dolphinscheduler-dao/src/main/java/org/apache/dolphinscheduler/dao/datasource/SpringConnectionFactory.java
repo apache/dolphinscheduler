@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.dao.datasource;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.baomidou.mybatisplus.extension.MybatisMapWrapperFactory;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
@@ -41,11 +43,6 @@ import java.util.Properties;
 public class SpringConnectionFactory {
 
     @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        return new PaginationInterceptor();
-    }
-
-    @Bean
     public DataSourceTransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
@@ -57,16 +54,19 @@ public class SpringConnectionFactory {
         configuration.setCacheEnabled(false);
         configuration.setCallSettersOnNulls(true);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
-        configuration.addInterceptor(paginationInterceptor());
+        configuration.setObjectWrapperFactory(new MybatisMapWrapperFactory());
 
-        configuration.setGlobalConfig(new GlobalConfig().setBanner(false));
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
         sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setPlugins(mybatisPlusInterceptor);
 
         GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
         dbConfig.setIdType(IdType.AUTO);
-        GlobalConfig globalConfig = new GlobalConfig();
+        GlobalConfig globalConfig = new GlobalConfig().setBanner(false);
         globalConfig.setDbConfig(dbConfig);
         sqlSessionFactoryBean.setGlobalConfig(globalConfig);
         sqlSessionFactoryBean.setTypeAliasesPackage("org.apache.dolphinscheduler.dao.entity");
