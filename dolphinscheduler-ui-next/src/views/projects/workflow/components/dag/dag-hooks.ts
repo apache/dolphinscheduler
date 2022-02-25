@@ -27,6 +27,7 @@ import { useGraphBackfill } from './use-graph-backfill'
 import { useDagDragAndDrop } from './use-dag-drag-drop'
 import { useTaskEdit } from './use-task-edit'
 import { useNodeMenu } from './use-node-menu'
+import { useNodeStatus } from './use-node-status'
 
 export {
   useCanvasInit,
@@ -40,5 +41,6 @@ export {
   useCellUpdate,
   useDagDragAndDrop,
   useTaskEdit,
-  useNodeMenu
+  useNodeMenu,
+  useNodeStatus
 }

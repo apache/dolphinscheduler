@@ -477,7 +477,11 @@ const project = {
     complement_range: 'Complement Range',
     parameters_variables: 'Parameters variables',
     global_parameters: 'Global parameters',
-    local_parameters: 'Local parameters'
+    local_parameters: 'Local parameters',
+    type: 'Type',
+    retry_count: 'Retry Count',
+    submit_time: 'Submit Time',
+    refresh_status_succeeded: 'Refresh status succeeded'
   },
   task: {
     task_name: 'Task Name',
@@ -537,6 +541,7 @@ const project = {
     save: 'Save',
     close: 'Close',
     format: 'Format',
+    refresh_dag_status: 'Refresh DAG status',
     layout_type: 'Layout Type',
     grid_layout: 'Grid',
     dagre_layout: 'Dagre',

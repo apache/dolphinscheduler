@@ -16,7 +16,15 @@
  */
 
 import type { Graph } from '@antv/x6'
-import { defineComponent, ref, provide, PropType, toRef } from 'vue'
+import {
+  defineComponent,
+  ref,
+  provide,
+  PropType,
+  toRef,
+  watch,
+  onBeforeUnmount
+} from 'vue'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
@@ -28,7 +36,8 @@ import {
   useDagDragAndDrop,
   useTaskEdit,
   useBusinessMapper,
-  useNodeMenu
+  useNodeMenu,
+  useNodeStatus
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
@@ -108,6 +117,9 @@ export default defineComponent({
       graph
     })
 
+    const statusTimerRef = ref()
+    const { refreshTaskStatus } = useNodeStatus({ graph })
+
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
       readonly: toRef(props, 'readonly'),
@@ -155,6 +167,18 @@ export default defineComponent({
       saveModelToggle(false)
     }
 
+    watch(
+      () => props.definition,
+      () => {
+        if (props.instance) {
+          refreshTaskStatus()
+          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 9000)
+        }
+      }
+    )
+
+    onBeforeUnmount(() => clearInterval(statusTimerRef.value))
+
     return () => (
       <div
         class={[
@@ -169,6 +193,7 @@ export default defineComponent({
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
           onRemoveTasks={removeTasks}
+          onRefresh={refreshTaskStatus}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -194,6 +219,7 @@ export default defineComponent({
           definition={props.definition}
         />
         <TaskModal
+          readonly={props.readonly}
           show={taskModalVisible.value}
           projectCode={props.projectCode}
           data={currTask.value as any}

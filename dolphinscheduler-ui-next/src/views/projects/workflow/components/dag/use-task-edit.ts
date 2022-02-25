@@ -37,10 +37,11 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-
   const { addNode, setNodeName } = useCellUpdate({ graph })
 
-  const taskDefinitions = ref<NodeData[]>([])
+  const taskDefinitions = ref<NodeData[]>(
+    definition.value?.taskDefinitionList || []
+  )
   const currTask = ref<NodeData>({
     taskType: 'SHELL',
     code: 0,
@@ -69,9 +70,10 @@ export function useTaskEdit(options: Options) {
     code: number,
     targetCode: number,
     type: TaskType,
+    flag: string,
     coordinate: Coordinate
   ) {
-    addNode(code + '', type, name, coordinate)
+    addNode(code + '', type, name, flag, coordinate)
     const definition = taskDefinitions.value.find((t) => t.code === targetCode)
 
     const newDefinition = {

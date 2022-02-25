@@ -43,7 +43,6 @@ public class Session {
     /**
      * last login time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date lastLoginTime;
 
     /**
