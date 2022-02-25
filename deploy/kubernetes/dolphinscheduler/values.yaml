@@ -76,6 +76,7 @@ common:
     FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
     FS_S3A_ACCESS_KEY: "xxxxxxx"
     FS_S3A_SECRET_KEY: "xxxxxxx"
+    FS_S3A_PATH_STYLE_ACCESS: "false"
     HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE: "false"
     JAVA_SECURITY_KRB5_CONF_PATH: "/opt/krb5.conf"
     LOGIN_USER_KEYTAB_USERNAME: "hdfs@HADOOP.COM"
