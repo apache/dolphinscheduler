@@ -562,7 +562,10 @@ const project = {
     positive_integer: '请输入大于 0 的正整数',
     prop_empty: '自定义参数prop不能为空',
     prop_repeat: 'prop中有重复',
-    node_not_created: '未创建节点保存失败'
+    node_not_created: '未创建节点保存失败',
+    copy_name: '复制名称',
+    view_variables: '查看变量',
+    startup_parameter: '启动参数'
   },
   node: {
     current_node_settings: '当前节点设置',

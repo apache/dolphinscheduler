@@ -75,6 +75,7 @@ $bgLight: #ffffff;
 
 .workflow-name {
   font-size: 14px;
+  font-weight: 700;
 }
 
 .toolbar-btn {
@@ -226,6 +227,12 @@ $bgLight: #ffffff;
   bottom: 0px;
   border: dashed 1px #e4e4e4;
   z-index: 9;
+}
+
+.toolbar-left-part {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .toolbar-right-part {
