@@ -761,7 +761,9 @@ const project = {
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: 'Queue',
     sea_tunnel_master_url_tips:
-      'Please enter the master url, e.g., 127.0.0.1:7077'
+      'Please enter the master url, e.g., 127.0.0.1:7077',
+    switch_condition: 'Condition',
+    switch_branch_flow: 'Branch Flow'
   }
 }
 

@@ -191,6 +191,12 @@ export function formatParams(data: INodeData): {
     buildRawScript(data)
   }
 
+  if (data.taskType === 'SWITCH') {
+    taskParams.switchResult = {}
+    taskParams.switchResult.dependTaskList = data.dependTaskList
+    taskParams.switchResult.nextNode = data.nextNode
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -323,6 +329,14 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.rawScript) {
     params.rawScript = data.taskParams?.rawScript
+  }
+
+  if (data.taskParams?.switchResult) {
+    params.switchResult = data.taskParams.switchResult
+    params.dependTaskList = data.taskParams.switchResult?.dependTaskList
+      ? data.taskParams.switchResult?.dependTaskList
+      : []
+    params.nextNode = data.taskParams.switchResult?.nextNode
   }
 
   return params

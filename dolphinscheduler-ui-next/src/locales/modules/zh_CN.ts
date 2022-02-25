@@ -752,7 +752,9 @@ const project = {
     sea_tunnel_master: 'Master',
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: '队列',
-    sea_tunnel_master_url_tips: '请直接填写地址,例如:127.0.0.1:7077'
+    sea_tunnel_master_url_tips: '请直接填写地址,例如:127.0.0.1:7077',
+    switch_condition: '条件',
+    switch_branch_flow: '分支流转'
   }
 }
 

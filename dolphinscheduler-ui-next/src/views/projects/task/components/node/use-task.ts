@@ -27,6 +27,7 @@ import { useSql } from './tasks/use-sql'
 import { useProcedure } from './tasks/use-procedure'
 import { useSqoop } from './tasks/use-sqoop'
 import { useSeaTunnel } from './tasks/use-sea-tunnel'
+import { useSwitch } from './tasks/use-switch'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -132,6 +133,15 @@ export function useTask({
   }
   if (taskType === 'SEATUNNEL') {
     node = useSeaTunnel({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'SWITCH') {
+    node = useSwitch({
       projectCode,
       from,
       readonly,
