@@ -559,7 +559,12 @@ const project = {
     value: 'Value',
     success: 'Success',
     delete_cell: 'Delete selected edges and nodes',
-    online_directly: 'Whether to go online the process definition'
+    online_directly: 'Whether to go online the process definition',
+    dag_name_empty: 'DAG graph name cannot be empty',
+    positive_integer: 'Please enter a positive integer greater than 0',
+    prop_empty: 'prop is empty',
+    prop_repeat: 'prop is repeat',
+    node_not_created: 'Failed to save node not created'
   },
   node: {
     current_node_settings: 'Current node settings',

@@ -139,7 +139,7 @@ export function querySimpleList(code: number): any {
   })
 }
 
-export function verifyName(params: NameReq, code: CodeReq): any {
+export function verifyName(params: NameReq, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/verify-name`,
     method: 'get',

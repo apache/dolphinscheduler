@@ -30,6 +30,8 @@ import {
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
 import { SaveForm, WorkflowDefinition } from './types'
+import { useRoute } from 'vue-router'
+import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 
 const props = {
@@ -54,8 +56,10 @@ export default defineComponent({
   props,
   emits: ['update:show', 'save'],
   setup(props, context) {
+    const route = useRoute()
     const { t } = useI18n()
 
+    const projectCode = Number(route.params.projectCode)
     const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
       if (tenants.value) {
@@ -86,33 +90,80 @@ export default defineComponent({
     const formRef = ref()
     const rule = {
       name: {
-        required: true
+        required: true,
+        message: t('project.dag.dag_name_empty')
+      },
+      timeout: {
+        validator() {
+          if (formValue.value.timeoutFlag && formValue.value.timeout <= 0) {
+            return new Error(t('project.dag.positive_integer'))
+          }
+        }
+      },
+      globalParams: {
+        validator() {
+          const props = new Set()
+          for (const param of formValue.value.globalParams) {
+            const prop = param.value
+            if (!prop) {
+              return new Error(t('project.dag.prop_empty'))
+            }
+
+            if (props.has(prop)) {
+              return new Error(t('project.dag.prop_repeat'))
+            }
+
+            props.add(prop)
+          }
+        }
       }
     }
     const onSubmit = () => {
-      context.emit('save', formValue.value)
+      formRef.value.validate(async (valid: any) => {
+        if (!valid) {
+          const params = {
+            name: formValue.value.name
+          }
+          if (
+            props.definition?.processDefinition.name !== formValue.value.name
+          ) {
+            verifyName(params, projectCode)
+              .then(() => context.emit('save', formValue.value))
+              .catch((error: any) => {
+                window.$message.error(error.message)
+              })
+          } else {
+            context.emit('save', formValue.value)
+          }
+        }
+      })
     }
     const onCancel = () => {
       context.emit('update:show', false)
     }
 
-    watch(
-      () => props.definition,
-      () => {
-        const process = props.definition?.processDefinition
-        if (process) {
-          formValue.value.name = process.name
-          formValue.value.description = process.description
-          formValue.value.tenantCode = process.tenantCode
-          if (process.timeout && process.timeout > 0) {
-            formValue.value.timeoutFlag = true
-            formValue.value.timeout = process.timeout
-          }
-          formValue.value.globalParams = process.globalParamList.map(
-            (param) => ({ key: param.prop, value: param.value })
-          )
+    const updateModalData = () => {
+      const process = props.definition?.processDefinition
+      if (process) {
+        formValue.value.name = process.name
+        formValue.value.description = process.description
+        formValue.value.tenantCode = process.tenantCode
+        if (process.timeout && process.timeout > 0) {
+          formValue.value.timeoutFlag = true
+          formValue.value.timeout = process.timeout
         }
+        formValue.value.globalParams = process.globalParamList.map((param) => ({
+          key: param.prop,
+          value: param.value
+        }))
       }
+    }
+
+    onMounted(() => updateModalData())
+
+    watch(
+      () => props.definition?.processDefinition,
+      () => updateModalData()
     )
 
     return () => (
