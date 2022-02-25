@@ -323,7 +323,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jna-platform 4.5.2: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/4.5.2, Apache 2.0 and LGPL 2.1
     joda-time 2.5: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
-    jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
+    jsqlparser 4.0: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
     jsr305 3.0.0: https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305, Apache 2.0
     j2objc-annotations 1.1 https://mvnrepository.com/artifact/com.google.j2objc/j2objc-annotations/1.1, Apache 2.0
     libfb303 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libfb303/0.9.3, Apache 2.0
@@ -334,13 +334,13 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     log4j-1.2-api 2.14.1: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-1.2-api/2.14.1, Apache 2.0
     lz4 1.3.0: https://mvnrepository.com/artifact/net.jpountz.lz4/lz4/1.3.0, Apache 2.0
     mapstruct 1.2.0.Final: https://github.com/mapstruct/mapstruct, Apache 2.0
-    mybatis 3.5.2 https://mvnrepository.com/artifact/org.mybatis/mybatis/3.5.2, Apache 2.0
-    mybatis-plus 3.2.0: https://github.com/baomidou/mybatis-plus, Apache 2.0
-    mybatis-plus-annotation 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-annotation/3.2.0, Apache 2.0
-    mybatis-plus-boot-starter 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter/3.2.0, Apache 2.0
-    mybatis-plus-core 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-core/3.2.0, Apache 2.0
-    mybatis-plus-extension 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-extension/3.2.0, Apache 2.0
-    mybatis-spring 2.0.2: https://mvnrepository.com/artifact/org.mybatis/mybatis-spring/2.0.2, Apache 2.0
+    mybatis 3.5.7 https://mvnrepository.com/artifact/org.mybatis/mybatis/3.5.7, Apache 2.0
+    mybatis-plus 3.4.3: https://github.com/baomidou/mybatis-plus, Apache 2.0
+    mybatis-plus-annotation 3.4.3: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-annotation/3.4.3, Apache 2.0
+    mybatis-plus-boot-starter 3.4.3: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter/3.4.3, Apache 2.0
+    mybatis-plus-core 3.4.3: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-core/3.4.3, Apache 2.0
+    mybatis-plus-extension 3.4.3: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-extension/3.4.3, Apache 2.0
+    mybatis-spring 2.0.6: https://mvnrepository.com/artifact/org.mybatis/mybatis-spring/2.0.6, Apache 2.0
     netty 3.6.2.Final: https://github.com/netty/netty, Apache 2.0
     netty 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
