@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 
@@ -69,4 +70,12 @@ public interface WorkFlowLineageMapper {
      */
     List<ProcessLineage> queryProcessLineageByCode(@Param("projectCode") long projectCode,
                                                    @Param("processDefinitionCode") long processDefinitionCode);
+
+
+    /**
+     * query process definition by name
+     *
+     * @return dependent process definition
+     */
+    List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(@Param("code") long code);
 }

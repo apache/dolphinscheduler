@@ -60,6 +60,7 @@ import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
@@ -114,6 +115,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
@@ -142,6 +144,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -255,6 +258,9 @@ public class ProcessService {
 
     @Autowired
     private TaskGroupMapper taskGroupMapper;
+
+    @Autowired
+    private WorkFlowLineageMapper workFlowLineageMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -1898,6 +1904,28 @@ public class ProcessService {
      */
     public List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode) {
         return scheduleMapper.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
+    }
+
+    /**
+     * query Schedule by processDefinitionCode
+     *
+     * @param processDefinitionCodeList processDefinitionCodeList
+     * @see Schedule
+     */
+    public Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList) {
+        List<Schedule> processDefinitionScheduleList = scheduleMapper.querySchedulesByProcessDefinitionCodes(processDefinitionCodeList);
+        return processDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
+                Schedule::getWorkerGroup));
+    }
+
+    /**
+     * query dependent process definition by process definition code
+     *
+     * @param processDefinitionCode processDefinitionCode
+     * @see DependentProcessDefinition
+     */
+    public List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode) {
+        return workFlowLineageMapper.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
     }
 
     /**

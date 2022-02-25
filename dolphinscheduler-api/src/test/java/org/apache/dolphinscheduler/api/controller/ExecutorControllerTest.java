@@ -66,6 +66,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
     final ImmutableMap<String, String> startParams = ImmutableMap.of("start", "params");
     final Integer expectedParallelismNumber = 6;
     final int dryRun = 7;
+    final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
 
     final JsonObject expectResponseContent = gson
             .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
@@ -102,7 +103,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
                 eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
-                eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun)))
+                eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun), eq(complementDependentMode)))
                 .thenReturn(executeServiceResult);
 
         //When
@@ -141,7 +142,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
                 eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
-                eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun))).thenReturn(executeServiceResult);
+                eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun),
+                eq(complementDependentMode))).thenReturn(executeServiceResult);
 
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
@@ -178,7 +180,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
                 eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
-                eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun))).thenReturn(executeServiceResult);
+                eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun),
+                eq(complementDependentMode))).thenReturn(executeServiceResult);
 
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
@@ -203,7 +206,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
 				eq(null), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
                 eq(0), eq(null), eq(null), eq("default"), eq(-1L),
-                eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0))).thenReturn(executeServiceResult);
+                eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0),
+                eq(complementDependentMode))).thenReturn(executeServiceResult);
 
 		//When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)

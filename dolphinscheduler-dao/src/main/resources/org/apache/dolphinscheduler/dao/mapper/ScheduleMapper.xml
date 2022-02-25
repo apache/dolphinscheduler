@@ -70,6 +70,17 @@
         from t_ds_schedules
         where process_definition_code = #{processDefinitionCode}
     </select>
+
+    <select id="querySchedulesByProcessDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select
+        <include refid="baseSql"/>
+        from t_ds_schedules
+        where process_definition_code in
+        <foreach collection="processDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+    </select>
+
     <select id="queryReleaseSchedulerListByProcessDefinitionCode"
             resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select

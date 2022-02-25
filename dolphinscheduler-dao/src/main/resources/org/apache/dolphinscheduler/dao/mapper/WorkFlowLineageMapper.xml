@@ -88,4 +88,21 @@
          where project_code = #{projectCode}
                 and process_definition_code = #{processDefinitionCode}
     </select>
+
+    <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="DependentProcessDefinition">
+        SELECT
+        c.code AS process_definition_code
+        ,c.name AS process_definition_name
+        ,a.code AS task_definition_code
+        ,a.task_params
+        FROM
+        t_ds_task_definition a
+        JOIN t_ds_process_task_relation b ON a.code	= b.pre_task_code and a.version = b.pre_task_version
+        JOIN t_ds_process_definition c ON c.code = b.process_definition_code AND c.version = b.process_definition_version AND c.project_code = b.project_code
+        WHERE 1=1
+        <if test="code != null and code != ''">
+            AND a.task_params LIKE concat('%', #{code}, '%')
+        </if>
+        AND a.task_type = 'DEPENDENT'
+    </select>
 </mapper>
