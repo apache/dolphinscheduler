@@ -46,7 +46,7 @@ export function useSwitch({
     rawScript: '',
     switchResult: {},
     dependTaskList: [],
-    nextNode: 0
+    nextNode: undefined
   } as INodeData)
 
   let extra: IJsonItem[] = []

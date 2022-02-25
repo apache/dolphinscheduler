@@ -191,6 +191,12 @@ export function formatParams(data: INodeData): {
     buildRawScript(data)
   }
 
+  if (data.taskType === 'SWITCH') {
+    taskParams.switchResult = {}
+    taskParams.switchResult.dependTaskList = data.dependTaskList
+    taskParams.switchResult.nextNode = data.nextNode
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),

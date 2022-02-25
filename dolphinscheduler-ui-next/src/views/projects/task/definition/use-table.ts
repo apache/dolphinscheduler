@@ -134,7 +134,7 @@ export function useTable(onEdit: Function) {
                         type: 'info',
                         size: 'small',
                         disabled:
-                          ['CONDITIONS', 'SWITCH1'].includes(row.taskType) ||
+                          ['CONDITIONS', 'SWITCH'].includes(row.taskType) ||
                           (!!row.processDefinitionCode &&
                             row.processReleaseState === 'ONLINE'),
                         onClick: () => {

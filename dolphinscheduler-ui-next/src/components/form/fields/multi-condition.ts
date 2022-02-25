@@ -28,6 +28,7 @@ import {
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import type { IJsonItem, FormItemRule } from '../types'
 import getField from "@/components/form/fields/get-field";
+import {formatValidate} from "@/components/form/utils";
 
 const MultiCondition = defineComponent({
   name: 'MultiCondition',
@@ -79,6 +80,12 @@ export function renderMultiCondition(
   // the item is the options of this component in the form.
   const { field, children = [] } = item
 
+  children.forEach((child: IJsonItem) => {
+    if (child.validate) {
+      ruleItem[child.field] = formatValidate(child.validate)
+    }
+  })
+
   const getChild = (item: object, i: number) =>
       children.map((child: IJsonItem) => {
         return h(
@@ -89,13 +96,13 @@ export function renderMultiCondition(
               path: `${fields[field]}[${i}].${child.field}`,
               span: unref(child.span)
             },
-            () => getField(child, item)
+            () => getField(child, fields[field][i])
         )
       })
 
   //initialize the component by using data
   const getChildren = ({ disabled }: { disabled: boolean }) =>
-    fields[item.field].map((item: object, i: number) => {
+    fields[field].map((item: object, i: number) => {
       return h(NGrid, { xGap: 10 }, () => [
         ...getChild(item, i),
         h(
@@ -127,9 +134,15 @@ export function renderMultiCondition(
   return h(
      MultiCondition,
     {
-      name: item.field,
+      name: field,
       onAdd: () => {
-        fields[item.field].push('')
+        const newCondition = {} as any
+        children.map((child: IJsonItem) => {
+          if (child.field) {
+            newCondition[child.field] = null
+          }
+        })
+        fields[field].push(newCondition)
       }
     },
     {

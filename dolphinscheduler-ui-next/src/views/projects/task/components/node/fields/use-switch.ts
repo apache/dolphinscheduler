@@ -73,6 +73,10 @@ export function useSwitch(
             loading: loading,
             type: 'textarea',
             autosize: { minRows: 2 }
+          },
+          validate: {
+            trigger: ['input', 'blur'],
+            required: true
           }
         },
         {
@@ -81,10 +85,9 @@ export function useSwitch(
           span: 18,
           name: t('project.node.switch_branch_flow'),
           options: branchFlowOptions,
-          props: {
-            loading: loading,
-            type: 'textarea',
-            autosize: { minRows: 2 }
+          validate: {
+            trigger: ['input', 'blur'],
+            required: true
           }
         }
       ]
