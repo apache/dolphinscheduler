@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -179,11 +180,8 @@ public class MasterSchedulerService extends Thread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
-        if (CollectionUtils.isEmpty(commands)) {
-            return null;
-        }
 
-        List<ProcessInstance> processInstances = new ArrayList<>(commands.size());
+        List<ProcessInstance> processInstances = Collections.synchronizedList(new ArrayList<>(commands.size()));
         CountDownLatch latch = new CountDownLatch(commands.size());
         for (final Command command : commands) {
             masterPrepareExecService.execute(() -> {
