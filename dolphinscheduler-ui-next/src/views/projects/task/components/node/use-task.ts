@@ -28,16 +28,16 @@ import { useProcedure } from './tasks/use-procedure'
 import { useSqoop } from './tasks/use-sqoop'
 import { useSeaTunnel } from './tasks/use-sea-tunnel'
 import { useSwitch } from './tasks/use-switch'
-import { useDataX } from "./tasks/use-datax"
+import { useConditions } from './tasks/use-conditions'
+import { useDataX } from './tasks/use-datax'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
-
 export function useTask({
-  data,
-  projectCode,
-  from,
-  readonly
-}: {
+                          data,
+                          projectCode,
+                          from,
+                          readonly
+                        }: {
   data: ITaskData
   projectCode: number
   from?: number
@@ -144,6 +144,15 @@ export function useTask({
 
   if (taskType === 'SWITCH') {
     node = useSwitch({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'CONDITIONS') {
+    node = useConditions({
       projectCode,
       from,
       readonly,

@@ -21,9 +21,9 @@ import type {
   ITaskData,
   ITaskParams,
   ISqoopTargetParams,
-  ISqoopSourceParams
+  ISqoopSourceParams,
+  ILocalParam
 } from './types'
-import {ILocalParam} from "./types";
 
 export function formatParams(data: INodeData): {
   processDefinitionCode: string
@@ -198,6 +198,13 @@ export function formatParams(data: INodeData): {
     taskParams.switchResult.nextNode = data.nextNode
   }
 
+  if (data.taskType === 'CONDITIONS') {
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: data.dependTaskList
+    }
+  }
+
   if (data.taskType === 'DATAX') {
     taskParams.customConfig = data.customConfig
     if (taskParams.customConfig === 0) {
@@ -364,6 +371,10 @@ export function formatModel(data: ITaskData) {
     params.nextNode = data.taskParams.switchResult?.nextNode
   }
 
+  if (data.taskParams?.dependence) {
+    params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
+    params.relation = data.taskParams?.dependence.relation
+  }
   return params
 }
 

@@ -24,6 +24,8 @@ import type { IDataBase } from '@/service/modules/data-source/types'
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
+type RelationType = 'AND' | 'OR'
+type ITaskType = TaskType
 
 interface IOption {
   label: string
@@ -48,8 +50,10 @@ interface ILocalParam {
 }
 
 interface IDependTask {
-  condition: string
-  nextNode: number
+  condition?: string
+  nextNode?: number
+  relation?: RelationType
+  dependItemList?: { depTaskCode?: number; status?: 'SUCCESS' | 'FAILURE' }[]
 }
 
 interface ISwitchResult {
@@ -145,7 +149,6 @@ interface ISqoopSourceParams {
   hivePartitionKey?: string
   hivePartitionValue?: string
 }
-
 interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
@@ -199,6 +202,10 @@ interface ITaskParams {
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
+  dependence?: {
+    relation?: RelationType
+    dependTaskList?: IDependTask[]
+  }
   customConfig?: number
   json?: string
   dsType?: string
@@ -212,15 +219,17 @@ interface ITaskParams {
   xmx?: number
 }
 
-type ITaskType = TaskType
-
 interface INodeData
-  extends Omit<
-      ITaskParams,
-      'resourceList' | 'mainJar' | 'targetParams' | 'sourceParams'
-    >,
-    ISqoopTargetData,
-    ISqoopSourceData {
+    extends Omit<
+        ITaskParams,
+        | 'resourceList'
+        | 'mainJar'
+        | 'targetParams'
+        | 'sourceParams'
+        | 'dependence'
+        >,
+        ISqoopTargetData,
+        ISqoopSourceData {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -239,7 +248,7 @@ interface INodeData
   workerGroup?: string
   code?: number
   name?: string
-  preTasks?: []
+  preTasks?: number[]
   preTaskOptions?: []
   postTaskOptions?: []
   resourceList?: number[]
@@ -249,13 +258,14 @@ interface INodeData
   method?: string
   masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
+  relation?: RelationType
 }
 
 interface ITaskData
-  extends Omit<
-    INodeData,
-    'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
-  > {
+    extends Omit<
+        INodeData,
+        'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
+        > {
   name?: string
   taskPriority?: string
   timeoutFlag: 'OPEN' | 'CLOSE'
