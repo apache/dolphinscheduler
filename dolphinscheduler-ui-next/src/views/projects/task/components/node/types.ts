@@ -220,16 +220,16 @@ interface ITaskParams {
 }
 
 interface INodeData
-    extends Omit<
-        ITaskParams,
-        | 'resourceList'
-        | 'mainJar'
-        | 'targetParams'
-        | 'sourceParams'
-        | 'dependence'
-        >,
-        ISqoopTargetData,
-        ISqoopSourceData {
+  extends Omit<
+      ITaskParams,
+      | 'resourceList'
+      | 'mainJar'
+      | 'targetParams'
+      | 'sourceParams'
+      | 'dependence'
+    >,
+    ISqoopTargetData,
+    ISqoopSourceData {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -262,10 +262,10 @@ interface INodeData
 }
 
 interface ITaskData
-    extends Omit<
-        INodeData,
-        'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
-        > {
+  extends Omit<
+    INodeData,
+    'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
+  > {
   name?: string
   taskPriority?: string
   timeoutFlag: 'OPEN' | 'CLOSE'

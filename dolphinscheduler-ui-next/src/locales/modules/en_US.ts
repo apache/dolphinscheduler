@@ -790,7 +790,7 @@ const project = {
     datax_job_runtime_memory: 'Runtime Memory Limits',
     datax_job_runtime_memory_xms: 'Low Limit Value',
     datax_job_runtime_memory_xmx: 'High Limit Value',
-    datax_job_runtime_memory_unit: 'G',
+    datax_job_runtime_memory_unit: 'G'
   }
 }
 

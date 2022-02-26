@@ -44,7 +44,9 @@ export function useDataX({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    customConfig: data?.taskParams?.customConfig? data?.taskParams?.customConfig : 0,
+    customConfig: data?.taskParams?.customConfig
+      ? data?.taskParams?.customConfig
+      : 0,
     customConfigSwitch: data?.taskParams?.customConfig !== 0,
     dsType: data?.taskParams?.dsType ? data?.taskParams?.dsType : 'MYSQL',
     dataSource: data?.taskParams?.dataSource,

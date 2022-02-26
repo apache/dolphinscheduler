@@ -33,11 +33,11 @@ import { useDataX } from './tasks/use-datax'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
-                          data,
-                          projectCode,
-                          from,
-                          readonly
-                        }: {
+  data,
+  projectCode,
+  from,
+  readonly
+}: {
   data: ITaskData
   projectCode: number
   from?: number

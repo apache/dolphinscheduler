@@ -17,9 +17,9 @@
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
-import {find, indexOf} from "lodash";
-import { TypeReq } from "@/service/modules/data-source/types";
-import { queryDataSourceList } from "@/service/modules/data-source";
+import { find, indexOf } from 'lodash'
+import { TypeReq } from '@/service/modules/data-source/types'
+import { queryDataSourceList } from '@/service/modules/data-source'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -74,61 +74,78 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const datasourceTypeOptions = ref([] as any)
   const datasourceOptions = ref([] as any)
   const destinationDatasourceOptions = ref([] as any)
-  const jobSpeedByteOptions : any[] = [
+  const jobSpeedByteOptions: any[] = [
     {
-      label: '不限制', value: 0
+      label: '不限制',
+      value: 0
     },
     {
-      label: '1KB', value: 1024
+      label: '1KB',
+      value: 1024
     },
     {
-      label: '10KB', value: 10240
+      label: '10KB',
+      value: 10240
     },
     {
-      label: '50KB', value: 51200
+      label: '50KB',
+      value: 51200
     },
     {
-      label: '100KB', value: 102400
+      label: '100KB',
+      value: 102400
     },
     {
-      label: '512KB', value: 524288
+      label: '512KB',
+      value: 524288
     }
   ]
-  const jobSpeedRecordOptions : any[] = [
+  const jobSpeedRecordOptions: any[] = [
     {
-      label: '不限制', value: 0
+      label: '不限制',
+      value: 0
     },
     {
-      label: '500', value: 500
+      label: '500',
+      value: 500
     },
     {
-      label: '1000', value: 1000
+      label: '1000',
+      value: 1000
     },
     {
-      label: '1500', value: 1500
+      label: '1500',
+      value: 1500
     },
     {
-      label: '2000', value: 2000
+      label: '2000',
+      value: 2000
     },
     {
-      label: '2500', value: 2500
+      label: '2500',
+      value: 2500
     },
     {
-      label: '3000', value: 3000
+      label: '3000',
+      value: 3000
     }
   ]
   const memoryLimitOptions = [
     {
-      label: '1G', value: 1
+      label: '1G',
+      value: 1
     },
     {
-      label: '2G', value: 2
+      label: '2G',
+      value: 2
     },
     {
-      label: '3G', value: 3
+      label: '3G',
+      value: 3
     },
     {
-      label: '4G', value: 4
+      label: '4G',
+      value: 4
     }
   ]
   const loading = ref(false)
@@ -138,8 +155,8 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     loading.value = true
     try {
       datasourceTypeOptions.value = datasourceTypes
-      .filter((item) => !item.disabled)
-      .map((item) => ({ label: item.code, value: item.code }))
+        .filter((item) => !item.disabled)
+        .map((item) => ({ label: item.code, value: item.code }))
       loading.value = false
     } catch (err) {
       loading.value = false
@@ -154,7 +171,9 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       datasourceOptions.value.push({ label: item.name, value: String(item.id) })
     })
     if (datasourceOptions.value && model.dataSource) {
-      let item = find(datasourceOptions.value, { value: String(model.dataSource) })
+      let item = find(datasourceOptions.value, {
+        value: String(model.dataSource)
+      })
       if (!item) {
         model.dataSource = null
       }
@@ -166,10 +185,15 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     const res = await queryDataSourceList(params)
     destinationDatasourceOptions.value = []
     res.map((item: any) => {
-      destinationDatasourceOptions.value.push({ label: item.name, value: String(item.id) })
+      destinationDatasourceOptions.value.push({
+        label: item.name,
+        value: String(item.id)
+      })
     })
     if (destinationDatasourceOptions.value && model.dataTarget) {
-      let item = find(destinationDatasourceOptions.value, { value: String(model.dataTarget) })
+      let item = find(destinationDatasourceOptions.value, {
+        value: String(model.dataTarget)
+      })
       if (!item) {
         model.dataTarget = null
       }
@@ -214,20 +238,20 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   })
 
   const onSourceTypeChange = (type: string) => {
-      model.dsType = type
-      getDatasourceInstances()
+    model.dsType = type
+    getDatasourceInstances()
   }
 
   const onDestinationTypeChange = (type: string) => {
-      model.dtType = type
-      getDestinationDatasourceInstances()
+    model.dtType = type
+    getDestinationDatasourceInstances()
   }
 
   watch(
-      () => model.customConfigSwitch,
-      () => {
-        initConstants()
-      }
+    () => model.customConfigSwitch,
+    () => {
+      initConstants()
+    }
   )
 
   return [
@@ -249,7 +273,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['input', 'blur'],
         required: true
-      },
+      }
     },
     {
       type: 'select',
@@ -322,7 +346,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.datax_target_table'),
       span: destinationDatasourceSpan,
       props: {
-        placeholder: t('project.node.datax_target_table_tips'),
+        placeholder: t('project.node.datax_target_table_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
@@ -390,7 +414,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
               }
 
               const sameItems = model.localParams.filter(
-                  (item: { prop: string }) => item.prop === value
+                (item: { prop: string }) => item.prop === value
               )
 
               if (sameItems.length > 1) {

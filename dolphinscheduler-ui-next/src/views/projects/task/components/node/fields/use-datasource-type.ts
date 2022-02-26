@@ -21,9 +21,9 @@ import type { IJsonItem } from '../types'
 import { indexOf } from 'lodash'
 
 export function useDatasourceType(
-    model: { [field: string]: any },
-    supportedDatasourceType?: string[],
-    field?: string
+  model: { [field: string]: any },
+  supportedDatasourceType?: string[],
+  field?: string
 ): IJsonItem {
   const { t } = useI18n()
 
@@ -112,7 +112,7 @@ export function useDatasourceType(
   })
   return {
     type: 'select',
-    field: field? field : 'datasourceType',
+    field: field ? field : 'datasourceType',
     span: 12,
     name: t('project.node.datasource_type'),
     props: {

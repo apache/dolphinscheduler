@@ -781,7 +781,7 @@ const project = {
     datax_job_runtime_memory: '运行内存',
     datax_job_runtime_memory_xms: '最小内存',
     datax_job_runtime_memory_xmx: '最大内存',
-    datax_job_runtime_memory_unit: 'G',
+    datax_job_runtime_memory_unit: 'G'
   }
 }
 
