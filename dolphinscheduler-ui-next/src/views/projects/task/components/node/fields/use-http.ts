@@ -88,7 +88,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
                 return new Error(t('project.node.prop_tips'))
               }
 
-              const sameItems = model.localParams.filter(
+              const sameItems = model.httpParams.filter(
                 (item: { prop: string }) => item.prop === value
               )
 

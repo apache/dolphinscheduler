@@ -30,3 +30,24 @@
     margin-right: 8px;
   }
 }
+.relaction-label {
+  height: 30px;
+  overflow: hidden;
+}
+.relaction-switch {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  &::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 100%;
+    background-color: var(--n-color);
+    border-radius: 4px;
+    position: absolute;
+    top: 0px;
+    left: 20px;
+  }
+}

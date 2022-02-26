@@ -37,6 +37,7 @@ export { useProcedure } from './use-procedure'
 export { useCustomParams } from './use-custom-params'
 export { useSourceType } from './use-sqoop-source-type'
 export { useTargetType } from './use-sqoop-target-type'
+export { useRelationCustomParams } from './use-relation-custom-params'
 
 export { useShell } from './use-shell'
 export { useSpark } from './use-spark'

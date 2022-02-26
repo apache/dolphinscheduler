@@ -49,6 +49,7 @@ interface IFormItem {
   widget: any
   span?: number | Ref<number>
   type?: 'custom'
+  class?: string
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
@@ -69,6 +70,7 @@ interface IJsonItem {
   slots?: object
   span?: number | Ref<number>
   widget?: any
+  class?: string
 }
 
 export {
