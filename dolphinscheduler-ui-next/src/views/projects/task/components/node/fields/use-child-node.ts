@@ -23,7 +23,6 @@ import {
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
 import type { IJsonItem } from '../types'
-import { number } from 'echarts'
 
 export function useChildNode({
   model,

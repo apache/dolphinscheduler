@@ -45,7 +45,6 @@ export function useRelationCustomParams({
       }
     )
   })
-  console.log(model.relation)
   return [
     {
       type: 'custom',
