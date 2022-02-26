@@ -23,10 +23,14 @@ export function renderSwitch(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field } = item
-  return h(NSwitch, {
-    ...props,
-    value: fields[field],
-    onUpdateValue: (value: string) => void (fields[field] = value)
-  })
+  const { props, field, slots = {} } = item
+  return h(
+    NSwitch,
+    {
+      ...props,
+      value: fields[field],
+      onUpdateValue: (value: string) => void (fields[field] = value)
+    },
+    { ...slots }
+  )
 }
