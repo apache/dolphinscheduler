@@ -28,7 +28,9 @@ import { useProcedure } from './tasks/use-procedure'
 import { useSqoop } from './tasks/use-sqoop'
 import { useSeaTunnel } from './tasks/use-sea-tunnel'
 import { useSwitch } from './tasks/use-switch'
+import { useDataX } from "./tasks/use-datax"
 import { IJsonItem, INodeData, ITaskData } from './types'
+
 
 export function useTask({
   data,
@@ -41,6 +43,7 @@ export function useTask({
   from?: number
   readonly?: boolean
 }): { json: IJsonItem[]; model: INodeData } {
+  data.taskType = 'DATAX'
   const { taskType = 'SHELL' } = data
   let node = {} as { json: IJsonItem[]; model: INodeData }
   if (taskType === 'SHELL') {
@@ -142,6 +145,15 @@ export function useTask({
 
   if (taskType === 'SWITCH') {
     node = useSwitch({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'DATAX') {
+    node = useDataX({
       projectCode,
       from,
       readonly,

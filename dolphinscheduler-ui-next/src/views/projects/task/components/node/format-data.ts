@@ -197,6 +197,22 @@ export function formatParams(data: INodeData): {
     taskParams.switchResult.nextNode = data.nextNode
   }
 
+  if (data.taskType === 'DATAX') {
+    taskParams.customConfig = 0
+    taskParams.dsType = data.dsType
+    taskParams.dataSource = data.dataSource
+    taskParams.dtType = data.dtType
+    taskParams.dataTarget = data.dataTarget
+    taskParams.sql = data.sql
+    taskParams.targetTable = data.targetTable
+    taskParams.jobSpeedByte = data.jobSpeedByte
+    taskParams.jobSpeedRecord = data.jobSpeedRecord
+    taskParams.preStatements = data.preStatements
+    taskParams.postStatements = data.postStatements
+    taskParams.xms = data.xms
+    taskParams.xmx = data.xmx
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),

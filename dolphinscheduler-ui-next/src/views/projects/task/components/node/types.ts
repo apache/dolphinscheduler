@@ -199,6 +199,16 @@ interface ITaskParams {
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
+  customConfig?: number
+  dsType?: string
+  dataSource?: number
+  dtType?: string
+  dataTarget?: number
+  targetTable?: string
+  jobSpeedByte?: number
+  jobSpeedRecord?: number
+  xms?: number
+  xmx?: number
 }
 
 type ITaskType = TaskType

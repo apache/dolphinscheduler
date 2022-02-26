@@ -773,7 +773,24 @@ const project = {
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
     and: 'and',
-    or: 'or'
+    or: 'or',
+    datax_custom_template: 'Custom Template Switch',
+    datax_json_template: 'JSON',
+    datax_target_datasource_type: 'Target Datasource Type',
+    datax_target_database: 'Target Database',
+    datax_target_table: 'Target Table',
+    datax_target_table_tips: 'Please enter the name of the target table',
+    datax_target_database_pre_sql: 'Pre SQL Statement',
+    datax_target_database_post_sql: 'Post SQL Statement',
+    datax_non_query_sql_tips: 'Please enter the non-query sql statement',
+    datax_job_speed_byte: 'Speed(Byte count)',
+    datax_job_speed_byte_info: '(0 means unlimited)',
+    datax_job_speed_record: 'Speed(Record count)',
+    datax_job_speed_record_info: '(0 means unlimited)',
+    datax_job_runtime_memory: 'Runtime Memory Limits',
+    datax_job_runtime_memory_xms: 'Low Limit Value',
+    datax_job_runtime_memory_xmx: 'High Limit Value',
+    datax_job_runtime_memory_unit: 'G',
   }
 }
 
