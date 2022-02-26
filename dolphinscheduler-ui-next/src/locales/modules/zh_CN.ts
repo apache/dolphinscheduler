@@ -764,7 +764,24 @@ const project = {
     switch_condition: '条件',
     switch_branch_flow: '分支流转',
     and: '且',
-    or: '或'
+    or: '或',
+    datax_custom_template: '自定义模板',
+    datax_json_template: 'JSON',
+    datax_target_datasource_type: '目标源类型',
+    datax_target_database: '目标源实例',
+    datax_target_table: '目标表',
+    datax_target_table_tips: '请输入目标表名',
+    datax_target_database_pre_sql: '目标库前置SQL',
+    datax_target_database_post_sql: '目标库后置SQL',
+    datax_non_query_sql_tips: '请输入非查询SQL语句',
+    datax_job_speed_byte: '限流(字节数)',
+    datax_job_speed_byte_info: '(KB，0代表不限制)',
+    datax_job_speed_record: '限流(记录数)',
+    datax_job_speed_record_info: '(0代表不限制)',
+    datax_job_runtime_memory: '运行内存',
+    datax_job_runtime_memory_xms: '最小内存',
+    datax_job_runtime_memory_xmx: '最大内存',
+    datax_job_runtime_memory_unit: 'G'
   }
 }
 

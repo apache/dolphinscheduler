@@ -206,6 +206,17 @@ interface ITaskParams {
     relation?: RelationType
     dependTaskList?: IDependTask[]
   }
+  customConfig?: number
+  json?: string
+  dsType?: string
+  dataSource?: number
+  dtType?: string
+  dataTarget?: number
+  targetTable?: string
+  jobSpeedByte?: number
+  jobSpeedRecord?: number
+  xms?: number
+  xmx?: number
 }
 
 interface INodeData
