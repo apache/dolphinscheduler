@@ -22,7 +22,10 @@ import type { IJsonItem } from '../types'
 import { TypeReq } from '@/service/modules/data-source/types'
 import { find } from 'lodash'
 
-export function useDatasource(model: { [field: string]: any }): IJsonItem {
+export function useDatasource(
+  model: { [field: string]: any },
+  field?: string
+): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
@@ -71,7 +74,7 @@ export function useDatasource(model: { [field: string]: any }): IJsonItem {
   })
   return {
     type: 'select',
-    field: 'datasource',
+    field: field ? field : 'datasource',
     span: 12,
     name: t('project.node.datasource_instances'),
     props: {

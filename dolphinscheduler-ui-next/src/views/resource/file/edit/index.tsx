@@ -75,10 +75,10 @@ export default defineComponent({
             class={styles['form-content']}
           >
             <NFormItem path='content'>
-              <div
-                style={{width: '90%'}}
-              >
-                <MonacoEditor v-model={[this.resourceViewRef.value.content, 'value']} />
+              <div style={{ width: '90%' }}>
+                <MonacoEditor
+                  v-model={[this.resourceViewRef.value.content, 'value']}
+                />
               </div>
             </NFormItem>
             {this.routeNameRef === 'resource-file-edit' && (
