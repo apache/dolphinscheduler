@@ -197,6 +197,13 @@ export function formatParams(data: INodeData): {
     taskParams.switchResult.nextNode = data.nextNode
   }
 
+  if (data.taskType === 'CONDITIONS') {
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: data.dependTaskList
+    }
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -339,6 +346,10 @@ export function formatModel(data: ITaskData) {
     params.nextNode = data.taskParams.switchResult?.nextNode
   }
 
+  if (data.taskParams?.dependence) {
+    params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
+    params.relation = data.taskParams?.dependence.relation
+  }
   return params
 }
 
