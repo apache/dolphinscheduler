@@ -58,27 +58,57 @@ const CustomParameters = defineComponent({
   }
 })
 
+const getDefaultValue = (children: IJsonItem[]) => {
+  const defaultValue: { [field: string]: any } = {}
+  const ruleItem: { [key: string]: FormItemRule[] | FormItemRule } = {}
+  const loop = (
+    children: IJsonItem[],
+    parent: { [field: string]: any },
+    ruleParent: { [key: string]: FormItemRule[] | FormItemRule }
+  ) => {
+    children.forEach((child) => {
+      if (Array.isArray(child.children)) {
+        const childDefaultValue = {}
+        const childRuleItem = {}
+        loop(child.children, childDefaultValue, childRuleItem)
+        parent[child.field] = [childDefaultValue]
+        ruleParent[child.field] = {
+          type: 'array',
+          fields: childRuleItem
+        }
+        return
+      } else {
+        parent[child.field] = child.value || null
+        if (child.validate)
+          ruleParent[child.field] = formatValidate(child.validate)
+      }
+    })
+  }
+
+  loop(children, defaultValue, ruleItem)
+  return {
+    defaultValue,
+    ruleItem
+  }
+}
+
 export function renderCustomParameters(
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules: { [key: string]: FormItemRule }[]
+  rules: { [key: string]: FormItemRule | FormItemRule[] }[]
 ) {
   const { field, children = [] } = item
-  let defaultValue: { [field: string]: any } = {}
-  let ruleItem: { [key: string]: FormItemRule } = {}
-
-  children.forEach((child) => {
-    defaultValue[child.field] = child.value || null
-    if (child.validate) ruleItem[child.field] = formatValidate(child.validate)
-  })
-  const getChild = (item: object, i: number) =>
+  const { defaultValue, ruleItem } = getDefaultValue(children)
+  rules.push(ruleItem)
+  const getChild = (item: object, i: number, disabled: boolean) =>
     children.map((child: IJsonItem) => {
       return h(
         NFormItemGi,
         {
           showLabel: false,
           path: `${field}[${i}].${child.field}`,
-          span: unref(child.span)
+          span: unref(child.span),
+          class: child.class
         },
         () => getField(child, item)
       )
@@ -86,7 +116,7 @@ export function renderCustomParameters(
   const getChildren = ({ disabled }: { disabled: boolean }) =>
     fields[field].map((item: object, i: number) => {
       return h(NGrid, { xGap: 10 }, () => [
-        ...getChild(item, i),
+        ...getChild(item, i, disabled),
         h(
           NGridItem,
           {
@@ -112,7 +142,6 @@ export function renderCustomParameters(
         )
       ])
     })
-
   return h(
     CustomParameters,
     {
