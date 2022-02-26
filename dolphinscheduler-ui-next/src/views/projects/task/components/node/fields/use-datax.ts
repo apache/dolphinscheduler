@@ -176,10 +176,41 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     }
   }
 
+  const sqlEditorSpan = ref(24)
+  const jsonEditorSpan = ref(0)
+  const datasourceSpan = ref(12)
+  const destinationDatasourceSpan = ref(8)
+  const otherStatementSpan = ref(22)
+  const jobSpeedSpan = ref(12)
+  const customParameterSpan = ref(0)
+
+  const initConstants = () => {
+    if (model.customConfigSwitch) {
+      model.customConfig = 1
+      sqlEditorSpan.value = 0
+      jsonEditorSpan.value = 24
+      datasourceSpan.value = 0
+      destinationDatasourceSpan.value = 0
+      otherStatementSpan.value = 0
+      jobSpeedSpan.value = 0
+      customParameterSpan.value = 24
+    } else {
+      model.customConfig = 0
+      sqlEditorSpan.value = 24
+      jsonEditorSpan.value = 0
+      datasourceSpan.value = 12
+      destinationDatasourceSpan.value = 8
+      otherStatementSpan.value = 22
+      jobSpeedSpan.value = 12
+      customParameterSpan.value = 0
+    }
+  }
+
   onMounted(() => {
     getDatasourceTypes()
     getDatasourceInstances()
     getDestinationDatasourceInstances()
+    initConstants()
   })
 
   const onSourceTypeChange = (type: string) => {
@@ -192,23 +223,10 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       getDestinationDatasourceInstances()
   }
 
-  const editorField = ref('sql')
-  const editorName = ref(t('project.node.sql_statement'))
-
-
   watch(
       () => model.customConfigSwitch,
       () => {
-        console.log(model.customConfigSwitch)
-        if (model.customConfigSwitch) {
-          editorField.value = 'json'
-          model.customConfig = 1
-          editorName.value = t('project.node.datax_json_template')
-        } else {
-          editorField.value = 'sql'
-          model.customConfig = 0
-          editorName.value = t('project.node.sql_statement')
-        }
+        initConstants()
       }
   )
 
@@ -221,7 +239,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'select',
       field: 'dsType',
-      span: 12,
+      span: datasourceSpan,
       name: t('project.node.datasource_type'),
       props: {
         loading: loading,
@@ -236,7 +254,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'select',
       field: 'dataSource',
-      span: 12,
+      span: datasourceSpan,
       name: t('project.node.datasource_instances'),
       props: {
         loading: loading
@@ -251,7 +269,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'editor',
       field: 'sql',
       name: t('project.node.sql_statement'),
-      span: 0,
+      span: sqlEditorSpan,
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
@@ -261,19 +279,19 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'editor',
       field: 'json',
-      name: t('project.node.sql_statement'),
-      span: 0,
+      name: t('project.node.datax_json_template'),
+      span: jsonEditorSpan,
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
-        message: t('project.node.datax_json_template')
+        message: t('project.node.sql_empty_tips')
       }
     },
     {
       type: 'select',
       field: 'dtType',
       name: t('project.node.datax_target_datasource_type'),
-      span: 8,
+      span: destinationDatasourceSpan,
       props: {
         loading: loading,
         'on-update:value': onDestinationTypeChange
@@ -288,7 +306,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'dataTarget',
       name: t('project.node.datax_target_database'),
-      span: 8,
+      span: destinationDatasourceSpan,
       props: {
         loading: loading
       },
@@ -302,7 +320,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'targetTable',
       name: t('project.node.datax_target_table'),
-      span: 8,
+      span: destinationDatasourceSpan,
       props: {
         placeholder: t('project.node.datax_target_table_tips'),
       },
@@ -315,7 +333,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'multi-input',
       field: 'preStatements',
       name: t('project.node.datax_target_database_pre_sql'),
-      span: 22,
+      span: otherStatementSpan,
       props: {
         placeholder: t('project.node.datax_non_query_sql_tips'),
         type: 'textarea',
@@ -326,7 +344,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'multi-input',
       field: 'postStatements',
       name: t('project.node.datax_target_database_post_sql'),
-      span: 22,
+      span: otherStatementSpan,
       props: {
         placeholder: t('project.node.datax_non_query_sql_tips'),
         type: 'textarea',
@@ -337,7 +355,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'jobSpeedByte',
       name: t('project.node.datax_job_speed_byte'),
-      span: 12,
+      span: jobSpeedSpan,
       options: jobSpeedByteOptions,
       value: 0
     },
@@ -345,9 +363,52 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'jobSpeedRecord',
       name: t('project.node.datax_job_speed_record'),
-      span: 12,
+      span: jobSpeedSpan,
       options: jobSpeedRecordOptions,
       value: 1000
+    },
+    {
+      type: 'custom-parameters',
+      field: 'localParams',
+      name: t('project.node.custom_parameters'),
+      span: customParameterSpan,
+      children: [
+        {
+          type: 'input',
+          field: 'prop',
+          span: 10,
+          props: {
+            placeholder: t('project.node.prop_tips'),
+            maxLength: 256
+          },
+          validate: {
+            trigger: ['input', 'blur'],
+            required: true,
+            validator(validate: any, value: string) {
+              if (!value) {
+                return new Error(t('project.node.prop_tips'))
+              }
+
+              const sameItems = model.localParams.filter(
+                  (item: { prop: string }) => item.prop === value
+              )
+
+              if (sameItems.length > 1) {
+                return new Error(t('project.node.prop_repeat'))
+              }
+            }
+          }
+        },
+        {
+          type: 'input',
+          field: 'value',
+          span: 10,
+          props: {
+            placeholder: t('project.node.value_tips'),
+            maxLength: 256
+          }
+        }
+      ]
     },
     {
       type: 'select',

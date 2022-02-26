@@ -23,6 +23,7 @@ import type {
   ISqoopTargetParams,
   ISqoopSourceParams
 } from './types'
+import {ILocalParam} from "./types";
 
 export function formatParams(data: INodeData): {
   processDefinitionCode: string
@@ -198,17 +199,25 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DATAX') {
-    taskParams.customConfig = 0
-    taskParams.dsType = data.dsType
-    taskParams.dataSource = data.dataSource
-    taskParams.dtType = data.dtType
-    taskParams.dataTarget = data.dataTarget
-    taskParams.sql = data.sql
-    taskParams.targetTable = data.targetTable
-    taskParams.jobSpeedByte = data.jobSpeedByte
-    taskParams.jobSpeedRecord = data.jobSpeedRecord
-    taskParams.preStatements = data.preStatements
-    taskParams.postStatements = data.postStatements
+    taskParams.customConfig = data.customConfig
+    if (taskParams.customConfig === 0) {
+      taskParams.dsType = data.dsType
+      taskParams.dataSource = data.dataSource
+      taskParams.dtType = data.dtType
+      taskParams.dataTarget = data.dataTarget
+      taskParams.sql = data.sql
+      taskParams.targetTable = data.targetTable
+      taskParams.jobSpeedByte = data.jobSpeedByte
+      taskParams.jobSpeedRecord = data.jobSpeedRecord
+      taskParams.preStatements = data.preStatements
+      taskParams.postStatements = data.postStatements
+    } else {
+      taskParams.json = data.json
+      data?.localParams?.map((param: ILocalParam) => {
+        param.direct = 'IN'
+        param.type = 'VARCHAR'
+      })
+    }
     taskParams.xms = data.xms
     taskParams.xmx = data.xmx
   }

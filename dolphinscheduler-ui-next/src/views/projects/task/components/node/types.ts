@@ -200,6 +200,7 @@ interface ITaskParams {
   dependTaskList?: IDependTask[]
   nextNode?: number
   customConfig?: number
+  json?: string
   dsType?: string
   dataSource?: number
   dtType?: string
