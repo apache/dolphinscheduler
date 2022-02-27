@@ -49,10 +49,10 @@ export function createProcessDefinition(
   })
 }
 
-export function queryAllByProjectCode(code: CodeReq): any {
+export function queryAllByProjectCode(code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/all`,
-    method: 'post'
+    method: 'get'
   })
 }
 
@@ -97,7 +97,7 @@ export function batchMoveByCodes(
 
 export function getTaskListByDefinitionCodes(
   params: CodesReq,
-  code: CodeReq
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/batch-query-tasks`,
@@ -189,8 +189,8 @@ export function release(
 }
 
 export function getTasksByDefinitionCode(
-  code: CodeReq,
-  processCode: CodeReq
+  code: number,
+  processCode: number
 ): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/tasks`,

@@ -19,9 +19,12 @@ import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
+export function useDependentTimeout(model: {
+  [field: string]: any
+}): IJsonItem[] {
   const { t } = useI18n()
-  const span = computed(() => (model.timeoutFlag ? 12 : 0))
+  const timeCompleteSpan = computed(() => (model.timeoutShowFlag ? 24 : 0))
+  const timeCompleteEnableSpan = computed(() => (model.timeoutFlag ? 12 : 0))
 
   const strategyOptions = [
     {
@@ -44,31 +47,28 @@ export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'switch',
-      field: 'timeoutFlag',
+      field: 'timeoutShowFlag',
       name: t('project.node.timeout_alarm')
     },
     {
-      type: 'checkbox',
-      field: 'timeoutNotifyStrategy',
-      name: t('project.node.timeout_strategy'),
-      options: strategyOptions,
-      span: span,
-      validate: {
-        trigger: ['input'],
-        validator(validate: any, value: []) {
-          if (model.timeoutFlag && !value.length) {
-            return new Error(t('project.node.timeout_strategy_tips'))
-          }
+      type: 'switch',
+      field: 'timeoutFlag',
+      name: t('project.node.waiting_dependent_complete'),
+      props: {
+        'on-update:value': (value: boolean) => {
+          model.timeoutNotifyStrategy = value ? ['WARN'] : null
+          model.timeout = value ? 30 : null
         }
-      }
+      },
+      span: timeCompleteSpan
     },
     {
       type: 'input-number',
       field: 'timeout',
       name: t('project.node.timeout_period'),
-      span,
+      span: timeCompleteEnableSpan,
       props: {
-        max: Math.pow(10, 10) - 1
+        max: Math.pow(9, 10) - 1
       },
       slots: {
         suffix: () => t('project.node.minute')
@@ -78,6 +78,21 @@ export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
         validator(validate: any, value: number) {
           if (model.timeoutFlag && !/^[1-9]\d*$/.test(String(value))) {
             return new Error(t('project.node.timeout_period_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'checkbox',
+      field: 'timeoutNotifyStrategy',
+      name: t('project.node.timeout_strategy'),
+      options: strategyOptions,
+      span: timeCompleteEnableSpan,
+      validate: {
+        trigger: ['input'],
+        validator(validate: any, value: []) {
+          if (model.waitCompleteTimeoutEnable && !value.length) {
+            return new Error(t('project.node.timeout_strategy_tips'))
           }
         }
       }

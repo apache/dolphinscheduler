@@ -49,11 +49,23 @@ interface ILocalParam {
   value?: string
 }
 
+interface IDependpendItem {
+  depTaskCode?: number
+  status?: 'SUCCESS' | 'FAILURE'
+  definitionCodeOptions?: IOption[]
+  depTaskCodeOptions?: IOption[]
+  dateOptions?: IOption[]
+  projectCode?: number
+  definitionCode?: number
+  cycle?: 'month' | 'week' | 'day' | 'hour'
+  dateValue?: string
+}
+
 interface IDependTask {
   condition?: string
   nextNode?: number
   relation?: RelationType
-  dependItemList?: { depTaskCode?: number; status?: 'SUCCESS' | 'FAILURE' }[]
+  dependItemList?: IDependpendItem[]
 }
 
 interface ISwitchResult {
@@ -289,5 +301,7 @@ export {
   ModelType,
   SourceType,
   ISqoopSourceParams,
-  ISqoopTargetParams
+  ISqoopTargetParams,
+  IDependTask,
+  IDependpendItem
 }
