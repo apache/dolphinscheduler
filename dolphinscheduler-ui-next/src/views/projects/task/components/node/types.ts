@@ -24,6 +24,8 @@ import type { IDataBase } from '@/service/modules/data-source/types'
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
+type RelationType = 'AND' | 'OR'
+type ITaskType = TaskType
 
 interface IOption {
   label: string
@@ -45,6 +47,30 @@ interface ILocalParam {
   direct?: string
   type?: string
   value?: string
+}
+
+interface IDependpendItem {
+  depTaskCode?: number
+  status?: 'SUCCESS' | 'FAILURE'
+  definitionCodeOptions?: IOption[]
+  depTaskCodeOptions?: IOption[]
+  dateOptions?: IOption[]
+  projectCode?: number
+  definitionCode?: number
+  cycle?: 'month' | 'week' | 'day' | 'hour'
+  dateValue?: string
+}
+
+interface IDependTask {
+  condition?: string
+  nextNode?: number
+  relation?: RelationType
+  dependItemList?: IDependpendItem[]
+}
+
+interface ISwitchResult {
+  dependTaskList?: IDependTask[]
+  nextNode?: number
 }
 
 interface ISourceItem {
@@ -135,7 +161,6 @@ interface ISqoopSourceParams {
   hivePartitionKey?: string
   hivePartitionValue?: string
 }
-
 interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
@@ -186,14 +211,34 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  switchResult?: ISwitchResult
+  dependTaskList?: IDependTask[]
+  nextNode?: number
+  dependence?: {
+    relation?: RelationType
+    dependTaskList?: IDependTask[]
+  }
+  customConfig?: number
+  json?: string
+  dsType?: string
+  dataSource?: number
+  dtType?: string
+  dataTarget?: number
+  targetTable?: string
+  jobSpeedByte?: number
+  jobSpeedRecord?: number
+  xms?: number
+  xmx?: number
 }
-
-type ITaskType = TaskType
 
 interface INodeData
   extends Omit<
       ITaskParams,
-      'resourceList' | 'mainJar' | 'targetParams' | 'sourceParams'
+      | 'resourceList'
+      | 'mainJar'
+      | 'targetParams'
+      | 'sourceParams'
+      | 'dependence'
     >,
     ISqoopTargetData,
     ISqoopSourceData {
@@ -215,7 +260,7 @@ interface INodeData
   workerGroup?: string
   code?: number
   name?: string
-  preTasks?: []
+  preTasks?: number[]
   preTaskOptions?: []
   postTaskOptions?: []
   resourceList?: number[]
@@ -225,6 +270,7 @@ interface INodeData
   method?: string
   masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
+  relation?: RelationType
 }
 
 interface ITaskData
@@ -255,5 +301,7 @@ export {
   ModelType,
   SourceType,
   ISqoopSourceParams,
-  ISqoopTargetParams
+  ISqoopTargetParams,
+  IDependTask,
+  IDependpendItem
 }

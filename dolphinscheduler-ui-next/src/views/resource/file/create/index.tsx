@@ -97,7 +97,6 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.file_content')} path='content'>
             <div
-              class={styles.cont}
               style={{
                 width: '90%'
               }}

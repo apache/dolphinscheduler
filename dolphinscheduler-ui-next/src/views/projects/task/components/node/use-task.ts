@@ -27,6 +27,10 @@ import { useSql } from './tasks/use-sql'
 import { useProcedure } from './tasks/use-procedure'
 import { useSqoop } from './tasks/use-sqoop'
 import { useSeaTunnel } from './tasks/use-sea-tunnel'
+import { useSwitch } from './tasks/use-switch'
+import { useConditions } from './tasks/use-conditions'
+import { useDataX } from './tasks/use-datax'
+import { useDependent } from './tasks/use-dependent'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -132,6 +136,41 @@ export function useTask({
   }
   if (taskType === 'SEATUNNEL') {
     node = useSeaTunnel({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'SWITCH') {
+    node = useSwitch({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'CONDITIONS') {
+    node = useConditions({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+
+  if (taskType === 'DATAX') {
+    node = useDataX({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'DEPENDENT') {
+    node = useDependent({
       projectCode,
       from,
       readonly,

@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-import { find, omit } from 'lodash'
+import { find, omit, cloneDeep } from 'lodash'
 import type {
   INodeData,
   ITaskData,
   ITaskParams,
   ISqoopTargetParams,
-  ISqoopSourceParams
+  ISqoopSourceParams,
+  ILocalParam,
+  IDependTask
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -191,6 +193,61 @@ export function formatParams(data: INodeData): {
     buildRawScript(data)
   }
 
+  if (data.taskType === 'SWITCH') {
+    taskParams.switchResult = {}
+    taskParams.switchResult.dependTaskList = data.dependTaskList
+    taskParams.switchResult.nextNode = data.nextNode
+  }
+
+  if (data.taskType === 'CONDITIONS') {
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: data.dependTaskList
+    }
+  }
+
+  if (data.taskType === 'DATAX') {
+    taskParams.customConfig = data.customConfig
+    if (taskParams.customConfig === 0) {
+      taskParams.dsType = data.dsType
+      taskParams.dataSource = data.dataSource
+      taskParams.dtType = data.dtType
+      taskParams.dataTarget = data.dataTarget
+      taskParams.sql = data.sql
+      taskParams.targetTable = data.targetTable
+      taskParams.jobSpeedByte = data.jobSpeedByte
+      taskParams.jobSpeedRecord = data.jobSpeedRecord
+      taskParams.preStatements = data.preStatements
+      taskParams.postStatements = data.postStatements
+    } else {
+      taskParams.json = data.json
+      data?.localParams?.map((param: ILocalParam) => {
+        param.direct = 'IN'
+        param.type = 'VARCHAR'
+      })
+    }
+    taskParams.xms = data.xms
+    taskParams.xmx = data.xmx
+  }
+  if (data.taskType === 'DEPENDENT') {
+    const dependTaskList = cloneDeep(data.dependTaskList)?.map(
+      (taskItem: IDependTask) => {
+        if (taskItem.dependItemList?.length) {
+          taskItem.dependItemList.forEach((dependItem) => {
+            delete dependItem.definitionCodeOptions
+            delete dependItem.depTaskCodeOptions
+            delete dependItem.dateOptions
+          })
+        }
+        return taskItem
+      }
+    )
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: dependTaskList
+    }
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -325,6 +382,18 @@ export function formatModel(data: ITaskData) {
     params.rawScript = data.taskParams?.rawScript
   }
 
+  if (data.taskParams?.switchResult) {
+    params.switchResult = data.taskParams.switchResult
+    params.dependTaskList = data.taskParams.switchResult?.dependTaskList
+      ? data.taskParams.switchResult?.dependTaskList
+      : []
+    params.nextNode = data.taskParams.switchResult?.nextNode
+  }
+
+  if (data.taskParams?.dependence) {
+    params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
+    params.relation = data.taskParams?.dependence.relation
+  }
   return params
 }
 
