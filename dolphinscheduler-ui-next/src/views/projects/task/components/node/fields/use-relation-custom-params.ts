@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, h, watchEffect } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
 import styles from '../index.module.scss'
 import type { IJsonItem } from '../types'
 
 export function useRelationCustomParams({
   model,
   children,
-  childrenField
+  childrenField,
+  name
 }: {
   model: {
     [field: string]: any
   }
   children: IJsonItem
   childrenField: string
+  name: string
 }): IJsonItem[] {
   const { t } = useI18n()
   const firstLevelRelationSpan = computed(() =>
@@ -48,7 +49,7 @@ export function useRelationCustomParams({
   return [
     {
       type: 'custom',
-      name: t('project.node.custom_parameters'),
+      name: t(`project.node.${name}`),
       field: 'relationLabel',
       span: 24,
       class: styles['relaction-label']

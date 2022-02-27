@@ -18,6 +18,7 @@
 import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
 import { NFormItemGi, NSpace, NButton, NGrid, NGridItem } from 'naive-ui'
+import { isFunction } from 'lodash'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import getField from './get-field'
 import { formatValidate } from '../utils'
@@ -67,20 +68,21 @@ const getDefaultValue = (children: IJsonItem[]) => {
     ruleParent: { [key: string]: FormItemRule[] | FormItemRule }
   ) => {
     children.forEach((child) => {
-      if (Array.isArray(child.children)) {
+      const mergedChild = isFunction(child) ? child() : child
+      if (Array.isArray(mergedChild.children)) {
         const childDefaultValue = {}
         const childRuleItem = {}
-        loop(child.children, childDefaultValue, childRuleItem)
-        parent[child.field] = [childDefaultValue]
-        ruleParent[child.field] = {
+        loop(mergedChild.children, childDefaultValue, childRuleItem)
+        parent[mergedChild.field] = [childDefaultValue]
+        ruleParent[mergedChild.field] = {
           type: 'array',
           fields: childRuleItem
         }
         return
       } else {
-        parent[child.field] = child.value || null
-        if (child.validate)
-          ruleParent[child.field] = formatValidate(child.validate)
+        parent[mergedChild.field] = mergedChild.value || null
+        if (mergedChild.validate)
+          ruleParent[mergedChild.field] = formatValidate(mergedChild.validate)
       }
     })
   }
@@ -97,20 +99,22 @@ export function renderCustomParameters(
   fields: { [field: string]: any },
   rules: { [key: string]: FormItemRule | FormItemRule[] }[]
 ) {
-  const { field, children = [] } = item
+  const mergedItem = isFunction(item) ? item() : item
+  const { field, children = [] } = mergedItem
   const { defaultValue, ruleItem } = getDefaultValue(children)
   rules.push(ruleItem)
   const getChild = (item: object, i: number, disabled: boolean) =>
     children.map((child: IJsonItem) => {
+      const mergedChild = isFunction(child) ? child(i) : child
       return h(
         NFormItemGi,
         {
           showLabel: false,
-          path: `${field}[${i}].${child.field}`,
-          span: unref(child.span),
-          class: child.class
+          path: `${field}[${i}].${mergedChild.field}`,
+          span: unref(mergedChild.span),
+          class: mergedChild.class
         },
-        () => getField(child, item)
+        () => getField(mergedChild, item)
       )
     })
   const getChildren = ({ disabled }: { disabled: boolean }) =>

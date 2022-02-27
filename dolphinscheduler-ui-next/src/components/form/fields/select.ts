@@ -17,17 +17,21 @@
 
 import { h, unref } from 'vue'
 import { NSelect } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderSelect(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field, options = [] } = item
+  const { props, field, options = [] } = isFunction(item) ? item() : item
   return h(NSelect, {
     ...props,
     value: fields[field],
-    onUpdateValue: (value) => void (fields[field] = value),
+    onUpdateValue: (value: any) => {
+      void (fields[field] = value)
+      if (props?.onUpdateValue) props.onUpdateValue(value)
+    },
     options: unref(options)
   })
 }

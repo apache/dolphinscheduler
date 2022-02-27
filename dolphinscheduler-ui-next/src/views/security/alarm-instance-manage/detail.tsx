@@ -25,6 +25,7 @@ import {
   Ref
 } from 'vue'
 import { NSelect, NInput } from 'naive-ui'
+import { isFunction } from 'lodash'
 import Modal from '@/components/modal'
 import Form from '@/components/form'
 import { useI18n } from 'vue-i18n'
@@ -97,7 +98,10 @@ const DetailModal = defineComponent({
       () => {
         if (!state.json?.length) return
         state.json.forEach((item) => {
-          item.name = t('security.alarm_instance' + '.' + item.field)
+          const mergedItem = isFunction(item) ? item() : item
+          mergedItem.name = t(
+            'security.alarm_instance' + '.' + mergedItem.field
+          )
         })
         const { rules: fieldsRules, elements: fieldsElements } =
           getElementByJson(state.json, state.detailForm)

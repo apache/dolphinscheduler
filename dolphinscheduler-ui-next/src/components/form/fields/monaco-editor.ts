@@ -17,13 +17,14 @@
 
 import { h } from 'vue'
 import Editor from '@/components/monaco-editor'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderEditor(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field } = item
+  const { props, field } = isFunction(item) ? item() : item
   return h(Editor, {
     ...props,
     value: fields[field],

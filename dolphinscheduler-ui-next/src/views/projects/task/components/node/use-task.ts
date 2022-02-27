@@ -30,6 +30,7 @@ import { useSeaTunnel } from './tasks/use-sea-tunnel'
 import { useSwitch } from './tasks/use-switch'
 import { useConditions } from './tasks/use-conditions'
 import { useDataX } from './tasks/use-datax'
+import { useDependent } from './tasks/use-dependent'
 import { IJsonItem, INodeData, ITaskData } from './types'
 
 export function useTask({
@@ -162,6 +163,14 @@ export function useTask({
 
   if (taskType === 'DATAX') {
     node = useDataX({
+      projectCode,
+      from,
+      readonly,
+      data
+    })
+  }
+  if (taskType === 'DEPENDENT') {
+    node = useDependent({
       projectCode,
       from,
       readonly,

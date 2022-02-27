@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
 import {
   genTaskCodeList,
   saveSingle,
@@ -27,7 +27,7 @@ import type { ITaskData, INodeData, ISingleSaveReq, IRecord } from './types'
 
 export function useTask(projectCode: number) {
   const initalTask = {
-    taskType: 'SHELL'
+    taskType: 'DEPENDENT'
   } as ITaskData
   const task = reactive({
     taskShow: false,

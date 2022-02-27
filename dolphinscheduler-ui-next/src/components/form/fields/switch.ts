@@ -17,13 +17,14 @@
 
 import { h } from 'vue'
 import { NSwitch } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderSwitch(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field, slots = {} } = item
+  const { props, field, slots = {} } = isFunction(item) ? item() : item
   return h(
     NSwitch,
     {

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { reactive, watch } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function useConditions({
+export function useDependent({
   projectCode,
   from = 0,
   readonly,
@@ -30,23 +30,26 @@ export function useConditions({
   readonly?: boolean
   data?: ITaskData
 }) {
+  const taskCodeOptions = ref([] as { label: string; value: number }[])
   const model = reactive({
-    taskType: 'CONDITIONS',
+    taskType: 'DEPENDENT',
     name: '',
     flag: 'YES',
     description: '',
-    timeoutFlag: false,
+    timeoutShowFlag: false,
     localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
-    timeout: 30,
+    delayTime: 0,
     relation: 'AND',
     dependTaskList: [],
     preTasks: [],
-    successNode: 'success',
-    failedNode: 'failed'
+    timeoutNotifyStrategy: [],
+    timeout: 30,
+    timeoutFlag: false,
+    ...data
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -64,6 +67,21 @@ export function useConditions({
     ]
   }
 
+  watch(
+    () => model.preTasks,
+    () => {
+      taskCodeOptions.value =
+        model.preTaskOptions
+          ?.filter((task: { code: number }) =>
+            model.preTasks?.includes(task.code)
+          )
+          .map((task: { code: number; name: string }) => ({
+            value: task.code,
+            label: task.name
+          })) || []
+    }
+  )
+
   return {
     json: [
       Fields.useName(),
@@ -75,7 +93,7 @@ export function useConditions({
       Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
-      ...Fields.useConditions(model),
+      ...Fields.useDependent(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

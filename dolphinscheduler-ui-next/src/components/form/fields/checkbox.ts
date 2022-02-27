@@ -17,13 +17,14 @@
 
 import { h, unref } from 'vue'
 import { NCheckbox, NCheckboxGroup, NSpace } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderCheckbox(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field, options } = item
+  const { props, field, options } = isFunction(item) ? item() : item
   if (!options) {
     return h(NCheckbox, {
       ...props,
