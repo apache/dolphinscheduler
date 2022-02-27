@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage.NavBarItem;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -44,10 +46,12 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     private List<WebElement> projectList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "el-popconfirm"),
+            @FindBy(className = "el-button--primary"),
     })
+
     private List<WebElement> buttonConfirm;
+
 
     private final CreateProjectForm createProjectForm;
 
@@ -65,36 +69,50 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         createProjectForm().buttonSubmit().click();
 
         new WebDriverWait(driver(), 10)
-            .until(ExpectedConditions.textToBePresentInElementLocated(By.className("project-name"), project));
+                .until(ExpectedConditions.textToBePresentInElementLocated(By.className("project-name"), project));
+
+        return this;
+    }
+
+    public ProjectPage create(String project, String describe) {
+        buttonCreateProject().click();
+        createProjectForm().inputProjectName().sendKeys(project);
+        if (describe != null && describe.length() > 0){
+            createProjectForm().describe().get(0).sendKeys(describe);
+        }
+        createProjectForm().buttonSubmit().click();
+
+        new WebDriverWait(driver(), 10)
+                .until(ExpectedConditions.textToBePresentInElementLocated(By.className("project-name"), project));
 
         return this;
     }
 
     public ProjectPage delete(String project) {
         projectList()
-            .stream()
-            .filter(it -> it.getText().contains(project))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
-            .findElement(By.className("delete")).click();
+                .stream()
+                .filter(it -> it.getText().contains(project))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
+                .findElement(By.className("delete")).click();
 
         buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button is displayed"))
-            .click();
+                .stream()
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No confirm button is displayed"))
+                .click();
 
         return this;
     }
 
     public ProjectDetailPage goTo(String project) {
         projectList().stream()
-                     .filter(it -> it.getText().contains(project))
-                     .map(it -> it.findElement(By.className("project-name")))
-                     .findFirst()
-                     .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
-                     .click();
+                .filter(it -> it.getText().contains(project))
+                .map(it -> it.findElement(By.className("project-name")))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
+                .click();
 
         return new ProjectDetailPage(driver);
     }
@@ -107,6 +125,9 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
         @FindBy(id = "inputProjectName")
         private WebElement inputProjectName;
+
+        @FindBy(className = "el-textarea__inner")
+        private List<WebElement> describe;
 
         @FindBy(id = "btnSubmit")
         private WebElement buttonSubmit;
