@@ -143,7 +143,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     public UserPage authorizeProject(String user, String projectName) {
         clickAuthorize(user);
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(new ByClassName("dialogAuthProject")));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(new ByClassName("dialogAuthProject")));
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthProject().click();
@@ -164,7 +164,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     public UserPage authorizeDataSource(String user, String dataSourceName) {
         clickAuthorize(user);
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(By.className("dialogAuthProject")));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("dialogAuthProject")));
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthDataSource().click();
