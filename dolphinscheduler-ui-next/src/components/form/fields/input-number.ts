@@ -17,20 +17,21 @@
 
 import { h } from 'vue'
 import { NInputNumber } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderInputNumber(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props, field, slots = {} } = item
+  const { props, field, slots = {} } = isFunction(item) ? item() : item
 
   return h(
     NInputNumber,
     {
       ...props,
       value: fields[field],
-      onUpdateValue: (value) => void (fields[field] = value)
+      onUpdateValue: (value: number) => void (fields[field] = value)
     },
     {
       ...slots
