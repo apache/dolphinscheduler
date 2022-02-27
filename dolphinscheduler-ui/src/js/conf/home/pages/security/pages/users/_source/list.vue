@@ -81,6 +81,7 @@
       </el-table>
     </div>
     <el-dialog
+      class="dialogAuthProject"
       v-if="authProjectDialog"
       :visible.sync="authProjectDialog"
       width="auto">
@@ -88,6 +89,7 @@
     </el-dialog>
 
     <el-dialog
+      class="dialogAuthDataSource"
       v-if="authDataSourceDialog"
       :visible.sync="authDataSourceDialog"
       width="auto">

@@ -24,11 +24,14 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByClassName;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
@@ -140,6 +143,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     public UserPage authorizeProject(String user, String projectName) {
         clickAuthorize(user);
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new ByClassName("dialogAuthProject")));
+
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthProject().click();
 
@@ -158,6 +163,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
     public UserPage authorizeDataSource(String user, String dataSourceName) {
         clickAuthorize(user);
+
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new ByClassName("dialogAuthDataSource")));
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthDataSource().click();
@@ -193,7 +200,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         @FindBy(className = "authDataSource")
         private WebElement buttonAuthDataSource;
 
-        @FindBy(className = "btnAuthUdfFunc")
+        @FindBy(className = "authUdfFunc")
         private WebElement buttonAuthUdfFunc;
 
         @FindBy(className = "selectName")
