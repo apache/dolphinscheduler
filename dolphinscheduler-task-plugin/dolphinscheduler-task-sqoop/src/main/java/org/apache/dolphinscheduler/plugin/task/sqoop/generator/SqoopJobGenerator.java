@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HdfsTarge
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HiveTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.MySQLTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 
 /**
  * Sqoop Job Scripts Generator
@@ -62,9 +62,10 @@ public class SqoopJobGenerator {
      * get the final sqoop scripts
      *
      * @param sqoopParameters sqoop params
+     * @param sqoopTaskExecutionContext
      * @return sqoop scripts
      */
-    public String generateSqoopJob(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
+    public String generateSqoopJob(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         String sqoopScripts = "";
 
@@ -75,8 +76,8 @@ public class SqoopJobGenerator {
             }
 
             sqoopScripts = String.format("%s%s%s", commonGenerator.generate(sqoopParameters),
-                sourceGenerator.generate(sqoopParameters, taskExecutionContext),
-                targetGenerator.generate(sqoopParameters, taskExecutionContext));
+                sourceGenerator.generate(sqoopParameters, sqoopTaskExecutionContext),
+                targetGenerator.generate(sqoopParameters, sqoopTaskExecutionContext));
         } else if (SqoopJobType.CUSTOM.getDescp().equals(sqoopParameters.getJobType())) {
             sqoopScripts = sqoopParameters.getCustomShell().replaceAll("\\r\\n", "\n");
         }

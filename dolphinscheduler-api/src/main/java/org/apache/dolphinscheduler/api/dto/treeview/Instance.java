@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.api.dto.treeview;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * Instance
  */

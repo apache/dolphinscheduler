@@ -18,8 +18,9 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
@@ -31,9 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.datax.DataxTaskExecutionContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -145,21 +145,4 @@ public class CommonTaskProcessorTest {
 
     }
 
-    @Test
-    public void testSetDataxTaskRelation() throws Exception {
-
-        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskParams("{\"dataSource\":1,\"dataTarget\":1}");
-        DataSource dataSource = new DataSource();
-        dataSource.setId(1);
-        dataSource.setConnectionParams("");
-        dataSource.setType(DbType.MYSQL);
-        Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);
-
-        commonTaskProcessor.setDataxTaskRelation(dataxTaskExecutionContext, taskInstance);
-
-        Assert.assertEquals(1, dataxTaskExecutionContext.getDataSourceId());
-        Assert.assertEquals(1, dataxTaskExecutionContext.getDataTargetId());
-    }
 }

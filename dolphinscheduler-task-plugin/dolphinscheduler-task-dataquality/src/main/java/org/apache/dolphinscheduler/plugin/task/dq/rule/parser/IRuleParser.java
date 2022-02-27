@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.dq.rule.parser;
 
 import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
-import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 
 import java.util.Map;
 

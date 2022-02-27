@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.dq;
 
 import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkParameters;
-import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
 import java.util.ArrayList;
 import java.util.List;

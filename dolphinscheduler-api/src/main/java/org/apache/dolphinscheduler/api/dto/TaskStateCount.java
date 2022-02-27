@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.dto;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 /**
  * task state count
