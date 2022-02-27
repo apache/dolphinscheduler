@@ -1,4 +1,4 @@
-<h1 align="center">Dolphin Scheduler UI Next</h1>
+# Dolphin Scheduler UI Next
 
 ---
 
