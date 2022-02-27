@@ -16,6 +16,7 @@
  */
 
 import { reactive } from 'vue'
+import { isFunction } from 'lodash'
 import {
   createAlertPluginInstance,
   updateAlertPluginInstance,
@@ -34,7 +35,8 @@ export function useDetail(getFormValues: Function) {
     values: { [field: string]: any } = {}
   ): string => {
     json?.forEach((item) => {
-      item.value = values[item.field]
+      const mergedItem = isFunction(item) ? item() : item
+      mergedItem.value = values[mergedItem.field]
     })
     return JSON.stringify(json)
   }
