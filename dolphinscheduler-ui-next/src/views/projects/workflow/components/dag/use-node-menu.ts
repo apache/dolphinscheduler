@@ -29,6 +29,7 @@ interface Options {
 export function useNodeMenu(options: Options) {
   const { graph } = options
   const startModalShow = ref(false)
+  const logModalShow = ref(false)
   const menuVisible = ref(false)
   const pageX = ref()
   const pageY = ref()
@@ -43,6 +44,14 @@ export function useNodeMenu(options: Options) {
 
   const menuStart = () => {
     startModalShow.value = true
+  }
+
+  const viewLog = () => {
+    logModalShow.value = true
+  }
+
+  const hideLog = () => {
+    logModalShow.value = false
   }
 
   onMounted(() => {
@@ -67,9 +76,12 @@ export function useNodeMenu(options: Options) {
     pageX,
     pageY,
     startModalShow,
+    logModalShow,
     menuVisible,
     menuCell,
     menuHide,
-    menuStart
+    menuStart,
+    viewLog,
+    hideLog
   }
 }

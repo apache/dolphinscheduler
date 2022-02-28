@@ -57,10 +57,10 @@ interface IMeta extends Omit<FormProps, 'model'> {
   model: object
 }
 
-interface IJsonItem {
+interface IJsonItemParams {
   field: string
   name?: string
-  props?: object
+  props?: any
   title?: string
   type?: IType
   validate?: FormItemRule
@@ -72,6 +72,10 @@ interface IJsonItem {
   widget?: any
   class?: string
 }
+
+type IJsonItemFn = (i?: number) => IJsonItemParams
+
+type IJsonItem = IJsonItemParams | IJsonItemFn
 
 export {
   IMeta,

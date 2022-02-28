@@ -17,16 +17,9 @@
 
 import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
-import {
-  NFormItemGi,
-  NSpace,
-  NButton,
-  NGrid,
-  NGridItem,
-  NInput,
-  NSelect
-} from 'naive-ui'
+import { NFormItemGi, NSpace, NButton, NGrid, NGridItem } from 'naive-ui'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
+import { isFunction } from 'lodash'
 import type { IJsonItem, FormItemRule } from '../types'
 import getField from '@/components/form/fields/get-field'
 import { formatValidate } from '@/components/form/utils'
@@ -79,23 +72,25 @@ export function renderMultiCondition(
 
   // the fields is the data of the task definition.
   // the item is the options of this component in the form.
-  const { field, children = [] } = item
+  const { field, children = [] } = isFunction(item) ? item() : item
 
   children.forEach((child: IJsonItem) => {
-    if (child.validate) {
-      ruleItem[child.field] = formatValidate(child.validate)
+    const mergedChild = isFunction(child) ? child() : child
+    if (mergedChild.validate) {
+      ruleItem[mergedChild.field] = formatValidate(mergedChild.validate)
     }
   })
 
   const getChild = (item: object, i: number) =>
     children.map((child: IJsonItem) => {
+      const mergedChild = isFunction(child) ? child() : child
       return h(
         NFormItemGi,
         {
           showLabel: child.name ? true : false,
           label: child.name ? child.name : '',
-          path: `${fields[field]}[${i}].${child.field}`,
-          span: unref(child.span)
+          path: `${fields[field]}[${i}].${mergedChild.field}`,
+          span: unref(mergedChild.span)
         },
         () => getField(child, fields[field][i])
       )
@@ -139,8 +134,9 @@ export function renderMultiCondition(
       onAdd: () => {
         const newCondition = {} as any
         children.map((child: IJsonItem) => {
-          if (child.field) {
-            newCondition[child.field] = null
+          const { field } = isFunction(child) ? child() : child
+          if (field) {
+            newCondition[field] = null
           }
         })
         fields[field].push(newCondition)
