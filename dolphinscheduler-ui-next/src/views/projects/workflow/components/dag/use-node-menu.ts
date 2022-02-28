@@ -30,6 +30,8 @@ export function useNodeMenu(options: Options) {
   const { graph } = options
   const startModalShow = ref(false)
   const logModalShow = ref(false)
+  const logViewTaskId = ref()
+  const logViewTaskType = ref()
   const menuVisible = ref(false)
   const pageX = ref()
   const pageY = ref()
@@ -46,7 +48,9 @@ export function useNodeMenu(options: Options) {
     startModalShow.value = true
   }
 
-  const viewLog = () => {
+  const viewLog = (taskId: number, taskType: string) => {
+    logViewTaskId.value = taskId
+    logViewTaskType.value = taskType
     logModalShow.value = true
   }
 
@@ -77,6 +81,8 @@ export function useNodeMenu(options: Options) {
     pageY,
     startModalShow,
     logModalShow,
+    logViewTaskId,
+    logViewTaskType,
     menuVisible,
     menuCell,
     menuHide,
