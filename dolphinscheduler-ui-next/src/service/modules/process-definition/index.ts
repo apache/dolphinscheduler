@@ -233,8 +233,8 @@ export function deleteVersion(
 }
 
 export function viewTree(
-  code: CodeReq,
-  processCode: CodeReq,
+  code: number,
+  processCode: number,
   params: LimitReq
 ): any {
   return axios({

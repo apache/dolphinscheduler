@@ -387,7 +387,7 @@ const project = {
     copy_workflow: '复制工作流',
     cron_manage: '定时管理',
     delete: '删除',
-    tree_view: '树形图',
+    tree_view: '工作流树形图',
     export: '导出',
     version_info: '版本信息',
     version: '版本',
