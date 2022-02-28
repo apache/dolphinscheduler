@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 import { ITaskData } from '../types'
-import {useI18n} from "vue-i18n";
+import { useI18n } from 'vue-i18n'
 
 export function useProcedure({
   projectCode,

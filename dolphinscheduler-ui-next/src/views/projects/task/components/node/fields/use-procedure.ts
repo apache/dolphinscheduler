@@ -28,7 +28,7 @@ export function useProcedure(model: { [field: string]: any }): IJsonItem[] {
       props: {
         language: 'sql',
         placeholder: t('project.node.procedure_method_tips'),
-        defaultValue: t('project.node.procedure_method_snippet')
+        defaultValue:  model.method? model.method : t('project.node.procedure_method_snippet')
       },
       validate: {
         trigger: ['input', 'trigger'],
