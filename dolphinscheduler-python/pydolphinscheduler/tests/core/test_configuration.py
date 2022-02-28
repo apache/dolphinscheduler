@@ -15,31 +15,31 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""DolphinScheduler Tenant object."""
+"""Test class :mod:`pydolphinscheduler.core.configuration`' method."""
 
-from typing import Optional
+import os
+from pathlib import Path
+
+import pytest
 
 from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base_side import BaseSide
-from pydolphinscheduler.java_gateway import launch_gateway
 
 
-class Tenant(BaseSide):
-    """DolphinScheduler Tenant object."""
-
-    def __init__(
-        self,
-        name: str = configuration.WORKFLOW_TENANT,
-        queue: str = configuration.WORKFLOW_QUEUE,
-        description: Optional[str] = None,
-    ):
-        super().__init__(name, description)
-        self.queue = queue
-
-    def create_if_not_exists(
-        self, queue_name: str, user=configuration.USER_NAME
-    ) -> None:
-        """Create Tenant if not exists."""
-        gateway = launch_gateway()
-        gateway.entry_point.createTenant(self.name, self.description, queue_name)
-        # gateway_result_checker(result, None)
+@pytest.mark.parametrize(
+    "env, expect",
+    [
+        (None, "~/pydolphinscheduler"),
+        ("/tmp/pydolphinscheduler", "/tmp/pydolphinscheduler"),
+        ("/tmp/test_abc", "/tmp/test_abc"),
+    ],
+)
+def test_get_config_file_path(env, expect):
+    """Test get config file path method."""
+    # Avoid env setting by other tests
+    os.environ.pop("PYDOLPHINSCHEDULER_HOME", None)
+    if env:
+        os.environ["PYDOLPHINSCHEDULER_HOME"] = env
+    assert (
+        Path(expect).joinpath("config.yaml").expanduser()
+        == configuration.get_config_file_path()
+    )
