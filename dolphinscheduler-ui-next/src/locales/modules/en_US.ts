@@ -713,6 +713,8 @@ const project = {
     sql_empty_tips: 'The sql can not be empty.',
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
+    procedure_method_snippet:
+      '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: 'Start',
     edit: 'Edit',
     copy: 'Copy',
