@@ -115,6 +115,8 @@ export default defineComponent({
       menuVisible,
       startModalShow,
       logModalShow,
+      logViewTaskId,
+      logViewTaskType,
       menuHide,
       menuStart,
       viewLog,
@@ -124,7 +126,7 @@ export default defineComponent({
     })
 
     const statusTimerRef = ref()
-    const { refreshTaskStatus } = useNodeStatus({ graph })
+    const { taskList, refreshTaskStatus } = useNodeStatus({ graph })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -238,6 +240,7 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
+          taskList={taskList.value}
           cell={menuCell.value}
           visible={menuVisible.value}
           left={pageX.value}
@@ -258,9 +261,8 @@ export default defineComponent({
         )}
         {!!props.instance && logModalShow.value && (
           <LogModal
-            v-model:show={logModalShow.value}
-            taskInstanceId={props.instance.id}
-            taskInstanceType={props.instance.taskType}
+            taskInstanceId={logViewTaskId.value}
+            taskInstanceType={logViewTaskType.value}
             onHideLog={hideLog}
           />
         )}
