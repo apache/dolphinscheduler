@@ -28,7 +28,7 @@ import {
   renderSlot
 } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NButton, NIcon, NTooltip } from 'naive-ui'
+import { dateEnGB, NButton, NIcon, NTooltip } from 'naive-ui'
 import { queryLog } from '@/service/modules/log'
 import {
   DownloadOutlined,
@@ -68,6 +68,7 @@ export default defineComponent({
     const textareaHeight = computed(() =>
       logContentBox.value ? logContentBox.value.clientHeight : 0
     )
+    const contentRef = ref()
 
     const boxRef = reactive({
       width: '',
@@ -113,10 +114,13 @@ export default defineComponent({
             setTimeout(() => {
               window.$message.warning(t('project.workflow.no_more_log'))
             }, 1000)
-            textareaLog.value.innerHTML = t('project.workflow.no_log')
+            textareaLog.value.innerHTML =
+              contentRef.value || t('project.workflow.no_log')
           } else {
             isDataRef.value = true
-            textareaLog.value.innerHTML = res || t('project.workflow.no_log')
+            contentRef.value = res
+            textareaLog.value.innerHTML =
+              contentRef.value || t('project.workflow.no_log')
             setTimeout(() => {
               textareaLog.value.scrollTop = 2
             }, 800)
@@ -178,30 +182,28 @@ export default defineComponent({
     /**
      * up
      */
-    const onUp = _.debounce(
+    const onUp = _.throttle(
       function () {
         loadingIndex.value = loadingIndex.value - 1
         showLog()
       },
       1000,
       {
-        leading: false,
-        trailing: true
+        trailing: false
       }
     )
 
     /**
      * down
      */
-    const onDown = _.debounce(
+    const onDown = _.throttle(
       function () {
         loadingIndex.value = loadingIndex.value + 1
         showLog()
       },
       1000,
       {
-        leading: false,
-        trailing: true
+        trailing: false
       }
     )
 
