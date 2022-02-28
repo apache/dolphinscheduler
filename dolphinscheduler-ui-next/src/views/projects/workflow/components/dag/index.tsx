@@ -185,7 +185,7 @@ export default defineComponent({
       () => {
         if (props.instance) {
           refreshTaskStatus()
-          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 9000)
+          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 90000)
         }
       }
     )
