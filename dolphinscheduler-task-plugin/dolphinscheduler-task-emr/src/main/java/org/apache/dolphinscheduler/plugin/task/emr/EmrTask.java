@@ -120,6 +120,7 @@ public class EmrTask extends AbstractTaskExecutor {
             RunJobFlowResult result = emrClient.runJobFlow(runJobFlowRequest);
 
             clusterId = result.getJobFlowId();
+            // TODO: Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
             setAppIds(clusterId);
 
             clusterStatus = getClusterStatus();
