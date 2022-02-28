@@ -19,6 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 import { ITaskData } from '../types'
+import { useI18n } from 'vue-i18n'
 
 export function useProcedure({
   projectCode,
@@ -31,6 +32,8 @@ export function useProcedure({
   readonly?: boolean
   data?: ITaskData
 }) {
+  const { t } = useI18n()
+
   const model = reactive({
     name: '',
     taskType: 'PROCEDURE',
