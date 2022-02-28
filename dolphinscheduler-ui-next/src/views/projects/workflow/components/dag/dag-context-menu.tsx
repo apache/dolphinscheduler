@@ -56,7 +56,7 @@ const props = {
 export default defineComponent({
   name: 'dag-context-menu',
   props,
-  emits: ['hide', 'start', 'edit', 'copyTask', 'removeTasks'],
+  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks'],
   setup(props, ctx) {
     const graph = inject('graph', ref())
     const route = useRoute()
@@ -78,6 +78,10 @@ export default defineComponent({
 
     const handleEdit = () => {
       ctx.emit('edit', Number(props.cell?.id))
+    }
+
+    const handleViewLog = () => {
+      ctx.emit('viewLog')
     }
 
     const handleCopy = () => {
@@ -112,7 +116,8 @@ export default defineComponent({
       startRunning,
       handleEdit,
       handleCopy,
-      handleDelete
+      handleDelete,
+      handleViewLog
     }
   },
   render() {
@@ -156,7 +161,9 @@ export default defineComponent({
           >
             {t('project.node.delete')}
           </div>
-          {/* TODO: view log */}
+          <div class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
+            {t('project.node.view_log')}
+          </div>
         </div>
       )
     )
