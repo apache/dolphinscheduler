@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -73,6 +74,9 @@ public class TaskDefinitionServiceImplTest {
     @Mock
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
+    @Mock
+    private TaskPluginManager taskPluginManager;
+
     @Test
     public void createTaskDefinition() {
         long projectCode = 1L;
@@ -97,6 +101,7 @@ public class TaskDefinitionServiceImplTest {
             + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
         List<TaskDefinitionLog> taskDefinitions = JSONUtils.toList(createTaskDefinitionJson, TaskDefinitionLog.class);
         Mockito.when(processService.saveTaskDefine(loginUser, projectCode, taskDefinitions, Boolean.TRUE)).thenReturn(1);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> relation = taskDefinitionService
             .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
@@ -131,6 +136,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionMapper.updateById(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode)).thenReturn(1);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         result = taskDefinitionService.updateTaskDefinition(loginUser, projectCode, taskCode, taskDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }

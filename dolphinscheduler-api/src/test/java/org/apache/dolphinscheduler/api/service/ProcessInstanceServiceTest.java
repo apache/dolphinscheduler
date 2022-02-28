@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -116,6 +117,9 @@ public class ProcessInstanceServiceTest {
     TenantMapper tenantMapper;
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    TaskPluginManager taskPluginManager;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
         + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -441,6 +445,7 @@ public class ProcessInstanceServiceTest {
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         when(processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs)).thenReturn(result);
         putMsg(result, Status.SUCCESS, projectCode);
+        when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
             taskRelationJson, taskDefinitionJson,"2020-02-21 00:00:00", true, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
