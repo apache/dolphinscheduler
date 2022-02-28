@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -155,7 +156,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQueryProcessInstanceListPaging() {
 
-
         int[] stateArray = new int[]{
                 ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
@@ -175,7 +175,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstance.setStartTime(new Date());
 
         processInstanceMapper.updateById(processInstance);
-
 
         Page<ProcessInstance> page = new Page(1, 3);
 
@@ -226,7 +225,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testUpdateProcessInstanceByState() {
 
-
         ProcessInstance processInstance = insertOne();
 
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
@@ -268,7 +266,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
 
         List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByProjectCodes(null, null, projectCodes);
 
-
         Assert.assertNotEquals(executeStatusCounts.size(), 0);
 
         projectMapper.deleteById(project.getId());
@@ -283,7 +280,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     public void testQueryByProcessDefineId() {
         ProcessInstance processInstance = insertOne();
         ProcessInstance processInstance1 = insertOne();
-
 
         List<ProcessInstance> processInstances = processInstanceMapper.queryByProcessDefineCode(processInstance.getProcessDefinitionCode(), 1);
         Assert.assertEquals(1, processInstances.size());
@@ -350,7 +346,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.deleteById(processInstance.getId());
 
     }
-
 
     /**
      * test whether it is in descending order by running duration

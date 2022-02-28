@@ -475,6 +475,7 @@ public class TaskDefinition {
             && taskGroupId == that.taskGroupId
             && taskGroupPriority == that.taskGroupPriority;
     }
+
     @Override
     public String toString() {
         return "TaskDefinition{"

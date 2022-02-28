@@ -234,9 +234,9 @@ public class TaskRecord {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "task record, id:" + id
-                +" proc id:" + procId
+                + " proc id:" + procId
                 + " proc name:" + procName
                 + " proc date: " + procDate
                 + " start date:" + startTime

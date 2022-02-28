@@ -32,7 +32,7 @@ public class DatasourceUser {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -58,7 +58,6 @@ public class DatasourceUser {
      * update time
      */
     private Date updateTime;
-
 
     public int getId() {
         return id;

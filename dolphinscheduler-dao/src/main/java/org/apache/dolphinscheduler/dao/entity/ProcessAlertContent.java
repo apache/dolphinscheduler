@@ -148,6 +148,7 @@ public class ProcessAlertContent implements Serializable {
             this.projectId = projectId;
             return this;
         }
+
         public Builder projectCode(Long projectCode) {
             this.projectCode = projectCode;
             return this;
@@ -167,6 +168,7 @@ public class ProcessAlertContent implements Serializable {
             this.processId = processId;
             return this;
         }
+
         public Builder processDefinitionCode(Long processDefinitionCode) {
             this.processDefinitionCode = processDefinitionCode;
             return this;
