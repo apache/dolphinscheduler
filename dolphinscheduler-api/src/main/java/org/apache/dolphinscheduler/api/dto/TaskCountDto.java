@@ -40,7 +40,6 @@ public class TaskCountDto {
      */
     private List<TaskStateCount> taskCountDtos;
 
-
     public TaskCountDto(List<ExecuteStatusCount> taskInstanceStateCounts) {
         countTaskDtos(taskInstanceStateCounts);
     }

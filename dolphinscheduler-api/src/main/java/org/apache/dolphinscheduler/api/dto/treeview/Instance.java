@@ -96,7 +96,6 @@ public class Instance {
         this(id, name, code, type, state, startTime, endTime, host, duration, 0);
     }
 
-
     public int getId() {
         return id;
     }
