@@ -410,7 +410,7 @@ public abstract class AbstractCommandExecutor {
      * @param line
      * @return
      */
-    private String findVarPool(String line){
+    private String findVarPool(String line) {
         Matcher matcher = SETVALUE_REGEX.matcher(line);
         if (matcher.find()) {
             return matcher.group(1);

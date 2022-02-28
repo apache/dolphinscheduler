@@ -45,7 +45,7 @@ public abstract class AbstractParameters implements IParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
-    };
+    }
 
     /**
      * local parameters

@@ -313,7 +313,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         Assert.assertEquals(countTask, 0);
         Assert.assertEquals(countTask2, 0);
 
-
     }
 
     /**
@@ -334,7 +333,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         definition.setUpdateTime(new Date());
         processDefinitionMapper.insert(definition);
         taskInstanceMapper.updateById(task);
-
 
         List<ExecuteStatusCount> count = taskInstanceMapper.countTaskInstanceStateByProjectCodes(
                 null, null,

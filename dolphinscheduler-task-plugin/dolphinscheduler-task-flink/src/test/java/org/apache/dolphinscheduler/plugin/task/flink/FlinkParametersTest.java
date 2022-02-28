@@ -21,11 +21,11 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class FlinkParametersTest {
     @Test

@@ -21,6 +21,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_Q
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.UNIQUE_CODE;
 
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
+import org.apache.dolphinscheduler.plugin.task.api.parser.BusinessTimeUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
@@ -31,9 +34,6 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.SingleTableCustomS
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.SingleTableRuleParser;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.RuleParserUtils;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
-import org.apache.dolphinscheduler.plugin.task.api.parser.BusinessTimeUtils;
-import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Date;

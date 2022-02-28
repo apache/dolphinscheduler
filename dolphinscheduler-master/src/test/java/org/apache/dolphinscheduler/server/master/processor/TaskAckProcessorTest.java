@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.util.Date;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -73,19 +72,4 @@ public class TaskAckProcessorTest {
         taskExecuteAckCommand.setProcessInstanceId(1);
     }
 
-    @Test
-    public void testProcess() {
-//        Command command = taskExecuteAckCommand.convert2Command();
-//        Assert.assertEquals(CommandType.TASK_EXECUTE_ACK,command.getType());
-//        InetSocketAddress socketAddress = new InetSocketAddress("localhost",12345);
-//        PowerMockito.when(channel.remoteAddress()).thenReturn(socketAddress);
-//        PowerMockito.mockStatic(TaskResponseEvent.class);
-//
-//        PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), channel))
-//                .thenReturn(taskResponseEvent);
-//        TaskInstance taskInstance = PowerMockito.mock(TaskInstance.class);
-//        PowerMockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-//
-//        taskAckProcessor.process(channel,command);
-    }
 }

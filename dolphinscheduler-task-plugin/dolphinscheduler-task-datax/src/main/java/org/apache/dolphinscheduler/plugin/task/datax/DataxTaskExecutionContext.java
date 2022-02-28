@@ -24,7 +24,7 @@ import java.io.Serializable;
 /**
  *  master/worker task transport
  */
-public class DataxTaskExecutionContext implements Serializable{
+public class DataxTaskExecutionContext implements Serializable {
 
     /**
      * dataSourceId
@@ -106,13 +106,13 @@ public class DataxTaskExecutionContext implements Serializable{
 
     @Override
     public String toString() {
-        return "DataxTaskExecutionContext{" +
-                "dataSourceId=" + dataSourceId +
-                ", sourcetype=" + sourcetype +
-                ", sourceConnectionParams='" + sourceConnectionParams + '\'' +
-                ", dataTargetId=" + dataTargetId +
-                ", targetType=" + targetType +
-                ", targetConnectionParams='" + targetConnectionParams + '\'' +
-                '}';
+        return "DataxTaskExecutionContext{"
+                + "dataSourceId=" + dataSourceId
+                + ", sourcetype=" + sourcetype
+                + ", sourceConnectionParams='" + sourceConnectionParams + '\''
+                + ", dataTargetId=" + dataTargetId
+                + ", targetType=" + targetType
+                + ", targetConnectionParams='" + targetConnectionParams + '\''
+                + '}';
     }
 }

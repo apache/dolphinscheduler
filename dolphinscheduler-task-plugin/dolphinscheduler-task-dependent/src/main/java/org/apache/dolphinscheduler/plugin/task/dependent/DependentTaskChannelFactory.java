@@ -17,15 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.dependent;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.Validate;
-import org.apache.dolphinscheduler.spi.params.input.InputParam;
-import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.auto.service.AutoService;
@@ -39,7 +36,7 @@ public class DependentTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "DEPENDENT";
+        return TASK_TYPE_DEPENDENT;
     }
 
     @Override

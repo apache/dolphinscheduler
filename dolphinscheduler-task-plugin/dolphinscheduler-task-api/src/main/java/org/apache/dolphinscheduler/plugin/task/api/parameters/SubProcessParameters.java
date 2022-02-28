@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
 public class SubProcessParameters extends AbstractParameters {
 
     /**

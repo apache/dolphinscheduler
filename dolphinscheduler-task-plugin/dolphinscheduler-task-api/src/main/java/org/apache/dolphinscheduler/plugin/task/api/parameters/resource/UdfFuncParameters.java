@@ -19,13 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.io.IOException;
 import java.util.Date;
-
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
 
 /**
  * udf function

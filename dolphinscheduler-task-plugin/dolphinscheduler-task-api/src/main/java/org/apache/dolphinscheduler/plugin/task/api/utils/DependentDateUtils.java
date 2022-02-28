@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
@@ -31,7 +32,7 @@ public class DependentDateUtils {
      * @param hourNumber hourNumber
      * @return DateInterval list
      */
-    public static List<DateInterval> getLastHoursInterval(Date businessDate, int hourNumber){
+    public static List<DateInterval> getLastHoursInterval(Date businessDate, int hourNumber) {
         List<DateInterval> dateIntervals = new ArrayList<>();
         if (hourNumber == 0) {
             Date lastHour = DateUtils.getSomeHourOfDay(businessDate, 0);
@@ -40,7 +41,7 @@ public class DependentDateUtils {
             dateIntervals.add(new DateInterval(beginTime, endTime));
             return dateIntervals;
         }
-        for(int index = hourNumber; index > 0; index--){
+        for (int index = hourNumber; index > 0; index--) {
             Date lastHour = DateUtils.getSomeHourOfDay(businessDate, -index);
             Date beginTime = DateUtils.getStartOfHour(lastHour);
             Date endTime = DateUtils.getEndOfHour(lastHour);
@@ -54,7 +55,7 @@ public class DependentDateUtils {
      * @param businessDate businessDate
      * @return DateInterval list
      */
-    public static List<DateInterval> getTodayInterval(Date businessDate){
+    public static List<DateInterval> getTodayInterval(Date businessDate) {
 
         List<DateInterval> dateIntervals = new ArrayList<>();
 
@@ -70,10 +71,10 @@ public class DependentDateUtils {
      * @param someDay someDay
      * @return DateInterval list
      */
-    public static List<DateInterval> getLastDayInterval(Date businessDate, int someDay){
+    public static List<DateInterval> getLastDayInterval(Date businessDate, int someDay) {
 
         List<DateInterval> dateIntervals = new ArrayList<>();
-        for(int index = someDay; index > 0; index--){
+        for (int index = someDay; index > 0; index--) {
             Date lastDay = DateUtils.getSomeDay(businessDate, -index);
 
             Date beginTime = DateUtils.getStartOfDay(lastDay);
@@ -88,13 +89,13 @@ public class DependentDateUtils {
      * @param businessDate businessDate
      * @return DateInterval list
      */
-    public static List<DateInterval> getSpecialLastDayInterval(Date businessDate){
+    public static List<DateInterval> getSpecialLastDayInterval(Date businessDate) {
 
         List<DateInterval> dateIntervals = new ArrayList<>();
         int hourIndex = DateUtils.getHourIndex(businessDate);
         int startIndex = hourIndex + 23;
         int endIndex = startIndex - 24;
-        for(int index = startIndex; index > endIndex; index--) {
+        for (int index = startIndex; index > endIndex; index--) {
             Date lastHour = DateUtils.getSomeHourOfDay(businessDate, -index);
             Date beginTime = DateUtils.getStartOfHour(lastHour);
             Date endTime = DateUtils.getEndOfHour(lastHour);
@@ -123,9 +124,8 @@ public class DependentDateUtils {
         Date firstDayThisMonth = DateUtils.getFirstDayOfMonth(businessDate);
         Date lastDay = DateUtils.getSomeDay(firstDayThisMonth, -1);
         Date firstDay = DateUtils.getFirstDayOfMonth(lastDay);
-        return getDateIntervalListBetweenTwoDates( firstDay, lastDay);
+        return getDateIntervalListBetweenTwoDates(firstDay, lastDay);
     }
-
 
     /**
      * get interval on first/last day of the last month
@@ -139,9 +139,9 @@ public class DependentDateUtils {
         Date firstDayThisMonth = DateUtils.getFirstDayOfMonth(businessDate);
         Date lastDay = DateUtils.getSomeDay(firstDayThisMonth, -1);
         Date firstDay = DateUtils.getFirstDayOfMonth(lastDay);
-        if(isBeginDay){
+        if (isBeginDay) {
             return getDateIntervalListBetweenTwoDates(firstDay, firstDay);
-        }else{
+        } else {
             return getDateIntervalListBetweenTwoDates(lastDay, lastDay);
         }
     }
@@ -178,9 +178,9 @@ public class DependentDateUtils {
      */
     public static List<DateInterval> getLastWeekOneDayInterval(Date businessDate, int dayOfWeek) {
         Date mondayThisWeek = DateUtils.getMonday(businessDate);
-        Date sunday = DateUtils.getSomeDay(mondayThisWeek, -1);
+        Date sunday = DateUtils.getSomeDay(mondayThisWeek, - 1);
         Date monday = DateUtils.getMonday(sunday);
-        Date destDay = DateUtils.getSomeDay(monday, dayOfWeek -1);
+        Date destDay = DateUtils.getSomeDay(monday, dayOfWeek - 1);
         return getDateIntervalListBetweenTwoDates(destDay, destDay);
     }
 
@@ -192,7 +192,7 @@ public class DependentDateUtils {
      */
     public static List<DateInterval> getDateIntervalListBetweenTwoDates(Date firstDay, Date lastDay) {
         List<DateInterval> dateIntervals = new ArrayList<>();
-        while(!firstDay.after(lastDay)){
+        while (!firstDay.after(lastDay)) {
             Date beginTime = DateUtils.getStartOfDay(firstDay);
             Date endTime = DateUtils.getEndOfDay(firstDay);
             dateIntervals.add(new DateInterval(beginTime, endTime));

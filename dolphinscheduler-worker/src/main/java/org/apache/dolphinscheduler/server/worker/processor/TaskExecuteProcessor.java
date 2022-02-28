@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -38,8 +40,6 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.util.Date;
@@ -96,8 +96,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private void setTaskCache(TaskExecutionContext taskExecutionContext) {
         TaskExecutionContext preTaskCache = new TaskExecutionContext();
         preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        TaskExecutionContext taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskExecutionContext.class);
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
     }
 
     @Override

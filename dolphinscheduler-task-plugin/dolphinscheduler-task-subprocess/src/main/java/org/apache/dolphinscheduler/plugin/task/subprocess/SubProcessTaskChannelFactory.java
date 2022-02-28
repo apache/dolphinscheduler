@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.subprocess;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -34,7 +36,7 @@ public class SubProcessTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "SUB_PROCESS";
+        return TASK_TYPE_SUB_PROCESS;
     }
 
     @Override
