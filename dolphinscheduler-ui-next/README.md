@@ -3,11 +3,11 @@
 ---
 
 > After two and a half months of development cycle, we have brought a brand-new `UI` management system (V1.0.0-Alpha).
-> 
+>
 > Compared with the old `UI`, it will be more standardized, and it will also have a more complete type checking mechanism. At the same time, its speed has made a qualitative leap.
-> 
+>
 > We also provide dark mode and light mode to meet the preferences of different developers. It will make your eyes shine.
-> 
+>
 > If you have tried the new `UI` and found problems in use, you can contact us through issue.
 
 ---
@@ -25,7 +25,6 @@ You can learn how to install the corresponding version from their official websi
 ```shell
 pnpm install
 ```
-
 
 #### Start Development Project
 

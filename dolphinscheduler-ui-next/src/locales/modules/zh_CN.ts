@@ -705,6 +705,8 @@ const project = {
     sql_empty_tips: '语句不能为空',
     procedure_method: 'SQL语句',
     procedure_method_tips: '请输入存储脚本',
+    procedure_method_snippet:
+      '--请输入存储脚本 \n\n--调用存储过程: call <procedure-name>[(<arg1>,<arg2>, ...)] \n\n--调用存储函数：?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: '运行',
     edit: '编辑',
     copy: '复制节点',
