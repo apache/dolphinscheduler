@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
@@ -471,7 +474,7 @@ public abstract class UpgradeDao {
                     } else {
                         taskDefinitionLog.setResourceIds(StringUtils.EMPTY);
                     }
-                    if (TaskType.SUB_PROCESS.getDesc().equals(taskType)) {
+                    if (TASK_TYPE_SUB_PROCESS.equals(taskType)) {
                         JsonNode jsonNodeDefinitionId = param.get("processDefinitionId");
                         if (jsonNodeDefinitionId != null) {
                             param.put("processDefinitionCode", processDefinitionMap.get(jsonNodeDefinitionId.asInt()).getCode());
@@ -493,8 +496,8 @@ public abstract class UpgradeDao {
                 taskDefinitionLog.setDescription(desc);
                 taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").asText()) ? Flag.YES : Flag.NO);
                 taskDefinitionLog.setTaskType(taskType);
-                taskDefinitionLog.setFailRetryInterval(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 1 : task.get("retryInterval").asInt());
-                taskDefinitionLog.setFailRetryTimes(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 0 : task.get("maxRetryTimes").asInt());
+                taskDefinitionLog.setFailRetryInterval(TASK_TYPE_SUB_PROCESS.equals(taskType) ? 1 : task.get("retryInterval").asInt());
+                taskDefinitionLog.setFailRetryTimes(TASK_TYPE_SUB_PROCESS.equals(taskType) ? 0 : task.get("maxRetryTimes").asInt());
                 taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
                 String name = task.get("name").asText();
                 taskDefinitionLog.setName(name);
@@ -532,7 +535,7 @@ public abstract class UpgradeDao {
 
     public void convertConditions(List<TaskDefinitionLog> taskDefinitionLogList, Map<String, Long> taskNameCodeMap) throws Exception {
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
-            if (TaskType.CONDITIONS.getDesc().equals(taskDefinitionLog.getTaskType())) {
+            if (TASK_TYPE_CONDITIONS.equals(taskDefinitionLog.getTaskType())) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 ObjectNode taskParams = JSONUtils.parseObject(taskDefinitionLog.getTaskParams());
                 // reset conditionResult
@@ -592,7 +595,7 @@ public abstract class UpgradeDao {
                                   Map<Integer, Long> projectIdCodeMap,
                                   Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) {
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-            if (TaskType.DEPENDENT.getDesc().equals(taskDefinitionLog.getTaskType())) {
+            if (TASK_TYPE_DEPENDENT.equals(taskDefinitionLog.getTaskType())) {
                 ObjectNode taskParams = JSONUtils.parseObject(taskDefinitionLog.getTaskParams());
                 ObjectNode dependence = (ObjectNode) taskParams.get("dependence");
                 ArrayNode dependTaskList = JSONUtils.parseArray(JSONUtils.toJsonString(dependence.get("dependTaskList")));

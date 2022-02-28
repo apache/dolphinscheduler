@@ -18,11 +18,14 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -578,19 +581,19 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isSubProcess() {
-        return TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(this.taskType);
+        return TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isDependTask() {
-        return TaskType.DEPENDENT.getDesc().equalsIgnoreCase(this.taskType);
+        return TASK_TYPE_DEPENDENT.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.taskType);
+        return TASK_TYPE_CONDITIONS.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isSwitchTask() {
-        return TaskType.SWITCH.getDesc().equalsIgnoreCase(this.taskType);
+        return TASK_TYPE_SWITCH.equalsIgnoreCase(this.taskType);
     }
 
     /**

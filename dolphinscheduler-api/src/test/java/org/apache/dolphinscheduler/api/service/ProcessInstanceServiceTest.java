@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -310,7 +309,7 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setState(ExecutionStatus.SUCCESS);
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType(TaskType.SHELL.getDesc());
+        taskInstance.setTaskType("SHELL");
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
         Result res = new Result();
@@ -361,7 +360,7 @@ public class ProcessInstanceServiceTest {
 
         //task not sub process
         TaskInstance taskInstance = getTaskInstance();
-        taskInstance.setTaskType(TaskType.HTTP.getDesc());
+        taskInstance.setTaskType("HTTP");
         taskInstance.setProcessInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
@@ -373,7 +372,7 @@ public class ProcessInstanceServiceTest {
 
         //sub process not exist
         TaskInstance subTask = getTaskInstance();
-        subTask.setTaskType(TaskType.SUB_PROCESS.getDesc());
+        subTask.setTaskType("SUB_PROCESS");
         subTask.setProcessInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findTaskInstanceById(subTask.getId())).thenReturn(subTask);

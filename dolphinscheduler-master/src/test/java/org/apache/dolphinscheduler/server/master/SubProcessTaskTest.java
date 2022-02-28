@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -135,7 +134,7 @@ public class SubProcessTaskTest {
         taskNode.setName("S");
         taskNode.setCode(1L);
         taskNode.setVersion(1);
-        taskNode.setType(TaskType.SUB_PROCESS.getDesc());
+        taskNode.setType("SUB_PROCESS");
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
         return taskNode;
     }
@@ -167,7 +166,7 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
         taskInstance.setName("S");
-        taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
+        taskInstance.setTaskType("SUB_PROCESS");
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskCode(taskNode.getCode());
         taskInstance.setTaskDefinitionVersion(taskNode.getVersion());

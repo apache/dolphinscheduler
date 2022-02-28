@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -163,7 +161,7 @@ public class TaskExecuteProcessorTest {
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setProcessDefineCode(1L);
         taskExecutionContext.setProcessDefineVersion(1);
-        taskExecutionContext.setTaskType(TaskType.SQL.getDesc());
+        taskExecutionContext.setTaskType("SQL");
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");

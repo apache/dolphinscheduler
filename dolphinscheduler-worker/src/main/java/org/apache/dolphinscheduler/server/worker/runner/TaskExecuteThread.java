@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -341,11 +340,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
         ackCommand.setLogPath(taskExecutionContext.getLogPath());
         ackCommand.setHost(taskExecutionContext.getHost());
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
-            ackCommand.setExecutePath(null);
-        } else {
-            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
-        }
+
+        ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
+
         return ackCommand;
     }
 

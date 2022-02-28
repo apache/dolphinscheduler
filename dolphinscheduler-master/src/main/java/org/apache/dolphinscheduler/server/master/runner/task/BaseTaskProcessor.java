@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.OTHER;
 import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
@@ -33,7 +34,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -281,7 +281,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // TODO to be optimized
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
-        if (TaskType.DATA_QUALITY.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
+        if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
             setDataQualityTaskRelation(dataQualityTaskExecutionContext,taskInstance,tenant.getTenantCode());
         }
 

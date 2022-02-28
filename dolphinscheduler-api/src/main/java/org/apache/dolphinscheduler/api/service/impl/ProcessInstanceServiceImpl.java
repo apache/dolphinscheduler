@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.PROCESS_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
@@ -39,7 +40,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -340,7 +340,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
-            if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
+            if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
                 Result<String> logResult = loggerService.queryLog(
                     taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {

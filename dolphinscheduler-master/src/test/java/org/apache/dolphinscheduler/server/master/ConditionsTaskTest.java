@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -136,7 +135,7 @@ public class ConditionsTaskTest {
         taskNode.setName("C");
         taskNode.setCode(1L);
         taskNode.setVersion(1);
-        taskNode.setType(TaskType.CONDITIONS.getDesc());
+        taskNode.setType("CONDITIONS");
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
 
         DependentItem dependentItem = new DependentItem();

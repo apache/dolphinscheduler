@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
+
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -117,7 +118,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public String getType() {
-        return TaskType.SWITCH.getDesc();
+        return TASK_TYPE_SWITCH;
     }
 
     private boolean setSwitchResult() {

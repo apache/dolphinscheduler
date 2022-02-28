@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
@@ -42,7 +44,6 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -1094,7 +1095,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         sqlParameters.setLocalParams(Collections.emptyList());
         taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
         taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
-        taskDefinition.setTaskType(TaskType.SQL.getDesc());
+        taskDefinition.setTaskType(TASK_TYPE_SQL);
         taskDefinition.setFailRetryTimes(0);
         taskDefinition.setFailRetryInterval(0);
         taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
@@ -1660,10 +1661,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                    if (TaskType.CONDITIONS.getDesc().equals(taskDefinitionLog.getTaskType())
-                        || TaskType.SWITCH.getDesc().equals(taskDefinitionLog.getTaskType())
-                        || TaskType.SUB_PROCESS.getDesc().equals(taskDefinitionLog.getTaskType())
-                        || TaskType.DEPENDENT.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                    if (COMPLEX_TASK_TYPES.contains(taskDefinitionLog.getTaskType())) {
                         putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
                         return;
                     }

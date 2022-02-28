@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
-import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -660,7 +658,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                 long projectCode,
                                                 String searchWorkflowName,
                                                 String searchTaskName,
-                                                TaskType taskType,
+                                                String taskType,
                                                 Integer pageNo,
                                                 Integer pageSize) {
         Result result = new Result();
@@ -674,7 +672,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
         IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
-                searchTaskName, taskType == null ? StringUtils.EMPTY : taskType.getDesc());
+                searchTaskName, taskType == null ? StringUtils.EMPTY : taskType);
         List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
         if (!records.isEmpty()) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();

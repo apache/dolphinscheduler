@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -60,7 +61,7 @@ public class DataQualityResultOperator {
      * @param taskInstance
      */
     public void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
-        if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
+        if (TASK_TYPE_DATA_QUALITY.equals(taskInstance.getTaskType())) {
 
             ProcessInstance processInstance =
                     processService.findProcessInstanceDetailById(

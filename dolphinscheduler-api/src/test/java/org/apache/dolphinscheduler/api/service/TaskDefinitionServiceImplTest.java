@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -247,7 +246,7 @@ public class TaskDefinitionServiceImplTest {
         taskDefinition.setProjectCode(1L);
         taskDefinition.setCode(1L);
         taskDefinition.setVersion(1);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setTaskType("SHELL");
         return taskDefinition;
     }
 
@@ -313,7 +312,7 @@ public class TaskDefinitionServiceImplTest {
         taskDefinition.setCode(taskCode);
         String params = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
         taskDefinition.setTaskParams(params);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setTaskType("SHELL");
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(taskDefinition);
         TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinition.getVersion())).thenReturn(taskDefinitionLog);

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
@@ -188,11 +187,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
-            ackCommand.setExecutePath(null);
-        } else {
-            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
-        }
+
+        ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
+
         taskExecutionContext.setLogPath(ackCommand.getLogPath());
         ackCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
 

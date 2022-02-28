@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class TaskConstants {
 
     private TaskConstants() {
@@ -372,4 +375,17 @@ public class TaskConstants {
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
 
+    public static final String TASK_TYPE_CONDITIONS = "CONDITIONS";
+
+    public static final String TASK_TYPE_SWITCH = "SWITCH";
+
+    public static final String TASK_TYPE_SUB_PROCESS = "SUB_PROCESS";
+
+    public static final String TASK_TYPE_DEPENDENT = "DEPENDENT";
+
+    public static final String TASK_TYPE_SQL = "SQL";
+
+    public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
+
+    public static final List<String> COMPLEX_TASK_TYPES = Arrays.asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
 }

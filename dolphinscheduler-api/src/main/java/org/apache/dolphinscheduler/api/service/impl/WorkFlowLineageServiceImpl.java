@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -183,7 +184,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList);
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (taskDefinitionLog.getProjectCode() == projectCode) {
-                if (taskDefinitionLog.getTaskType().equals(TaskType.DEPENDENT.getDesc())) {
+                if (taskDefinitionLog.getTaskType().equals(TASK_TYPE_DEPENDENT)) {
                     DependentParameters dependentParameters = JSONUtils.parseObject(taskDefinitionLog.getDependence(), DependentParameters.class);
                     if (dependentParameters != null) {
                         List<DependentTaskModel> dependTaskList = dependentParameters.getDependTaskList();

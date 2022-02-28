@@ -22,9 +22,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -32,8 +30,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.plugin.task.datax.DataxTaskExecutionContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +59,7 @@ public class CommonTaskProcessorTest {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL.getDesc());
+        taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -96,7 +92,7 @@ public class CommonTaskProcessorTest {
     public void testGetResourceFullNames() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL.getDesc());
+        taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -123,7 +119,7 @@ public class CommonTaskProcessorTest {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL.getDesc());
+        taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
 
         ProcessInstance processInstance = new ProcessInstance();

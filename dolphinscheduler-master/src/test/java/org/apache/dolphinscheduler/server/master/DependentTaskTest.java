@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -362,7 +361,7 @@ public class DependentTaskTest {
         taskNode.setId("tasks-10");
         taskNode.setName("D");
         taskNode.setCode(DEPEND_TASK_CODE_D);
-        taskNode.setType(TaskType.DEPENDENT.getDesc());
+        taskNode.setType("DEPENDENT");
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
         return taskNode;
     }
@@ -415,7 +414,7 @@ public class DependentTaskTest {
             long taskCode, ProcessInstance processInstance
     ) {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType(TaskType.DEPENDENT.getDesc());
+        taskInstance.setTaskType("DEPENDENT");
         taskInstance.setId(taskInstanceId);
         taskInstance.setTaskCode(taskCode);
         taskInstance.setProcessInstanceId(processInstance.getId());

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -64,7 +63,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
      */
     private TaskInstance insertTaskInstance(int processInstanceId) {
         //insertOne
-        return insertTaskInstance(processInstanceId, TaskType.SHELL.getDesc());
+        return insertTaskInstance(processInstanceId, "SHELL");
     }
 
     /**
