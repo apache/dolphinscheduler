@@ -1,7 +1,5 @@
 # Dolphin Scheduler UI Next
 
----
-
 > After two and a half months of development cycle, we have brought a brand-new `UI` management system (V1.0.0-Alpha).
 >
 > Compared with the old `UI`, it will be more standardized, and it will also have a more complete type checking mechanism. At the same time, its speed has made a qualitative leap.
@@ -46,4 +44,29 @@ pnpm run build:dev
 pnpm run build:prod
 ```
 
+#### Code Format
+
+Usually after you modify the code, you need to perform code formatting operations to ensure that the code in the project is the same style.
+
+```shell
+pnpm run prettier
+```
+
 ---
+
+### E2E
+
+In order to ensure the stability of the project, we have added a lot of `E2E` tests, you can learn about it through the following list, and when you make code changes, please make sure that the `DOM` of `E2E` has not changed, if there are changes, please Correspondingly modify the backend code or explain it in `PR`.
+
+- [Login](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/login.md)
+- [Data Source](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/data-source.md)
+- [Navbar](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/navbar.md)
+- [Project](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/project.md)
+- [Resource](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/resource.md)
+- [Security](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/security.md)
+
+### Known Issues
+
+Since this system is newly developed, there are some known issues, but this does not affect your use. We will deal with it in subsequent versions. If you are an open source enthusiast, your contributions are very welcome.
+
+Check out all known issues [Know Issues](https://github.com/apache/dolphinscheduler/issues/8565).
