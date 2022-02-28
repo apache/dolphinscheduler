@@ -16,7 +16,7 @@
  */
 
 import type { Ref } from 'vue'
-import { render, h } from 'vue'
+import { render, h, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Graph } from '@antv/x6'
@@ -35,6 +35,7 @@ interface Options {
 export function useNodeStatus(options: Options) {
   const { graph } = options
   const route = useRoute()
+  const taskList = ref<Array<Object>>([])
 
   const { t } = useI18n()
 
@@ -66,9 +67,9 @@ export function useNodeStatus(options: Options) {
 
     queryTaskListByProcessId(instanceId, projectCode).then((res: any) => {
       window.$message.success(t('project.workflow.refresh_status_succeeded'))
-      const { taskList } = res
-      if (taskList) {
-        taskList.forEach((taskInstance: any) => {
+      taskList.value = res.taskList
+      if (taskList.value) {
+        taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
         })
       }
@@ -76,6 +77,7 @@ export function useNodeStatus(options: Options) {
   }
 
   return {
+    taskList,
     refreshTaskStatus
   }
 }

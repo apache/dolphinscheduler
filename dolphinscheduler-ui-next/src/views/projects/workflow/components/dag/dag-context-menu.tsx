@@ -35,6 +35,10 @@ const props = {
     type: Object as PropType<Cell>,
     require: true
   },
+  taskList: {
+    type: Array as PropType<Array<any>>,
+    default: []
+  },
   visible: {
     type: Boolean as PropType<boolean>,
     default: true
@@ -81,7 +85,13 @@ export default defineComponent({
     }
 
     const handleViewLog = () => {
-      ctx.emit('viewLog')
+      const taskCode = Number(props.cell?.id)
+      const taskInstance = props.taskList.find(
+        (task: any) => task.taskCode === taskCode
+      )
+      if (taskInstance) {
+        ctx.emit('viewLog', taskInstance.id, taskInstance.taskType)
+      }
     }
 
     const handleCopy = () => {
@@ -161,9 +171,11 @@ export default defineComponent({
           >
             {t('project.node.delete')}
           </div>
-          <div class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
-            {t('project.node.view_log')}
-          </div>
+          {this.taskList.length > 0 && (
+            <div class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
+              {t('project.node.view_log')}
+            </div>
+          )}
         </div>
       )
     )
