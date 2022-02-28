@@ -24,7 +24,7 @@ import java.io.Serializable;
 /**
  *  master/worker task transport
  */
-public class SqoopTaskExecutionContext implements Serializable{
+public class SqoopTaskExecutionContext implements Serializable {
 
     /**
      * dataSourceId
@@ -106,13 +106,13 @@ public class SqoopTaskExecutionContext implements Serializable{
 
     @Override
     public String toString() {
-        return "SqoopTaskExecutionContext{" +
-                "dataSourceId=" + dataSourceId +
-                ", sourcetype=" + sourcetype +
-                ", sourceConnectionParams='" + sourceConnectionParams + '\'' +
-                ", dataTargetId=" + dataTargetId +
-                ", targetType=" + targetType +
-                ", targetConnectionParams='" + targetConnectionParams + '\'' +
-                '}';
+        return "SqoopTaskExecutionContext{"
+                + "dataSourceId=" + dataSourceId
+                + ", sourcetype=" + sourcetype
+                + ", sourceConnectionParams='" + sourceConnectionParams + '\''
+                + ", dataTargetId=" + dataTargetId
+                + ", targetType=" + targetType
+                + ", targetConnectionParams='" + targetConnectionParams + '\''
+                + '}';
     }
 }

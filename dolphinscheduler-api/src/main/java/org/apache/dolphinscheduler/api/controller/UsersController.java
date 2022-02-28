@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopJobType;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.HdfsSourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.HiveSourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.MySQLSourceGenerator;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HdfsTarge
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HiveTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.MySQLTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 
 /**
  * Sqoop Job Scripts Generator

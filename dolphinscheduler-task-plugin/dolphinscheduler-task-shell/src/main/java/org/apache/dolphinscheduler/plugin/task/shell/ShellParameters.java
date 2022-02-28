@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.List;
 

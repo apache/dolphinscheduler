@@ -17,16 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATALOG_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATALOG_PARTITION_KEYS;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATALOG_PARTITION_VALUES;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATALOG_TABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHiveParameter;
-import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
