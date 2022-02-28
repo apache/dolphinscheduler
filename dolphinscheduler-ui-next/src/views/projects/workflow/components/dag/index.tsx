@@ -44,9 +44,10 @@ import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
+import ContextMenuItem from './dag-context-menu'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import StartModal from '@/views/projects/workflow/definition/components/start-modal'
-import ContextMenuItem from './dag-context-menu'
+import LogModal from '@/views/projects/workflow/instance/components/log-modal'
 import './x6-style.scss'
 
 const props = {
@@ -113,8 +114,11 @@ export default defineComponent({
       pageY,
       menuVisible,
       startModalShow,
+      logModalShow,
       menuHide,
-      menuStart
+      menuStart,
+      viewLog,
+      hideLog
     } = useNodeMenu({
       graph
     })
@@ -244,11 +248,20 @@ export default defineComponent({
           onEdit={editTask}
           onCopyTask={copyTask}
           onRemoveTasks={removeTasks}
+          onViewLog={viewLog}
         />
         {!!props.definition && (
           <StartModal
             v-model:row={props.definition.processDefinition}
             v-model:show={startModalShow.value}
+          />
+        )}
+        {!!props.instance && logModalShow.value && (
+          <LogModal
+            v-model:show={logModalShow.value}
+            taskInstanceId={props.instance.id}
+            taskInstanceType={props.instance.taskType}
+            onHideLog={hideLog}
           />
         )}
       </div>
