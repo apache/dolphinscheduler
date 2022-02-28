@@ -19,25 +19,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-datasource-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
         <version>2.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>dolphinscheduler-datasource-plugin</artifactId>
-    <name>${project.artifactId}</name>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>dolphinscheduler-datasource-sqlserver</module>
-        <module>dolphinscheduler-datasource-clickhouse</module>
-        <module>dolphinscheduler-datasource-db2</module>
-        <module>dolphinscheduler-datasource-hive</module>
-        <module>dolphinscheduler-datasource-mysql</module>
-        <module>dolphinscheduler-datasource-oracle</module>
-        <module>dolphinscheduler-datasource-postgresql</module>
-        <module>dolphinscheduler-datasource-api</module>
-        <module>dolphinscheduler-datasource-all</module>
-        <module>dolphinscheduler-datasource-redshift</module>
-    </modules>
+    <artifactId>dolphinscheduler-datasource-redshift</artifactId>
+    <packaging>jar</packaging>
+    <dependencies>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-api</artifactId>
+        </dependency>
+
+    </dependencies>
 </project>
