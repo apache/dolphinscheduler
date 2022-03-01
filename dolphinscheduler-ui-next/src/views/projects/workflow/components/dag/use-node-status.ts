@@ -24,6 +24,7 @@ import { tasksState } from '@/utils/common'
 import { NODE, NODE_STATUS_MARKUP } from './dag-config'
 import { queryTaskListByProcessId } from '@/service/modules/process-instances'
 import NodeStatus from '@/views/projects/workflow/components/dag/dag-node-status'
+import { IWorkflowTaskInstance } from './types'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -35,7 +36,7 @@ interface Options {
 export function useNodeStatus(options: Options) {
   const { graph } = options
   const route = useRoute()
-  const taskList = ref<Array<Object>>([])
+  const taskList = ref<Array<IWorkflowTaskInstance>>([])
 
   const { t } = useI18n()
 

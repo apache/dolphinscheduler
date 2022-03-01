@@ -143,3 +143,9 @@ export interface IStartupParam {
   warningType: string
   warningGroupId: number
 }
+
+export interface IWorkflowTaskInstance {
+  id: number
+  taskCode: number
+  taskType: string
+}
