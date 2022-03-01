@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Test command line interface subcommand version."""
+"""Test command line interface subcommand `version`."""
 
 import pytest
 
