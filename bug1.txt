@@ -1,0 +1,4 @@
+表结构和文档字段不一致
+https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/architecture/task-structure.html
+V2.0.3版本 t_ds_process_definition 
+表中17个字段，文档中20个
