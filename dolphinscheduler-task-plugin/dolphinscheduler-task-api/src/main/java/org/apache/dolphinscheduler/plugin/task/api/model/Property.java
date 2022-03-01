@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.spi.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
 import java.io.Serializable;
 import java.util.Objects;

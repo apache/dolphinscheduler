@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
-import org.apache.dolphinscheduler.spi.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Date;
