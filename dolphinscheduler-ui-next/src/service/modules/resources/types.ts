@@ -113,6 +113,11 @@ interface ResourceListRes {
   totalList: ResourceFile[]
 }
 
+interface ResourceViewRes {
+  alias: string
+  content: string
+}
+
 export {
   FileReq,
   ResourceTypeReq,
@@ -131,5 +136,6 @@ export {
   ViewResourceReq,
   ResourceIdReq,
   UdfFuncReq,
-  ResourceListRes
+  ResourceListRes,
+  ResourceViewRes
 }
