@@ -35,7 +35,11 @@ logger = logging.getLogger(__name__)
 version = "2.0.4"
 
 # Start package required
-prod = ["click>=8.0.0", "py4j~=0.10", "pyyaml"]
+prod = [
+    "click>=8.0.0",
+    "py4j~=0.10",
+    "pyyaml",
+]
 
 build = [
     "build",
