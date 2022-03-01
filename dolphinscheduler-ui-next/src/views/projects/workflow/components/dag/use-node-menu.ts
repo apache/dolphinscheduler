@@ -29,6 +29,9 @@ interface Options {
 export function useNodeMenu(options: Options) {
   const { graph } = options
   const startModalShow = ref(false)
+  const logModalShow = ref(false)
+  const logViewTaskId = ref()
+  const logViewTaskType = ref()
   const menuVisible = ref(false)
   const pageX = ref()
   const pageY = ref()
@@ -43,6 +46,16 @@ export function useNodeMenu(options: Options) {
 
   const menuStart = () => {
     startModalShow.value = true
+  }
+
+  const viewLog = (taskId: number, taskType: string) => {
+    logViewTaskId.value = taskId
+    logViewTaskType.value = taskType
+    logModalShow.value = true
+  }
+
+  const hideLog = () => {
+    logModalShow.value = false
   }
 
   onMounted(() => {
@@ -67,9 +80,14 @@ export function useNodeMenu(options: Options) {
     pageX,
     pageY,
     startModalShow,
+    logModalShow,
+    logViewTaskId,
+    logViewTaskType,
     menuVisible,
     menuCell,
     menuHide,
-    menuStart
+    menuStart,
+    viewLog,
+    hideLog
   }
 }

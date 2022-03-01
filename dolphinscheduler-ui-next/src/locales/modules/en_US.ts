@@ -481,7 +481,17 @@ const project = {
     type: 'Type',
     retry_count: 'Retry Count',
     submit_time: 'Submit Time',
-    refresh_status_succeeded: 'Refresh status succeeded'
+    refresh_status_succeeded: 'Refresh status succeeded',
+    view_log: 'View log',
+    update_log_success: 'Update log success',
+    no_more_log: 'No more logs',
+    no_log: 'No log',
+    loading_log: 'Loading Log...',
+    close: 'Close',
+    download_log: 'Download Log',
+    refresh_log: 'Refresh Log',
+    enter_full_screen: 'Enter full screen',
+    cancel_full_screen: 'Cancel full screen'
   },
   task: {
     task_name: 'Task Name',
@@ -703,6 +713,8 @@ const project = {
     sql_empty_tips: 'The sql can not be empty.',
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
+    procedure_method_snippet:
+      '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: 'Start',
     edit: 'Edit',
     copy: 'Copy',

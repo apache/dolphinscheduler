@@ -479,7 +479,17 @@ const project = {
     type: '类型',
     retry_count: '重试次数',
     submit_time: '提交时间',
-    refresh_status_succeeded: '刷新状态成功'
+    refresh_status_succeeded: '刷新状态成功',
+    view_log: '查看日志',
+    update_log_success: '更新日志成功',
+    no_more_log: '暂无更多日志',
+    no_log: '暂无日志',
+    loading_log: '正在努力请求日志中...',
+    close: '关闭',
+    download_log: '下载日志',
+    refresh_log: '刷新日志',
+    enter_full_screen: '进入全屏',
+    cancel_full_screen: '取消全屏'
   },
   task: {
     task_name: '任务名称',
@@ -695,6 +705,8 @@ const project = {
     sql_empty_tips: '语句不能为空',
     procedure_method: 'SQL语句',
     procedure_method_tips: '请输入存储脚本',
+    procedure_method_snippet:
+      '--请输入存储脚本 \n\n--调用存储过程: call <procedure-name>[(<arg1>,<arg2>, ...)] \n\n--调用存储函数：?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: '运行',
     edit: '编辑',
     copy: '复制节点',

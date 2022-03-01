@@ -129,6 +129,12 @@
             <artifactId>dolphinscheduler-task-switch</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-emr</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

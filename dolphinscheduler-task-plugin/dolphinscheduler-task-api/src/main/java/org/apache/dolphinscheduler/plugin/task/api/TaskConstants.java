@@ -27,7 +27,7 @@ public class TaskConstants {
     }
 
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
-    
+
     public static final String SETVALUE_REGEX = "\\$\\{setValue\\(([^)]*)\\)}";
 
     /**
@@ -388,4 +388,12 @@ public class TaskConstants {
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
     public static final List<String> COMPLEX_TASK_TYPES = Arrays.asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
+
+    /**
+     * aws config
+     */
+    public static final String AWS_ACCESS_KEY_ID= "aws.access.key.id";
+    public static final String AWS_SECRET_ACCESS_KEY= "aws.secret.access.key";
+    public static final String AWS_REGION = "aws.region";
+
 }

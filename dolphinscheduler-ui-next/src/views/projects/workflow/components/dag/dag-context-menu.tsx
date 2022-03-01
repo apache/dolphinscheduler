@@ -35,6 +35,10 @@ const props = {
     type: Object as PropType<Cell>,
     require: true
   },
+  taskList: {
+    type: Array as PropType<Array<any>>,
+    default: []
+  },
   visible: {
     type: Boolean as PropType<boolean>,
     default: true
@@ -56,7 +60,7 @@ const props = {
 export default defineComponent({
   name: 'dag-context-menu',
   props,
-  emits: ['hide', 'start', 'edit', 'copyTask', 'removeTasks'],
+  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks'],
   setup(props, ctx) {
     const graph = inject('graph', ref())
     const route = useRoute()
@@ -78,6 +82,16 @@ export default defineComponent({
 
     const handleEdit = () => {
       ctx.emit('edit', Number(props.cell?.id))
+    }
+
+    const handleViewLog = () => {
+      const taskCode = Number(props.cell?.id)
+      const taskInstance = props.taskList.find(
+        (task: any) => task.taskCode === taskCode
+      )
+      if (taskInstance) {
+        ctx.emit('viewLog', taskInstance.id, taskInstance.taskType)
+      }
     }
 
     const handleCopy = () => {
@@ -112,7 +126,8 @@ export default defineComponent({
       startRunning,
       handleEdit,
       handleCopy,
-      handleDelete
+      handleDelete,
+      handleViewLog
     }
   },
   render() {
@@ -156,7 +171,11 @@ export default defineComponent({
           >
             {t('project.node.delete')}
           </div>
-          {/* TODO: view log */}
+          {this.taskList.length > 0 && (
+            <div class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
+              {t('project.node.view_log')}
+            </div>
+          )}
         </div>
       )
     )

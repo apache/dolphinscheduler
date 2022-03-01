@@ -44,9 +44,10 @@ import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
 import { WorkflowDefinition } from './types'
 import DagSaveModal from './dag-save-modal'
+import ContextMenuItem from './dag-context-menu'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import StartModal from '@/views/projects/workflow/definition/components/start-modal'
-import ContextMenuItem from './dag-context-menu'
+import LogModal from '@/views/projects/workflow/instance/components/log-modal'
 import './x6-style.scss'
 
 const props = {
@@ -113,14 +114,19 @@ export default defineComponent({
       pageY,
       menuVisible,
       startModalShow,
+      logModalShow,
+      logViewTaskId,
+      logViewTaskType,
       menuHide,
-      menuStart
+      menuStart,
+      viewLog,
+      hideLog
     } = useNodeMenu({
       graph
     })
 
     const statusTimerRef = ref()
-    const { refreshTaskStatus } = useNodeStatus({ graph })
+    const { taskList, refreshTaskStatus } = useNodeStatus({ graph })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -179,7 +185,7 @@ export default defineComponent({
       () => {
         if (props.instance) {
           refreshTaskStatus()
-          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 9000)
+          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 90000)
         }
       }
     )
@@ -234,6 +240,7 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
+          taskList={taskList.value}
           cell={menuCell.value}
           visible={menuVisible.value}
           left={pageX.value}
@@ -244,11 +251,19 @@ export default defineComponent({
           onEdit={editTask}
           onCopyTask={copyTask}
           onRemoveTasks={removeTasks}
+          onViewLog={viewLog}
         />
         {!!props.definition && (
           <StartModal
             v-model:row={props.definition.processDefinition}
             v-model:show={startModalShow.value}
+          />
+        )}
+        {!!props.instance && logModalShow.value && (
+          <LogModal
+            taskInstanceId={logViewTaskId.value}
+            taskInstanceType={logViewTaskType.value}
+            onHideLog={hideLog}
           />
         )}
       </div>
