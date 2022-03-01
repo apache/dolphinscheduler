@@ -24,7 +24,7 @@ You can learn how to install the corresponding version from their official websi
 pnpm install
 ```
 
-#### Start Development Project
+#### Development Project
 
 To do this you need to change the `VITE_APP_DEV_WEB_URL` parameter variable in `.env.development` in the project root directory.
 
@@ -36,11 +36,9 @@ pnpm run dev
 
 #### Build Project
 
-We provide two packaging and compilation environments by default, `development` and `production`. Their interface request configurations are in `.env.development` and `.env.production` in the project root directory respectively. Please change the `URL` is the address of the corresponding backend service.
+When you are ready to package, you need to modify the `VITE_APP_PROD_WEB_URL` parameter in `.env.production` accordingly to ensure that the packaged file can be normally requested to the backend service address.
 
 ```shell
-pnpm run build:dev
-# or
 pnpm run build:prod
 ```
 
