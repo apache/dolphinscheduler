@@ -15,54 +15,14 @@
  * limitations under the License.
  */
 
-type IDataBase =
-  | 'MYSQL'
-  | 'POSTGRESQL'
-  | 'HIVE'
-  | 'SPARK'
-  | 'CLICKHOUSE'
-  | 'ORACLE'
-  | 'SQLSERVER'
-  | 'DB2'
-  | 'PRESTO'
-  | 'REDSHIFT'
+package org.apache.dolphinscheduler.plugin.datasource.redshift;
 
-interface IDataSource {
-  id?: number
-  type?: IDataBase
-  name?: string
-  note?: string
-  host?: string
-  port?: number
-  principal?: string
-  javaSecurityKrb5Conf?: string
-  loginUserKeytabUsername?: string
-  loginUserKeytabPath?: string
-  userName?: string
-  password?: string
-  database?: string
-  connectType?: string
-  other?: object
+import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+public class RedshiftDataSourceClient extends CommonDataSourceClient {
+    public RedshiftDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
+    }
 }
-
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
-
-interface UserIdReq {
-  userId: number
-}
-
-interface TypeReq {
-  type: IDataBase
-}
-
-interface NameReq {
-  name: string
-}
-
-type IdReq = number
-
-export { ListReq, IDataBase, IDataSource, UserIdReq, TypeReq, NameReq, IdReq }

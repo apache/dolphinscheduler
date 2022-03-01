@@ -113,6 +113,11 @@ export default {
       id: 8,
       code: 'PRESTO',
       disabled: false
+    },
+    {
+      id: 9,
+      code: 'REDSHIFT',
+      disabled: false
     }
   ],
   // Alarm interface

@@ -75,6 +75,11 @@ export function useDatasourceType(
       id: 8,
       code: 'PRESTO',
       disabled: false
+    },
+    {
+      id: 9,
+      code: 'REDSHIFT',
+      disabled: false
     }
   ]
 
