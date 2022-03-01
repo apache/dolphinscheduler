@@ -433,6 +433,7 @@ const project = {
     crontab: 'Crontab',
     delete_confirm: 'Delete?',
     enter_name_tips: 'Please enter name',
+    switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
     run_type: 'Run Type',
