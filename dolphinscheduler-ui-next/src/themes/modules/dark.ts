@@ -18,6 +18,7 @@
 const dark = {
   common: {
     bodyColor: '#141414',
+    baseColor: '#f8f8fc',
 
     /**************** Brand color */
     primaryColor: '#177ddc',
