@@ -548,7 +548,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
      * @return hdfs resource dir
      */
     public static String getHdfsResDir(String tenantCode) {
-        return String.format("%s/"+RESOURCE_TYPE_FILE, tenantCode);
+        return String.format("%s/" + RESOURCE_TYPE_FILE, getHdfsTenantDir(tenantCode));
     }
 
 //    /**
@@ -584,7 +584,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
-        return String.format(FORMAT_SS, getHdfsDir(resourceType, tenantCode), fileName);
+        return String.format(FORMAT_S_S, getHdfsDir(resourceType, tenantCode), fileName);
     }
 
     /**
@@ -598,7 +598,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
-        return String.format(FORMAT_SS, getHdfsResDir(tenantCode), fileName);
+        return String.format(FORMAT_S_S, getHdfsResDir(tenantCode), fileName);
     }
 
     /**
@@ -612,7 +612,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
-        return String.format(FORMAT_SS, getHdfsUdfDir(tenantCode), fileName);
+        return String.format(FORMAT_S_S, getHdfsUdfDir(tenantCode), fileName);
     }
 
     /**
@@ -620,7 +620,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
      * @return file directory of tenants on hdfs
      */
     public static String getHdfsTenantDir(String tenantCode) {
-        return String.format(FORMAT_SS, getHdfsDataBasePath(), tenantCode);
+        return String.format(FORMAT_S_S, getHdfsDataBasePath(), tenantCode);
     }
 
     /**
