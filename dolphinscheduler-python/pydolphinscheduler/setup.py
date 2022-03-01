@@ -134,9 +134,9 @@ setup(
         "Homepage": "https://dolphinscheduler.apache.org",
         "Documentation": "https://dolphinscheduler.apache.org/python/index.html",
         "Source": "https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/"
-                  "pydolphinscheduler",
+        "pydolphinscheduler",
         "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues?"
-                         "q=is%3Aissue+is%3Aopen+label%3APython",
+        "q=is%3Aissue+is%3Aopen+label%3APython",
         "Discussion": "https://github.com/apache/dolphinscheduler/discussions",
         "Twitter": "https://twitter.com/dolphinschedule",
     },
