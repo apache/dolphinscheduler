@@ -38,6 +38,7 @@ version = "2.0.4"
 prod = [
     "click>=8.0.0",
     "py4j~=0.10",
+    "pyyaml",
 ]
 
 build = [

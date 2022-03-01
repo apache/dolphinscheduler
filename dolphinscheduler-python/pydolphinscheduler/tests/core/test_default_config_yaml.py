@@ -15,38 +15,25 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Exceptions for pydolphinscheduler."""
+"""Test default config file."""
+
+from typing import Dict
+
+import yaml
+
+from tests.testing.path import path_default_config_yaml
 
 
-class PyDSBaseException(Exception):
-    """Base exception for pydolphinscheduler."""
-
-    pass
-
-
-class PyDSParamException(PyDSBaseException):
-    """Exception for pydolphinscheduler parameter verify error."""
-
-    pass
+def nested_key_check(test_dict: Dict) -> None:
+    """Test whether default configuration file exists specific character."""
+    for key, val in test_dict.items():
+        assert "." not in key, f"There is not allowed special character in key `{key}`."
+        if isinstance(val, dict):
+            nested_key_check(val)
 
 
-class PyDSTaskNoFoundException(PyDSBaseException):
-    """Exception for pydolphinscheduler workflow task no found error."""
-
-    pass
-
-
-class PyDSJavaGatewayException(PyDSBaseException):
-    """Exception for pydolphinscheduler Java gateway error."""
-
-    pass
-
-
-class PyDSProcessDefinitionNotAssignException(PyDSBaseException):
-    """Exception for pydolphinscheduler process definition not assign error."""
-
-
-class PyDSConfException(PyDSBaseException):
-    """Exception for pydolphinscheduler configuration error."""
-
-    pass
+def test_key_without_dot_delimiter():
+    """Test wrapper of whether default configuration file exists specific character."""
+    with open(path_default_config_yaml, "r") as f:
+        default_config = yaml.safe_load(f)
+        nested_key_check(default_config)
