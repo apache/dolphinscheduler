@@ -1475,6 +1475,8 @@ public class WorkflowExecuteThread {
                 || CollectionUtils.isNotEmpty(failList)
                 || !isComplementEnd()) {
                 return ExecutionStatus.STOP;
+            } else {
+                return ExecutionStatus.SUCCESS;
             }
         }
 
