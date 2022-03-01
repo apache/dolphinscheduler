@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.service.quartz;
 
 import static org.apache.dolphinscheduler.common.Constants.PROJECT_ID;
-import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_GROUP_PRIFIX;
-import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_PRIFIX;
+import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_GROUP_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_PREFIX;
 import static org.apache.dolphinscheduler.common.Constants.SCHEDULE;
 import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_ID;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
@@ -147,11 +147,11 @@ public class QuartzExecutors {
     }
 
     public static String buildJobName(int processId) {
-        return QUARTZ_JOB_PRIFIX + UNDERLINE + processId;
+        return QUARTZ_JOB_PREFIX + UNDERLINE + processId;
     }
 
     public static String buildJobGroupName(int projectId) {
-        return QUARTZ_JOB_GROUP_PRIFIX + UNDERLINE + projectId;
+        return QUARTZ_JOB_GROUP_PREFIX + UNDERLINE + projectId;
     }
 
     public static Map<String, Object> buildDataMap(int projectId, Schedule schedule) {

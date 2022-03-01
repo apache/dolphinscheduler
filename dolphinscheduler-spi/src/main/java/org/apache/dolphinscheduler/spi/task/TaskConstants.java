@@ -308,7 +308,7 @@ public class TaskConstants {
     /**
      * resource storage type
      */
-    public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
+   // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
      * kerberos

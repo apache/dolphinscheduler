@@ -133,6 +133,7 @@
         <aws.sdk.version>1.12.160</aws.sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
 
+        <aws.sdk.version>1.12.160</aws.sdk.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
@@ -951,6 +952,13 @@
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${aws.sdk.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

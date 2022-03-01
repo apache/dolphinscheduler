@@ -17,21 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_NAME;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_DATASOURCE_ID;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
-
+import com.google.common.base.Enums;
+import com.google.common.base.Strings;
+import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
@@ -46,21 +35,8 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -73,31 +49,23 @@ import org.apache.dolphinscheduler.spi.task.dq.enums.ConnectorType;
 import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
 import org.apache.dolphinscheduler.spi.task.dq.utils.JdbcUrlParser;
-import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
+import org.apache.dolphinscheduler.spi.task.request.*;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Enums;
-import com.google.common.base.Strings;
-import com.zaxxer.hikari.HikariDataSource;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.*;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -238,6 +206,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return null;
     }
 
+    @Override
     public TaskInstance taskInstance() {
         return this.taskInstance;
     }
@@ -428,7 +397,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // set the path used to store data quality task check error data
         dataQualityTaskExecutionContext.setHdfsPath(
-                PropertyUtils.getString(Constants.FS_DEFAULTFS)
+                PropertyUtils.getString(Constants.FS_DEFAULT_FS)
                 + PropertyUtils.getString(
                         Constants.DATA_QUALITY_ERROR_OUTPUT_PATH,
                         "/user/" + tenantCode + "/data_quality_error_data"));
@@ -554,7 +523,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(TARGET_DATASOURCE_ID)));
             if (dataSource != null) {
                 ConnectorType targetConnectorType = ConnectorType.of(
-                        DbType.of(Integer.parseInt(config.get(TARGET_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                        Objects.requireNonNull(DbType.of(Integer.parseInt(config.get(TARGET_CONNECTOR_TYPE)))).isHive() ? 1 : 0);
                 dataQualityTaskExecutionContext.setTargetConnectorType(targetConnectorType.getDescription());
                 dataQualityTaskExecutionContext.setTargetType(dataSource.getType().getCode());
                 dataQualityTaskExecutionContext.setTargetConnectionParams(dataSource.getConnectionParams());
@@ -573,7 +542,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(SRC_DATASOURCE_ID)));
             if (dataSource != null) {
                 ConnectorType srcConnectorType = ConnectorType.of(
-                        DbType.of(Integer.parseInt(config.get(SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                        Objects.requireNonNull(DbType.of(Integer.parseInt(config.get(SRC_CONNECTOR_TYPE)))).isHive() ? 1 : 0);
                 dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
                 dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
                 dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
@@ -589,6 +558,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
         SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
+        assert sqlParameters != null;
         int datasourceId = sqlParameters.getDatasource();
         DataSource datasource = processService.findDataSourceById(datasourceId);
         sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());

@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.io.Files;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -30,12 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -63,9 +62,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.io.Files;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * resources service test
@@ -211,7 +209,7 @@ public class ResourcesServiceTest {
         PowerMockito.when(HadoopUtils.getHdfsFileName(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn("test1");
 
         try {
-            Mockito.when(HadoopUtils.getInstance().exists(Mockito.any())).thenReturn(false);
+            Mockito.when(HadoopUtils.getInstance().exists(Mockito.any(),Mockito.any())).thenReturn(false);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -223,7 +221,7 @@ public class ResourcesServiceTest {
         Mockito.when(userMapper.queryDetailsById(1)).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         try {
-            Mockito.when(HadoopUtils.getInstance().exists(Mockito.any())).thenReturn(true);
+            Mockito.when(HadoopUtils.getInstance().exists(Mockito.any(),Mockito.any())).thenReturn(true);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -345,7 +343,7 @@ public class ResourcesServiceTest {
 
             //SUCCESS
             loginUser.setTenantId(1);
-            Mockito.when(hadoopUtils.delete(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(true);
+            Mockito.when(hadoopUtils.delete(Mockito.any(),Mockito.anyString(), Mockito.anyBoolean())).thenReturn(true);
             Mockito.when(processDefinitionMapper.listResources()).thenReturn(getResources());
             Mockito.when(resourcesMapper.deleteIds(Mockito.any())).thenReturn(1);
             Mockito.when(resourceUserMapper.deleteResourceUserArray(Mockito.anyInt(), Mockito.any())).thenReturn(1);
@@ -373,7 +371,7 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         String unExistFullName = "/test.jar";
         try {
-            Mockito.when(hadoopUtils.exists(unExistFullName)).thenReturn(false);
+            Mockito.when(hadoopUtils.exists(Mockito.any(),unExistFullName)).thenReturn(false);
         } catch (IOException e) {
             logger.error("hadoop error", e);
         }
@@ -384,7 +382,7 @@ public class ResourcesServiceTest {
         //RESOURCE_FILE_EXIST
         user.setTenantId(1);
         try {
-            Mockito.when(hadoopUtils.exists("test")).thenReturn(true);
+            Mockito.when(hadoopUtils.exists(Mockito.any(),"test")).thenReturn(true);
         } catch (IOException e) {
             logger.error("hadoop error", e);
         }
@@ -418,14 +416,14 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
         //RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
-        PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("class");
+        PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
 
         //USER_NOT_EXIST
-        PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("jar");
+        PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("jar");
         PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
@@ -440,7 +438,7 @@ public class ResourcesServiceTest {
         //RESOURCE_FILE_NOT_EXIST
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         try {
-            Mockito.when(hadoopUtils.exists(Mockito.anyString())).thenReturn(false);
+            Mockito.when(hadoopUtils.exists(Mockito.any(),Mockito.anyString())).thenReturn(false);
         } catch (IOException e) {
             logger.error("hadoop error", e);
         }
@@ -450,7 +448,7 @@ public class ResourcesServiceTest {
 
         //SUCCESS
         try {
-            Mockito.when(hadoopUtils.exists(null)).thenReturn(true);
+            Mockito.when(hadoopUtils.exists(Mockito.any(),null)).thenReturn(true);
             Mockito.when(hadoopUtils.catFile(null, 1, 10)).thenReturn(getContent());
         } catch (IOException e) {
             logger.error("hadoop error", e);
@@ -475,14 +473,14 @@ public class ResourcesServiceTest {
 
         //RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("class");
+        PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "desc", "content", -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
 
         //RuntimeException
         try {
-            PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("jar");
+            PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("jar");
             Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
             result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "desc", "content", -1, "/");
         } catch (RuntimeException ex) {
@@ -517,13 +515,13 @@ public class ResourcesServiceTest {
 
         //RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("class");
+        PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
 
         //USER_NOT_EXIST
-        PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("jar");
+        PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("jar");
         PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
@@ -714,7 +712,7 @@ public class ResourcesServiceTest {
 
         //SUCCESS
         try {
-            Mockito.when(hadoopUtils.exists(null)).thenReturn(true);
+            Mockito.when(hadoopUtils.exists(Mockito.any(),null)).thenReturn(true);
             Mockito.when(hadoopUtils.catFile(null, 1, 10)).thenReturn(getContent());
 
             List<String> list = hadoopUtils.catFile(null, 1, 10);

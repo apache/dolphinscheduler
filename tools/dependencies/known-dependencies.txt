@@ -271,3 +271,4 @@ okio-1.17.2.jar
 jmespath-java-1.12.160.jar
 jackson-dataformat-cbor-2.12.5.jar
 ion-java-1.0.2.jar
+aws-java-sdk-s3-1.12.160.jar

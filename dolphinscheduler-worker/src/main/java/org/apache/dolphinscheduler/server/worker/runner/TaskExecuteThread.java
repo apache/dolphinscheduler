@@ -17,18 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import com.github.rholder.retry.RetryException;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.RetryerUtils;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -37,32 +35,25 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskAlertInfo;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.rholder.retry.RetryException;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 /**
  * task scheduler thread
@@ -78,6 +69,16 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * task instance
      */
     private TaskExecutionContext taskExecutionContext;
+
+    public StorageOperate getStorageOperate() {
+        return storageOperate;
+    }
+
+    public void setStorageOperate(StorageOperate storageOperate) {
+        this.storageOperate = storageOperate;
+    }
+
+    private StorageOperate storageOperate;
 
     /**
      * abstract task
@@ -165,7 +166,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
-                throw new RuntimeException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
+                throw new ServiceException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
             String taskLogName = LoggerUtils.buildTaskId(taskExecutionContext.getFirstSubmitTime(),
@@ -173,6 +174,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getProcessDefineVersion(),
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
+            assert taskRequest != null;
             taskRequest.setTaskLogName(taskLogName);
 
             // set the name of the current thread
@@ -234,7 +236,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 return;
             }
 
-            if ("/".equals(execLocalPath)) {
+            if (SINGLE_SLASH.equals(execLocalPath)) {
                 logger.warn("task: {} exec local path is '/', direct deletion is not allowed", taskExecutionContext.getTaskName());
                 return;
             }
@@ -300,13 +302,15 @@ public class TaskExecuteThread implements Runnable, Delayed {
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tenantCode, fullName);
+                    //XXX
+                    String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                    //XXX
+                    storageOperate.download(tenantCode,resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage());
+                    throw new ServiceException(e.getMessage());
                 }
             } else {
                 logger.info("file : {} exists ", resFile.getName());
@@ -386,4 +390,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
         taskExecutionContext.setParamsMap(paramsMap);
     }
+
+
 }

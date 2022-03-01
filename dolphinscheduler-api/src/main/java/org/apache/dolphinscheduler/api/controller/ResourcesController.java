@@ -17,30 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_FILE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZE_RESOURCE_TREE;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_RESOURCE_FILE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.EDIT_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_BY_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RESOURCES_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RESOURCES_LIST_PAGING;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UDF_FUNCTION_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_FILE_IS_EMPTY;
-import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_NOT_EXIST;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_NAME_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -49,15 +30,10 @@ import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Map;
-
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,24 +41,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * resources controller
@@ -108,13 +73,13 @@ public class ResourcesController extends BaseController {
      * @param currentDir current directory
      * @return create result code
      */
-    @ApiOperation(value = "createDirctory", notes = "CREATE_RESOURCE_NOTES")
+    @ApiOperation(value = "createDirectory", notes = "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
         @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
         @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
+        @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -125,6 +90,7 @@ public class ResourcesController extends BaseController {
                                   @RequestParam(value = "description", required = false) String description,
                                   @RequestParam(value = "pid") int pid,
                                   @RequestParam(value = "currentDir") String currentDir) {
+        //todo verify the directory name
         return resourceService.createDirectory(loginUser, alias, description, type, pid, currentDir);
     }
 
@@ -140,7 +106,7 @@ public class ResourcesController extends BaseController {
         @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
         @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
         @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
+        @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
     })
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -152,6 +118,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam("file") MultipartFile file,
                                  @RequestParam(value = "pid") int pid,
                                  @RequestParam(value = "currentDir") String currentDir) {
+        //todo  verify the file name
         return resourceService.createResource(loginUser, alias, description, type, file, pid, currentDir);
     }
 
@@ -183,6 +150,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
                                  @RequestParam(value = "file", required = false) MultipartFile file) {
+        //todo verify the resource name
         return resourceService.updateResource(loginUser, resourceId, alias, description, type, file);
     }
 
@@ -496,6 +464,7 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "database", required = false) String database,
                                 @RequestParam(value = "description", required = false) String description,
                                 @PathVariable(value = "resourceId") int resourceId) {
+        //todo verify the sourceName
         return udfFuncService.createUdfFunction(loginUser, funcName, className, argTypes, database, description, type, resourceId);
     }
 
@@ -590,7 +559,6 @@ public class ResourcesController extends BaseController {
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
-
         }
         result = udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
         return result;
@@ -636,7 +604,6 @@ public class ResourcesController extends BaseController {
     public Result verifyUdfFuncName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "name") String name
     ) {
-
         return udfFuncService.verifyUdfFuncByName(name);
     }
 

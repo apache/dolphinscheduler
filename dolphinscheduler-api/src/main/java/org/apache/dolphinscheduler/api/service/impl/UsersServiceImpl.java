@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -28,54 +32,23 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UDFUser;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * users service impl
@@ -118,16 +91,19 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    @Autowired
+    private StorageOperate storageOperate;
+
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser login user
-     * @param userName user name
+     * @param loginUser    login user
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tenant id
+     * @param phone        phone
+     * @param queue        queue
      * @return create result code
      * @throws Exception exception
      */
@@ -140,7 +116,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws IOException {
+                                          int state) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
         //check all user params
@@ -165,12 +141,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
-            // if tenant not exists
-            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))) {
-                createTenantDirIfNotExists(tenant.getTenantCode());
-            }
-            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(), user.getId());
-            HadoopUtils.getInstance().mkdir(userPath);
+            storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
+//
         }
 
         result.put(Constants.DATA_LIST, user);
@@ -277,7 +249,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * query user
      *
-     * @param name name
+     * @param name     name
      * @param password password
      * @return user info
      */
@@ -313,9 +285,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * query user list
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return user list page
      */
     @Override
@@ -342,15 +314,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * updateProcessInstance user
      *
-     * @param userId user id
-     * @param userName user name
+     * @param userId       user id
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
-     * @param state state
-     * @param timeZone timeZone
+     * @param email        email
+     * @param tenantId     tenant id
+     * @param phone        phone
+     * @param queue        queue
+     * @param state        state
+     * @param timeZone     timeZone
      * @return update result code
      * @throws Exception exception
      */
@@ -367,7 +339,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -435,17 +407,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
             //query tenant
             Tenant newTenant = tenantMapper.queryById(tenantId);
-            if (newTenant != null) {
-                // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState() && oldTenant != null) {
-                    String newTenantCode = newTenant.getTenantCode();
-                    String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
-                    String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
+            // if hdfs startup
+            if (newTenant != null && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
+                String newTenantCode = newTenant.getTenantCode();
+                String oldResourcePath = storageOperate.getResDir(oldTenant.getTenantCode());
+                String oldUdfsPath = storageOperate.getUdfDir(oldTenant.getTenantCode());
 
-                    // if old tenant dir exists
-                    if (HadoopUtils.getInstance().exists(oldResourcePath)) {
-                        String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
-                        String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
+                try {// if old tenant dir exists
+                    if (storageOperate.exists(oldTenant.getTenantCode(), oldResourcePath)) {
+                        String newResourcePath = storageOperate.getResDir(newTenantCode);
+                        String newUdfsPath = storageOperate.getUdfDir(newTenantCode);
 
                         //file resources list
                         List<Resource> fileResourcesList = resourceMapper.queryResourceList(
@@ -453,7 +424,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                         if (CollectionUtils.isNotEmpty(fileResourcesList)) {
                             ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
+                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldResourcePath, newResourcePath);
                         }
 
                         //udf resources
@@ -462,34 +433,33 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                         if (CollectionUtils.isNotEmpty(udfResourceList)) {
                             ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldUdfsPath, newUdfsPath);
+                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldUdfsPath, newUdfsPath);
                         }
 
-                        //Delete the user from the old tenant directory
-                        String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(), userId);
-                        HadoopUtils.getInstance().delete(oldUserPath, true);
                     } else {
                         // if old tenant dir not exists , create
-                        createTenantDirIfNotExists(oldTenant.getTenantCode());
-                    }
+                        storageOperate.createTenantDirIfNotExists(oldTenant.getTenantCode());
 
-                    if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))) {
-                        //create user in the new tenant directory
-                        String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(), user.getId());
-                        HadoopUtils.getInstance().mkdir(newUserPath);
-                    } else {
-                        // if new tenant dir not exists , create
-                        createTenantDirIfNotExists(newTenant.getTenantCode());
+                        if (!storageOperate.exists(newTenant.getTenantCode(), storageOperate.getDir(null,newTenant.getTenantCode()))) {
+                            storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
+                        }
                     }
-
+                } catch (Exception e) {
+                    logger.error("create tenant {} failed ,the reason is {}", oldTenant, e.getMessage());
                 }
             }
             user.setTenantId(tenantId);
+            try {
+                assert newTenant != null;
+                storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
+            } catch (Exception e) {
+                logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
+            }
+
         }
 
         // updateProcessInstance user
         userMapper.updateById(user);
-
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -498,7 +468,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * delete user
      *
      * @param loginUser login user
-     * @param id user id
+     * @param id        user id
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
@@ -525,16 +495,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         // delete user
-        User user = userMapper.queryTenantCodeByUserId(id);
+        userMapper.queryTenantCodeByUserId(id);
 
-        if (user != null) {
-            if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(), id);
-                if (HadoopUtils.getInstance().exists(userPath)) {
-                    HadoopUtils.getInstance().delete(userPath, true);
-                }
-            }
-        }
+
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
 
@@ -548,8 +511,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant project
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser  login user
+     * @param userId     user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -593,8 +556,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant project by code
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser   login user
+     * @param userId      user id
      * @param projectCode project code
      * @return grant result code
      */
@@ -618,7 +581,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 3. only project owner can operate
-        if (!this.hasPerm(loginUser, project.getUserId())) {
+        if (!this.canOperator(loginUser, project.getUserId())) {
             this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -639,9 +602,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     /**
      * revoke the project permission for specified user.
-     * @param loginUser     Login user
-     * @param userId        User id
-     * @param projectCode   Project Code
+     *
+     * @param loginUser   Login user
+     * @param userId      User id
+     * @param projectCode Project Code
      * @return
      */
     @Override
@@ -677,8 +641,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant resource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser   login user
+     * @param userId      user id
      * @param resourceIds resource id array
      * @return grant result code
      */
@@ -772,8 +736,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId user id
-     * @param udfIds udf id array
+     * @param userId    user id
+     * @param udfIds    udf id array
      * @return grant result code
      */
     @Override
@@ -814,8 +778,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant datasource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser     login user
+     * @param userId        user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
@@ -879,7 +843,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             if (alertGroups != null && !alertGroups.isEmpty()) {
                 for (int i = 0; i < alertGroups.size() - 1; i++) {
-                    sb.append(alertGroups.get(i).getGroupName() + ",");
+                    sb.append(alertGroups.get(i).getGroupName()).append(",");
                 }
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
@@ -957,7 +921,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * unauthorized user
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -994,18 +958,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * authorized user
      *
-     * @param loginUser login user
-     * @param alertgroupId alert group id
+     * @param loginUser    login user
+     * @param alertGroupId alert group id
      * @return authorized result code
      */
     @Override
-    public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
+    public Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
-        List<User> userList = userMapper.queryUserListByAlertGroupId(alertgroupId);
+        List<User> userList = userMapper.queryUserListByAlertGroupId(alertGroupId);
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
@@ -1019,6 +983,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private boolean checkTenantExists(int tenantId) {
         return tenantMapper.queryById(tenantId) != null;
     }
+
 
     /**
      * @return if check failed return the field, otherwise return null
@@ -1045,48 +1010,54 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     /**
      * copy resource files
+     * xxx unchecked
      *
      * @param resourceComponent resource component
-     * @param srcBasePath src base path
-     * @param dstBasePath dst base path
+     * @param srcBasePath       src base path
+     * @param dstBasePath       dst base path
      * @throws IOException io exception
      */
-    private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
+    private void copyResourceFiles(String oldTenantCode, String newTenantCode, ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) {
         List<ResourceComponent> components = resourceComponent.getChildren();
 
-        if (CollectionUtils.isNotEmpty(components)) {
-            for (ResourceComponent component : components) {
-                // verify whether exist
-                if (!HadoopUtils.getInstance().exists(String.format("%s/%s", srcBasePath, component.getFullName()))) {
-                    logger.error("resource file: {} not exist,copy error", component.getFullName());
-                    throw new ServiceException(Status.RESOURCE_NOT_EXIST);
-                }
-
-                if (!component.isDirctory()) {
-                    // copy it to dst
-                    HadoopUtils.getInstance().copy(String.format("%s/%s", srcBasePath, component.getFullName()), String.format("%s/%s", dstBasePath, component.getFullName()), false, true);
-                    continue;
-                }
-
-                if (CollectionUtils.isEmpty(component.getChildren())) {
-                    // if not exist,need create it
-                    if (!HadoopUtils.getInstance().exists(String.format("%s/%s", dstBasePath, component.getFullName()))) {
-                        HadoopUtils.getInstance().mkdir(String.format("%s/%s", dstBasePath, component.getFullName()));
+        try {
+            if (CollectionUtils.isNotEmpty(components)) {
+                for (ResourceComponent component : components) {
+                    // verify whether exist
+                    if (!storageOperate.exists(oldTenantCode, String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
+                        logger.error("resource file: {} not exist,copy error", component.getFullName());
+                        throw new ServiceException(Status.RESOURCE_NOT_EXIST);
                     }
-                } else {
-                    copyResourceFiles(component, srcBasePath, dstBasePath);
+
+                    if (!component.isDirctory()) {
+                        // copy it to dst
+                        storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()), String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true);
+                        continue;
+                    }
+
+                    if (CollectionUtils.isEmpty(component.getChildren())) {
+                        // if not exist,need create it
+                        if (!storageOperate.exists(oldTenantCode, String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
+                            storageOperate.mkdir(newTenantCode, String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
+                        }
+                    } else {
+                        copyResourceFiles(oldTenantCode, newTenantCode, component, srcBasePath, dstBasePath);
+                    }
                 }
+
             }
+        } catch (IOException e) {
+            logger.error("copy the resources failed,the error message  is {}", e.getMessage());
         }
     }
 
     /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
-     * @param userName user name
-     * @param userPassword user password
+     * @param userName       user name
+     * @param userPassword   user password
      * @param repeatPassword repeat password
-     * @param email email
+     * @param email          email
      * @return registry result code
      * @throws Exception exception
      */
@@ -1117,7 +1088,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
-     * @param userName user name
+     * @param userName  user name
      * @return create result code
      */
     @Override

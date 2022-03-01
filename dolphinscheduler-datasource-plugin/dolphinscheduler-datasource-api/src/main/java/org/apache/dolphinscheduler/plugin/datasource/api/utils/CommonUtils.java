@@ -17,25 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.DATA_QUALITY_JAR_NAME;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.KERBEROS;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.LOGIN_USER_KEY_TAB_PATH;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.LOGIN_USER_KEY_TAB_USERNAME;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.RESOURCE_STORAGE_TYPE;
-
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
+
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.*;
+import static org.apache.dolphinscheduler.spi.utils.Constants.RESOURCE_STORAGE_TYPE;
 
 /**
  * common utils

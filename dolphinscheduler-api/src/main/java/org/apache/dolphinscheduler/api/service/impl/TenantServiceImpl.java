@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -33,21 +37,14 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * tenant service impl
@@ -67,6 +64,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private StorageOperate storageOperate;
+
     /**
      * create tenant
      *
@@ -83,7 +83,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                             String tenantCode,
                                             int queueId,
                                             String desc) throws Exception {
-
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         if (isNotAdmin(loginUser, result)) {
@@ -107,13 +106,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenant.setDescription(desc);
         tenant.setCreateTime(now);
         tenant.setUpdateTime(now);
-
         // save
         tenantMapper.insert(tenant);
 
         // if hdfs startup
         if (PropertyUtils.getResUploadStartupState()) {
-            createTenantDirIfNotExists(tenantCode);
+            storageOperate.createTenantDirIfNotExists(tenantCode);
         }
 
         result.put(Constants.DATA_LIST, tenant);
@@ -146,9 +144,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         pageInfo.setTotal((int) tenantIPage.getTotal());
         pageInfo.setTotalList(tenantIPage.getRecords());
         result.setData(pageInfo);
-
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -189,11 +185,14 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             if (checkTenantExists(tenantCode)) {
                 // if hdfs startup
                 if (PropertyUtils.getResUploadStartupState()) {
-                    String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
-                    String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-                    //init hdfs resource
-                    HadoopUtils.getInstance().mkdir(resourcePath);
-                    HadoopUtils.getInstance().mkdir(udfsPath);
+                    //todo  check this
+//                    String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
+//                    String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
+//                    //init hdfs resource
+//                    storageOperate.mkdir(tenantCode,resourcePath);
+//                    storageOperate.mkdir(tenantCode,udfsPath);
+
+                    storageOperate.createTenantDirIfNotExists(tenantCode);
                 }
             } else {
                 putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
@@ -263,11 +262,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         // if resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
-            String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
-
-            if (HadoopUtils.getInstance().exists(tenantPath)) {
-                HadoopUtils.getInstance().delete(tenantPath, true);
-            }
+          storageOperate.deleteTenant(tenant.getTenantCode());
         }
 
         tenantMapper.deleteById(id);
@@ -325,7 +320,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Override
     public boolean checkTenantExists(String tenantCode) {
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
-        return existTenant == Boolean.TRUE;
+        return existTenant.equals(Boolean.TRUE);
     }
 
     /**
