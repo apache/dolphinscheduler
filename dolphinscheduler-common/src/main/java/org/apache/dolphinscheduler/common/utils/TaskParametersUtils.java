@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
+import org.apache.dolphinscheduler.common.task.emr.EmrParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapReduceParameters;
@@ -91,6 +92,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, SwitchParameters.class);
             case "PIGEON":
                 return JSONUtils.parseObject(parameter, PigeonCommonParameters.class);
+            case "EMR":
+                return JSONUtils.parseObject(parameter, EmrParameters.class);
             default:
                 logger.error("not support task type: {}", taskType);
                 return null;
