@@ -24,6 +24,7 @@ import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
+import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
@@ -80,6 +81,21 @@ public class UserAuthorizeE2ETest {
             .createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams)
             .goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        new NavBarPage(browser)
+            .goToNav(ProjectPage.class)
+            .delete(project)
+            .goToNav(DataSourcePage.class)
+            .delete(dataSourceName)
+            .goToNav(SecurityPage.class)
+            .goToTab(UserPage.class)
+            .delete(user)
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .delete(tenant);
     }
 
     @Test
