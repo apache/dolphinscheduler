@@ -15,15 +15,42 @@
  * limitations under the License.
 */
 
-ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
+/************************************
+ * Procedure
+ ************************************/
+delimiter d//
+
+DROP PROCEDURE IF EXISTS create_index_if_not_exists d//
+CREATE PROCEDURE create_index_if_not_exists (
+    IN tableName varchar(128),
+    IN indexName varchar(128),
+    IN indexColumns varchar(128)
+)
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND table_name = tableName AND index_name = indexName)
+    THEN
+        SET @sqlstmt = CONCAT('ALTER TABLE `', tableName , '` ADD KEY `', indexName, '` (', indexColumns, ') USING BTREE');
+        PREPARE stmt FROM @sqlstmt;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END;
+
+d//
+delimiter ;
+
+/************************************
+ * DDL
+ ************************************/
+call create_index_if_not_exists('t_ds_task_instance', 'idx_code_version', 'task_code, task_definition_version');
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`);
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`);
 ALTER TABLE `t_ds_process_task_relation_log` ADD KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`) USING BTREE;
 
-ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_project_code` (`project_code`) USING BTREE;
-ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_code_version` (`code`,`version`) USING BTREE;
+call create_index_if_not_exists('t_ds_task_definition_log', 'idx_project_code', 'project_code');
+call create_index_if_not_exists('t_ds_task_definition_log', 'idx_code_version', 'code, version');
 alter table t_ds_task_definition_log add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
 alter table t_ds_task_definition_log add `task_group_priority` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `task_group_id`;
 alter table t_ds_task_definition add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
