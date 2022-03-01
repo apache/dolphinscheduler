@@ -22,7 +22,7 @@ import viteCompression from 'vite-plugin-compression'
 import path from 'path'
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? './' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/dolphinscheduler/ui/' : '/',
   plugins: [
     vue(),
     vueJsx(),
