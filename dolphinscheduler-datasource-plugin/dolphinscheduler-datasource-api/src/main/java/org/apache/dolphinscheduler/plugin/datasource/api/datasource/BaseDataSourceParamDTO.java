@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLD
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.redshift.RedshiftDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -46,6 +47,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * see {@link SQLServerDataSourceParamDTO}
  * see {@link Db2DataSourceParamDTO}
  * see {@link PrestoDataSourceParamDTO}
+ * see {@link RedshiftDataSourceParamDTO}
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(value = {
@@ -58,6 +60,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = SQLServerDataSourceParamDTO.class, name = "SQLSERVER"),
     @JsonSubTypes.Type(value = Db2DataSourceParamDTO.class, name = "DB2"),
     @JsonSubTypes.Type(value = PrestoDataSourceParamDTO.class, name = "PRESTO"),
+    @JsonSubTypes.Type(value = RedshiftDataSourceParamDTO.class, name = "REDSHIFT"),
 })
 public abstract class BaseDataSourceParamDTO implements Serializable {
 
