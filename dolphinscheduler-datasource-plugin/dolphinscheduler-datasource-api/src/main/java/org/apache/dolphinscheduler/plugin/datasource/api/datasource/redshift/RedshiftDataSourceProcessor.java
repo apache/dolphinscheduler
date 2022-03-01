@@ -62,7 +62,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         RedshiftDataSourceParamDTO redshiftParam = (RedshiftDataSourceParamDTO) datasourceParam;
         String address = String.format("%s%s:%s", Constants.JDBC_REDSHIFT, redshiftParam.getHost(), redshiftParam.getPort());
-        String jdbcUrl = address + "/" + redshiftParam.getDatabase();
+        String jdbcUrl = address + Constants.SLASH + redshiftParam.getDatabase();
 
         RedshiftConnectionParam
             redshiftConnectionParam = new RedshiftConnectionParam();
@@ -121,7 +121,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isNotEmpty(otherMap)) {
             List<String> list = new ArrayList<>(otherMap.size());
             otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-            return String.join(";", list);
+            return String.join(Constants.SEMICOLON, list);
         }
         return null;
     }
@@ -131,9 +131,9 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         if (StringUtils.isEmpty(other)) {
             return otherMap;
         }
-        String[] configs = other.split(";");
+        String[] configs = other.split(Constants.SEMICOLON);
         for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
+            otherMap.put(config.split(Constants.EQUAL_SIGN)[0], config.split(Constants.EQUAL_SIGN)[1]);
         }
         return otherMap;
     }

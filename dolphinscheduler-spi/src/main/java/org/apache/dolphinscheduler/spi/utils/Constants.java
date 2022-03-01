@@ -207,6 +207,11 @@ public class Constants {
     public static final String DOUBLE_SLASH = "//";
 
     /**
+     * SLASH /
+     */
+    public static final String SLASH = "/";
+
+    /**
      * comma ,
      */
     public static final String COMMA = ",";
@@ -216,10 +221,22 @@ public class Constants {
      */
     public static final String COLON = ":";
 
+
     /**
-     * AT SIGN
+     * AT SIGN @
      */
     public static final String AT_SIGN = "@";
+
+    /**
+     * SEMICOLON ;
+     */
+    public static final String SEMICOLON = ";";
+
+
+    /**
+     * EQUAL_SIGN =
+     */
+    public static final String EQUAL_SIGN = "=";
 
     /**
      * datasource encryption salt
