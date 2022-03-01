@@ -17,146 +17,67 @@
 
 import Card from '@/components/card'
 import { ArrowLeftOutlined } from '@vicons/antd'
-import { NButton, NIcon } from 'naive-ui'
+import {NButton, NFormItem, NIcon, NSelect} from 'naive-ui'
 import { defineComponent, onMounted, Ref, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import styles from '../index.module.scss'
+import styles from './index.module.scss'
 import UseTree from '@/views/projects/workflow/definition/tree/use-tree'
 import { IChartDataItem } from '@/components/chart/modules/types'
-import {Router, useRouter} from 'vue-router'
-import {viewTree} from "@/service/modules/process-definition";
+import { Router, useRouter } from 'vue-router'
+import { viewTree } from "@/service/modules/process-definition";
+import { SelectMixedOption } from "naive-ui/lib/select/src/interface";
 
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
   setup() {
     const router: Router = useRouter()
+    const options: Ref<Array<SelectMixedOption>> = ref([{label: '25', value: 25},
+      {label: '50', value: 50},
+      {label: '75', value: 75},
+      {label: '100', value: 100}]
+    )
 
     const projectCode = ref(Number(router.currentRoute.value.params.projectCode))
     const definitionCode = ref(Number(router.currentRoute.value.params.definitionCode))
 
-    // let chartData: IChartDataItem = {name: '', value: ''}
-    //
-    // const getWorkflowTreeData = async ()  => {
-    //   if (projectCode && definitionCode) {
-    //     const res = await viewTree(projectCode.value, definitionCode.value, {limit: 50})
-    //     initChartData(chartData, res)
-    //     chartData = res
-    //     console.log(chartData)
-    //   }
-    // }
-    //
-    // const initChartData = (chartData: any, node: any) => {
-    //   chartData.children = []
-    //   node?.children.map((child: any) => {
-    //     let newChild = {}
-    //     initChartData(newChild, child)
-    //     chartData.children.push(newChild)
-    //     console.log(chartData)
-    //   })
-    //   chartData.name = node.name
-    //   chartData.value = node?.type
-    // }
-    //
-    let chartData: Ref<IChartDataItem> = ref({} as IChartDataItem)
-    onMounted(() => {
-      // getWorkflowTreeData()
-      chartData.value = {
-        "name": "Upstream shell",
-        "value": "SHELL",
-        "children": [
-          {
-            "children": [
-              {
-                "children": [],
-                "name": "Downstream shell 0",
-                "value": "SHELL"
-              },
-              {
-                "children": [],
-                "name": "Downstream shell 1",
-                "value": "SHELL"
-              }
-            ],
-            "name": "Switch Task",
-            "value": "SWITCH"
-          }
-        ]
+    const chartData: Ref<Array<IChartDataItem>> = ref([] as IChartDataItem[])
+
+    const getWorkflowTreeData = async (limit: number)  => {
+      if (projectCode && definitionCode) {
+        const res = await viewTree(projectCode.value, definitionCode.value, {limit: limit})
+        chartData.value = [{name: 'DAG', value: 'DAG'}]
+        initChartData(res, chartData.value[0])
       }
-      console.log(chartData)
+    }
+
+    const initChartData = (node: any, newNode: any) => {
+      newNode.children = []
+      node?.children.map((child: any) => {
+        let newChild = {}
+        initChartData(child, newChild)
+        newNode.children.push(newChild)
+      })
+      newNode.name = node.name
+      newNode.value = node?.type
+    }
+    const onSelectChange = (value: number) => {
+      if (value) {
+        getWorkflowTreeData(value)
+      }
+    }
+
+    onMounted(() => {
+      getWorkflowTreeData(25)
     })
 
-    //
-    // const chartData: IChartDataItem = {
-    //   name: 'flare',
-    //   children: [
-    //     {
-    //       name: 'data',
-    //       children: [
-    //         {
-    //           name: 'converters',
-    //           children: [
-    //             { name: 'Converters', value: 721 },
-    //             { name: 'DelimitedTextConverter', value: 4294 }
-    //           ]
-    //         },
-    //         {
-    //           name: 'DataUtil',
-    //           value: 3322
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       name: 'display',
-    //       children: [
-    //         { name: 'DirtySprite', value: 8833 },
-    //         { name: 'LineSprite', value: 1732 },
-    //         { name: 'RectSprite', value: 3623 }
-    //       ]
-    //     },
-    //     {
-    //       name: 'flex',
-    //       children: [{ name: 'FlareVis', value: 4116 }]
-    //     },
-    //     {
-    //       name: 'query',
-    //       children: [
-    //         { name: 'AggregateExpression', value: 1616 },
-    //         { name: 'And', value: 1027 },
-    //         { name: 'Arithmetic', value: 3891 },
-    //         { name: 'Average', value: 891 },
-    //         { name: 'BinaryExpression', value: 2893 },
-    //         { name: 'Comparison', value: 5103 },
-    //         { name: 'CompositeExpression', value: 3677 },
-    //         { name: 'Count', value: 781 },
-    //         { name: 'DateUtil', value: 4141 },
-    //         { name: 'Distinct', value: 933 },
-    //         { name: 'Expression', value: 5130 }
-    //       ]
-    //     },
-    //     {
-    //       name: 'scale',
-    //       children: [
-    //         { name: 'IScaleMap', value: 2105 },
-    //         { name: 'LinearScale', value: 1316 },
-    //         { name: 'LogScale', value: 3151 },
-    //         { name: 'OrdinalScale', value: 3770 },
-    //         { name: 'QuantileScale', value: 2435 },
-    //         { name: 'QuantitativeScale', value: 4839 },
-    //         { name: 'RootScale', value: 1756 },
-    //         { name: 'Scale', value: 4268 },
-    //         { name: 'ScaleType', value: 1821 },
-    //         { name: 'TimeScale', value: 5833 }
-    //       ]
-    //     }
-    //   ]
-    // }
-
     return {
-      chartData
+      chartData,
+      options,
+      onSelectChange
     }
   },
   render() {
-    const { chartData } = this
+    const { chartData, options, onSelectChange} = this
     const { t } = useI18n()
     const router: Router = useRouter()
 
@@ -169,10 +90,13 @@ export default defineComponent({
                 <ArrowLeftOutlined />
               </NIcon>
             </NButton>
+            <NFormItem size={'small'} class={styles.right} showFeedback={false} labelPlacement={'left'} label={t('project.workflow.tree_limit')}>
+              <NSelect size='small' defaultValue={25} onUpdateValue={onSelectChange} options={ options } />
+            </NFormItem>
           </div>
         </Card>
         <Card title={t('project.workflow.tree_view')}>
-            <UseTree chartData={ [chartData] }/>
+            <UseTree chartData={ chartData }/>
         </Card>
       </div>
     )

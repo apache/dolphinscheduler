@@ -388,6 +388,7 @@ const project = {
     cron_manage: '定时管理',
     delete: '删除',
     tree_view: '工作流树形图',
+    tree_limit: '限制大小',
     export: '导出',
     version_info: '版本信息',
     version: '版本',

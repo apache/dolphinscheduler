@@ -26,7 +26,8 @@ const props = {
     type: String as PropType<string>
   },
   chartData: {
-    type: Array as PropType<Array<IChartDataItem>>
+    type: Array as PropType<Array<IChartDataItem>>,
+    default: () => []
   }
 }
 
@@ -44,14 +45,11 @@ const UseTree = defineComponent({
   render() {
     const { title, chartData } = this
 
-    console.log('use treed')
-    console.log(chartData)
-
     return (
       <Card title={title}>
         <NGrid x-gap={12} cols={1}>
           <NGi>
-            <TreeChart data={chartData}/>
+            { chartData.length > 0 && <TreeChart data={chartData} />}
           </NGi>
         </NGrid>
       </Card>

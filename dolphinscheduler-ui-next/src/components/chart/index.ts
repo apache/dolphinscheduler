@@ -41,7 +41,6 @@ function initChart<Opt extends ECBasicOption>(
       themeStore.darkTheme && 'dark-bold'
     )
     chart && chart.setOption(option)
-    console.log('init chart ...')
   }
 
   const resize = throttle(() => {
@@ -67,7 +66,6 @@ function initChart<Opt extends ECBasicOption>(
   watch(
     () => option,
     () => {
-      console.log('data changed...')
       chart?.dispose()
       init()
     },

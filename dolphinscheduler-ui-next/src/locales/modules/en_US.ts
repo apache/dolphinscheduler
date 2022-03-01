@@ -391,6 +391,7 @@ const project = {
     cron_manage: 'Cron manage',
     delete: 'Delete',
     tree_view: 'Tree View',
+    tree_limit: 'Limit Size',
     export: 'Export',
     version_info: 'Version Info',
     version: 'Version',
