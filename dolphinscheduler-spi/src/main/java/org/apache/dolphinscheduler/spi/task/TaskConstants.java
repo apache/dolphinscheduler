@@ -24,7 +24,7 @@ public class TaskConstants {
     }
 
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
-    
+
     public static final String SETVALUE_REGEX = "\\$\\{setValue\\(([^)]*)\\)}";
 
     /**
@@ -371,5 +371,12 @@ public class TaskConstants {
      * data.quality.error.output.path
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
+
+    /**
+     * aws config
+     */
+    public static final String AWS_ACCESS_KEY_ID= "aws.access.key.id";
+    public static final String AWS_SECRET_ACCESS_KEY= "aws.secret.access.key";
+    public static final String AWS_REGION = "aws.region";
 
 }

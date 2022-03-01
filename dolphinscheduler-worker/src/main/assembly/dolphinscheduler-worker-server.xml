@@ -24,6 +24,7 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <baseDirectory>worker-server</baseDirectory>
+
     <fileSets>
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
@@ -59,6 +60,10 @@
     <dependencySets>
         <dependencySet>
             <outputDirectory>libs</outputDirectory>
+            <excludes>
+                <exclude>com.amazonaws:aws-java-sdk-emr</exclude>
+                <exclude>com.amazonaws:aws-java-sdk-core</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>
