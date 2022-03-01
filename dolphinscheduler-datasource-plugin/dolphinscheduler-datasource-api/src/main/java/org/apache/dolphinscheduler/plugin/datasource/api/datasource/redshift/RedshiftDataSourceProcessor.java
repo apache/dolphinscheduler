@@ -119,7 +119,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isNotEmpty(otherMap)) {
-            List<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<>(otherMap.size());
             otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
             return String.join(";", list);
         }
