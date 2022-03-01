@@ -22,11 +22,11 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
     Delimiter,
-    ProcessDefinitionDefault,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
 )
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
@@ -104,7 +104,7 @@ class Task(Base):
         description: Optional[str] = None,
         flag: Optional[str] = TaskFlag.YES,
         task_priority: Optional[str] = TaskPriority.MEDIUM,
-        worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
+        worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
         delay_time: Optional[int] = 0,
         fail_retry_times: Optional[int] = 0,
         fail_retry_interval: Optional[int] = 1,

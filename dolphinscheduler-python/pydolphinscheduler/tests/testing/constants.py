@@ -17,6 +17,8 @@
 
 """Constants variables for test module."""
 
+import os
+
 # Record some task without example in directory `example`. Some of them maybe can not write example,
 # but most of them just without adding by mistake, and we should add it later.
 task_without_example = {
@@ -26,3 +28,9 @@ task_without_example = {
     "python",
     "procedure",
 }
+
+# whether in dev mode, if true we will add or remove some tests. Or make be and more detail infos when
+# test failed.
+DEV_MODE = str(
+    os.environ.get("PY_DOLPHINSCHEDULER_DEV_MODE", False)
+).strip().lower() in {"true", "t", "1"}

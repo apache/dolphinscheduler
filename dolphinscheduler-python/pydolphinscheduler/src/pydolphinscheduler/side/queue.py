@@ -19,7 +19,7 @@
 
 from typing import Optional
 
-from pydolphinscheduler.constants import ProcessDefinitionDefault
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base_side import BaseSide
 from pydolphinscheduler.java_gateway import gateway_result_checker, launch_gateway
 
@@ -29,12 +29,12 @@ class Queue(BaseSide):
 
     def __init__(
         self,
-        name: str = ProcessDefinitionDefault.QUEUE,
+        name: str = configuration.WORKFLOW_QUEUE,
         description: Optional[str] = "",
     ):
         super().__init__(name, description)
 
-    def create_if_not_exists(self, user=ProcessDefinitionDefault.USER) -> None:
+    def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
         """Create Queue if not exists."""
         gateway = launch_gateway()
         # Here we set Queue.name and Queue.queueName same as self.name

@@ -18,16 +18,13 @@
 """Utils of command line test."""
 
 
-import os
-
 from click.testing import CliRunner
+
+from tests.testing.constants import DEV_MODE
 
 
 class CliTestWrapper:
     """Wrap command click CliRunner.invoke."""
-
-    _dev_mode_env_name = "PY_DOLPHINSCHEDULER_DEV_MODE"
-    _dev_mode_true_val = {"true", "t", "1"}
 
     def __init__(self, *args, **kwargs):
         runner = CliRunner()
@@ -55,8 +52,7 @@ class CliTestWrapper:
         It read variable named `PY_DOLPHINSCHEDULER_DEV_MODE` from env, when it set to `true` or `t` or `1`
         will print result output when class :class:`CliTestWrapper` is initialization.
         """
-        dev_mode = str(os.getenv(self._dev_mode_env_name))
-        if dev_mode.strip().lower() in self._dev_mode_true_val:
+        if DEV_MODE:
             print(f"\n{self.result.output}\n")
 
     def assert_success(self, output: str = None, fuzzy: bool = False):

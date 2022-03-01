@@ -25,22 +25,6 @@ class ProcessDefinitionReleaseState:
     OFFLINE: str = "OFFLINE"
 
 
-class ProcessDefinitionDefault:
-    """Constants default value for :class:`pydolphinscheduler.core.process_definition.ProcessDefinition`."""
-
-    PROJECT: str = "project-pydolphin"
-    TENANT: str = "tenant_pydolphin"
-    USER: str = "userPythonGateway"
-    # TODO simple set password same as username
-    USER_PWD: str = "userPythonGateway"
-    USER_EMAIL: str = "userPythonGateway@dolphinscheduler.com"
-    USER_PHONE: str = "11111111111"
-    USER_STATE: int = 1
-    QUEUE: str = "queuePythonGateway"
-    WORKER_GROUP: str = "default"
-    TIME_ZONE: str = "Asia/Shanghai"
-
-
 class TaskPriority(str):
     """Constants for task priority."""
 
@@ -98,10 +82,6 @@ class JavaGatewayDefault(str):
     RESULT_STATUS_SUCCESS = "SUCCESS"
 
     RESULT_DATA = "data"
-
-    SERVER_ADDRESS = "127.0.0.1"
-    SERVER_PORT = 25333
-    AUTO_CONVERT = True
 
 
 class Delimiter(str):
