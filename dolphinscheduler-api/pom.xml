@@ -245,11 +245,6 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>

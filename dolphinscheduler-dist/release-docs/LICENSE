@@ -441,6 +441,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-emr 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-emr/1.12.160 Apache 2.0
     aws-java-sdk-core 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
     aws-java-sdk-s3 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.12.160  Apache 2.0
+    aws-java-sdk-core-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
+    aws-java-sdk-kms-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.160  Apache 2.0
 
 ========================================================================
 BSD licenses
