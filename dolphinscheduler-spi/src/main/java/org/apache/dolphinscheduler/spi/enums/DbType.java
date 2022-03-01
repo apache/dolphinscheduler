@@ -35,7 +35,9 @@ public enum DbType {
     SQLSERVER(6, "sqlserver"),
     DB2(7, "db2"),
     PRESTO(8, "presto"),
-    H2(9, "h2");
+    H2(9, "h2"),
+    REDSHIFT(10,"redshift"),
+    ;
 
     @EnumValue
     private final int code;
