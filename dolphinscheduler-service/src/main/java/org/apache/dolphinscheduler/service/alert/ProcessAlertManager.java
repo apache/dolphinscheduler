@@ -193,6 +193,7 @@ public class ProcessAlertManager {
             alert.setTitle("worker fault tolerance");
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
+            alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alertDao.addAlert(alert);
@@ -223,6 +224,7 @@ public class ProcessAlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
+        alert.setWarningType(processInstance.getState().typeIsSuccess() ? WarningType.SUCCESS : WarningType.FAILURE);
         String content = getContentProcessInstance(processInstance, taskInstances,projectUser);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
