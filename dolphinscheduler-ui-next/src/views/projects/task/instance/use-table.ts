@@ -23,7 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip } from 'naive-ui'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
@@ -145,7 +145,7 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(CheckCircleOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(CheckCircleOutlined) })
                       }
                     ),
                   default: () => t('project.task.serial_wait')
@@ -165,7 +165,7 @@ export function useTable() {
                         onClick: () => handleLog(row)
                       },
                       {
-                        icon: () => h(AlignLeftOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(AlignLeftOutlined) })
                       }
                     ),
                   default: () => t('project.task.view_log')
@@ -185,7 +185,7 @@ export function useTable() {
                         onClick: () => downloadLog(row.id)
                       },
                       {
-                        icon: () => h(DownloadOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(DownloadOutlined) })
                       }
                     ),
                   default: () => t('project.task.download_log')

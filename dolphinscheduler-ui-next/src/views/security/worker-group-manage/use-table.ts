@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
@@ -102,7 +102,7 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.worker_group.edit')
@@ -131,7 +131,7 @@ export function useTable() {
                               class: 'delete'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
                             }
                           ),
                         default: () => t('security.worker_group.delete')

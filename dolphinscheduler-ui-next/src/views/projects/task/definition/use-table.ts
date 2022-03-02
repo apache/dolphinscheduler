@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   DeleteOutlined,
@@ -143,7 +143,7 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('project.task.edit')
@@ -169,7 +169,7 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(DragOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(DragOutlined) })
                       }
                     ),
                   default: () => t('project.task.move')
@@ -192,7 +192,7 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(ExclamationCircleOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(ExclamationCircleOutlined) })
                       }
                     ),
                   default: () => t('project.task.version')
@@ -223,7 +223,7 @@ export function useTable(onEdit: Function) {
                                 row.processReleaseState === 'ONLINE'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
                             }
                           ),
                         default: () => t('project.task.delete')
