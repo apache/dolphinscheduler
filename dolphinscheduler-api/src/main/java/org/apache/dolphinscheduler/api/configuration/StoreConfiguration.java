@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
- * @author Terry.Dai
  * @version since 2.0.4
  */
 
