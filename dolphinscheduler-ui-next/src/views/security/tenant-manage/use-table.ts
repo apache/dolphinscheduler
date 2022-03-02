@@ -21,7 +21,7 @@ import {
   deleteTenantById
 } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 
@@ -98,7 +98,7 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.tenant.edit')
@@ -127,7 +127,7 @@ export function useTable() {
                               class: 'delete'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
                             }
                           ),
                         default: () => t('security.tenant.delete')
