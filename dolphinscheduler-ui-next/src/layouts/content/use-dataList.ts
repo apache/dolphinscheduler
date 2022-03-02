@@ -166,11 +166,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_group_option'),
-                key: 'task-group-option'
+                key: '/resource/task-group-option'
               },
               {
                 label: t('menu.task_group_queue'),
-                key: 'task-group-queue'
+                key: '/resource/task-group-queue'
               }
             ]
           }
