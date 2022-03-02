@@ -18,7 +18,7 @@
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
 import { parseISO, format } from 'date-fns'
-import { NButton, NPopconfirm, NSpace, NTooltip, NTag } from 'naive-ui'
+import { NButton, NPopconfirm, NSpace, NTooltip, NTag, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   queryEnvironmentListPaging,
@@ -105,7 +105,7 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.environment.edit')
@@ -134,7 +134,7 @@ export function useTable() {
                               class: 'delete'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
                             }
                           ),
                         default: () => t('security.environment.delete')
