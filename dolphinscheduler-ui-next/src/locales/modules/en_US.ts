@@ -533,7 +533,6 @@ const project = {
     waiting_depend: 'Waiting Depend',
     delay_execution: 'Delay Execution',
     forced_success: 'Forced Success',
-    serial_wait: 'Serial Wait',
     view_log: 'View Log',
     download_log: 'Download Log'
   },

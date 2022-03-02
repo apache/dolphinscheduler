@@ -530,7 +530,6 @@ const project = {
     waiting_depend: '等待依赖完成',
     delay_execution: '延时执行',
     forced_success: '强制成功',
-    serial_wait: '串行等待',
     view_log: '查看日志',
     download_log: '下载日志'
   },
