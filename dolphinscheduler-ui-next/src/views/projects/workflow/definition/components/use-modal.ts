@@ -20,7 +20,7 @@ import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import { importProcessDefinition } from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
@@ -78,11 +78,11 @@ export function useModal(
         state.startForm.processDefinitionCode = code
         if (state.startForm.startEndTime) {
           const start = format(
-            new Date(state.startForm.startEndTime[0]),
+            parseISO(state.startForm.startEndTime[0]),
             'yyyy-MM-dd hh:mm:ss'
           )
           const end = format(
-            new Date(state.startForm.startEndTime[1]),
+            parseISO(state.startForm.startEndTime[1]),
             'yyyy-MM-dd hh:mm:ss'
           )
           state.startForm.scheduleTime = `${start},${end}`
@@ -148,11 +148,11 @@ export function useModal(
 
   const getTimingData = () => {
     const start = format(
-      new Date(state.timingForm.startEndTime[0]),
+      parseISO(state.timingForm.startEndTime[0]),
       'yyyy-MM-dd hh:mm:ss'
     )
     const end = format(
-      new Date(state.timingForm.startEndTime[1]),
+      parseISO(state.timingForm.startEndTime[1]),
       'yyyy-MM-dd hh:mm:ss'
     )
 
@@ -210,11 +210,11 @@ export function useModal(
         const projectCode = Number(router.currentRoute.value.params.projectCode)
 
         const start = format(
-          new Date(state.timingForm.startEndTime[0]),
+          parseISO(state.timingForm.startEndTime[0]),
           'yyyy-MM-dd hh:mm:ss'
         )
         const end = format(
-          new Date(state.timingForm.startEndTime[1]),
+          parseISO(state.timingForm.startEndTime[1]),
           'yyyy-MM-dd hh:mm:ss'
         )
 
