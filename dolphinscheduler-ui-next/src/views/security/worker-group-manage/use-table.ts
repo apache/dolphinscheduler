@@ -42,7 +42,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.worker_group.group_name'),
@@ -176,7 +177,6 @@ export function useTable() {
       queryAllWorkerGroupsPaging({ ...params }).then((res: WorkerGroupRes) => {
         variables.tableData = res.totalList.map((item, index) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any

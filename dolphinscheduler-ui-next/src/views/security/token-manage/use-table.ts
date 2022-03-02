@@ -42,7 +42,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.token.user'),
@@ -176,7 +177,6 @@ export function useTable() {
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any

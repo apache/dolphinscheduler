@@ -36,7 +36,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.yarn_queue.queue_name'),
@@ -104,7 +105,6 @@ export function useTable() {
       queryQueueListPaging({ ...params }).then((res: QueueRes) => {
         variables.tableData = res.totalList.map((item, index) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any

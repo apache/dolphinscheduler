@@ -46,7 +46,8 @@ export function useTable(onEdit: Function) {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.task.task_name'),
@@ -281,7 +282,6 @@ export function useTable(onEdit: Function) {
             }
 
             return {
-              index: index + 1,
               ...item
             }
           }) as any

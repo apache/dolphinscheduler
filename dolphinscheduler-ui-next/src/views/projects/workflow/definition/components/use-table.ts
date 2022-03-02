@@ -37,7 +37,7 @@ export function useTable(
 
   const columns: TableColumns<any> = [
     {
-      title: t('project.workflow.id'),
+      title: '#',
       key: 'id',
       width: 50,
       render: (_row, index) => index + 1

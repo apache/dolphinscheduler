@@ -56,7 +56,7 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('project.workflow.id'),
+        title: '#',
         key: 'id',
         width: 50,
         render: (row, index) => index + 1

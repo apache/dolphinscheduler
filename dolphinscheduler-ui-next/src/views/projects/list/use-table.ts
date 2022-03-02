@@ -41,7 +41,7 @@ export function useTable(
   const menuStore = useMenuStore()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index' },
+    { title: '#', key: 'index',render: (row, index) => index + 1 },
     {
       title: t('project.list.project_name'),
       key: 'name',
@@ -111,7 +111,6 @@ export function useTable(
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any

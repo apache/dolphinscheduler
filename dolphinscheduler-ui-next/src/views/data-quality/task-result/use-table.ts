@@ -44,7 +44,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('data_quality.task_result.task_name'),
@@ -181,7 +182,6 @@ export function useTable() {
       queryExecuteResultListPaging(data).then((res: ResultListRes) => {
         variables.tableData = res.totalList.map((item, index) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any

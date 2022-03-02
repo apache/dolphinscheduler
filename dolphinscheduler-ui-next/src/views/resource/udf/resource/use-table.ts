@@ -66,7 +66,7 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('resource.udf.id'),
+        title: '#',
         key: 'id',
         width: 50,
         render: (_row, index) => index + 1

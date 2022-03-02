@@ -28,7 +28,7 @@ export function useColumns(onCallback: Function) {
 
   const columnsRef: TableColumns = [
     {
-      title: t('datasource.serial_number'),
+      title: '#',
       key: 'index',
       render: (rowData, rowIndex) => rowIndex + 1
     },

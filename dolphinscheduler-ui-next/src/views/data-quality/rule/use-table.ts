@@ -129,7 +129,6 @@ export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
           )
 
           return {
-            index: index + 1,
             ...item,
             ruleName: ruleNameLocale,
             ruleTypeName: ruleTypeName

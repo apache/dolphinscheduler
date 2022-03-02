@@ -40,7 +40,8 @@ export function useVersion() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.task.version'),
@@ -189,7 +190,6 @@ export function useVersion() {
       ).then((res: TaskDefinitionVersionRes) => {
         variables.tableData = res.totalList.map((item, index) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any

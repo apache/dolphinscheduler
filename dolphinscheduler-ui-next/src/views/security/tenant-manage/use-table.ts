@@ -50,8 +50,9 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('security.tenant.num'),
-        key: 'num'
+        title: '#',
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.tenant.tenant_code'),
@@ -159,7 +160,6 @@ export function useTable() {
       queryTenantListPaging({ ...params }).then((res: any) => {
         variables.tableData = res.totalList.map((item: any, index: number) => {
           return {
-            num: index + 1,
             ...item
           }
         })

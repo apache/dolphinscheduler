@@ -32,7 +32,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
   const columns = computed(() =>
     [
       {
-        title: t('security.user.index'),
+        title: '#',
         key: 'index',
         width: 80,
         render: (rowData: any, rowIndex: number) => rowIndex + 1
