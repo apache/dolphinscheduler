@@ -95,7 +95,7 @@ export default defineComponent({
         code,
         projectCode
       )
-        .then((res: any) => {
+        .then((ignored: any) => {
           message.success(t('project.dag.success'))
           router.push({ path: `/projects/${projectCode}/workflow-definition` })
         })

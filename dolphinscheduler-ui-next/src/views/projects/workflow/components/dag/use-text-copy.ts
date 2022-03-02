@@ -27,7 +27,7 @@ export function useTextCopy() {
   const { copy } = useClipboard()
   const message = useMessage()
   const copyText = (text: string) => {
-    copy(text).then((res) => {
+    copy(text).then(() => {
       message.success(t('project.dag.copy_success'))
     })
   }
