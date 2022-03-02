@@ -749,12 +749,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
             if (tenant != null) {
                 String tenantCode = tenant.getTenantCode();
-
                 try {
                     //xxx
                     String filename = storageOperate.getFileName(type, tenantCode, fullName);
                     if (storageOperate.exists(tenantCode, filename)) {
-                        logger.error("resource type:{} name:{} has exist in store {}, can't create again.", type, RegexUtils.escapeNRT(fullName), filename);
                         putMsg(result, Status.RESOURCE_FILE_EXIST, filename);
                     }
 
@@ -1121,11 +1119,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServerException("download the resource file failed ,it may be related to your storage");
         }
 
-//        if(storageOperate.download(tenantCode,hdfsFileName, localFileName, false, true)) {
-//            return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
-//        }else{
-//            throw  new ServerException("download the resource file failed ,it may be related to your storage");
-//        }
+
     }
 
     /**

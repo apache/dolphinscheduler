@@ -119,7 +119,6 @@ public class S3Utils implements Closeable, StorageOperate {
         }
         return String.format(FORMAT_S_S, tenantCode+FOLDER_SEPARATOR+RESOURCE_TYPE_FILE, fileName);
     }
-
     @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
