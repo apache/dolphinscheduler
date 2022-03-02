@@ -226,7 +226,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // fail upload
         if (!upload(loginUser, fullName, file, type)) {
             logger.error("upload resource: {} file: {} failed.", RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
-            putMsg(result, Status.HDFS_OPERATION_ERROR);
+            putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
             throw new ServiceException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
         }
         return result;

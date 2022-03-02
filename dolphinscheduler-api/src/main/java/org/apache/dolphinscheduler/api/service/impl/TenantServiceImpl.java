@@ -109,7 +109,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         // save
         tenantMapper.insert(tenant);
 
-        // if hdfs startup
+        // if storage startup
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
@@ -320,7 +320,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Override
     public boolean checkTenantExists(String tenantCode) {
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
-        return existTenant.equals(Boolean.TRUE);
+        return Boolean.TRUE.equals(existTenant);
     }
 
     /**

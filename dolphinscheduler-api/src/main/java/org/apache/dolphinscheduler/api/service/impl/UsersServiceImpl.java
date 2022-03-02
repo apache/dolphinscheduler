@@ -450,7 +450,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
             user.setTenantId(tenantId);
             try {
-                assert newTenant != null;
                 storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
             } catch (Exception e) {
                 logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
