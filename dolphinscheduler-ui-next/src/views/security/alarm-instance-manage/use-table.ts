@@ -73,7 +73,7 @@ export function useTable() {
 
   const deleteRecord = async (id: number) => {
     try {
-      const res = await deleteAlertPluginInstance(id)
+      const ignored = await deleteAlertPluginInstance(id)
       updateList()
     } catch (e) {
       window.$message.error((e as Error).message)

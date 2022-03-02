@@ -19,13 +19,13 @@ import { useI18n } from 'vue-i18n'
 import { h, reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryRuleListPaging } from '@/service/modules/data-quality'
-import type { Rule, RuleRes } from '@/service/modules/data-quality/types'
+import type { RuleRes } from '@/service/modules/data-quality/types'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import { parseISO, format } from 'date-fns'
 import { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
-export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
+export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
   const { t } = useI18n()
 
   const variables = reactive({
@@ -106,7 +106,7 @@ export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
 
     const { state } = useAsyncState(
       queryRuleListPaging(data).then((res: RuleRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           const ruleName =
             'data_quality.rule.' + item.name.substring(3, item.name.length - 1)
           const ruleNameLocale = t(ruleName)

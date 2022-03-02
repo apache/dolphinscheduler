@@ -188,7 +188,7 @@ export function useVersion() {
         { code: variables.taskCode },
         { projectCode }
       ).then((res: TaskDefinitionVersionRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
             ...item
           }

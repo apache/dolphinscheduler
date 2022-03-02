@@ -44,7 +44,7 @@ export function useCustomCellBuilder() {
   function buildEdge(
     sourceId: string,
     targetId: string,
-    label: string = ''
+    label = ''
   ): Edge.Metadata {
     return {
       shape: X6_EDGE_NAME,
