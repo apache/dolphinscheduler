@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { queryQueueListPaging } from '@/service/modules/queues'
 import { EditOutlined } from '@vicons/antd'
@@ -77,7 +77,7 @@ export function useTable() {
                     }
                   },
                   {
-                    icon: () => h(EditOutlined)
+                    icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
                   }
                 ),
               default: () => t('security.yarn_queue.edit')
