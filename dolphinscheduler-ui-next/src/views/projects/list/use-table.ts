@@ -27,6 +27,7 @@ import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
 import { useMenuStore } from '@/store/menu/menu'
+import {NEllipsis} from "naive-ui";
 
 export function useTable(
   updateProjectItem = (
@@ -47,18 +48,25 @@ export function useTable(
       key: 'name',
       render: (row) =>
         h(
-          'a',
+          NEllipsis,
+          { style: 'max-width: 200px; color: #2080f0' },
           {
-            class: styles.links,
-            onClick: () => {
-              menuStore.setProjectCode(row.code)
-              router.push({ path: `/projects/${row.code}` })
-            }
-          },
-          {
-            default: () => {
-              return row.name
-            }
+            default: () =>
+              h(
+                'a',
+                {
+                  onClick: () => {
+                    menuStore.setProjectCode(row.code)
+                    router.push({ path: `/projects/${row.code}` })
+                  }
+                },
+                {
+                  default: () => {
+                    return row.name
+                  }
+                }
+              ),
+            tooltip: () => row.name
           }
         )
     },
