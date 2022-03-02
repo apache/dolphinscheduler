@@ -21,13 +21,12 @@ import { useAsyncState } from '@vueuse/core'
 import { queryProjectListPaging } from '@/service/modules/projects'
 import { parseISO, format } from 'date-fns'
 import { useRouter } from 'vue-router'
+import { useMenuStore } from '@/store/menu/menu'
+import { NEllipsis } from 'naive-ui'
 import TableAction from './components/table-action'
-import styles from './index.module.scss'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import { useMenuStore } from '@/store/menu/menu'
-import {NEllipsis} from "naive-ui";
 
 export function useTable(
   updateProjectItem = (
