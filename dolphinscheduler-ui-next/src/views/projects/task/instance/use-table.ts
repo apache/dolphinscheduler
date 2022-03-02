@@ -150,7 +150,7 @@ export function useTable() {
                           })
                       }
                     ),
-                  default: () => t('project.task.serial_wait')
+                  default: () => t('project.task.forced_success')
                 }
               ),
               h(
