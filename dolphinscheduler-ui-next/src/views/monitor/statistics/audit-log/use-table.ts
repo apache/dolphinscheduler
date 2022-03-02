@@ -41,7 +41,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('monitor.audit_log.user_name'),
@@ -85,7 +86,6 @@ export function useTable() {
       queryAuditLogListPaging(data).then((res: AuditListRes) => {
         variables.tableData = res.totalList.map((item, index) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any
