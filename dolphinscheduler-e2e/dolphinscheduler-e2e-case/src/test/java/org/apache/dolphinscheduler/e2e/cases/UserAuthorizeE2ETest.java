@@ -19,28 +19,48 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
+import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
+import org.apache.dolphinscheduler.e2e.pages.resource.FunctionManagePage;
+import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
+import org.apache.dolphinscheduler.e2e.pages.resource.UdfManagePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/datasource-mysql/docker-compose.yaml")
 public class UserAuthorizeE2ETest {
     private static final String tenant = System.getProperty("user.name");
+    private static final String admin = "admin";
+    private static final String adminPassword = "dolphinscheduler123";
+    private static final String adminEmail = "admin@gmail.com";
+    private static final String adminPhone = "15800000000";
+
     private static final String user = "test_user";
     private static final String password = "test_user123";
     private static final String email = "test_user@gmail.com";
@@ -57,13 +77,22 @@ public class UserAuthorizeE2ETest {
     private static final String mysqlPassword = "123456";
     private static final String database = "mysql";
     private static final String jdbcParams = "{\"useSSL\": false}";
+    private static final String fileName = "test_file";
+    private static final String fileScripts = "echo 123";
+    private static final String uploadUdfFileName = "hive-jdbc-3.1.2.jar";
+    private static final String udfFunctionName = "test_udfFunction";
+    private static final String udfClassName = "org.dolphinscheduler.UdfTest";
+    private static final String udfDescription = "test_udfDescription";
+    private static final Path uploadUdfFilePath = Constants.HOST_TMP_PATH.resolve(uploadUdfFileName);
 
     private static RemoteWebDriver browser;
 
+
     @BeforeAll
+    @SneakyThrows
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
+            .login(admin, adminPassword)
             .goToNav(SecurityPage.class)
             .goToTab(TenantPage.class)
             .create(tenant);
@@ -73,14 +102,45 @@ public class UserAuthorizeE2ETest {
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(tenant)));
 
+        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", uploadUdfFilePath.toFile().getAbsolutePath());
+
         tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class)
             .create(user, password, email, phone)
+            .update(admin, admin, adminPassword, adminEmail, adminPhone)
             .goToNav(ProjectPage.class).create(project)
             .goToNav(DataSourcePage.class)
             .createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams)
-            .goToNav(SecurityPage.class)
-            .goToTab(UserPage.class);
+            .goToNav(ResourcePage.class)
+            .goToTab(FileManagePage.class).createFile(fileName, fileScripts)
+            .goToNav(ResourcePage.class)
+            .goToTab(UdfManagePage.class)
+            .uploadFile(uploadUdfFilePath.toFile().getAbsolutePath());
+
+        new WebDriverWait(browser, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
+
+        tenantPage.goToNav(ResourcePage.class)
+            .goToTab(FunctionManagePage.class)
+            .createUdfFunction(udfFunctionName, udfClassName, uploadUdfFileName, udfDescription);
+
+    }
+
+    static void downloadFile(String downloadUrl, String filePath) throws Exception {
+        int byteRead;
+
+        URL url = new URL(downloadUrl);
+
+        URLConnection conn = url.openConnection();
+        InputStream inputStream = conn.getInputStream();
+        FileOutputStream fs = new FileOutputStream(filePath);
+
+        byte[] buffer = new byte[1024];
+        while ((byteRead = inputStream.read(buffer)) != -1) {
+            fs.write(buffer, 0, byteRead);
+        }
+
+        inputStream.close();
+        fs.close();
     }
 
     @AfterAll
@@ -134,6 +194,23 @@ public class UserAuthorizeE2ETest {
         });
 
         page.closeAuthorize();
+    }
+
+    @Test
+    @Order(30)
+    void testAuthorizeUdfFunction() {
+        final UserPage page = new UserPage(browser);
+
+        page.authorizeUdfFunction(user, udfFunctionName);
+        page.clickAuthorize(user);
+
+        await().untilAsserted(() -> {
+
+            assertThat(page.selectedList())
+                .as("Selected udfFunction list should contain newly-authorized udfFunction")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(udfClassName));
+        });
     }
 
 }

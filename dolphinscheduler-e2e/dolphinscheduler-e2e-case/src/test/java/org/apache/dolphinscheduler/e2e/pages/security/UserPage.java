@@ -143,7 +143,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     public UserPage authorizeProject(String user, String projectName) {
         clickAuthorize(user);
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(new ByClassName("authProject")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(new ByClassName("authProject")));
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthProject().click();
@@ -164,7 +164,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     public UserPage authorizeDataSource(String user, String dataSourceName) {
         clickAuthorize(user);
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("authDataSource")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.className("authDataSource")));
 
         UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
         userAuthorizeForm.buttonAuthDataSource().click();
@@ -175,6 +175,26 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No dataSource in dataSource list"))
+            .click();
+
+        userAuthorizeForm.buttonSubmit().click();
+
+        return this;
+    }
+
+    public UserPage authorizeUdfFunction(String user, String udfFunctionName) {
+        clickAuthorize(user);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.className("authUdfFunc")));
+
+        UserAuthorizeForm userAuthorizeForm = new UserAuthorizeForm();
+        userAuthorizeForm.buttonAuthFile().click();
+
+        selectList()
+            .stream()
+            .filter(it -> it.findElement(By.className("selectName")).getAttribute("innerHTML").contains(udfFunctionName))
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No udfFunction in udf list"))
             .click();
 
         userAuthorizeForm.buttonSubmit().click();
