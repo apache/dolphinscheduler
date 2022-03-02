@@ -110,7 +110,7 @@ services:
       replicas: 1
 
   dolphinscheduler-worker:
-    image: apache/dolphinscheduler:2.0.4
+    image: apache/dolphinscheduler:2.0.5
     command: worker-server
     environment:
       TZ: Asia/Shanghai
