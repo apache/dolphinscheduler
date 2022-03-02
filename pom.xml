@@ -66,8 +66,8 @@
         <hadoop.version>2.7.3</hadoop.version>
         <quartz.version>2.3.0</quartz.version>
         <jackson.version>2.10.5</jackson.version>
-        <mybatis-plus.version>3.4.3</mybatis-plus.version>
-        <mybatis.spring.version>2.0.6</mybatis.spring.version>
+        <mybatis-plus.version>3.2.0</mybatis-plus.version>
+        <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>9.1.3</cron.utils.version>
         <druid.version>1.2.4</druid.version>
         <h2.version>1.4.200</h2.version>
