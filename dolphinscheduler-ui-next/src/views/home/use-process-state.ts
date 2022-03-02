@@ -25,8 +25,8 @@ export function useProcessState() {
   const getProcessState = (date: Array<number>) => {
     const { state } = useAsyncState(
       countProcessInstanceState({
-        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: 0
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item) => {
