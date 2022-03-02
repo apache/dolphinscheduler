@@ -145,7 +145,12 @@ public final class AlertSender {
         }
 
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
-        String instanceWarnType = paramsMap.getOrDefault(AlertConstants.NAME_WARNING_TYPE, WarningType.ALL.getDescp());
+        String instanceWarnType = WarningType.ALL.getDescp();
+
+        if(paramsMap != null){
+            instanceWarnType = paramsMap.getOrDefault(AlertConstants.NAME_WARNING_TYPE, WarningType.ALL.getDescp());
+        }
+
         WarningType warningType = WarningType.of(instanceWarnType);
 
         if (warningType == null) {
