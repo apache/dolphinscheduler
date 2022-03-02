@@ -196,7 +196,7 @@ public class S3Utils implements Closeable, StorageOperate {
     @Override
     public List<String> vimFile(String tenantCode,String filePath, int skipLineNums, int limit) throws IOException {
         if (StringUtils.isBlank(filePath)) {
-            logger.error("hdfs file path:{} is blank", filePath);
+            logger.error("file path:{} is blank", filePath);
             return Collections.emptyList();
         }
             S3Object s3Object=s3Client.getObject(BUCKET_NAME,filePath);

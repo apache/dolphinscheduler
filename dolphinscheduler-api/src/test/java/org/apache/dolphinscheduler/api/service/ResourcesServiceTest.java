@@ -418,7 +418,7 @@ public class ResourcesServiceTest {
         PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
-        Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), (int) result.getCode());
 
         //TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
@@ -435,14 +435,15 @@ public class ResourcesServiceTest {
         }
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
-        Assert.assertTrue(Status.RESOURCE_FILE_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertEquals(Status.RESOURCE_FILE_NOT_EXIST.getCode(), (int) result.getCode());
+
 
         //SUCCESS
         try {
-            Mockito.when(storageOperate.exists(Mockito.any(), null)).thenReturn(true);
-            Mockito.when(storageOperate.vimFile(Mockito.any(), null, 1, 10)).thenReturn(getContent());
+            Mockito.when(storageOperate.exists(Mockito.any(), Mockito.any())).thenReturn(true);
+            Mockito.when(storageOperate.vimFile(Mockito.any(), Mockito.any(), eq(1), eq(10))).thenReturn(getContent());
         } catch (IOException e) {
-            logger.error("hadoop error", e);
+            logger.error("storage error", e);
         }
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
@@ -454,7 +455,7 @@ public class ResourcesServiceTest {
     public void testOnlineCreateResource() {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
-        PowerMockito.when(storageOperate.getResourceFileName(Mockito.anyString(), "hdfsdDir")).thenReturn("hdfsDir");
+        PowerMockito.when(storageOperate.getResourceFileName(Mockito.anyString(), eq("hdfsdDir"))).thenReturn("hdfsDir");
         PowerMockito.when(storageOperate.getUdfDir("udfDir")).thenReturn("udfDir");
         User user = getUser();
         //HDFS_NOT_STARTUP
@@ -703,10 +704,9 @@ public class ResourcesServiceTest {
 
         //SUCCESS
         try {
-            Mockito.when(storageOperate.exists(Mockito.any(), null)).thenReturn(true);
-            Mockito.when(storageOperate.vimFile(Mockito.any(), null, 1, 10)).thenReturn(getContent());
-
-            List<String> list = storageOperate.vimFile(Mockito.any(), null, 1, 10);
+            Mockito.when(storageOperate.exists(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+            Mockito.when(storageOperate.vimFile(Mockito.anyString(), Mockito.anyString(), eq(1), eq(10))).thenReturn(getContent());
+            List<String> list = storageOperate.vimFile(Mockito.any(), Mockito.anyString(), eq(1), eq(10));
             Assert.assertNotNull(list);
 
         } catch (IOException e) {
@@ -813,6 +813,7 @@ public class ResourcesServiceTest {
         User user = new User();
         user.setId(1);
         user.setTenantId(1);
+        user.setTenantCode("tenantCode");
         return user;
     }
 
