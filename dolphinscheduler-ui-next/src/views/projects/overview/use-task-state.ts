@@ -28,8 +28,8 @@ export function useTaskState() {
   const getTaskState = (date: Array<number>) => {
     const { state } = useAsyncState(
       countTaskState({
-        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: Number(route.params.projectCode)
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item, index) => {
