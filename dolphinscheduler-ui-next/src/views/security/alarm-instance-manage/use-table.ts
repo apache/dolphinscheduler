@@ -20,7 +20,7 @@ import {
   queryAlertPluginInstanceListPaging,
   deleteAlertPluginInstance
 } from '@/service/modules/alert-plugin'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import type { IRecord } from './types'
 
 export function useTable() {
@@ -47,10 +47,10 @@ export function useTable() {
       if (!totalList) throw Error()
       data.list = totalList.map((record: IRecord) => {
         record.createTime = record.createTime
-          ? format(new Date(record.createTime), 'yyyy-MM-dd HH:mm:ss')
+          ? format(parseISO(record.createTime), 'yyyy-MM-dd HH:mm:ss')
           : ''
         record.updateTime = record.updateTime
-          ? format(new Date(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
+          ? format(parseISO(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
           : ''
         return record
       })
