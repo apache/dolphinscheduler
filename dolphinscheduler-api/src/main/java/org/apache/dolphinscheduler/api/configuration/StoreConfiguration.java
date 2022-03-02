@@ -35,19 +35,26 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 @Configuration
 public class StoreConfiguration {
 
+    private StorageOperate storageOperate;
+
     @Bean
     public StorageOperate storageOperate() {
-    return S3Utils.getInstance();
+        return storageOperate;
     }
 
     @ConditionalOnProperty(value = RESOURCE_STORAGE_TYPE, havingValue = STORAGE_S3)
-    private StorageOperate getS3Operator(){
-        return S3Utils.getInstance();
+    private void getS3Operator() {
+        storageOperate = S3Utils.getInstance();
     }
 
     @ConditionalOnProperty(value = RESOURCE_STORAGE_TYPE, havingValue = STORAGE_HDFS)
-    private StorageOperate getHdfsOperator(){
-        return HadoopUtils.getInstance();
+    private void getHdfsOperator() {
+        storageOperate = HadoopUtils.getInstance();
+    }
+
+    @ConditionalOnProperty(value = RESOURCE_STORAGE_TYPE, havingValue = "None")
+    private void getNoneOperator() {
+        storageOperate = null;
     }
 
 }

@@ -64,7 +64,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private StorageOperate storageOperate;
 
     /**

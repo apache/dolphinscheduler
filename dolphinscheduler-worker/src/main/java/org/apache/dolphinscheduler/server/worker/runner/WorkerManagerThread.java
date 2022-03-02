@@ -52,7 +52,7 @@ public class WorkerManagerThread implements Runnable {
      */
     private final DelayQueue<TaskExecuteThread> workerExecuteQueue = new DelayQueue<>();
 
-    @Autowired
+    @Autowired(required = false)
     private StorageOperate storageOperate;
 
     /**

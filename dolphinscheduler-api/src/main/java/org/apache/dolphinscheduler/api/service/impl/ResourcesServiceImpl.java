@@ -87,7 +87,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private StorageOperate storageOperate;
 
     /**

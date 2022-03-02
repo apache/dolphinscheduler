@@ -91,7 +91,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private StorageOperate storageOperate;
 
     /**
