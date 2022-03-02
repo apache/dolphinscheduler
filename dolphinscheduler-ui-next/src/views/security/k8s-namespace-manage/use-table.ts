@@ -17,9 +17,9 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
   queryNamespaceListPaging,
@@ -56,7 +56,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.k8s_namespace.k8s_namespace'),
@@ -112,7 +113,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.k8s_namespace.edit')
@@ -140,7 +142,10 @@ export function useTable() {
                               size: 'small'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.k8s_namespace.delete')
@@ -171,17 +176,16 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryNamespaceListPaging({ ...params }).then((res: NamespaceListRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            new Date(item.createTime),
+            parseISO(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseISO(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any

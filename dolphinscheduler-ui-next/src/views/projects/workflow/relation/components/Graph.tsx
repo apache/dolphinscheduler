@@ -47,8 +47,6 @@ const GraphChart = defineComponent({
     const graphChartRef: Ref<HTMLDivElement | null> = ref(null)
     const { t } = useI18n()
 
-    console.log(props.seriesData)
-
     const legendData = [
       { name: t('project.workflow.online') },
       { name: t('project.workflow.workflow_offline') },
@@ -56,8 +54,6 @@ const GraphChart = defineComponent({
     ]
 
     const getCategory = (schedulerStatus: number, workflowStatus: number) => {
-      console.log(schedulerStatus, workflowStatus)
-
       switch (true) {
         case workflowStatus === 0:
           return 1

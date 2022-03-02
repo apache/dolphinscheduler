@@ -19,7 +19,7 @@ import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryProjectListPaging } from '@/service/modules/projects'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -30,9 +30,9 @@ import { useMenuStore } from '@/store/menu/menu'
 
 export function useTable(
   updateProjectItem = (
-    code: number,
-    name: string,
-    description: string
+    unusedCode: number,
+    unusedName: string,
+    unusedDescription: string
   ): void => {},
   resetTableData = () => {}
 ) {
@@ -41,7 +41,7 @@ export function useTable(
   const menuStore = useMenuStore()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index' },
+    { title: '#', key: 'index', render: (row, index) => index + 1 },
     {
       title: t('project.list.project_name'),
       key: 'name',
@@ -101,17 +101,16 @@ export function useTable(
     const { state } = useAsyncState(
       queryProjectListPaging(params).then((res: ProjectRes) => {
         variables.totalPage = res.totalPage
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            new Date(item.createTime),
+            parseISO(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseISO(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any

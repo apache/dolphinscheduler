@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  toRefs,
-  ref,
-  toRaw,
-  Ref,
-  onMounted
-} from 'vue'
+import { defineComponent, PropType, toRefs, onMounted } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
@@ -52,7 +44,7 @@ const FormModal = defineComponent({
     })
 
     const onConfirm = () => {
-      let value = state.formData.priority + ''
+      const value = state.formData.priority + ''
       if (value) {
         modifyTaskGroupQueuePriority(state.formData).then(() => {
           emit('confirm')

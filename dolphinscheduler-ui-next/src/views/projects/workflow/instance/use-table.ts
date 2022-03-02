@@ -16,7 +16,7 @@
  */
 
 import _ from 'lodash'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -64,9 +64,10 @@ export function useTable() {
         type: 'selection'
       },
       {
-        title: t('project.workflow.id'),
+        title: '#',
         key: 'id',
-        width: 50
+        width: 50,
+        render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
         title: t('project.workflow.workflow_name'),
@@ -148,7 +149,7 @@ export function useTable() {
         key: 'scheduleTime',
         render: (_row: IWorkflowInstance) =>
           _row.scheduleTime
-            ? format(new Date(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
+            ? format(parseISO(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
             : '-'
       },
       {
@@ -156,7 +157,7 @@ export function useTable() {
         key: 'startTime',
         render: (_row: IWorkflowInstance) =>
           _row.startTime
-            ? format(new Date(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
+            ? format(parseISO(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
             : '-'
       },
       {
@@ -164,7 +165,7 @@ export function useTable() {
         key: 'endTime',
         render: (_row: IWorkflowInstance) =>
           _row.endTime
-            ? format(new Date(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
+            ? format(parseISO(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
             : '-'
       },
       {

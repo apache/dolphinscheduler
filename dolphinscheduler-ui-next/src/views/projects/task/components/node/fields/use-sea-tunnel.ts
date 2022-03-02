@@ -117,12 +117,12 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const parseRawScript = () => {
     if (model.rawScript) {
       model.rawScript.split('\n').forEach((script: string) => {
-        let params = script.replace(baseScript, '').split('--')
+        const params = script.replace(baseScript, '').split('--')
         params?.forEach((param: string) => {
-          let pair = param.split(' ')
+          const pair = param.split(' ')
           if (pair && pair.length >= 2) {
             if (pair[0] === 'master') {
-              let prefix = pair[1].substring(0, 8)
+              const prefix = pair[1].substring(0, 8)
               if (pair[1] && (prefix === 'mesos://' || prefix === 'spark://')) {
                 model.master = prefix
                 model.masterUrl = pair[1].substring(8, pair[1].length)

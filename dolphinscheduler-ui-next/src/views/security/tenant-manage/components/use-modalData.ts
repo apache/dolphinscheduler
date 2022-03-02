@@ -76,19 +76,19 @@ export function useModalData(
 
   const submitTenantModal = () => {
     verifyTenantCode({ tenantCode: variables.model.tenantCode }).then(
-      (res: any) => {
+      (unused: any) => {
         const data = {
           tenantCode: variables.model.tenantCode,
           queueId: variables.model.queueId,
           description: variables.model.description
         }
         createTenant(data).then(
-          (res: any) => {
+          (unused: any) => {
             variables.model.tenantCode = ''
             variables.model.description = ''
             ctx.emit('confirmModal', props.showModalRef)
           },
-          (err: any) => {
+          (unused: any) => {
             return
           }
         )
@@ -103,7 +103,7 @@ export function useModalData(
       description: variables.model.description,
       id: variables.model.id
     }
-    updateTenant(data, { id: variables.model.id }).then((res: any) => {
+    updateTenant(data, { id: variables.model.id }).then((unused: any) => {
       ctx.emit('confirmModal', props.showModalRef)
     })
   }

@@ -28,7 +28,7 @@ import {
   renderSlot
 } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { dateEnGB, NButton, NIcon, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { queryLog } from '@/service/modules/log'
 import {
   DownloadOutlined,

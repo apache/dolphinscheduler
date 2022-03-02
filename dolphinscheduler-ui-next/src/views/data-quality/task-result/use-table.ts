@@ -19,7 +19,7 @@ import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryExecuteResultListPaging } from '@/service/modules/data-quality'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import type {
   ResultItem,
   ResultListRes
@@ -44,7 +44,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('data_quality.task_result.task_name'),
@@ -170,18 +171,17 @@ export function useTable() {
       state: params.state,
       searchVal: params.searchVal,
       startDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseISO(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseISO(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : ''
     }
 
     const { state } = useAsyncState(
       queryExecuteResultListPaging(data).then((res: ResultListRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any
