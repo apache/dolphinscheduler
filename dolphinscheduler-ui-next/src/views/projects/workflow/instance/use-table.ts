@@ -64,9 +64,10 @@ export function useTable() {
         type: 'selection'
       },
       {
-        title: t('project.workflow.id'),
+        title: '#',
         key: 'id',
-        width: 50
+        width: 50,
+        render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
         title: t('project.workflow.workflow_name'),
