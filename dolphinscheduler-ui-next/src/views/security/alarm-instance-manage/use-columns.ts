@@ -26,7 +26,7 @@ export function useColumns(onCallback: Function) {
 
   const columnsRef: TableColumns = [
     {
-      title: t('security.alarm_instance.serial_number'),
+      title: '#',
       key: 'index',
       render: (rowData, rowIndex) => rowIndex + 1
     },

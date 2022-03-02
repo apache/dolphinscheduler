@@ -34,7 +34,6 @@ export function useTaskState() {
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item, index) => {
           return {
-            index: index + 1,
             state: item.taskStateType,
             number: item.count
           }

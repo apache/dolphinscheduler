@@ -37,7 +37,7 @@ export function useTable(
   const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
-    { title: t('resource.task_group_queue.id'), key: 'index' },
+    { title: '#', key: 'index',render: (row, index) => index + 1 },
     { title: t('resource.task_group_queue.project_name'), key: 'projectName' },
     { title: t('resource.task_group_queue.task_name'), key: 'taskName' },
     {
@@ -116,7 +116,6 @@ export function useTable(
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }
