@@ -22,11 +22,11 @@ import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 
 export function useTaskState() {
-  const getTaskState = (date: Array<number>) => {
+  const getTaskState = (date: Array<any>) => {
     const { state } = useAsyncState(
       countTaskState({
-        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: 0
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item, index) => {
