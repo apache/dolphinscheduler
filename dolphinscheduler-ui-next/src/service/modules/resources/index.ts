@@ -226,7 +226,7 @@ export function updateResourceContent(data: ContentReq, id: number): any {
 export function viewResource(
   params: ViewResourceReq,
   id: number
-): ResourceViewRes {
+): any {
   return axios({
     url: `/resources/${id}/view`,
     method: 'get',

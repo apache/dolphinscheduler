@@ -18,7 +18,7 @@
 import { useAsyncState, useAsyncQueue } from '@vueuse/core'
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
@@ -108,11 +108,11 @@ export function useTable(
 
           item.taskGroupName = taskGroupName
           item.createTime = format(
-            new Date(item.createTime),
+            parseISO(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseISO(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
