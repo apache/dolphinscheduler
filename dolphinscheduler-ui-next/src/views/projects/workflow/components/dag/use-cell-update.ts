@@ -64,7 +64,6 @@ export function useCellUpdate(options: Options) {
     coordinate: Coordinate = { x: 100, y: 100 }
   ) {
     if (!TASK_TYPES_MAP[type as TaskType]) {
-      console.warn(`taskType:${type} is invalid!`)
       return
     }
     const node = buildNode(id, type, name, flag, coordinate)

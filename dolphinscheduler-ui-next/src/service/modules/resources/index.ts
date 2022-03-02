@@ -18,7 +18,6 @@
 import { axios, downloadFile } from '@/service/service'
 import {
   ResourceTypeReq,
-  UdfTypeReq,
   NameReq,
   FileNameReq,
   FullNameReq,
@@ -223,10 +222,7 @@ export function updateResourceContent(data: ContentReq, id: number): any {
   })
 }
 
-export function viewResource(
-  params: ViewResourceReq,
-  id: number
-): any {
+export function viewResource(params: ViewResourceReq, id: number): any {
   return axios({
     url: `/resources/${id}/view`,
     method: 'get',

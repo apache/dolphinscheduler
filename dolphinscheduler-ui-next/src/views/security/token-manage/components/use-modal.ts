@@ -20,14 +20,12 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/user/user'
 import { useAsyncState } from '@vueuse/core'
 import { format } from 'date-fns'
-import { queryAlertPluginInstanceList } from '@/service/modules/alert-plugin'
 import { listAll } from '@/service/modules/users'
 import {
   generateToken,
   createToken,
   updateToken
 } from '@/service/modules/token'
-import type { AlertPluginItem } from '@/service/modules/alert-plugin/types'
 import type { UserListRes } from '@/service/modules/users/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 

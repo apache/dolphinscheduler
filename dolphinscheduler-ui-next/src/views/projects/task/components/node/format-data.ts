@@ -404,7 +404,7 @@ const buildRawScript = (model: INodeData) => {
   let master = model.master
   let masterUrl = model?.masterUrl ? model?.masterUrl : ''
   let deployMode = model.deployMode
-  let queue = model.queue
+  const queue = model.queue
 
   if (model.deployMode === 'local') {
     master = 'local'
@@ -423,7 +423,7 @@ const buildRawScript = (model: INodeData) => {
 
   let rawScript = ''
   model.resourceList?.forEach((id: number) => {
-    let item = find(model.resourceFiles, { id: id })
+    const item = find(model.resourceFiles, { id: id })
 
     rawScript =
       rawScript +

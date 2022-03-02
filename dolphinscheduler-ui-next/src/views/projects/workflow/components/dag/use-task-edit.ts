@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import _ from 'lodash'
 import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'

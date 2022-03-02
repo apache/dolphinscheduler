@@ -30,9 +30,9 @@ import { useMenuStore } from '@/store/menu/menu'
 
 export function useTable(
   updateProjectItem = (
-    code: number,
-    name: string,
-    description: string
+    unusedCode: number,
+    unusedName: string,
+    unusedDescription: string
   ): void => {},
   resetTableData = () => {}
 ) {
@@ -41,7 +41,7 @@ export function useTable(
   const menuStore = useMenuStore()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index',render: (row, index) => index + 1 },
+    { title: '#', key: 'index', render: (row, index) => index + 1 },
     {
       title: t('project.list.project_name'),
       key: 'name',
@@ -101,7 +101,7 @@ export function useTable(
     const { state } = useAsyncState(
       queryProjectListPaging(params).then((res: ProjectRes) => {
         variables.totalPage = res.totalPage
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
             parseISO(item.createTime),
             'yyyy-MM-dd HH:mm:ss'

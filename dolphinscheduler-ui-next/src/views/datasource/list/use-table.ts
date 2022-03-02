@@ -60,7 +60,7 @@ export function useTable() {
 
   const deleteRecord = async (id: number) => {
     try {
-      const res = await deleteDataSource(id)
+      const ignored = await deleteDataSource(id)
       updateList()
     } catch (e) {
       window.$message.error((e as Error).message)

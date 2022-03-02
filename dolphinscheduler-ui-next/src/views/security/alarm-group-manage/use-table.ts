@@ -81,7 +81,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.alarm_group.edit')
@@ -109,7 +110,10 @@ export function useTable() {
                               size: 'small'
                             },
                             {
-                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.alarm_group.delete')
@@ -153,7 +157,7 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryAlertGroupListPaging({ ...params }).then((res: AlarmGroupRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
             parseISO(item.createTime),
             'yyyy-MM-dd HH:mm:ss'

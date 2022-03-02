@@ -22,7 +22,7 @@ import { MenuOption } from 'naive-ui'
 export function useMenuClick() {
   const router: Router = useRouter()
 
-  const handleMenuClick = (key: string, item: MenuOption) => {
+  const handleMenuClick = (key: string, unused: MenuOption) => {
     // console.log(key, item)
     router.push({ path: `${key}` })
   }

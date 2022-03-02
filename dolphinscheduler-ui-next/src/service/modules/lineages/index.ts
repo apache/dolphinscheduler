@@ -16,7 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import { ProjectCodeReq, WorkFlowNameReq, WorkflowCodeReq } from './types'
+import { ProjectCodeReq, WorkflowCodeReq } from './types'
 
 export function queryWorkFlowList(projectCode: ProjectCodeReq): any {
   return axios({

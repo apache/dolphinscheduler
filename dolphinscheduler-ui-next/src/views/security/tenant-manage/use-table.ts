@@ -98,7 +98,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.tenant.edit')
@@ -127,7 +128,10 @@ export function useTable() {
                               class: 'delete'
                             },
                             {
-                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.tenant.delete')
@@ -158,7 +162,7 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryTenantListPaging({ ...params }).then((res: any) => {
-        variables.tableData = res.totalList.map((item: any, index: number) => {
+        variables.tableData = res.totalList.map((item: any, unused: number) => {
           return {
             ...item
           }

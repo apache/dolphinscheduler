@@ -20,7 +20,6 @@ import { useI18n } from 'vue-i18n'
 import { NPopover, NButton, NIcon, NPopconfirm, NSpace } from 'naive-ui'
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
-import styles from './index.module.scss'
 import { TableColumns } from './types'
 
 export function useColumns(onCallback: Function) {
@@ -84,7 +83,7 @@ export function useColumns(onCallback: Function) {
       title: t('datasource.operation'),
       key: 'operation',
       width: 150,
-      render: (rowData, rowIndex) => {
+      render: (rowData, unused) => {
         return h(NSpace, null, {
           default: () => [
             h(

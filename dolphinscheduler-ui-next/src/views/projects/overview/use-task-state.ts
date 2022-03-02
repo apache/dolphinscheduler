@@ -32,7 +32,7 @@ export function useTaskState() {
         endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: Number(route.params.projectCode)
       }).then((res: TaskStateRes): StateData => {
-        const table = res.taskCountDtos.map((item, index) => {
+        const table = res.taskCountDtos.map((item, unused) => {
           return {
             state: item.taskStateType,
             number: item.count

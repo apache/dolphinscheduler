@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-import { useAsyncState, useAsyncQueue } from '@vueuse/core'
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parseISO, format } from 'date-fns'
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
@@ -29,20 +26,19 @@ import _ from 'lodash'
 
 export function useTable(
   updateItem = (
-    id: number,
-    name: string,
-    projectCode: number,
-    groupSize: number,
-    description: string,
-    status: number
+    unusedId: number,
+    unusedName: string,
+    unusedProjectCode: number,
+    unusedGroupSize: number,
+    unusedDescription: string,
+    unusedStatus: number
   ): void => {},
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
-  const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index',render: (row, index) => index + 1 },
+    { title: '#', key: 'index', render: (row, index) => index + 1 },
     { title: t('resource.task_group_option.name'), key: 'name' },
     { title: t('resource.task_group_option.project_name'), key: 'projectName' },
     {
@@ -96,10 +92,10 @@ export function useTable(
       (values: any[]) => {
         variables.totalPage = values[0].totalPage
         variables.tableData = values[0].totalList.map(
-          (item: any, index: number) => {
+          (item: any, unused: number) => {
             let projectName = ''
             if (values[1]) {
-              let project = _.find(values[1], { code: item.projectCode })
+              const project = _.find(values[1], { code: item.projectCode })
               if (project) {
                 projectName = project.name
               }

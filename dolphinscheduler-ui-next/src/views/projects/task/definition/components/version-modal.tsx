@@ -17,7 +17,7 @@
 
 import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
-import { NDataTable, NPagination, useThemeVars } from 'naive-ui'
+import { NDataTable, NPagination } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useVersion } from './use-version'
 import styles from './version.module.scss'

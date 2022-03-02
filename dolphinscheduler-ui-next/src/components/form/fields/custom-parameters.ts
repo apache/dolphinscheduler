@@ -103,7 +103,7 @@ export function renderCustomParameters(
   const { field, children = [] } = mergedItem
   const { defaultValue, ruleItem } = getDefaultValue(children)
   rules.push(ruleItem)
-  const getChild = (item: object, i: number, disabled: boolean) =>
+  const getChild = (item: object, i: number, unused: boolean) =>
     children.map((child: IJsonItem) => {
       const mergedChild = isFunction(child) ? child(i) : child
       return h(

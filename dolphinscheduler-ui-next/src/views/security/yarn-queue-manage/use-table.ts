@@ -77,7 +77,8 @@ export function useTable() {
                     }
                   },
                   {
-                    icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
+                    icon: () =>
+                      h(NIcon, null, { default: () => h(EditOutlined) })
                   }
                 ),
               default: () => t('security.yarn_queue.edit')
@@ -103,7 +104,7 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryQueueListPaging({ ...params }).then((res: QueueRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
             ...item
           }

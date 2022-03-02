@@ -66,9 +66,9 @@ const MultiCondition = defineComponent({
 export function renderMultiCondition(
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules: { [key: string]: FormItemRule }[]
+  unused: { [key: string]: FormItemRule }[]
 ) {
-  let ruleItem: { [key: string]: FormItemRule } = {}
+  const ruleItem: { [key: string]: FormItemRule } = {}
 
   // the fields is the data of the task definition.
   // the item is the options of this component in the form.

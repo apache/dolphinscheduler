@@ -143,7 +143,8 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('project.task.edit')
@@ -169,7 +170,8 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(DragOutlined) })
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DragOutlined) })
                       }
                     ),
                   default: () => t('project.task.move')
@@ -192,7 +194,10 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(ExclamationCircleOutlined) })
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ExclamationCircleOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.version')
@@ -223,7 +228,10 @@ export function useTable(onEdit: Function) {
                                 row.processReleaseState === 'ONLINE'
                             },
                             {
-                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('project.task.delete')
@@ -272,7 +280,7 @@ export function useTable(onEdit: Function) {
     const { state } = useAsyncState(
       queryTaskDefinitionListPaging({ ...params }, { projectCode }).then(
         (res: TaskDefinitionRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
+          variables.tableData = res.totalList.map((item, unused) => {
             if (Object.keys(item.upstreamTaskMap).length > 0) {
               item.upstreamTaskMap = Object.keys(item.upstreamTaskMap).map(
                 (code) => item.upstreamTaskMap[code]

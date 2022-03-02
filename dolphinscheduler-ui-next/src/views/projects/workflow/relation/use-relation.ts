@@ -39,7 +39,6 @@ export function useRelation() {
     variables.seriesData = []
 
     variables.seriesData = obj.map((item) => {
-      console.log(item)
       return {
         name: item.workFlowName,
         id: item.workFlowCode,

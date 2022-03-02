@@ -102,7 +102,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(EditOutlined) })
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.worker_group.edit')
@@ -131,7 +132,10 @@ export function useTable() {
                               class: 'delete'
                             },
                             {
-                              icon: () => h(NIcon, null, { default: () => h(DeleteOutlined) })
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.worker_group.delete')
@@ -175,7 +179,7 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryAllWorkerGroupsPaging({ ...params }).then((res: WorkerGroupRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
             ...item
           }

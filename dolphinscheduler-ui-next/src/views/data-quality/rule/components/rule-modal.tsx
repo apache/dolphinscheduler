@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, h, PropType, reactive, ref, toRefs, watch } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NDataTable } from 'naive-ui'
 import Modal from '@/components/modal'

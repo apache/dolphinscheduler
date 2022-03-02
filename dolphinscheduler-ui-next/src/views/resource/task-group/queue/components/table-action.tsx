@@ -21,7 +21,6 @@ import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
 import { EditOutlined, PlayCircleOutlined } from '@vicons/antd'
 import type {
   TaskGroupQueueIdReq,
-  TaskGroupQueuePriorityUpdateReq,
   TaskGroupQueue
 } from '@/service/modules/task-group/types'
 import { forceStartTaskInQueue } from '@/service/modules/task-group'

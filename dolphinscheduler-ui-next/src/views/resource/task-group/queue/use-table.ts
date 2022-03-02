@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-import { useAsyncState, useAsyncQueue } from '@vueuse/core'
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parseISO, format } from 'date-fns'
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import {
   queryTaskGroupListPaging,
@@ -30,14 +27,13 @@ import TableAction from './components/table-action'
 import _ from 'lodash'
 
 export function useTable(
-  updatePriority = (queueId: number, priority: number): void => {},
+  updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
-  const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index',render: (row, index) => index + 1 },
+    { title: '#', key: 'index', render: (row, index) => index + 1 },
     { title: t('resource.task_group_queue.project_name'), key: 'projectName' },
     { title: t('resource.task_group_queue.task_name'), key: 'taskName' },
     {
@@ -97,10 +93,10 @@ export function useTable(
       const taskGroupList = values[1].totalList
       variables.totalPage = values[0].totalPage
       variables.tableData = values[0].totalList.map(
-        (item: any, index: number) => {
+        (item: any, unused: number) => {
           let taskGroupName = ''
           if (taskGroupList) {
-            let taskGroup = _.find(taskGroupList, { id: item.groupId })
+            const taskGroup = _.find(taskGroupList, { id: item.groupId })
             if (taskGroup) {
               taskGroupName = taskGroup.name
             }

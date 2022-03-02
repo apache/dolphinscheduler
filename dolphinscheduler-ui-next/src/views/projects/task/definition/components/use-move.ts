@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive, ref, SetupContext } from 'vue'
+import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { querySimpleList } from '@/service/modules/process-definition'

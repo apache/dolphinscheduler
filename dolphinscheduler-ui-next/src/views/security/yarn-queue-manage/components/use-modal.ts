@@ -76,7 +76,7 @@ export function useModal(
 
   const updateYarnQueueModal = () => {
     updateQueue({ ...variables.model }, { id: variables.model.id }).then(
-      (res: any) => {
+      (ignored: any) => {
         ctx.emit('confirmModal', props.showModalRef)
       }
     )

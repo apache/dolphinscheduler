@@ -22,9 +22,7 @@ import {
   NInput,
   NCard,
   NDataTable,
-  NSwitch,
-  NPagination,
-  NTooltip
+  NPagination
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'

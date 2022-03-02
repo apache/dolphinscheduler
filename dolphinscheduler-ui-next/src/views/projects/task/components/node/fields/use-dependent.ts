@@ -227,7 +227,6 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               dependItem.definitionCode
             )
           }
-          console.log(dependItem)
           if (dependItem.cycle) {
             dependItem.dateOptions = DATE_LSIT[dependItem.cycle]
           }
@@ -240,7 +239,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     ...useDependentTimeout(model),
     ...useRelationCustomParams({
       model,
-      children: (i: number = 0) => ({
+      children: (i = 0) => ({
         type: 'custom-parameters',
         field: 'dependItemList',
         span: 18,
@@ -260,7 +259,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             },
             options: projectList
           }),
-          (j: number = 0) => ({
+          (j = 0) => ({
             type: 'select',
             field: 'definitionCode',
             span: 12,
@@ -279,7 +278,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               model.dependTaskList[i]?.dependItemList[j]
                 ?.definitionCodeOptions || []
           }),
-          (j: number = 0) => ({
+          (j = 0) => ({
             type: 'select',
             field: 'depTaskCode',
             span: 12,
@@ -290,7 +289,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               model.dependTaskList[i]?.dependItemList[j]?.depTaskCodeOptions ||
               []
           }),
-          (j: number = 0) => ({
+          (j = 0) => ({
             type: 'select',
             field: 'cycle',
             span: 12,
@@ -302,7 +301,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             },
             options: CYCLE_LIST
           }),
-          (j: number = 0) => ({
+          (j = 0) => ({
             type: 'select',
             field: 'dateValue',
             span: 12,

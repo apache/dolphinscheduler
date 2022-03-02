@@ -50,7 +50,7 @@ export function useColumns(onCallback: Function) {
       title: t('security.alarm_instance.operation'),
       key: 'operation',
       width: 150,
-      render: (rowData, rowIndex) => {
+      render: (rowData, unused) => {
         return h(NSpace, null, {
           default: () => [
             h(

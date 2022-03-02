@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  toRefs,
-  onMounted,
-  ref,
-  toRaw,
-  Ref
-} from 'vue'
+import { defineComponent, PropType, toRefs, onMounted, ref, Ref } from 'vue'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
@@ -56,7 +48,10 @@ const FormModal = defineComponent({
     onMounted(() => {
       queryAllProjectList().then((res: any[]) => {
         res.map((item) => {
-          let option: SelectMixedOption = { label: item.name, value: item.code }
+          const option: SelectMixedOption = {
+            label: item.name,
+            value: item.code
+          }
           projectOptions.value.push(option)
         })
       })

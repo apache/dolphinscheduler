@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive, onMounted } from 'vue'
+import { reactive } from 'vue'
 import {
   genTaskCodeList,
   saveSingle,

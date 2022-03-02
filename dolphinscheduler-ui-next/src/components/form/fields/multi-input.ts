@@ -71,7 +71,7 @@ const MultiInput = defineComponent({
 export function renderMultiInput(
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules: { [key: string]: FormItemRule }[]
+  unused: { [key: string]: FormItemRule }[]
 ) {
   const { field } = isFunction(item) ? item() : item
   // the fields is the data of the task definition.

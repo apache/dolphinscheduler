@@ -31,7 +31,6 @@ import {
 } from '@vicons/antd'
 import { parseISO, format } from 'date-fns'
 import { useRoute } from 'vue-router'
-import { downloadFile } from '@/service/service'
 import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
 
 export function useTable() {
@@ -145,7 +144,10 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(CheckCircleOutlined) })
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(CheckCircleOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.serial_wait')
@@ -165,7 +167,10 @@ export function useTable() {
                         onClick: () => handleLog(row)
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(AlignLeftOutlined) })
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(AlignLeftOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.view_log')
@@ -185,7 +190,8 @@ export function useTable() {
                         onClick: () => downloadLog(row.id)
                       },
                       {
-                        icon: () => h(NIcon, null, { default: () => h(DownloadOutlined) })
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DownloadOutlined) })
                       }
                     ),
                   default: () => t('project.task.download_log')
@@ -243,7 +249,7 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
+          variables.tableData = res.totalList.map((item, unused) => {
             item.submitTime = format(
               parseISO(item.submitTime),
               'yyyy-MM-dd HH:mm:ss'
