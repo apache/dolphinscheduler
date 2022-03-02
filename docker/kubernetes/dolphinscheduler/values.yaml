@@ -23,7 +23,7 @@ timezone: "Asia/Shanghai"
 
 image:
   repository: "apache/dolphinscheduler"
-  tag: "2.0.4"
+  tag: "2.0.5"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
 
