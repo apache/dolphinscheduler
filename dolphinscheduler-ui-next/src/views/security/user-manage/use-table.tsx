@@ -61,7 +61,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
       {
         title: t('security.user.state'),
         key: 'state',
-        render: (rowData: any, rowIndex: number) => {
+        render: (rowData: any, unused: number) => {
           return rowData.state === 1 ? (
             <NTag type='success'>{t('security.user.state_enabled')}</NTag>
           ) : (
@@ -84,7 +84,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
         key: 'operation',
         fixed: 'right',
         width: 140,
-        render: (rowData: any, rowIndex: number) => {
+        render: (rowData: any, unused: number) => {
           return (
             <NSpace>
               <NDropdown

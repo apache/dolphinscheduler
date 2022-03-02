@@ -29,17 +29,9 @@ export default function getElementByJson(
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
   const elements: IFormItem[] = []
-  for (let item of json) {
+  for (const item of json) {
     const mergedItem = isFunction(item) ? item() : item
-    const {
-      name,
-      value,
-      field,
-      span = 24,
-      children,
-      validate,
-      ...rest
-    } = mergedItem
+    const { name, value, field, children, validate, ...rest } = mergedItem
     if (value || value === 0) {
       fields[field] = value
       initialValues[field] = value

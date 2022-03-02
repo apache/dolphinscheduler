@@ -60,7 +60,7 @@ export function deleteToken(id: number): any {
 
 export function generateToken(data: TokenReq): any {
   return axios({
-    url: `/access-tokens/generate`,
+    url: '/access-tokens/generate',
     method: 'post',
     data
   })
