@@ -29,7 +29,7 @@ import {
   CheckCircleOutlined,
   DownloadOutlined
 } from '@vicons/antd'
-import { format } from 'date-fns'
+import { parseISO, format } from 'date-fns'
 import { useRoute } from 'vue-router'
 import { downloadFile } from '@/service/service'
 import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
@@ -231,10 +231,10 @@ export function useTable() {
       host: params.host,
       stateType: params.stateType,
       startDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseISO(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseISO(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: params.executorName,
       processInstanceName: params.processInstanceName
@@ -245,14 +245,14 @@ export function useTable() {
         (res: TaskInstancesRes) => {
           variables.tableData = res.totalList.map((item, index) => {
             item.submitTime = format(
-              new Date(item.submitTime),
+              parseISO(item.submitTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             item.startTime = format(
-              new Date(item.startTime),
+              parseISO(item.startTime),
               'yyyy-MM-dd HH:mm:ss'
             )
-            item.endTime = format(new Date(item.endTime), 'yyyy-MM-dd HH:mm:ss')
+            item.endTime = format(parseISO(item.endTime), 'yyyy-MM-dd HH:mm:ss')
             return {
               ...item
             }
