@@ -270,7 +270,8 @@ public class S3Utils implements Closeable, StorageOperate {
             MultipleFileDownload download= tm.downloadDirectory(BUCKET_NAME,tenantCode+ FOLDER_SEPARATOR +keyPrefix,new File(srcPath));
             download.waitForCompletion();
         }catch (AmazonS3Exception | InterruptedException e){
-                logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}",BUCKET_NAME,tenantCode+ FOLDER_SEPARATOR +keyPrefix);
+                logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix);
+            Thread.currentThread().interrupt();
         }finally {
             tm.shutdownNow();
         }

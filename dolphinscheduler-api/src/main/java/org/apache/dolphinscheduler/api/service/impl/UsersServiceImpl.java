@@ -291,8 +291,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return user list page
      */
     @Override
-    public Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result<Object> result = new Result<>();
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -408,7 +408,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             //query tenant
             Tenant newTenant = tenantMapper.queryById(tenantId);
             // if hdfs startup
-            if (newTenant != null && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
+            if (null != newTenant && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
                 String newTenantCode = newTenant.getTenantCode();
                 String oldResourcePath = storageOperate.getResDir(oldTenant.getTenantCode());
                 String oldUdfsPath = storageOperate.getUdfDir(oldTenant.getTenantCode());
@@ -447,14 +447,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 } catch (Exception e) {
                     logger.error("create tenant {} failed ,the reason is {}", oldTenant, e.getMessage());
                 }
-            }
+
             user.setTenantId(tenantId);
             try {
                 storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
             } catch (Exception e) {
                 logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
             }
-
+            }
         }
 
         // updateProcessInstance user
