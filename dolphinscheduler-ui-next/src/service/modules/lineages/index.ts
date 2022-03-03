@@ -16,32 +16,28 @@
  */
 
 import { axios } from '@/service/service'
-import { ProjectCodeReq, WorkFlowNameReq } from './types'
+import { ProjectCodeReq, WorkflowCodeReq } from './types'
 
 export function queryWorkFlowList(projectCode: ProjectCodeReq): any {
   return axios({
-    url: `/projects/${projectCode}/lineages/list`,
-    method: 'get',
+    url: `/projects/${projectCode.projectCode}/lineages/list`,
+    method: 'get'
   })
 }
 
-export function queryLineageByWorkFlowName(
-  params: WorkFlowNameReq,
-  projectCode: ProjectCodeReq
-): any {
+export function queryLineageByWorkFlowName(projectCode: ProjectCodeReq): any {
   return axios({
-    url: `/projects/${projectCode}/lineages/query-by-name`,
-    method: 'get',
-    params,
+    url: `/projects/${projectCode.projectCode}/lineages/query-by-name`,
+    method: 'get'
   })
 }
 
 export function queryLineageByWorkFlowCode(
-  workFlowCode: WorkFlowNameReq,
+  workFlowCode: WorkflowCodeReq,
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/lineages/${workFlowCode}`,
-    method: 'get',
+    url: `/projects/${projectCode.projectCode}/lineages/${workFlowCode.workFlowCode}`,
+    method: 'get'
   })
 }

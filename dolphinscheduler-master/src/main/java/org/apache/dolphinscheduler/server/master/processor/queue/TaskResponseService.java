@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -66,6 +67,12 @@ public class TaskResponseService {
      */
     @Autowired
     private ProcessService processService;
+
+    /**
+     * data quality result operator
+     */
+    @Autowired
+    private DataQualityResultOperator dataQualityResultOperator;
 
     /**
      * task response worker
@@ -211,6 +218,8 @@ public class TaskResponseService {
         Channel channel = taskResponseEvent.getChannel();
         try {
             if (taskInstance != null) {
+                dataQualityResultOperator.operateDqExecuteResult(taskResponseEvent, taskInstance);
+
                 processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
                         taskResponseEvent.getEndTime(),
                         taskResponseEvent.getProcessId(),

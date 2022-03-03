@@ -16,39 +16,61 @@
  */
 
 import { defineComponent, PropType, renderSlot } from 'vue'
-import { NModal, NCard, NButton } from 'naive-ui'
+import { NModal, NCard, NButton, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   title: {
     type: String as PropType<string>,
-    required: true,
+    required: true
   },
   cancelText: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
   },
   cancelShow: {
     type: Boolean as PropType<boolean>,
-    default: true,
+    default: true
   },
   confirmText: {
+    type: String as PropType<string>
+  },
+  confirmClassName: {
     type: String as PropType<string>,
+    default: ''
+  },
+  cancelClassName: {
+    type: String as PropType<string>,
+    default: ''
   },
   confirmDisabled: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
+  confirmLoading: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  autoFocus: {
+    type: Boolean as PropType<boolean>,
+    default: true
+  },
+  linkEventShow: {
+    type: Boolean as PropType<boolean>
+  },
+  linkEventText: {
+    type: String as PropType<string>
+  }
 }
 
 const Modal = defineComponent({
   name: 'Modal',
   props,
-  emits: ['cancel', 'confirm'],
+  emits: ['cancel', 'confirm', 'jumpLink'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -60,42 +82,77 @@ const Modal = defineComponent({
       ctx.emit('confirm')
     }
 
-    return { t, onCancel, onConfirm }
+    const onJumpLink = () => {
+      ctx.emit('jumpLink')
+    }
+
+    return { t, onCancel, onConfirm, onJumpLink }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm, confirmDisabled } = this
+    const {
+      $slots,
+      t,
+      onCancel,
+      onConfirm,
+      confirmDisabled,
+      confirmLoading,
+      onJumpLink
+    } = this
 
     return (
       <NModal
         v-model={[this.show, 'show']}
         class={styles.container}
         mask-closable={false}
+        auto-focus={this.autoFocus}
       >
-        <NCard title={this.title}>
+        <NCard
+          title={this.title}
+          class={styles['modal-card']}
+          contentStyle={{ overflowY: 'auto' }}
+        >
           {{
             default: () => renderSlot($slots, 'default'),
+            'header-extra': () => (
+              <NSpace justify='end'>
+                {this.linkEventShow && (
+                  <NButton text onClick={onJumpLink}>
+                    {this.linkEventText}
+                  </NButton>
+                )}
+              </NSpace>
+            ),
             footer: () => (
-              <div class={styles['btn-box']}>
+              <NSpace justify='end'>
                 {this.cancelShow && (
-                  <NButton quaternary size='small' onClick={onCancel}>
+                  <NButton
+                    class={this.cancelClassName}
+                    quaternary
+                    size='small'
+                    onClick={onCancel}
+                  >
                     {this.cancelText || t('modal.cancel')}
                   </NButton>
                 )}
+                {/* TODO: Add left and right slots later */}
+                {renderSlot($slots, 'btn-middle')}
                 <NButton
+                  class={this.confirmClassName}
                   type='info'
                   size='small'
                   onClick={onConfirm}
                   disabled={confirmDisabled}
+                  loading={confirmLoading}
                 >
                   {this.confirmText || t('modal.confirm')}
                 </NButton>
-              </div>
-            ),
+              </NSpace>
+            )
           }}
         </NCard>
       </NModal>
     )
-  },
+  }
 })
 
 export default Modal

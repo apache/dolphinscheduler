@@ -368,6 +368,20 @@ CREATE TABLE `t_ds_worker_group` (
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `resource_type` int(11) NOT NULL COMMENT 'resource type',
+  `operation` int(11) NOT NULL COMMENT 'operation',
+  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
+
 -- t_ds_command
 alter table t_ds_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
 alter table t_ds_command add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;

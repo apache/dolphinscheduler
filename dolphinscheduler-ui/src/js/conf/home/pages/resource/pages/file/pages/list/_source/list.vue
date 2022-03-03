@@ -17,7 +17,7 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Name')">
           <template slot-scope="scope">
@@ -51,16 +51,19 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="150">
+        <el-table-column :label="$t('Operation')" width="180">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('ReUpload File')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="_reUploadFile(scope.row)" v-show="scope.row.directory? false: true" circle></el-button></span>
+            </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
+              <span><el-button id="btnEdit" type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Rename')" placement="top">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
+              <span><el-button id="btnRename" type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Download')" placement="top">
-              <span><el-button type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
+              <span><el-button id="btnDownload" type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
@@ -71,7 +74,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button id="delete" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -92,7 +95,9 @@
   import { filtTypeArr } from '../../_source/common'
   import { bytesToSize } from '@/module/util/util'
   import { downloadFile } from '@/module/download'
+  import { findComponentDownward } from '@/module/util/'
   import localStore from '@/module/util/localStorage'
+
   export default {
     name: 'file-manage-list',
     data () {
@@ -122,6 +127,9 @@
         } else {
           this.$router.push({ path: `/resource/file/list/${item.id}` })
         }
+      },
+      _reUploadFile (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload(item)
       },
       _downloadFile (item) {
         downloadFile(`resources/${item.id}/download`)

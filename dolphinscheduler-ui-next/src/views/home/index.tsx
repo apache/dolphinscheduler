@@ -15,29 +15,29 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, watch } from 'vue'
 import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import { useTaskState } from './use-task-state'
 import { useProcessState } from './use-process-state'
-import StateCard from './state-card'
-import DefinitionCard from './definition-card'
+import StateCard from './components/state-card'
+import DefinitionCard from './components/definition-card'
 
 export default defineComponent({
   name: 'home',
   setup() {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
+    const taskStateRef = ref()
+    const processStateRef = ref()
     const { getTaskState } = useTaskState()
     const { getProcessState } = useProcessState()
-    let taskStateRef = ref()
-    let processStateRef = ref()
 
-    onMounted(() => {
+    const initData = () => {
       taskStateRef.value = getTaskState(dateRef.value)
       processStateRef.value = getProcessState(dateRef.value)
-    })
+    }
 
     const handleTaskDate = (val: any) => {
       taskStateRef.value = getTaskState(val)
@@ -47,13 +47,22 @@ export default defineComponent({
       processStateRef.value = getProcessState(val)
     }
 
+    onMounted(() => {
+      initData()
+    })
+
+    watch(
+      () => locale.value,
+      () => initData()
+    )
+
     return {
       t,
       dateRef,
       handleTaskDate,
       handleProcessDate,
       taskStateRef,
-      processStateRef,
+      processStateRef
     }
   },
   render() {
@@ -88,5 +97,5 @@ export default defineComponent({
         </NGrid>
       </div>
     )
-  },
+  }
 })

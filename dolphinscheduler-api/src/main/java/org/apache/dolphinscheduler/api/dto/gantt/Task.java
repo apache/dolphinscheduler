@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.dto.gantt;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -43,19 +42,16 @@ public class Task {
     /**
      * task execution date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date executionDate;
 
     /**
      * task iso start
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date isoStart;
 
     /**
      * task iso end
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date isoEnd;
 
     /**

@@ -50,7 +50,6 @@ public class BusinessTimeUtils {
         Date businessDate = runTime;
         switch (commandType) {
             case COMPLEMENT_DATA:
-                break;
             case START_PROCESS:
             case START_CURRENT_TASK_PROCESS:
             case RECOVER_TOLERANCE_FAULT_PROCESS:

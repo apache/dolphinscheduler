@@ -20,25 +20,25 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkerGroupE2ETest {
-    private static final String tenant = System.getProperty("user.name");
     private static final String workerGroupName = "test_worker_group";
     private static final String editWorkerGroupName = "edit_worker_group";
 
@@ -54,8 +54,11 @@ class WorkerGroupE2ETest {
 
     @Test
     @Order(1)
-    void testCreateWorkerGroup() throws InterruptedException {
+    void testCreateWorkerGroup() {
         final WorkerGroupPage page = new WorkerGroupPage(browser);
+
+        new WebDriverWait(page.driver(), 10)
+            .until(ExpectedConditions.urlContains("/#/security/worker-groups"));
 
         page.create(workerGroupName);
 
@@ -71,7 +74,7 @@ class WorkerGroupE2ETest {
 
     @Test
     @Order(20)
-    void testCreateDuplicateWorkerGroup() throws InterruptedException {
+    void testCreateDuplicateWorkerGroup() {
         final WorkerGroupPage page = new WorkerGroupPage(browser);
 
         page.create(workerGroupName);

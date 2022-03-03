@@ -25,7 +25,6 @@ interface DatabaseRes {
   date: string
 }
 
-
 interface MasterRes {
   id: number
   host: string

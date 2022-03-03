@@ -33,11 +33,17 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +75,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     @Autowired
     private DataSourceUserMapper datasourceUserMapper;
+
+    private static final String TABLE = "TABLE";
+    private static final String VIEW = "VIEW";
+    private static final String[] TABLE_TYPES = new String[]{TABLE, VIEW};
+    private static final String TABLE_NAME = "TABLE_NAME";
+    private static final String COLUMN_NAME = "COLUMN_NAME";
 
     /**
      * create data source
@@ -389,30 +401,27 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      */
     @Override
     public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
-
         Map<String, Object> result = new HashMap<>();
-        //only admin operate
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
 
-        /**
-         * query all data sources except userId
-         */
+        List<DataSource> datasourceList;
+        if (isAdmin(loginUser)) {
+            // admin gets all data sources except userId
+            datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
+        } else {
+            // non-admins users get their own data sources
+            datasourceList = dataSourceMapper.selectByMap(Collections.singletonMap("user_id", loginUser.getId()));
+        }
         List<DataSource> resultList = new ArrayList<>();
-        List<DataSource> datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
-        Set<DataSource> datasourceSet = null;
+        Set<DataSource> datasourceSet;
         if (datasourceList != null && !datasourceList.isEmpty()) {
             datasourceSet = new HashSet<>(datasourceList);
 
             List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
 
-            Set<DataSource> authedDataSourceSet = null;
+            Set<DataSource> authedDataSourceSet;
             if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
                 authedDataSourceSet = new HashSet<>(authedDataSourceList);
                 datasourceSet.removeAll(authedDataSourceSet);
-
             }
             resultList = new ArrayList<>(datasourceSet);
         }
@@ -432,15 +441,194 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
         List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public Map<String, Object> getTables(Integer datasourceId) {
+        Map<String, Object> result = new HashMap<>();
+
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+
+        List<String> tableList = null;
+        BaseConnectionParam connectionParam =
+                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataSource.getType(),
+                        dataSource.getConnectionParams());
+
+        if (null == connectionParam) {
+            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+            return result;
+        }
+
+        Connection connection =
+                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        ResultSet tables = null;
+
+        try {
+
+            if (null == connection) {
+                putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+                return result;
+            }
+
+            DatabaseMetaData metaData = connection.getMetaData();
+            String schema = null;
+            try {
+                schema = metaData.getConnection().getSchema();
+            } catch (SQLException e) {
+                logger.error("cant not get the schema : {}", e.getMessage(), e);
+            }
+
+            tables = metaData.getTables(
+                    connectionParam.getDatabase(),
+                    getDbSchemaPattern(dataSource.getType(),schema,connectionParam),
+                    "%", TABLE_TYPES);
+            if (null == tables) {
+                putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
+                return result;
+            }
+
+            tableList = new ArrayList<>();
+            while (tables.next()) {
+                String name = tables.getString(TABLE_NAME);
+                tableList.add(name);
+            }
+
+        } catch (Exception e) {
+            logger.error(e.toString(), e);
+            putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
+            return result;
+        } finally {
+            closeResult(tables);
+            releaseConnection(connection);
+        }
+
+        List<ParamsOptions> options = getParamsOptions(tableList);
+
+        result.put(Constants.DATA_LIST, options);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getTableColumns(Integer datasourceId,String tableName) {
+        Map<String, Object> result = new HashMap<>();
+
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+        BaseConnectionParam connectionParam =
+                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataSource.getType(),
+                        dataSource.getConnectionParams());
+
+        if (null == connectionParam) {
+            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+            return result;
+        }
+
+        Connection connection =
+                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        List<String> columnList = new ArrayList<>();
+        ResultSet rs = null;
+
+        try {
+
+            String database = connectionParam.getDatabase();
+            if (null == connection) {
+                return result;
+            }
+
+            DatabaseMetaData metaData = connection.getMetaData();
+
+            if (dataSource.getType() == DbType.ORACLE) {
+                database = null;
+            }
+            rs = metaData.getColumns(database, null, tableName, "%");
+            if (rs == null) {
+                return result;
+            }
+            while (rs.next()) {
+                columnList.add(rs.getString(COLUMN_NAME));
+            }
+        } catch (Exception e) {
+            logger.error(e.toString(), e);
+        } finally {
+            closeResult(rs);
+            releaseConnection(connection);
+        }
+
+        List<ParamsOptions> options = getParamsOptions(columnList);
+
+        result.put(Constants.DATA_LIST, options);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    private List<ParamsOptions> getParamsOptions(List<String> columnList) {
+        List<ParamsOptions> options = null;
+        if (CollectionUtils.isNotEmpty(columnList)) {
+            options = new ArrayList<>();
+
+            for (String column : columnList) {
+                ParamsOptions childrenOption =
+                        new ParamsOptions(column, column, false);
+                options.add(childrenOption);
+            }
+        }
+        return options;
+    }
+
+    private String getDbSchemaPattern(DbType dbType,String schema,BaseConnectionParam connectionParam) {
+        if (dbType == null) {
+            return null;
+        }
+        String schemaPattern = null;
+        switch (dbType) {
+            case HIVE:
+                schemaPattern = connectionParam.getDatabase();
+                break;
+            case ORACLE:
+                schemaPattern = connectionParam.getUser();
+                if (null != schemaPattern) {
+                    schemaPattern = schemaPattern.toUpperCase();
+                }
+                break;
+            case SQLSERVER:
+                schemaPattern = "dbo";
+                break;
+            case CLICKHOUSE:
+            case PRESTO:
+                if (!StringUtils.isEmpty(schema)) {
+                    schemaPattern = schema;
+                }
+                break;
+            default:
+                break;
+        }
+        return schemaPattern;
+    }
+
+    private static void releaseConnection(Connection connection) {
+        if (null != connection) {
+            try {
+                connection.close();
+            } catch (Exception e) {
+                logger.error("Connection release error", e);
+            }
+        }
+    }
+
+    private static void closeResult(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (Exception e) {
+                logger.error("ResultSet close error", e);
+            }
+        }
     }
 
 }

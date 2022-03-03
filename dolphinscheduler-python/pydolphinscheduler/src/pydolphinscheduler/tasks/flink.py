@@ -17,19 +17,10 @@
 
 """Task Flink."""
 
-from typing import Dict, Optional
+from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.task import Task
-from pydolphinscheduler.java_gateway import launch_gateway
-
-
-class ProgramType(str):
-    """Type of program flink runs, for now it just contain `JAVA`, `SCALA` and `PYTHON`."""
-
-    JAVA = "JAVA"
-    SCALA = "SCALA"
-    PYTHON = "PYTHON"
+from pydolphinscheduler.core.engine import Engine, ProgramType
 
 
 class FlinkVersion(str):
@@ -46,12 +37,10 @@ class DeployMode(str):
     CLUSTER = "cluster"
 
 
-class Flink(Task):
+class Flink(Engine):
     """Task flink object, declare behavior for flink task to dolphinscheduler."""
 
     _task_custom_attr = {
-        "main_class",
-        "main_jar",
         "deploy_mode",
         "flink_version",
         "slot",
@@ -59,7 +48,6 @@ class Flink(Task):
         "job_manager_memory",
         "task_manager_memory",
         "app_name",
-        "program_type",
         "parallelism",
         "main_args",
         "others",
@@ -84,10 +72,15 @@ class Flink(Task):
         *args,
         **kwargs
     ):
-        super().__init__(name, TaskType.FLINK, *args, **kwargs)
-        self.main_class = main_class
-        self.main_package = main_package
-        self.program_type = program_type
+        super().__init__(
+            name,
+            TaskType.FLINK,
+            main_class,
+            main_package,
+            program_type,
+            *args,
+            **kwargs
+        )
         self.deploy_mode = deploy_mode
         self.flink_version = flink_version
         self.app_name = app_name
@@ -98,20 +91,3 @@ class Flink(Task):
         self.parallelism = parallelism
         self.main_args = main_args
         self.others = others
-        self._resource = {}
-
-    @property
-    def main_jar(self) -> Dict:
-        """Return main package of dict."""
-        resource_info = self.get_resource_info(self.program_type, self.main_package)
-        return {"id": resource_info.get("id")}
-
-    def get_resource_info(self, program_type, main_package) -> Dict:
-        """Get resource info from java gateway, contains resource id, name."""
-        if not self._resource:
-            self._resource = launch_gateway().entry_point.getResourcesFileInfo(
-                program_type,
-                main_package,
-            )
-
-        return self._resource

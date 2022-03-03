@@ -30,14 +30,12 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -181,33 +179,24 @@ public class MasterSchedulerService extends Thread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
-        if (CollectionUtils.isEmpty(commands)) {
-            return null;
-        }
-
-        ProcessInstance[] processInstances = new ProcessInstance[commands.size()];
+        List<ProcessInstance> processInstances = new ArrayList<>(commands.size());
         CountDownLatch latch = new CountDownLatch(commands.size());
-        for (int i = 0; i < commands.size(); i++) {
-            int index = i;
-            this.masterPrepareExecService.execute(() -> {
-                Command command = commands.get(index);
-                // slot check again
-                if (!slotCheck(command)) {
-                    latch.countDown();
-                    return;
-                }
-
+        for (final Command command : commands) {
+            masterPrepareExecService.execute(() -> {
                 try {
+                    // slot check again
+                    if (!slotCheck(command)) {
+                        return;
+                    }
                     ProcessInstance processInstance = processService.handleCommand(logger,
                             getLocalAddress(),
                             command);
                     if (processInstance != null) {
-                        processInstances[index] = processInstance;
-                        logger.info("handle command command {} end, create process instance {}",
-                                command.getId(), processInstance.getId());
+                        processInstances.add(processInstance);
+                        logger.info("handle command {} end, create process instance {}", command.getId(), processInstance.getId());
                     }
                 } catch (Exception e) {
-                    logger.error("scan command error ", e);
+                    logger.error("handle command error ", e);
                     processService.moveToErrorCommand(command, e.toString());
                 } finally {
                     latch.countDown();
@@ -222,7 +211,7 @@ public class MasterSchedulerService extends Thread {
             logger.error("countDownLatch await error ", e);
         }
 
-        return Arrays.asList(processInstances);
+        return processInstances;
     }
 
     private List<Command> findCommands() {
@@ -230,9 +219,10 @@ public class MasterSchedulerService extends Thread {
         int pageSize = masterConfig.getFetchCommandNum();
         List<Command> result = new ArrayList<>();
         while (Stopper.isRunning()) {
-            if (ServerNodeManager.MASTER_SIZE == 0) {
+            if (ServerNodeManager.getMasterSize() == 0) {
                 return result;
             }
+            // todo: Can we use the slot to scan database?
             List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
             if (commandList.size() == 0) {
                 return result;
@@ -253,10 +243,8 @@ public class MasterSchedulerService extends Thread {
 
     private boolean slotCheck(Command command) {
         int slot = ServerNodeManager.getSlot();
-        if (ServerNodeManager.MASTER_SIZE != 0 && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
-            return true;
-        }
-        return false;
+        int masterSize = ServerNodeManager.getMasterSize();
+        return masterSize != 0 && command.getId() % masterSize == slot;
     }
 
     private String getLocalAddress() {

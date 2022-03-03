@@ -22,6 +22,7 @@ import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
+import { useThemeStore } from '@/store/theme/theme'
 
 const login = defineComponent({
   name: 'login',
@@ -30,6 +31,11 @@ const login = defineComponent({
     const { handleChange } = useTranslate(locale)
     const { handleLogin } = useLogin(state)
     const localesStore = useLocalesStore()
+    const themeStore = useThemeStore()
+
+    if (themeStore.getTheme) {
+      themeStore.setDarkTheme()
+    }
 
     return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },
@@ -45,7 +51,7 @@ const login = defineComponent({
           >
             {{
               checked: () => 'en_US',
-              unchecked: () => 'zh_CN',
+              unchecked: () => 'zh_CN'
             }}
           </NSwitch>
         </div>
@@ -61,6 +67,7 @@ const login = defineComponent({
                 path='userName'
               >
                 <NInput
+                  class='input-user-name'
                   type='text'
                   size='large'
                   v-model={[this.loginForm.userName, 'value']}
@@ -75,6 +82,7 @@ const login = defineComponent({
                 path='userPassword'
               >
                 <NInput
+                  class='input-password'
                   type='password'
                   size='large'
                   v-model={[this.loginForm.userPassword, 'value']}
@@ -84,6 +92,7 @@ const login = defineComponent({
               </NFormItem>
             </NForm>
             <NButton
+              class='btn-login'
               round
               type='info'
               disabled={
@@ -98,7 +107,7 @@ const login = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default login

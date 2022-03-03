@@ -199,6 +199,12 @@
           }
         }
 
+        // Verify tenant
+        if (!this.tenantId) {
+          this.$message.warning(`${i18n.$t('select tenant')}`)
+          return false
+        }
+
         // email
         if (!this.email) {
           this.$message.warning(`${i18n.$t('Please enter email')}`)

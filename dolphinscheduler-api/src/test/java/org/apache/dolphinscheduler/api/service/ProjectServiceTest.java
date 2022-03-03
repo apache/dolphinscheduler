@@ -254,24 +254,21 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAuthorizedProject() {
+        Mockito.when(projectMapper.queryAuthedProjectListByUserId(2)).thenReturn(getList());
 
         User loginUser = getLoginUser();
 
-        Mockito.when(projectMapper.queryAuthedProjectListByUserId(1)).thenReturn(getList());
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, 3);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-
-        //success
+        // test admin user
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = projectService.queryAuthorizedProject(loginUser, 1);
+        Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, 2);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
 
+        // test non-admin user
         loginUser.setUserType(UserType.GENERAL_USER);
-        result = projectService.queryAuthorizedProject(loginUser, loginUser.getId());
+        loginUser.setId(3);
+        result = projectService.queryAuthorizedProject(loginUser, 2);
         projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
@@ -359,15 +356,24 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryUnauthorizedProject() {
-        // Mockito.when(projectMapper.queryAuthedProjectListByUserId(1)).thenReturn(getList());
         Mockito.when(projectMapper.queryProjectExceptUserId(2)).thenReturn(getList());
+        Mockito.when(projectMapper.queryProjectCreatedByUser(2)).thenReturn(getList());
+        Mockito.when(projectMapper.queryAuthedProjectListByUserId(2)).thenReturn(getSingleList());
 
+        // test admin user
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
-
         Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, 2);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+
+        // test non-admin user
+        loginUser.setId(2);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        result = projectService.queryUnauthorizedProject(loginUser, 3);
+        logger.info(result.toString());
+        projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
@@ -380,10 +386,25 @@ public class ProjectServiceTest {
         return project;
     }
 
+    private Project getProject(int projectId) {
+        Project project = new Project();
+        project.setId(projectId);
+        project.setCode(1L);
+        project.setName(projectName);
+        project.setUserId(1);
+        return project;
+    }
+
     private List<Project> getList() {
         List<Project> list = new ArrayList<>();
-        list.add(getProject());
+        list.add(getProject(1));
+        list.add(getProject(2));
+        list.add(getProject(3));
         return list;
+    }
+
+    private List<Project> getSingleList() {
+        return Collections.singletonList(getProject(2));
     }
 
     /**

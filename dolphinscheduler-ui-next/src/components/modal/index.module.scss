@@ -18,12 +18,6 @@
 .container {
   width: 600px;
 }
-
-.btn-box {
-  display: flex;
-  justify-content: flex-end;
-
-  button:last-child {
-    margin-left: 20px;
-  }
+.modal-card {
+  max-height: 100vh;
 }

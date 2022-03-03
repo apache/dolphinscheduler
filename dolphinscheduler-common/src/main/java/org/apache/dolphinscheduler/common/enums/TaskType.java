@@ -38,7 +38,10 @@ public enum TaskType {
      * 11 CONDITIONS
      * 12 SQOOP
      * 13 SEATUNNEL
+     * 14 SWITCH
      * 15 PIGEON
+     * 16 DATA_QUALITY
+     * 17 EMR
      */
     SHELL(0, "SHELL"),
     SQL(1, "SQL"),
@@ -55,7 +58,10 @@ public enum TaskType {
     SQOOP(12, "SQOOP"),
     SEATUNNEL(13, "SEATUNNEL"),
     SWITCH(14, "SWITCH"),
-    PIGEON(15, "PIGEON");
+    PIGEON(15, "PIGEON"),
+    DATA_QUALITY(16, "DATA_QUALITY"),
+    EMR(17, "EMR"),
+    ;
 
     TaskType(int code, String desc) {
         this.code = code;

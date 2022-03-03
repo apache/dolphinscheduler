@@ -22,12 +22,12 @@ export function useTable() {
   const { t } = useI18n()
 
   const columnsRef: TableColumns<any> = [
-    { title: '#', key: 'id' },
+    { title: '#', key: 'index', render: (row, index) => index + 1 },
     { title: t('home.number'), key: 'number' },
-    { title: t('home.state'), key: 'state' },
+    { title: t('home.state'), key: 'state' }
   ]
 
   return {
-    columnsRef,
+    columnsRef
   }
 }

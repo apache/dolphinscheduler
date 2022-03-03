@@ -21,7 +21,7 @@ import { CodeReq, StateReq } from './types'
 export function countCommandState(): any {
   return axios({
     url: '/projects/analysis/command-state-count',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -29,7 +29,7 @@ export function countDefinitionByUser(params: CodeReq): any {
   return axios({
     url: '/projects/analysis/define-user-count',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -37,14 +37,14 @@ export function countProcessInstanceState(params: StateReq): any {
   return axios({
     url: '/projects/analysis/process-state-count',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function countQueueState(): any {
   return axios({
     url: '/projects/analysis/queue-count',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -52,6 +52,6 @@ export function countTaskState(params: StateReq): any {
   return axios({
     url: '/projects/analysis/task-state-count',
     method: 'get',
-    params,
+    params
   })
 }

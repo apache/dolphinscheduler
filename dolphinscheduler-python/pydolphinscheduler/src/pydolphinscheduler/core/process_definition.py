@@ -21,11 +21,8 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-from pydolphinscheduler.constants import (
-    ProcessDefinitionDefault,
-    ProcessDefinitionReleaseState,
-    TaskType,
-)
+from pydolphinscheduler.constants import ProcessDefinitionReleaseState, TaskType
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
@@ -90,12 +87,12 @@ class ProcessDefinition(Base):
         schedule: Optional[str] = None,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
-        timezone: Optional[str] = ProcessDefinitionDefault.TIME_ZONE,
-        user: Optional[str] = ProcessDefinitionDefault.USER,
-        project: Optional[str] = ProcessDefinitionDefault.PROJECT,
-        tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
-        queue: Optional[str] = ProcessDefinitionDefault.QUEUE,
-        worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
+        timezone: Optional[str] = configuration.WORKFLOW_TIME_ZONE,
+        user: Optional[str] = configuration.WORKFLOW_USER,
+        project: Optional[str] = configuration.WORKFLOW_PROJECT,
+        tenant: Optional[str] = configuration.WORKFLOW_TENANT,
+        queue: Optional[str] = configuration.WORKFLOW_QUEUE,
+        worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
         timeout: Optional[int] = 0,
         release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
         param: Optional[Dict] = None,
@@ -153,12 +150,12 @@ class ProcessDefinition(Base):
         """
         return User(
             self._user,
-            ProcessDefinitionDefault.USER_PWD,
-            ProcessDefinitionDefault.USER_EMAIL,
-            ProcessDefinitionDefault.USER_PHONE,
+            configuration.USER_PASSWORD,
+            configuration.USER_EMAIL,
+            configuration.USER_PHONE,
             self._tenant,
             self._queue,
-            ProcessDefinitionDefault.USER_STATE,
+            configuration.USER_STATE,
         )
 
     @staticmethod
@@ -195,7 +192,7 @@ class ProcessDefinition(Base):
         """Return param json base on self.param."""
         # Handle empty dict and None value
         if not self.param:
-            return None
+            return []
         return [
             {
                 "prop": k,

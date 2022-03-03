@@ -25,25 +25,119 @@ const components: { [key: string]: Component } = utils.mapping(modules)
 export default {
   path: '/resource',
   name: 'resource',
-  redirect: { name: 'file' },
+  redirect: { name: 'file-manage' },
   meta: { title: '资源中心' },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/resource/file',
-      name: 'file',
-      component: components['home'],
+      path: '/resource/file-manage',
+      name: 'file-manage',
+      component: components['resource-file'],
       meta: {
         title: '文件管理',
-      },
+        showSide: true,
+        auth: []
+      }
     },
     {
       path: '/resource/file/create',
       name: 'resource-file-create',
-      component: components['home'],
+      component: components['resource-file-create'],
       meta: {
-        title: '创建资源',
-      },
+        title: '文件创建',
+        showSide: true,
+        auth: []
+      }
     },
-  ],
+    {
+      path: '/resource/file/edit/:id',
+      name: 'resource-file-edit',
+      component: components['resource-file-edit'],
+      meta: {
+        title: '文件编辑',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/file/subdirectory/:id',
+      name: 'resource-file-subdirectory',
+      component: components['resource-file'],
+      meta: {
+        title: '文件管理',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/file/list/:id',
+      name: 'resource-file-list',
+      component: components['resource-file-edit'],
+      meta: {
+        title: '文件详情',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/file/create/:id',
+      name: 'resource-subfile-create',
+      component: components['resource-file-create'],
+      meta: {
+        title: '文件创建',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/resource-manage',
+      name: 'resource-manage',
+      component: components['resource-udf-resource'],
+      meta: {
+        title: '资源管理',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/resource-manage/:id',
+      name: 'resource-sub-manage',
+      component: components['resource-udf-resource'],
+      meta: {
+        title: '资源管理',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/function-manage',
+      name: 'function-manage',
+      component: components['resource-udf-function'],
+      meta: {
+        title: '函数管理',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/task-group-option',
+      name: 'task-group-option',
+      component: components['resource-task-group-option'],
+      meta: {
+        title: '任务组配置',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/resource/task-group-queue',
+      name: 'task-group-queue',
+      component: components['resource-task-group-queue'],
+      meta: {
+        title: '任务组队列',
+        showSide: true,
+        auth: []
+      }
+    }
+  ]
 }

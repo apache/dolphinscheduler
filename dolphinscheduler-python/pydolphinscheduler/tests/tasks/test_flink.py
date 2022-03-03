@@ -23,7 +23,7 @@ from pydolphinscheduler.tasks.flink import DeployMode, Flink, FlinkVersion, Prog
 
 
 @patch(
-    "pydolphinscheduler.tasks.flink.Flink.get_resource_info",
+    "pydolphinscheduler.core.engine.Engine.get_resource_info",
     return_value=({"id": 1, "name": "test"}),
 )
 def test_flink_get_define(mock_resource):

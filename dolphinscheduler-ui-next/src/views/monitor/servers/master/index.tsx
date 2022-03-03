@@ -30,13 +30,13 @@ import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 const master = defineComponent({
   name: 'master',
   setup() {
-    let showModalRef = ref(false)
+    const showModalRef = ref(false)
     const { t } = useI18n()
     const { getMaster } = useMaster()
     const masterRef: Ref<Array<MasterRes>> = ref(getMaster())
     const columnsRef: TableColumns<any> = [
-      { title: '#', key: 'id' },
-      { title: t('monitor.master.directory'), key: 'directory' },
+      { title: '#', key: 'index' },
+      { title: t('monitor.master.directory'), key: 'directory' }
     ]
 
     return { t, masterRef, showModalRef, columnsRef }
@@ -121,16 +121,16 @@ const master = defineComponent({
               masterRef[0] && (
                 <NDataTable
                   columns={columnsRef}
-                  data={[{ id: 1, directory: masterRef[0].zkDirectory }]}
+                  data={[{ index: 1, directory: masterRef[0].zkDirectory }]}
                   striped
                   size={'small'}
                 />
-              ),
+              )
           }}
         </Modal>
       </div>
     )
-  },
+  }
 })
 
 export default master

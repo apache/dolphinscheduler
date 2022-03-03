@@ -22,10 +22,12 @@ import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
 import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
+import { useMenuStore } from '@/store/menu/menu'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
+  const menuStore = useMenuStore()
 
   const handleLogin = () => {
     state.loginFormRef.validate(async (valid: any) => {
@@ -36,12 +38,14 @@ export function useLogin(state: any) {
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
 
-        router.push({ path: 'home' })
+        const key = menuStore.getMenuKey
+
+        router.push({ path: key || 'home' })
       }
     })
   }
 
   return {
-    handleLogin,
+    handleLogin
   }
 }

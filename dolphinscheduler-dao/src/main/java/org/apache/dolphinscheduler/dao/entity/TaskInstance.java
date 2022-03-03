@@ -37,7 +37,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
@@ -98,25 +97,21 @@ public class TaskInstance implements Serializable {
     /**
      * task first submit time.
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date firstSubmitTime;
 
     /**
      * task submit time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submitTime;
 
     /**
      * task start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * task end time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**
@@ -599,7 +594,8 @@ public class TaskInstance implements Serializable {
     }
 
     /**
-     * determine if you can try again
+     * determine if a task instance can retry
+     * if subProcess,
      *
      * @return can try result
      */
@@ -609,10 +605,8 @@ public class TaskInstance implements Serializable {
         }
         if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        } else {
-            return (this.getState().typeIsFailure()
-                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+        return this.getState() == ExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
     }
 
     /**
@@ -624,9 +618,7 @@ public class TaskInstance implements Serializable {
         if (getState() != ExecutionStatus.FAILURE) {
             return true;
         }
-        if (getId() == 0
-                || getMaxRetryTimes() == 0
-                || getRetryInterval() == 0) {
+        if (getMaxRetryTimes() == 0 || getRetryInterval() == 0) {
             return true;
         }
         Date now = new Date();

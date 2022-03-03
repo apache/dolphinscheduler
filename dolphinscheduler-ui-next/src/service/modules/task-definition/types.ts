@@ -37,12 +37,8 @@ interface TaskDefinitionJsonReq {
   taskDefinitionJson: string
 }
 
-interface GenNumReq {
-  genNum: number
-}
-
 interface CodeReq {
-  code: number
+  code: any
 }
 
 interface TaskDefinitionJsonObjReq {
@@ -57,15 +53,94 @@ interface VersionReq {
   version: number
 }
 
+interface TaskDefinitionItem {
+  taskName: string
+  taskCode: any
+  taskVersion: number
+  taskType: string
+  taskCreateTime: string
+  taskUpdateTime: string
+  processDefinitionCode: any
+  processDefinitionVersion: number
+  processDefinitionName: string
+  processReleaseState: string
+  upstreamTaskMap: any
+  upstreamTaskCode: number
+  upstreamTaskName: string
+}
+
+interface TaskDefinitionRes {
+  totalList: TaskDefinitionItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+interface TaskDefinitionVersionItem {
+  id: number
+  code: number
+  name: string
+  version: number
+  description: string
+  projectCode: number
+  userId: number
+  taskType: string
+  taskParams: any
+  taskParamList: any[]
+  taskParamMap: any
+  flag: string
+  taskPriority: string
+  userName?: any
+  projectName?: any
+  workerGroup: string
+  environmentCode: number
+  failRetryTimes: number
+  failRetryInterval: number
+  timeoutFlag: string
+  timeoutNotifyStrategy?: any
+  timeout: number
+  delayTime: number
+  resourceIds: string
+  createTime: string
+  updateTime: string
+  modifyBy?: any
+  taskGroupId: number
+  taskGroupPriority: number
+  operator: number
+  operateTime: string
+  dependence: string
+}
+
+interface TaskDefinitionVersionRes {
+  totalList: TaskDefinitionVersionItem[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+interface ISingleSaveReq {
+  processDefinitionCode?: string
+  upstreamCodes: string
+  taskDefinitionJsonObj: string
+}
+
 export {
   PageReq,
   ListReq,
   ProjectCodeReq,
   TaskDefinitionListReq,
   TaskDefinitionJsonReq,
-  GenNumReq,
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
   VersionReq,
+  TaskDefinitionItem,
+  TaskDefinitionRes,
+  TaskDefinitionVersionItem,
+  TaskDefinitionVersionRes,
+  ISingleSaveReq
 }

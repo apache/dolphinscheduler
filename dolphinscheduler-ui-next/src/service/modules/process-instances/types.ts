@@ -34,7 +34,7 @@ interface ProcessInstanceListReq {
 
 interface BatchDeleteReq {
   processInstanceIds: string
-  projectName: string
+  projectName?: string
   alertGroup?: string
   createTime?: string
   email?: string
@@ -82,6 +82,26 @@ interface ProcessInstanceReq {
   timeout?: string
 }
 
+interface IWorkflowInstance {
+  id: number
+  name: string
+  state: string
+  commandType: string
+  scheduleTime?: string
+  processDefinitionCode?: number
+  startTime: string
+  endTime: string
+  duration?: string
+  runTimes: number
+  recovery: string
+  dryRun: number
+  executorName: string
+  host: string
+  count?: number
+  disabled?: boolean
+  buttonType?: string
+}
+
 export {
   CodeReq,
   ProcessInstanceListReq,
@@ -91,4 +111,5 @@ export {
   LongestReq,
   IdReq,
   ProcessInstanceReq,
+  IWorkflowInstance
 }

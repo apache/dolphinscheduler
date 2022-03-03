@@ -22,19 +22,20 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.*;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
 /**
  *  db task ack processor
  */
+@Component
 public class DBTaskAckProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(DBTaskAckProcessor.class);
-
 
     @Override
     public void process(Channel channel, Command command) {
@@ -45,11 +46,13 @@ public class DBTaskAckProcessor implements NettyRequestProcessor {
                 command.getBody(), DBTaskAckCommand.class);
 
         if (taskAckCommand == null){
+            logger.error("dBTask ACK request command is null");
             return;
         }
+        logger.info("dBTask ACK request command : {}", taskAckCommand);
 
         if (taskAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()){
-            ResponceCache.get().removeAckCache(taskAckCommand.getTaskInstanceId());
+            ResponseCache.get().removeAckCache(taskAckCommand.getTaskInstanceId());
         }
     }
 

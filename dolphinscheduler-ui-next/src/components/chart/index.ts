@@ -15,13 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  getCurrentInstance,
-  onMounted,
-  onBeforeUnmount,
-  watch,
-  watchEffect,
-} from 'vue'
+import { getCurrentInstance, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useThemeStore } from '@/store/theme/theme'
 import { throttle } from 'echarts'
 import { useI18n } from 'vue-i18n'
@@ -44,7 +38,7 @@ function initChart<Opt extends ECBasicOption>(
   const init = () => {
     chart = globalProperties?.echarts.init(
       domRef.value,
-      themeStore.darkTheme ? 'dark-bold' : 'macarons'
+      themeStore.darkTheme && 'dark-bold'
     )
     chart && chart.setOption(option)
   }
@@ -76,7 +70,7 @@ function initChart<Opt extends ECBasicOption>(
       init()
     },
     {
-      deep: true,
+      deep: true
     }
   )
 
