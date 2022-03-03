@@ -45,7 +45,6 @@
     <select id="queryWorkFlowLineageByProcessDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
         select tepd.code as work_flow_code,
                tepd.name as work_flow_name,
-               '' as source_work_flow_code,
                tepd.release_state as work_flow_publish_status,
                tes.start_time as schedule_start_time,
                tes.end_time as schedule_end_time,

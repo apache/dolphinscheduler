@@ -46,7 +46,7 @@ public interface WorkFlowLineageMapper {
     WorkFlowLineage queryWorkFlowLineageByCode(@Param("projectCode") long projectCode, @Param("workFlowCode") long workFlowCode);
 
     /**
-     * queryWorkFlowLineageByCode
+     * queryWorkFlowLineageByProcessDefinitionCodes
      *
      * @param workFlowCodes workFlowCodes
      * @return WorkFlowLineage
