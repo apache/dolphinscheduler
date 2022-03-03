@@ -19,7 +19,8 @@ import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryAuditLogListPaging } from '@/service/modules/audit'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
+import { parseTime } from '@/utils/common'
 import type { AuditListRes } from '@/service/modules/audit/types'
 
 export function useTable() {
@@ -75,10 +76,10 @@ export function useTable() {
       operationType: params.operationType,
       userName: params.userName,
       startDate: params.datePickerRange
-        ? format(parseISO(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(parseISO(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : ''
     }
 
