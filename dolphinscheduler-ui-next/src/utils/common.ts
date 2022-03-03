@@ -32,6 +32,8 @@ import {
   GlobalOutlined,
   IssuesCloseOutlined
 } from '@vicons/antd'
+import { parseISO } from 'date-fns'
+import _ from 'lodash'
 import { ITaskState } from './types'
 
 /**
@@ -350,3 +352,11 @@ export const warningTypeList = [
     code: 'project.workflow.all_send'
   }
 ]
+
+export const parseTime = (dateTime: string | number) => {
+  if (_.isString(dateTime) === true) {
+    return parseISO(dateTime as string)
+  } else {
+    return new Date(dateTime)
+  }
+}

@@ -22,8 +22,9 @@ import { queryRuleListPaging } from '@/service/modules/data-quality'
 import type { RuleRes } from '@/service/modules/data-quality/types'
 import TableAction from './components/table-action'
 import _ from 'lodash'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import { parseTime } from '@/utils/common'
 
 export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
   const { t } = useI18n()
@@ -120,11 +121,11 @@ export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
           }
 
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
 

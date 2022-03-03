@@ -17,12 +17,13 @@
 
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
+import { parseTime } from '@/utils/common'
 
 export function useTable(
   updateItem = (
@@ -103,11 +104,11 @@ export function useTable(
 
             item.projectName = projectName
             item.createTime = format(
-              parseISO(item.createTime),
+              parseTime(item.createTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             item.updateTime = format(
-              parseISO(item.updateTime),
+              parseTime(item.updateTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             return {

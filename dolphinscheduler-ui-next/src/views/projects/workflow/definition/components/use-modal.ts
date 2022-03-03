@@ -20,7 +20,7 @@ import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { importProcessDefinition } from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
@@ -31,6 +31,7 @@ import {
   updateSchedule,
   previewSchedule
 } from '@/service/modules/schedules'
+import { parseTime } from '@/utils/common'
 
 export function useModal(
   state: any,
@@ -78,11 +79,11 @@ export function useModal(
         state.startForm.processDefinitionCode = code
         if (state.startForm.startEndTime) {
           const start = format(
-            parseISO(state.startForm.startEndTime[0]),
+            new Date(state.startForm.startEndTime[0]),
             'yyyy-MM-dd hh:mm:ss'
           )
           const end = format(
-            parseISO(state.startForm.startEndTime[1]),
+            new Date(state.startForm.startEndTime[1]),
             'yyyy-MM-dd hh:mm:ss'
           )
           state.startForm.scheduleTime = `${start},${end}`
@@ -148,11 +149,11 @@ export function useModal(
 
   const getTimingData = () => {
     const start = format(
-      parseISO(state.timingForm.startEndTime[0]),
+      parseTime(state.timingForm.startEndTime[0]),
       'yyyy-MM-dd hh:mm:ss'
     )
     const end = format(
-      parseISO(state.timingForm.startEndTime[1]),
+      parseTime(state.timingForm.startEndTime[1]),
       'yyyy-MM-dd hh:mm:ss'
     )
 
@@ -210,11 +211,11 @@ export function useModal(
         const projectCode = Number(router.currentRoute.value.params.projectCode)
 
         const start = format(
-          parseISO(state.timingForm.startEndTime[0]),
+          new Date(state.timingForm.startEndTime[0]),
           'yyyy-MM-dd hh:mm:ss'
         )
         const end = format(
-          parseISO(state.timingForm.startEndTime[1]),
+          new Date(state.timingForm.startEndTime[1]),
           'yyyy-MM-dd hh:mm:ss'
         )
 

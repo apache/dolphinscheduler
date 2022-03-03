@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
@@ -25,6 +25,7 @@ import {
   delAlertGroupById
 } from '@/service/modules/alert-group'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
+import { parseTime } from '@/utils/common'
 import type { AlarmGroupRes } from '@/service/modules/alert-group/types'
 
 export function useTable() {
@@ -159,11 +160,11 @@ export function useTable() {
       queryAlertGroupListPaging({ ...params }).then((res: AlarmGroupRes) => {
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {

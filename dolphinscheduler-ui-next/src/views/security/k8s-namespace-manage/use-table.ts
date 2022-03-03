@@ -19,7 +19,7 @@ import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
   queryNamespaceListPaging,
@@ -29,6 +29,7 @@ import type {
   NamespaceListRes,
   NamespaceItem
 } from '@/service/modules/k8s-namespace/types'
+import { parseTime } from '@/utils/common'
 
 export function useTable() {
   const { t } = useI18n()
@@ -178,11 +179,11 @@ export function useTable() {
       queryNamespaceListPaging({ ...params }).then((res: NamespaceListRes) => {
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {

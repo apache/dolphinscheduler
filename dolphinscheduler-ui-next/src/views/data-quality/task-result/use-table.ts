@@ -19,11 +19,12 @@ import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryExecuteResultListPaging } from '@/service/modules/data-quality'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import type {
   ResultItem,
   ResultListRes
 } from '@/service/modules/data-quality/types'
+import { parseTime } from '@/utils/common'
 
 export function useTable() {
   const { t } = useI18n()
@@ -171,10 +172,10 @@ export function useTable() {
       state: params.state,
       searchVal: params.searchVal,
       startDate: params.datePickerRange
-        ? format(parseISO(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(parseISO(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : ''
     }
 

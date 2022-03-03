@@ -17,7 +17,7 @@
 
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import {
   queryTaskGroupListPaging,
@@ -25,6 +25,7 @@ import {
 } from '@/service/modules/task-group'
 import TableAction from './components/table-action'
 import _ from 'lodash'
+import { parseTime } from '@/utils/common'
 
 export function useTable(
   updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},
@@ -104,11 +105,11 @@ export function useTable(
 
           item.taskGroupName = taskGroupName
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
