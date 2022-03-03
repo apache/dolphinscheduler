@@ -44,6 +44,10 @@ public class PropertyUtils {
 
     static {
         loadPropertyFile(COMMON_PROPERTIES_PATH);
+        Set<Object> keys = properties.keySet();
+        for (Object key : keys) {
+            logger.info("key is {}, value is {}", key, properties.getProperty(key.toString()));
+        }
     }
 
     public static synchronized void loadPropertyFile(String... propertyFiles) {
