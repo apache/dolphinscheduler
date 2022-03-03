@@ -125,14 +125,14 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
     @Override
-    public Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result<Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Result result = new Result();
+        Result<Object> result = new Result<>();
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -185,13 +185,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             if (checkTenantExists(tenantCode)) {
                 // if hdfs startup
                 if (PropertyUtils.getResUploadStartupState()) {
-                    //todo  check this
-//                    String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
-//                    String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-//                    //init hdfs resource
-//                    storageOperate.mkdir(tenantCode,resourcePath);
-//                    storageOperate.mkdir(tenantCode,udfsPath);
-
                     storageOperate.createTenantDirIfNotExists(tenantCode);
                 }
             } else {
@@ -301,8 +294,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return true if tenant code can user, otherwise return false
      */
     @Override
-    public Result verifyTenantCode(String tenantCode) {
-        Result result = new Result();
+    public Result<Object> verifyTenantCode(String tenantCode) {
+        Result<Object> result = new Result<>();
         if (checkTenantExists(tenantCode)) {
             putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
         } else {
