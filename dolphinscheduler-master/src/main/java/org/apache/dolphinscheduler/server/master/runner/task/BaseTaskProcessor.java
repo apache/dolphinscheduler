@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -45,6 +46,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.k8s.K8sParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractResourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -81,6 +83,7 @@ import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
@@ -278,6 +281,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
             setDataQualityTaskRelation(dataQualityTaskExecutionContext,taskInstance,tenant.getTenantCode());
         }
+        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
+        if (TASK_TYPE_K8S.equalsIgnoreCase(taskInstance.getTaskType())) {
+            setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
+        }
 
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
@@ -286,6 +293,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
                 .buildResourceParametersInfo(resources)
                 .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
+                .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)
                 .create();
     }
 
@@ -578,5 +586,21 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         }
 
         return resourcesMap;
+    }
+
+
+    /**
+     * set k8s task relation
+     *
+     * @param k8sTaskExecutionContext k8sTaskExecutionContext
+     * @param taskInstance taskInstance
+     */
+    private void setK8sTaskRelation(K8sTaskExecutionContext k8sTaskExecutionContext, TaskInstance taskInstance) {
+        K8sParameters k8sParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), K8sParameters.class);
+        String clusterName = k8sParameters.getClusterName();
+        String configYaml = processService.findConfigYamlByName(clusterName);
+        if (configYaml != null) {
+            k8sTaskExecutionContext.setConfigYaml(configYaml);
+        }
     }
 }

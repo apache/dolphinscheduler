@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.builder;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -115,7 +116,16 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setResourceParametersHelper(parametersHelper);
         return this;
     }
-
+    /**
+     * build k8sTask related info
+     *
+     * @param k8sTaskExecutionContext sqoopTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildK8sTaskRelatedInfo(K8sTaskExecutionContext k8sTaskExecutionContext) {
+        taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
+        return this;
+    }
     /**
      * create
      *

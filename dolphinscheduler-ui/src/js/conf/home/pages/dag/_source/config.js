@@ -341,6 +341,10 @@ const tasksType = {
     desc: 'SEATUNNEL',
     color: '#646465',
     helperLinkDisable: true
+  },
+  K8S: {
+    desc: 'K8S',
+    color: '#646465'
   }
 }
 
