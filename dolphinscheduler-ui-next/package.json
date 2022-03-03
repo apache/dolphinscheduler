@@ -17,7 +17,7 @@
     "echarts": "^5.3.0",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.31.1",
-    "naive-ui": "2.25.1",
+    "naive-ui": "^2.26.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.11",
     "pinia-plugin-persistedstate": "^1.2.2",
