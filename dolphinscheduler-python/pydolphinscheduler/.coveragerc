@@ -29,4 +29,4 @@ skip_covered = True
 show_missing = True
 precision = 2
 # Report will fail when coverage under 90.00%
-fail_under = 85
+fail_under = 90
