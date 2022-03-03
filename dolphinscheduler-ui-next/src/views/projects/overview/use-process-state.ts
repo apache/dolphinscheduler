@@ -19,11 +19,14 @@ import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { countProcessInstanceState } from '@/service/modules/projects-analysis'
 import { format } from 'date-fns'
-import { TaskStateRes } from '@/service/modules/projects-analysis/types'
-import { StateData } from './types'
+import { toLower } from 'lodash'
+import { useI18n } from 'vue-i18n'
+import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
+import type { StateData } from './types'
 
 export function useProcessState() {
   const route = useRoute()
+  const { t } = useI18n()
 
   const getProcessState = (date: Array<number>) => {
     const { state } = useAsyncState(
@@ -34,7 +37,7 @@ export function useProcessState() {
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item, unused) => {
           return {
-            state: item.taskStateType,
+            state: t('home.' + toLower(item.taskStateType)),
             number: item.count
           }
         })
@@ -42,7 +45,7 @@ export function useProcessState() {
         const chart = res.taskCountDtos.map((item) => {
           return {
             value: item.count,
-            name: item.taskStateType
+            name: t('home.' + toLower(item.taskStateType))
           }
         })
 

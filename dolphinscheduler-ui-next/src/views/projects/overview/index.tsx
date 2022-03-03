@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, watch } from 'vue'
 import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
@@ -27,17 +27,12 @@ import DefinitionCard from './components/definition-card'
 const workflowMonitor = defineComponent({
   name: 'workflow-monitor',
   setup() {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
-    const { getTaskState } = useTaskState()
-    const { getProcessState } = useProcessState()
     const taskStateRef = ref()
     const processStateRef = ref()
-
-    onMounted(() => {
-      taskStateRef.value = getTaskState(dateRef.value)
-      processStateRef.value = getProcessState(dateRef.value)
-    })
+    const { getTaskState } = useTaskState()
+    const { getProcessState } = useProcessState()
 
     const handleTaskDate = (val: any) => {
       taskStateRef.value = getTaskState(val)
@@ -46,6 +41,20 @@ const workflowMonitor = defineComponent({
     const handleProcessDate = (val: any) => {
       processStateRef.value = getProcessState(val)
     }
+
+    const initData = () => {
+      taskStateRef.value = getTaskState(dateRef.value)
+      processStateRef.value = getProcessState(dateRef.value)
+    }
+
+    onMounted(() => {
+      initData()
+    })
+
+    watch(
+      () => locale.value,
+      () => initData()
+    )
 
     return {
       t,
