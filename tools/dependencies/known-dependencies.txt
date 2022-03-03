@@ -13,7 +13,6 @@ asm-6.2.1.jar
 aspectjweaver-1.9.7.jar
 audience-annotations-0.5.0.jar
 avro-1.7.4.jar
-aws-java-sdk-1.7.4.jar
 bonecp-0.8.0.RELEASE.jar
 byte-buddy-1.9.16.jar
 caffeine-2.9.2.jar
@@ -273,3 +272,4 @@ ion-java-1.0.2.jar
 aws-java-sdk-s3-1.12.160.jar
 aws-java-sdk-core-1.12.160.jar
 aws-java-sdk-kms-1.12.160.jar
+aws-java-sdk-emr-1.12.160.jar
