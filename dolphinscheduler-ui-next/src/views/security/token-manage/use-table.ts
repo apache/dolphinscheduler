@@ -17,11 +17,12 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import { queryAccessTokenList, deleteToken } from '@/service/modules/token'
+import { parseTime } from '@/utils/common'
 import type { TokenRes } from '@/service/modules/token/types'
 
 export function useTable() {
@@ -164,15 +165,15 @@ export function useTable() {
       queryAccessTokenList({ ...params }).then((res: TokenRes) => {
         variables.tableData = res.totalList.map((item, unused) => {
           item.expireTime = format(
-            parseISO(item.expireTime),
+            parseTime(item.expireTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
