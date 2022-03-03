@@ -124,7 +124,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         getProcessDefinitionCodeByDependentDefinitionList(workFlowDependentDefinitionList,
                 upstreamProcessDefinitionCodes);
 
-        if (upstreamProcessDefinitionCodes.size() != 0) {
+        if (!upstreamProcessDefinitionCodes.isEmpty()) {
             upstreamWorkFlowLineages.addAll(
                     workFlowLineageMapper.queryWorkFlowLineageByProcessDefinitionCodes(upstreamProcessDefinitionCodes));
         }
