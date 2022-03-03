@@ -49,6 +49,7 @@ public class PropertyUtils {
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
+                logger.info("fileName is {}", fileName);
                 properties.load(fis);
 
             } catch (IOException e) {
@@ -70,6 +71,7 @@ public class PropertyUtils {
      */
     public static boolean getResUploadStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
+        logger.info("the resource type is {}", resUploadStartupType);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
         return resUploadType != ResUploadType.NONE;
     }

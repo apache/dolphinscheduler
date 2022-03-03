@@ -36,7 +36,6 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 @Configuration
 public class StoreConfiguration {
 
-    private StorageOperate storageOperate;
 
     @Bean
     public StorageOperate storageOperate() {

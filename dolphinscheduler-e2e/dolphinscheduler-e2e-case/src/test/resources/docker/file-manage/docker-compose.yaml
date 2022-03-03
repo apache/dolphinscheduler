@@ -33,7 +33,7 @@ services:
       timeout: 60s
       retries: 120
     volumes:
-      - ./common.properties:/common.properties
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
     depends_on:
       s3:
         condition: service_healthy
