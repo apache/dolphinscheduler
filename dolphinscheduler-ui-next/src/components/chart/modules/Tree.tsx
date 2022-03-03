@@ -45,10 +45,6 @@ const TreeChart = defineComponent({
         trigger: 'item',
         backgroundColor: '#fff'
       },
-      legend: {
-        bottom: '0%',
-        left: 'center'
-      },
       textStyle: {
         fontSize: 14
       },
@@ -56,17 +52,19 @@ const TreeChart = defineComponent({
         {
           type: 'tree',
           id: 0,
+          name: 'tree1',
           data: props.data,
           top: '10%',
           left: '5%',
           bottom: '10%',
           right: '15%',
-          symbolSize: 12,
+          symbol: 'circle',
+          symbolSize: 18,
           edgeShape: 'polyline',
           edgeForkPosition: '63%',
           initialTreeDepth: 3,
           lineStyle: {
-            width: 2
+            width: 3
           },
           label: {
             backgroundColor: '#fff',
