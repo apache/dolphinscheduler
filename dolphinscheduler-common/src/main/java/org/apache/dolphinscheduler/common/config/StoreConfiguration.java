@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.common.config;
 
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.S3Utils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -40,22 +40,15 @@ public class StoreConfiguration {
 
     @Bean
     public StorageOperate storageOperate() {
-        return storageOperate;
+        switch (PropertyUtils.getString(RESOURCE_STORAGE_TYPE)) {
+            case STORAGE_S3:
+                return S3Utils.getInstance();
+            case STORAGE_HDFS:
+                return HadoopUtils.getInstance();
+            default:
+                return null;
+        }
     }
 
-    @ConditionalOnProperty(value = RESOURCE_STORAGE_TYPE, havingValue = STORAGE_S3)
-    private void getS3Operator() {
-        storageOperate = S3Utils.getInstance();
-    }
-
-    @ConditionalOnProperty(value = RESOURCE_STORAGE_TYPE, havingValue = STORAGE_HDFS)
-    private void getHdfsOperator() {
-        storageOperate = HadoopUtils.getInstance();
-    }
-
-    @ConditionalOnProperty(value = RESOURCE_STORAGE_TYPE, havingValue = "None")
-    private void getNoneOperator() {
-        storageOperate = null;
-    }
 
 }
