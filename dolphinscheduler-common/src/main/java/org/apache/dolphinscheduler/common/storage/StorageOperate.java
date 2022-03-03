@@ -24,9 +24,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @author Terry.Dai
- */
+
 public interface StorageOperate {
 
     public static final String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");

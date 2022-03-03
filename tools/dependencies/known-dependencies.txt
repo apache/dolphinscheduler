@@ -62,7 +62,6 @@ guice-servlet-3.0.jar
 h2-1.4.200.jar
 hadoop-annotations-2.7.3.jar
 hadoop-auth-2.7.3.jar
-hadoop-aws-2.7.3.jar
 hadoop-client-2.7.3.jar
 hadoop-common-2.7.3.jar
 hadoop-hdfs-2.7.3.jar

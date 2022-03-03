@@ -132,8 +132,6 @@
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
         <aws.sdk.version>1.12.160</aws.sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
-
-        <aws.sdk.version>1.12.160</aws.sdk.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
@@ -769,11 +767,7 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-aws</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
+
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
