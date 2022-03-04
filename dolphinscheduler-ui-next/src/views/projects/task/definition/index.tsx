@@ -16,6 +16,7 @@
  */
 
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   NButton,
   NCard,
@@ -29,17 +30,26 @@ import {
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
+import { useTask } from './use-task'
 import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import Card from '@/components/card'
 import VersionModal from './components/version-modal'
 import MoveModal from './components/move-modal'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import styles from './index.module.scss'
+import type { INodeData } from './types'
 
 const TaskDefinition = defineComponent({
   name: 'task-definition',
   setup() {
+    const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
     const { t } = useI18n()
-    const { variables, getTableData, createColumns } = useTable()
+
+    const { task, onToggleShow, onTaskSave, onEditTask, onInitTask } =
+      useTask(projectCode)
+
+    const { variables, getTableData, createColumns } = useTable(onEditTask)
 
     const requestData = () => {
       getTableData({
@@ -66,7 +76,20 @@ const TaskDefinition = defineComponent({
       variables.showMoveModalRef = false
       requestData()
     }
-
+    const onCreate = () => {
+      onToggleShow(true)
+    }
+    const onTaskCancel = () => {
+      onToggleShow(false)
+      onInitTask()
+    }
+    const onTaskSubmit = async (params: { data: INodeData }) => {
+      const result = await onTaskSave(params.data)
+      if (result) {
+        onTaskCancel()
+        onRefresh()
+      }
+    }
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -79,21 +102,27 @@ const TaskDefinition = defineComponent({
     return {
       t,
       ...toRefs(variables),
+      ...toRefs(task),
       onSearch,
       requestData,
       onUpdatePageSize,
-      onRefresh
+      onRefresh,
+      onCreate,
+      onTaskSubmit,
+      onTaskCancel,
+      projectCode
     }
   },
   render() {
-    const { t, onSearch, requestData, onUpdatePageSize, onRefresh } = this
+    const { t, onSearch, requestData, onUpdatePageSize, onRefresh, onCreate } =
+      this
 
     return (
       <>
         <NCard>
           <div class={styles['search-card']}>
             <div>
-              <NButton size='small' type='primary'>
+              <NButton size='small' type='primary' onClick={onCreate}>
                 {t('project.task.create_task')}
               </NButton>
             </div>
@@ -158,6 +187,15 @@ const TaskDefinition = defineComponent({
           row={this.row}
           onCancel={() => (this.showMoveModalRef = false)}
           onRefresh={onRefresh}
+        />
+        <TaskModal
+          show={this.taskShow}
+          data={this.taskData}
+          onSubmit={this.onTaskSubmit}
+          onCancel={this.onTaskCancel}
+          projectCode={this.projectCode}
+          from={1}
+          readonly={this.taskReadonly}
         />
       </>
     )

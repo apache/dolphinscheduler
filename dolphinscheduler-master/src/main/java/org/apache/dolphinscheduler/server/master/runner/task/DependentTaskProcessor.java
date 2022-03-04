@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.auto.service.AutoService;
 
 /**
@@ -61,7 +60,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      * dependent date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dependentDate;
 
     DependResult result;

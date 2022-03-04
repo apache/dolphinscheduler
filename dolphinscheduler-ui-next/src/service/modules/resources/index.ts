@@ -18,7 +18,6 @@
 import { axios, downloadFile } from '@/service/service'
 import {
   ResourceTypeReq,
-  UdfTypeReq,
   NameReq,
   FileNameReq,
   FullNameReq,
@@ -66,7 +65,7 @@ export function createResource(
   })
 }
 
-export function authorizedFile(params: UserIdReq): any {
+export function authorizedFile(params: UserIdReq) {
   return axios({
     url: '/resources/authed-file',
     method: 'get',
@@ -74,7 +73,7 @@ export function authorizedFile(params: UserIdReq): any {
   })
 }
 
-export function authorizeResourceTree(params: UserIdReq): any {
+export function authorizeResourceTree(params: UserIdReq) {
   return axios({
     url: '/resources/authed-resource-tree',
     method: 'get',
@@ -82,7 +81,7 @@ export function authorizeResourceTree(params: UserIdReq): any {
   })
 }
 
-export function authUDFFunc(params: UserIdReq): any {
+export function authUDFFunc(params: UserIdReq) {
   return axios({
     url: '/resources/authed-udf-func',
     method: 'get',
@@ -118,7 +117,9 @@ export function onlineCreateResource(
   })
 }
 
-export function queryResourceByProgramType(params: ResourceTypeReq): any {
+export function queryResourceByProgramType(
+  params: ResourceTypeReq & ProgramTypeReq
+): any {
   return axios({
     url: '/resources/query-by-type',
     method: 'get',
@@ -157,7 +158,7 @@ export function deleteUdfFunc(id: number): any {
   })
 }
 
-export function unAuthUDFFunc(params: UserIdReq): any {
+export function unAuthUDFFunc(params: UserIdReq) {
   return axios({
     url: '/resources/unauth-udf-func',
     method: 'get',

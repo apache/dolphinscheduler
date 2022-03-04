@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
+import { h, unref } from 'vue'
 import { NRadio, NRadioGroup, NSpace } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem, IOption } from '../types'
 
 export function renderRadio(item: IJsonItem, fields: { [field: string]: any }) {
-  const { props, field, options } = item
-  if (!options || options.length === 0) {
+  const { props, field, options } = isFunction(item) ? item() : item
+  if (!options) {
     return h(NRadio, {
       ...props,
       value: fields[field],
@@ -36,7 +37,9 @@ export function renderRadio(item: IJsonItem, fields: { [field: string]: any }) {
     },
     () =>
       h(NSpace, null, () =>
-        options.map((option: IOption) => h(NRadio, option, () => option.label))
+        unref(options).map((option: IOption) =>
+          h(NRadio, option, () => option.label)
+        )
       )
   )
 }

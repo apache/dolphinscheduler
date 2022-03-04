@@ -70,13 +70,15 @@ $bgLight: #ffffff;
   width: 190px;
   height: 100%;
   margin-right: 20px;
+  overflow-y: scroll;
 }
 
 .workflow-name {
   font-size: 14px;
+  font-weight: 700;
 }
 
-.copy-btn {
+.toolbar-btn {
   margin-left: 5px;
 }
 
@@ -225,6 +227,12 @@ $bgLight: #ffffff;
   bottom: 0px;
   border: dashed 1px #e4e4e4;
   z-index: 9;
+}
+
+.toolbar-left-part {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .toolbar-right-part {

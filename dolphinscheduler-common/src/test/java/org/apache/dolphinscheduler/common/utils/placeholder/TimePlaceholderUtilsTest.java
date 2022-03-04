@@ -38,7 +38,7 @@ public class TimePlaceholderUtilsTest {
 
     @Before
     public void init() {
-        date = DateUtils.parse("20170101010101", "yyyyMMddHHmmss");
+        date = DateUtils.parse("20170101010101", "yyyyMMddHHmmss", null);
     }
 
     @Test

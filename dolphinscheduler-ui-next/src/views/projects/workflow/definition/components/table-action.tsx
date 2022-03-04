@@ -51,7 +51,8 @@ export default defineComponent({
     'releaseWorkflow',
     'copyWorkflow',
     'exportWorkflow',
-    'gotoTimingManage'
+    'gotoTimingManage',
+    'gotoWorkflowTree'
   ],
   setup(props, ctx) {
     const handleStartWorkflow = () => {
@@ -86,6 +87,10 @@ export default defineComponent({
       ctx.emit('gotoTimingManage')
     }
 
+    const handleGotoWorkflowTree = () => {
+      ctx.emit('gotoWorkflowTree')
+    }
+
     return {
       handleStartWorkflow,
       handleTimingWorkflow,
@@ -95,6 +100,7 @@ export default defineComponent({
       handleCopyWorkflow,
       handleExportWorkflow,
       handleGotoTimingManage,
+      handleGotoWorkflowTree,
       ...toRefs(props)
     }
   },
@@ -164,7 +170,7 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.workflow.up_line'),
+            default: () => releaseState === 'ONLINE'? t('project.workflow.down_line'):t('project.workflow.up_line'),
             trigger: () => (
               <NButton
                 size='tiny'
@@ -261,7 +267,7 @@ export default defineComponent({
                 type='info'
                 tag='div'
                 circle
-                /* TODO: Goto tree view*/
+                onClick={this.handleGotoWorkflowTree}
               >
                 <NIcon>
                   <ApartmentOutlined />

@@ -60,6 +60,11 @@ public abstract class AbstractCommandExecutor {
      * rules for extracting application ID
      */
     protected static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.APPLICATION_REGEX);
+    
+    /**
+     * rules for extracting Var Pool
+     */
+    protected static final Pattern SETVALUE_REGEX = Pattern.compile(TaskConstants.SETVALUE_REGEX);
 
     protected StringBuilder varPool = new StringBuilder();
     /**
@@ -124,10 +129,12 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
 
-        // setting up user to run commands
-        command.add("sudo");
-        command.add("-u");
-        command.add(taskRequest.getTenantCode());
+        // if sudo.enable=true,setting up user to run commands
+        if (OSUtils.isSudoEnable()) {
+            command.add("sudo");
+            command.add("-u");
+            command.add(taskRequest.getTenantCode());
+        }
         command.add(commandInterpreter());
         command.addAll(Collections.emptyList());
         command.add(commandFile);
@@ -316,7 +323,7 @@ public abstract class AbstractCommandExecutor {
                 String line;
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(")) {
-                        varPool.append(line, "${setValue(".length(), line.length() - 2);
+                        varPool.append(findVarPool(line));
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
@@ -400,6 +407,19 @@ public abstract class AbstractCommandExecutor {
         }
 
         return lineList;
+    }
+    
+    /**
+     * find var pool
+     * @param line
+     * @return
+     */
+    private String findVarPool(String line){
+        Matcher matcher = SETVALUE_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     /**

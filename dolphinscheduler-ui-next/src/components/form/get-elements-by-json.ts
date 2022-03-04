@@ -18,7 +18,7 @@
 import { toRef, Ref } from 'vue'
 import { formatValidate } from './utils'
 import getField from './fields/get-field'
-import { omit } from 'lodash'
+import { omit, isFunction } from 'lodash'
 import type { FormRules } from 'naive-ui'
 import type { IFormItem, IJsonItem } from './types'
 
@@ -29,8 +29,9 @@ export default function getElementByJson(
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
   const elements: IFormItem[] = []
-  for (let item of json) {
-    const { name, value, field, span = 24, children, validate, ...rest } = item
+  for (const item of json) {
+    const mergedItem = isFunction(item) ? item() : item
+    const { name, value, field, children, validate, ...rest } = mergedItem
     if (value || value === 0) {
       fields[field] = value
       initialValues[field] = value
@@ -42,7 +43,7 @@ export default function getElementByJson(
       label: name,
       path: !children ? field : '',
       widget: () => getField(item, fields, rules),
-      span: toRef(item, 'span') as Ref<number>
+      span: toRef(mergedItem, 'span') as Ref<number>
     }
     elements.push(element)
   }

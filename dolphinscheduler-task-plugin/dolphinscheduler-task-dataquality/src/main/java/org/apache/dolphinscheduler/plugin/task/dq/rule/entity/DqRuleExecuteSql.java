@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * RuleExecuteSql
@@ -55,12 +54,10 @@ public class DqRuleExecuteSql implements Serializable {
     /**
      * create_time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     /**
      * update_time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public int getId() {

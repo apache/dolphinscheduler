@@ -202,10 +202,13 @@ const datasourceType: IDataBaseOptionKeys = {
     value: 'PRESTO',
     label: 'PRESTO',
     defaultPort: 8080
+  },
+  REDSHIFT: {
+    value: 'REDSHIFT',
+    label: 'REDSHIFT',
+    defaultPort: 5439
   }
 }
-
-console.log(Object.values(datasourceType))
 
 export const datasourceTypeList: IDataBaseOption[] = Object.values(
   datasourceType

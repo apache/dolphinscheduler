@@ -56,7 +56,7 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('project.workflow.id'),
+        title: '#',
         key: 'id',
         width: 50,
         render: (row, index) => index + 1
@@ -159,7 +159,8 @@ export function useTable() {
             onReleaseWorkflow: () => releaseWorkflow(row),
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
-            onGotoTimingManage: () => gotoTimingManage(row)
+            onGotoTimingManage: () => gotoTimingManage(row),
+            onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
     ] as TableColumns<any>
@@ -277,6 +278,13 @@ export function useTable() {
   const gotoTimingManage = (row: any) => {
     router.push({
       name: 'workflow-definition-timing',
+      params: { projectCode: variables.projectCode, definitionCode: row.code }
+    })
+  }
+
+  const gotoWorkflowTree = (row: any) => {
+    router.push({
+      name: 'workflow-definition-tree',
       params: { projectCode: variables.projectCode, definitionCode: row.code }
     })
   }

@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { queryQueueListPaging } from '@/service/modules/queues'
 import { EditOutlined } from '@vicons/antd'
@@ -36,11 +36,13 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.yarn_queue.queue_name'),
-        key: 'queueName'
+        key: 'queueName',
+        className: 'queue-name'
       },
       {
         title: t('security.yarn_queue.queue_value'),
@@ -69,12 +71,14 @@ export function useTable() {
                     circle: true,
                     type: 'info',
                     size: 'small',
+                    class: 'edit',
                     onClick: () => {
                       handleEdit(row)
                     }
                   },
                   {
-                    icon: () => h(EditOutlined)
+                    icon: () =>
+                      h(NIcon, null, { default: () => h(EditOutlined) })
                   }
                 ),
               default: () => t('security.yarn_queue.edit')
@@ -100,9 +104,8 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryQueueListPaging({ ...params }).then((res: QueueRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any

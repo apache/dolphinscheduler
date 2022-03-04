@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   DeleteOutlined,
@@ -30,12 +30,14 @@ import {
   deleteTaskDefinition
 } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
+import styles from './index.module.scss'
 import type {
   TaskDefinitionItem,
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
+import type { IRecord } from './types'
 
-export function useTable() {
+export function useTable(onEdit: Function) {
   const { t } = useI18n()
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
@@ -44,15 +46,33 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.task.task_name'),
-        key: 'taskName'
+        key: 'taskName',
+        width: 400,
+        render: (row: IRecord) =>
+          h(
+            'a',
+            {
+              class: styles.links,
+              onClick: () => {
+                onEdit(row, true)
+              }
+            },
+            {
+              default: () => {
+                return row.taskName
+              }
+            }
+          )
       },
       {
         title: t('project.task.workflow_name'),
-        key: 'processDefinitionName'
+        key: 'processDefinitionName',
+        width: 400
       },
       {
         title: t('project.task.workflow_state'),
@@ -116,14 +136,15 @@ export function useTable() {
                         size: 'small',
                         disabled:
                           ['CONDITIONS', 'SWITCH'].includes(row.taskType) ||
-                          (row.processDefinitionCode &&
+                          (!!row.processDefinitionCode &&
                             row.processReleaseState === 'ONLINE'),
                         onClick: () => {
-                          // handleEdit(row)
+                          onEdit(row, false)
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('project.task.edit')
@@ -141,7 +162,7 @@ export function useTable() {
                         type: 'info',
                         size: 'small',
                         disabled:
-                          row.processDefinitionCode &&
+                          !!row.processDefinitionCode &&
                           row.processReleaseState === 'ONLINE',
                         onClick: () => {
                           variables.showMoveModalRef = true
@@ -149,7 +170,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(DragOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DragOutlined) })
                       }
                     ),
                   default: () => t('project.task.move')
@@ -172,7 +194,10 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(ExclamationCircleOutlined)
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ExclamationCircleOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.version')
@@ -199,11 +224,14 @@ export function useTable() {
                               type: 'error',
                               size: 'small',
                               disabled:
-                                row.processDefinitionCode &&
+                                !!row.processDefinitionCode &&
                                 row.processReleaseState === 'ONLINE'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('project.task.delete')
@@ -252,7 +280,7 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskDefinitionListPaging({ ...params }, { projectCode }).then(
         (res: TaskDefinitionRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
+          variables.tableData = res.totalList.map((item, unused) => {
             if (Object.keys(item.upstreamTaskMap).length > 0) {
               item.upstreamTaskMap = Object.keys(item.upstreamTaskMap).map(
                 (code) => item.upstreamTaskMap[code]
@@ -262,7 +290,6 @@ export function useTable() {
             }
 
             return {
-              index: index + 1,
               ...item
             }
           }) as any

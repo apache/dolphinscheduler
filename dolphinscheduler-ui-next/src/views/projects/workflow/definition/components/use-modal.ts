@@ -31,6 +31,7 @@ import {
   updateSchedule,
   previewSchedule
 } from '@/service/modules/schedules'
+import { parseTime } from '@/utils/common'
 
 export function useModal(
   state: any,
@@ -148,11 +149,11 @@ export function useModal(
 
   const getTimingData = () => {
     const start = format(
-      new Date(state.timingForm.startEndTime[0]),
+      parseTime(state.timingForm.startEndTime[0]),
       'yyyy-MM-dd hh:mm:ss'
     )
     const end = format(
-      new Date(state.timingForm.startEndTime[1]),
+      parseTime(state.timingForm.startEndTime[1]),
       'yyyy-MM-dd hh:mm:ss'
     )
 
@@ -160,7 +161,8 @@ export function useModal(
       schedule: JSON.stringify({
         startTime: start,
         endTime: end,
-        crontab: state.timingForm.crontab
+        crontab: state.timingForm.crontab,
+        timezoneId: state.timingForm.timezoneId
       }),
       failureStrategy: state.timingForm.failureStrategy,
       warningType: state.timingForm.warningType,
@@ -169,7 +171,7 @@ export function useModal(
         state.timingForm.warningGroupId === ''
           ? 0
           : state.timingForm.warningGroupId,
-      workerGroup: state.timingForm.workerGroups,
+      workerGroup: state.timingForm.workerGroup,
       environmentCode: state.timingForm.environmentCode
     }
     return data

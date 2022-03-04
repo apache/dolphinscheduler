@@ -24,10 +24,35 @@ import {
   createUser,
   updateUser,
   delUserById,
-  verifyUserName
+  verifyUserName,
+  grantProject,
+  grantResource,
+  grantDataSource,
+  grantUDFFunc
 } from '@/service/modules/users'
+import {
+  queryAuthorizedProject,
+  queryUnauthorizedProject
+} from '@/service/modules/projects'
+import {
+  authorizedFile,
+  authorizeResourceTree,
+  authUDFFunc,
+  unAuthUDFFunc
+} from '@/service/modules/resources'
+import {
+  authedDatasource,
+  unAuthDatasource
+} from '@/service/modules/data-source'
 import regexUtils from '@/utils/regex'
-export type Mode = 'add' | 'edit' | 'delete'
+export type Mode =
+  | 'add'
+  | 'edit'
+  | 'delete'
+  | 'auth_project'
+  | 'auth_resource'
+  | 'auth_datasource'
+  | 'auth_udf'
 
 export type UserModalSharedStateType = ReturnType<
   typeof useSharedUserModalState
@@ -66,6 +91,15 @@ export function useModal({
   })
   const tenants = ref<any[]>([])
   const queues = ref<any[]>([])
+  const authorizedProjects = ref<string[]>([])
+  const projects = ref<any[]>([])
+  const authorizedFiles = ref<string[]>([])
+  const originResourceTree = ref<any[]>([])
+  const resourceType = ref<'file' | 'udf'>()
+  const authorizedUDF = ref<string[]>([])
+  const UDFs = ref<any[]>([])
+  const authorizedDatasource = ref<string[]>([])
+  const datasource = ref<any[]>([])
   const optionsLoading = ref(false)
   const confirmLoading = ref(false)
 
@@ -125,11 +159,44 @@ export function useModal({
     }
   })
 
-  const titleMap: Record<Mode, string> = {
-    add: t('security.user.create_user'),
-    edit: t('security.user.update_user'),
-    delete: t('security.user.delete_user')
-  }
+  const resourceTree = computed(() => {
+    const loopTree = (arr: any[]): any[] =>
+      arr
+        .map((d) => {
+          if (
+            (resourceType.value &&
+              `${d.type}`.toLowerCase() === resourceType.value) ||
+            !resourceType.value
+          ) {
+            const obj = { key: `${d.pid}-${d.id}`, label: d.name }
+            const children = d.children
+            if (children instanceof Array && children.length > 0) {
+              return {
+                ...obj,
+                children: loopTree(children)
+              }
+            }
+            return obj
+          }
+          return null
+        })
+        .filter((f) => f)
+    const data = loopTree(originResourceTree.value)
+    return data
+  })
+
+  const titleMap = computed(() => {
+    const titles: Record<Mode, string> = {
+      add: t('security.user.create_user'),
+      edit: t('security.user.update_user'),
+      delete: t('security.user.delete_user'),
+      auth_project: t('security.user.authorize_project'),
+      auth_resource: t('security.user.authorize_resource'),
+      auth_datasource: t('security.user.authorize_datasource'),
+      auth_udf: t('security.user.authorize_udf')
+    }
+    return titles
+  })
 
   const setFormValues = () => {
     const defaultValues = {
@@ -171,6 +238,103 @@ export function useModal({
       .finally(() => {
         optionsLoading.value = false
       })
+  }
+
+  const fetchProjects = async () => {
+    optionsLoading.value = true
+    Promise.all([
+      queryAuthorizedProject({ userId: user.value.id }),
+      queryUnauthorizedProject({ userId: user.value.id })
+    ])
+      .then((res: any[]) => {
+        const ids: string[] = []
+        res[0]?.forEach((d: any) => {
+          if (!ids.includes(d.id)) {
+            ids.push(d.id)
+          }
+        })
+        authorizedProjects.value = ids
+        projects.value =
+          res?.flat().map((d: any) => ({ label: d.name, value: d.id })) || []
+      })
+      .finally(() => {
+        optionsLoading.value = false
+      })
+  }
+
+  const fetchResources = async () => {
+    optionsLoading.value = true
+    Promise.all([
+      authorizedFile({ userId: user.value.id }),
+      authorizeResourceTree({ userId: user.value.id })
+    ])
+      .then((res: any[]) => {
+        const ids: string[] = []
+        const getIds = (arr: any[]) => {
+          arr.forEach((d) => {
+            const children = d.children
+            if (children instanceof Array && children.length > 0) {
+              getIds(children)
+            } else {
+              ids.push(`${d.pid}-${d.id}`)
+            }
+          })
+        }
+        getIds(res[0] || [])
+        authorizedFiles.value = ids
+        originResourceTree.value = res[1] || []
+      })
+      .finally(() => {
+        optionsLoading.value = false
+      })
+  }
+
+  const fetchDatasource = async () => {
+    optionsLoading.value = true
+    Promise.all([
+      authedDatasource({ userId: user.value.id }),
+      unAuthDatasource({ userId: user.value.id })
+    ])
+      .then((res: any[]) => {
+        const ids: string[] = []
+        res[0]?.forEach((d: any) => {
+          if (!ids.includes(d.id)) {
+            ids.push(d.id)
+          }
+        })
+        authorizedDatasource.value = ids
+        datasource.value =
+          res?.flat().map((d: any) => ({ label: d.name, value: d.id })) || []
+      })
+      .finally(() => {
+        optionsLoading.value = false
+      })
+  }
+
+  const fetchUDFs = async () => {
+    optionsLoading.value = true
+    Promise.all([
+      authUDFFunc({ userId: user.value.id }),
+      unAuthUDFFunc({ userId: user.value.id })
+    ])
+      .then((res: any[]) => {
+        const ids: string[] = []
+        res[0]?.forEach((d: any) => {
+          if (!ids.includes(d.id)) {
+            ids.push(d.id)
+          }
+        })
+        authorizedUDF.value = ids
+        UDFs.value =
+          res?.flat().map((d: any) => ({ label: d.name, value: d.id })) || []
+      })
+      .finally(() => {
+        optionsLoading.value = false
+      })
+  }
+
+  const onModalCancel = () => {
+    show.value = false
   }
 
   const onDelete = () => {
@@ -235,24 +399,70 @@ export function useModal({
       })
   }
 
+  const onGrant = (grantReq: () => Promise<any>) => {
+    confirmLoading.value = true
+    grantReq()
+      .then(
+        () => {
+          onSuccess?.(mode.value)
+          onModalCancel()
+          message.success(t('security.user.auth_success_msg'))
+        },
+        () => {
+          message.error(t('security.user.auth_error_msg'))
+        }
+      )
+      .finally(() => {
+        confirmLoading.value = false
+      })
+  }
+
   const onConfirm = () => {
-    if (mode.value === 'delete') {
-      onDelete()
-    } else {
+    if (mode.value === 'add' || mode.value === 'edit') {
       formRef.value.validate((errors: any) => {
         if (!errors) {
           user.value ? onUpdateUser() : onCreateUser()
         }
       })
+    } else {
+      mode.value === 'delete' && onDelete()
+      mode.value === 'auth_project' &&
+        onGrant(() =>
+          grantProject({
+            userId: user.value.id,
+            projectIds: authorizedProjects.value.join(',')
+          })
+        )
+      mode.value === 'auth_resource' &&
+        onGrant(() =>
+          grantResource({
+            userId: user.value.id,
+            resourceIds: authorizedFiles.value.join(',')
+          })
+        )
+      mode.value === 'auth_datasource' &&
+        onGrant(() =>
+          grantDataSource({
+            userId: user.value.id,
+            datasourceIds: authorizedDatasource.value.join(',')
+          })
+        )
+      mode.value === 'auth_udf' &&
+        onGrant(() =>
+          grantUDFFunc({
+            userId: user.value.id,
+            udfIds: authorizedUDF.value.join(',')
+          })
+        )
     }
   }
 
-  const onModalCancel = () => {
-    show.value = false
-  }
-
   watch([show, mode], () => {
-    show.value && mode.value !== 'delete' && prepareOptions()
+    show.value && ['add', 'edit'].includes(mode.value) && prepareOptions()
+    show.value && mode.value === 'auth_project' && fetchProjects()
+    show.value && mode.value === 'auth_resource' && fetchResources()
+    show.value && mode.value === 'auth_datasource' && fetchDatasource()
+    show.value && mode.value === 'auth_udf' && fetchUDFs()
   })
 
   watch([queues, tenants, user], () => {
@@ -270,6 +480,15 @@ export function useModal({
     formRules,
     tenants,
     queues,
+    authorizedProjects,
+    projects,
+    authorizedDatasource,
+    datasource,
+    authorizedUDF,
+    UDFs,
+    authorizedFiles,
+    resourceTree,
+    resourceType,
     optionsLoading,
     onConfirm,
     confirmLoading
