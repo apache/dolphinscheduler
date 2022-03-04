@@ -23,11 +23,10 @@ from pathlib import Path
 import pytest
 
 from pydolphinscheduler.cli.commands import cli
-from pydolphinscheduler.core.configuration import get_config_file_path
+from pydolphinscheduler.core.configuration import config_path
 from tests.testing.cli import CliTestWrapper
 from tests.testing.constants import DEV_MODE
 
-default_config_path = "~/pydolphinscheduler"
 config_file = "config.yaml"
 
 
@@ -35,7 +34,7 @@ config_file = "config.yaml"
 def delete_tmp_config_file():
     """Util for deleting temp configuration file after test finish."""
     yield
-    config_file_path = get_config_file_path()
+    config_file_path = config_path()
     config_file_path.unlink()
 
 
@@ -57,7 +56,7 @@ def test_config_init(delete_tmp_config_file, home):
         os.environ["PYDOLPHINSCHEDULER_HOME"] = home
         config_path = home
     else:
-        config_path = default_config_path
+        config_path = "~/pydolphinscheduler"
 
     path = Path(config_path).joinpath(config_file).expanduser()
     assert not path.exists()
@@ -66,9 +65,8 @@ def test_config_init(delete_tmp_config_file, home):
     cli_test.assert_success()
 
     assert path.exists()
-    # TODO We have a bug here, yaml dump do not support comment
-    # with path.open(mode="r") as cli_crt, open(path_default_config_yaml, "r") as src:
-    #     assert src.read() == cli_crt.read()
+    with path.open(mode="r") as cli_crt, open(path, "r") as src:
+        assert src.read() == cli_crt.read()
 
 
 @pytest.mark.parametrize(
@@ -125,8 +123,6 @@ def test_config_get_multiple(delete_tmp_config_file, keys: str, expects: str):
         cli_test.assert_success(output=f"{keys[idx]} = {expect}", fuzzy=True)
 
 
-# TODO fix command `config --set KEY VAL`
-@pytest.mark.skip(reason="We still have bug in command `config --set KEY VAL`")
 @pytest.mark.parametrize(
     "key, value",
     [
@@ -138,7 +134,9 @@ def test_config_get_multiple(delete_tmp_config_file, keys: str, expects: str):
 )
 def test_config_set(delete_tmp_config_file, key: str, value: str):
     """Test command line interface `config --set KEY VALUE`."""
-    os.environ["PYDOLPHINSCHEDULER_HOME"] = "/tmp/pydolphinscheduler"
+    path = "/tmp/pydolphinscheduler"
+    assert not Path(path).joinpath(config_file).exists()
+    os.environ["PYDOLPHINSCHEDULER_HOME"] = path
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
@@ -153,10 +151,6 @@ def test_config_set(delete_tmp_config_file, key: str, value: str):
     assert f"{key} = {value}" in cli_test.result.output
 
 
-# TODO do not skip `config --set KEY1 VAL1 --set KEY2 VAL2`
-@pytest.mark.skip(
-    reason="We still have bug in command `config --set KEY1 VAL1 --set KEY2 VAL2`"
-)
 @pytest.mark.parametrize(
     "keys, values",
     [
@@ -178,7 +172,9 @@ def test_config_set(delete_tmp_config_file, key: str, value: str):
 )
 def test_config_set_multiple(delete_tmp_config_file, keys: str, values: str):
     """Test command line interface `config --set KEY1 VAL1 --set KEY2 VAL2`."""
-    os.environ["PYDOLPHINSCHEDULER_HOME"] = "/tmp/pydolphinscheduler"
+    path = "/tmp/pydolphinscheduler"
+    assert not Path(path).joinpath(config_file).exists()
+    os.environ["PYDOLPHINSCHEDULER_HOME"] = path
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
