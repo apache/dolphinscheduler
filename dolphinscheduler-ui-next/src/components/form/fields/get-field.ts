@@ -19,12 +19,28 @@ import { camelCase, upperFirst, isFunction } from 'lodash'
 import type { FormRules, FormItemRule } from 'naive-ui'
 import type { IJsonItem } from '../types'
 
+const TYPES = [
+  'input',
+  'radio',
+  'editor',
+  'custom-parameters',
+  'switch',
+  'input-number',
+  'select',
+  'checkbox',
+  'tree-select',
+  'multi-input',
+  'custom',
+  'multi-condition'
+]
+
 const getField = (
   item: IJsonItem,
   fields: { [field: string]: any },
   rules?: FormRules
 ) => {
   const { type = 'input', widget, field } = isFunction(item) ? item() : item
+  if (!TYPES.includes(type)) return null
   const renderTypeName = `render${upperFirst(camelCase(type))}`
   if (type === 'custom') {
     return widget || null
