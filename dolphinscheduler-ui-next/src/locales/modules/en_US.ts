@@ -400,6 +400,7 @@ const project = {
     cron_manage: 'Cron manage',
     delete: 'Delete',
     tree_view: 'Tree View',
+    tree_limit: 'Limit Size',
     export: 'Export',
     version_info: 'Version Info',
     version: 'Version',
@@ -501,7 +502,8 @@ const project = {
     download_log: 'Download Log',
     refresh_log: 'Refresh Log',
     enter_full_screen: 'Enter full screen',
-    cancel_full_screen: 'Cancel full screen'
+    cancel_full_screen: 'Cancel full screen',
+    task_state: 'Task status'
   },
   task: {
     task_name: 'Task Name',

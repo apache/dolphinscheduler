@@ -396,7 +396,8 @@ const project = {
     copy_workflow: '复制工作流',
     cron_manage: '定时管理',
     delete: '删除',
-    tree_view: '树形图',
+    tree_view: '工作流树形图',
+    tree_limit: '限制大小',
     export: '导出',
     version_info: '版本信息',
     version: '版本',
@@ -498,7 +499,8 @@ const project = {
     download_log: '下载日志',
     refresh_log: '刷新日志',
     enter_full_screen: '进入全屏',
-    cancel_full_screen: '取消全屏'
+    cancel_full_screen: '取消全屏',
+    task_state: '任务状态'
   },
   task: {
     task_name: '任务名称',
