@@ -15,43 +15,48 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import { Ref, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function useFlink({
+export function useDataQuality({
   projectCode,
   from = 0,
   readonly,
-  data
+  data,
+  jsonRef
 }: {
   projectCode: number
   from?: number
   readonly?: boolean
   data?: ITaskData
+  jsonRef: Ref<IJsonItem[]>
 }) {
-  const model = reactive<INodeData>({
-    taskType: 'FLINK',
+  const { t } = useI18n()
+  const model = reactive({
+    taskType: 'DATA_QUALITY',
     name: '',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
+    timeoutNotifyStrategy: ['WARN'],
+    timeout: 30,
     localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30,
-    programType: 'SCALA',
+    ruleId: 1,
     deployMode: 'cluster',
-    flinkVersion: '<1.10',
-    jobManagerMemory: '1G',
-    taskManagerMemory: '2G',
-    slot: 1,
-    taskManager: 2,
-    parallelism: 1
-  })
+    driverCores: 1,
+    driverMemory: '512M',
+    numExecutors: 2,
+    executorMemory: '2G',
+    executorCores: 2,
+    others: '--conf spark.yarn.maxAppAttempts=1'
+  } as INodeData)
 
   let extra: IJsonItem[] = []
   if (from === 1) {
@@ -81,7 +86,29 @@ export function useFlink({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useFlink(model),
+      ...Fields.useRules(model, (items: IJsonItem[], len: number) => {
+        jsonRef.value.splice(17, len, ...items)
+      }),
+      Fields.useDeployMode(),
+      Fields.useDriverCores(),
+      Fields.useDriverMemory(),
+      Fields.useExecutorNumber(),
+      Fields.useExecutorMemory(),
+      Fields.useExecutorCores(),
+      {
+        type: 'input',
+        field: 'others',
+        name: t('project.node.option_parameters'),
+        props: {
+          type: 'textarea',
+          placeholder: t('project.node.option_parameters_tips')
+        }
+      },
+      ...Fields.useCustomParams({
+        model,
+        field: 'localParams',
+        isSimple: true
+      }),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

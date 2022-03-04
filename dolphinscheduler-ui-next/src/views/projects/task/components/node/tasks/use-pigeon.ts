@@ -31,6 +31,7 @@ export function usePigeon({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'PIGEON',
     name: '',
     flag: 'YES',
     description: '',
