@@ -64,7 +64,7 @@ public final class Constants {
 
     public static final String STORAGE_HDFS="HDFS";
 
-    public static final String BUCKET_NAME="dolpins";
+    public static final String BUCKET_NAME = "dolphinscheduler";
 
     /**
      * fs.defaultFS
