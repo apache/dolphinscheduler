@@ -261,7 +261,7 @@ export const tasksState = (t: any): ITaskState => ({
   SUCCESS: {
     id: 7,
     desc: `${t('project.workflow.success')}`,
-    color: '#33cc00',
+    color: '#95DF96',
     icon: CheckCircleOutlined,
     isSpin: false,
     classNames: 'success'
