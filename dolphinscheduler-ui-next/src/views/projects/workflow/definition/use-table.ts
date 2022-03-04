@@ -160,7 +160,7 @@ export function useTable() {
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
             onGotoTimingManage: () => gotoTimingManage(row),
-            onGotoWorkflowTree: () => gotoWorkflowTree(row),
+            onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
     ] as TableColumns<any>

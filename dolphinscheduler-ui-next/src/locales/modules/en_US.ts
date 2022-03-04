@@ -503,7 +503,7 @@ const project = {
     refresh_log: 'Refresh Log',
     enter_full_screen: 'Enter full screen',
     cancel_full_screen: 'Cancel full screen',
-    task_state: 'Task status',
+    task_state: 'Task status'
   },
   task: {
     task_name: 'Task Name',

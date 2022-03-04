@@ -500,7 +500,7 @@ const project = {
     refresh_log: '刷新日志',
     enter_full_screen: '进入全屏',
     cancel_full_screen: '取消全屏',
-    task_state: '任务状态',
+    task_state: '任务状态'
   },
   task: {
     task_name: '任务名称',

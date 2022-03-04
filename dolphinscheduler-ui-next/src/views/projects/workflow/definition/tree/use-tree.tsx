@@ -48,9 +48,7 @@ const UseTree = defineComponent({
     return (
       <Card title={title}>
         <NGrid x-gap={12} cols={1}>
-          <NGi>
-            { chartData.length > 0 && <TreeChart data={ chartData } />}
-          </NGi>
+          <NGi>{chartData.length > 0 && <TreeChart data={chartData} />}</NGi>
         </NGrid>
       </Card>
     )

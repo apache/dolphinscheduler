@@ -66,6 +66,6 @@ module.exports = {
     'vue/component-definition-name-casing': 'off',
     'vue/require-valid-default-prop': 'off',
     'no-console': 'error',
-    'vue/no-setup-props-destructure': 'off',
+    'vue/no-setup-props-destructure': 'off'
   }
 }

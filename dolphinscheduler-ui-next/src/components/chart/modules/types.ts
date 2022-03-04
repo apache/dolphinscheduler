@@ -16,7 +16,7 @@
  */
 
 export interface IChartDataItem {
-  name: string,
+  name: string
   value?: string | number
   children?: IChartDataItem[]
 }
