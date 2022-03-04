@@ -216,7 +216,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         pageInfo.setTotalList(list);
 
         result.put(Constants.DATA_LIST, pageInfo);
-        logger.info("select result:{}", taskGroupPaging);
         putMsg(result, Status.SUCCESS);
         return result;
     }
