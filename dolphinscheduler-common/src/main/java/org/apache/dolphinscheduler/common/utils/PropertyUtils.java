@@ -44,18 +44,12 @@ public class PropertyUtils {
 
     static {
         loadPropertyFile(COMMON_PROPERTIES_PATH);
-        Set<Object> keys = properties.keySet();
-        for (Object key : keys) {
-            logger.info("key is {}, value is {}", key, properties.getProperty(key.toString()));
-        }
     }
 
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
-                logger.info("fileName is {}", fileName);
                 properties.load(fis);
-
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 System.exit(1);
@@ -75,7 +69,6 @@ public class PropertyUtils {
      */
     public static boolean getResUploadStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
-        logger.info("the resource type is {}", resUploadStartupType);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
         return resUploadType != ResUploadType.NONE;
     }
