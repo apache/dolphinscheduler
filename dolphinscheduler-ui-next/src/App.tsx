@@ -65,7 +65,9 @@ const App = defineComponent({
         theme={this.currentTheme}
         theme-overrides={themeOverrides}
         style={{ width: '100%', height: '100vh' }}
-        date-locale={String(this.localesStore.getLocales) === 'zh_CN' ? dateZhCN : dateEnUS}
+        date-locale={
+          String(this.localesStore.getLocales) === 'zh_CN' ? dateZhCN : dateEnUS
+        }
         locale={String(this.localesStore.getLocales) === 'zh_CN' ? zhCN : enUS}
       >
         <NMessageProvider>
