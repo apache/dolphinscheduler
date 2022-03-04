@@ -35,7 +35,6 @@ import java.util.Objects;
 
 /**
  * base service impl
- * @author Terry.Dai
  */
 public class BaseServiceImpl implements BaseService {
 

@@ -165,6 +165,7 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
+    public static final String AWS_END_POINT = "aws.endpoint";
     /**
      * comma ,
      */

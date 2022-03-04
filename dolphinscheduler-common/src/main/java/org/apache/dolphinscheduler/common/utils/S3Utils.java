@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -58,10 +59,22 @@ public class S3Utils implements Closeable, StorageOperate {
 
     private S3Utils() {
         if (PropertyUtils.getString(RESOURCE_STORAGE_TYPE).equals(STORAGE_S3)) {
-            s3Client = AmazonS3ClientBuilder
-                    .standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
-                    .withRegion(Regions.fromName(REGION)).build();
+            logger.info("the endpoint is {}", AmazonS3ClientBuilder.standard().getEndpoint().getServiceEndpoint());
+
+            if (!StringUtils.isEmpty(PropertyUtils.getString(AWS_END_POINT))) {
+                s3Client = AmazonS3ClientBuilder
+                        .standard()
+                        .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(AWS_END_POINT, Regions.fromName(REGION).getName()))
+                        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
+                        .build();
+            } else {
+                s3Client = AmazonS3ClientBuilder
+                        .standard()
+                        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
+                        .withRegion(Regions.fromName(REGION))
+                        .build();
+            }
+            checkBucketNameIfNotPresent(BUCKET_NAME);
         }
     }
 
@@ -264,17 +277,23 @@ public class S3Utils implements Closeable, StorageOperate {
      * @param keyPrefix the name of directory
      * @param srcPath
      */
-    private void downloadDirectory(String  tenantCode,String keyPrefix,String srcPath){
+    private void downloadDirectory(String  tenantCode, String keyPrefix, String srcPath){
         TransferManager  tm= TransferManagerBuilder.standard().withS3Client(s3Client).build();
         try{
-            MultipleFileDownload download= tm.downloadDirectory(BUCKET_NAME,tenantCode+ FOLDER_SEPARATOR +keyPrefix,new File(srcPath));
+            MultipleFileDownload download = tm.downloadDirectory(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(srcPath));
             download.waitForCompletion();
-        }catch (AmazonS3Exception | InterruptedException e){
-                logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix);
+        } catch (AmazonS3Exception | InterruptedException e) {
+            logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix);
             Thread.currentThread().interrupt();
-        }finally {
+        } finally {
             tm.shutdownNow();
         }
-
     }
+
+    public void checkBucketNameIfNotPresent(String bucketName) {
+        if (s3Client.doesBucketExistV2(bucketName)) {
+            s3Client.createBucket(bucketName);
+        }
+    }
+
 }

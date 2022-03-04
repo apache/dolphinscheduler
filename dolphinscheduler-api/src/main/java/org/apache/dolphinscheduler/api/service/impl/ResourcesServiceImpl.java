@@ -306,8 +306,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         // verify whether the resource exists in storage
         // get the path of origin file in storage
-        //xxx
-        //String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
         String originHdfsFileName = storageOperate.getFileName(resource.getType(), tenantCode, originFullName);
         try {
             if (!storageOperate.exists(tenantCode, originHdfsFileName)) {
@@ -716,7 +714,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // get hdfs file by type
-        //xxx
         String storageFilename = storageOperate.getFileName(resource.getType(), tenantCode, resource.getFullName());
         //delete data in database
         resourcesMapper.deleteIds(needDeleteResourceIdArray);
@@ -750,7 +747,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (tenant != null) {
                 String tenantCode = tenant.getTenantCode();
                 try {
-                    //xxx
                     String filename = storageOperate.getFileName(type, tenantCode, fullName);
                     if (storageOperate.exists(tenantCode, filename)) {
                         putMsg(result, Status.RESOURCE_FILE_EXIST, filename);
