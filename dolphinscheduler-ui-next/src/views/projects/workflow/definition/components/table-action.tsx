@@ -170,7 +170,7 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.workflow.up_line'),
+            default: () => releaseState === 'ONLINE'? t('project.workflow.down_line'):t('project.workflow.up_line'),
             trigger: () => (
               <NButton
                 size='tiny'
