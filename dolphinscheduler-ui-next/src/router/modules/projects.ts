@@ -140,6 +140,16 @@ export default {
         showSide: true,
         auth: []
       }
+    },
+    {
+      path: '/projects/:projectCode/workflow-definition/tree/:definitionCode',
+      name: 'workflow-definition-tree',
+      component: components['projects-workflow-definition-tree'],
+      meta: {
+        title: '工作流定义树形图',
+        showSide: true,
+        auth: []
+      }
     }
   ]
 }
