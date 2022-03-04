@@ -53,7 +53,7 @@ export function useDatasource(
       options.value.push({ label: item.name, value: String(item.id) })
     })
     if (options.value && model.datasource) {
-      let item = find(options.value, { value: String(model.datasource) })
+      const item = find(options.value, { value: String(model.datasource) })
       if (!item) {
         model.datasource = null
       }

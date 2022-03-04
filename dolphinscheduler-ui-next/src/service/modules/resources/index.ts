@@ -18,7 +18,6 @@
 import { axios, downloadFile } from '@/service/service'
 import {
   ResourceTypeReq,
-  UdfTypeReq,
   NameReq,
   FileNameReq,
   FullNameReq,

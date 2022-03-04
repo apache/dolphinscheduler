@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { Graph } from '@antv/x6'
+import type { Cell, Graph } from '@antv/x6'
 import {
   defineComponent,
   ref,
@@ -23,9 +23,11 @@ import {
   PropType,
   toRef,
   watch,
-  onBeforeUnmount
+  onBeforeUnmount,
+  computed
 } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
@@ -76,6 +78,7 @@ export default defineComponent({
   emits: ['refresh', 'save'],
   setup(props, context) {
     const { t } = useI18n()
+    const route = useRoute()
     const theme = useThemeStore()
 
     // Whether the graph can be operated
@@ -108,23 +111,51 @@ export default defineComponent({
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     // Right click cell
-    const {
-      menuCell,
-      pageX,
-      pageY,
-      menuVisible,
-      startModalShow,
-      logModalShow,
-      menuHide,
-      menuStart,
-      viewLog,
-      hideLog
-    } = useNodeMenu({
-      graph
+    const { nodeVariables, menuHide, menuStart, viewLog, hideLog } =
+      useNodeMenu({
+        graph
+      })
+
+    // start button in the dag node menu
+    const startReadonly = computed(() => {
+      if (props.definition) {
+        return (
+          route.name === 'workflow-definition-detail' &&
+          props.definition!.processDefinition.releaseState === 'NOT_RELEASE'
+        )
+      } else {
+        return false
+      }
+    })
+
+    // other button in the dag node menu
+    const menuReadonly = computed(() => {
+      if (props.instance) {
+        return (
+          props.instance.state !== 'WAITING_THREAD' &&
+          props.instance.state !== 'SUCCESS' &&
+          props.instance.state !== 'PAUSE' &&
+          props.instance.state !== 'FAILURE' &&
+          props.instance.state !== 'STOP'
+        )
+      } else if (props.definition) {
+        return props.definition!.processDefinition.releaseState === 'ONLINE'
+      } else {
+        return false
+      }
+    })
+
+    const taskInstance = computed(() => {
+      if (nodeVariables.menuCell) {
+        const taskCode = Number(nodeVariables.menuCell!.id)
+        return taskList.value.find((task: any) => task.taskCode === taskCode)
+      } else {
+        return undefined
+      }
     })
 
     const statusTimerRef = ref()
-    const { refreshTaskStatus } = useNodeStatus({ graph })
+    const { taskList, refreshTaskStatus } = useNodeStatus({ graph })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -183,7 +214,7 @@ export default defineComponent({
       () => {
         if (props.instance) {
           refreshTaskStatus()
-          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 9000)
+          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 90000)
         }
       }
     )
@@ -238,11 +269,13 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
-          cell={menuCell.value}
-          visible={menuVisible.value}
-          left={pageX.value}
-          top={pageY.value}
-          releaseState={props.definition?.processDefinition.releaseState}
+          startReadonly={startReadonly.value}
+          menuReadonly={menuReadonly.value}
+          taskInstance={taskInstance.value}
+          cell={nodeVariables.menuCell as Cell}
+          visible={nodeVariables.menuVisible}
+          left={nodeVariables.pageX}
+          top={nodeVariables.pageY}
           onHide={menuHide}
           onStart={menuStart}
           onEdit={editTask}
@@ -253,14 +286,13 @@ export default defineComponent({
         {!!props.definition && (
           <StartModal
             v-model:row={props.definition.processDefinition}
-            v-model:show={startModalShow.value}
+            v-model:show={nodeVariables.startModalShow}
           />
         )}
-        {!!props.instance && logModalShow.value && (
+        {!!props.instance && nodeVariables.logModalShow && (
           <LogModal
-            v-model:show={logModalShow.value}
-            taskInstanceId={props.instance.id}
-            taskInstanceType={props.instance.taskType}
+            taskInstanceId={nodeVariables.logTaskId}
+            taskInstanceType={nodeVariables.logTaskType}
             onHideLog={hideLog}
           />
         )}

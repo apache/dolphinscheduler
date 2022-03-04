@@ -20,7 +20,7 @@ Dolphin Scheduler Official Website
 其主要目标如下：
 
  - 以DAG图的方式将Task按照任务的依赖关系关联起来，可实时可视化监控任务的运行状态
- - 支持丰富的任务类型：Shell、MR、Spark、SQL(mysql、postgresql、hive、sparksql),Python,Sub_Process、Procedure等
+ - 支持丰富的任务类型：Shell、MR、Spark、SQL(mysql、postgresql、hive、sparksql)、Python、Sub_Process、Procedure等
  - 支持工作流定时调度、依赖调度、手动调度、手动暂停/停止/恢复，同时支持失败重试/告警、从指定节点恢复失败、Kill任务等操作
  - 支持工作流优先级、任务优先级及任务的故障转移及任务超时告警/失败
  - 支持工作流全局参数及节点自定义参数设置

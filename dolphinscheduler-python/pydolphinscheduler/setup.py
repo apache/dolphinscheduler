@@ -38,6 +38,7 @@ version = "2.0.4"
 prod = [
     "click>=8.0.0",
     "py4j~=0.10",
+    "pyyaml",
 ]
 
 build = [
@@ -132,8 +133,10 @@ setup(
     project_urls={
         "Homepage": "https://dolphinscheduler.apache.org",
         "Documentation": "https://dolphinscheduler.apache.org/python/index.html",
-        "Source": "https://github.com/apache/dolphinscheduler/dolphinscheduler-python/pydolphinscheduler",
-        "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues",
+        "Source": "https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/"
+        "pydolphinscheduler",
+        "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues?"
+        "q=is%3Aissue+is%3Aopen+label%3APython",
         "Discussion": "https://github.com/apache/dolphinscheduler/discussions",
         "Twitter": "https://twitter.com/dolphinschedule",
     },

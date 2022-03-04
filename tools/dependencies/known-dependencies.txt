@@ -143,7 +143,7 @@ joda-time-2.10.13.jar
 jpam-1.1.jar
 jsch-0.1.42.jar
 jsp-api-2.1.jar
-jsqlparser-4.0.jar
+jsqlparser-2.1.jar
 jsr305-3.0.0.jar
 jta-1.1.jar
 jul-to-slf4j-1.7.32.jar
@@ -159,13 +159,13 @@ mapstruct-1.2.0.Final.jar
 micrometer-core-1.7.5.jar
 micrometer-registry-prometheus-1.7.5.jar
 mssql-jdbc-6.1.0.jre8.jar
-mybatis-3.5.7.jar
-mybatis-plus-3.4.3.jar
-mybatis-plus-annotation-3.4.3.jar
-mybatis-plus-boot-starter-3.4.3.jar
-mybatis-plus-core-3.4.3.jar
-mybatis-plus-extension-3.4.3.jar
-mybatis-spring-2.0.6.jar
+mybatis-3.5.2.jar
+mybatis-plus-3.2.0.jar
+mybatis-plus-annotation-3.2.0.jar
+mybatis-plus-boot-starter-3.2.0.jar
+mybatis-plus-core-3.2.0.jar
+mybatis-plus-extension-3.2.0.jar
+mybatis-spring-2.0.2.jar
 netty-3.6.2.Final.jar
 netty-all-4.1.53.Final.jar
 opencsv-2.3.jar
@@ -268,3 +268,6 @@ jackson-dataformat-yaml-2.12.5.jar
 logging-interceptor-3.14.9.jar
 okhttp-3.14.9.jar
 okio-1.17.2.jar
+jmespath-java-1.12.160.jar
+jackson-dataformat-cbor-2.12.5.jar
+ion-java-1.0.2.jar

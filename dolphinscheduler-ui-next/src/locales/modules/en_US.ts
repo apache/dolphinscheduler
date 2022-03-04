@@ -88,7 +88,22 @@ const home = {
   process_state_statistics: 'Process State Statistics',
   process_definition_statistics: 'Process Definition Statistics',
   number: 'Number',
-  state: 'State'
+  state: 'State',
+  submitted_success: 'SUBMITTED_SUCCESS',
+  running_execution: 'RUNNING_EXECUTION',
+  ready_pause: 'READY_PAUSE',
+  pause: 'PAUSE',
+  ready_stop: 'READY_STOP',
+  stop: 'STOP',
+  failure: 'FAILURE',
+  success: 'SUCCESS',
+  need_fault_tolerance: 'NEED_FAULT_TOLERANCE',
+  kill: 'KILL',
+  waiting_thread: 'WAITING_THREAD',
+  waiting_depend: 'WAITING_DEPEND',
+  delay_execution: 'DELAY_EXECUTION',
+  forced_success: 'FORCED_SUCCESS',
+  serial_wait: 'SERIAL_WAIT'
 }
 
 const password = {
@@ -182,7 +197,6 @@ const resource = {
     create_file: 'Create File',
     upload_files: 'Upload Files',
     enter_keyword_tips: 'Please enter keyword',
-    id: '#',
     name: 'Name',
     user_name: 'Resource userName',
     whether_directory: 'Whether directory',
@@ -215,7 +229,6 @@ const resource = {
     udf_resources: 'UDF resources',
     create_folder: 'Create Folder',
     upload_udf_resources: 'Upload UDF Resources',
-    id: '#',
     udf_source_name: 'UDF Resource Name',
     whether_directory: 'Whether directory',
     file_name: 'File Name',
@@ -243,7 +256,6 @@ const resource = {
     udf_function: 'UDF Function',
     create_udf_function: 'Create UDF Function',
     edit_udf_function: 'Create UDF Function',
-    id: '#',
     udf_function_name: 'UDF Function Name',
     class_name: 'Class Name',
     type: 'Type',
@@ -272,7 +284,6 @@ const resource = {
     enter_description_tips: 'Please enter description'
   },
   task_group_option: {
-    id: 'No.',
     manage: 'Task group manage',
     option: 'Task group option',
     create: 'Create task group',
@@ -302,7 +313,6 @@ const resource = {
     please_enter_keywords: 'Please enter keywords'
   },
   task_group_queue: {
-    id: 'No.',
     actions: 'Actions',
     task_name: 'Task name',
     task_group_name: 'Task group name',
@@ -373,7 +383,6 @@ const project = {
     schedule_publish_status: 'Schedule Publish Status',
     workflow_definition: 'Workflow Definition',
     workflow_instance: 'Workflow Instance',
-    id: '#',
     status: 'Status',
     create_time: 'Create Time',
     update_time: 'Update Time',
@@ -434,6 +443,7 @@ const project = {
     crontab: 'Crontab',
     delete_confirm: 'Delete?',
     enter_name_tips: 'Please enter name',
+    switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
     run_type: 'Run Type',
@@ -540,7 +550,6 @@ const project = {
     waiting_depend: 'Waiting Depend',
     delay_execution: 'Delay Execution',
     forced_success: 'Forced Success',
-    serial_wait: 'Serial Wait',
     view_log: 'View Log',
     download_log: 'Download Log'
   },
@@ -715,6 +724,8 @@ const project = {
     sql_empty_tips: 'The sql can not be empty.',
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
+    procedure_method_snippet:
+      '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: 'Start',
     edit: 'Edit',
     copy: 'Copy',
@@ -842,7 +853,6 @@ const security = {
     tenant_manage: 'Tenant Manage',
     create_tenant: 'Create Tenant',
     search_tips: 'Please enter keywords',
-    num: 'Serial number',
     tenant_code: 'Operating System Tenant',
     description: 'Description',
     queue_name: 'QueueName',
@@ -956,7 +966,6 @@ const security = {
     authorize_resource: 'Resource Authorize',
     authorize_datasource: 'Datasource Authorize',
     authorize_udf: 'UDF Function Authorize',
-    index: 'Index',
     username: 'Username',
     username_exists: 'The username already exists',
     username_rule_msg: 'Please enter username',
@@ -989,7 +998,6 @@ const security = {
     search_input_tips: 'Please input the keywords',
     alarm_instance_manage: 'Alarm instance manage',
     alarm_instance: 'Alarm Instance',
-    serial_number: '#',
     alarm_instance_name: 'Alarm instance name',
     alarm_instance_name_tips: 'Please enter alarm plugin instance name',
     alarm_plugin_name: 'Alarm plugin name',
@@ -1072,7 +1080,6 @@ const datasource = {
   datasource: 'DataSource',
   create_datasource: 'Create DataSource',
   search_input_tips: 'Please input the keywords',
-  serial_number: '#',
   datasource_name: 'Datasource Name',
   datasource_name_tips: 'Please enter datasource name',
   datasource_user_name: 'Owner',

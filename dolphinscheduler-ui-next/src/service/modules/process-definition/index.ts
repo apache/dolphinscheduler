@@ -19,10 +19,8 @@ import { axios } from '@/service/service'
 import {
   CodeReq,
   CodesReq,
-  FileReq,
   NameReq,
   ReleaseStateReq,
-  VersionReq,
   LimitReq,
   PageReq,
   ListReq,

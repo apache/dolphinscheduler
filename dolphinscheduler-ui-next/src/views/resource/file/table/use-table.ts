@@ -44,7 +44,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
 
   const columnsRef: TableColumns<any> = [
     {
-      title: t('resource.file.id'),
+      title: '#',
       key: 'id',
       width: 50,
       render: (_row, index) => index + 1

@@ -18,24 +18,26 @@
 import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { format } from 'date-fns'
+import { toLower } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import { countTaskState } from '@/service/modules/projects-analysis'
 import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 
 export function useTaskState() {
   const route = useRoute()
+  const { t } = useI18n()
 
   const getTaskState = (date: Array<number>) => {
     const { state } = useAsyncState(
       countTaskState({
-        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: Number(route.params.projectCode)
       }).then((res: TaskStateRes): StateData => {
-        const table = res.taskCountDtos.map((item, index) => {
+        const table = res.taskCountDtos.map((item, unused) => {
           return {
-            index: index + 1,
-            state: item.taskStateType,
+            state: t('home.' + toLower(item.taskStateType)),
             number: item.count
           }
         })
@@ -43,7 +45,7 @@ export function useTaskState() {
         const chart = res.taskCountDtos.map((item) => {
           return {
             value: item.count,
-            name: item.taskStateType
+            name: t('home.' + toLower(item.taskStateType))
           }
         })
 

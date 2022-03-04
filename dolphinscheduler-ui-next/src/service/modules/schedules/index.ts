@@ -18,13 +18,11 @@
 import { axios } from '@/service/service'
 import {
   ProjectCodeReq,
-  IdReq,
   CodeReq,
   ListReq,
   ScheduleReq,
   WorkerGroupIdReq,
   CreateScheduleReq,
-  DeleteScheduleReq,
   ProcessDefinitionCodeReq
 } from './types'
 

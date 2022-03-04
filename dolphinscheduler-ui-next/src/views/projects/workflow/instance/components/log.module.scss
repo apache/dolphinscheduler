@@ -21,7 +21,7 @@
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,.4);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 10;
   .log-box {
     width: 660px;
@@ -29,7 +29,7 @@
     background: #fff;
     border-radius: 3px;
     position: absolute;
-    left:50%;
+    left: 50%;
     top: 50%;
     margin-left: -340px;
     margin-top: -250px;
@@ -54,19 +54,19 @@
     }
     .content {
       height: calc(100% - 100px);
-      background: #002A35;
-      padding:6px 2px;
+      background: #002a35;
+      padding: 6px 2px;
       .content-log-box {
         width: 100%;
         height: 100%;
-        word-break:break-all;
+        word-break: break-all;
         textarea {
           background: none;
-          color: #9CABAF;
+          color: #9cabaf;
           border: 0;
           font-family: 'Microsoft Yahei,Arial,Hiragino Sans GB,tahoma,SimSun,sans-serif';
           font-weight: bold;
-          resize:none;
+          resize: none;
           line-height: 1.6;
           padding: 0px;
         }
@@ -83,15 +83,35 @@
     }
   }
 }
-@-webkit-keyframes rotateloading{from{-webkit-transform: rotate(0deg)}
-  to{-webkit-transform: rotate(360deg)}
+@-webkit-keyframes rotateloading {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
 }
-@-moz-keyframes rotateloading{from{-moz-transform: rotate(0deg)}
-  to{-moz-transform: rotate(359deg)}
+@-moz-keyframes rotateloading {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(359deg);
+  }
 }
-@-o-keyframes rotateloading{from{-o-transform: rotate(0deg)}
-  to{-o-transform: rotate(359deg)}
+@-o-keyframes rotateloading {
+  from {
+    -o-transform: rotate(0deg);
+  }
+  to {
+    -o-transform: rotate(359deg);
+  }
 }
-@keyframes rotateloading{from{transform: rotate(0deg)}
-  to{transform: rotate(359deg)}
+@keyframes rotateloading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
 }

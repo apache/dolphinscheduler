@@ -161,6 +161,7 @@ public class Constants {
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+    public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
 
 
     /**
@@ -174,6 +175,7 @@ public class Constants {
     public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
     public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
     public static final String PRESTO_VALIDATION_QUERY = "select 1";
+    public static final String REDHIFT_VALIDATION_QUERY = "select 1";
 
     /**
      * jdbc url
@@ -187,7 +189,7 @@ public class Constants {
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
     public static final String JDBC_PRESTO = "jdbc:presto://";
-
+    public static final String JDBC_REDSHIFT = "jdbc:redshift://";
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
@@ -205,6 +207,11 @@ public class Constants {
     public static final String DOUBLE_SLASH = "//";
 
     /**
+     * SLASH /
+     */
+    public static final String SLASH = "/";
+
+    /**
      * comma ,
      */
     public static final String COMMA = ",";
@@ -214,10 +221,22 @@ public class Constants {
      */
     public static final String COLON = ":";
 
+
     /**
-     * AT SIGN
+     * AT SIGN @
      */
     public static final String AT_SIGN = "@";
+
+    /**
+     * SEMICOLON ;
+     */
+    public static final String SEMICOLON = ";";
+
+
+    /**
+     * EQUAL_SIGN =
+     */
+    public static final String EQUAL_SIGN = "=";
 
     /**
      * datasource encryption salt

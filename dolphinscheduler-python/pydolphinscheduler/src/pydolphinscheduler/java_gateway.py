@@ -23,6 +23,7 @@ from py4j.java_collections import JavaMap
 from py4j.java_gateway import GatewayParameters, JavaGateway
 
 from pydolphinscheduler.constants import JavaGatewayDefault
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException
 
 
@@ -38,9 +39,9 @@ def launch_gateway(
     This is why automatic conversion is disabled by default.
     """
     gateway_parameters = GatewayParameters(
-        address=address or JavaGatewayDefault.SERVER_ADDRESS,
-        port=port or JavaGatewayDefault.SERVER_PORT,
-        auto_convert=auto_convert or JavaGatewayDefault.AUTO_CONVERT,
+        address=address or configuration.JAVA_GATEWAY_ADDRESS,
+        port=port or configuration.JAVA_GATEWAY_PORT,
+        auto_convert=auto_convert or configuration.JAVA_GATEWAY_AUTO_CONVERT,
     )
     gateway = JavaGateway(gateway_parameters=gateway_parameters)
     return gateway
