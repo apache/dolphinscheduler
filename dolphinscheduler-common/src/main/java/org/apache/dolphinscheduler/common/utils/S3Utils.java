@@ -58,14 +58,12 @@ public class S3Utils implements Closeable, StorageOperate {
 
     private S3Utils() {
         if (PropertyUtils.getString(RESOURCE_STORAGE_TYPE).equals(STORAGE_S3)) {
-            logger.info("the endpoint is {}", AmazonS3ClientBuilder.standard().getEndpoint().getServiceEndpoint());
                 s3Client = AmazonS3ClientBuilder
                         .standard()
                         .withPathStyleAccessEnabled(true)
                         .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
                         .withRegion(Regions.fromName(REGION))
                         .build();
-
             checkBucketNameIfNotPresent(BUCKET_NAME);
         }
     }
