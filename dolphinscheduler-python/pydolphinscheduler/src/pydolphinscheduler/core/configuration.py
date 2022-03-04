@@ -16,7 +16,6 @@
 # under the License.
 
 """Configuration module for pydolphinscheduler."""
-import copy
 import os
 from pathlib import Path
 from typing import Any
@@ -44,12 +43,6 @@ def get_configs() -> YamlParser:
     path = str(config_path()) if config_path().exists() else BUILD_IN_CONFIG_PATH
     with open(path, mode="r") as f:
         return YamlParser(f.read())
-
-
-# Add configs as module variables to avoid read configuration multiple times when
-#  Get common configuration setting
-#  Set or get multiple configs in single time
-configs: YamlParser = get_configs()
 
 
 def init_config_file() -> None:
@@ -86,11 +79,12 @@ def get_single_config(key: str) -> Any:
 
     :param key: The config key want to get it value.
     """
-    if key not in configs:
+    config = get_configs()
+    if key not in config:
         raise PyDSConfException(
             "Configuration path %s do not exists. Can not get configuration.", key
         )
-    return configs[key]
+    return config[key]
 
 
 def set_single_config(key: str, value: Any) -> None:
@@ -115,19 +109,21 @@ def set_single_config(key: str, value: Any) -> None:
     :param key: The config key want change.
     :param value: The new value want to set.
     """
-    if key not in configs:
+    config = get_configs()
+    if key not in config:
         raise PyDSConfException(
             "Configuration path %s do not exists. Can not set configuration.", key
         )
-    # Change deep copy to avoid odd behavior when getter and setter in the same time
-    configs_copy = copy.deepcopy(configs)
-    configs_copy[key] = value
-    file.write(
-        content=configs_copy.to_string(), to_path=str(config_path()), overwrite=True
-    )
+    config[key] = value
+    file.write(content=config.to_string(), to_path=str(config_path()), overwrite=True)
 
 
 # Start Common Configuration Settings
+
+# Add configs as module variables to avoid read configuration multiple times when
+#  Get common configuration setting
+#  Set or get multiple configs in single time
+configs: YamlParser = get_configs()
 
 # Java Gateway Settings
 JAVA_GATEWAY_ADDRESS = configs.get("java_gateway.address")

@@ -29,6 +29,9 @@ task_without_example = {
     "procedure",
 }
 
+# pydolphinscheduler environment home
+ENV_PYDS_HOME = "PYDOLPHINSCHEDULER_HOME"
+
 # whether in dev mode, if true we will add or remove some tests. Or make be and more detail infos when
 # test failed.
 DEV_MODE = str(

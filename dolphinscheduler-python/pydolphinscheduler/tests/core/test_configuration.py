@@ -24,24 +24,26 @@ from typing import Any
 import pytest
 
 from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.configuration import (  set_single_config,
+from pydolphinscheduler.core.configuration import (
     BUILD_IN_CONFIG_PATH,
+    config_path,
     get_single_config,
+    set_single_config,
 )
 from pydolphinscheduler.exceptions import PyDSConfException
 from pydolphinscheduler.utils.yaml_parser import YamlParser
-from tests.testing.constants import DEV_MODE
-from tests.testing.file import delete_file, get_file_content
-
-env_pyds_home = "PYDOLPHINSCHEDULER_HOME"
-config_file = "~/pydolphinscheduler/config.yaml"
+from tests.testing.constants import DEV_MODE, ENV_PYDS_HOME
+from tests.testing.file import get_file_content
 
 
 @pytest.fixture
-def teardown_del_file():
-    """Teardown about delete default config file path."""
+def teardown_file_env():
+    """Util for deleting temp configuration file and pop env var after test finish."""
     yield
-    delete_file(config_file)
+    config_file_path = config_path()
+    if config_file_path.exists():
+        config_file_path.unlink()
+    os.environ.pop(ENV_PYDS_HOME, None)
 
 
 @pytest.mark.parametrize(
@@ -55,34 +57,52 @@ def teardown_del_file():
 def test_config_path(home: Any, expect: str):
     """Test function :func:`config_path`."""
     if home:
-        os.environ[env_pyds_home] = home
+        os.environ[ENV_PYDS_HOME] = home
     assert Path(expect).expanduser() == configuration.config_path()
 
 
-@pytest.mark.skipif(
-    DEV_MODE,
-    reason="Avoid delete ~/pydolphinscheduler/config.yaml by accident when test locally.",
+@pytest.mark.parametrize(
+    "home",
+    [
+        None,
+        "/tmp/pydolphinscheduler",
+        "/tmp/test_abc",
+    ],
 )
-def test_init_config_file(teardown_del_file):
+def test_init_config_file(teardown_file_env, home: Any):
     """Test init config file."""
-    path = Path(config_file).expanduser()
-    assert not path.exists()
+    if home:
+        os.environ[ENV_PYDS_HOME] = home
+    elif DEV_MODE:
+        pytest.skip(
+            "Avoid delete ~/pydolphinscheduler/config.yaml by accident when test locally."
+        )
+    assert not config_path().exists()
     configuration.init_config_file()
-    assert path.exists()
+    assert config_path().exists()
 
-    assert get_file_content(path) == get_file_content(BUILD_IN_CONFIG_PATH)
+    assert get_file_content(config_path()) == get_file_content(BUILD_IN_CONFIG_PATH)
 
 
-@pytest.mark.skipif(
-    DEV_MODE,
-    reason="Avoid delete ~/pydolphinscheduler/config.yaml by accident when test locally.",
+@pytest.mark.parametrize(
+    "home",
+    [
+        None,
+        "/tmp/pydolphinscheduler",
+        "/tmp/test_abc",
+    ],
 )
-def test_init_config_file_duplicate(teardown_del_file):
+def test_init_config_file_duplicate(teardown_file_env, home: Any):
     """Test raise error with init config file which already exists."""
-    path = Path(config_file).expanduser()
-    assert not path.exists()
+    if home:
+        os.environ[ENV_PYDS_HOME] = home
+    elif DEV_MODE:
+        pytest.skip(
+            "Avoid delete ~/pydolphinscheduler/config.yaml by accident when test locally."
+        )
+    assert not config_path().exists()
     configuration.init_config_file()
-    assert path.exists()
+    assert config_path().exists()
 
     with pytest.raises(PyDSConfException, match=".*file already exists.*"):
         configuration.init_config_file()
@@ -118,11 +138,20 @@ def test_get_configs_build_in():
         ("default.workflow.time_zone", "Asia/Shanghai", "Asia/Beijing"),
     ],
 )
-def test_single_config_get_set(teardown_del_file, key: str, val: Any, new_val: Any):
+def test_single_config_get_set(teardown_file_env, key: str, val: Any, new_val: Any):
     """Test function :func:`get_single_config` and :func:`set_single_config`."""
     assert val == get_single_config(key)
     set_single_config(key, new_val)
     assert new_val == get_single_config(key)
+
+
+def test_single_config_get_set_not_exists_key():
+    """Test function :func:`get_single_config` and :func:`set_single_config` error while key not exists."""
+    not_exists_key = "i_am_not_exists_key"
+    with pytest.raises(PyDSConfException, match=".*do not exists.*"):
+        get_single_config(not_exists_key)
+    with pytest.raises(PyDSConfException, match=".*do not exists.*"):
+        set_single_config(not_exists_key, not_exists_key)
 
 
 @pytest.mark.parametrize(

@@ -25,7 +25,7 @@ from pydolphinscheduler.utils import file
 from tests.testing.file import delete_file, get_file_content
 
 content = "test_content"
-file_path = "test_file_write.txt"
+file_path = "/tmp/test/file/test_file_write.txt"
 
 
 @pytest.fixture
