@@ -19,14 +19,15 @@ import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryProjectListPaging } from '@/service/modules/projects'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
+import { useMenuStore } from '@/store/menu/menu'
+import { NEllipsis } from 'naive-ui'
 import TableAction from './components/table-action'
-import styles from './index.module.scss'
+import { parseTime } from '@/utils/common'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import { useMenuStore } from '@/store/menu/menu'
 
 export function useTable(
   updateProjectItem = (
@@ -47,18 +48,25 @@ export function useTable(
       key: 'name',
       render: (row) =>
         h(
-          'a',
+          NEllipsis,
+          { style: 'max-width: 200px; color: #2080f0' },
           {
-            class: styles.links,
-            onClick: () => {
-              menuStore.setProjectCode(row.code)
-              router.push({ path: `/projects/${row.code}` })
-            }
-          },
-          {
-            default: () => {
-              return row.name
-            }
+            default: () =>
+              h(
+                'a',
+                {
+                  onClick: () => {
+                    menuStore.setProjectCode(row.code)
+                    router.push({ path: `/projects/${row.code}` })
+                  }
+                },
+                {
+                  default: () => {
+                    return row.name
+                  }
+                }
+              ),
+            tooltip: () => row.name
           }
         )
     },
@@ -103,11 +111,11 @@ export function useTable(
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {

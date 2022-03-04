@@ -28,7 +28,6 @@ export function useDropDown() {
   const menuStore = useMenuStore()
 
   const handleSelect = (key: string | number, unused: DropdownOption) => {
-    menuStore.setMenuKey('')
     if (key === 'logout') {
       useLogout()
     } else if (key === 'password') {

@@ -29,8 +29,9 @@ import {
   CheckCircleOutlined,
   DownloadOutlined
 } from '@vicons/antd'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { useRoute } from 'vue-router'
+import { parseTime } from '@/utils/common'
 import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
 
 export function useTable() {
@@ -150,7 +151,7 @@ export function useTable() {
                           })
                       }
                     ),
-                  default: () => t('project.task.serial_wait')
+                  default: () => t('project.task.forced_success')
                 }
               ),
               h(
@@ -237,10 +238,10 @@ export function useTable() {
       host: params.host,
       stateType: params.stateType,
       startDate: params.datePickerRange
-        ? format(parseISO(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(parseISO(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: params.executorName,
       processInstanceName: params.processInstanceName
@@ -251,14 +252,17 @@ export function useTable() {
         (res: TaskInstancesRes) => {
           variables.tableData = res.totalList.map((item, unused) => {
             item.submitTime = format(
-              parseISO(item.submitTime),
+              parseTime(item.submitTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             item.startTime = format(
-              parseISO(item.startTime),
+              parseTime(item.startTime),
               'yyyy-MM-dd HH:mm:ss'
             )
-            item.endTime = format(parseISO(item.endTime), 'yyyy-MM-dd HH:mm:ss')
+            item.endTime = format(
+              parseTime(item.endTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
             return {
               ...item
             }

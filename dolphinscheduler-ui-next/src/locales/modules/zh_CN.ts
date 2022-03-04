@@ -88,7 +88,22 @@ const home = {
   process_state_statistics: '流程状态统计',
   process_definition_statistics: '流程定义统计',
   number: '数量',
-  state: '状态'
+  state: '状态',
+  submitted_success: '提交成功',
+  running_execution: '正在运行',
+  ready_pause: '准备暂停',
+  pause: '暂停',
+  ready_stop: '准备停止',
+  stop: '停止',
+  failure: '失败',
+  success: '成功',
+  need_fault_tolerance: '需要容错',
+  kill: 'KILL',
+  waiting_thread: '等待线程',
+  waiting_depend: '等待依赖完成',
+  delay_execution: '延时执行',
+  forced_success: '强制成功',
+  serial_wait: '串行等待'
 }
 
 const password = {
@@ -525,12 +540,11 @@ const project = {
     failure: '失败',
     success: '成功',
     need_fault_tolerance: '需要容错',
-    kill: '已被杀',
+    kill: 'KILL',
     waiting_thread: '等待线程',
     waiting_depend: '等待依赖完成',
     delay_execution: '延时执行',
     forced_success: '强制成功',
-    serial_wait: '串行等待',
     view_log: '查看日志',
     download_log: '下载日志'
   },

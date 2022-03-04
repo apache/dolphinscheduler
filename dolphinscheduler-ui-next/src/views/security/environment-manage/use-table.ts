@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { NButton, NPopconfirm, NSpace, NTooltip, NTag, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
@@ -29,6 +29,7 @@ import type {
   EnvironmentRes,
   EnvironmentItem
 } from '@/service/modules/environment/types'
+import { parseTime } from '@/utils/common'
 
 export function useTable() {
   const { t } = useI18n()
@@ -184,11 +185,11 @@ export function useTable() {
       queryEnvironmentListPaging({ ...params }).then((res: EnvironmentRes) => {
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
