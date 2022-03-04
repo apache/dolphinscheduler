@@ -85,5 +85,6 @@ export {
   FormItemRule,
   FormRules,
   IFormItem,
-  GridProps
+  GridProps,
+  IJsonItemParams
 }

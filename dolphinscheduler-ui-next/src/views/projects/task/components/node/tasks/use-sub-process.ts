@@ -31,6 +31,7 @@ export function useSubProcess({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'SUB_PROCESS',
     name: '',
     flag: 'YES',
     description: '',

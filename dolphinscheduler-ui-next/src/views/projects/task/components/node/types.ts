@@ -17,9 +17,15 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type { IFormItem, IJsonItem } from '@/components/form/types'
+
 import type { TaskType } from '@/views/projects/task/constants/task-type'
 import type { IDataBase } from '@/service/modules/data-source/types'
+import type {
+  IFormItem,
+  IJsonItem,
+  FormRules,
+  IJsonItemParams
+} from '@/components/form/types'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
@@ -47,6 +53,11 @@ interface ILocalParam {
   direct?: string
   type?: string
   value?: string
+}
+
+interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
+  type: 'input' | 'select' | 'radio' | 'group'
+  emit: 'change'[]
 }
 
 interface IDependpendItem {
@@ -161,6 +172,33 @@ interface ISqoopSourceParams {
   hivePartitionKey?: string
   hivePartitionValue?: string
 }
+interface ISparkParameters {
+  deployMode?: string
+  driverCores?: number
+  driverMemory?: string
+  executorCores?: number
+  executorMemory?: string
+  numExecutors?: number
+  others?: string
+}
+
+interface IRuleParameters {
+  check_type?: string
+  comparison_execute_sql?: string
+  comparison_name?: string
+  failure_strategy?: string
+  operator?: string
+  src_connector_type?: number
+  src_datasource_id?: number
+  src_table?: string
+  statistics_execute_sql?: string
+  statistics_name?: string
+  target_connector_type?: number
+  target_datasource_id?: number
+  target_table?: string
+  threshold?: string
+}
+
 interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
@@ -229,6 +267,9 @@ interface ITaskParams {
   jobSpeedRecord?: number
   xms?: number
   xmx?: number
+  sparkParameters?: ISparkParameters
+  ruleId?: number
+  ruleInputParameter?: IRuleParameters
 }
 
 interface INodeData
@@ -239,9 +280,11 @@ interface INodeData
       | 'targetParams'
       | 'sourceParams'
       | 'dependence'
+      | 'sparkParameters'
     >,
     ISqoopTargetData,
-    ISqoopSourceData {
+    ISqoopSourceData,
+    IRuleParameters {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -280,7 +323,7 @@ interface ITaskData
   > {
   name?: string
   taskPriority?: string
-  timeoutFlag: 'OPEN' | 'CLOSE'
+  timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
 }
@@ -292,8 +335,6 @@ export {
   ITaskType,
   ITaskData,
   INodeData,
-  IFormItem,
-  IJsonItem,
   ITaskParams,
   IOption,
   IDataBase,
@@ -303,5 +344,10 @@ export {
   ISqoopSourceParams,
   ISqoopTargetParams,
   IDependTask,
-  IDependpendItem
+  IDependpendItem,
+  IFormItem,
+  IJsonItem,
+  FormRules,
+  IJsonItemParams,
+  IResponseJsonItem
 }

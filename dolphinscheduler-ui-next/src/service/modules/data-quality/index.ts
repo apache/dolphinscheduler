@@ -33,3 +33,30 @@ export function queryExecuteResultListPaging(params: ResultListReq): any {
     params
   })
 }
+
+export function queryRuleList(): any {
+  return axios({
+    url: '/data-quality/ruleList',
+    method: 'get'
+  })
+}
+
+export function getRuleFormCreateJson(ruleId: number): any {
+  return axios({
+    url: '/data-quality/getRuleFormCreateJson',
+    method: 'get',
+    params: {
+      ruleId
+    }
+  })
+}
+
+export function getDatasourceOptionsById(datasourceId: number): any {
+  return axios({
+    url: '/data-quality/getDatasourceOptionsById',
+    method: 'get',
+    params: {
+      datasourceId
+    }
+  })
+}
