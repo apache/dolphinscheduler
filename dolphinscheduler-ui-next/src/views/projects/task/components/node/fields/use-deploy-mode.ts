@@ -14,59 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export const TASK_TYPES_MAP = {
-  SHELL: {
-    alias: 'SHELL'
-  },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
-  },
-  PROCEDURE: {
-    alias: 'PROCEDURE'
-  },
-  SQL: {
-    alias: 'SQL'
-  },
-  SPARK: {
-    alias: 'SPARK'
-  },
-  FLINK: {
-    alias: 'FLINK'
-  },
-  MR: {
-    alias: 'MapReduce'
-  },
-  PYTHON: {
-    alias: 'PYTHON'
-  },
-  DEPENDENT: {
-    alias: 'DEPENDENT'
-  },
-  HTTP: {
-    alias: 'HTTP'
-  },
-  DATAX: {
-    alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
-  },
-  SQOOP: {
-    alias: 'SQOOP'
-  },
-  CONDITIONS: {
-    alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY'
-  },
-  SWITCH: {
-    alias: 'SWITCH'
-  },
-  SEATUNNEL: {
-    alias: 'WATERDROP'
+export function useDeployMode(span = 24): IJsonItem {
+  const { t } = useI18n()
+
+  return {
+    type: 'radio',
+    field: 'deployMode',
+    name: t('project.node.deploy_mode'),
+    options: DEPLOY_MODES,
+    span
   }
 }
 
-export type TaskType = keyof typeof TASK_TYPES_MAP
+export const DEPLOY_MODES = [
+  {
+    label: 'cluster',
+    value: 'cluster'
+  },
+  {
+    label: 'client',
+    value: 'client'
+  },
+  {
+    label: 'local',
+    value: 'local'
+  }
+]
