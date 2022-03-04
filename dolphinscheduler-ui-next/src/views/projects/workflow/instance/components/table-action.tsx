@@ -62,6 +62,14 @@ export default defineComponent({
       })
     }
 
+    const handleGantt = () => {
+      router.push({
+        name: 'workflow-instance-gantt',
+        params: { id: props.row!.id },
+        query: { code: props.row!.processDefinitionCode }
+      })
+    }
+
     const handleReRun = () => {
       ctx.emit('reRun')
     }
@@ -89,6 +97,7 @@ export default defineComponent({
       handleStop,
       handleSuspend,
       handleDeleteInstance,
+      handleGantt,
       ...toRefs(props)
     }
   },
@@ -280,8 +289,8 @@ export default defineComponent({
                 size='tiny'
                 type='info'
                 circle
-                /* TODO: Goto gantt*/
                 disabled={this.row?.disabled}
+                onClick={this.handleGantt}
               >
                 <NIcon>
                   <ControlOutlined />
