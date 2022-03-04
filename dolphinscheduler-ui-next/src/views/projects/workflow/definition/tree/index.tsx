@@ -16,23 +16,25 @@
  */
 
 import Card from '@/components/card'
-import {ArrowLeftOutlined, DeleteOutlined, PlusCircleOutlined} from '@vicons/antd'
-import {NButton, NFormItem, NIcon, NSelect, NSpace, NImage, NInput} from 'naive-ui'
-import { defineComponent, onMounted, Ref, ref } from 'vue'
+import { ArrowLeftOutlined } from '@vicons/antd'
+import { NButton, NFormItem, NIcon, NSelect, NSpace, NImage } from 'naive-ui'
+import { defineComponent, onMounted, Ref, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 import UseTree from '@/views/projects/workflow/definition/tree/use-tree'
 import { IChartDataItem } from '@/components/chart/modules/types'
 import { Router, useRouter } from 'vue-router'
-import { viewTree } from "@/service/modules/process-definition";
-import { SelectMixedOption } from "naive-ui/lib/select/src/interface";
+import { viewTree } from '@/service/modules/process-definition'
+import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { find } from 'lodash'
+import { ITaskTypeNodeOption, ITaskStateOption } from './types'
+
 
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
   setup() {
     const router: Router = useRouter()
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const options: Ref<Array<SelectMixedOption>> = ref([{label: '25', value: 25},
       {label: '50', value: 50},
       {label: '75', value: 75},
@@ -43,8 +45,9 @@ export default defineComponent({
     const definitionCode = ref(Number(router.currentRoute.value.params.definitionCode))
 
     const chartData: Ref<Array<IChartDataItem>> = ref([] as IChartDataItem[])
+    const taskStateMap = ref()
 
-    const taskTypeNodeOptions:any[] = [
+    const taskTypeNodeOptions:Ref<Array<ITaskTypeNodeOption>> = ref([
       { taskType: 'SHELL', color: '#646464', image: '/src/assets/images/task-icons/shell.png' },
       { taskType: 'SUB_PROCESS', color: '#4295DA', image: '/src/assets/images/task-icons/sub_process.png' },
       { taskType: 'PROCEDURE', color: '#545CC6', image: '/src/assets/images/task-icons/procedure.png'  },
@@ -62,25 +65,27 @@ export default defineComponent({
       { taskType: 'SWITCH', color: '#ff6f00', image: '/src/assets/images/task-icons/switch.png' },
       { taskType: 'SEATUNNEL', color: '#8c8c8f', image: '/src/assets/images/task-icons/seatunnel.png' },
       { taskType: 'DAG', color: '#bbdde9' }
-    ]
+    ])
 
-    const taskStateMap:any[] = [
-      {state: 'SUBMITTED_SUCCESS', value: t('project.task.submitted_success'), color: '#A9A9A9'},
-      {state: 'RUNNING_EXECUTION', value: t('project.task.running_execution'), color: '#4295DA'},
-      {state: 'READY_PAUSE', value: t('project.task.ready_pause'), color: '#50AEA3'},
-      {state: 'PAUSE', value: t('project.task.pause'), color: '#367A72'},
-      {state: 'READY_STOP', value: t('project.task.ready_stop'), color: '#E93424'},
-      {state: 'STOP', value: t('project.task.stop'), color: '#D62E20'},
-      {state: 'FAILURE', value: t('project.task.failed'), color: '#000000'},
-      {state: 'SUCCESS', value: t('project.task.success'), color: '#67C93B'},
-      {state: 'NEED_FAULT_TOLERANCE', value: t('project.task.need_fault_tolerance'), color: '#F09235'},
-      {state: 'KILL', value: t('project.task.kill'), color: '#991F14'},
-      {state: 'WAITING_THREAD', value: t('project.task.waiting_thread'), color: '#8635E4'},
-      {state: 'WAITING_DEPEND', value: t('project.task.waiting_depend'), color: '#4A0AB6'},
-      {state: 'DELAY_EXECUTION', value: t('project.task.delay_execution'), color: '#c5b4ec'},
-      {state: 'FORCED_SUCCESS', value: t('project.task.forced_success'), color: '#453463'},
-      {state: 'SERIAL_WAIT', value: t('project.task.serial_wait'), color: '#1b0446'},
-    ]
+    const initTaskStateMap = () => {
+      taskStateMap.value = [
+        {state: 'SUBMITTED_SUCCESS', value: t('project.task.submitted_success'), color: '#A9A9A9'},
+        {state: 'RUNNING_EXECUTION', value: t('project.task.running_execution'), color: '#4295DA'},
+        {state: 'READY_PAUSE', value: t('project.task.ready_pause'), color: '#50AEA3'},
+        {state: 'PAUSE', value: t('project.task.pause'), color: '#367A72'},
+        {state: 'READY_STOP', value: t('project.task.ready_stop'), color: '#E93424'},
+        {state: 'STOP', value: t('project.task.stop'), color: '#D62E20'},
+        {state: 'FAILURE', value: t('project.task.failed'), color: '#000000'},
+        {state: 'SUCCESS', value: t('project.task.success'), color: '#67C93B'},
+        {state: 'NEED_FAULT_TOLERANCE', value: t('project.task.need_fault_tolerance'), color: '#F09235'},
+        {state: 'KILL', value: t('project.task.kill'), color: '#991F14'},
+        {state: 'WAITING_THREAD', value: t('project.task.waiting_thread'), color: '#8635E4'},
+        {state: 'WAITING_DEPEND', value: t('project.task.waiting_depend'), color: '#4A0AB6'},
+        {state: 'DELAY_EXECUTION', value: t('project.task.delay_execution'), color: '#c5b4ec'},
+        {state: 'FORCED_SUCCESS', value: t('project.task.forced_success'), color: '#453463'},
+        {state: 'SERIAL_WAIT', value: t('project.task.serial_wait'), color: '#1b0446'}
+      ]
+    }
 
     const initChartData = (node: any, newNode: any) => {
       newNode.children = []
@@ -92,13 +97,13 @@ export default defineComponent({
 
       newNode.name = node.name
       newNode.value = node.name=== 'DAG'? 'DAG':node?.type
-      let taskTypeNodeOption = find(taskTypeNodeOptions, { taskType:newNode.value })
+      let taskTypeNodeOption = find(taskTypeNodeOptions.value, { taskType:newNode.value })
       if (taskTypeNodeOption) {
         newNode.itemStyle = { color: taskTypeNodeOption.color }
         if (newNode.name !== 'DAG') {
           let taskState = null
           if (node.instances && node.instances.length>0 && node.instances[0].state) {
-            taskState = find(taskStateMap, {state: node.instances[0].state})
+            taskState = find(taskStateMap.value, {state: node.instances[0].state})
           }
           newNode.label =  {
             show: true,
@@ -132,7 +137,6 @@ export default defineComponent({
         const res = await viewTree(projectCode.value, definitionCode.value, {limit: limit})
         chartData.value = [{name: 'DAG', value: 'DAG'}]
         initChartData(res, chartData.value[0])
-        console.log(chartData.value)
       }
     }
 
@@ -142,9 +146,22 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => {
+    const initData = () => {
+      initTaskStateMap()
       getWorkflowTreeData(25)
+    }
+
+
+    onMounted(() => {
+      initData()
     })
+
+    watch(
+        () => locale.value,
+        () => {
+          initData()
+        }
+    )
 
     return {
       chartData,

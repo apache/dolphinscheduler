@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {defineComponent, onMounted, PropType, ref, watch} from 'vue'
+import {defineComponent, onMounted, PropType, ref, watch, reactive} from 'vue'
 import initChart from '@/components/chart'
 import type { Ref } from 'vue'
 import {IChartDataItem} from "@/components/chart/modules/types";
@@ -40,56 +40,65 @@ const TreeChart = defineComponent({
   setup(props) {
     const treeChartRef: Ref<HTMLDivElement | null> = ref(null)
 
-    const option = {
-      tooltip: {
-        trigger: 'item',
-        backgroundColor: '#fff'
-      },
-      textStyle: {
-        fontSize: 14
-      },
-      series: [
-        {
-          type: 'tree',
-          id: 0,
-          name: 'tree1',
-          data: props.data,
-          top: '10%',
-          left: '5%',
-          bottom: '10%',
-          right: '15%',
-          symbol: 'circle',
-          symbolSize: 18,
-          edgeShape: 'polyline',
-          edgeForkPosition: '63%',
-          initialTreeDepth: 3,
-          lineStyle: {
-            width: 3
-          },
-          label: {
-            backgroundColor: '#fff',
-            position: 'left',
-            verticalAlign: 'middle',
-            align: 'right'
-          },
-          leaves: {
+    const option = reactive(
+      {
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: '#fff'
+        },
+        textStyle: {
+          fontSize: 14
+        },
+        series: [
+          {
+            type: 'tree',
+            id: 0,
+            name: 'tree1',
+            data: props.data,
+            top: '10%',
+            left: '5%',
+            bottom: '10%',
+            right: '15%',
+            symbol: 'circle',
+            symbolSize: 18,
+            edgeShape: 'polyline',
+            edgeForkPosition: '63%',
+            initialTreeDepth: 3,
+            lineStyle: {
+              width: 3
+            },
             label: {
-              position: 'right',
+              backgroundColor: '#fff',
+              position: 'left',
               verticalAlign: 'middle',
-              align: 'left'
-            }
-          },
-          emphasis: {
-            focus: 'descendant'
-          },
-          expandAndCollapse: true,
-          animationDuration: 550,
-          animationDurationUpdate: 750
-        }
-      ]
-    }
+              align: 'right'
+            },
+            leaves: {
+              label: {
+                position: 'right',
+                verticalAlign: 'middle',
+                align: 'left'
+              }
+            },
+            emphasis: {
+              focus: 'descendant'
+            },
+            expandAndCollapse: true,
+            animationDuration: 550,
+            animationDurationUpdate: 750
+          }
+        ]
+      }
+    )
 
     initChart(treeChartRef, option)
+
+    watch(
+        () => props.data,
+        () => {
+          option.series[0].data = props.data
+        }
+    )
 
     return { treeChartRef }
   },
