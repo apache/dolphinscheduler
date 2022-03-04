@@ -62,6 +62,8 @@ public class S3Utils implements Closeable, StorageOperate {
                     .standard()
                     .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
                     .withRegion(Regions.fromName(REGION)).build();
+            logger.info("s3 region is {}", s3Client.getRegionName());
+            logger.info("s3 info is {}", s3Client.toString());
         }
     }
 
@@ -83,7 +85,6 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     public static S3Utils getInstance() {
-
         return S3Singleton.INSTANCE.getInstance();
     }
 
