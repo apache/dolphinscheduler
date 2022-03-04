@@ -72,7 +72,7 @@
     methods: {
       _onChange (o) {
         // positive integer judgment
-        const r = /^\+?[1-9][0-9]*$/
+        const r = /^\+?[0-9]*$/
         if (!r.test(o)) {
           this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
         } else {
