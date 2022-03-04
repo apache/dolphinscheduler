@@ -91,7 +91,8 @@ public interface WorkFlowLineageMapper {
      *
      * @return dependent process definition
      */
-    List<WorkFlowLineage> queryDownstreamLineageByProcessDefinitionCode(@Param("code") long code);
+    List<WorkFlowLineage> queryDownstreamLineageByProcessDefinitionCode(@Param("code") long code,
+                                                                        @Param("taskType") String taskType);
 
 
     /**
@@ -99,6 +100,7 @@ public interface WorkFlowLineageMapper {
      *
      * @return task_params
      */
-    List<DependentProcessDefinition> queryUpstreamDependentParamsByProcessDefinitionCode(@Param("code") long code);
+    List<DependentProcessDefinition> queryUpstreamDependentParamsByProcessDefinitionCode(@Param("code") long code,
+                                                                                         @Param("taskType") String taskType);
 
 }

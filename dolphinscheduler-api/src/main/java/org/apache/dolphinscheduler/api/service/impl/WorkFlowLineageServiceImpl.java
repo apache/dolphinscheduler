@@ -104,7 +104,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         workFlowLineages.add(workFlowLineageMapper.queryWorkFlowLineageByCode(projectCode,sourceWorkFlowCode));
 
         List<WorkFlowLineage> downStreamWorkFlowLineages =
-                workFlowLineageMapper.queryDownstreamLineageByProcessDefinitionCode(sourceWorkFlowCode);
+                workFlowLineageMapper.queryDownstreamLineageByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
         workFlowLineages.addAll(downStreamWorkFlowLineages);
         downStreamWorkFlowLineages.forEach(workFlowLineage -> workFlowRelations.add(new WorkFlowRelation(sourceWorkFlowCode, workFlowLineage.getWorkFlowCode())));
 
@@ -117,7 +117,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     private void getUpstreamLineages(long sourceWorkFlowCode,
                                      List<WorkFlowLineage> upstreamWorkFlowLineages) {
         List<DependentProcessDefinition> workFlowDependentDefinitionList =
-                workFlowLineageMapper.queryUpstreamDependentParamsByProcessDefinitionCode(sourceWorkFlowCode);
+                workFlowLineageMapper.queryUpstreamDependentParamsByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
 
         List<Long> upstreamProcessDefinitionCodes = new ArrayList<>();
 

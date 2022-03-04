@@ -118,7 +118,7 @@
         JOIN t_ds_task_definition c ON c.code = b.pre_task_code and c.version = b.pre_task_version
         WHERE 1=1
         AND a.code = #{code}
-        AND c.task_type = 'DEPENDENT'
+        AND c.task_type = #{taskType}
         ;
     </select>
 
@@ -142,7 +142,7 @@
         <if test="code != null and code != ''">
             AND a.task_params LIKE concat('%', #{code}, '%')
         </if>
-        AND a.task_type = 'DEPENDENT'
+        AND a.task_type = #{taskType}
     </select>
 
     <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="DependentProcessDefinition">
