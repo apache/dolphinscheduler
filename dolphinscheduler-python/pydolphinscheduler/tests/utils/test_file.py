@@ -17,6 +17,7 @@
 
 """Test file utils."""
 
+import shutil
 from pathlib import Path
 
 import pytest
@@ -49,6 +50,19 @@ def test_write_content(teardown_del_file):
     file.write(content=content, to_path=file_path)
     assert Path(file_path).exists()
     assert content == get_file_content(file_path)
+
+
+def test_write_not_create_parent(teardown_del_file):
+    """Test function :func:`write` with parent not exists and do not create path."""
+    file_test_dir = Path(file_path).parent
+    if file_test_dir.exists():
+        shutil.rmtree(str(file_test_dir))
+    assert not file_test_dir.exists()
+    with pytest.raises(
+        ValueError,
+        match="Parent directory do not exists and set param `create` to `False`",
+    ):
+        file.write(content=content, to_path=file_path, create=False)
 
 
 def test_write_overwrite(setup_crt_first):

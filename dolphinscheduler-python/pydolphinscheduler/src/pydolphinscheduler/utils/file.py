@@ -31,15 +31,20 @@ def write(
 
     :param content: The source string want to write to :param:`to_path`.
     :param to_path: The path want to write content.
-    :param create: Whether create the file or not if it does not exist. If set ``True``
-      will create file with :param:`to_path` if path not exists, otherwise ``False``
-      will not create. Default ``True``.
+    :param create: Whether create the file parent directory or not if it does not exist.
+      If set ``True`` will create file with :param:`to_path` if path not exists, otherwise
+      ``False`` will not create. Default ``True``.
     :param overwrite: Whether overwrite the file or not if it exists. If set ``True``
       will overwrite the exists content, otherwise ``False`` will not overwrite it. Default ``True``.
     """
     path = Path(to_path)
-    if create and not path.parent.exists():
-        path.parent.mkdir(parents=True)
+    if not path.parent.exists():
+        if create:
+            path.parent.mkdir(parents=True)
+        else:
+            raise ValueError(
+                "Parent directory do not exists and set param `create` to `False`."
+            )
     if not path.exists():
         with path.open(mode="w") as f:
             f.write(content)
