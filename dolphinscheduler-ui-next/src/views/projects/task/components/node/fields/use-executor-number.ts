@@ -14,59 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-export const TASK_TYPES_MAP = {
-  SHELL: {
-    alias: 'SHELL'
-  },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
-  },
-  PROCEDURE: {
-    alias: 'PROCEDURE'
-  },
-  SQL: {
-    alias: 'SQL'
-  },
-  SPARK: {
-    alias: 'SPARK'
-  },
-  FLINK: {
-    alias: 'FLINK'
-  },
-  MR: {
-    alias: 'MapReduce'
-  },
-  PYTHON: {
-    alias: 'PYTHON'
-  },
-  DEPENDENT: {
-    alias: 'DEPENDENT'
-  },
-  HTTP: {
-    alias: 'HTTP'
-  },
-  DATAX: {
-    alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
-  },
-  SQOOP: {
-    alias: 'SQOOP'
-  },
-  CONDITIONS: {
-    alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY'
-  },
-  SWITCH: {
-    alias: 'SWITCH'
-  },
-  SEATUNNEL: {
-    alias: 'WATERDROP'
+export function useExecutorNumber(): IJsonItem {
+  const { t } = useI18n()
+
+  return {
+    type: 'input-number',
+    field: 'numExecutors',
+    name: t('project.node.executor_number'),
+    span: 12,
+    props: {
+      placeholder: t('project.node.executor_number_tips'),
+      min: 1
+    },
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      validator(validate: any, value: string) {
+        if (!value) {
+          return new Error(t('project.node.executor_number_tips'))
+        }
+      }
+    }
   }
 }
-
-export type TaskType = keyof typeof TASK_TYPES_MAP

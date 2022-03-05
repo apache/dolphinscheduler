@@ -348,6 +348,7 @@ export default defineComponent({
                 item.workerGroups?.includes(this.timingForm.workerGroup)
               )}
               v-model:value={this.timingForm.environmentCode}
+              clearable
             />
           </NFormItem>
           <NFormItem
@@ -358,6 +359,7 @@ export default defineComponent({
               options={this.alertGroups}
               placeholder={t('project.workflow.please_choose')}
               v-model:value={this.timingForm.warningGroupId}
+              clearable
             />
           </NFormItem>
         </NForm>

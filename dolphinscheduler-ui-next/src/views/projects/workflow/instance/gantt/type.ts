@@ -15,58 +15,25 @@
  * limitations under the License.
  */
 
-export const TASK_TYPES_MAP = {
-  SHELL: {
-    alias: 'SHELL'
-  },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
-  },
-  PROCEDURE: {
-    alias: 'PROCEDURE'
-  },
-  SQL: {
-    alias: 'SQL'
-  },
-  SPARK: {
-    alias: 'SPARK'
-  },
-  FLINK: {
-    alias: 'FLINK'
-  },
-  MR: {
-    alias: 'MapReduce'
-  },
-  PYTHON: {
-    alias: 'PYTHON'
-  },
-  DEPENDENT: {
-    alias: 'DEPENDENT'
-  },
-  HTTP: {
-    alias: 'HTTP'
-  },
-  DATAX: {
-    alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
-  },
-  SQOOP: {
-    alias: 'SQOOP'
-  },
-  CONDITIONS: {
-    alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY'
-  },
-  SWITCH: {
-    alias: 'SWITCH'
-  },
-  SEATUNNEL: {
-    alias: 'WATERDROP'
-  }
+interface ITask {
+  taskName: string
+  startDate: Array<number>
+  endDate: Array<number>
+  isoStart: string
+  isoEnd: string
+  status: string
+  duration: string
 }
 
-export type TaskType = keyof typeof TASK_TYPES_MAP
+interface IGanttRes {
+  height: number
+  taskNames: Array<number>
+  taskStatus: Object
+  tasks: Array<ITask>
+}
+
+interface ISeriesData {
+  [taskState: string]: Array<any>
+}
+
+export { ITask, IGanttRes, ISeriesData }

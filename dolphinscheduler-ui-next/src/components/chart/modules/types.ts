@@ -15,58 +15,8 @@
  * limitations under the License.
  */
 
-export const TASK_TYPES_MAP = {
-  SHELL: {
-    alias: 'SHELL'
-  },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
-  },
-  PROCEDURE: {
-    alias: 'PROCEDURE'
-  },
-  SQL: {
-    alias: 'SQL'
-  },
-  SPARK: {
-    alias: 'SPARK'
-  },
-  FLINK: {
-    alias: 'FLINK'
-  },
-  MR: {
-    alias: 'MapReduce'
-  },
-  PYTHON: {
-    alias: 'PYTHON'
-  },
-  DEPENDENT: {
-    alias: 'DEPENDENT'
-  },
-  HTTP: {
-    alias: 'HTTP'
-  },
-  DATAX: {
-    alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
-  },
-  SQOOP: {
-    alias: 'SQOOP'
-  },
-  CONDITIONS: {
-    alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY'
-  },
-  SWITCH: {
-    alias: 'SWITCH'
-  },
-  SEATUNNEL: {
-    alias: 'WATERDROP'
-  }
+export interface IChartDataItem {
+  name: string
+  value?: string | number
+  children?: IChartDataItem[]
 }
-
-export type TaskType = keyof typeof TASK_TYPES_MAP
