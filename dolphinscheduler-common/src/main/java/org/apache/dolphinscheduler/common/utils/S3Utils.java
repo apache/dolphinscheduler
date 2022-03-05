@@ -291,7 +291,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     public void checkBucketNameIfNotPresent(String bucketName) {
-        if (s3Client.doesBucketExistV2(bucketName)) {
+        if (!s3Client.doesBucketExistV2(bucketName)) {
             s3Client.createBucket(bucketName);
         }
     }
