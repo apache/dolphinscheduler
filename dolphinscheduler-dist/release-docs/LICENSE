@@ -641,7 +641,7 @@ BSD licenses
 ========================================================================
 
 The following components are provided under a BSD license. See project link for details.
-The text of each license is also included at licenses/LICENSE-[project].txt.
+The text of each license is also included at licenses/ui-next-licenses/LICENSE-[project].txt.
     qs 6.10.3: https://github.com/ljharb/qs BSD 3-Clause
     @typescript-eslint/eslint-plugin 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
     @typescript-eslint/parser 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
