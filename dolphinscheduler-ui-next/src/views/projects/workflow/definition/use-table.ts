@@ -146,7 +146,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 300,
+        width: 360,
         fixed: 'right',
         className: styles.operation,
         render: (row) =>
