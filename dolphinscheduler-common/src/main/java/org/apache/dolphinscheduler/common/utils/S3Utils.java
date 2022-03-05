@@ -63,13 +63,13 @@ public class S3Utils implements Closeable, StorageOperate {
             if (!StringUtils.isEmpty(PropertyUtils.getString(AWS_END_POINT))) {
                 s3Client = AmazonS3ClientBuilder
                         .standard()
+                        .withPathStyleAccessEnabled(true)
                         .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(PropertyUtils.getString(AWS_END_POINT), Regions.fromName(REGION).getName()))
                         .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
                         .build();
             } else {
                 s3Client = AmazonS3ClientBuilder
                         .standard()
-                        .withPathStyleAccessEnabled(true)
                         .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
                         .withRegion(Regions.fromName(REGION))
                         .build();
