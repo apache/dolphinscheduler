@@ -187,6 +187,8 @@ export default defineComponent({
     watch(
       () => props.row,
       () => {
+        if (!props.row.crontab) return
+
         timingState.timingForm.startEndTime = [
           new Date(props.row.startTime),
           new Date(props.row.endTime)
