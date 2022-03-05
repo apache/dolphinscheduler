@@ -43,6 +43,7 @@ export default defineComponent({
   name: 'TableAction',
   props,
   emits: [
+    'editWorkflow',
     'updateList',
     'startWorkflow',
     'timingWorkflow',
@@ -55,6 +56,11 @@ export default defineComponent({
     'gotoWorkflowTree'
   ],
   setup(props, ctx) {
+
+    const handleEditWorkflow = () => {
+      ctx.emit('editWorkflow')
+    }
+
     const handleStartWorkflow = () => {
       ctx.emit('startWorkflow')
     }
@@ -92,6 +98,7 @@ export default defineComponent({
     }
 
     return {
+      handleEditWorkflow,
       handleStartWorkflow,
       handleTimingWorkflow,
       handleVersionWorkflow,
@@ -120,6 +127,7 @@ export default defineComponent({
                 type='info'
                 tag='div'
                 circle
+                onClick={this.handleEditWorkflow}
                 disabled={releaseState === 'ONLINE'}
                 /* TODO: Edit workflow */
               >
