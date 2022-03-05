@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * execute task request command
  */

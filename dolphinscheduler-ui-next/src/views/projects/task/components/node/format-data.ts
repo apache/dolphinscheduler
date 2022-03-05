@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-import { find, omit } from 'lodash'
+import { find, omit, cloneDeep } from 'lodash'
 import type {
   INodeData,
   ITaskData,
   ITaskParams,
   ISqoopTargetParams,
-  ISqoopSourceParams
+  ISqoopSourceParams,
+  ILocalParam,
+  IDependTask
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -191,6 +193,89 @@ export function formatParams(data: INodeData): {
     buildRawScript(data)
   }
 
+  if (data.taskType === 'SWITCH') {
+    taskParams.switchResult = {}
+    taskParams.switchResult.dependTaskList = data.dependTaskList
+    taskParams.switchResult.nextNode = data.nextNode
+  }
+
+  if (data.taskType === 'CONDITIONS') {
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: data.dependTaskList
+    }
+  }
+
+  if (data.taskType === 'DATAX') {
+    taskParams.customConfig = data.customConfig
+    if (taskParams.customConfig === 0) {
+      taskParams.dsType = data.dsType
+      taskParams.dataSource = data.dataSource
+      taskParams.dtType = data.dtType
+      taskParams.dataTarget = data.dataTarget
+      taskParams.sql = data.sql
+      taskParams.targetTable = data.targetTable
+      taskParams.jobSpeedByte = data.jobSpeedByte
+      taskParams.jobSpeedRecord = data.jobSpeedRecord
+      taskParams.preStatements = data.preStatements
+      taskParams.postStatements = data.postStatements
+    } else {
+      taskParams.json = data.json
+      data?.localParams?.map((param: ILocalParam) => {
+        param.direct = 'IN'
+        param.type = 'VARCHAR'
+      })
+    }
+    taskParams.xms = data.xms
+    taskParams.xmx = data.xmx
+  }
+  if (data.taskType === 'DEPENDENT') {
+    const dependTaskList = cloneDeep(data.dependTaskList)?.map(
+      (taskItem: IDependTask) => {
+        if (taskItem.dependItemList?.length) {
+          taskItem.dependItemList.forEach((dependItem) => {
+            delete dependItem.definitionCodeOptions
+            delete dependItem.depTaskCodeOptions
+            delete dependItem.dateOptions
+          })
+        }
+        return taskItem
+      }
+    )
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: dependTaskList
+    }
+  }
+  if (data.taskType === 'DATA_QUALITY') {
+    taskParams.ruleId = data.ruleId
+    taskParams.ruleInputParameter = {
+      check_type: data.check_type,
+      comparison_execute_sql: data.comparison_execute_sql,
+      comparison_name: data.comparison_name,
+      failure_strategy: data.failure_strategy,
+      operator: data.operator,
+      src_connector_type: data.src_connector_type,
+      src_datasource_id: data.src_datasource_id,
+      src_table: data.src_table,
+      statistics_execute_sql: data.statistics_execute_sql,
+      statistics_name: data.statistics_name,
+      target_connector_type: data.target_connector_type,
+      target_datasource_id: data.target_datasource_id,
+      target_table: data.target_table,
+      threshold: data.threshold
+    }
+    taskParams.sparkParameters = {
+      deployMode: data.deployMode,
+      driverCores: data.driverCores,
+      driverMemory: data.driverMemory,
+      executorCores: data.executorCores,
+      executorMemory: data.executorMemory,
+      numExecutors: data.numExecutors,
+      others: data.others
+    }
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -325,6 +410,43 @@ export function formatModel(data: ITaskData) {
     params.rawScript = data.taskParams?.rawScript
   }
 
+  if (data.taskParams?.switchResult) {
+    params.switchResult = data.taskParams.switchResult
+    params.dependTaskList = data.taskParams.switchResult?.dependTaskList
+      ? data.taskParams.switchResult?.dependTaskList
+      : []
+    params.nextNode = data.taskParams.switchResult?.nextNode
+  }
+
+  if (data.taskParams?.dependence) {
+    params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
+    params.relation = data.taskParams?.dependence.relation
+  }
+  if (data.taskParams?.ruleInputParameter) {
+    params.check_type = data.check_type
+    params.comparison_execute_sql = data.comparison_execute_sql
+    params.comparison_name = data.comparison_name
+    params.failure_strategy = data.failure_strategy
+    params.operator = data.operator
+    params.src_connector_type = data.src_connector_type
+    params.src_datasource_id = data.src_datasource_id
+    params.src_table = data.src_table
+    params.statistics_execute_sql = data.statistics_execute_sql
+    params.statistics_name = data.statistics_name
+    params.target_connector_type = data.target_connector_type
+    params.target_datasource_id = data.target_datasource_id
+    params.target_table = data.target_table
+    params.threshold = data.threshold
+  }
+  if (data.taskParams?.sparkParameters) {
+    params.deployMode = data.deployMode
+    params.driverCores = data.driverCores
+    params.driverMemory = data.driverMemory
+    params.executorCores = data.executorCores
+    params.executorMemory = data.executorMemory
+    params.numExecutors = data.numExecutors
+    params.others = data.others
+  }
   return params
 }
 
@@ -335,7 +457,7 @@ const buildRawScript = (model: INodeData) => {
   let master = model.master
   let masterUrl = model?.masterUrl ? model?.masterUrl : ''
   let deployMode = model.deployMode
-  let queue = model.queue
+  const queue = model.queue
 
   if (model.deployMode === 'local') {
     master = 'local'
@@ -354,7 +476,7 @@ const buildRawScript = (model: INodeData) => {
 
   let rawScript = ''
   model.resourceList?.forEach((id: number) => {
-    let item = find(model.resourceFiles, { id: id })
+    const item = find(model.resourceFiles, { id: id })
 
     rawScript =
       rawScript +

@@ -17,13 +17,21 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type { IFormItem, IJsonItem } from '@/components/form/types'
+
 import type { TaskType } from '@/views/projects/task/constants/task-type'
 import type { IDataBase } from '@/service/modules/data-source/types'
+import type {
+  IFormItem,
+  IJsonItem,
+  FormRules,
+  IJsonItemParams
+} from '@/components/form/types'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
+type RelationType = 'AND' | 'OR'
+type ITaskType = TaskType
 
 interface IOption {
   label: string
@@ -45,6 +53,35 @@ interface ILocalParam {
   direct?: string
   type?: string
   value?: string
+}
+
+interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
+  type: 'input' | 'select' | 'radio' | 'group'
+  emit: 'change'[]
+}
+
+interface IDependpendItem {
+  depTaskCode?: number
+  status?: 'SUCCESS' | 'FAILURE'
+  definitionCodeOptions?: IOption[]
+  depTaskCodeOptions?: IOption[]
+  dateOptions?: IOption[]
+  projectCode?: number
+  definitionCode?: number
+  cycle?: 'month' | 'week' | 'day' | 'hour'
+  dateValue?: string
+}
+
+interface IDependTask {
+  condition?: string
+  nextNode?: number
+  relation?: RelationType
+  dependItemList?: IDependpendItem[]
+}
+
+interface ISwitchResult {
+  dependTaskList?: IDependTask[]
+  nextNode?: number
 }
 
 interface ISourceItem {
@@ -135,6 +172,32 @@ interface ISqoopSourceParams {
   hivePartitionKey?: string
   hivePartitionValue?: string
 }
+interface ISparkParameters {
+  deployMode?: string
+  driverCores?: number
+  driverMemory?: string
+  executorCores?: number
+  executorMemory?: string
+  numExecutors?: number
+  others?: string
+}
+
+interface IRuleParameters {
+  check_type?: string
+  comparison_execute_sql?: string
+  comparison_name?: string
+  failure_strategy?: string
+  operator?: string
+  src_connector_type?: number
+  src_datasource_id?: number
+  src_table?: string
+  statistics_execute_sql?: string
+  statistics_name?: string
+  target_connector_type?: number
+  target_datasource_id?: number
+  target_table?: string
+  threshold?: string
+}
 
 interface ITaskParams {
   resourceList?: ISourceItem[]
@@ -186,17 +249,42 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  switchResult?: ISwitchResult
+  dependTaskList?: IDependTask[]
+  nextNode?: number
+  dependence?: {
+    relation?: RelationType
+    dependTaskList?: IDependTask[]
+  }
+  customConfig?: number
+  json?: string
+  dsType?: string
+  dataSource?: number
+  dtType?: string
+  dataTarget?: number
+  targetTable?: string
+  jobSpeedByte?: number
+  jobSpeedRecord?: number
+  xms?: number
+  xmx?: number
+  sparkParameters?: ISparkParameters
+  ruleId?: number
+  ruleInputParameter?: IRuleParameters
 }
-
-type ITaskType = TaskType
 
 interface INodeData
   extends Omit<
       ITaskParams,
-      'resourceList' | 'mainJar' | 'targetParams' | 'sourceParams'
+      | 'resourceList'
+      | 'mainJar'
+      | 'targetParams'
+      | 'sourceParams'
+      | 'dependence'
+      | 'sparkParameters'
     >,
     ISqoopTargetData,
-    ISqoopSourceData {
+    ISqoopSourceData,
+    IRuleParameters {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -215,7 +303,7 @@ interface INodeData
   workerGroup?: string
   code?: number
   name?: string
-  preTasks?: []
+  preTasks?: number[]
   preTaskOptions?: []
   postTaskOptions?: []
   resourceList?: number[]
@@ -225,6 +313,7 @@ interface INodeData
   method?: string
   masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
+  relation?: RelationType
 }
 
 interface ITaskData
@@ -234,7 +323,7 @@ interface ITaskData
   > {
   name?: string
   taskPriority?: string
-  timeoutFlag: 'OPEN' | 'CLOSE'
+  timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
 }
@@ -246,8 +335,6 @@ export {
   ITaskType,
   ITaskData,
   INodeData,
-  IFormItem,
-  IJsonItem,
   ITaskParams,
   IOption,
   IDataBase,
@@ -255,5 +342,12 @@ export {
   ModelType,
   SourceType,
   ISqoopSourceParams,
-  ISqoopTargetParams
+  ISqoopTargetParams,
+  IDependTask,
+  IDependpendItem,
+  IFormItem,
+  IJsonItem,
+  FormRules,
+  IJsonItemParams,
+  IResponseJsonItem
 }

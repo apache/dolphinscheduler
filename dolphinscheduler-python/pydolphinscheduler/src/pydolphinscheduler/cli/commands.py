@@ -21,6 +21,11 @@ import click
 from click import echo
 
 from pydolphinscheduler import __version__
+from pydolphinscheduler.core.configuration import (
+    get_single_config,
+    init_config_file,
+    set_single_config,
+)
 
 version_option_val = ["major", "minor", "micro"]
 
@@ -46,3 +51,42 @@ def version(part: str) -> None:
         echo(f"{__version__.split('.')[idx]}")
     else:
         echo(f"{__version__}")
+
+
+@cli.command()
+@click.option(
+    "--init",
+    "-i",
+    is_flag=True,
+    help="Initialize and create configuration file to `PYDOLPHINSCHEDULER_HOME`.",
+)
+@click.option(
+    "--set",
+    "-s",
+    "setter",
+    multiple=True,
+    type=click.Tuple([str, str]),
+    help="Set specific setting to config file."
+    "Use multiple ``--set <KEY> <VAL>`` options to set multiple configs",
+)
+@click.option(
+    "--get",
+    "-g",
+    "getter",
+    multiple=True,
+    type=str,
+    help="Get specific setting from config file."
+    "Use multiple ``--get <KEY>`` options to get multiple configs",
+)
+def config(getter, setter, init) -> None:
+    """Manage the configuration for pydolphinscheduler."""
+    if init:
+        init_config_file()
+    elif getter:
+        click.echo("The configuration query as below:\n")
+        configs_kv = [f"{key} = {get_single_config(key)}" for key in getter]
+        click.echo("\n".join(configs_kv))
+    elif setter:
+        for key, val in setter:
+            set_single_config(key, val)
+        click.echo("Set configuration done.")

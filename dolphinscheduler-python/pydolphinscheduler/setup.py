@@ -16,23 +16,35 @@
 # under the License.
 
 """The script for setting up pydolphinscheduler."""
-
+import logging
+import os
 import sys
+from distutils.dir_util import remove_tree
 from os.path import dirname, join
+from typing import List
 
-from setuptools import find_packages, setup
+from setuptools import Command, find_packages, setup
 
 if sys.version_info[0] < 3:
     raise Exception(
         "pydolphinscheduler does not support Python 2. Please upgrade to Python 3."
     )
 
-version = "0.1.0"
+logger = logging.getLogger(__name__)
+
+version = "2.0.4"
 
 # Start package required
 prod = [
     "click>=8.0.0",
     "py4j~=0.10",
+    "pyyaml",
+]
+
+build = [
+    "build",
+    "setuptools>=42",
+    "wheel",
 ]
 
 doc = [
@@ -54,7 +66,7 @@ style = [
     "isort>=5.10",
 ]
 
-dev = style + test + doc
+dev = style + test + doc + build
 
 all_dep = prod + dev
 # End package required
@@ -65,6 +77,39 @@ def read(*names, **kwargs):
     return open(
         join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
     ).read()
+
+
+class CleanCommand(Command):
+    """Command to clean up python api before setup by running `python setup.py pre_clean`."""
+
+    description = "Clean up project root"
+    user_options: List[str] = []
+    clean_list = [
+        "build",
+        "htmlcov",
+        "dist",
+        ".pytest_cache",
+        ".coverage",
+    ]
+
+    def initialize_options(self) -> None:
+        """Set default values for options."""
+        pass
+
+    def finalize_options(self) -> None:
+        """Set final values for options."""
+        pass
+
+    def run(self) -> None:
+        """Run and remove temporary files."""
+        for cl in self.clean_list:
+            if not os.path.exists(cl):
+                logger.info("Path %s do not exists.", cl)
+            elif os.path.isdir(cl):
+                remove_tree(cl)
+            else:
+                os.remove(cl)
+        logger.info("Finish pre_clean process.")
 
 
 setup(
@@ -88,8 +133,10 @@ setup(
     project_urls={
         "Homepage": "https://dolphinscheduler.apache.org",
         "Documentation": "https://dolphinscheduler.apache.org/python/index.html",
-        "Source": "https://github.com/apache/dolphinscheduler/dolphinscheduler-python/pydolphinscheduler",
-        "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues",
+        "Source": "https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/"
+        "pydolphinscheduler",
+        "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues?"
+        "q=is%3Aissue+is%3Aopen+label%3APython",
         "Discussion": "https://github.com/apache/dolphinscheduler/discussions",
         "Twitter": "https://twitter.com/dolphinschedule",
     },
@@ -126,6 +173,10 @@ setup(
         "style": style,
         "test": test,
         "doc": doc,
+        "build": build,
+    },
+    cmdclass={
+        "pre_clean": CleanCommand,
     },
     entry_points={
         "console_scripts": [

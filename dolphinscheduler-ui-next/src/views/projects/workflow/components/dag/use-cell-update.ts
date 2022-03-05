@@ -60,13 +60,13 @@ export function useCellUpdate(options: Options) {
     id: string,
     type: string,
     name: string,
+    flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
   ) {
     if (!TASK_TYPES_MAP[type as TaskType]) {
-      console.warn(`taskType:${type} is invalid!`)
       return
     }
-    const node = buildNode(id, type, name, coordinate)
+    const node = buildNode(id, type, name, flag, coordinate)
     graph.value?.addNode(node)
   }
 

@@ -44,3 +44,9 @@ class PyDSJavaGatewayException(PyDSBaseException):
 
 class PyDSProcessDefinitionNotAssignException(PyDSBaseException):
     """Exception for pydolphinscheduler process definition not assign error."""
+
+
+class PyDSConfException(PyDSBaseException):
+    """Exception for pydolphinscheduler configuration error."""
+
+    pass

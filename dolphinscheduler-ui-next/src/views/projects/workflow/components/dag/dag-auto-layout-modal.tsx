@@ -55,7 +55,7 @@ const props = {
 export default defineComponent({
   name: 'dag-format-modal',
   props,
-  setup(props, context) {
+  setup(props, unusedContext) {
     const { t } = useI18n()
     const { formValue, formRef, submit, cancel } = props
 

@@ -20,15 +20,17 @@ import {
   PropType,
   ref,
   reactive,
-  toRefs,
   watch,
-  nextTick
+  nextTick,
+  provide,
+  computed
 } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { omit } from 'lodash'
 import Modal from '@/components/modal'
 import Detail from './detail'
 import { formatModel } from './format-data'
-import type { ITaskData } from './types'
+import type { ITaskData, ITaskType } from './types'
 
 const props = {
   show: {
@@ -59,17 +61,17 @@ const NodeDetailModal = defineComponent({
   emits: ['cancel', 'submit'],
   setup(props, { emit }) {
     const { t } = useI18n()
+    const detailRef = ref()
     const state = reactive({
       saving: false,
-      detailRef: ref(),
       linkEventShowRef: ref(),
       linkEventTextRef: ref(),
       linkUrlRef: ref()
     })
 
     const onConfirm = async () => {
-      await state.detailRef.form.validate()
-      emit('submit', { data: state.detailRef.form.getValues() })
+      await detailRef.value.value.validate()
+      emit('submit', { data: detailRef.value.value.getValues() })
     }
     const onCancel = () => {
       emit('cancel')
@@ -85,54 +87,45 @@ const NodeDetailModal = defineComponent({
       state.linkUrlRef = url
     }
 
+    const onTaskTypeChange = (taskType: ITaskType) => {
+      props.data.taskType = taskType
+    }
+
+    provide(
+      'data',
+      computed(() => ({
+        projectCode: props.projectCode,
+        data: props.data,
+        from: props.from,
+        readonly: props.readonly
+      }))
+    )
+
     watch(
       () => props.data,
       async () => {
+        if (!props.show) return
         await nextTick()
-        state.detailRef.form.setValues(formatModel(props.data))
+        detailRef.value.value.setValues(formatModel(props.data))
       }
     )
 
-    return {
-      t,
-      ...toRefs(state),
-      getLinkEventText,
-      onConfirm,
-      onCancel,
-      onJumpLink
-    }
-  },
-  render() {
-    const {
-      t,
-      show,
-      onConfirm,
-      onCancel,
-      projectCode,
-      data,
-      readonly,
-      from,
-      onJumpLink
-    } = this
-    return (
+    return () => (
       <Modal
-        show={show}
+        show={props.show}
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
         confirmLoading={false}
-        confirmDisabled={readonly}
+        confirmDisabled={props.readonly}
         onCancel={onCancel}
-        linkEventShow={this.linkEventShowRef}
-        linkEventText={this.linkEventTextRef}
+        linkEventShow={state.linkEventShowRef}
+        linkEventText={state.linkEventTextRef}
         onJumpLink={onJumpLink}
       >
         <Detail
-          ref='detailRef'
-          data={data}
-          projectCode={projectCode}
-          readonly={readonly}
-          from={from}
-          onLinkEventText={this.getLinkEventText}
+          ref={detailRef}
+          onTaskTypeChange={onTaskTypeChange}
+          key={props.data.taskType}
         />
       </Modal>
     )

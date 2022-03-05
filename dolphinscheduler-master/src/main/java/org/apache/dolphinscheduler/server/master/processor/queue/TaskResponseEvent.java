@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;

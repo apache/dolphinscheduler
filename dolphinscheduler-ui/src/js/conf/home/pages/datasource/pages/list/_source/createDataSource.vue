@@ -279,6 +279,10 @@
           {
             value: 'PRESTO',
             label: 'PRESTO'
+          },
+          {
+            value: 'REDSHIFT',
+            label: 'REDSHIFT'
           }
         ]
       }
@@ -489,6 +493,9 @@
             break
           case 'PRESTO':
             defaultPort = '8080'
+            break
+          case 'REDSHIFT':
+            defaultPort = '5439'
             break
           default:
             break
