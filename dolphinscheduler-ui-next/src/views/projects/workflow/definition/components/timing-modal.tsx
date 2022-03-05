@@ -188,8 +188,8 @@ export default defineComponent({
       () => props.row,
       () => {
         timingState.timingForm.startEndTime = [
-          new Date(props.row.startTime),
-          new Date(props.row.endTime)
+          props.row.startTime? new Date(props.row.startTime) : new Date(),
+          props.row.endTime? new Date(props.row.endTime) : new Date()
         ]
         timingState.timingForm.crontab = props.row.crontab
         timingState.timingForm.timezoneId = props.row.timezoneId
