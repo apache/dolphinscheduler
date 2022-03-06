@@ -74,6 +74,7 @@ public class S3Utils implements Closeable, StorageOperate {
                         .withRegion(Regions.fromName(REGION))
                         .build();
             }
+            logger.info("s3client is null :{}", null == s3Client);
             checkBucketNameIfNotPresent(BUCKET_NAME);
         }
     }
@@ -292,6 +293,7 @@ public class S3Utils implements Closeable, StorageOperate {
 
     public void checkBucketNameIfNotPresent(String bucketName) {
         if (!s3Client.doesBucketExistV2(bucketName)) {
+            logger.info(s3Client.getRegionName());
             s3Client.createBucket(bucketName);
         }
     }
