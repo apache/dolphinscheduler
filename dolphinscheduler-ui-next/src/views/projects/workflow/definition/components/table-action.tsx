@@ -56,7 +56,6 @@ export default defineComponent({
     'gotoWorkflowTree'
   ],
   setup(props, ctx) {
-
     const handleEditWorkflow = () => {
       ctx.emit('editWorkflow')
     }
@@ -178,7 +177,10 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => releaseState === 'ONLINE'? t('project.workflow.down_line'):t('project.workflow.up_line'),
+            default: () =>
+              releaseState === 'ONLINE'
+                ? t('project.workflow.down_line')
+                : t('project.workflow.up_line'),
             trigger: () => (
               <NButton
                 size='small'
