@@ -19,14 +19,28 @@ package org.apache.dolphinscheduler;
 
 import org.apache.curator.test.TestingServer;
 
+import java.util.TimeZone;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class StandaloneServer {
+
+    @Value("${spring.jackson.time-zone:UTC}")
+    private String timezone;
+
     public static void main(String[] args) throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
         SpringApplication.run(StandaloneServer.class, args);
+    }
+
+    @PostConstruct
+    public void run() {
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
     }
 }

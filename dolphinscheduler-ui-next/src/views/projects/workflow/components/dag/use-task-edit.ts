@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
 import type { Coordinate, NodeData } from './types'
 import { TaskType } from '@/views/projects/task/constants/task-type'
+import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
+import { WorkflowDefinition } from './types'
 
 interface Options {
   graph: Ref<Graph | undefined>
+  definition: Ref<WorkflowDefinition | undefined>
 }
 
 /**
@@ -32,11 +35,12 @@ interface Options {
  * @returns
  */
 export function useTaskEdit(options: Options) {
-  const { graph } = options
-
+  const { graph, definition } = options
   const { addNode, setNodeName } = useCellUpdate({ graph })
 
-  const taskDefinitions = ref<NodeData[]>([])
+  const taskDefinitions = ref<NodeData[]>(
+    definition.value?.taskDefinitionList || []
+  )
   const currTask = ref<NodeData>({
     taskType: 'SHELL',
     code: 0,
@@ -48,7 +52,7 @@ export function useTaskEdit(options: Options) {
    * Append a new task
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
-    addNode(code + '', type, '', coordinate)
+    addNode(code + '', type, '', 'YES', coordinate)
     taskDefinitions.value.push({
       code,
       taskType: type,
@@ -57,8 +61,53 @@ export function useTaskEdit(options: Options) {
     openTaskModal({ code, taskType: type, name: '' })
   }
 
+  /**
+   * Copy a task
+   */
+  function copyTask(
+    name: string,
+    code: number,
+    targetCode: number,
+    type: TaskType,
+    flag: string,
+    coordinate: Coordinate
+  ) {
+    addNode(code + '', type, name, flag, coordinate)
+    const definition = taskDefinitions.value.find((t) => t.code === targetCode)
+
+    const newDefinition = {
+      ...definition,
+      code,
+      name
+    } as NodeData
+
+    taskDefinitions.value.push(newDefinition)
+  }
+
+  /**
+   * Remove task
+   * @param {number} code
+   */
+  function removeTasks(codes: number[]) {
+    taskDefinitions.value = taskDefinitions.value.filter(
+      (task) => !codes.includes(task.code)
+    )
+  }
+
   function openTaskModal(task: NodeData) {
     currTask.value = task
+    taskModalVisible.value = true
+  }
+
+  /**
+   * Edit task
+   * @param {number} code
+   */
+  function editTask(code: number) {
+    const definition = taskDefinitions.value.find((t) => t.code === code)
+    if (definition) {
+      currTask.value = definition
+    }
     taskModalVisible.value = true
   }
 
@@ -67,25 +116,21 @@ export function useTaskEdit(options: Options) {
    * @param formRef
    * @param from
    */
-  function taskConfirm({ formRef, form }: any) {
-    formRef.validate((errors: any) => {
-      if (!errors) {
-        // override target config
-        taskDefinitions.value = taskDefinitions.value.map((task) => {
-          if (task.code === currTask.value?.code) {
-            setNodeName(task.code + '', form.name)
-            console.log(form)
-            console.log(JSON.stringify(form))
-            return {
-              code: task.code,
-              ...form
-            }
-          }
-          return task
-        })
-        taskModalVisible.value = false
+  function taskConfirm({ data }: any) {
+    const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
+    // override target config
+    taskDefinitions.value = taskDefinitions.value.map((task) => {
+      if (task.code === currTask.value?.code) {
+        setNodeName(task.code + '', taskDef.name)
+        return {
+          ...taskDef,
+          code: task.code,
+          taskType: currTask.value.taskType
+        }
       }
+      return task
     })
+    taskModalVisible.value = false
   }
 
   /**
@@ -99,13 +144,13 @@ export function useTaskEdit(options: Options) {
     if (graph.value) {
       graph.value.on('cell:dblclick', ({ cell }) => {
         const code = Number(cell.id)
-        const definition = taskDefinitions.value.find((t) => t.code === code)
-        if (definition) {
-          currTask.value = definition
-        }
-        taskModalVisible.value = true
+        editTask(code)
       })
     }
+  })
+
+  watch(definition, () => {
+    taskDefinitions.value = definition.value?.taskDefinitionList || []
   })
 
   return {
@@ -114,6 +159,9 @@ export function useTaskEdit(options: Options) {
     taskConfirm,
     taskCancel,
     appendTask,
-    taskDefinitions
+    editTask,
+    copyTask,
+    taskDefinitions,
+    removeTasks
   }
 }

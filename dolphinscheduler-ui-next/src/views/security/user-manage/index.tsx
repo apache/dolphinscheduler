@@ -45,9 +45,9 @@ const UsersManage = defineComponent({
     const { t } = useI18n()
     const { show, mode, user } = useSharedUserModalState()
     const tableState = useTable({
-      onEdit: (u) => {
+      onEdit: (u, m: Mode) => {
         show.value = true
-        mode.value = 'edit'
+        mode.value = m
         user.value = u
       },
       onDelete: (u) => {
@@ -58,10 +58,10 @@ const UsersManage = defineComponent({
     })
 
     const onSuccess = (mode: Mode) => {
-      if (mode === 'add') {
-        tableState.resetPage()
+      if (!mode.startsWith('auth')) {
+        mode === 'add' && tableState.resetPage()
+        tableState.getUserList()
       }
-      tableState.getUserList()
     }
 
     const onAddUser = () => {
@@ -86,7 +86,11 @@ const UsersManage = defineComponent({
           <NGridItem>
             <NCard>
               <NSpace justify='space-between'>
-                <NButton onClick={this.onAddUser} type='primary'>
+                <NButton
+                  onClick={this.onAddUser}
+                  type='primary'
+                  class='btn-create-user'
+                >
                   {t('security.user.create_user')}
                 </NButton>
                 <NInputGroup>
@@ -112,10 +116,11 @@ const UsersManage = defineComponent({
           <NGridItem>
             <NCard>
               {userListLoading ? (
-                <NSkeleton text repeat={6}></NSkeleton>
+                <NSkeleton text repeat={6} />
               ) : (
                 <NSpace v-show={!userListLoading} vertical size={20}>
                   <NDataTable
+                    row-class-name='items'
                     columns={this.columns}
                     data={this.userList}
                     scrollX={this.scrollX}

@@ -87,9 +87,11 @@ export function useModal(
   }
 
   const updateK8SNamespaceModal = () => {
-    updateK8sNamespace(variables.model, variables.model.id).then((res: any) => {
-      ctx.emit('confirmModal', props.showModalRef)
-    })
+    updateK8sNamespace(variables.model, variables.model.id).then(
+      (ignored: any) => {
+        ctx.emit('confirmModal', props.showModalRef)
+      }
+    )
   }
 
   return {

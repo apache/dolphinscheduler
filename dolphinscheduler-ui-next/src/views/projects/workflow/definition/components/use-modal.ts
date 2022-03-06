@@ -31,6 +31,7 @@ import {
   updateSchedule,
   previewSchedule
 } from '@/service/modules/schedules'
+import { parseTime } from '@/utils/common'
 
 export function useModal(
   state: any,
@@ -148,11 +149,11 @@ export function useModal(
 
   const getTimingData = () => {
     const start = format(
-      new Date(state.timingForm.startEndTime[0]),
+      parseTime(state.timingForm.startEndTime[0]),
       'yyyy-MM-dd hh:mm:ss'
     )
     const end = format(
-      new Date(state.timingForm.startEndTime[1]),
+      parseTime(state.timingForm.startEndTime[1]),
       'yyyy-MM-dd hh:mm:ss'
     )
 

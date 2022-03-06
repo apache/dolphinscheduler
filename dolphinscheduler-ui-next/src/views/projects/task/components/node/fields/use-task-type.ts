@@ -24,10 +24,12 @@ export function useTaskType(
   readonly?: boolean
 ): IJsonItem {
   const { t } = useI18n()
+  const disabledTaskType = ['CONDITIONS', 'SWITCH']
 
   const options = Object.keys(TASK_TYPES_MAP).map((option: string) => ({
     label: option,
-    value: option
+    value: option,
+    disabled: disabledTaskType.includes(option)
   }))
   return {
     type: 'select',
@@ -43,6 +45,6 @@ export function useTaskType(
       required: true,
       message: t('project.node.task_type_tips')
     },
-    value: 'SHELL'
+    value: model.taskType ? model.taskType : 'SHELL'
   }
 }

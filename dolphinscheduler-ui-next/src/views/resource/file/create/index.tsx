@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, toRefs } from 'vue'
+import { defineComponent, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { NForm, NFormItem, NInput, NSelect, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -97,7 +97,6 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.file_content')} path='content'>
             <div
-              class={styles.cont}
               style={{
                 width: '90%'
               }}

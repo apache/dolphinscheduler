@@ -42,7 +42,7 @@ export function useTable() {
 
   const columns: TableColumns<any> = [
     {
-      title: t('project.workflow.id'),
+      title: '#',
       key: 'id',
       width: 50,
       render: (_row, index) => index + 1
@@ -105,7 +105,7 @@ export function useTable() {
               {
                 circle: true,
                 type: 'info',
-                size: 'tiny',
+                size: 'small',
                 disabled: row.releaseState === 'ONLINE',
                 onClick: () => {
                   handleEdit(row)
@@ -120,7 +120,7 @@ export function useTable() {
               {
                 circle: true,
                 type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
-                size: 'tiny',
+                size: 'small',
                 onClick: () => {
                   handleReleaseState(row)
                 }
@@ -153,7 +153,7 @@ export function useTable() {
                           {
                             circle: true,
                             type: 'error',
-                            size: 'tiny'
+                            size: 'small'
                           },
                           {
                             icon: () => h(DeleteOutlined)

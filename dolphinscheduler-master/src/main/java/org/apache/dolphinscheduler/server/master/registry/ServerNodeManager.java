@@ -363,7 +363,6 @@ public class ServerNodeManager implements InitializingBean {
     private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
         workerGroupLock.lock();
         try {
-            workerGroup = workerGroup.toLowerCase();
             Set<String> workerNodes = workerGroupNodes.getOrDefault(workerGroup, new HashSet<>());
             workerNodes.clear();
             workerNodes.addAll(nodes);
@@ -389,7 +388,6 @@ public class ServerNodeManager implements InitializingBean {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
-            workerGroup = workerGroup.toLowerCase();
             Set<String> nodes = workerGroupNodes.get(workerGroup);
             if (CollectionUtils.isNotEmpty(nodes)) {
                 return Collections.unmodifiableSet(nodes);

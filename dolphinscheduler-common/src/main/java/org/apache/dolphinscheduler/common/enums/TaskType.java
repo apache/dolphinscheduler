@@ -41,7 +41,8 @@ public enum TaskType {
      * 14 SWITCH
      * 15 PIGEON
      * 16 DATA_QUALITY
-     * 17 BLOCKING
+     * 17 EMR
+     * 18 BLOCKING
      */
     SHELL(0, "SHELL"),
     SQL(1, "SQL"),
@@ -60,7 +61,9 @@ public enum TaskType {
     SWITCH(14, "SWITCH"),
     PIGEON(15, "PIGEON"),
     DATA_QUALITY(16, "DATA_QUALITY"),
-    BLOCKING(17, "BLOCKING");
+    EMR(17, "EMR"),
+    BLOCKING(18, "BLOCKING");
+    ;
 
     TaskType(int code, String desc) {
         this.code = code;

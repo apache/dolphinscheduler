@@ -16,13 +16,14 @@
  */
 
 import { ref, watch, onBeforeMount, computed } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon, NTag } from 'naive-ui'
-import { EditOutlined, DeleteOutlined } from '@vicons/antd'
+import { NSpace, NTooltip, NButton, NIcon, NTag, NDropdown } from 'naive-ui'
+import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
 import { queryUserList } from '@/service/modules/users'
 import { useI18n } from 'vue-i18n'
+import { Mode } from './components/use-modal'
 
 type UseTableProps = {
-  onEdit: (user: any) => void
+  onEdit: (user: any, mode: Mode) => void
   onDelete: (user: any) => void
 }
 
@@ -31,14 +32,15 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
   const columns = computed(() =>
     [
       {
-        title: t('security.user.index'),
+        title: '#',
         key: 'index',
         width: 80,
         render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
         title: t('security.user.username'),
-        key: 'userName'
+        key: 'userName',
+        className: 'name'
       },
       {
         title: t('security.user.tenant_code'),
@@ -59,7 +61,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
       {
         title: t('security.user.state'),
         key: 'state',
-        render: (rowData: any, rowIndex: number) => {
+        render: (rowData: any, unused: number) => {
           return rowData.state === 1 ? (
             <NTag type='success'>{t('security.user.state_enabled')}</NTag>
           ) : (
@@ -81,10 +83,47 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
         title: t('security.user.operation'),
         key: 'operation',
         fixed: 'right',
-        width: 120,
-        render: (rowData: any, rowIndex: number) => {
+        width: 140,
+        render: (rowData: any, unused: number) => {
           return (
             <NSpace>
+              <NDropdown
+                trigger='click'
+                options={[
+                  { label: t('security.user.project'), key: 'auth_project' },
+                  { label: t('security.user.resource'), key: 'auth_resource' },
+                  {
+                    label: t('security.user.datasource'),
+                    key: 'auth_datasource'
+                  },
+                  { label: t('security.user.udf'), key: 'auth_udf' }
+                ]}
+                onSelect={(key) => {
+                  onEdit(rowData, key)
+                }}
+              >
+                <NTooltip trigger='hover'>
+                  {{
+                    trigger: () => (
+                      <NButton
+                        circle
+                        type='warning'
+                        size='small'
+                        class='authorize'
+                      >
+                        {{
+                          icon: () => (
+                            <NIcon>
+                              <UserOutlined />
+                            </NIcon>
+                          )
+                        }}
+                      </NButton>
+                    ),
+                    default: () => t('security.user.authorize')
+                  }}
+                </NTooltip>
+              </NDropdown>
               <NTooltip trigger='hover'>
                 {{
                   trigger: () => (
@@ -92,8 +131,9 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
                       circle
                       type='info'
                       size='small'
+                      class='edit'
                       onClick={() => {
-                        onEdit(rowData)
+                        onEdit(rowData, 'edit')
                       }}
                     >
                       {{
@@ -115,6 +155,7 @@ function useColumns({ onEdit, onDelete }: UseTableProps) {
                       circle
                       type='error'
                       size='small'
+                      class='delete'
                       onClick={() => {
                         onDelete(rowData)
                       }}

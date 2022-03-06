@@ -14,25 +14,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { useShell } from './tasks/use-shell'
-import { IJsonItem, ITaskType, INodeData } from './types'
+import { ref, Ref, watch } from 'vue'
+import nodes from './tasks'
+import getElementByJson from '@/components/form/get-elements-by-json'
+import { IFormItem, IJsonItem, INodeData, ITaskData, FormRules } from './types'
 
 export function useTask({
-  taskType = 'SHELL',
+  data,
   projectCode,
   from,
   readonly
 }: {
-  taskType?: ITaskType
+  data: ITaskData
+  projectCode: number
   from?: number
-  projectCode?: number
   readonly?: boolean
-}): { json: IJsonItem[]; model: INodeData } {
-  console.log(taskType, 'taskType')
-  let node = {} as { json: IJsonItem[]; model: INodeData }
-  if (taskType === 'SHELL' && projectCode) {
-    node = useShell({ projectCode, from, readonly })
+}): {
+  elementsRef: Ref<IFormItem[]>
+  rulesRef: Ref<FormRules>
+  model: INodeData
+} {
+  const jsonRef = ref([]) as Ref<IJsonItem[]>
+  const elementsRef = ref([]) as Ref<IFormItem[]>
+  const rulesRef = ref({})
+  const params = {
+    projectCode,
+    from,
+    readonly,
+    data,
+    jsonRef
   }
-  return node
+
+  const { model, json } = nodes[data.taskType || 'SHELL'](params)
+  jsonRef.value = json
+
+  const getElements = () => {
+    const { rules, elements } = getElementByJson(jsonRef.value, model)
+    elementsRef.value = elements
+    rulesRef.value = rules
+  }
+
+  getElements()
+
+  watch(
+    () => jsonRef.value.length,
+    () => {
+      getElements()
+    }
+  )
+
+  return { elementsRef, rulesRef, model }
 }

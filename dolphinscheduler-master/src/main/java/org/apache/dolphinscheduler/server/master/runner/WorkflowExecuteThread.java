@@ -421,6 +421,9 @@ public class WorkflowExecuteThread {
             iTaskProcessor.action(TaskAction.RUN);
 
             if (iTaskProcessor.taskInstance().getState().typeIsFinished()) {
+                if (iTaskProcessor.taskInstance().getState() != task.getState()) {
+                    task.setState(iTaskProcessor.taskInstance().getState());
+                }
                 taskFinished(task);
             }
             return true;
@@ -464,7 +467,10 @@ public class WorkflowExecuteThread {
                     killAllTasks();
                 }
             }
+        } else if (taskInstance.getState().typeIsFinished()) {
+            completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
         }
+
         this.updateProcessInstanceState();
     }
 
@@ -738,7 +744,7 @@ public class WorkflowExecuteThread {
         if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
         }
-        cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.format(scheduleDate, "yyyy-MM-dd HH:mm:ss"));
+        cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.format(scheduleDate, "yyyy-MM-dd HH:mm:ss", null));
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setTaskDependType(processInstance.getTaskDependType());
         command.setFailureStrategy(processInstance.getFailureStrategy());

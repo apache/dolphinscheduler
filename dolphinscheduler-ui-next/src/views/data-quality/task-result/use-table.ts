@@ -24,6 +24,7 @@ import type {
   ResultItem,
   ResultListRes
 } from '@/service/modules/data-quality/types'
+import { parseTime } from '@/utils/common'
 
 export function useTable() {
   const { t } = useI18n()
@@ -44,7 +45,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('data_quality.task_result.task_name'),
@@ -170,18 +172,17 @@ export function useTable() {
       state: params.state,
       searchVal: params.searchVal,
       startDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : ''
     }
 
     const { state } = useAsyncState(
       queryExecuteResultListPaging(data).then((res: ResultListRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any

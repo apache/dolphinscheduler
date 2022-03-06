@@ -59,4 +59,9 @@ public final class Constants {
     public static final String APPEND = "append";
 
     public static final String SPARK_APP_NAME = "spark.app.name";
+
+    /**
+     * date format of yyyy-MM-dd HH:mm:ss
+     */
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 }

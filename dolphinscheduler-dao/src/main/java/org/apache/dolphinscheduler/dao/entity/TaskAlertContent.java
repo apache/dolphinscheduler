@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,10 +44,8 @@ public class TaskAlertContent implements Serializable {
     private String processInstanceName;
     @JsonProperty("state")
     private ExecutionStatus state;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("startTime")
     private Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("endTime")
     private Date endTime;
     @JsonProperty("host")

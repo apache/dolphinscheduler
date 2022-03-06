@@ -36,8 +36,8 @@ export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => model.timeoutFlag,
     (timeoutFlag) => {
-      model.strategy = timeoutFlag ? ['WARN'] : []
-      model.interval = timeoutFlag ? 30 : null
+      model.timeoutNotifyStrategy = timeoutFlag ? ['WARN'] : []
+      model.timeout = timeoutFlag ? 30 : null
     }
   )
 
@@ -60,8 +60,7 @@ export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
             return new Error(t('project.node.timeout_strategy_tips'))
           }
         }
-      },
-      value: ['WARN']
+      }
     },
     {
       type: 'input-number',
@@ -81,8 +80,7 @@ export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
             return new Error(t('project.node.timeout_period_tips'))
           }
         }
-      },
-      value: 30
+      }
     }
   ]
 }

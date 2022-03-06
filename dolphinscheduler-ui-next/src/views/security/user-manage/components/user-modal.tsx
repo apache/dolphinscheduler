@@ -24,8 +24,11 @@ import {
   NSelect,
   NRadio,
   NRadioGroup,
+  NRadioButton,
   NSpace,
-  NAlert
+  NAlert,
+  NTransfer,
+  NTreeSelect
 } from 'naive-ui'
 
 import Modal from '@/components/modal'
@@ -55,8 +58,11 @@ export const UserModal = defineComponent({
         show={this.show}
         title={this.titleMap?.[this.mode || 'add']}
         onCancel={this.onModalCancel}
+        confirmDisabled={this.optionsLoading}
         confirmLoading={this.confirmLoading}
         onConfirm={this.onConfirm}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
       >
         {{
           default: () => {
@@ -65,6 +71,62 @@ export const UserModal = defineComponent({
                 <NAlert type='error' title={t('security.user.delete_confirm')}>
                   {t('security.user.delete_confirm_tip')}
                 </NAlert>
+              )
+            }
+            if (this.mode === 'auth_project') {
+              return (
+                <NTransfer
+                  virtualScroll
+                  options={this.projects}
+                  filterable
+                  v-model:value={this.authorizedProjects}
+                  style={{ margin: '0 auto' }}
+                />
+              )
+            }
+            if (this.mode === 'auth_datasource') {
+              return (
+                <NTransfer
+                  virtualScroll
+                  options={this.datasource}
+                  filterable
+                  v-model:value={this.authorizedDatasource}
+                  style={{ margin: '0 auto' }}
+                />
+              )
+            }
+            if (this.mode === 'auth_udf') {
+              return (
+                <NTransfer
+                  virtualScroll
+                  options={this.UDFs}
+                  filterable
+                  v-model:value={this.authorizedUDF}
+                  style={{ margin: '0 auto' }}
+                />
+              )
+            }
+            if (this.mode === 'auth_resource') {
+              return (
+                <NSpace vertical>
+                  <NRadioGroup v-model:value={this.resourceType}>
+                    <NRadioButton key='file' value='file'>
+                      {t('security.user.file_resource')}
+                    </NRadioButton>
+                    <NRadioButton key='udf' value='udf'>
+                      {t('security.user.udf_resource')}
+                    </NRadioButton>
+                  </NRadioGroup>
+                  <NTreeSelect
+                    multiple
+                    cascade
+                    checkable
+                    checkStrategy='child'
+                    defaultExpandAll
+                    options={this.resourceTree}
+                    v-model:value={this.authorizedFiles}
+                  />
+                </NSpace>
               )
             }
             return (
@@ -78,6 +140,7 @@ export const UserModal = defineComponent({
               >
                 <NFormItem label={t('security.user.username')} path='userName'>
                   <NInput
+                    class='input-username'
                     inputProps={{ autocomplete: 'off' }}
                     v-model:value={this.formValues.userName}
                   />
@@ -87,6 +150,7 @@ export const UserModal = defineComponent({
                   path='userPassword'
                 >
                   <NInput
+                    class='input-password'
                     inputProps={{ autocomplete: 'off' }}
                     type='password'
                     v-model:value={this.formValues.userPassword}
@@ -97,27 +161,39 @@ export const UserModal = defineComponent({
                   path='tenantId'
                 >
                   <NSelect
+                    class='select-tenant'
                     options={this.tenants}
                     v-model:value={this.formValues.tenantId}
                   />
                 </NFormItem>
                 <NFormItem label={t('security.user.queue')} path='queue'>
                   <NSelect
+                    class='select-queue'
                     options={this.queues}
                     v-model:value={this.formValues.queue}
                   />
                 </NFormItem>
                 <NFormItem label={t('security.user.email')} path='email'>
-                  <NInput v-model:value={this.formValues.email} />
+                  <NInput
+                    class='input-email'
+                    v-model:value={this.formValues.email}
+                  />
                 </NFormItem>
                 <NFormItem label={t('security.user.phone')} path='phone'>
-                  <NInput v-model:value={this.formValues.phone} />
+                  <NInput
+                    class='input-phone'
+                    v-model:value={this.formValues.phone}
+                  />
                 </NFormItem>
                 <NFormItem label={t('security.user.state')} path='state'>
                   <NRadioGroup v-model:value={this.formValues.state}>
                     <NSpace>
-                      <NRadio value={1}>启用</NRadio>
-                      <NRadio value={0}>停用</NRadio>
+                      <NRadio value={1} class='radio-state-enable'>
+                        启用
+                      </NRadio>
+                      <NRadio value={0} class='radio-state-disable'>
+                        停用
+                      </NRadio>
                     </NSpace>
                   </NRadioGroup>
                 </NFormItem>

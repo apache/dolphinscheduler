@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModalData } from './use-modalData'
@@ -101,6 +101,8 @@ const TenantModal = defineComponent({
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
+          confirmClassName='btn-submit'
+          cancelClassName='btn-cancel'
         >
           {{
             default: () => (
@@ -119,6 +121,7 @@ const TenantModal = defineComponent({
                   path='tenantCode'
                 >
                   <NInput
+                    class='input-tenant-code'
                     disabled={this.statusRef === 1}
                     placeholder={t('security.tenant.tenant_code_tips')}
                     v-model={[this.model.tenantCode, 'value']}
@@ -129,6 +132,7 @@ const TenantModal = defineComponent({
                   path='queueId'
                 >
                   <NSelect
+                    class='select-queue'
                     placeholder={t('security.tenant.queue_name_tips')}
                     options={this.model.generalOptions}
                     v-model={[this.model.queueId, 'value']}
@@ -139,6 +143,7 @@ const TenantModal = defineComponent({
                   path='description'
                 >
                   <NInput
+                    class='input-description'
                     placeholder={t('security.tenant.description_tips')}
                     v-model={[this.model.description, 'value']}
                     type='textarea'
