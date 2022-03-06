@@ -18,7 +18,14 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm, NEllipsis } from 'naive-ui'
+import {
+  NSpace,
+  NTooltip,
+  NButton,
+  NPopconfirm,
+  NEllipsis,
+  NIcon
+} from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -101,37 +108,56 @@ export function useTable() {
         return h(NSpace, null, {
           default: () => [
             h(
-              NButton,
+              NTooltip,
+              {},
               {
-                circle: true,
-                type: 'info',
-                size: 'small',
-                disabled: row.releaseState === 'ONLINE',
-                onClick: () => {
-                  handleEdit(row)
-                }
-              },
-              {
-                icon: () => h(EditOutlined)
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      circle: true,
+                      type: 'info',
+                      size: 'small',
+                      disabled: row.releaseState === 'ONLINE',
+                      onClick: () => {
+                        handleEdit(row)
+                      }
+                    },
+                    {
+                      icon: () => h(EditOutlined)
+                    }
+                  ),
+                default: () => t('project.workflow.edit')
               }
             ),
             h(
-              NButton,
+              NTooltip,
+              {},
               {
-                circle: true,
-                type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
-                size: 'small',
-                onClick: () => {
-                  handleReleaseState(row)
-                }
-              },
-              {
-                icon: () =>
+                trigger: () =>
                   h(
-                    row.releaseState === 'ONLINE'
-                      ? ArrowDownOutlined
-                      : ArrowUpOutlined
-                  )
+                    NButton,
+                    {
+                      circle: true,
+                      type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                      size: 'small',
+                      onClick: () => {
+                        handleReleaseState(row)
+                      }
+                    },
+                    {
+                      icon: () =>
+                        h(
+                          row.releaseState === 'ONLINE'
+                            ? ArrowDownOutlined
+                            : ArrowUpOutlined
+                        )
+                    }
+                  ),
+                default: () =>
+                  row.releaseState === 'ONLINE'
+                    ? t('project.workflow.down_line')
+                    : t('project.workflow.up_line')
               }
             ),
             h(
