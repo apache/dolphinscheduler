@@ -113,7 +113,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='info'
                 circle
                 disabled={
@@ -139,7 +139,7 @@ export default defineComponent({
               return (
                 <NButton
                   tag='div'
-                  size='tiny'
+                  size='small'
                   type='info'
                   circle
                   onClick={this.handleReRun}
@@ -169,7 +169,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='primary'
                 circle
                 onClick={this.handleReStore}
@@ -195,7 +195,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='error'
                 circle
                 onClick={this.handleStop}
@@ -224,7 +224,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='warning'
                 circle
                 disabled={
@@ -250,7 +250,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='error'
                 circle
                 disabled={
@@ -286,7 +286,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='info'
                 circle
                 disabled={this.row?.disabled}
