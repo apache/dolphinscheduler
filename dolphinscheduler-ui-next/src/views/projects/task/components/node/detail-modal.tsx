@@ -23,7 +23,8 @@ import {
   watch,
   nextTick,
   provide,
-  computed
+  computed,
+  onMounted
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { omit } from 'lodash'
@@ -102,12 +103,12 @@ const NodeDetailModal = defineComponent({
     )
 
     watch(
-      () => props.data,
-      async () => {
-        if (!props.show) return
-        await nextTick()
-        detailRef.value.value.setValues(formatModel(props.data))
-      }
+        () => [props.show, props.data],
+        async () => {
+          if (!props.show) return
+          await nextTick()
+          detailRef.value.value.setValues(formatModel(props.data))
+        }
     )
 
     return () => (
