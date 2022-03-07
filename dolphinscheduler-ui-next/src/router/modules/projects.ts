@@ -122,6 +122,16 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/workflow/instances/:id/gantt',
+      name: 'workflow-instance-gantt',
+      component: components['projects-workflow-instance-gantt'],
+      meta: {
+        title: '工作流实例甘特图',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/projects/:projectCode/task/definitions',
       name: 'task-definition',
       component: components['projects-task-definition'],
@@ -137,6 +147,16 @@ export default {
       component: components['projects-task-instance'],
       meta: {
         title: '任务实例',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-definition/tree/:definitionCode',
+      name: 'workflow-definition-tree',
+      component: components['projects-workflow-definition-tree'],
+      meta: {
+        title: '工作流定义树形图',
         showSide: true,
         auth: []
       }

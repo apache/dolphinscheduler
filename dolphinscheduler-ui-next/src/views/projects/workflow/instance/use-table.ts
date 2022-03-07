@@ -16,7 +16,7 @@
  */
 
 import _ from 'lodash'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -34,6 +34,7 @@ import { runningType, tasksState } from '@/utils/common'
 import { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import { ICountDownParam } from './types'
 import { ExecuteReq } from '@/service/modules/executors/types'
+import { parseTime } from '@/utils/common'
 import styles from './index.module.scss'
 
 export function useTable() {
@@ -149,7 +150,7 @@ export function useTable() {
         key: 'scheduleTime',
         render: (_row: IWorkflowInstance) =>
           _row.scheduleTime
-            ? format(parseISO(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
+            ? format(parseTime(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
             : '-'
       },
       {
@@ -157,7 +158,7 @@ export function useTable() {
         key: 'startTime',
         render: (_row: IWorkflowInstance) =>
           _row.startTime
-            ? format(parseISO(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
+            ? format(parseTime(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
             : '-'
       },
       {
@@ -165,7 +166,7 @@ export function useTable() {
         key: 'endTime',
         render: (_row: IWorkflowInstance) =>
           _row.endTime
-            ? format(parseISO(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
+            ? format(parseTime(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
             : '-'
       },
       {
@@ -197,7 +198,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 220,
+        width: 250,
         fixed: 'right',
         className: styles.operation,
         render: (_row: IWorkflowInstance, index: number) =>

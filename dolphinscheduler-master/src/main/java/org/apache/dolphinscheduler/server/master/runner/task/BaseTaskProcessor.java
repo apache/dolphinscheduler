@@ -238,6 +238,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return null;
     }
 
+    @Override
     public TaskInstance taskInstance() {
         return this.taskInstance;
     }

@@ -19,8 +19,9 @@ import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryProjectListPaging } from '@/service/modules/projects'
+import { parseTime } from '@/utils/common'
 import { deleteProject } from '@/service/modules/projects'
-import { parseISO, format } from 'date-fns'
+import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import { useMenuStore } from '@/store/menu/menu'
 import { NButton, NEllipsis, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
@@ -181,11 +182,11 @@ export function useTable() {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            parseISO(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            parseISO(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
