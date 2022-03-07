@@ -635,6 +635,8 @@ Apache 2.0 licenses
 ========================================
     echarts	5.3.0: https://github.com/apache/echarts Apache-2.0
     typescript 4.5.5: https://github.com/Microsoft/TypeScript Apache-2.0
+    open-sans: Apache-2.0
+    roboto: Apache-2.0
 
 ========================================================================
 BSD licenses
@@ -645,3 +647,12 @@ The text of each license is also included at licenses/ui-next-licenses/LICENSE-[
     qs 6.10.3: https://github.com/ljharb/qs BSD 3-Clause
     @typescript-eslint/eslint-plugin 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
     @typescript-eslint/parser 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+
+========================================
+SIL licenses
+========================================
+    fira-code: https://github.com/tonsky/FiraCode SIL
+    fira-sans: SIL
+    ibm-plex: SIL
+    inter: https://github.com/rsms/inter SIL
+    lato: SIL
