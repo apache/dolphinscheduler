@@ -43,6 +43,8 @@ public enum ExecutionStatus {
      * 12 delay execution
      * 13 forced success
      * 14 serial wait
+     * 15 ready block
+     * 16 block
      */
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
@@ -58,7 +60,9 @@ public enum ExecutionStatus {
     WAITING_DEPEND(11, "waiting depend node complete"),
     DELAY_EXECUTION(12, "delay execution"),
     FORCED_SUCCESS(13, "forced success"),
-    SERIAL_WAIT(14, "serial wait");
+    SERIAL_WAIT(14, "serial wait"),
+    READY_BLOCK(15, "ready block"),
+    BLOCK(16, "block");
 
     ExecutionStatus(int code, String descp) {
         this.code = code;
@@ -102,7 +106,7 @@ public enum ExecutionStatus {
      */
     public boolean typeIsFinished() {
         return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-                || typeIsStop();
+            || typeIsStop() || typeIsBlock();
     }
 
     /**
@@ -139,6 +143,15 @@ public enum ExecutionStatus {
      */
     public boolean typeIsRunning() {
         return this == RUNNING_EXECUTION || this == WAITING_DEPEND || this == DELAY_EXECUTION;
+    }
+
+    /**
+     * status is block
+     *
+     * @return status
+     */
+    public boolean typeIsBlock() {
+        return this == BLOCK;
     }
 
     /**

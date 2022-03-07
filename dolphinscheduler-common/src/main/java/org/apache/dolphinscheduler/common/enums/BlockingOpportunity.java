@@ -17,32 +17,19 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+public enum BlockingOpportunity {
 
-public enum StateEventType {
+    BLOCKING_ON_SUCCESS("BlockingOnSuccess"),
+    BLOCKING_ON_FAILED("BlockingOnFailed");
 
-    PROCESS_STATE_CHANGE(0, "process statechange"),
-    TASK_STATE_CHANGE(1, "task state change"),
-    PROCESS_TIMEOUT(2, "process timeout"),
-    TASK_TIMEOUT(3, "task timeout"),
-    WAIT_TASK_GROUP(4, "wait task group"),
-    TASK_RETRY(5, "task retry"),
-    PROCESS_BLOCKED(6, "process blocked");
+    private final String desc;
 
-    StateEventType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
+    BlockingOpportunity(String desc){
+        this.desc = desc;
     }
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
+    public String getDesc() {
+        return desc;
     }
 
-    public String getDescp() {
-        return descp;
-    }
 }

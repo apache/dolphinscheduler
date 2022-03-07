@@ -260,6 +260,7 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
+
     /**
      * task params
      */
@@ -591,6 +592,10 @@ public class TaskInstance implements Serializable {
 
     public boolean isSwitchTask() {
         return TaskType.SWITCH.getDesc().equalsIgnoreCase(this.taskType);
+    }
+
+    public boolean isBlockingTask() {
+        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**
