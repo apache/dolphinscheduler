@@ -198,7 +198,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 220,
+        width: 250,
         fixed: 'right',
         className: styles.operation,
         render: (_row: IWorkflowInstance, index: number) =>
