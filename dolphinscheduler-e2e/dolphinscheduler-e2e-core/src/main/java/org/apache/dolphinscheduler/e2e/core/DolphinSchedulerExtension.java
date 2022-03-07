@@ -157,7 +157,7 @@ final class DolphinSchedulerExtension
             }
         };
         address = HostAndPort.fromParts("dolphinscheduler", 12345);
-        rootPath = "/dolphinscheduler";
+        rootPath = "/dolphinscheduler/ui/";
     }
 
     @Override
