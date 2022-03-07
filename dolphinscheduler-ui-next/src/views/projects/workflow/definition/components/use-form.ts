@@ -54,7 +54,7 @@ export const useForm = () => {
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       warningGroupId: null,
-      execType: '',
+      execType: 'START_PROCESS',
       startNodeList: '',
       taskDependType: 'TASK_POST',
       runMode: 'RUN_MODE_SERIAL',
