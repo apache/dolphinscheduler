@@ -15,25 +15,20 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Constants variables for test module."""
+"""Testing util about file operating."""
 
-import os
+from pathlib import Path
+from typing import Union
 
-# Record some task without example in directory `example`. Some of them maybe can not write example,
-# but most of them just without adding by mistake, and we should add it later.
-task_without_example = {
-    "sql",
-    "http",
-    "sub_process",
-    "python",
-    "procedure",
-}
 
-# pydolphinscheduler environment home
-ENV_PYDS_HOME = "PYDOLPHINSCHEDULER_HOME"
+def get_file_content(path: Union[str, Path]) -> str:
+    """Get file content in given path."""
+    with open(path, mode="r") as f:
+        return f.read()
 
-# whether in dev mode, if true we will add or remove some tests. Or make be and more detail infos when
-# test failed.
-DEV_MODE = str(
-    os.environ.get("PY_DOLPHINSCHEDULER_DEV_MODE", False)
-).strip().lower() in {"true", "t", "1"}
+
+def delete_file(path: Union[str, Path]) -> None:
+    """Delete file in given path."""
+    path = Path(path).expanduser() if isinstance(path, str) else path.expanduser()
+    if path.exists():
+        path.unlink()

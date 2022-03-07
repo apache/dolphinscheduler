@@ -17,23 +17,23 @@
 
 """Test default config file."""
 
-from typing import Dict
-
-import yaml
+from ruamel.yaml import YAML
+from ruamel.yaml.comments import CommentedMap
 
 from tests.testing.path import path_default_config_yaml
 
 
-def nested_key_check(test_dict: Dict) -> None:
+def nested_key_check(comment_map: CommentedMap) -> None:
     """Test whether default configuration file exists specific character."""
-    for key, val in test_dict.items():
+    for key, val in comment_map.items():
         assert "." not in key, f"There is not allowed special character in key `{key}`."
-        if isinstance(val, dict):
+        if isinstance(val, CommentedMap):
             nested_key_check(val)
 
 
 def test_key_without_dot_delimiter():
     """Test wrapper of whether default configuration file exists specific character."""
+    yaml = YAML()
     with open(path_default_config_yaml, "r") as f:
-        default_config = yaml.safe_load(f)
-        nested_key_check(default_config)
+        comment_map = yaml.load(f.read())
+        nested_key_check(comment_map)
