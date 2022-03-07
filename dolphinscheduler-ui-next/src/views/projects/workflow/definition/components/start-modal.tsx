@@ -292,6 +292,21 @@ export default defineComponent({
             this.startForm.execType !== 'START_PROCESS' && (
               <NSpace>
                 <NFormItem
+                  label={t('project.workflow.mode_of_dependent')}
+                  path='dependentMode'
+                >
+                  <NRadioGroup v-model:value={this.startForm.dependentMode}>
+                    <NSpace>
+                      <NRadio value={'OFF_MODE'}>
+                        {t('project.workflow.close')}
+                      </NRadio>
+                      <NRadio value={'ALL_DEPENDENT'}>
+                        {t('project.workflow.open')}
+                      </NRadio>
+                    </NSpace>
+                  </NRadioGroup>
+                </NFormItem>
+                <NFormItem
                   label={t('project.workflow.mode_of_execution')}
                   path='runMode'
                 >
