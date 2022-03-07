@@ -20,6 +20,7 @@ import zh_CN from './modules/zh_CN'
 import en_US from './modules/en_US'
 
 const i18n = createI18n({
+  legacy: false,
   globalInjection: true,
   locale: 'zh_CN',
   messages: {
