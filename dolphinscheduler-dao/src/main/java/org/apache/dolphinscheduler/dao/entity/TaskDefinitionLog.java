@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * task definition log

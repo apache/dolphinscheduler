@@ -17,20 +17,26 @@
 
 import { genTaskCodeList } from '@/service/modules/task-definition'
 import type { Cell } from '@antv/x6'
-import {
-  defineComponent,
-  onMounted,
-  PropType,
-  inject,
-  ref,
-  computed
-} from 'vue'
+import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
 import { uuid } from '@/utils/common'
+import { IWorkflowTaskInstance } from './types'
 
 const props = {
+  startReadonly: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  menuReadonly: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  taskInstance: {
+    type: Object as PropType<IWorkflowTaskInstance>,
+    require: true
+  },
   cell: {
     type: Object as PropType<Cell>,
     require: true
@@ -46,27 +52,17 @@ const props = {
   top: {
     type: Number as PropType<number>,
     default: 0
-  },
-  releaseState: {
-    type: String as PropType<string>,
-    default: 'OFFLINE'
   }
 }
 
 export default defineComponent({
   name: 'dag-context-menu',
   props,
-  emits: ['hide', 'start', 'edit', 'copyTask', 'removeTasks'],
+  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks'],
   setup(props, ctx) {
     const graph = inject('graph', ref())
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
-
-    const startAvailable = computed(
-      () =>
-        route.name === 'workflow-definition-detail' &&
-        props.releaseState !== 'NOT_RELEASE'
-    )
 
     const hide = () => {
       ctx.emit('hide', false)
@@ -80,15 +76,22 @@ export default defineComponent({
       ctx.emit('edit', Number(props.cell?.id))
     }
 
+    const handleViewLog = () => {
+      if (props.taskInstance) {
+        ctx.emit('viewLog', props.taskInstance.id, props.taskInstance.taskType)
+      }
+    }
+
     const handleCopy = () => {
       const genNums = 1
       const type = props.cell?.data.taskType
       const taskName = uuid(props.cell?.data.taskName + '_')
       const targetCode = Number(props.cell?.id)
+      const flag = props.cell?.data.flag
 
       genTaskCodeList(genNums, projectCode).then((res) => {
         const [code] = res
-        ctx.emit('copyTask', taskName, code, targetCode, type, {
+        ctx.emit('copyTask', taskName, code, targetCode, type, flag, {
           x: props.left + 100,
           y: props.top + 100
         })
@@ -107,11 +110,11 @@ export default defineComponent({
     })
 
     return {
-      startAvailable,
       startRunning,
       handleEdit,
       handleCopy,
-      handleDelete
+      handleDelete,
+      handleViewLog
     }
   },
   render() {
@@ -125,7 +128,7 @@ export default defineComponent({
         >
           <div
             class={`${styles['menu-item']} ${
-              !this.startAvailable ? styles['disabled'] : ''
+              this.startReadonly ? styles['disabled'] : ''
             } `}
             onClick={this.startRunning}
           >
@@ -133,7 +136,7 @@ export default defineComponent({
           </div>
           <div
             class={`${styles['menu-item']} ${
-              this.releaseState === 'ONLINE' ? styles['disabled'] : ''
+              this.menuReadonly ? styles['disabled'] : ''
             } `}
             onClick={this.handleEdit}
           >
@@ -141,7 +144,7 @@ export default defineComponent({
           </div>
           <div
             class={`${styles['menu-item']} ${
-              this.releaseState === 'ONLINE' ? styles['disabled'] : ''
+              this.menuReadonly ? styles['disabled'] : ''
             } `}
             onClick={this.handleCopy}
           >
@@ -149,13 +152,17 @@ export default defineComponent({
           </div>
           <div
             class={`${styles['menu-item']} ${
-              this.releaseState === 'ONLINE' ? styles['disabled'] : ''
+              this.menuReadonly ? styles['disabled'] : ''
             } `}
             onClick={this.handleDelete}
           >
             {t('project.node.delete')}
           </div>
-          {/* TODO: view log */}
+          {this.taskInstance && (
+            <div class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
+              {t('project.node.view_log')}
+            </div>
+          )}
         </div>
       )
     )

@@ -17,10 +17,11 @@
 
 import { h } from 'vue'
 import { NInput } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderInput(item: IJsonItem, fields: { [field: string]: any }) {
-  const { props, field } = item
+  const { props, field } = isFunction(item) ? item() : item
   return h(NInput, {
     ...props,
     value: fields[field],

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import { defineComponent, onMounted, ref, toRefs } from 'vue'
 import {
   NSpace,
   NInput,

@@ -36,13 +36,14 @@ export function useShell({
     flag: 'YES',
     description: '',
     timeoutFlag: false,
+    timeoutNotifyStrategy: ['WARN'],
+    timeout: 30,
     localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30,
     rawScript: ''
   } as INodeData)
 

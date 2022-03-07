@@ -18,8 +18,13 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
+import { indexOf } from 'lodash'
 
-export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
+export function useDatasourceType(
+  model: { [field: string]: any },
+  supportedDatasourceType?: string[],
+  field?: string
+): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
@@ -70,6 +75,11 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
       id: 8,
       code: 'PRESTO',
       disabled: false
+    },
+    {
+      id: 9,
+      code: 'REDSHIFT',
+      disabled: false
     }
   ]
 
@@ -78,7 +88,15 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
     loading.value = true
     try {
       options.value = datasourceTypes
-        .filter((item) => !item.disabled)
+        .filter((item) => {
+          if (item.disabled) {
+            return false
+          }
+          if (supportedDatasourceType) {
+            return indexOf(supportedDatasourceType, item.code) !== -1
+          }
+          return true
+        })
         .map((item) => ({ label: item.code, value: item.code }))
       loading.value = false
     } catch (err) {
@@ -87,7 +105,11 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
   }
 
   const onChange = (type: string) => {
-    model.type = type
+    if (field) {
+      model[field] = type
+    } else {
+      model.type = type
+    }
   }
 
   onMounted(() => {
@@ -95,7 +117,7 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
   })
   return {
     type: 'select',
-    field: 'datasourceType',
+    field: field ? field : 'datasourceType',
     span: 12,
     name: t('project.node.datasource_type'),
     props: {
@@ -105,8 +127,7 @@ export function useDatasourceType(model: { [field: string]: any }): IJsonItem {
     options: options,
     validate: {
       trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.worker_group_tips')
+      required: true
     },
     value: model.type
   }

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import _ from 'lodash'
 import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
@@ -53,7 +52,7 @@ export function useTaskEdit(options: Options) {
    * Append a new task
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
-    addNode(code + '', type, '', coordinate)
+    addNode(code + '', type, '', 'YES', coordinate)
     taskDefinitions.value.push({
       code,
       taskType: type,
@@ -70,9 +69,10 @@ export function useTaskEdit(options: Options) {
     code: number,
     targetCode: number,
     type: TaskType,
+    flag: string,
     coordinate: Coordinate
   ) {
-    addNode(code + '', type, name, coordinate)
+    addNode(code + '', type, name, flag, coordinate)
     const definition = taskDefinitions.value.find((t) => t.code === targetCode)
 
     const newDefinition = {

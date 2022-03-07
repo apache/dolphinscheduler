@@ -202,6 +202,11 @@ const datasourceType: IDataBaseOptionKeys = {
     value: 'PRESTO',
     label: 'PRESTO',
     defaultPort: 8080
+  },
+  REDSHIFT: {
+    value: 'REDSHIFT',
+    label: 'REDSHIFT',
+    defaultPort: 5439
   }
 }
 

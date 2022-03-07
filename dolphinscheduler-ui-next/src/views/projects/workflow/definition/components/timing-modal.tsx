@@ -187,6 +187,8 @@ export default defineComponent({
     watch(
       () => props.row,
       () => {
+        if (!props.row.crontab) return
+
         timingState.timingForm.startEndTime = [
           new Date(props.row.startTime),
           new Date(props.row.endTime)
@@ -348,6 +350,7 @@ export default defineComponent({
                 item.workerGroups?.includes(this.timingForm.workerGroup)
               )}
               v-model:value={this.timingForm.environmentCode}
+              clearable
             />
           </NFormItem>
           <NFormItem
@@ -358,6 +361,7 @@ export default defineComponent({
               options={this.alertGroups}
               placeholder={t('project.workflow.please_choose')}
               v-model:value={this.timingForm.warningGroupId}
+              clearable
             />
           </NFormItem>
         </NForm>

@@ -446,6 +446,11 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hibernate-validator  6.2.2.Final https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator/6.2.2.Final, Apache 2.0
     jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0
     jboss-logging:jar 3.4.2.Final https://mvnrepository.com/artifact/org.jboss.logging/jboss-logging/3.4.2.Final, Apache 2.0
+    ion-java 1.0.2  https://mvnrepository.com/artifact/software.amazon.ion/ion-java/1.0.2  Apache 2.0
+    jmespath-java 1.12.160 https://mvnrepository.com/artifact/com.amazonaws/jmespath-java/1.12.160 Apache 2.0
+    jackson-dataformat-cbor 2.12.5 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.12.5 Apache 2.0
+    aws-java-sdk-emr 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-emr/1.12.160 Apache 2.0
+    aws-java-sdk-core 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
 
 ========================================================================
 BSD licenses

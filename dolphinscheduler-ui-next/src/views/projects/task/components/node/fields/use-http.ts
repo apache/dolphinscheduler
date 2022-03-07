@@ -23,7 +23,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const timeoutSpan = computed(() => (model.timeoutSetting ? 12 : 0))
 
-  const HTTP_CHECK_CONDITIONs = [
+  const HTTP_CHECK_CONDITIONS = [
     {
       label: t('project.node.status_code_default'),
       value: 'STATUS_CODE_DEFAULT'
@@ -88,7 +88,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
                 return new Error(t('project.node.prop_tips'))
               }
 
-              const sameItems = model.localParams.filter(
+              const sameItems = model.httpParams.filter(
                 (item: { prop: string }) => item.prop === value
               )
 
@@ -129,7 +129,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'httpCheckCondition',
       name: t('project.node.http_check_condition'),
-      options: HTTP_CHECK_CONDITIONs
+      options: HTTP_CHECK_CONDITIONS
     },
     {
       type: 'input',

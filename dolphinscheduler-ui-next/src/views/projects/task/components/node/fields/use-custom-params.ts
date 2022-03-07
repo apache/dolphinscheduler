@@ -57,7 +57,7 @@ export function useCustomParams({
                   return new Error(t('project.node.prop_tips'))
                 }
 
-                const sameItems = model.localParams.filter(
+                const sameItems = model[field].filter(
                   (item: { prop: string }) => item.prop === value
                 )
 
@@ -103,7 +103,7 @@ export function useCustomParams({
                   return new Error(t('project.node.prop_tips'))
                 }
 
-                const sameItems = model.localParams.filter(
+                const sameItems = model[field].filter(
                   (item: { prop: string }) => item.prop === value
                 )
 

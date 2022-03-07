@@ -18,15 +18,11 @@
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
 import { format } from 'date-fns'
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import {
-  queryAlertGroupListPaging,
-  delAlertGroupById
-} from '@/service/modules/alert-group'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import { queryAccessTokenList, deleteToken } from '@/service/modules/token'
-import type { AlarmGroupRes } from '@/service/modules/alert-group/types'
+import { parseTime } from '@/utils/common'
 import type { TokenRes } from '@/service/modules/token/types'
 
 export function useTable() {
@@ -42,7 +38,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.token.user'),
@@ -89,7 +86,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.token.edit')
@@ -118,7 +116,10 @@ export function useTable() {
                               class: 'delete'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.token.delete')
@@ -162,21 +163,20 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryAccessTokenList({ ...params }).then((res: TokenRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.expireTime = format(
-            new Date(item.expireTime),
+            parseTime(item.expireTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.createTime = format(
-            new Date(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any

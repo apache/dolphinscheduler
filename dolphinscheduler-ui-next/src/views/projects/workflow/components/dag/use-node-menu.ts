@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue'
-import { onMounted, ref } from 'vue'
+import { reactive, Ref } from 'vue'
+import { onMounted } from 'vue'
 import type { Graph, Cell } from '@antv/x6'
 
 interface Options {
@@ -28,48 +28,62 @@ interface Options {
  */
 export function useNodeMenu(options: Options) {
   const { graph } = options
-  const startModalShow = ref(false)
-  const menuVisible = ref(false)
-  const pageX = ref()
-  const pageY = ref()
-  const menuCell = ref<Cell>()
+
+  const nodeVariables = reactive({
+    menuVisible: false,
+    startModalShow: false,
+    logModalShow: false,
+    logTaskId: -1,
+    logTaskType: '',
+    pageX: 0,
+    pageY: 0,
+    menuCell: {} as Cell
+  })
 
   const menuHide = () => {
-    menuVisible.value = false
+    nodeVariables.menuVisible = false
 
     // unlock scroller
     graph.value?.unlockScroller()
   }
 
   const menuStart = () => {
-    startModalShow.value = true
+    nodeVariables.startModalShow = true
+  }
+
+  const viewLog = (taskId: number, taskType: string) => {
+    nodeVariables.logTaskId = taskId
+    nodeVariables.logTaskType = taskType
+    nodeVariables.logModalShow = true
+  }
+
+  const hideLog = () => {
+    nodeVariables.logModalShow = false
   }
 
   onMounted(() => {
     if (graph.value) {
       // contextmenu
       graph.value.on('node:contextmenu', ({ cell, x, y }) => {
-        menuCell.value = cell
-        const data = graph.value?.localToPage(x, y)
-        pageX.value = data?.x
-        pageY.value = data?.y
+        nodeVariables.menuCell = cell
+        const data = graph.value!.localToPage(x, y)
+        nodeVariables.pageX = data.x
+        nodeVariables.pageY = data.y
 
         // show menu
-        menuVisible.value = true
+        nodeVariables.menuVisible = true
 
         // lock scroller
-        graph.value?.lockScroller()
+        graph.value!.lockScroller()
       })
     }
   })
 
   return {
-    pageX,
-    pageY,
-    startModalShow,
-    menuVisible,
-    menuCell,
+    nodeVariables,
     menuHide,
-    menuStart
+    menuStart,
+    viewLog,
+    hideLog
   }
 }

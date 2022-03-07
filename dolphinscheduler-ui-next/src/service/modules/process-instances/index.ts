@@ -118,7 +118,7 @@ export function queryTaskListByProcessId(id: number, code: number): any {
   })
 }
 
-export function vieGanttTree(id: IdReq, code: CodeReq): any {
+export function viewGanttTree(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-gantt`,
     method: 'get'
