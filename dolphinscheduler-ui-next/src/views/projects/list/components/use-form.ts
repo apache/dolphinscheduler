@@ -16,18 +16,22 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { reactive, ref } from 'vue'
+import { reactive, ref, SetupContext } from 'vue'
 import { useUserStore } from '@/store/user/user'
 import type { FormRules } from 'naive-ui'
 import type { UserInfoRes } from '@/service/modules/users/types'
+import { createProject, updateProject } from '@/service/modules/projects'
 
-export function useForm() {
+export function useForm(
+  props: any,
+  ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
+) {
   const { t } = useI18n()
   const userStore = useUserStore()
 
-  const state = reactive({
+  const variables = reactive({
     projectFormRef: ref(),
-    projectForm: {
+    model: {
       projectName: '',
       description: '',
       userName: (userStore.getUserInfo as UserInfoRes).userName
@@ -37,7 +41,7 @@ export function useForm() {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.projectForm.projectName === '') {
+          if (variables.model.projectName === '') {
             return new Error(t('project.list.project_tips'))
           }
         }
@@ -46,7 +50,7 @@ export function useForm() {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.projectForm.userName === '') {
+          if (variables.model.userName === '') {
             return new Error(t('project.list.username_tips'))
           }
         }
@@ -54,5 +58,27 @@ export function useForm() {
     } as FormRules
   })
 
-  return { state, t }
+  const handleValidate = (statusRef: number) => {
+    variables.projectFormRef.validate((errors: any) => {
+      if (!errors) {
+        statusRef === 0 ? submitProjectModal() : updateProjectModal()
+      } else {
+        return
+      }
+    })
+  }
+
+  const submitProjectModal = () => {
+    createProject(variables.model).then(() => {
+      ctx.emit('confirmModal', props.showModalRef)
+    })
+  }
+
+  const updateProjectModal = () => {
+    updateProject(variables.model, props.row.code).then(() => {
+      ctx.emit('confirmModal', props.showModalRef)
+    })
+  }
+
+  return { variables, t, handleValidate }
 }
