@@ -23,26 +23,24 @@ from pathlib import Path
 import pytest
 
 from pydolphinscheduler.cli.commands import cli
-from pydolphinscheduler.core.configuration import get_config_file_path
+from pydolphinscheduler.core.configuration import BUILD_IN_CONFIG_PATH, config_path
 from tests.testing.cli import CliTestWrapper
-from tests.testing.constants import DEV_MODE
+from tests.testing.constants import DEV_MODE, ENV_PYDS_HOME
+from tests.testing.file import get_file_content
 
-default_config_path = "~/pydolphinscheduler"
 config_file = "config.yaml"
 
 
 @pytest.fixture
-def delete_tmp_config_file():
-    """Util for deleting temp configuration file after test finish."""
+def teardown_file_env():
+    """Util for deleting temp configuration file and pop env var after test finish."""
     yield
-    config_file_path = get_config_file_path()
-    config_file_path.unlink()
+    config_file_path = config_path()
+    if config_file_path.exists():
+        config_file_path.unlink()
+    os.environ.pop(ENV_PYDS_HOME, None)
 
 
-@pytest.mark.skipif(
-    DEV_MODE,
-    reason="Avoid delete ~/pydolphinscheduler/config.yaml by accident when test locally.",
-)
 @pytest.mark.parametrize(
     "home",
     [
@@ -51,24 +49,23 @@ def delete_tmp_config_file():
         "/tmp/test_abc",
     ],
 )
-def test_config_init(delete_tmp_config_file, home):
+def test_config_init(teardown_file_env, home):
     """Test command line interface `config --init`."""
     if home:
-        os.environ["PYDOLPHINSCHEDULER_HOME"] = home
-        config_path = home
-    else:
-        config_path = default_config_path
+        os.environ[ENV_PYDS_HOME] = home
+    elif DEV_MODE:
+        pytest.skip(
+            "Avoid delete ~/pydolphinscheduler/config.yaml by accident when test locally."
+        )
 
-    path = Path(config_path).joinpath(config_file).expanduser()
-    assert not path.exists()
+    config_file_path = config_path()
+    assert not config_file_path.exists()
 
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
-    assert path.exists()
-    # TODO We have a bug here, yaml dump do not support comment
-    # with path.open(mode="r") as cli_crt, open(path_default_config_yaml, "r") as src:
-    #     assert src.read() == cli_crt.read()
+    assert config_file_path.exists()
+    assert get_file_content(config_file_path) == get_file_content(BUILD_IN_CONFIG_PATH)
 
 
 @pytest.mark.parametrize(
@@ -80,9 +77,9 @@ def test_config_init(delete_tmp_config_file, home):
         ("default.workflow.project", "project-pydolphin"),
     ],
 )
-def test_config_get(delete_tmp_config_file, key: str, expect: str):
+def test_config_get(teardown_file_env, key: str, expect: str):
     """Test command line interface `config --get XXX`."""
-    os.environ["PYDOLPHINSCHEDULER_HOME"] = "/tmp/pydolphinscheduler"
+    os.environ[ENV_PYDS_HOME] = "/tmp/pydolphinscheduler"
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
@@ -109,9 +106,9 @@ def test_config_get(delete_tmp_config_file, key: str, expect: str):
         ),
     ],
 )
-def test_config_get_multiple(delete_tmp_config_file, keys: str, expects: str):
+def test_config_get_multiple(teardown_file_env, keys: str, expects: str):
     """Test command line interface `config --get KEY1 --get KEY2 ...`."""
-    os.environ["PYDOLPHINSCHEDULER_HOME"] = "/tmp/pydolphinscheduler"
+    os.environ[ENV_PYDS_HOME] = "/tmp/pydolphinscheduler"
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
@@ -125,8 +122,6 @@ def test_config_get_multiple(delete_tmp_config_file, keys: str, expects: str):
         cli_test.assert_success(output=f"{keys[idx]} = {expect}", fuzzy=True)
 
 
-# TODO fix command `config --set KEY VAL`
-@pytest.mark.skip(reason="We still have bug in command `config --set KEY VAL`")
 @pytest.mark.parametrize(
     "key, value",
     [
@@ -136,9 +131,11 @@ def test_config_get_multiple(delete_tmp_config_file, keys: str, expects: str):
         ("default.workflow.project", "edit-project-pydolphin"),
     ],
 )
-def test_config_set(delete_tmp_config_file, key: str, value: str):
+def test_config_set(teardown_file_env, key: str, value: str):
     """Test command line interface `config --set KEY VALUE`."""
-    os.environ["PYDOLPHINSCHEDULER_HOME"] = "/tmp/pydolphinscheduler"
+    path = "/tmp/pydolphinscheduler"
+    assert not Path(path).joinpath(config_file).exists()
+    os.environ[ENV_PYDS_HOME] = path
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
@@ -153,10 +150,6 @@ def test_config_set(delete_tmp_config_file, key: str, value: str):
     assert f"{key} = {value}" in cli_test.result.output
 
 
-# TODO do not skip `config --set KEY1 VAL1 --set KEY2 VAL2`
-@pytest.mark.skip(
-    reason="We still have bug in command `config --set KEY1 VAL1 --set KEY2 VAL2`"
-)
 @pytest.mark.parametrize(
     "keys, values",
     [
@@ -176,9 +169,11 @@ def test_config_set(delete_tmp_config_file, key: str, value: str):
         ),
     ],
 )
-def test_config_set_multiple(delete_tmp_config_file, keys: str, values: str):
+def test_config_set_multiple(teardown_file_env, keys: str, values: str):
     """Test command line interface `config --set KEY1 VAL1 --set KEY2 VAL2`."""
-    os.environ["PYDOLPHINSCHEDULER_HOME"] = "/tmp/pydolphinscheduler"
+    path = "/tmp/pydolphinscheduler"
+    assert not Path(path).joinpath(config_file).exists()
+    os.environ[ENV_PYDS_HOME] = path
     cli_test = CliTestWrapper(cli, ["config", "--init"])
     cli_test.assert_success()
 
