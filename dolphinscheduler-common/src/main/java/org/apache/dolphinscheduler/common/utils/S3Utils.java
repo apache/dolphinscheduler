@@ -229,7 +229,7 @@ public class S3Utils implements Closeable, StorageOperate {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(0);
         InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-        PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName+FOLDER_SEPARATOR , emptyContent, metadata);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName + FOLDER_SEPARATOR, emptyContent, metadata);
         s3Client.putObject(putObjectRequest);
     }
 
@@ -238,24 +238,10 @@ public class S3Utils implements Closeable, StorageOperate {
         deleteTenantCode(tenantCode);
     }
 
-    private void deleteTenantCode(String tenantCode) throws ServiceException {
-        try {
-            ObjectListing objectListing = s3Client.listObjects(tenantCode);
-            while (true) {
-                for (S3ObjectSummary s3ObjectSummary : objectListing.getObjectSummaries()) {
-                    s3Client.deleteObject(tenantCode, s3ObjectSummary.getKey());
-                }
+    private void deleteTenantCode(String tenantCode) {
+        deleteDirectory(getResDir(tenantCode));
+        deleteDirectory(getUdfDir(tenantCode));
 
-                if (objectListing.isTruncated()) {
-                    objectListing = s3Client.listNextBatchOfObjects(objectListing);
-                } else {
-                    break;
-                }
-            }
-        } catch (AmazonServiceException e) {
-            logger.error("delete the bucket {} error,the message is {}", tenantCode, e.getErrorMessage());
-            throw new ServiceException("delete error!");
-        }
     }
 
 
@@ -295,6 +281,12 @@ public class S3Utils implements Closeable, StorageOperate {
         if (!s3Client.doesBucketExistV2(bucketName)) {
             logger.info(s3Client.getRegionName());
             s3Client.createBucket(bucketName);
+        }
+    }
+
+    private void deleteDirectory(String directoryName) {
+        if (s3Client.doesObjectExist(BUCKET_NAME, directoryName)) {
+            s3Client.deleteObject(BUCKET_NAME, directoryName);
         }
     }
 
