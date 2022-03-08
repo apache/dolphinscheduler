@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, h, onMounted, ref } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  h,
+  onMounted,
+  ref,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
@@ -67,7 +75,8 @@ export default defineComponent({
       handleStartDefinition,
       getWorkerGroups,
       getAlertGroups,
-      getEnvironmentList
+      getEnvironmentList,
+      getStartParamsList
     } = useModal(startState, ctx)
 
     const hideModal = () => {
@@ -175,6 +184,11 @@ export default defineComponent({
       getAlertGroups()
       getEnvironmentList()
     })
+
+    watch(
+      () => props.row,
+      () => getStartParamsList(props.row.code)
+    )
 
     return {
       t,
@@ -368,6 +382,7 @@ export default defineComponent({
                       pair
                       separator=':'
                       placeholder={['prop', 'value']}
+                      defaultValue={[item.prop, item.value]}
                       onUpdateValue={(param) =>
                         this.updateParamsList(index, param)
                       }

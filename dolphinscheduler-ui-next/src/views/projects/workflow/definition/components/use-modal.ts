@@ -18,10 +18,13 @@
 import _ from 'lodash'
 import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { format } from 'date-fns'
-import { importProcessDefinition } from '@/service/modules/process-definition'
+import {
+  importProcessDefinition,
+  queryProcessDefinitionByCode
+} from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
@@ -39,9 +42,10 @@ export function useModal(
 ) {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const route = useRoute()
 
   const variables = reactive({
-    projectCode: Number(router.currentRoute.value.params.projectCode),
+    projectCode: Number(route.params.projectCode),
     workerGroups: [],
     alertGroups: [],
     environmentList: [],
@@ -205,6 +209,16 @@ export function useModal(
     })
   }
 
+  const getStartParamsList = (code: number) => {
+    queryProcessDefinitionByCode(code, variables.projectCode)
+      .then((res: any) => {
+        variables.startParamsList = res.processDefinition.globalParamList
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message)
+      })
+  }
+
   const getPreviewSchedule = () => {
     state.timingFormRef.validate(async (valid: any) => {
       if (!valid) {
@@ -244,6 +258,7 @@ export function useModal(
     getWorkerGroups,
     getAlertGroups,
     getEnvironmentList,
+    getStartParamsList,
     getPreviewSchedule
   }
 }
