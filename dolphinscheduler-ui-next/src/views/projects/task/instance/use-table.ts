@@ -46,7 +46,7 @@ export function useTable() {
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
-    processInstanceId: ref(processInstanceId? processInstanceId:null),
+    processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),

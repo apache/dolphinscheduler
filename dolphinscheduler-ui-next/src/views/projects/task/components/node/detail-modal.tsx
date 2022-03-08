@@ -32,10 +32,9 @@ import Detail from './detail'
 import { formatModel } from './format-data'
 import type { ITaskData, ITaskType } from './types'
 import { HistoryOutlined, ProfileOutlined } from '@vicons/antd'
-import {NIcon} from "naive-ui";
-import {Router, useRouter} from "vue-router";
-import {IWorkflowTaskInstance} from "@/views/projects/workflow/components/dag/types";
-
+import { NIcon } from 'naive-ui'
+import { Router, useRouter } from 'vue-router'
+import { IWorkflowTaskInstance } from '@/views/projects/workflow/components/dag/types'
 
 const props = {
   show: {
@@ -96,23 +95,26 @@ const NodeDetailModal = defineComponent({
 
     const initHeaderLinks = (processInstance: any) => {
       headerLinks.value = [
-          {
-            text: t('project.node.view_history'),
-            show: true,
-            action: () => {
-              router.push({ name: 'task-instance', params: { processInstanceId: processInstance.id } })
-            },
-            icon: renderIcon(HistoryOutlined)
+        {
+          text: t('project.node.view_history'),
+          show: true,
+          action: () => {
+            router.push({
+              name: 'task-instance',
+              params: { processInstanceId: processInstance.id }
+            })
           },
-          {
-            text: t('project.node.view_log'),
-            show: props.taskInstance? true:false,
-            action: () => {
-              handleViewLog()
-            },
-            icon: renderIcon(ProfileOutlined)
-          }
-        ]
+          icon: renderIcon(HistoryOutlined)
+        },
+        {
+          text: t('project.node.view_log'),
+          show: props.taskInstance ? true : false,
+          action: () => {
+            handleViewLog()
+          },
+          icon: renderIcon(ProfileOutlined)
+        }
+      ]
     }
 
     const onTaskTypeChange = (taskType: ITaskType) => {
@@ -130,15 +132,15 @@ const NodeDetailModal = defineComponent({
     )
 
     watch(
-        () => [props.show, props.data],
-        async () => {
-          if (!props.show) return
-          if (props.processInstance) {
-            initHeaderLinks(props.processInstance)
-          }
-          await nextTick()
-          detailRef.value.value.setValues(formatModel(props.data))
+      () => [props.show, props.data],
+      async () => {
+        if (!props.show) return
+        if (props.processInstance) {
+          initHeaderLinks(props.processInstance)
         }
+        await nextTick()
+        detailRef.value.value.setValues(formatModel(props.data))
+      }
     )
 
     return () => (
@@ -157,7 +159,6 @@ const NodeDetailModal = defineComponent({
           key={props.data.taskType}
         />
       </Modal>
-
     )
   }
 })

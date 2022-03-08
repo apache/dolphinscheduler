@@ -157,13 +157,15 @@ export default defineComponent({
     const currentTaskInstance = ref()
 
     watch(
-        () => taskModalVisible.value,
-        () => {
-          if (props.instance && taskModalVisible.value) {
-            const taskCode = currTask.value.code
-            currentTaskInstance.value = taskList.value.find((task: any) => task.taskCode === taskCode)
-          }
+      () => taskModalVisible.value,
+      () => {
+        if (props.instance && taskModalVisible.value) {
+          const taskCode = currTask.value.code
+          currentTaskInstance.value = taskList.value.find(
+            (task: any) => task.taskCode === taskCode
+          )
         }
+      }
     )
 
     const statusTimerRef = ref()

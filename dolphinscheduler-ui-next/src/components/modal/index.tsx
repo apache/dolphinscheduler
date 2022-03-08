@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import {defineComponent, h, PropType, renderSlot, Ref} from 'vue'
+import { defineComponent, h, PropType, renderSlot, Ref } from 'vue'
 import { NModal, NCard, NButton, NSpace, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
-import {LinkOption} from "@/components/modal/types";
+import { LinkOption } from '@/components/modal/types'
 
 const props = {
   show: {
@@ -84,14 +84,8 @@ const Modal = defineComponent({
     return { t, onCancel, onConfirm }
   },
   render() {
-    const {
-      $slots,
-      t,
-      onCancel,
-      onConfirm,
-      confirmDisabled,
-      confirmLoading
-    } = this
+    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading } =
+      this
 
     return (
       <NModal
@@ -109,16 +103,19 @@ const Modal = defineComponent({
             default: () => renderSlot($slots, 'default'),
             'header-extra': () => (
               <NSpace justify='end'>
-                {this.headerLinks.value && (this.headerLinks.value.filter((item: any) => item.show).map((item: any) => {
-                  return (
-                      <NButton text onClick={item.action}>
-                        {{
-                          default: () => item.text,
-                          icon: () => item.icon()
-                        }}
-                      </NButton>
-                  )
-                }))}
+                {this.headerLinks.value &&
+                  this.headerLinks.value
+                    .filter((item: any) => item.show)
+                    .map((item: any) => {
+                      return (
+                        <NButton text onClick={item.action}>
+                          {{
+                            default: () => item.text,
+                            icon: () => item.icon()
+                          }}
+                        </NButton>
+                      )
+                    })}
               </NSpace>
             ),
             footer: () => (
