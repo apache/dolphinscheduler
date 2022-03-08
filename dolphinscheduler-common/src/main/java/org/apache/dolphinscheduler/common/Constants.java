@@ -72,21 +72,6 @@ public final class Constants {
     public static final String FS_DEFAULT_FS = "fs.defaultFS";
 
 
-    /**
-     * fs s3a endpoint
-     */
-    public static final String FS_S3A_ENDPOINT = "fs.s3a.endpoint";
-
-    /**
-     * fs s3a access key
-     */
-    public static final String FS_S3A_ACCESS_KEY = "fs.s3a.access.key";
-
-    /**
-     * fs s3a secret key
-     */
-    public static final String FS_S3A_SECRET_KEY = "fs.s3a.secret.key";
-
 
     /**
      * hadoop configuration
