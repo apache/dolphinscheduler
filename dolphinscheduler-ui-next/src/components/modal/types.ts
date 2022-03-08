@@ -15,13 +15,9 @@
  * limitations under the License.
  */
 
-.container {
-  width: 600px;
-}
-.modal-card {
-  max-height: 100vh;
-}
-
-.header-icon {
-  padding-right: 5px;
+export interface LinkOption {
+  text: string
+  show: boolean
+  action?: Function
+  icon?: object
 }

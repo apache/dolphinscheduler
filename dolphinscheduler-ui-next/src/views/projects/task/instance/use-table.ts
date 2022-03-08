@@ -38,6 +38,7 @@ export function useTable() {
   const { t } = useI18n()
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
+  const processInstanceId = Number(route.params.processInstanceId)
 
   const variables = reactive({
     columns: [],
@@ -45,7 +46,7 @@ export function useTable() {
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
-    processInstanceId: ref(null),
+    processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),
