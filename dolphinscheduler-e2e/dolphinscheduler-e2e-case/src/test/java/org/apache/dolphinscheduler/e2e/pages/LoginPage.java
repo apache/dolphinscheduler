@@ -32,8 +32,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.List;
-
 @Getter
 public final class LoginPage extends NavBarPage {
     @FindBys({
@@ -42,7 +40,10 @@ public final class LoginPage extends NavBarPage {
     })
     private WebElement inputUsername;
 
-    @FindBy(className = "input-password")
+    @FindBys( {
+        @FindBy(className = "input-password"),
+        @FindBy(tagName = "input"),
+    })
     private WebElement inputPassword;
 
     @FindBy(className = "btn-login")
