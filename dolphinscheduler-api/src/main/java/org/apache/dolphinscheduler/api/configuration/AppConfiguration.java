@@ -116,8 +116,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("redirect:/ui/");
         registry.addViewController("/ui/").setViewName("forward:/ui/index.html");
-        registry.addViewController("/").setViewName("forward:/ui/index.html");
     }
 
     /**
