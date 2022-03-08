@@ -21,4 +21,6 @@ const regex = {
   password: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/
 }
 
+export const positiveIntegerRegex = /^\+?[0-9]*$/
+
 export default regex
