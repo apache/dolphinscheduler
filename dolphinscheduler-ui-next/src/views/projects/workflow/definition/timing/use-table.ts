@@ -152,7 +152,8 @@ export function useTable() {
                       NButton,
                       {
                         circle: true,
-                        type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                        type:
+                          row.releaseState === 'ONLINE' ? 'error' : 'warning',
                         size: 'small',
                         onClick: () => {
                           handleReleaseState(row)

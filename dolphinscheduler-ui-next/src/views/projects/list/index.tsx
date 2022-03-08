@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
-
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
-import { NButton, NCard, NDataTable, NIcon, NInput, NPagination, NSpace } from 'naive-ui'
+import {
+  NButton,
+  NCard,
+  NDataTable,
+  NIcon,
+  NInput,
+  NPagination,
+  NSpace
+} from 'naive-ui'
 import { defineComponent, onMounted, ref, toRefs, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProjectModal from './components/project-modal'
@@ -72,7 +79,16 @@ const list = defineComponent({
       createColumns(variables)
     })
 
-    return { t, ...toRefs(variables), requestData, handleModalChange, handleSearch, onCancelModal, onConfirmModal, handleChangePageSize }
+    return {
+      t,
+      ...toRefs(variables),
+      requestData,
+      handleModalChange,
+      handleSearch,
+      onCancelModal,
+      onConfirmModal,
+      handleChangePageSize
+    }
   },
   render() {
     const { t } = this
