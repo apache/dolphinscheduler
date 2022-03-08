@@ -36,7 +36,7 @@ import java.util.List;
 @Getter
 public final class LoginPage extends NavBarPage {
     @FindBy(className = "input-user-name")
-    private List<WebElement> inputUsername;
+    private WebElement inputUsername;
 
     @FindBy(className = "input-password")
     private WebElement inputPassword;
@@ -50,7 +50,8 @@ public final class LoginPage extends NavBarPage {
 
     @SneakyThrows
     public TenantPage login(String username, String password) {
-        inputUsername().get(0).sendKeys(username);
+        inputUsername().click();
+        inputUsername().sendKeys(username);
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
