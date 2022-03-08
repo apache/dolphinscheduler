@@ -398,6 +398,10 @@ public class TaskNode {
         return preTaskNodeList;
     }
 
+    public boolean isBlockingTask() {
+        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.getType());
+    }
+
     public void setPreTaskNodeList(List<PreviousTaskNode> preTaskNodeList) {
         this.preTaskNodeList = preTaskNodeList;
     }
