@@ -149,6 +149,9 @@ $bgLight: #ffffff;
     &.icon-switch {
       background-image: url('@/assets/images/task-icons/switch.png');
     }
+    &.icon-aws_emr {
+      background-image: url('@/assets/images/task-icons/aws_emr.png');
+    }
   }
 
   &:hover {
@@ -200,6 +203,9 @@ $bgLight: #ffffff;
       }
       &.icon-switch {
         background-image: url('@/assets/images/task-icons/switch_hover.png');
+      }
+      &.icon-aws_emr {
+        background-image: url('@/assets/images/task-icons/aws_emr_hover.png');
       }
     }
   }
