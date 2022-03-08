@@ -89,9 +89,7 @@ const ProjectModal = defineComponent({
         show={this.showModalRef}
         onConfirm={this.confirmModal}
         onCancel={this.cancelModal}
-        confirmDisabled={
-          !this.model.projectName || !this.model.userName
-        }
+        confirmDisabled={!this.model.projectName || !this.model.userName}
       >
         <NForm rules={this.rules} ref='projectFormRef'>
           <NFormItem label={t('project.list.project_name')} path='projectName'>
