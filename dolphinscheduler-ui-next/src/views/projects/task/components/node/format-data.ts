@@ -276,6 +276,11 @@ export function formatParams(data: INodeData): {
     }
   }
 
+  if (data.taskType === 'EMR') {
+    taskParams.type = data.type
+    taskParams.jobFlowDefineJson = data.jobFlowDefineJson
+  }
+
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -447,6 +452,11 @@ export function formatModel(data: ITaskData) {
     params.numExecutors = data.numExecutors
     params.others = data.others
   }
+
+  if (data.taskParams?.jobFlowDefineJson) {
+    params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
   return params
 }
 

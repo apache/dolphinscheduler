@@ -877,7 +877,9 @@ const project = {
     enum_list: '枚举值列表',
     begin_time: '起始时间',
     fix_value: '固定值',
-    required: '必填'
+    required: '必填',
+    emr_flow_define_json: 'jobFlowDefineJson',
+    emr_flow_define_json_tips: '请输入工作流定义'
   }
 }
 

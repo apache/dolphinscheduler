@@ -270,6 +270,7 @@ interface ITaskParams {
   sparkParameters?: ISparkParameters
   ruleId?: number
   ruleInputParameter?: IRuleParameters
+  jobFlowDefineJson?: string
 }
 
 interface INodeData
