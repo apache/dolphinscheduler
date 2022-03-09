@@ -124,6 +124,7 @@ export function useTaskEdit(options: Options) {
         setNodeName(task.code + '', taskDef.name)
         return {
           ...taskDef,
+          version: task.version,
           code: task.code,
           taskType: currTask.value.taskType
         }
