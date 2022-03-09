@@ -42,7 +42,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 class UserE2ETest {
     private static final String tenant = System.getProperty("user.name");
     private static final String user = "test_user";
-    private static final String password = "test_user123";
+    private static final String password = "testUser123";
     private static final String email = "test_user@gmail.com";
     private static final String phone = "15800000000";
     private static final String queue = "default";

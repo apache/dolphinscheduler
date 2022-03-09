@@ -69,12 +69,12 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .click();
 
         createUserForm().btnSelectQueueDropdown().click();
-        createUserForm().selectQueue()
-            .stream()
-            .filter(it -> it.getText().contains(queue))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in queue dropdown list", queue)))
-            .click();
+//        createUserForm().selectQueue()
+//            .stream()
+//            .filter(it -> it.getText().contains(queue))
+//            .findFirst()
+//            .orElseThrow(() -> new RuntimeException(String.format("No %s in queue dropdown list", queue)))
+//            .click();
 
         createUserForm().inputEmail().sendKeys(email);
         createUserForm().inputPhone().sendKeys(phone);
