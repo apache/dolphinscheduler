@@ -17,13 +17,13 @@
 
 import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NDataTable } from 'naive-ui'
-import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
 import { useTable } from './use-table'
-import { IDefinitionData } from '../types'
+import { NDataTable, NPagination } from 'naive-ui'
+import Modal from '@/components/modal'
 import styles from '../index.module.scss'
+import type { IDefinitionData } from '../types'
 
 const props = {
   show: {
@@ -44,6 +44,13 @@ export default defineComponent({
     const { variables, getTableData } = useTable(ctx)
     const { importState } = useForm()
     const { handleImportDefinition } = useModal(importState, ctx)
+
+    const requestData = () => {
+      if (props.show && props.row?.code) {
+        getTableData(props.row)
+      }
+    }
+
     const hideModal = () => {
       ctx.emit('update:show')
     }
@@ -59,23 +66,21 @@ export default defineComponent({
 
     watch(
       () => props.show,
-      () => {
-        if (props.show && props.row?.code) {
-          getTableData(props.row)
-        }
-      }
+      () => requestData()
     )
 
     return {
       hideModal,
       handleImport,
       customRequest,
+      requestData,
       ...toRefs(variables)
     }
   },
 
   render() {
     const { t } = useI18n()
+    const { requestData } = this
 
     return (
       <Modal
@@ -91,6 +96,14 @@ export default defineComponent({
           size={'small'}
           class={styles.table}
         />
+        <div class={styles.pagination}>
+          <NPagination
+            v-model:page={this.page}
+            v-model:page-size={this.pageSize}
+            page-count={this.totalPage}
+            onUpdatePage={requestData}
+          />
+        </div>
       </Modal>
     )
   }
