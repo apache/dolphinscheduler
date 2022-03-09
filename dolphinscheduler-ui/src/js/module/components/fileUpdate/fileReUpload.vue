@@ -106,7 +106,6 @@
         // file
         file: null,
         currentDir: '/',
-        id: null,
         // Whether to drag upload
         dragOver: false
       }
