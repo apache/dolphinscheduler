@@ -111,13 +111,19 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(className = "input-tenant-code")
+        @FindBys({
+                @FindBy(className = "input-tenant-code"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputTenantCode;
 
         @FindBy(className = "select-queue")
         private WebElement selectQueue;
 
-        @FindBy(className = "input-description")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDescription;
 
         @FindBy(id = "btn-submit")
