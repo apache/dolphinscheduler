@@ -74,7 +74,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     public TenantPage update(String tenant, String description) {
         tenantList().stream()
-            .filter(it -> it.findElement(By.className("tenantCode")).getAttribute("innerHTML").contains(tenant))
+            .filter(it -> it.findElement(By.className("tenant-code")).getAttribute("innerHTML").contains(tenant))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
