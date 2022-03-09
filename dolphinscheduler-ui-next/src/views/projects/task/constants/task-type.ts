@@ -67,8 +67,8 @@ export const TASK_TYPES_MAP = {
   SEATUNNEL: {
     alias: 'WATERDROP'
   },
-  AWSEMR: {
-    alias: 'AWSEMR'
+  EMR: {
+    alias: 'AmazonEMR'
   }
 }
 

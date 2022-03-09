@@ -17,25 +17,21 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function useAwsEmr(model: { [field: string]: any }): IJsonItem[] {
+export function useEmr(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
   return [
     {
       type: 'editor',
-      field: 'method',
-      name: t('project.node.procedure_method'),
+      field: 'jobFlowDefineJson',
+      name: t('project.node.emr_flow_define_json'),
       props: {
-        language: 'sql',
-        placeholder: t('project.node.procedure_method_tips'),
-        defaultValue: model.method
-          ? model.method
-          : t('project.node.procedure_method_snippet')
+        language: 'json'
       },
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
-        message: t('project.node.procedure_method_tips')
+        message: t('project.node.emr_flow_define_json_tips')
       }
     },
     {

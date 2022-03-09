@@ -20,7 +20,7 @@ import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 import { ITaskData } from '../types'
 
-export function useAwsEmr({
+export function useEmr({
   projectCode,
   from = 0,
   readonly,
@@ -33,7 +33,7 @@ export function useAwsEmr({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'AWSEMR',
+    taskType: 'EMR',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -43,10 +43,7 @@ export function useAwsEmr({
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30,
-    type: data?.taskParams?.type ? data?.taskParams?.type : 'MYSQL',
-    datasource: data?.taskParams?.datasource,
-    method: data?.taskParams?.method
+    timeout: 30
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -77,7 +74,7 @@ export function useAwsEmr({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useAwsEmr(model),
+      ...Fields.useEmr(model),
       Fields.usePreTasks(model)
     ] as IJsonItem[],
     model

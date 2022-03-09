@@ -32,7 +32,7 @@ import { useConditions } from './use-conditions'
 import { useDataX } from './use-datax'
 import { useDependent } from './use-dependent'
 import { useDataQuality } from './use-data-quality'
-import { useAwsEmr } from './use-aws-emr'
+import { useEmr } from './use-emr'
 
 export default {
   SHELL: useShell,
@@ -52,5 +52,5 @@ export default {
   DATAX: useDataX,
   DEPENDENT: useDependent,
   DATA_QUALITY: useDataQuality,
-  AWSEMR: useAwsEmr
+  EMR: useEmr
 }

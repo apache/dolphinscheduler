@@ -276,7 +276,7 @@ export function formatParams(data: INodeData): {
     }
   }
 
-  if (data.taskType === 'AWSEMR') {
+  if (data.taskType === 'EMR') {
     taskParams.type = data.type
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
   }
