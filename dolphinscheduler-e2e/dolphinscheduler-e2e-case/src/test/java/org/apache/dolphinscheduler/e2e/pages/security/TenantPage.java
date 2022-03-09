@@ -126,10 +126,10 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
         })
         private WebElement inputDescription;
 
-        @FindBy(id = "btn-submit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btn-cancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }
