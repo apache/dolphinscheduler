@@ -34,7 +34,7 @@ import lombok.Getter;
 
 @Getter
 public final class UserPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btn-create-user")
+    @FindBy(className = "btn-create-user")
     private WebElement buttonCreateUser;
 
     @FindBy(className = "items")
