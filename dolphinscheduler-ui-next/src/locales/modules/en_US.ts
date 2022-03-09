@@ -887,7 +887,9 @@ const project = {
     enum_list: 'EnumList',
     begin_time: 'BeginTime',
     fix_value: 'FixValue',
-    required: 'required'
+    required: 'required',
+    emr_flow_define_json: 'jobFlowDefineJson',
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
   }
 }
 
