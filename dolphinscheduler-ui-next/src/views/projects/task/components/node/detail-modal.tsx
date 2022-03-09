@@ -31,7 +31,11 @@ import Modal from '@/components/modal'
 import Detail from './detail'
 import { formatModel } from './format-data'
 import type { ITaskData, ITaskType } from './types'
-import { HistoryOutlined, ProfileOutlined } from '@vicons/antd'
+import {
+  HistoryOutlined,
+  ProfileOutlined,
+  QuestionCircleTwotone
+} from '@vicons/antd'
 import { NIcon } from 'naive-ui'
 import { Router, useRouter } from 'vue-router'
 import { IWorkflowTaskInstance } from '@/views/projects/workflow/components/dag/types'
@@ -70,7 +74,7 @@ const NodeDetailModal = defineComponent({
   props,
   emits: ['cancel', 'submit', 'viewLog'],
   setup(props, { emit }) {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const router: Router = useRouter()
     const renderIcon = (icon: any) => {
       return () => h(NIcon, null, { default: () => h(icon) })
@@ -93,11 +97,28 @@ const NodeDetailModal = defineComponent({
       }
     }
 
-    const initHeaderLinks = (processInstance: any) => {
+    const initHeaderLinks = (
+      processInstance: any,
+      taskType: ITaskType | undefined
+    ) => {
       headerLinks.value = [
         {
+          text: t('project.node.instructions'),
+          show: taskType ? true : false,
+          action: () => {
+            const helpUrl =
+              'https://dolphinscheduler.apache.org/' +
+              locale.value.toLowerCase().replace('_', '-') +
+              '/docs/latest/user_doc/guide/task/' +
+              taskType?.toLowerCase() +
+              '.html'
+            window.open(helpUrl)
+          },
+          icon: renderIcon(QuestionCircleTwotone)
+        },
+        {
           text: t('project.node.view_history'),
-          show: true,
+          show: props.taskInstance ? true : false,
           action: () => {
             router.push({
               name: 'task-instance',
@@ -135,9 +156,8 @@ const NodeDetailModal = defineComponent({
       () => [props.show, props.data],
       async () => {
         if (!props.show) return
-        if (props.processInstance) {
-          initHeaderLinks(props.processInstance)
-        }
+
+        initHeaderLinks(props.processInstance, props.data.taskType)
         await nextTick()
         detailRef.value.value.setValues(formatModel(props.data))
       }
