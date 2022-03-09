@@ -38,17 +38,25 @@ import lombok.Getter;
 public class NavBarPage {
     protected final RemoteWebDriver driver;
 
-    @FindBy(id = "tabProject")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')" +
+            "][2]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement projectTab;
 
-    @FindBy(id = "tabSecurity")
-    private WebElement securityTab;
-
-    @FindBy(id = "tabResource")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][3]//div[contains" +
+            "(@class, 'n-menu-item-content')]")
     private WebElement resourceTab;
 
-    @FindBy(id = "tabDataSource")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][4]//div[contains" +
+            "(@class, 'n-menu-item-content')]")
+    private WebElement dataQualityTab;
+
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][5]//div[contains" +
+            "(@class, 'n-menu-item-content')]")
     private WebElement dataSourceTab;
+
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][7]//div[contains" +
+            "(@class, 'n-menu-item-content')]")
+    private WebElement securityTab;
 
     public NavBarPage(RemoteWebDriver driver) {
         this.driver = driver;
@@ -65,9 +73,8 @@ public class NavBarPage {
         }
 
         if (nav == SecurityPage.class) {
-            WebElement securityTabElement = new WebDriverWait(driver, 60)
-                .until(ExpectedConditions.elementToBeClickable(securityTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", securityTabElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(securityTab));
+            securityTab.click();
             return nav.cast(new SecurityPage(driver));
         }
 

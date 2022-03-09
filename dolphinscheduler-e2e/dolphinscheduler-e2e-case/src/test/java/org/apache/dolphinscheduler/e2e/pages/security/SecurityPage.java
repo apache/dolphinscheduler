@@ -34,26 +34,33 @@ import lombok.Getter;
 
 @Getter
 public class SecurityPage extends NavBarPage implements NavBarItem {
-    @FindBy(className = "tab-tenant-manage")
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][1]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement menuTenantManage;
 
-    @FindBy(className = "tab-user-manage")
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][2]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement menUserManage;
 
-    @FindBy(className = "tab-worker-group-manage")
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][5]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement menWorkerGroupManage;
 
-    @FindBy(className = "tab-queue-manage")
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][6]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement menuQueueManage;
 
-    @FindBy(className = "tab-environment-manage")
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][7]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement menuEnvironmentManage;
 
-    @FindBy(className = "tab-token-manage")
-    private WebElement menuTokenManage;
-
-    @FindBy(className = "tab-namespace-manage")
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][8]//div[contains(@class, 'n-menu-item-content')]")
     private WebElement menuNamespaceManage;
+
+    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
+            "][9]//div[contains(@class, 'n-menu-item-content')]")
+    private WebElement menuTokenManage;
 
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
@@ -61,9 +68,8 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
 
     public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
         if (tab == TenantPage.class) {
-            WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuTenantManageElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(menuTenantManage));
+            menuTenantManage.click();
             return tab.cast(new TenantPage(driver));
         }
         if (tab == UserPage.class) {

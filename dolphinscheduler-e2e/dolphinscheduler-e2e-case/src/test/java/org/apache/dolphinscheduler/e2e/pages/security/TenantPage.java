@@ -34,7 +34,7 @@ import lombok.Getter;
 
 @Getter
 public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btnCreateTenant")
+    @FindBy(className = "btn-create-tenant")
     private WebElement buttonCreateTenant;
 
     @FindBy(className = "items")
@@ -111,19 +111,19 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputTenantCode")
+        @FindBy(className = "input-tenant-code")
         private WebElement inputTenantCode;
 
-        @FindBy(id = "selectQueue")
+        @FindBy(className = "select-queue")
         private WebElement selectQueue;
 
-        @FindBy(id = "inputDescription")
+        @FindBy(className = "input-description")
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(id = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(id = "btn-cancel")
         private WebElement buttonCancel;
     }
 }
