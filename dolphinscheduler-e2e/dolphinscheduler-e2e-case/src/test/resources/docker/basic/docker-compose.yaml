@@ -27,6 +27,8 @@ services:
 #      - 12345
     ports:
       - 12345:12345
+    volumes:
+      - /data/master/dolphinscheduler/ds_dev/dolphinscheduler-ui-next/dist:/opt/dolphinscheduler/ui
     networks:
       - e2e
     healthcheck:
