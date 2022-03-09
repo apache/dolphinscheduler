@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 
 import java.util.Date;
 
@@ -45,6 +46,9 @@ public class ProcessScheduleJob extends QuartzJobBean {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private QuartzExecutor quartzExecutor;
 
     @Counted(value = "quartz_job_executed")
     @Timed(value = "quartz_job_execution", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
@@ -96,8 +100,8 @@ public class ProcessScheduleJob extends QuartzJobBean {
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {
         final Scheduler scheduler = context.getScheduler();
-        String jobName = QuartzExecutors.buildJobName(scheduleId);
-        String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
+        String jobName = quartzExecutor.buildJobName(scheduleId);
+        String jobGroupName = quartzExecutor.buildJobGroupName(projectId);
 
         JobKey jobKey = new JobKey(jobName, jobGroupName);
         try {
