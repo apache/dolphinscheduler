@@ -889,7 +889,7 @@ const project = {
     fix_value: 'FixValue',
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
   }
 }
 

@@ -879,7 +879,7 @@ const project = {
     fix_value: '固定值',
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: '请输入工作流定义',
+    emr_flow_define_json_tips: '请输入工作流定义'
   }
 }
 
