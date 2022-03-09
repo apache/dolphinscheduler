@@ -54,7 +54,7 @@ public final class LoginPage extends NavBarPage {
     }
 
     @SneakyThrows
-    public TenantPage login(String username, String password) {
+    public NavBarPage login(String username, String password) {
         inputUsername().sendKeys(username);
         inputPassword().sendKeys(password);
         buttonLogin().click();
@@ -62,6 +62,6 @@ public final class LoginPage extends NavBarPage {
         new WebDriverWait(driver, 10)
             .until(ExpectedConditions.urlContains("/home"));
 
-        return new TenantPage(driver);
+        return new NavBarPage(driver);
     }
 }
