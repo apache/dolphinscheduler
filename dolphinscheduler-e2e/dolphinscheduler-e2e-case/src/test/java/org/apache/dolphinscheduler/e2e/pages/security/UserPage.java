@@ -41,8 +41,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     private List<WebElement> userList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private List<WebElement> buttonConfirm;
 
@@ -54,11 +54,28 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         super(driver);
     }
 
-    public UserPage create(String user, String password, String email, String phone) {
+    public UserPage create(String user, String password, String email, String phone, String tenant, String queue) {
         buttonCreateUser().click();
 
         createUserForm().inputUserName().sendKeys(user);
         createUserForm().inputUserPassword().sendKeys(password);
+
+        createUserForm().btnSelectTenantDropdown().click();
+        createUserForm().selectTenant()
+            .stream()
+            .filter(it -> it.getText().contains(tenant))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
+            .click();
+
+        createUserForm().btnSelectQueueDropdown().click();
+        createUserForm().selectQueue()
+            .stream()
+            .filter(it -> it.getText().contains(queue))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in queue dropdown list", queue)))
+            .click();
+
         createUserForm().inputEmail().sendKeys(email);
         createUserForm().inputPhone().sendKeys(phone);
         createUserForm().buttonSubmit().click();
@@ -117,34 +134,58 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputUserName")
+        @FindBys({
+            @FindBy(className = "input-username"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputUserName;
 
-        @FindBy(id = "inputUserPassword")
+        @FindBys({
+                @FindBy(className = "input-password"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputUserPassword;
 
-        @FindBy(id = "selectTenant")
-        private WebElement selectTenant;
+        @FindBys({
+            @FindBy(className = "select-tenant"),
+            @FindBy(className = "n-base-selection"),
+        })
+        private WebElement btnSelectTenantDropdown;
 
-        @FindBy(id = "selectQueue")
-        private WebElement selectQueue;
+        @FindBy(className = "n-base-select-option__content")
+        private List<WebElement> selectTenant;
 
-        @FindBy(id = "inputEmail")
+        @FindBys({
+                @FindBy(className = "select-queue"),
+                @FindBy(className = "n-base-selection"),
+        })
+        private WebElement btnSelectQueueDropdown;
+
+        @FindBy(className = "n-base-select-option__content")
+        private List<WebElement> selectQueue;
+
+        @FindBys({
+                @FindBy(className = "input-email"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputEmail;
 
-        @FindBy(id = "inputPhone")
+        @FindBys({
+                @FindBy(className = "input-phone"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputPhone;
 
-        @FindBy(id = "radioStateEnable")
+        @FindBy(className = "radio-state-enable")
         private WebElement radioStateEnable;
 
-        @FindBy(id = "radioStateDisable")
+        @FindBy(className = "radio-state-disable")
         private WebElement radioStateDisable;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }
