@@ -15,61 +15,33 @@
  * limitations under the License.
  */
 
-export const TASK_TYPES_MAP = {
-  SHELL: {
-    alias: 'SHELL'
-  },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
-  },
-  PROCEDURE: {
-    alias: 'PROCEDURE'
-  },
-  SQL: {
-    alias: 'SQL'
-  },
-  SPARK: {
-    alias: 'SPARK'
-  },
-  FLINK: {
-    alias: 'FLINK'
-  },
-  MR: {
-    alias: 'MapReduce'
-  },
-  PYTHON: {
-    alias: 'PYTHON'
-  },
-  DEPENDENT: {
-    alias: 'DEPENDENT'
-  },
-  HTTP: {
-    alias: 'HTTP'
-  },
-  DATAX: {
-    alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
-  },
-  SQOOP: {
-    alias: 'SQOOP'
-  },
-  CONDITIONS: {
-    alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY'
-  },
-  SWITCH: {
-    alias: 'SWITCH'
-  },
-  SEATUNNEL: {
-    alias: 'WATERDROP'
-  },
-  EMR: {
-    alias: 'AmazonEMR'
-  }
-}
+package org.apache.dolphinscheduler.service.quartz;
 
-export type TaskType = keyof typeof TASK_TYPES_MAP
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+
+import java.util.Map;
+
+import org.quartz.Job;
+
+public interface QuartzExecutor {
+
+    /**
+     * build job name
+     */
+    String buildJobName(int scheduleId);
+
+    /**
+     * build job group name
+     */
+    String buildJobGroupName(int projectId);
+
+    /**
+     * build data map of job detail
+     */
+    Map<String, Object> buildDataMap(int projectId, Schedule schedule);
+
+    /**
+     * add job to quartz
+     */
+    void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule);
+}
