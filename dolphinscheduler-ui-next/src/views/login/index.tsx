@@ -23,6 +23,7 @@ import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
+import cookies from 'js-cookie'
 
 const login = defineComponent({
   name: 'login',
@@ -36,6 +37,8 @@ const login = defineComponent({
     if (themeStore.getTheme) {
       themeStore.setDarkTheme()
     }
+
+    cookies.set('language', localesStore.getLocales, { path: '/' })
 
     return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },
