@@ -107,6 +107,12 @@ It would not only run unit test but also show each file coverage which cover rat
 line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
 this command output.
 
+## Add LICENSE When New Dependencies Adding
+
+When you add a new package in pydolphinscheduler, you should also add the package's LICENSE to directory
+`dolphinscheduler-dist/release-docs/licenses/python-api-licenses`, and also add a short description to
+`dolphinscheduler-dist/release-docs/LICENSE`.
+
 <!-- content -->
 [py4j]: https://www.py4j.org/index.html
 [pycharm]: https://www.jetbrains.com/pycharm
