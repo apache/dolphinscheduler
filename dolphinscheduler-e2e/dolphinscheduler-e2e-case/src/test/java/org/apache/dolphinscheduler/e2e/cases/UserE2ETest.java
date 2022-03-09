@@ -114,6 +114,9 @@ class UserE2ETest {
     @Order(30)
     void testEditUser() {
         final UserPage page = new UserPage(browser);
+
+        browser.navigate().refresh();
+
         page.update(user, editUser, editPassword, editEmail, editPhone);
 
         await().untilAsserted(() -> {
