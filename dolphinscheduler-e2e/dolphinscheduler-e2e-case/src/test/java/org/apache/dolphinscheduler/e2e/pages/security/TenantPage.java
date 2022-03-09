@@ -41,12 +41,12 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     private List<WebElement> tenantList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
-    @FindBy(className = "tenantCode")
+    @FindBy(className = "tenant-code")
     private WebElement tenantCode;
 
     private final TenantForm tenantForm;
@@ -122,7 +122,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
         @FindBys({
                 @FindBy(className = "input-description"),
-                @FindBy(tagName = "input"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
