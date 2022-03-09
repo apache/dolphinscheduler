@@ -113,7 +113,7 @@ class UserE2ETest {
     @Test
     @Order(30)
     void testEditUser() {
-        final UserPage page = new UserPage(browser);
+        UserPage page = new UserPage(browser);
 
         browser.navigate().refresh();
 
