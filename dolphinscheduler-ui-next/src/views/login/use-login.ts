@@ -23,6 +23,7 @@ import type { Router } from 'vue-router'
 import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { useMenuStore } from '@/store/menu/menu'
+import cookies from 'js-cookie'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
@@ -34,6 +35,7 @@ export function useLogin(state: any) {
       if (!valid) {
         const loginRes: SessionIdRes = await login({ ...state.loginForm })
         await userStore.setSessionId(loginRes.sessionId)
+        cookies.set('sessionId', loginRes.sessionId, { path: '/' })
 
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
