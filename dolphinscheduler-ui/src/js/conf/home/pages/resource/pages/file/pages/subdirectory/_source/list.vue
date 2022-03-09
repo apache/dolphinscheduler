@@ -82,6 +82,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
+      v-if="renameDialog"
       width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
@@ -127,7 +128,7 @@
         }
       },
       _reUploadFile (item) {
-        findComponentDownward(this.$root, 'roof-nav')._fileReUpload(item)
+        findComponentDownward(this.$root, 'roof-nav')._fileChildReUpload('FILE', item, this.$route.params.id)
       },
       _downloadFile (item) {
         downloadFile(`resources/${item.id}/download`)

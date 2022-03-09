@@ -48,7 +48,7 @@
                 type="input"
                 size="small"
                 v-model="name"
-                :disabled="true"
+                :disabled="progress !== 0"
                 :placeholder="$t('Please enter name')">
               </el-input>
             </template>
@@ -93,7 +93,7 @@
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
   export default {
-    name: 'file-upload',
+    name: 'file-update',
     data () {
       return {
         store,
@@ -106,21 +106,17 @@
         // file
         file: null,
         currentDir: '/',
-        id: null,
         // Whether to drag upload
         dragOver: false
       }
     },
     watch: {
-      originalFileData: {
-        deep: true,
-        handler () {
-          this._init()
-        }
-      }
     },
     props: {
-      originalFileData: Object
+      type: String,
+      fileName: String,
+      desc: String,
+      id: Number
     },
     methods: {
       /**
@@ -129,7 +125,7 @@
       _ok () {
         this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
-          if (this.originalFileData.fileName === this.name) {
+          if (this.fileName === this.name) {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
             if (isLt1024M) {
               this._formDataUpdate().then(res => {
@@ -144,8 +140,10 @@
               this.$refs.popup.spinnerLoading = false
             }
           } else {
-            const params = { fullName: this.currentDir + this.name, type: 'FILE' }
-            this.store.dispatch('resource/resourceVerifyName', params).then(res => {
+            this.store.dispatch('resource/resourceVerifyName', {
+              fullName: '/' + this.name,
+              type: this.type
+            }).then(res => {
               const isLt1024M = this.file.size / 1024 / 1024 < 1024
               if (isLt1024M) {
                 this._formDataUpdate().then(res => {
@@ -167,9 +165,6 @@
         } else {
           this.$refs.popup.spinnerLoading = false
         }
-      },
-      _close () {
-        this.$emit('closeFileUpload')
       },
       /**
        * validation
@@ -196,15 +191,16 @@
           formData.append('file', this.file)
           formData.append('name', this.name)
           formData.append('description', this.description)
-          formData.append('type', 'FILE')
+          formData.append('id', this.id)
+          formData.append('type', this.type)
           io.put('resources/' + this.id, res => {
             this.$message.success(res.msg)
             resolve()
-            self.$emit('onUploadFile')
+            self.$emit('onUpdate')
             this.reset()
           }, e => {
             reject(e)
-            self.$emit('closeFileUpload')
+            self.$emit('close')
             this.$message.error(e.msg || '')
             this.reset()
           }, {
@@ -251,20 +247,13 @@
         this.name = file.name
         this.$refs.file.value = null
       },
-      _init () {
-        if (this.originalFileData) {
-          this.id = this.originalFileData.id
-          this.name = this.originalFileData.fileName
-          if (this.originalFileData.desc) {
-            this.description = this.originalFileData.desc
-          }
-          this.currentDir = this.originalFileData.fullName.substring(0, this.originalFileData.fullName.length - this.originalFileData.fileName.length)
-        }
+      _close () {
+        this.$emit('closeReUpload')
       }
     },
     mounted () {
-      this.reset()
-      this._init()
+      this.name = this.fileName
+      this.description = this.desc
     },
     components: { mPopup, mListBoxF, mProgressBar }
   }

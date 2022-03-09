@@ -83,6 +83,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
+      v-if="renameDialog"
       width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
