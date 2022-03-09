@@ -71,7 +71,7 @@ fi
 case $startStop in
   (start)
     echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
-    nohup "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
+    nohup /bin/sh "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
     echo $! > $pid
     ;;
 
