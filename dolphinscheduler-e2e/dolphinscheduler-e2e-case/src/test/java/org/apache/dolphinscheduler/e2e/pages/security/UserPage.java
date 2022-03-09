@@ -54,7 +54,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         super(driver);
     }
 
-    public UserPage create(String user, String password, String email, String phone, String tenant, String queue) {
+    public UserPage create(String user, String password, String email, String phone, String tenant) {
         buttonCreateUser().click();
 
         createUserForm().inputUserName().sendKeys(user);
@@ -67,14 +67,6 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .findFirst()
             .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
             .click();
-
-        createUserForm().btnSelectQueueDropdown().click();
-//        createUserForm().selectQueue()
-//            .stream()
-//            .filter(it -> it.getText().contains(queue))
-//            .findFirst()
-//            .orElseThrow(() -> new RuntimeException(String.format("No %s in queue dropdown list", queue)))
-//            .click();
 
         createUserForm().inputEmail().sendKeys(email);
         createUserForm().inputPhone().sendKeys(phone);
