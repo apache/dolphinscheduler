@@ -28,6 +28,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -54,8 +55,15 @@ public class NavBarPage {
             "(@class, 'n-menu-item-content')]")
     private WebElement dataSourceTab;
 
-    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][7]//div[contains" +
-            "(@class, 'n-menu-item-content')]")
+//    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][7]//div[contains" +
+//            "(@class, 'n-menu-item-content')]")
+
+    @FindBys({
+        @FindBy(className = "tab-horizontal"),
+        @FindBy(className = "n-menu-item"),
+        @FindBy(xpath = "//*[7]"),
+        @FindBy(className = "n-menu-item-content"),
+    })
     private WebElement securityTab;
 
     public NavBarPage(RemoteWebDriver driver) {
