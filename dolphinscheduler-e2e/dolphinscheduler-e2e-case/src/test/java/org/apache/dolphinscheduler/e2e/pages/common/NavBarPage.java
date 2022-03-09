@@ -60,8 +60,8 @@ public class NavBarPage {
 
     @FindBys({
         @FindBy(className = "tab-horizontal"),
-        @FindBy(className = "n-menu-item"),
-        @FindBy(xpath = "//*[7]"),
+//        @FindBy(className = "n-menu-item"),
+        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][7]"),
         @FindBy(className = "n-menu-item-content"),
     })
     private WebElement securityTab;
