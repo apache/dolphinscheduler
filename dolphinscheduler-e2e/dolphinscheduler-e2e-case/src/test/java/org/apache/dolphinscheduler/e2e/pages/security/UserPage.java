@@ -31,6 +31,8 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import lombok.Getter;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class UserPage extends NavBarPage implements SecurityPage.Tab {
@@ -61,6 +63,10 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         createUserForm().inputUserPassword().sendKeys(password);
 
         createUserForm().btnSelectTenantDropdown().click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                "n-base-select-option__content")));
+
         createUserForm().selectTenant()
             .stream()
             .filter(it -> it.getText().contains(tenant))
