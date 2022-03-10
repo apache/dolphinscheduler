@@ -88,7 +88,7 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public TokenPage update(String userName) {
         tokenList().stream()
-            .filter(it -> it.findElement(By.className("user-name")).getAttribute("innerHTML").contains(userName))
+            .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
@@ -105,7 +105,7 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public String getToken(String userName) {
         return tokenList().stream()
-                          .filter(it -> it.findElement(By.className("user-name")).getAttribute("innerHTML").contains(userName))
+                          .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
                           .flatMap(it -> it.findElements(By.className("token")).stream())
                           .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
                           .map(it -> it.getAttribute("innerHTML"))
