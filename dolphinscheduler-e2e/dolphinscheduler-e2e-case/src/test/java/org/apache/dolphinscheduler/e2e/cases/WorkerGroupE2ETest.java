@@ -58,7 +58,7 @@ class WorkerGroupE2ETest {
         final WorkerGroupPage page = new WorkerGroupPage(browser);
 
         new WebDriverWait(page.driver(), 10)
-            .until(ExpectedConditions.urlContains("/#/security/worker-groups"));
+            .until(ExpectedConditions.urlContains("/security/worker-group-manage"));
 
         page.create(workerGroupName);
 
