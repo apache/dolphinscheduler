@@ -34,22 +34,18 @@ export function useEnvironmentName(
   const getEnvironmentList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const res = await queryAllEnvironmentList()
-      environmentList = res.map(
-        (item: { code: string; name: string; workerGroups: string[] }) => ({
-          label: item.name,
-          value: item.code,
-          workerGroups: item.workerGroups
-        })
-      )
-      options.value = environmentList.filter((option: IEnvironmentNameOption) =>
-        filterByWorkerGroup(option)
-      )
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const res = await queryAllEnvironmentList()
+    environmentList = res.map(
+      (item: { code: string; name: string; workerGroups: string[] }) => ({
+        label: item.name,
+        value: item.code,
+        workerGroups: item.workerGroups
+      })
+    )
+    options.value = environmentList.filter((option: IEnvironmentNameOption) =>
+      filterByWorkerGroup(option)
+    )
+    loading.value = false
   }
 
   const filterByWorkerGroup = (option: IEnvironmentNameOption) => {
