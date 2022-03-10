@@ -34,7 +34,7 @@ import java.util.List;
 
 @Getter
 public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btn-createw-worker-group")
+    @FindBy(className = "btn-create-worker-group")
     private WebElement buttonCreateWorkerGroup;
 
     @FindBy(className = "items")
