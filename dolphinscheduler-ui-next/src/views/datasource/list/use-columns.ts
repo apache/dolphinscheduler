@@ -20,6 +20,7 @@ import { useI18n } from 'vue-i18n'
 import { NPopover, NButton, NIcon, NPopconfirm, NSpace } from 'naive-ui'
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
+import ButtonLink from '@/components/button-link'
 import { TableColumns } from './types'
 
 export function useColumns(onCallback: Function) {
@@ -52,16 +53,9 @@ export function useColumns(onCallback: Function) {
           { trigger: 'click' },
           {
             trigger: () =>
-              h(
-                NButton,
-                {
-                  quaternary: true,
-                  type: 'primary'
-                },
-                {
-                  default: () => t('datasource.click_to_view')
-                }
-              ),
+              h(ButtonLink, null, {
+                default: () => t('datasource.click_to_view')
+              }),
             default: () => h(JsonHighlight, { rowData })
           }
         )

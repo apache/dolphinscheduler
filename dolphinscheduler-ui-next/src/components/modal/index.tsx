@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, h, PropType, renderSlot, Ref } from 'vue'
-import { NModal, NCard, NButton, NSpace, NIcon } from 'naive-ui'
+import { defineComponent, PropType, renderSlot, Ref } from 'vue'
+import { NModal, NCard, NButton, NSpace } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 import { LinkOption } from '@/components/modal/types'
@@ -108,12 +109,12 @@ const Modal = defineComponent({
                     .filter((item: any) => item.show)
                     .map((item: any) => {
                       return (
-                        <NButton text onClick={item.action}>
+                        <ButtonLink onClick={item.action}>
                           {{
                             default: () => item.text,
                             icon: () => item.icon()
                           }}
-                        </NButton>
+                        </ButtonLink>
                       )
                     })}
               </NSpace>

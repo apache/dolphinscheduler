@@ -18,6 +18,7 @@
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
 import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 import { useI18n } from 'vue-i18n'
 import {
   DeleteOutlined,
@@ -30,7 +31,6 @@ import {
   deleteTaskDefinition
 } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
-import styles from './index.module.scss'
 import type {
   TaskDefinitionItem,
   TaskDefinitionRes
@@ -55,18 +55,11 @@ export function useTable(onEdit: Function) {
         width: 400,
         render: (row: IRecord) =>
           h(
-            'a',
+            ButtonLink,
             {
-              class: styles.links,
-              onClick: () => {
-                onEdit(row, true)
-              }
+              onClick: () => void onEdit(row, true)
             },
-            {
-              default: () => {
-                return row.taskName
-              }
-            }
+            { default: () => row.taskName }
           )
       },
       {

@@ -22,9 +22,9 @@ import { bytesToSize } from '@/utils/common'
 import { useFileStore } from '@/store/file/file'
 import TableAction from './table-action'
 import { IRenameFile } from '../types'
+import ButtonLink from '@/components/button-link'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import styles from './index.module.scss'
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
@@ -55,17 +55,11 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       width: 120,
       render: (row) =>
         h(
-          'a',
+          ButtonLink,
           {
-            href: 'javascript:',
-            class: styles.links,
-            onClick: () => goSubFolder(router, row)
+            onClick: () => void goSubFolder(router, row)
           },
-          {
-            default: () => {
-              return row.name
-            }
-          }
+          { default: () => row.name }
         )
     },
     { title: t('resource.file.user_name'), width: 100, key: 'user_name' },

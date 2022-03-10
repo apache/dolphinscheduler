@@ -14,43 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- .ansfont {
+.ansfont {
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
- .as {
+.as {
   display: inline-block;
   font-size: 14px;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
- .as-spin {
-    -webkit-animation: as-spin 2s infinite linear;
-    animation: as-spin 2s infinite linear;
+.as-spin {
+  -webkit-animation: as-spin 2s infinite linear;
+  animation: as-spin 2s infinite linear;
+}
+@-webkit-keyframes as-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
   }
-  @-webkit-keyframes as-spin {
-    0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(359deg);
-      transform: rotate(359deg);
-    }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
   }
-  @keyframes as-spin {
-    0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(359deg);
-      transform: rotate(359deg);
-    }
+}
+@keyframes as-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
   }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
 .table-box {
   border-top: 1px solid #ecf3ff;
   .ans-checkbox-wrapper-disabled {
@@ -71,7 +71,7 @@
   .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space:  nowrap;
+    white-space: nowrap;
     display: block;
   }
   button {
@@ -97,7 +97,8 @@
       &:hover {
         background: #ddecff;
       }
-      th,td{
+      th,
+      td {
         &:nth-child(1) {
           width: 50px;
           text-align: center;
@@ -108,13 +109,13 @@
           width: 60px;
           text-align: center;
         }
-        >span {
+        > span {
           font-size: 12px;
           color: #555;
         }
       }
       td {
-        >span {
+        > span {
           font-size: 12px;
           color: #666;
         }
@@ -126,21 +127,16 @@
       }
     }
   }
-  .links {
-    color: #2d8cf0;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 }
 
 .table-small-model {
   padding: 0 10px;
   table {
     width: 100%;
-    tr{
+    tr {
       background: #fff;
-      th,td {
+      th,
+      td {
         padding-left: 8px;
       }
       th {
@@ -149,18 +145,15 @@
         font-size: 12px;
         font-weight: bold;
         color: #333;
-        border-bottom: 2px solid #ECEDEC;
+        border-bottom: 2px solid #ecedec;
       }
       td {
         height: 32px;
         line-height: 32px;
-        border-bottom: 1px solid #ECEDEC;
+        border-bottom: 1px solid #ecedec;
         span {
           font-size: 12px;
           color: #333;
-        }
-        .links {
-          color:#2d8cf0;
         }
       }
       &:hover {
@@ -171,10 +164,10 @@
     }
   }
 }
-.el-table--enable-row-hover .el-table__body tr:hover>td {
+.el-table--enable-row-hover .el-table__body tr:hover > td {
   background-color: #ddecff;
 }
-.el-table th>.cell {
+.el-table th > .cell {
   color: #555;
   padding-left: 0;
   padding-right: 0;
@@ -182,7 +175,7 @@
 .el-table td div {
   color: #666;
 }
-.el-table td>.cell {
+.el-table td > .cell {
   padding-left: 0;
   padding-right: 0;
 }
