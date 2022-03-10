@@ -22,6 +22,7 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -44,7 +45,7 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
         @FindBy(className = "n-popconfirm__action"),
         @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final WorkerGroupForm createWorkerForm = new WorkerGroupForm();
     private final WorkerGroupForm editWorkerForm = new WorkerGroupForm();
@@ -97,12 +98,7 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
             .orElseThrow(() -> new RuntimeException("No delete button in workerGroup list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
