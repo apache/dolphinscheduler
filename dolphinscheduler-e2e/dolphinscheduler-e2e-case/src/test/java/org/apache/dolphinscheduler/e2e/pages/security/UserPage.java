@@ -94,6 +94,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         UserForm editUserForm = new UserForm();
 
+        editUserForm.inputUserName().sendKeys(Keys.CONTROL+"a");
         editUserForm.inputUserName().sendKeys(Keys.BACK_SPACE);
         editUserForm.inputUserName().sendKeys(editUser);
         editUserForm.inputUserPassword().clear();
