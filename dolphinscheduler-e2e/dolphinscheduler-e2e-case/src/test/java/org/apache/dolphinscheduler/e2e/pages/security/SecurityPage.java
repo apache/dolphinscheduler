@@ -35,54 +35,26 @@ import lombok.Getter;
 
 @Getter
 public class SecurityPage extends NavBarPage implements NavBarItem {
-//    @FindBys({
-//        @FindBy(className = "tab-vertical"),
-//        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][1]"),
-//        @FindBy(className = "n-menu-item-content"),
-//    })
-    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
-        "][1]//div[contains(@class, 'n-menu-item-content')]")
+
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
     private WebElement menuTenantManage;
 
-
-//    @FindBy(xpath = "//div[contains(@class, 'tab-vertical')]//div[contains(@class, 'n-menu-item')" +
-//            "][2]//div[contains(@class, 'n-menu-item-content')]")
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(2) > .n-menu-item-content")
     private WebElement menUserManage;
 
-    @FindBys({
-        @FindBy(className = "tab-vertical"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][5]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(5) > .n-menu-item-content")
     private WebElement menWorkerGroupManage;
 
-    @FindBys({
-        @FindBy(className = "tab-vertical"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][6]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(6) > .n-menu-item-content")
     private WebElement menuQueueManage;
 
-    @FindBys({
-        @FindBy(className = "tab-vertical"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][7]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(7) > .n-menu-item-content")
     private WebElement menuEnvironmentManage;
 
-    @FindBys({
-        @FindBy(className = "tab-vertical"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][8]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(8) > .n-menu-item-content")
     private WebElement menuNamespaceManage;
 
-    @FindBys({
-        @FindBy(className = "tab-vertical"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][9]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(9) > .n-menu-item-content")
     private WebElement menuTokenManage;
 
     public SecurityPage(RemoteWebDriver driver) {
