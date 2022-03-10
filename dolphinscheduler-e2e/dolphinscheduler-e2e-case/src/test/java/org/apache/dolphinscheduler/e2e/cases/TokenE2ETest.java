@@ -52,7 +52,7 @@ public class TokenE2ETest {
     @Test
     @Order(10)
     void testCreateToken() {
-        final TokenPage page = new TokenPage(browser);
+        TokenPage page = new TokenPage(browser);
         page.create(userName);
 
         await().untilAsserted(() -> {
