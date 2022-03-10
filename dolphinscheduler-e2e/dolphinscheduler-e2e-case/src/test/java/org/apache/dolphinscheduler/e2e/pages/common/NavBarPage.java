@@ -39,24 +39,16 @@ import lombok.Getter;
 public class NavBarPage {
     protected final RemoteWebDriver driver;
 
-    @FindBy(css = ".tab-horizontal > .n-menu-item:nth-child(2) > .n-menu-item-content")
+    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(2) > .n-menu-item-content")
     private WebElement projectTab;
 
-    @FindBy(css = ".tab-horizontal > .n-menu-item:nth-child(3) > .n-menu-item-content")
+    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(3) > .n-menu-item-content")
     private WebElement resourceTab;
 
-    @FindBys({
-        @FindBy(className = "tab-horizontal"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][4]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(4) > .n-menu-item-content")
     private WebElement dataQualityTab;
 
-    @FindBys({
-        @FindBy(className = "tab-horizontal"),
-        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][5]"),
-        @FindBy(className = "n-menu-item-content"),
-    })
+    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(5) > .n-menu-item-content")
     private WebElement dataSourceTab;
 
     @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(7) > .n-menu-item-content")
