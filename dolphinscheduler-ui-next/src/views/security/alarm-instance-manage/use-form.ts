@@ -89,16 +89,11 @@ export function useForm() {
     if (state.pluginsLoading) return
     state.pluginsLoading = true
     state.detailForm.pluginDefineId = pluginId
-    try {
-      const { pluginParams } = await queryUiPluginDetailById(pluginId)
-      if (pluginParams) {
-        state.json = JSON.parse(pluginParams)
-      }
-      state.pluginsLoading = false
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      state.pluginsLoading = false
+    const { pluginParams } = await queryUiPluginDetailById(pluginId)
+    if (pluginParams) {
+      state.json = JSON.parse(pluginParams)
     }
+    state.pluginsLoading = false
   }
 
   const initForm = () => {
