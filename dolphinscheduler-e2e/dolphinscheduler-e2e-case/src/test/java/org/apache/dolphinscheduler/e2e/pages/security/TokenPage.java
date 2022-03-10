@@ -67,6 +67,7 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create(String userName) {
         buttonCreateToken().click();
 
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
         createTokenForm().selectUserNameDropdown().click();
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
@@ -95,8 +96,9 @@ public final class TokenPage extends NavBarPage implements Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in token list"))
             .click();
 
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
         editTokenForm().buttonGenerateToken().click();
-        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
 
         editTokenForm().buttonSubmit().click();
 
