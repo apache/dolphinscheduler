@@ -49,12 +49,17 @@ public final class LoginPage extends NavBarPage {
     @FindBy(className = "btn-login")
     private WebElement buttonLogin;
 
+    @FindBy(className = "n-switch__button")
+    private WebElement buttonSwitchLanguage;
+
     public LoginPage(RemoteWebDriver driver) {
         super(driver);
     }
 
     @SneakyThrows
     public NavBarPage login(String username, String password) {
+        buttonSwitchLanguage().click();
+
         inputUsername().sendKeys(username);
         inputPassword().sendKeys(password);
         buttonLogin().click();
