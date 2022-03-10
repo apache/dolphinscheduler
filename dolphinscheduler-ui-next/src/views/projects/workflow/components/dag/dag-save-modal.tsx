@@ -176,11 +176,8 @@ export default defineComponent({
         autoFocus={false}
       >
         <NForm
-          label-width='100'
           model={formValue.value}
           rules={rule}
-          size='medium'
-          label-placement='left'
           ref={formRef}
         >
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
@@ -209,8 +206,7 @@ export default defineComponent({
                 min={0}
                 v-slots={{
                   suffix: () => '分'
-                }}
-              ></NInputNumber>
+                }} />
             </NFormItem>
           )}
           <NFormItem
@@ -225,7 +221,7 @@ export default defineComponent({
             />
           </NFormItem>
           {props.definition && (
-            <NFormItem label=' ' path='timeoutFlag'>
+            <NFormItem path='timeoutFlag'>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
               </NCheckbox>
