@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -68,19 +69,19 @@ class QueueE2ETest {
         });
     }
 
-//    @Test
-//    @Order(20)
-//    void testCreateDuplicateQueue() {
-//        final QueuePage page = new QueuePage(browser);
-//        page.create(queueName, queueValue);
-//
-//        await().untilAsserted(() ->
-//                assertThat(browser.findElement(By.tagName("body")).getText())
-//                        .contains("already exists")
-//        );
-//
-//        page.createQueueForm().buttonCancel().click();
-//    }
+    @Test
+    @Order(20)
+    void testCreateDuplicateQueue() {
+        final QueuePage page = new QueuePage(browser);
+        page.create(queueName, queueValue);
+
+        await().untilAsserted(() ->
+                assertThat(browser.findElement(By.tagName("body")).getText())
+                        .contains("already exists")
+        );
+
+        page.createQueueForm().buttonCancel().click();
+    }
 
     @Test
     @Order(30)

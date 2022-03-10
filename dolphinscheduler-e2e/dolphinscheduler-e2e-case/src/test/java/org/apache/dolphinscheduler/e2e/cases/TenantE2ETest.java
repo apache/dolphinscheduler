@@ -62,20 +62,20 @@ class TenantE2ETest {
             .anyMatch(it -> it.contains(tenant)));
     }
 
-//    @Test
-//    @Order(20)
-//    void testCreateDuplicateTenant() {
-//        final TenantPage page = new TenantPage(browser);
-//
-//        page.create(tenant);
-//
-//        await().untilAsserted(() ->
-//            assertThat(browser.findElement(By.tagName("body")).getText())
-//                .contains("already exists")
-//        );
-//
-//        page.tenantForm().buttonCancel().click();
-//    }
+    @Test
+    @Order(20)
+    void testCreateDuplicateTenant() {
+        final TenantPage page = new TenantPage(browser);
+
+        page.create(tenant);
+
+        await().untilAsserted(() ->
+            assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists")
+        );
+
+        page.tenantForm().buttonCancel().click();
+    }
 
     @Test
     @Order(30)

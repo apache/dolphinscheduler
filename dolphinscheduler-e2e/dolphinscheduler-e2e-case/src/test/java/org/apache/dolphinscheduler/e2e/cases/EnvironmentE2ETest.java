@@ -77,19 +77,19 @@ class EnvironmentE2ETest {
         });
     }
 
-//    @Test
-//    @Order(20)
-//    void testCreateDuplicateEnvironment() {
-//        final EnvironmentPage page = new EnvironmentPage(browser);
-//        page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
-//
-//        await().untilAsserted(() ->
-//                assertThat(browser.findElement(By.tagName("body")).getText())
-//                        .contains("already exists")
-//        );
-//
-//        page.createEnvironmentForm().buttonCancel().click();
-//    }
+    @Test
+    @Order(20)
+    void testCreateDuplicateEnvironment() {
+        final EnvironmentPage page = new EnvironmentPage(browser);
+        page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
+
+        await().untilAsserted(() ->
+                assertThat(browser.findElement(By.tagName("body")).getText())
+                        .contains("already exists")
+        );
+
+        page.createEnvironmentForm().buttonCancel().click();
+    }
 
     @Test
     @Order(30)

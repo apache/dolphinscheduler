@@ -95,20 +95,20 @@ class UserE2ETest {
         });
     }
 
-//    @Test
-//    @Order(20)
-//    void testCreateDuplicateUser() {
-//        final UserPage page = new UserPage(browser);
-//
-//        page.create(user, password, email, phone);
-//
-//        await().untilAsserted(() ->
-//            assertThat(browser.findElement(By.tagName("body")).getText())
-//                .contains("already exists")
-//        );
-//
-//        page.createUserForm().buttonCancel().click();
-//    }
+    @Test
+    @Order(20)
+    void testCreateDuplicateUser() {
+        final UserPage page = new UserPage(browser);
+
+        page.create(user, password, email, phone, tenant);
+
+        await().untilAsserted(() ->
+            assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists")
+        );
+
+        page.createUserForm().buttonCancel().click();
+    }
 
     @Test
     @Order(30)
