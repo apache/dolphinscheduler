@@ -40,30 +40,30 @@ public class NavBarPage {
     protected final RemoteWebDriver driver;
 
     @FindBys({
-            @FindBy(className = "tab-horizontal"),
-            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][2]"),
-            @FindBy(className = "n-menu-item-content"),
+        @FindBy(className = "tab-horizontal"),
+        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][2]"),
+        @FindBy(className = "n-menu-item-content"),
     })
     private WebElement projectTab;
 
     @FindBys({
-            @FindBy(className = "tab-horizontal"),
-            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][3]"),
-            @FindBy(className = "n-menu-item-content"),
+        @FindBy(className = "tab-horizontal"),
+        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][3]"),
+        @FindBy(className = "n-menu-item-content"),
     })
     private WebElement resourceTab;
 
     @FindBys({
-            @FindBy(className = "tab-horizontal"),
-            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][4]"),
-            @FindBy(className = "n-menu-item-content"),
+        @FindBy(className = "tab-horizontal"),
+        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][4]"),
+        @FindBy(className = "n-menu-item-content"),
     })
     private WebElement dataQualityTab;
 
     @FindBys({
-            @FindBy(className = "tab-horizontal"),
-            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][5]"),
-            @FindBy(className = "n-menu-item-content"),
+        @FindBy(className = "tab-horizontal"),
+        @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][5]"),
+        @FindBy(className = "n-menu-item-content"),
     })
     private WebElement dataSourceTab;
 
