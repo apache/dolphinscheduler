@@ -47,38 +47,30 @@ export function useRules(
   const getRuleList = async () => {
     if (ruleLoading.value) return
     ruleLoading.value = true
-    try {
-      const result = await queryRuleList()
-      rules.value = result.map((item: { id: number; name: string }) => {
-        let name = ''
-        if (item.name) {
-          name = item.name.replace('$t(', '').replace(')', '')
-        }
-        return {
-          value: item.id,
-          label: name ? t(`project.node.${name}`) : ''
-        }
-      })
-      ruleLoading.value = false
-    } catch (err) {
-      ruleLoading.value = false
-    }
+    const result = await queryRuleList()
+    rules.value = result.map((item: { id: number; name: string }) => {
+      let name = ''
+      if (item.name) {
+        name = item.name.replace('$t(', '').replace(')', '')
+      }
+      return {
+        value: item.id,
+        label: name ? t(`project.node.${name}`) : ''
+      }
+    })
+    ruleLoading.value = false
   }
 
   const getRuleById = async (ruleId: number) => {
     if (ruleLoading.value) return
     ruleLoading.value = true
-    try {
-      const result = await getRuleFormCreateJson(ruleId)
-      const items = JSON.parse(result).map((item: IResponseJsonItem) =>
-        formatResponseJson(item)
-      )
-      updateRules(items, preItemLen)
-      preItemLen = items.length
-      ruleLoading.value = false
-    } catch (err) {
-      ruleLoading.value = false
-    }
+    const result = await getRuleFormCreateJson(ruleId)
+    const items = JSON.parse(result).map((item: IResponseJsonItem) =>
+      formatResponseJson(item)
+    )
+    updateRules(items, preItemLen)
+    preItemLen = items.length
+    ruleLoading.value = false
   }
 
   const formatResponseJson = (
@@ -138,60 +130,58 @@ export function useRules(
   }
 
   const onFieldChange = async (value: string | number, field: string) => {
-    try {
-      if (field === 'src_connector_type' && typeof value === 'number') {
-        const result = await getDatasourceOptionsById(value)
-        srcDatasourceOptions.value = result || []
-        srcTableOptions.value = []
-        model.src_datasource_id = null
-        model.src_table = null
-        model.src_field = null
-        return
-      }
-      if (field === 'target_connector_type' && typeof value === 'number') {
-        const result = await getDatasourceOptionsById(value)
-        targetDatasourceOptions.value = result || []
-        targetTableOptions.value = []
-        model.target_datasource_id = null
-        model.target_table = null
-        model.target_field = null
-        return
-      }
-      if (field === 'writer_connector_type' && typeof value === 'number') {
-        const result = await getDatasourceOptionsById(value)
-        writerDatasourceOptions.value = result || []
-        model.writer_datasource_id = null
-        return
-      }
-      if (field === 'src_datasource_id' && typeof value === 'number') {
-        const result = await getDatasourceTablesById(value)
-        srcTableOptions.value = result || []
-        model.src_table = null
-        model.src_field = null
-      }
-      if (field === 'target_datasource_id' && typeof value === 'number') {
-        const result = await getDatasourceTablesById(value)
-        targetTableOptions.value = result || []
-        model.target_table = null
-        model.target_field = null
-      }
-      if (field === 'src_table' && typeof value === 'string') {
-        const result = await getDatasourceTableColumnsById(
-          model.src_datasource_id,
-          value
-        )
-        srcTableColumnOptions.value = result || []
-        model.src_field = null
-      }
-      if (field === 'target_table' && typeof value === 'string') {
-        const result = await getDatasourceTableColumnsById(
-          model.target_datasource_id,
-          value
-        )
-        targetTableColumnOptions.value = result || []
-        model.target_field = null
-      }
-    } catch (err) {}
+    if (field === 'src_connector_type' && typeof value === 'number') {
+      const result = await getDatasourceOptionsById(value)
+      srcDatasourceOptions.value = result || []
+      srcTableOptions.value = []
+      model.src_datasource_id = null
+      model.src_table = null
+      model.src_field = null
+      return
+    }
+    if (field === 'target_connector_type' && typeof value === 'number') {
+      const result = await getDatasourceOptionsById(value)
+      targetDatasourceOptions.value = result || []
+      targetTableOptions.value = []
+      model.target_datasource_id = null
+      model.target_table = null
+      model.target_field = null
+      return
+    }
+    if (field === 'writer_connector_type' && typeof value === 'number') {
+      const result = await getDatasourceOptionsById(value)
+      writerDatasourceOptions.value = result || []
+      model.writer_datasource_id = null
+      return
+    }
+    if (field === 'src_datasource_id' && typeof value === 'number') {
+      const result = await getDatasourceTablesById(value)
+      srcTableOptions.value = result || []
+      model.src_table = null
+      model.src_field = null
+    }
+    if (field === 'target_datasource_id' && typeof value === 'number') {
+      const result = await getDatasourceTablesById(value)
+      targetTableOptions.value = result || []
+      model.target_table = null
+      model.target_field = null
+    }
+    if (field === 'src_table' && typeof value === 'string') {
+      const result = await getDatasourceTableColumnsById(
+        model.src_datasource_id,
+        value
+      )
+      srcTableColumnOptions.value = result || []
+      model.src_field = null
+    }
+    if (field === 'target_table' && typeof value === 'string') {
+      const result = await getDatasourceTableColumnsById(
+        model.target_datasource_id,
+        value
+      )
+      targetTableColumnOptions.value = result || []
+      model.target_field = null
+    }
   }
 
   onMounted(async () => {

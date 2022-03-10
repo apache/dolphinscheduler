@@ -33,20 +33,16 @@ export function useTaskGroup(
   const getTaskGroupList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const { totalList = [] } = await queryTaskGroupListPagingByProjectCode({
-        pageNo: 1,
-        pageSize: 2147483647,
-        projectCode
-      })
-      options.value = totalList.map((item: { id: string; name: string }) => ({
-        label: item.name,
-        value: item.id
-      }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const { totalList = [] } = await queryTaskGroupListPagingByProjectCode({
+      pageNo: 1,
+      pageSize: 2147483647,
+      projectCode
+    })
+    options.value = totalList.map((item: { id: string; name: string }) => ({
+      label: item.name,
+      value: item.id
+    }))
+    loading.value = false
   }
 
   onMounted(() => {

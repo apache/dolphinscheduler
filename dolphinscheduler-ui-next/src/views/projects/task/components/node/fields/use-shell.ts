@@ -29,14 +29,10 @@ export function useShell(model: { [field: string]: any }): IJsonItem[] {
   const getResourceList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const res = await queryResourceList({ type: 'FILE' })
-      removeUselessChildren(res)
-      options.value = res || []
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const res = await queryResourceList({ type: 'FILE' })
+    removeUselessChildren(res)
+    options.value = res || []
+    loading.value = false
   }
 
   onMounted(() => {

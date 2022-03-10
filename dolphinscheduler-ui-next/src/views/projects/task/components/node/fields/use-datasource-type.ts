@@ -86,22 +86,18 @@ export function useDatasourceType(
   const getDatasourceTypes = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      options.value = datasourceTypes
-        .filter((item) => {
-          if (item.disabled) {
-            return false
-          }
-          if (supportedDatasourceType) {
-            return indexOf(supportedDatasourceType, item.code) !== -1
-          }
-          return true
-        })
-        .map((item) => ({ label: item.code, value: item.code }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    options.value = datasourceTypes
+      .filter((item) => {
+        if (item.disabled) {
+          return false
+        }
+        if (supportedDatasourceType) {
+          return indexOf(supportedDatasourceType, item.code) !== -1
+        }
+        return true
+      })
+      .map((item) => ({ label: item.code, value: item.code }))
+    loading.value = false
   }
 
   const onChange = (type: string) => {

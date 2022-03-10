@@ -32,20 +32,16 @@ export function useSwitch(
     if (loading.value) return
     loading.value = true
     branchFlowOptions.value = []
-    try {
-      const res = await queryProcessDefinitionByCode(
-        model.processName,
-        projectCode
-      )
-      res?.taskDefinitionList.forEach((item: any) => {
-        if (item.code != model.code) {
-          branchFlowOptions.value.push({ label: item.name, value: item.code })
-        }
-      })
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const res = await queryProcessDefinitionByCode(
+      model.processName,
+      projectCode
+    )
+    res?.taskDefinitionList.forEach((item: any) => {
+      if (item.code != model.code) {
+        branchFlowOptions.value.push({ label: item.name, value: item.code })
+      }
+    })
+    loading.value = false
   }
 
   watch(

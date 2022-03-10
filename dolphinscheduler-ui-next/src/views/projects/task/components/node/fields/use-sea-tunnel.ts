@@ -55,15 +55,11 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const getResourceList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      model.resourceFiles = []
-      const res = await queryResourceList({ type: 'FILE' })
-      removeUselessChildren(res)
-      options.value = res || []
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    model.resourceFiles = []
+    const res = await queryResourceList({ type: 'FILE' })
+    removeUselessChildren(res)
+    options.value = res || []
+    loading.value = false
   }
 
   function removeUselessChildren(

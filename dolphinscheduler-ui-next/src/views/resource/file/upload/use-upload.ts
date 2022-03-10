@@ -44,13 +44,9 @@ export function useUpload(state: any) {
         formData.append('currentDir', currentDir)
         formData.append('description', state.uploadForm.description)
 
-        try {
-          await createResource(formData as any)
-          window.$message.success(t('resource.file.success'))
-          emit('updateList')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        await createResource(formData as any)
+        window.$message.success(t('resource.file.success'))
+        emit('updateList')
 
         hideModal()
         resetForm()

@@ -270,9 +270,6 @@ export function useTable() {
         fileStore.setCurrentDir(res.fullName)
         router.push({ name: 'resource-sub-manage', params: { id: res.id } })
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   return {

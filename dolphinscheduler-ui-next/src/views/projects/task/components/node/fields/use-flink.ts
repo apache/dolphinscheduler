@@ -44,15 +44,13 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       mainJarOptions.value = resources[programType]
       return
     }
-    try {
-      const res = await queryResourceByProgramType({
-        type: 'FILE',
-        programType
-      })
-      removeUselessChildren(res)
-      mainJarOptions.value = res || []
-      resources[programType] = res
-    } catch (err) {}
+    const res = await queryResourceByProgramType({
+      type: 'FILE',
+      programType
+    })
+    removeUselessChildren(res)
+    mainJarOptions.value = res || []
+    resources[programType] = res
   }
 
   onMounted(() => {

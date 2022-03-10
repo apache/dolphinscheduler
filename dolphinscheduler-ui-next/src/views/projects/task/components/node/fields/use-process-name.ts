@@ -47,23 +47,17 @@ export function useProcessName({
   const getProcessList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const res = await querySimpleList(projectCode)
-      options.value = res.map((option: { name: string; code: number }) => ({
-        label: option.name,
-        value: option.code
-      }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const res = await querySimpleList(projectCode)
+    options.value = res.map((option: { name: string; code: number }) => ({
+      label: option.name,
+      value: option.code
+    }))
+    loading.value = false
   }
   const getProcessListByCode = async (processCode: number) => {
     if (!processCode) return
-    try {
-      const res = await queryProcessDefinitionByCode(processCode, projectCode)
-      getTaskOptions(res)
-    } catch (err) {}
+    const res = await queryProcessDefinitionByCode(processCode, projectCode)
+    getTaskOptions(res)
   }
   const getTaskOptions = (processDefinition: {
     processTaskRelationList: []

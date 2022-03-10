@@ -60,42 +60,32 @@ export function useTask(projectCode: number) {
     task.taskShow = show
   }
   const onTaskSave = async (data: INodeData) => {
-    try {
-      if (task.taskSaving) return
-      task.taskSaving = true
-      if (data.id) {
-        data.code &&
-          (await updateWithUpstream(
-            projectCode,
-            data.code,
-            formatParams({ ...data, code: data.code }, false)
-          ))
-      } else {
-        const taskCode = await getTaskCode()
-        await saveSingle(
+    if (task.taskSaving) return
+    task.taskSaving = true
+    if (data.id) {
+      data.code &&
+        (await updateWithUpstream(
           projectCode,
-          formatParams({ ...data, code: taskCode }, true)
-        )
-      }
-
-      task.taskSaving = false
-      return true
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      task.taskSaving = false
-      return false
+          data.code,
+          formatParams({ ...data, code: data.code }, false)
+        ))
+    } else {
+      const taskCode = await getTaskCode()
+      await saveSingle(
+        projectCode,
+        formatParams({ ...data, code: taskCode }, true)
+      )
     }
+
+    task.taskSaving = false
+    return true
   }
 
   const onEditTask = async (row: IRecord, readonly: boolean) => {
-    try {
-      const result = await queryTaskDefinitionByCode(row.taskCode, projectCode)
-      task.taskData = { ...result, processName: row.processDefinitionCode }
-      task.taskShow = true
-      task.taskReadonly = readonly
-    } catch (e) {
-      window.$message.error((e as Error).message)
-    }
+    const result = await queryTaskDefinitionByCode(row.taskCode, projectCode)
+    task.taskData = { ...result, processName: row.processDefinitionCode }
+    task.taskShow = true
+    task.taskReadonly = readonly
   }
 
   const onInitTask = () => {

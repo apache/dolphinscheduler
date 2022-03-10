@@ -29,9 +29,7 @@ export function useCustomCellBuilder() {
   function parseLocationStr(locationStr: string) {
     let locations = null
     if (!locationStr) return locations
-    try {
-      locations = JSON.parse(locationStr)
-    } catch (error) {}
+    locations = JSON.parse(locationStr)
     return Array.isArray(locations) ? locations : null
   }
 

@@ -47,33 +47,22 @@ export function useDetail(getFieldsValue: Function) {
   const queryById = async (id: number) => {
     if (status.loading) return {}
     status.loading = true
-    try {
-      const dataSourceRes = await queryDataSource(id)
-      status.loading = false
-      PREV_NAME = dataSourceRes.name
-      return dataSourceRes
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      status.loading = false
-      return {}
-    }
+    const dataSourceRes = await queryDataSource(id)
+    status.loading = false
+    PREV_NAME = dataSourceRes.name
+    return dataSourceRes
   }
 
   const testConnect = async () => {
     if (status.testing) return
     status.testing = true
-    try {
-      const res = await connectDataSource(formatParams())
-      window.$message.success(
-        res
-          ? res.msg
-          : `${t('datasource.test_connect')} ${t('datasource.success')}`
-      )
-      status.testing = false
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      status.testing = false
-    }
+    const res = await connectDataSource(formatParams())
+    window.$message.success(
+      res
+        ? res.msg
+        : `${t('datasource.test_connect')} ${t('datasource.success')}`
+    )
+    status.testing = false
   }
 
   const createOrUpdate = async (id?: number) => {
@@ -81,22 +70,16 @@ export function useDetail(getFieldsValue: Function) {
     if (status.saving || !values.name) return false
     status.saving = true
 
-    try {
-      if (PREV_NAME !== values.name) {
-        await verifyDataSourceName({ name: values.name })
-      }
-
-      id
-        ? await updateDataSource(formatParams(), id)
-        : await createDataSource(formatParams())
-
-      status.saving = false
-      return true
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      status.saving = false
-      return false
+    if (PREV_NAME !== values.name) {
+      await verifyDataSourceName({ name: values.name })
     }
+
+    id
+      ? await updateDataSource(formatParams(), id)
+      : await createDataSource(formatParams())
+
+    status.saving = false
+    return true
   }
 
   return { status, queryById, testConnect, createOrUpdate }

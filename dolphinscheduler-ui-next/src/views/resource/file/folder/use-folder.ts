@@ -36,17 +36,13 @@ export function useFolder(state: any) {
     const currentDir = fileStore.getCurrentDir || '/'
     state.folderFormRef.validate(async (valid: any) => {
       if (!valid) {
-        try {
-          await createDirectory({
-            ...state.folderForm,
-            ...{ pid, currentDir }
-          })
+        await createDirectory({
+          ...state.folderForm,
+          ...{ pid, currentDir }
+        })
 
-          window.$message.success(t('resource.file.success'))
-          emit('updateList')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        window.$message.success(t('resource.file.success'))
+        emit('updateList')
         hideModal()
         resetForm()
       }
