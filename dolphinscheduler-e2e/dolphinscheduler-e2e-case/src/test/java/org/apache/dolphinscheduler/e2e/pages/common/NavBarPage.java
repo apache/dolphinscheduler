@@ -59,7 +59,7 @@ public class NavBarPage {
     })
     private WebElement dataSourceTab;
 
-    @FindBy(css = ".tab-horizontal > .n-menu-item:nth-child(7) > .n-menu-item-content")
+    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(7) > .n-menu-item-content")
     private WebElement securityTab;
 
     public NavBarPage(RemoteWebDriver driver) {
