@@ -86,7 +86,8 @@ class QueueE2ETest {
     @Test
     @Order(30)
     void testEditQueue() {
-        final QueuePage page = new QueuePage(browser);
+        QueuePage page = new QueuePage(browser);
+
         page.update(queueName, editQueueName, editQueueValue);
 
         await().untilAsserted(() -> {
@@ -97,4 +98,5 @@ class QueueE2ETest {
                     .anyMatch(it -> it.contains(editQueueName));
         });
     }
+
 }

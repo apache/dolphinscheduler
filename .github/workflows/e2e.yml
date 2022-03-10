@@ -64,7 +64,6 @@ jobs:
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
-    if: false
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -76,34 +75,34 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
           - name: WorkerGroup
             class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
-          - name: Project
-            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
+#          - name: Project
+#            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
           - name: Queue
             class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
           - name: Environment
             class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
           - name: Token
             class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
-          - name: Workflow
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
-          - name: WorkflowForSwitch
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
-          - name: FileManage
-            class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
-          - name: UdfManage
-            class: org.apache.dolphinscheduler.e2e.cases.UdfManageE2ETest
-          - name: FunctionManage
-            class: org.apache.dolphinscheduler.e2e.cases.FunctionManageE2ETest
-          - name: MysqlDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
-          - name: ClickhouseDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
-          - name: PostgresDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
-          - name: SqlServerDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
-          - name: HiveDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
+#          - name: Workflow
+#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
+#          - name: WorkflowForSwitch
+#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
+#          - name: FileManage
+#            class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
+#          - name: UdfManage
+#            class: org.apache.dolphinscheduler.e2e.cases.UdfManageE2ETest
+#          - name: FunctionManage
+#            class: org.apache.dolphinscheduler.e2e.cases.FunctionManageE2ETest
+#          - name: MysqlDataSource
+#            class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
+#          - name: ClickhouseDataSource
+#            class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
+#          - name: PostgresDataSource
+#            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
+#          - name: SqlServerDataSource
+#            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
+#          - name: HiveDataSource
+#            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

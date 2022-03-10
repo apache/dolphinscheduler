@@ -52,8 +52,8 @@ public class TokenE2ETest {
     @Test
     @Order(10)
     void testCreateToken() {
-        final TokenPage page = new TokenPage(browser);
-        page.create();
+        TokenPage page = new TokenPage(browser);
+        page.create(userName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -68,7 +68,7 @@ public class TokenE2ETest {
     @Test
     @Order(30)
     void testEditToken() {
-        final TokenPage page = new TokenPage(browser);
+        TokenPage page = new TokenPage(browser);
         String oldToken = page.getToken(userName);
         page.update(userName);
 
@@ -85,7 +85,7 @@ public class TokenE2ETest {
     @Test
     @Order(40)
     void testDeleteToken() {
-        final TokenPage page = new TokenPage(browser);
+        TokenPage page = new TokenPage(browser);
         page.delete(userName);
 
         await().untilAsserted(() -> {

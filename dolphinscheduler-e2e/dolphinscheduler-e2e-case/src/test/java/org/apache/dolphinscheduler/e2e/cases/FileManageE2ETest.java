@@ -84,20 +84,20 @@ public class FileManageE2ETest {
 
     @BeforeAll
     public static void setup() {
-        TenantPage tenantPage = new LoginPage(browser)
-                .login(user, password)
-                .create(tenant);
-
-        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-                .as("Tenant list should contain newly-created tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
-
-        tenantPage.goToNav(SecurityPage.class)
-            .goToTab(UserPage.class)
-            .update(user, user, password, email, phone)
-            .goToNav(ResourcePage.class)
-            .goToTab(FileManagePage.class);
+//        TenantPage tenantPage = new LoginPage(browser)
+//                .login(user, password)
+//                .create(tenant);
+//
+//        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
+//                .as("Tenant list should contain newly-created tenant")
+//                .extracting(WebElement::getText)
+//                .anyMatch(it -> it.contains(tenant)));
+//
+//        tenantPage.goToNav(SecurityPage.class)
+//            .goToTab(UserPage.class)
+//            .update(user, user, password, email, phone)
+//            .goToNav(ResourcePage.class)
+//            .goToTab(FileManagePage.class);
     }
 
     @AfterAll

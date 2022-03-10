@@ -42,14 +42,14 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 class UserE2ETest {
     private static final String tenant = System.getProperty("user.name");
     private static final String user = "test_user";
-    private static final String password = "test_user123";
-    private static final String email = "test_user@gmail.com";
-    private static final String phone = "15800000000";
+    private static final String password = "testUser123";
+    private static final String email = "testUser@gmail.com";
+    private static final String phone = "15812389765";
 
     private static final String editUser = "edit_test_user";
-    private static final String editPassword = "edit_test_user123";
-    private static final String editEmail = "edit_test_user@gmail.com";
-    private static final String editPhone = "15800000001";
+    private static final String editPassword = "editTestUser123";
+    private static final String editEmail = "editTestUser@gmail.com";
+    private static final String editPhone = "15812389780";
 
     private static RemoteWebDriver browser;
 
@@ -83,7 +83,7 @@ class UserE2ETest {
     void testCreateUser() {
         final UserPage page = new UserPage(browser);
 
-        page.create(user, password, email, phone);
+        page.create(user, password, email, phone, tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -100,7 +100,7 @@ class UserE2ETest {
     void testCreateDuplicateUser() {
         final UserPage page = new UserPage(browser);
 
-        page.create(user, password, email, phone);
+        page.create(user, password, email, phone, tenant);
 
         await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
@@ -113,7 +113,8 @@ class UserE2ETest {
     @Test
     @Order(30)
     void testEditUser() {
-        final UserPage page = new UserPage(browser);
+        UserPage page = new UserPage(browser);
+
         page.update(user, editUser, editPassword, editEmail, editPhone);
 
         await().untilAsserted(() -> {
@@ -126,21 +127,21 @@ class UserE2ETest {
     }
 
 
-    @Test
-    @Order(40)
-    void testDeleteUser() {
-        final UserPage page = new UserPage(browser);
-
-        page.delete(editUser);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(
-                page.userList()
-            ).noneMatch(
-                it -> it.getText().contains(user) || it.getText().contains(editUser)
-            );
-        });
-    }
+//    @Test
+//    @Order(40)
+//    void testDeleteUser() {
+//        final UserPage page = new UserPage(browser);
+//
+//        page.delete(editUser);
+//
+//        await().untilAsserted(() -> {
+//            browser.navigate().refresh();
+//
+//            assertThat(
+//                page.userList()
+//            ).noneMatch(
+//                it -> it.getText().contains(user) || it.getText().contains(editUser)
+//            );
+//        });
+//    }
 }

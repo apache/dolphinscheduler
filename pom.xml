@@ -1034,9 +1034,6 @@
                             </goals>
                             <configuration>
                                 <skip>${docker.build.skip}</skip>
-                                <environmentVariables>
-                                    <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
-                                </environmentVariables>
                                 <executable>docker</executable>
                                 <workingDirectory>${project.basedir}</workingDirectory>
                                 <arguments>

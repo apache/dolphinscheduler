@@ -53,7 +53,6 @@ import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.apache.commons.lang.SystemUtils;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import com.google.common.base.Strings;
