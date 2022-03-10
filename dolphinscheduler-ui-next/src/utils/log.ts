@@ -27,11 +27,20 @@ const log = {
 const typeColor = (type = 'primary') => {
   let color = ''
   switch (type) {
-    case 'primary': color = '#1890ff'; break
-    case 'success': color = '#52c41a'; break
-    case 'warning': color = '#faad14'; break
-    case 'error': color = '#ff4d4f'; break
-    default:; break
+    case 'primary':
+      color = '#1890ff'
+      break
+    case 'success':
+      color = '#52c41a'
+      break
+    case 'warning':
+      color = '#faad14'
+      break
+    case 'error':
+      color = '#ff4d4f'
+      break
+    default:
+      break
   }
   return color
 }
@@ -42,11 +51,13 @@ const typeColor = (type = 'primary') => {
  * @param {String} text info text
  * @param {String} type style
  */
- log.capsule = (title: string, text: string, type: string = 'primary') => {
+log.capsule = (title: string, text: string, type: string = 'primary') => {
   console.log(
     `%c ${title} %c ${text} %c`,
     'background:#35495E; padding: 2px ; border-radius: 3px 0 0 3px; color: #fff;',
-    `background:${typeColor(type)}; padding: 2px; border-radius: 0 3px 3px 0;  color: #fff;`,
+    `background:${typeColor(
+      type
+    )}; padding: 2px; border-radius: 0 3px 3px 0;  color: #fff;`,
     'background:transparent'
   )
 }

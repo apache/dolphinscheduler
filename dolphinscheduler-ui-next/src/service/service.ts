@@ -29,7 +29,7 @@ const userStore = useUserStore()
  * @description Log and display errors
  * @param {Error} error Error object
  */
- const handleError =  (res: AxiosResponse<any, any>) => {
+const handleError = (res: AxiosResponse<any, any>) => {
   // Print to console
   if (import.meta.env.MODE === 'development') {
     utils.log.capsule('DolphinScheduler', 'UI-NEXT')
