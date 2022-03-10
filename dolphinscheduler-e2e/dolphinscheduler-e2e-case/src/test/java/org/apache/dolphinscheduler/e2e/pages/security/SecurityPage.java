@@ -49,7 +49,7 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
 //            "][2]//div[contains(@class, 'n-menu-item-content')]")
     @FindBys({
             @FindBy(className = "tab-vertical"),
-            @FindBy(css = "div.n-menu-item > div.n-menu-item-content:nth-child(2)")
+            @FindBy(css = "div.n-menu-item > div:nth-child(2)")
 //            @FindBy(xpath = "/*/div[contains(@class, 'n-menu-item')][2]//div[contains(@class, 'n-menu-item-content')]")
     })
     private WebElement menUserManage;
