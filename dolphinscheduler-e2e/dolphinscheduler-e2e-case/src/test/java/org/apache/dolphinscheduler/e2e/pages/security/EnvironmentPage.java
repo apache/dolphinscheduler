@@ -146,7 +146,7 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
         @FindBys({
             @FindBy(className = "input-environment-config"),
-            @FindBy(tagName = "input"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputEnvironmentConfig;
 
