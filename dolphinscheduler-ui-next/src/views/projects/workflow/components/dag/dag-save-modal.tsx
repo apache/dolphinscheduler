@@ -133,9 +133,6 @@ export default defineComponent({
           ) {
             verifyName(params, projectCode)
               .then(() => context.emit('save', formValue.value))
-              .catch((error: any) => {
-                window.$message.error(error.message)
-              })
           } else {
             context.emit('save', formValue.value)
           }

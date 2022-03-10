@@ -178,9 +178,6 @@ export function useTable(
         ctx.emit('updateList')
         getTableData(variables.row)
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   const handleDeleteVersion = (version: number) => {
@@ -189,9 +186,6 @@ export function useTable(
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
         getTableData(variables.row)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
       })
   }
 

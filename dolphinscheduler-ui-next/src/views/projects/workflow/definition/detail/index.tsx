@@ -99,9 +99,6 @@ export default defineComponent({
           message.success(t('project.dag.success'))
           router.push({ path: `/projects/${projectCode}/workflow-definition` })
         })
-        .catch((error: any) => {
-          window.$message.error(error.message)
-        })
     }
 
     onMounted(() => {
