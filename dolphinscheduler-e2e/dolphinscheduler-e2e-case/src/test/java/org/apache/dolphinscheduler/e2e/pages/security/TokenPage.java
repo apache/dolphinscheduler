@@ -49,7 +49,7 @@ public final class TokenPage extends NavBarPage implements Tab {
         @FindBy(className = "n-popconfirm__action"),
         @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     @FindBy(className = "username")
     private List<WebElement> userName;
@@ -125,12 +125,9 @@ public final class TokenPage extends NavBarPage implements Tab {
             .orElseThrow(() -> new RuntimeException("No delete button in token list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(buttonConfirm()));
+
+        buttonConfirm().click();
 
         return this;
     }
