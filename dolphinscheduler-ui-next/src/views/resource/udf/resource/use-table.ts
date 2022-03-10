@@ -31,8 +31,8 @@ import {
   deleteResource,
   queryResourceById
 } from '@/service/modules/resources'
+import ButtonLink from '@/components/button-link'
 import { IUdfResourceParam } from './types'
-import styles from './index.module.scss'
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
@@ -75,23 +75,15 @@ export function useTable() {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
         render: (row) => {
-          if (!row.directory) {
-            return row.alias
-          } else {
-            return h(
-              'a',
-              {
-                href: 'javascript:',
-                class: styles.links,
-                onClick: () => goSubFolder(router, row)
-              },
-              {
-                default: () => {
-                  return row.alias
-                }
-              }
-            )
-          }
+          return !row.directory
+            ? row.alias
+            : h(
+                ButtonLink,
+                {
+                  onClick: () => void goSubFolder(router, row)
+                },
+                { default: () => row.alias }
+              )
         }
       },
       {
@@ -265,11 +257,10 @@ export function useTable() {
         fullName
       },
       id
-    )
-      .then((res: any) => {
-        fileStore.setCurrentDir(res.fullName)
-        router.push({ name: 'resource-sub-manage', params: { id: res.id } })
-      })
+    ).then((res: any) => {
+      fileStore.setCurrentDir(res.fullName)
+      router.push({ name: 'resource-sub-manage', params: { id: res.id } })
+    })
   }
 
   return {
