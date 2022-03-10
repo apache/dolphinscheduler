@@ -97,7 +97,8 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.CONTROL + "a");
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
-
+        System.out.printf("editEnvironmentForm().selectedWorkerGroup().getText(): %s",
+                editEnvironmentForm().selectedWorkerGroup().getText());
         if (!editEnvironmentForm().selectedWorkerGroup().getText().equals(workerGroup)) {
             editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
             editEnvironmentForm().selectWorkerGroupList()
