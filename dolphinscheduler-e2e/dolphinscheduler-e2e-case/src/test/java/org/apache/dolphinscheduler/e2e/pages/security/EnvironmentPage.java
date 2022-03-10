@@ -32,6 +32,8 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import lombok.Getter;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class EnvironmentPage extends NavBarPage implements SecurityPage.Tab {
@@ -63,6 +65,8 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         createEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
         editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                "n-base-select-option__content")));
         editEnvironmentForm().selectWorkerGroupList()
                 .stream()
                 .filter(it -> it.getText().contains(workerGroup))
