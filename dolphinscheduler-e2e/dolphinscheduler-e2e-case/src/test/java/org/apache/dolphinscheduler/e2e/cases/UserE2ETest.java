@@ -127,21 +127,21 @@ class UserE2ETest {
     }
 
 
-    @Test
-    @Order(40)
-    void testDeleteUser() {
-        final UserPage page = new UserPage(browser);
-
-        page.delete(editUser);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(
-                page.userList()
-            ).noneMatch(
-                it -> it.getText().contains(user) || it.getText().contains(editUser)
-            );
-        });
-    }
+//    @Test
+//    @Order(40)
+//    void testDeleteUser() {
+//        final UserPage page = new UserPage(browser);
+//
+//        page.delete(editUser);
+//
+//        await().untilAsserted(() -> {
+//            browser.navigate().refresh();
+//
+//            assertThat(
+//                page.userList()
+//            ).noneMatch(
+//                it -> it.getText().contains(user) || it.getText().contains(editUser)
+//            );
+//        });
+//    }
 }
