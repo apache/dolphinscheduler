@@ -98,22 +98,4 @@ class QueueE2ETest {
         });
     }
 
-    @Test
-    @Order(50)
-    void testDeleteQueue() {
-        QueuePage page = new QueuePage(browser);
-
-        page.delete(editQueueName);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(
-                    page.queueList()
-            ).as("Queue list should not contain deleted Queue")
-            .noneMatch(
-                    it -> it.getText().contains(editQueueName)
-            );
-        });
-    }
 }

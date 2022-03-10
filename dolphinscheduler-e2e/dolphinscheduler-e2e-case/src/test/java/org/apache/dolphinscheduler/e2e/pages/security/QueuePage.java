@@ -42,12 +42,6 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
     @FindBy(className = "items")
     private List<WebElement> queueList;
 
-    @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
-    })
-    private List<WebElement> buttonConfirm;
-
     private final QueueForm createQueueForm;
     private final QueueForm editQueueForm;
 
@@ -84,26 +78,6 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
         editQueueForm().inputQueueValue().sendKeys(editQueueValue);
 
         editQueueForm().buttonSubmit().click();
-
-        return this;
-    }
-
-    public QueuePage delete(String queueName) {
-        queueList()
-                .stream()
-                .filter(it -> it.findElement(By.className("queue-name")).getAttribute("innerHTML").contains(queueName))
-                .flatMap(it -> it.findElements(By.className("delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in user list"))
-                .click();
-
-        buttonConfirm()
-                .stream()
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-                .click();
 
         return this;
     }
