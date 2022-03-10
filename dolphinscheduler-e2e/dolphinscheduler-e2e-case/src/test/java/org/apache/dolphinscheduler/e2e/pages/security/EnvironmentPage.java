@@ -63,7 +63,7 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         createEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
         editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-        editEnvironmentForm().selectWorkerGroup()
+        editEnvironmentForm().selectWorkerGroupList()
                 .stream()
                 .filter(it -> it.getText().contains(workerGroup))
                 .findFirst()
@@ -98,14 +98,16 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
-        editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-        editEnvironmentForm().selectWorkerGroup()
-                .stream()
-                .filter(it -> it.getText().contains(workerGroup))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
-                        workerGroup)))
-                .click();
+        if (!editEnvironmentForm().selectedWorkerGroup().getText().equals(workerGroup)) {
+            editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
+            editEnvironmentForm().selectWorkerGroupList()
+                    .stream()
+                    .filter(it -> it.getText().contains(workerGroup))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+                            workerGroup)))
+                    .click();
+        }
 
         editEnvironmentForm().buttonSubmit().click();
 
@@ -163,7 +165,13 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         private WebElement btnSelectWorkerGroupDropdown;
 
         @FindBy(className = "n-base-select-option__content")
-        private List<WebElement> selectWorkerGroup;
+        private List<WebElement> selectWorkerGroupList;
+
+        @FindBys({
+            @FindBy(className = "n-base-selection-tags"),
+            @FindBy(className = "n-tag__content"),
+        })
+        private WebElement selectedWorkerGroup;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
