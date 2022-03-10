@@ -39,28 +39,36 @@ import lombok.Getter;
 public class NavBarPage {
     protected final RemoteWebDriver driver;
 
-    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')" +
-            "][2]//div[contains(@class, 'n-menu-item-content')]")
+    @FindBys({
+            @FindBy(className = "tab-horizontal"),
+            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][2]"),
+            @FindBy(className = "n-menu-item-content"),
+    })
     private WebElement projectTab;
 
-    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][3]//div[contains" +
-            "(@class, 'n-menu-item-content')]")
+    @FindBys({
+            @FindBy(className = "tab-horizontal"),
+            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][3]"),
+            @FindBy(className = "n-menu-item-content"),
+    })
     private WebElement resourceTab;
 
-    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][4]//div[contains" +
-            "(@class, 'n-menu-item-content')]")
+    @FindBys({
+            @FindBy(className = "tab-horizontal"),
+            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][4]"),
+            @FindBy(className = "n-menu-item-content"),
+    })
     private WebElement dataQualityTab;
 
-    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][5]//div[contains" +
-            "(@class, 'n-menu-item-content')]")
+    @FindBys({
+            @FindBy(className = "tab-horizontal"),
+            @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][5]"),
+            @FindBy(className = "n-menu-item-content"),
+    })
     private WebElement dataSourceTab;
-
-//    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@class, 'n-menu-item')][7]//div[contains" +
-//            "(@class, 'n-menu-item-content')]")
 
     @FindBys({
         @FindBy(className = "tab-horizontal"),
-//        @FindBy(className = "n-menu-item"),
         @FindBy(xpath = "//div[contains(@class, 'n-menu-item')][7]"),
         @FindBy(className = "n-menu-item-content"),
     })
@@ -74,9 +82,8 @@ public class NavBarPage {
 
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
-            WebElement projectTabElement = new WebDriverWait(driver, 60)
-                .until(ExpectedConditions.elementToBeClickable(projectTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", projectTabElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(projectTab));
+            projectTab.click();
             return nav.cast(new ProjectPage(driver));
         }
 
@@ -87,16 +94,14 @@ public class NavBarPage {
         }
 
         if (nav == ResourcePage.class) {
-            WebElement resourceTabElement = new WebDriverWait(driver, 60)
-                .until(ExpectedConditions.elementToBeClickable(resourceTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", resourceTabElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(resourceTab));
+            resourceTab.click();
             return nav.cast(new ResourcePage(driver));
         }
 
         if (nav == DataSourcePage.class) {
-            WebElement dataSourceTabElement = new WebDriverWait(driver, 60)
-                .until(ExpectedConditions.elementToBeClickable(dataSourceTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", dataSourceTabElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
+            dataSourceTab.click();
             return nav.cast(new DataSourcePage(driver));
         }
 

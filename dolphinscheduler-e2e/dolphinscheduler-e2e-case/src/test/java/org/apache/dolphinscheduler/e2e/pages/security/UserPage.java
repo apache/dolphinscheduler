@@ -83,7 +83,6 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     }
 
     public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone) {
-//        List<WebElement> userList = driver.findElementsByClassName("items");
         userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
@@ -92,20 +91,21 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in user list"))
             .click();
 
-        UserForm editUserForm = new UserForm();
+        editUserForm().inputUserName().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputUserName().sendKeys(editUser);
 
-        editUserForm.inputUserName().sendKeys(Keys.CONTROL+"a");
-        editUserForm.inputUserName().sendKeys(Keys.BACK_SPACE);
-        editUserForm.inputUserName().sendKeys(editUser);
-        editUserForm.inputUserPassword().clear();
-        editUserForm.inputUserPassword().sendKeys(editPassword);
-        editUserForm.inputEmail().click();
-        editUserForm.inputEmail().clear();
-        editUserForm.inputEmail().sendKeys(editEmail);
-        editUserForm.inputPhone().click();
-        editUserForm.inputPhone().clear();
-        editUserForm.inputPhone().sendKeys(editPhone);
-        editUserForm.buttonSubmit().click();
+        editUserForm().inputUserPassword().sendKeys(editPassword);
+
+        editUserForm().inputEmail().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputEmail().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputEmail().sendKeys(editEmail);
+
+        editUserForm().inputPhone().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputPhone().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputPhone().sendKeys(editPhone);
+
+        editUserForm().buttonSubmit().click();
 
         return this;
     }
