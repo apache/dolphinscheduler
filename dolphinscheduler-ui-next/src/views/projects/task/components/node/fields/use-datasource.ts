@@ -35,12 +35,8 @@ export function useDatasource(
   const getDatasources = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      await refreshOptions()
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    await refreshOptions()
+    loading.value = false
   }
 
   const refreshOptions = async () => {

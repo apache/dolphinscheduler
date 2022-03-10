@@ -262,9 +262,6 @@ export function useTable() {
           searchVal: variables.searchVal
         })
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   return {

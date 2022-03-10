@@ -200,9 +200,6 @@ export function useTable() {
           searchVal: variables.searchVal
         })
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   const releaseWorkflow = (row: any) => {
@@ -221,9 +218,6 @@ export function useTable() {
           searchVal: variables.searchVal
         })
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   const copyWorkflow = (row: any) => {
@@ -239,9 +233,6 @@ export function useTable() {
           pageNo: variables.page,
           searchVal: variables.searchVal
         })
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
       })
   }
 
@@ -279,9 +270,6 @@ export function useTable() {
     batchExportByCodes(data, variables.projectCode)
       .then((res: any) => {
         downloadBlob(res, fileName)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
       })
   }
 

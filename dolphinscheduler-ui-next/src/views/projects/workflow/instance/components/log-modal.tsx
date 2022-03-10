@@ -96,10 +96,6 @@ export default defineComponent({
           }, 1500)
           textareaLog.value.innerHTML = res || t('project.workflow.no_log')
         })
-        .catch((error: any) => {
-          window.$message.error(error.message || '')
-          loadingRef.value = false
-        })
     }
 
     const showLog = () => {
@@ -125,9 +121,6 @@ export default defineComponent({
               textareaLog.value.scrollTop = 2
             }, 800)
           }
-        })
-        .catch((error: any) => {
-          window.$message.error(error.message || '')
         })
     }
 
@@ -259,7 +252,7 @@ export default defineComponent({
   render() {
     return (
       <div>
-        <span class={styles['log-model']}>
+        <span>
           {this.taskInstanceId && this.taskInstanceType !== 'SUB_PROCESS' && (
             <span>
               {renderSlot(this.$slots, 'history')}
@@ -349,7 +342,6 @@ export default defineComponent({
                   <div class={styles['content']} ref='logContent'>
                     <div class={styles['content-log-box']} ref='logContentBox'>
                       <textarea
-                        class={styles['textarea-ft']}
                         style={`width: 100%; height: ${this.textareaHeight}px`}
                         spellcheck='false'
                         ref='textareaLog'

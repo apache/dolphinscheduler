@@ -133,9 +133,6 @@ export default defineComponent({
           ) {
             verifyName(params, projectCode)
               .then(() => context.emit('save', formValue.value))
-              .catch((error: any) => {
-                window.$message.error(error.message)
-              })
           } else {
             context.emit('save', formValue.value)
           }
@@ -151,7 +148,7 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode
+        formValue.value.tenantCode = process.tenantCode || 'default'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true
           formValue.value.timeout = process.timeout
