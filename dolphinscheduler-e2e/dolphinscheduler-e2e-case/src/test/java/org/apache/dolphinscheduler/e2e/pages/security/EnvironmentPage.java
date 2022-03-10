@@ -102,22 +102,24 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
-//        if (editEnvironmentForm().selectedWorkerGroup().getText().equals(workerGroup)) {
-//            editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-//            editEnvironmentForm().selectWorkerGroupList()
-//                    .stream()
-//                    .filter(it -> it.getText().contains(workerGroup))
-//                    .findFirst()
-//                    .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
-//                            workerGroup)))
-//                    .click();
-//        }else {
-        throw new RuntimeException(String.format("getText: %s", editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML")));
+        if (editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML").equals(workerGroup)) {
+            editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                    "n-base-select-option__content")));
+            editEnvironmentForm().selectWorkerGroupList()
+                    .stream()
+                    .filter(it -> it.getText().contains(workerGroup))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+                            workerGroup)))
+                    .click();
+        }
+//        throw new RuntimeException(String.format("getText: %s", editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML")));
 //        }
 
-//        editEnvironmentForm().buttonSubmit().click();
+        editEnvironmentForm().buttonSubmit().click();
 
-//        return this;
+        return this;
     }
 
     public EnvironmentPage delete(String name) {
