@@ -114,8 +114,6 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
                             workerGroup)))
                     .click();
         }
-//        throw new RuntimeException(String.format("getText: %s", editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML")));
-//        }
 
         editEnvironmentForm().buttonSubmit().click();
 
