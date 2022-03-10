@@ -19,6 +19,8 @@ import { defineComponent, PropType, toRefs, onMounted, watch } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from './use-form'
 import Modal from '@/components/modal'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
   showModalRef: {
@@ -42,10 +44,14 @@ const ProjectModal = defineComponent({
   setup(props, ctx) {
     const { variables, t, handleValidate } = useForm(props, ctx)
 
+    const userStore = useUserStore()
+
     const cancelModal = () => {
       if (props.statusRef === 0) {
         variables.model.projectName = ''
         variables.model.description = ''
+      } else {
+        variables.model.userName = props.row.userName
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -59,9 +65,11 @@ const ProjectModal = defineComponent({
       () => {
         if (props.statusRef === 0) {
           variables.model.projectName = ''
+          variables.model.userName = (userStore.getUserInfo as UserInfoRes).userName
           variables.model.description = ''
         } else {
           variables.model.projectName = props.row.name
+          variables.model.userName = props.row.userName
           variables.model.description = props.row.description
         }
       }
@@ -71,6 +79,7 @@ const ProjectModal = defineComponent({
       () => props.row,
       () => {
         variables.model.projectName = props.row.name
+        variables.model.userName = props.row.userName
         variables.model.description = props.row.description
       }
     )
