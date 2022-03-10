@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -93,8 +94,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         UserForm editUserForm = new UserForm();
 
-        editUserForm.inputUserName().click();
-        editUserForm.inputUserName().clear();
+        editUserForm.inputUserName().sendKeys(Keys.BACK_SPACE);
         editUserForm.inputUserName().sendKeys(editUser);
         editUserForm.inputUserPassword().clear();
         editUserForm.inputUserPassword().sendKeys(editPassword);
