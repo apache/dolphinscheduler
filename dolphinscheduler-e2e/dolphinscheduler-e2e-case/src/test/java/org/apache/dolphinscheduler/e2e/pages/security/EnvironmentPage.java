@@ -102,18 +102,18 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
-        if (editEnvironmentForm().selectedWorkerGroup().getText().equals(workerGroup)) {
-            editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-            editEnvironmentForm().selectWorkerGroupList()
-                    .stream()
-                    .filter(it -> it.getText().contains(workerGroup))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
-                            workerGroup)))
-                    .click();
-        }else {
-            throw new RuntimeException(String.format("getText: %s", editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML")));
-        }
+//        if (editEnvironmentForm().selectedWorkerGroup().getText().equals(workerGroup)) {
+//            editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
+//            editEnvironmentForm().selectWorkerGroupList()
+//                    .stream()
+//                    .filter(it -> it.getText().contains(workerGroup))
+//                    .findFirst()
+//                    .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+//                            workerGroup)))
+//                    .click();
+//        }else {
+        throw new RuntimeException(String.format("getText: %s", editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML")));
+//        }
 
         editEnvironmentForm().buttonSubmit().click();
 
