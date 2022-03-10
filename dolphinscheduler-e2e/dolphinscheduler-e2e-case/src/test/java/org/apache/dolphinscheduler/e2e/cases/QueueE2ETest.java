@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -69,24 +68,25 @@ class QueueE2ETest {
         });
     }
 
-    @Test
-    @Order(20)
-    void testCreateDuplicateQueue() {
-        final QueuePage page = new QueuePage(browser);
-        page.create(queueName, queueValue);
-
-        await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
-        );
-
-        page.createQueueForm().buttonCancel().click();
-    }
+//    @Test
+//    @Order(20)
+//    void testCreateDuplicateQueue() {
+//        final QueuePage page = new QueuePage(browser);
+//        page.create(queueName, queueValue);
+//
+//        await().untilAsserted(() ->
+//                assertThat(browser.findElement(By.tagName("body")).getText())
+//                        .contains("already exists")
+//        );
+//
+//        page.createQueueForm().buttonCancel().click();
+//    }
 
     @Test
     @Order(30)
     void testEditQueue() {
-        final QueuePage page = new QueuePage(browser);
+        QueuePage page = new QueuePage(browser);
+
         page.update(queueName, editQueueName, editQueueValue);
 
         await().untilAsserted(() -> {
@@ -95,6 +95,25 @@ class QueueE2ETest {
                     .as("Queue list should contain newly-modified Queue")
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains(editQueueName));
+        });
+    }
+
+    @Test
+    @Order(50)
+    void testDeleteQueue() {
+        QueuePage page = new QueuePage(browser);
+
+        page.delete(editQueueName);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                    page.queueList()
+            ).as("Queue list should not contain deleted Queue")
+            .noneMatch(
+                    it -> it.getText().contains(editQueueName)
+            );
         });
     }
 }

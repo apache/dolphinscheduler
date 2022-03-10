@@ -143,8 +143,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         private WebElement inputUserName;
 
         @FindBys({
-                @FindBy(className = "input-password"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-password"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputUserPassword;
 
