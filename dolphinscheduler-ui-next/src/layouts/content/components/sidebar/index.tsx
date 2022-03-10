@@ -60,6 +60,7 @@ const Sidebar = defineComponent({
         onExpand={() => (this.collapsedRef = false)}
       >
         <NMenu
+          class="tab-vertical"
           value={this.sideKey}
           options={this.sideMenuOptions}
           defaultExpandedKeys={this.defaultExpandedKeys}
