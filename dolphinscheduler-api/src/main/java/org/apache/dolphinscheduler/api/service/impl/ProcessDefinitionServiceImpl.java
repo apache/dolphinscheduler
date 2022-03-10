@@ -1108,16 +1108,20 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return false;
         }
         ProcessDefinition processDefinition = dagDataSchedule.getProcessDefinition();
+
+        // generate import processDefinitionName
+        String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
+        String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
+
         //unique check
-        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, processDefinition.getName());
+        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {
             result.putAll(checkResult);
             return false;
         }
-        String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
-        processDefinition.setName(processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp());
+        processDefinition.setName(importProcessDefinitionName);
         processDefinition.setId(0);
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
