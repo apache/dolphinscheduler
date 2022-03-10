@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -34,15 +35,15 @@ import lombok.Getter;
 
 @Getter
 public final class EnvironmentPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btnCreateEnvironment")
+    @FindBy(className = "btn-create-environment")
     private WebElement buttonCreateEnvironment;
 
     @FindBy(className = "items")
     private List<WebElement> environmentList;
 
     @FindBys({
-            @FindBy(className = "el-popconfirm"),
-            @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private List<WebElement> buttonConfirm;
 
@@ -60,7 +61,16 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         createEnvironmentForm().inputEnvironmentName().sendKeys(name);
         createEnvironmentForm().inputEnvironmentConfig().sendKeys(config);
         createEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
-        createEnvironmentForm().inputWorkerGroup().sendKeys(workerGroup);
+
+        editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
+        editEnvironmentForm().selectWorkerGroup()
+                .stream()
+                .filter(it -> it.getText().contains(workerGroup))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+                        workerGroup)))
+                .click();
+
         createEnvironmentForm().buttonSubmit().click();
         return this;
     }
@@ -68,17 +78,35 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
     public EnvironmentPage update(String oldName, String name, String config, String desc, String workerGroup) {
         environmentList()
                 .stream()
-                .filter(it -> it.findElement(By.className("environmentName")).getAttribute("innerHTML").contains(oldName))
+                .filter(it -> it.findElement(By.className("environment-name")).getAttribute("innerHTML").contains(oldName))
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No edit button in environment list"))
                 .click();
 
+
+        editEnvironmentForm().inputEnvironmentName().sendKeys(Keys.CONTROL + "a");
+        editEnvironmentForm().inputEnvironmentName().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentName().sendKeys(name);
+
+        editEnvironmentForm().inputEnvironmentConfig().sendKeys(Keys.CONTROL + "a");
+        editEnvironmentForm().inputEnvironmentConfig().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentConfig().sendKeys(config);
+
+        editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.CONTROL + "a");
+        editEnvironmentForm().inputEnvironmentDesc().sendKeys(Keys.BACK_SPACE);
         editEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
-        editEnvironmentForm().inputWorkerGroup().sendKeys(workerGroup);
+
+        editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
+        editEnvironmentForm().selectWorkerGroup()
+                .stream()
+                .filter(it -> it.getText().contains(workerGroup))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+                        workerGroup)))
+                .click();
+
         editEnvironmentForm().buttonSubmit().click();
 
         return this;
@@ -110,22 +138,37 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputEnvironmentName")
+        @FindBys({
+            @FindBy(className = "input-environment-name"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputEnvironmentName;
 
-        @FindBy(id = "inputEnvironmentConfig")
+        @FindBys({
+            @FindBy(className = "input-environment-config"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputEnvironmentConfig;
 
-        @FindBy(id = "inputEnvironmentDesc")
+        @FindBys({
+            @FindBy(className = "input-environment-desc"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputEnvironmentDesc;
 
-        @FindBy(id = "inputEnvironmentWorkerGroup")
-        private WebElement inputWorkerGroup;
+        @FindBys({
+                @FindBy(className = "input-environment-worker-group"),
+                @FindBy(className = "n-base-selection"),
+        })
+        private WebElement btnSelectWorkerGroupDropdown;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "n-base-select-option__content")
+        private List<WebElement> selectWorkerGroup;
+
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }

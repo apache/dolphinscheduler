@@ -77,19 +77,19 @@ class EnvironmentE2ETest {
         });
     }
 
-    @Test
-    @Order(20)
-    void testCreateDuplicateEnvironment() {
-        final EnvironmentPage page = new EnvironmentPage(browser);
-        page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
-
-        await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
-        );
-
-        page.createEnvironmentForm().buttonCancel().click();
-    }
+//    @Test
+//    @Order(20)
+//    void testCreateDuplicateEnvironment() {
+//        final EnvironmentPage page = new EnvironmentPage(browser);
+//        page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
+//
+//        await().untilAsserted(() ->
+//                assertThat(browser.findElement(By.tagName("body")).getText())
+//                        .contains("already exists")
+//        );
+//
+//        page.createEnvironmentForm().buttonCancel().click();
+//    }
 
     @Test
     @Order(30)
@@ -118,7 +118,9 @@ class EnvironmentE2ETest {
 
             assertThat(
                     page.environmentList()
-            ).noneMatch(
+            )
+            .as("Environment list should not contain deleted environment")
+            .noneMatch(
                     it -> it.getText().contains(environmentName) || it.getText().contains(editEnvironmentName)
             );
         });
