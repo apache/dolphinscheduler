@@ -266,7 +266,7 @@ public class SqlParameters extends AbstractParameters {
             //result only one line
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
-                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+                info.setValue(String.valueOf(firstRow.get(info.getProp().toUpperCase())));
                 varPool.add(info);
             }
         }
