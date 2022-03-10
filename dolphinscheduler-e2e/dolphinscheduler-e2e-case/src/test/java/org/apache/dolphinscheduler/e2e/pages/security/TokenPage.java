@@ -126,9 +126,7 @@ public final class TokenPage extends NavBarPage implements Tab {
             .orElseThrow(() -> new RuntimeException("No delete button in token list"))
             .click();
 
-//        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(buttonConfirm()));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
-//        buttonConfirm().click();
 
         return this;
     }
