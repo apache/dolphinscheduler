@@ -198,7 +198,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 220,
+        width: 250,
         fixed: 'right',
         className: styles.operation,
         render: (_row: IWorkflowInstance, index: number) =>
@@ -285,10 +285,6 @@ export function useTable() {
 
         getTableData()
       })
-      .catch((error: any) => {
-        window.$message.error(error.message || '')
-        getTableData()
-      })
   }
 
   const batchDeleteInstance = () => {
@@ -310,10 +306,6 @@ export function useTable() {
         variables.checkedRowKeys = []
         getTableData()
       })
-      .catch((error: any) => {
-        window.$message.error(error.message || '')
-        getTableData()
-      })
   }
 
   /**
@@ -324,10 +316,6 @@ export function useTable() {
       .then(() => {
         window.$message.success(t('project.workflow.success'))
 
-        getTableData()
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message || '')
         getTableData()
       })
   }
@@ -367,10 +355,6 @@ export function useTable() {
         _countDown(() => {
           getTableData()
         }, index)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-        getTableData()
       })
   }
 

@@ -33,6 +33,7 @@ import { SaveForm, WorkflowDefinition } from './types'
 import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
+import { positiveIntegerRegex } from '@/utils/regex'
 
 const props = {
   visible: {
@@ -95,7 +96,10 @@ export default defineComponent({
       },
       timeout: {
         validator() {
-          if (formValue.value.timeoutFlag && formValue.value.timeout <= 0) {
+          if (
+            formValue.value.timeoutFlag &&
+            !positiveIntegerRegex.test(String(formValue.value.timeout))
+          ) {
             return new Error(t('project.dag.positive_integer'))
           }
         }
@@ -129,9 +133,6 @@ export default defineComponent({
           ) {
             verifyName(params, projectCode)
               .then(() => context.emit('save', formValue.value))
-              .catch((error: any) => {
-                window.$message.error(error.message)
-              })
           } else {
             context.emit('save', formValue.value)
           }
@@ -147,7 +148,7 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode
+        formValue.value.tenantCode = process.tenantCode || 'default'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true
           formValue.value.timeout = process.timeout

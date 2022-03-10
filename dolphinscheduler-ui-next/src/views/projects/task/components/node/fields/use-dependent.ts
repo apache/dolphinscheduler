@@ -157,52 +157,46 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   }
 
   const getProjectList = async () => {
-    try {
-      const result = await queryProjectCreatedAndAuthorizedByUser()
-      projectList.value = result.map(
-        (item: { code: number; name: string }) => ({
-          value: item.code,
-          label: item.name
-        })
-      )
-      return projectList
-    } catch (err) {}
+    const result = await queryProjectCreatedAndAuthorizedByUser()
+    projectList.value = result.map(
+      (item: { code: number; name: string }) => ({
+        value: item.code,
+        label: item.name
+      })
+    )
+    return projectList
   }
   const getProcessList = async (code: number) => {
     if (processCache[code]) {
       return processCache[code]
     }
-    try {
-      const result = await queryAllByProjectCode(code)
-      const processList = result.map(
-        (item: { processDefinition: { code: number; name: string } }) => ({
-          value: item.processDefinition.code,
-          label: item.processDefinition.name
-        })
-      )
-      processCache[code] = processList
+    const result = await queryAllByProjectCode(code)
+    const processList = result.map(
+      (item: { processDefinition: { code: number; name: string } }) => ({
+        value: item.processDefinition.code,
+        label: item.processDefinition.name
+      })
+    )
+    processCache[code] = processList
 
-      return processList
-    } catch (err) {}
+    return processList
   }
 
   const getTaskList = async (code: number, processCode: number) => {
     if (taskCache[processCode]) {
       return taskCache[processCode]
     }
-    try {
-      const result = await getTasksByDefinitionCode(code, processCode)
-      const taskList = result.map((item: { code: number; name: string }) => ({
-        value: item.code,
-        label: item.name
-      }))
-      taskList.unshift({
-        value: 0,
-        label: 'ALL'
-      })
-      taskCache[processCode] = taskList
-      return taskList
-    } catch (err) {}
+    const result = await getTasksByDefinitionCode(code, processCode)
+    const taskList = result.map((item: { code: number; name: string }) => ({
+      value: item.code,
+      label: item.name
+    }))
+    taskList.unshift({
+      value: 0,
+      label: 'ALL'
+    })
+    taskCache[processCode] = taskList
+    return taskList
   }
 
   onMounted(() => {

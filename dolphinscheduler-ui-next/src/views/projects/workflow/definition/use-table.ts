@@ -146,12 +146,13 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 300,
+        width: 360,
         fixed: 'right',
         className: styles.operation,
         render: (row) =>
           h(TableAction, {
             row,
+            onEditWorkflow: () => editWorkflow(row),
             onStartWorkflow: () => startWorkflow(row),
             onTimingWorkflow: () => timingWorkflow(row),
             onVersionWorkflow: () => versionWorkflow(row),
@@ -159,11 +160,21 @@ export function useTable() {
             onReleaseWorkflow: () => releaseWorkflow(row),
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
-            onGotoTimingManage: () => gotoTimingManage(row)
+            onGotoTimingManage: () => gotoTimingManage(row),
+            onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
     ] as TableColumns<any>
   }
+
+  const editWorkflow = (row: any) => {
+    variables.row = row
+    router.push({
+      name: 'workflow-definition-detail',
+      params: { code: row.code }
+    })
+  }
+
   const startWorkflow = (row: any) => {
     variables.startShowRef = true
     variables.row = row
@@ -189,9 +200,6 @@ export function useTable() {
           searchVal: variables.searchVal
         })
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   const releaseWorkflow = (row: any) => {
@@ -210,9 +218,6 @@ export function useTable() {
           searchVal: variables.searchVal
         })
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   const copyWorkflow = (row: any) => {
@@ -228,9 +233,6 @@ export function useTable() {
           pageNo: variables.page,
           searchVal: variables.searchVal
         })
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
       })
   }
 
@@ -269,14 +271,18 @@ export function useTable() {
       .then((res: any) => {
         downloadBlob(res, fileName)
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
   }
 
   const gotoTimingManage = (row: any) => {
     router.push({
       name: 'workflow-definition-timing',
+      params: { projectCode: variables.projectCode, definitionCode: row.code }
+    })
+  }
+
+  const gotoWorkflowTree = (row: any) => {
+    router.push({
+      name: 'workflow-definition-tree',
       params: { projectCode: variables.projectCode, definitionCode: row.code }
     })
   }

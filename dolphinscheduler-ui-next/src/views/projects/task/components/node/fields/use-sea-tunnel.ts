@@ -17,26 +17,12 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
+import { useDeployMode } from '.'
 import type { IJsonItem } from '../types'
 
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const options = ref([])
-
-  const deployModeOptions = [
-    {
-      label: 'client',
-      value: 'client'
-    },
-    {
-      label: 'cluster',
-      value: 'cluster'
-    },
-    {
-      label: 'local',
-      value: 'local'
-    }
-  ]
 
   const masterTypeOptions = [
     {
@@ -69,15 +55,11 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const getResourceList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      model.resourceFiles = []
-      const res = await queryResourceList({ type: 'FILE' })
-      removeUselessChildren(res)
-      options.value = res || []
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    model.resourceFiles = []
+    const res = await queryResourceList({ type: 'FILE' })
+    removeUselessChildren(res)
+    options.value = res || []
+    loading.value = false
   }
 
   function removeUselessChildren(
@@ -148,13 +130,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   )
 
   return [
-    {
-      type: 'radio',
-      field: 'deployMode',
-      name: t('project.node.sea_tunnel_deploy_mode'),
-      options: deployModeOptions,
-      value: model.deployMode
-    },
+    useDeployMode(),
     {
       type: 'select',
       field: 'master',

@@ -15,25 +15,33 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Setting about Java gateway server
 java_gateway:
   # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
   # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
   address: 127.0.0.1
+
   # The port of Python gateway server start. Define which port you could connect to Python gateway server from
   # Python API side.
   port: 25333
-  
+
+  # Whether automatically convert Python objects to Java Objects. Default value is ``True``. There is some
+  # performance lost when set to ``True`` but for now pydolphinscheduler do not handle the convert issue between
+  # java and Python, mark it as TODO item in the future.
   auto_convert: true
 
+# Setting about dolphinscheduler default value, will use the value set below if property do not set, which
+# including ``user``, ``workflow`` 
 default:
+  # Default value for dolphinscheduler's user object
   user:
     name: userPythonGateway
-    # TODO simple set password same as username
     password: userPythonGateway
     email: userPythonGateway@dolphinscheduler.com
     tenant: tenant_pydolphin
     phone: 11111111111
     state: 1
+  # Default value for dolphinscheduler's workflow object
   workflow:
     project: project-pydolphin
     tenant: tenant_pydolphin

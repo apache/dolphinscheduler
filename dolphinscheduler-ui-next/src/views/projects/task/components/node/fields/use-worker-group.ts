@@ -29,13 +29,9 @@ export function useWorkerGroup(): IJsonItem {
   const getWorkerGroups = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const res = await queryAllWorkerGroups()
-      options.value = res.map((item: string) => ({ label: item, value: item }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const res = await queryAllWorkerGroups()
+    options.value = res.map((item: string) => ({ label: item, value: item }))
+    loading.value = false
   }
 
   onMounted(() => {

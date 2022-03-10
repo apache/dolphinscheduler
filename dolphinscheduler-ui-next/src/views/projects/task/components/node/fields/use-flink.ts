@@ -18,7 +18,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
 import { removeUselessChildren } from './use-shell'
-import { useCustomParams } from '.'
+import { useCustomParams, useDeployMode } from '.'
 import type { IJsonItem, ProgramType } from '../types'
 
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
@@ -44,15 +44,13 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       mainJarOptions.value = resources[programType]
       return
     }
-    try {
-      const res = await queryResourceByProgramType({
-        type: 'FILE',
-        programType
-      })
-      removeUselessChildren(res)
-      mainJarOptions.value = res || []
-      resources[programType] = res
-    } catch (err) {}
+    const res = await queryResourceByProgramType({
+      type: 'FILE',
+      programType
+    })
+    removeUselessChildren(res)
+    mainJarOptions.value = res || []
+    resources[programType] = res
   }
 
   onMounted(() => {
@@ -116,12 +114,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       options: mainJarOptions
     },
-    {
-      type: 'radio',
-      field: 'deployMode',
-      name: t('project.node.deploy_mode'),
-      options: DeployModes
-    },
+    useDeployMode(),
     {
       type: 'select',
       field: 'flinkVersion',
@@ -292,16 +285,5 @@ const FLINK_VERSIONS = [
   {
     label: '>=1.10',
     value: '>=1.10'
-  }
-]
-
-const DeployModes = [
-  {
-    label: 'cluster',
-    value: 'cluster'
-  },
-  {
-    label: 'local',
-    value: 'local'
   }
 ]

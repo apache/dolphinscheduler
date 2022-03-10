@@ -39,15 +39,11 @@ export function useSqlType(unusedModel: { [field: string]: any }): IJsonItem {
   const getSqlTypes = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      options.value = sqlTypes.map((item) => ({
-        label: item.code,
-        value: item.id
-      }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    options.value = sqlTypes.map((item) => ({
+      label: item.code,
+      value: item.id
+    }))
+    loading.value = false
   }
 
   onMounted(() => {

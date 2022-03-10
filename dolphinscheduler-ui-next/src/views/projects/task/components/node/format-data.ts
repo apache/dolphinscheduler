@@ -247,6 +247,39 @@ export function formatParams(data: INodeData): {
       dependTaskList: dependTaskList
     }
   }
+  if (data.taskType === 'DATA_QUALITY') {
+    taskParams.ruleId = data.ruleId
+    taskParams.ruleInputParameter = {
+      check_type: data.check_type,
+      comparison_execute_sql: data.comparison_execute_sql,
+      comparison_name: data.comparison_name,
+      failure_strategy: data.failure_strategy,
+      operator: data.operator,
+      src_connector_type: data.src_connector_type,
+      src_datasource_id: data.src_datasource_id,
+      src_table: data.src_table,
+      statistics_execute_sql: data.statistics_execute_sql,
+      statistics_name: data.statistics_name,
+      target_connector_type: data.target_connector_type,
+      target_datasource_id: data.target_datasource_id,
+      target_table: data.target_table,
+      threshold: data.threshold
+    }
+    taskParams.sparkParameters = {
+      deployMode: data.deployMode,
+      driverCores: data.driverCores,
+      driverMemory: data.driverMemory,
+      executorCores: data.executorCores,
+      executorMemory: data.executorMemory,
+      numExecutors: data.numExecutors,
+      others: data.others
+    }
+  }
+
+  if (data.taskType === 'EMR') {
+    taskParams.type = data.type
+    taskParams.jobFlowDefineJson = data.jobFlowDefineJson
+  }
 
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
@@ -394,6 +427,36 @@ export function formatModel(data: ITaskData) {
     params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
     params.relation = data.taskParams?.dependence.relation
   }
+  if (data.taskParams?.ruleInputParameter) {
+    params.check_type = data.check_type
+    params.comparison_execute_sql = data.comparison_execute_sql
+    params.comparison_name = data.comparison_name
+    params.failure_strategy = data.failure_strategy
+    params.operator = data.operator
+    params.src_connector_type = data.src_connector_type
+    params.src_datasource_id = data.src_datasource_id
+    params.src_table = data.src_table
+    params.statistics_execute_sql = data.statistics_execute_sql
+    params.statistics_name = data.statistics_name
+    params.target_connector_type = data.target_connector_type
+    params.target_datasource_id = data.target_datasource_id
+    params.target_table = data.target_table
+    params.threshold = data.threshold
+  }
+  if (data.taskParams?.sparkParameters) {
+    params.deployMode = data.deployMode
+    params.driverCores = data.driverCores
+    params.driverMemory = data.driverMemory
+    params.executorCores = data.executorCores
+    params.executorMemory = data.executorMemory
+    params.numExecutors = data.numExecutors
+    params.others = data.others
+  }
+
+  if (data.taskParams?.jobFlowDefineJson) {
+    params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
   return params
 }
 
