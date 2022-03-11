@@ -115,7 +115,7 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
 
         new WebDriverWait(page.driver(), 10)
-            .until(ExpectedConditions.urlContains("/#/resource/udf"));
+            .until(ExpectedConditions.urlContains("/resource-manage"));
 
         page.createDirectory(testDirectoryName, "test_desc");
 
@@ -169,8 +169,6 @@ public class UdfManageE2ETest {
         downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
 
         page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
-
-        new WebDriverWait(browser, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
 
         await().untilAsserted(() -> {
             assertThat(page.udfList())
