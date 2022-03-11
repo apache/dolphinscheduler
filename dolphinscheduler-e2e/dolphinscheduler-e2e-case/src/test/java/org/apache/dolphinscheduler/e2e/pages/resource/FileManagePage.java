@@ -281,7 +281,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        private CodeEditor codeEditor = new CodeEditor(driver);
+        CodeEditor codeEditor = new CodeEditor(driver);
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
