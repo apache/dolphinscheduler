@@ -144,7 +144,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     package_data={
-        "examples": ["examples.tutorial.py"],
+        "pydolphinscheduler": ["core/default_config.yaml"],
     },
     platforms=["any"],
     classifiers=[
