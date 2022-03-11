@@ -32,13 +32,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
-    @FindBy(className = "tab-file-manage")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content > .n-menu-item-content")
     private WebElement fileManageTab;
 
-    @FindBy(className = "tab-udf-resource-manage")
+    @FindBy(className = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(1) > .n-menu-item-content")
     private WebElement udfManageTab;
 
-    @FindBy(className = "tab-function-resource-manage")
+    @FindBy(className = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
     private WebElement functionManageTab;
 
     public ResourcePage(RemoteWebDriver driver) {
@@ -47,20 +47,20 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            WebElement fileManageTabElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
-            fileManageTabElement.click();
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
+            fileManageTab.click();
             return tab.cast(new FileManagePage(driver));
         }
 
         if (tab == UdfManagePage.class) {
-            WebElement udfManageTabElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(udfManageTab));
-            udfManageTabElement.click();
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(udfManageTab));
+            udfManageTab.click();
             return tab.cast(new UdfManagePage(driver));
         }
 
         if (tab == FunctionManagePage.class) {
-            WebElement functionManageTabElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(functionManageTab));
-            functionManageTabElement.click();
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(functionManageTab));
+            functionManageTab.click();
             return tab.cast(new FunctionManagePage(driver));
         }
 
