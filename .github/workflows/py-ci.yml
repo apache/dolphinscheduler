@@ -125,4 +125,4 @@ jobs:
           python -m pip install --upgrade tox pip build wheel setuptools
       - name: Run Tests Coverage
         run: |
-          python tox -vv -e ci-local
+          python -m tox -vv -e ci-local
