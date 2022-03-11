@@ -34,6 +34,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.util.List;
@@ -47,7 +49,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(className = "btn-create-file")
     private WebElement buttonCreateFile;
 
-    @FindBy(className = "btn-upload")
+    @FindBy(className = "btn-upload-file")
     private WebElement buttonUploadFile;
 
     private final CreateDirectoryBox createDirectoryBox;
@@ -173,6 +175,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))
             .click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.urlContains("/edit"));
 
         editFileBox().codeEditor().content(scripts);
         editFileBox().buttonSubmit().click();
