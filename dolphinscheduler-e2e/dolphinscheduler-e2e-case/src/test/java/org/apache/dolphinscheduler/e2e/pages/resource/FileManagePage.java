@@ -304,7 +304,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(className = "btn-upload"),
                 @FindBy(tagName = "button"),
         })
-        private WebElement buttonUpload;
+        WebElement buttonUpload;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
