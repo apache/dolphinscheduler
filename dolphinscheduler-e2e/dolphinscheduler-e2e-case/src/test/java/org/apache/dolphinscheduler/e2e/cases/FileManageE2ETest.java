@@ -139,19 +139,19 @@ public class FileManageE2ETest {
             .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
-    @Test
-    @Order(20)
-    void testCreateDuplicateDirectory() {
-        final FileManagePage page = new FileManagePage(browser);
-
-        page.createDirectory(testDirectoryName, "test_desc");
-
-        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("resource already exists")
-        );
-
-        page.createDirectoryBox().buttonCancel().click();
-    }
+//    @Test
+//    @Order(20)
+//    void testCreateDuplicateDirectory() {
+//        final FileManagePage page = new FileManagePage(browser);
+//
+//        page.createDirectory(testDirectoryName, "test_desc");
+//
+//        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+//                .contains("resource already exists")
+//        );
+//
+//        page.createDirectoryBox().buttonCancel().click();
+//    }
 
 //    @Test
 //    @Order(21)
