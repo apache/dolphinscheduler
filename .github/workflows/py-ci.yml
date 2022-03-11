@@ -82,7 +82,6 @@ jobs:
       - name: Run All Tests
         run: |
           tox -e code-test
-          tox -e ${{ env.TOXENV }}
   coverage:
     name: Tests Coverage
     needs:
