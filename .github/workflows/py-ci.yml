@@ -57,8 +57,7 @@ jobs:
           python -m tox -vv -e lint
   pytest:
     name: Pytest
-#    needs:
-#      - lint
+    needs: lint
 #      - sanity
     runs-on: ${{ matrix.os }}
     strategy:
@@ -80,8 +79,7 @@ jobs:
           python -m tox -vv -e code-test
   coverage:
     name: Tests Coverage
-#    needs:
-#      - pytest
+    needs: pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -97,7 +95,7 @@ jobs:
           python -m tox -vv -e coverage
   doc-build:
     name: Document Build Test
-#    needs: pytest
+    needs: pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -114,7 +112,7 @@ jobs:
   # TODO remove it later just for test
   ci-local:
     name: Document Build Test
-#    needs: pytest
+    needs: pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
