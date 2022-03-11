@@ -32,7 +32,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
-    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content > .n-menu-item-content")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
     private WebElement fileManageTab;
 
     @FindBy(className = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(1) > .n-menu-item-content")
