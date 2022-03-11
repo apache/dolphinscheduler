@@ -40,7 +40,7 @@ jobs:
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
   lint:
-    name: Code Style
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -48,14 +48,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Development Dependences
-        run: pip install -e .[style]
-      - name: Run Isort Checking
-        run: isort --check .
-      - name: Run Black Checking
-        run: black --check .
-      - name: Run Flake8 Checking
-        run: flake8
+      - name: Install TOX
+        run: |
+          pip install tox
+      - name: Run All Lint Check
+        run: |
+          tox -e lint
   pytest:
     name: Pytest
     needs:
@@ -73,14 +71,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies & pydolphinscheduler
+      - name: Install TOX
         run: |
-          pip install -e .[test]
-      - name: Run tests
+          pip install tox
+      # TODO
+      - name: Set Tox Params
         run: |
-          pytest
+          echo "TOXENV=$(echo "${{ matrix.python-version }}" | sed "s/\.//" | sed "s/^/py/") >> $GITHUB_ENV
+      - name: Run All Tests
+        run: |
+          tox -e ${{ env.TOXENV }}
   coverage:
-    name: Tests coverage
+    name: Tests Coverage
     needs:
       - pytest
     runs-on: ubuntu-latest
@@ -90,11 +92,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Development Dependences
+      - name: Install TOX
         run: |
-          pip install -e .[test]
-      - name: Run Tests && Check coverage
-        run: coverage run && coverage report
+          pip install tox
+      - name: Run Tests Coverage
+        run: |
+          tox -e coverage
   doc-build:
     name: Document Build Test
     needs: pytest
@@ -105,9 +108,26 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Development Dependences
+      - name: Install TOX
         run: |
-          pip install -e .[doc]
-      - name: Test Build Document
-        working-directory: dolphinscheduler-python/pydolphinscheduler/docs
-        run: make clean && make html
+          pip install tox
+      - name: Run Tests Coverage
+        run: |
+          tox -e doc-build-test
+  # TODO remove it later just for test
+  ci-local:
+    name: Document Build Test
+    needs: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install TOX
+        run: |
+          pip install tox
+      - name: Run Tests Coverage
+        run: |
+          tox -e ci-local
