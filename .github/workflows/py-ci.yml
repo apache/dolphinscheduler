@@ -77,7 +77,7 @@ jobs:
       # TODO
       - name: Set Tox Params
         run: |
-          echo "TOXENV=$(echo "${{ matrix.python-version }}" | sed "s/\.//" | sed "s/^/py/") >> $GITHUB_ENV
+          echo "TOXENV=$(echo "${{ matrix.python-version }}" | sed "s/\.//" | sed "s/^/py/")" >> $GITHUB_ENV
       - name: Run All Tests
         run: |
           tox -e ${{ env.TOXENV }}
