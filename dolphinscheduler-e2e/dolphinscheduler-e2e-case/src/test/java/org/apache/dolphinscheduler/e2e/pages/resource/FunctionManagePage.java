@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -44,10 +46,10 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     private List<WebElement> functionList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final CreateUdfFunctionBox createUdfFunctionBox;
 
@@ -88,7 +90,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         functionList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.id("btnRename")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-rename")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No rename button in function manage list"))
@@ -96,8 +98,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("createUdfDialog")));
 
-        renameUdfFunctionBox().inputFunctionName().clear();
-
+        renameUdfFunctionBox().inputFunctionName().sendKeys(Keys.CONTROL + "a");
+        renameUdfFunctionBox().inputFunctionName().sendKeys(Keys.BACK_SPACE);
         renameUdfFunctionBox().inputFunctionName().sendKeys(afterName);
 
         renameUdfFunctionBox.buttonSubmit().click();
@@ -109,18 +111,13 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         functionList()
             .stream()
             .filter(it -> it.getText().contains(udfFunctionName))
-            .flatMap(it -> it.findElements(By.id("btnDelete")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in udf resource list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting in udf resource page"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
