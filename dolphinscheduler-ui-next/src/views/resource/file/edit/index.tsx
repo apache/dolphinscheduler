@@ -89,7 +89,7 @@ export default defineComponent({
                   text
                   style={{ marginRight: '15px' }}
                   onClick={this.handleReturn}
-                  class='btn-submit'
+                  class='btn-cancel'
                 >
                   {t('resource.file.return')}
                 </NButton>
@@ -98,7 +98,7 @@ export default defineComponent({
                   size='small'
                   round
                   onClick={() => this.handleFileContent()}
-                  class='btn-cancel'
+                  class='btn-submit'
                 >
                   {t('resource.file.save')}
                 </NButton>
