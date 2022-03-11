@@ -54,7 +54,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final RenameBox renameBox;
 
-    private final CreateFileBox createFileBox;
+    private CreateFileBox createFileBox;
 
     private final UploadFileBox uploadFileBox;
 
