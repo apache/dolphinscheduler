@@ -153,25 +153,25 @@ public class FileManageE2ETest {
         page.createDirectoryBox().buttonCancel().click();
     }
 
-    @Test
-    @Order(21)
-    void testCreateSubDirectory() {
-        final FileManagePage page = new FileManagePage(browser);
-
-        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
-
-        await().untilAsserted(() -> assertThat(page.fileList())
-            .as("File list should contain newly-created file")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(testSubDirectoryName)));
-    }
+//    @Test
+//    @Order(21)
+//    void testCreateSubDirectory() {
+//        final FileManagePage page = new FileManagePage(browser);
+//
+//        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
+//
+//        await().untilAsserted(() -> assertThat(page.fileList())
+//            .as("File list should contain newly-created file")
+//            .extracting(WebElement::getText)
+//            .anyMatch(it -> it.contains(testSubDirectoryName)));
+//    }
 
     @Test
     @Order(22)
     void testRenameDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.rename(testSubDirectoryName, testRenameDirectoryName);
+        page.rename(testDirectoryName, testRenameDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -190,7 +190,7 @@ public class FileManageE2ETest {
 
         page.goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class)
-            .delete(testDirectoryName);
+            .delete(testRenameDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -198,7 +198,7 @@ public class FileManageE2ETest {
             assertThat(
                     page.fileList()
             ).noneMatch(
-                    it -> it.getText().contains(testDirectoryName)
+                    it -> it.getText().contains(testRenameDirectoryName)
             );
         });
     }
