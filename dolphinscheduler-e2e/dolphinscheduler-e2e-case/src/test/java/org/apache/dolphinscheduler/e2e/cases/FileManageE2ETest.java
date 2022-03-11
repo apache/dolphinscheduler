@@ -97,7 +97,7 @@ public class FileManageE2ETest {
 
         tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class)
-            .update(user, user, password, email, phone)
+            .update(user, user, password, email, phone, tenant)
             .goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class);
     }
