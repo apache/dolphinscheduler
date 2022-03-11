@@ -106,7 +106,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.className("btn-rename")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No rename button in udf manage list"))
