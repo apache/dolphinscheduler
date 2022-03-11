@@ -22,21 +22,27 @@ import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
 import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
+import { useMenuStore } from '@/store/menu/menu'
+import cookies from 'js-cookie'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
+  const menuStore = useMenuStore()
 
   const handleLogin = () => {
     state.loginFormRef.validate(async (valid: any) => {
       if (!valid) {
         const loginRes: SessionIdRes = await login({ ...state.loginForm })
         await userStore.setSessionId(loginRes.sessionId)
+        cookies.set('sessionId', loginRes.sessionId, { path: '/' })
 
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
 
-        router.push({ path: 'home' })
+        const key = menuStore.getMenuKey
+
+        router.push({ path: key || 'home' })
       }
     })
   }

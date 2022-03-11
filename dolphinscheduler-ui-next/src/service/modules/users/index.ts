@@ -65,7 +65,7 @@ export function createUser(data: UserReq): any {
   })
 }
 
-export function delUserById(data: IdReq): any {
+export function delUserById(data: IdReq) {
   return axios({
     url: '/users/delete',
     method: 'post',
@@ -80,7 +80,7 @@ export function getUserInfo(): any {
   })
 }
 
-export function grantDataSource(data: GrantDataSourceReq): any {
+export function grantDataSource(data: GrantDataSourceReq) {
   return axios({
     url: '/users/grant-datasource',
     method: 'post',
@@ -88,7 +88,7 @@ export function grantDataSource(data: GrantDataSourceReq): any {
   })
 }
 
-export function grantResource(data: GrantResourceReq): any {
+export function grantResource(data: GrantResourceReq) {
   return axios({
     url: '/users/grant-file',
     method: 'post',
@@ -96,7 +96,7 @@ export function grantResource(data: GrantResourceReq): any {
   })
 }
 
-export function grantProject(data: GrantProject): any {
+export function grantProject(data: GrantProject) {
   return axios({
     url: '/users/grant-project',
     method: 'post',
@@ -112,7 +112,7 @@ export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   })
 }
 
-export function grantUDFFunc(data: GrantUDFReq & UserIdReq): any {
+export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
   return axios({
     url: '/users/grant-udf-func',
     method: 'post',
@@ -127,7 +127,7 @@ export function listUser(): any {
   })
 }
 
-export function listAll(params: ListAllReq): any {
+export function listAll(params?: ListAllReq): any {
   return axios({
     url: '/users/list-all',
     method: 'get',
@@ -135,7 +135,7 @@ export function listAll(params: ListAllReq): any {
   })
 }
 
-export function queryUserList(params: ListReq): any {
+export function queryUserList(params: ListReq) {
   return axios({
     url: '/users/list-paging',
     method: 'get',
@@ -167,7 +167,7 @@ export function unauthorizedUser(params: AlertGroupIdReq): any {
   })
 }
 
-export function updateUser(data: IdReq & UserReq): any {
+export function updateUser(data: IdReq & UserReq) {
   return axios({
     url: '/users/update',
     method: 'post',
@@ -175,7 +175,7 @@ export function updateUser(data: IdReq & UserReq): any {
   })
 }
 
-export function verifyUserName(params: UserNameReq): any {
+export function verifyUserName(params: UserNameReq) {
   return axios({
     url: '/users/verify-user-name',
     method: 'get',

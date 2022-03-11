@@ -89,7 +89,7 @@
             size="small"
             v-model="sourceType"
             :disabled="isDetails"
-            @change="_handleSourceTypeChange">
+            @change="(val)=> _handleSourceTypeChange({label: val})">
             <el-option
               v-for="city in sourceTypeList"
               :key="city.code"
@@ -1094,7 +1094,10 @@
         this.keypress = () => {
           if (!editor.getOption('readOnly')) {
             editor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }
@@ -1128,7 +1131,10 @@
         this.keypress = () => {
           if (!shellEditor.getOption('readOnly')) {
             shellEditor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }

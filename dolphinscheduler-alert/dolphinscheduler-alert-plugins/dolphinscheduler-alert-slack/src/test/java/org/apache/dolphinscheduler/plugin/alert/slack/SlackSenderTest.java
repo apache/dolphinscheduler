@@ -28,7 +28,7 @@ public class SlackSenderTest {
     @Test
     public void testSendMessage() {
         Map<String, String> alertparam = new HashMap<>();
-        alertparam.put(SlackParamsConstants.SLACK_WEN_HOOK_URL_NAME,
+        alertparam.put(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME,
             "https://hooks.slack.com/services/123456");
         alertparam.put(SlackParamsConstants.SLACK_BOT_NAME, "Dolphinscheduler");
 

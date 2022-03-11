@@ -270,6 +270,7 @@
       addTaskInfo ({ item }) {
         this.addTask(item)
         this.$refs.canvas.setNodeName(item.code, item.name)
+        this.$refs.canvas.setNodeForbiddenStatus(item.code, item.flag === 'NO')
         this.taskDrawer = false
       },
       closeTaskDrawer ({ flag }) {
@@ -332,11 +333,11 @@
                     })
                     if (this.type === 'instance') {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/instance/list`
+                        path: `/projects/${this.projectCode}/instance/list/${methodParam}`
                       })
                     } else {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/definition/list`
+                        path: `/projects/${this.projectCode}/definition/list/${methodParam}`
                       })
                     }
                   })
@@ -413,6 +414,7 @@
             task.code,
             task.taskType,
             task.name,
+            task.flag === 'NO',
             {
               x: location.x,
               y: location.y
@@ -420,6 +422,7 @@
           )
           nodes.push(node)
         })
+
         connects
           .filter((r) => !!r.preTaskCode)
           .forEach((c) => {

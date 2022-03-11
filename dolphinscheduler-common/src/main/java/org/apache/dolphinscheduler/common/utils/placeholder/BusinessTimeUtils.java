@@ -53,7 +53,6 @@ public class BusinessTimeUtils {
                 if (runTime == null) {
                     return result;
                 }
-                break;
             case START_PROCESS:
             case START_CURRENT_TASK_PROCESS:
             case RECOVER_TOLERANCE_FAULT_PROCESS:
@@ -72,9 +71,9 @@ public class BusinessTimeUtils {
                 break;
         }
         Date businessCurrentDate = addDays(businessDate, 1);
-        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE));
-        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE));
-        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME));
+        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE, null));
+        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE, null));
+        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME, null));
         return result;
     }
 }

@@ -47,12 +47,12 @@ import org.junit.runners.model.Statement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.apache.commons.lang.SystemUtils;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import com.google.common.base.Strings;
@@ -69,6 +69,9 @@ final class DolphinSchedulerExtension
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
     private BrowserWebDriverContainer<?> browser;
+    private Network network;
+    private HostAndPort address;
+    private String rootPath;
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -76,33 +79,10 @@ final class DolphinSchedulerExtension
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
         Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
 
-        Network network = null;
-        HostAndPort address = null;
-        String rootPath = "/";
-        if (!LOCAL_MODE) {
-            compose = createDockerCompose(context);
-            compose.start();
-
-            final ContainerState dsContainer = compose.getContainerByServiceName("dolphinscheduler_1")
-                                                      .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
-            final String networkId = dsContainer.getContainerInfo().getNetworkSettings().getNetworks().keySet().iterator().next();
-            network = new Network() {
-                @Override
-                public String getId() {
-                    return networkId;
-                }
-
-                @Override
-                public void close() {
-                }
-
-                @Override
-                public Statement apply(Statement base, Description description) {
-                    return null;
-                }
-            };
-            address = HostAndPort.fromParts("dolphinscheduler", 12345);
-            rootPath = "/dolphinscheduler";
+        if (LOCAL_MODE) {
+            runInLocal();
+        } else {
+            runInDockerContainer(context);
         }
 
         final Path record;
@@ -116,8 +96,12 @@ final class DolphinSchedulerExtension
         } else {
             record = Files.createTempDirectory("record-");
         }
+
         browser = new BrowserWebDriverContainer<>()
             .withCapabilities(new ChromeOptions())
+            .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
+            .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
+                                Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
             .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
@@ -131,18 +115,7 @@ final class DolphinSchedulerExtension
               .pageLoadTimeout(5, TimeUnit.SECONDS);
         driver.manage().window()
               .maximize();
-        if (address == null) {
-            try {
-                address = HostAndPort.fromParts(browser.getTestHostIpAddress(), 8888);
-            } catch (UnsupportedOperationException ignored) {
-                if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
-                    address = HostAndPort.fromParts("host.docker.internal", 8888);
-                }
-            }
-        }
-        if (address == null) {
-            throw new UnsupportedOperationException("Unsupported operation system");
-        }
+
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
         browser.beforeTest(new TestDescription(context));
@@ -152,6 +125,38 @@ final class DolphinSchedulerExtension
               .filter(it -> Modifier.isStatic(it.getModifiers()))
               .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
               .forEach(it -> setDriver(clazz, it));
+    }
+
+    private void runInLocal() {
+        Testcontainers.exposeHostPorts(8888);
+        address = HostAndPort.fromParts("host.testcontainers.internal", 8888);
+        rootPath = "/";
+    }
+
+    private void runInDockerContainer(ExtensionContext context) {
+        compose = createDockerCompose(context);
+        compose.start();
+
+        final ContainerState dsContainer = compose.getContainerByServiceName("dolphinscheduler_1")
+                .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
+        final String networkId = dsContainer.getContainerInfo().getNetworkSettings().getNetworks().keySet().iterator().next();
+        network = new Network() {
+            @Override
+            public String getId() {
+                return networkId;
+            }
+
+            @Override
+            public void close() {
+            }
+
+            @Override
+            public Statement apply(Statement base, Description description) {
+                return null;
+            }
+        };
+        address = HostAndPort.fromParts("dolphinscheduler", 12345);
+        rootPath = "/dolphinscheduler/ui/";
     }
 
     @Override

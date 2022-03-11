@@ -1,26 +1,27 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
   <m-popup
-          ref="popup"
-          :ok-text="$t('Upload')"
-          :nameText="$t('ReUpload File')"
-          @ok="_ok"
-          :disabled="progress === 0 ? false : true">
+    ref="popup"
+    :ok-text="$t('Upload')"
+    :nameText="$t('ReUpload File')"
+    @ok="_ok"
+    @close="_close"
+    :disabled="progress === 0 ? false : true">
     <template slot="content">
       <form name="files" enctype="multipart/form-data" method="post">
         <div class="file-update-model"
@@ -44,11 +45,11 @@
             <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
             <template slot="content">
               <el-input
-                      type="input"
-                      size="small"
-                      v-model="name"
-                      :disabled="progress !== 0"
-                      :placeholder="$t('Please enter name')">
+                type="input"
+                size="small"
+                v-model="name"
+                :disabled="progress !== 0"
+                :placeholder="$t('Please enter name')">
               </el-input>
             </template>
           </m-list-box-f>
@@ -56,11 +57,11 @@
             <template slot="name">{{$t('Description')}}</template>
             <template slot="content">
               <el-input
-                      type="textarea"
-                      size="small"
-                      v-model="description"
-                      :disabled="progress !== 0"
-                      :placeholder="$t('Please enter description')">
+                type="textarea"
+                size="small"
+                v-model="description"
+                :disabled="progress !== 0"
+                :placeholder="$t('Please enter description')">
               </el-input>
             </template>
           </m-list-box-f>
@@ -186,12 +187,13 @@
         return new Promise((resolve, reject) => {
           let self = this
           let formData = new FormData()
+
           formData.append('file', this.file)
           formData.append('name', this.name)
           formData.append('description', this.description)
           formData.append('id', this.id)
           formData.append('type', this.type)
-          io.post('resources/update', res => {
+          io.put('resources/' + this.id, res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdate')
@@ -244,6 +246,9 @@
         this.file = file
         this.name = file.name
         this.$refs.file.value = null
+      },
+      _close () {
+        this.$emit('closeReUpload')
       }
     },
     mounted () {

@@ -30,10 +30,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
+import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 import org.apache.hadoop.util.ThreadUtil;
 
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
@@ -42,8 +41,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 1. timeout check wheel
- * 2. dependent task check wheel
+ * Check thread
+ * 1. timeout task check
+ * 2. dependent task state check
+ * 3. retry task check
+ * 4. timeout process check
  */
 @Component
 public class StateWheelExecuteThread extends Thread {
@@ -56,14 +58,19 @@ public class StateWheelExecuteThread extends Thread {
     private ConcurrentLinkedQueue<Integer> processInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
 
     /**
-     * task time out check list, key is taskInstanceId, value is processInstanceId
+     * task time out check list
      */
-    private ConcurrentHashMap<Integer, Integer> taskInstanceTimeoutCheckList = new ConcurrentHashMap<>();
+    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
 
     /**
-     * task retry check list, key is taskInstanceId, value is processInstanceId
+     * task retry check list
      */
-    private ConcurrentHashMap<Integer, Integer> taskInstanceRetryCheckList = new ConcurrentHashMap<>();
+    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceRetryCheckList = new ConcurrentLinkedQueue<>();
+
+    /**
+     * task state check list
+     */
+    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceStateCheckList = new ConcurrentLinkedQueue<>();
 
     @Autowired
     private MasterConfig masterConfig;
@@ -80,6 +87,7 @@ public class StateWheelExecuteThread extends Thread {
             try {
                 checkTask4Timeout();
                 checkTask4Retry();
+                checkTask4State();
                 checkProcess4Timeout();
             } catch (Exception e) {
                 logger.error("state wheel thread check error:", e);
@@ -94,107 +102,6 @@ public class StateWheelExecuteThread extends Thread {
 
     public void removeProcess4TimeoutCheck(ProcessInstance processInstance) {
         processInstanceTimeoutCheckList.remove(processInstance.getId());
-    }
-
-    public void addTask4TimeoutCheck(TaskInstance taskInstance) {
-        if (taskInstanceTimeoutCheckList.containsKey(taskInstance.getId())) {
-            return;
-        }
-        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
-        if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
-            return;
-        }
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
-            taskInstanceTimeoutCheckList.put(taskInstance.getId(), taskInstance.getProcessInstanceId());
-        }
-        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-            taskInstanceTimeoutCheckList.put(taskInstance.getId(), taskInstance.getProcessInstanceId());
-        }
-    }
-
-    public void removeTask4TimeoutCheck(TaskInstance taskInstance) {
-        taskInstanceTimeoutCheckList.remove(taskInstance.getId());
-    }
-
-    public void addTask4RetryCheck(TaskInstance taskInstance) {
-        if (taskInstanceRetryCheckList.containsKey(taskInstance.getId())) {
-            return;
-        }
-        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
-        if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
-            return;
-        }
-        if (taskInstance.taskCanRetry()) {
-            taskInstanceRetryCheckList.put(taskInstance.getId(), taskInstance.getProcessInstanceId());
-        }
-
-        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-            taskInstanceRetryCheckList.put(taskInstance.getId(), taskInstance.getProcessInstanceId());
-        }
-    }
-
-    public void removeTask4RetryCheck(TaskInstance taskInstance) {
-        taskInstanceRetryCheckList.remove(taskInstance.getId());
-    }
-
-    private void checkTask4Timeout() {
-        if (taskInstanceTimeoutCheckList.isEmpty()) {
-            return;
-        }
-        for (Entry<Integer, Integer> entry : taskInstanceTimeoutCheckList.entrySet()) {
-            int processInstanceId = entry.getValue();
-            int taskInstanceId = entry.getKey();
-
-            WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
-            if (workflowExecuteThread == null) {
-                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskInstanceId:{}",
-                        processInstanceId, taskInstanceId);
-                taskInstanceTimeoutCheckList.remove(taskInstanceId);
-                continue;
-            }
-            TaskInstance taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
-            if (taskInstance == null) {
-                continue;
-            }
-            if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
-                long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), (long) taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-                if (timeRemain < 0) {
-                    addTaskTimeoutEvent(taskInstance);
-                    taskInstanceTimeoutCheckList.remove(taskInstance.getId());
-                }
-            }
-        }
-    }
-
-    private void checkTask4Retry() {
-        if (taskInstanceRetryCheckList.isEmpty()) {
-            return;
-        }
-        for (Entry<Integer, Integer> entry : taskInstanceRetryCheckList.entrySet()) {
-            int processInstanceId = entry.getValue();
-            int taskInstanceId = entry.getKey();
-
-            WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
-            if (workflowExecuteThread == null) {
-                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskInstanceId:{}",
-                        processInstanceId, taskInstanceId);
-                taskInstanceRetryCheckList.remove(taskInstanceId);
-                continue;
-            }
-            TaskInstance taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
-            if (taskInstance == null) {
-                continue;
-            }
-
-            if (!taskInstance.getState().typeIsFinished() && (taskInstance.isSubProcess() || taskInstance.isDependTask())) {
-                addTaskStateChangeEvent(taskInstance);
-            } else if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
-                addTaskStateChangeEvent(taskInstance);
-                taskInstanceRetryCheckList.remove(taskInstance.getId());
-            }
-        }
     }
 
     private void checkProcess4Timeout() {
@@ -223,11 +130,218 @@ public class StateWheelExecuteThread extends Thread {
         }
     }
 
+    public void addTask4TimeoutCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+        TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
+        if (taskInstanceKey == null) {
+            logger.error("taskInstanceKey is null");
+            return;
+        }
+        if (taskInstanceTimeoutCheckList.contains(taskInstanceKey)) {
+            return;
+        }
+        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
+        if (taskDefinition == null) {
+            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            return;
+        }
+        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
+            taskInstanceTimeoutCheckList.add(taskInstanceKey);
+        }
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            taskInstanceTimeoutCheckList.add(taskInstanceKey);
+        }
+    }
+
+    public void removeTask4TimeoutCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+        TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
+        if (taskInstanceKey == null) {
+            logger.error("taskInstanceKey is null");
+            return;
+        }
+        taskInstanceTimeoutCheckList.remove(taskInstanceKey);
+    }
+
+    public void addTask4RetryCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+        TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
+        if (taskInstanceKey == null) {
+            logger.error("taskInstanceKey is null");
+            return;
+        }
+        if (taskInstanceRetryCheckList.contains(taskInstanceKey)) {
+            return;
+        }
+        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
+        if (taskDefinition == null) {
+            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            return;
+        }
+        logger.debug("addTask4RetryCheck, taskCode:{}, processInstanceId:{}", taskInstance.getTaskCode(), taskInstance.getProcessInstanceId());
+        taskInstanceRetryCheckList.add(taskInstanceKey);
+    }
+
+    public void removeTask4RetryCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+        TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
+        if (taskInstanceKey == null) {
+            logger.error("taskInstanceKey is null");
+            return;
+        }
+        taskInstanceRetryCheckList.remove(taskInstanceKey);
+    }
+
+    public void addTask4StateCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+        TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
+        if (taskInstanceKey == null) {
+            logger.error("taskInstanceKey is null");
+            return;
+        }
+        if (taskInstanceStateCheckList.contains(taskInstanceKey)) {
+            return;
+        }
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            taskInstanceStateCheckList.add(taskInstanceKey);
+        }
+    }
+
+    public void removeTask4StateCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+        TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
+        if (taskInstanceKey == null) {
+            logger.error("taskInstanceKey is null");
+            return;
+        }
+        taskInstanceStateCheckList.remove(taskInstanceKey);
+    }
+
+    private void checkTask4Timeout() {
+        if (taskInstanceTimeoutCheckList.isEmpty()) {
+            return;
+        }
+        for (TaskInstanceKey taskInstanceKey : taskInstanceTimeoutCheckList) {
+            int processInstanceId = taskInstanceKey.getProcessInstanceId();
+            long taskCode = taskInstanceKey.getTaskCode();
+
+            WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+            if (workflowExecuteThread == null) {
+                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
+                        processInstanceId, taskCode);
+                taskInstanceTimeoutCheckList.remove(taskInstanceKey);
+                continue;
+            }
+            TaskInstance taskInstance = workflowExecuteThread.getActiveTaskInstanceByTaskCode(taskCode);
+            if (taskInstance == null) {
+                logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
+                        processInstanceId, taskCode);
+                taskInstanceTimeoutCheckList.remove(taskInstanceKey);
+                continue;
+            }
+            if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
+                long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), (long) taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
+                if (timeRemain < 0) {
+                    addTaskTimeoutEvent(taskInstance);
+                    taskInstanceTimeoutCheckList.remove(taskInstanceKey);
+                }
+            }
+        }
+    }
+
+    private void checkTask4Retry() {
+        if (taskInstanceRetryCheckList.isEmpty()) {
+            return;
+        }
+
+        for (TaskInstanceKey taskInstanceKey : taskInstanceRetryCheckList) {
+            int processInstanceId = taskInstanceKey.getProcessInstanceId();
+            long taskCode = taskInstanceKey.getTaskCode();
+
+            WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+
+            if (workflowExecuteThread == null) {
+                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
+                        processInstanceId, taskCode);
+                taskInstanceRetryCheckList.remove(taskInstanceKey);
+                continue;
+            }
+
+            TaskInstance taskInstance = workflowExecuteThread.getRetryTaskInstanceByTaskCode(taskCode);
+            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                addProcessStopEvent(processInstance);
+                taskInstanceRetryCheckList.remove(taskInstanceKey);
+                break;
+            }
+
+            if (taskInstance == null) {
+                logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
+                        processInstanceId, taskCode);
+                taskInstanceRetryCheckList.remove(taskInstanceKey);
+                continue;
+            }
+
+            if (taskInstance.retryTaskIntervalOverTime()) {
+                // reset taskInstance endTime and state
+                // todo relative funtion: TaskInstance.retryTaskIntervalOverTime, WorkflowExecuteThread.cloneRetryTaskInstance
+                taskInstance.setEndTime(null);
+                taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+
+                addTaskRetryEvent(taskInstance);
+                taskInstanceRetryCheckList.remove(taskInstanceKey);
+            }
+        }
+    }
+
+    private void checkTask4State() {
+        if (taskInstanceStateCheckList.isEmpty()) {
+            return;
+        }
+        for (TaskInstanceKey taskInstanceKey : taskInstanceStateCheckList) {
+            int processInstanceId = taskInstanceKey.getProcessInstanceId();
+            long taskCode = taskInstanceKey.getTaskCode();
+
+            WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+            if (workflowExecuteThread == null) {
+                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
+                        processInstanceId, taskCode);
+                taskInstanceStateCheckList.remove(taskInstanceKey);
+                continue;
+            }
+            TaskInstance taskInstance = workflowExecuteThread.getActiveTaskInstanceByTaskCode(taskCode);
+            if (taskInstance == null) {
+                logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
+                        processInstanceId, taskCode);
+                taskInstanceStateCheckList.remove(taskInstanceKey);
+                continue;
+            }
+            if (taskInstance.getState().typeIsFinished()) {
+                continue;
+            }
+            addTaskStateChangeEvent(taskInstance);
+        }
+    }
+
     private void addTaskStateChangeEvent(TaskInstance taskInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
         stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskInstance.getId());
+        stateEvent.setTaskCode(taskInstance.getTaskCode());
+        stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+        workflowExecuteThreadPool.submitStateEvent(stateEvent);
+    }
+
+    private void addProcessStopEvent(ProcessInstance processInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(processInstance.getId());
+        stateEvent.setExecutionStatus(ExecutionStatus.STOP);
+        workflowExecuteThreadPool.submitStateEvent(stateEvent);
+    }
+
+    private void addTaskRetryEvent(TaskInstance taskInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.TASK_RETRY);
+        stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
+        stateEvent.setTaskInstanceId(taskInstance.getId());
+        stateEvent.setTaskCode(taskInstance.getTaskCode());
         stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
@@ -237,6 +351,7 @@ public class StateWheelExecuteThread extends Thread {
         stateEvent.setType(StateEventType.TASK_TIMEOUT);
         stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskInstance.getId());
+        stateEvent.setTaskCode(taskInstance.getTaskCode());
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 

@@ -21,7 +21,7 @@ import {
   deleteTenantById
 } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 
@@ -50,12 +50,14 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('security.tenant.num'),
-        key: 'num'
+        title: '#',
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.tenant.tenant_code'),
-        key: 'tenantCode'
+        key: 'tenantCode',
+        className: 'tenant-code'
       },
       {
         title: t('security.tenant.description'),
@@ -90,12 +92,14 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.tenant.edit')
@@ -120,10 +124,14 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small'
+                              size: 'small',
+                              class: 'delete'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.tenant.delete')
@@ -154,9 +162,8 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryTenantListPaging({ ...params }).then((res: any) => {
-        variables.tableData = res.totalList.map((item: any, index: number) => {
+        variables.tableData = res.totalList.map((item: any, unused: number) => {
           return {
-            num: index + 1,
             ...item
           }
         })

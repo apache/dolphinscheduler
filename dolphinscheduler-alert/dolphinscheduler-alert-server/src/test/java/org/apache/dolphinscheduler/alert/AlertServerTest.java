@@ -49,7 +49,7 @@ public class AlertServerTest extends TestCase {
         
         Mockito.when(alertConfig.getPort()).thenReturn(50053);
         
-        alertServer.start();
+        alertServer.start(null);
     
         NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "server");
     

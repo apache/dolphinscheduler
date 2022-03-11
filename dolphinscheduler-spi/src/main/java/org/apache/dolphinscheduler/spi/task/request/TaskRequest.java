@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.spi.task.Property;
 import java.util.Date;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * to master/worker task transport
  */
@@ -43,13 +41,11 @@ public class TaskRequest {
     /**
      * task first submit time.
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date firstSubmitTime;
 
     /**
      * task start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
@@ -96,7 +92,6 @@ public class TaskRequest {
     /**
      * process instance schedule time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date scheduleTime;
 
     /**
@@ -224,6 +219,8 @@ public class TaskRequest {
      * sqoop TaskExecutionContext
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
     public Map<String, String> getResources() {
         return resources;
@@ -503,5 +500,13 @@ public class TaskRequest {
 
     public void setProcedureTaskExecutionContext(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
         this.procedureTaskExecutionContext = procedureTaskExecutionContext;
+    }
+
+    public DataQualityTaskExecutionContext getDataQualityTaskExecutionContext() {
+        return dataQualityTaskExecutionContext;
+    }
+
+    public void setDataQualityTaskExecutionContext(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        this.dataQualityTaskExecutionContext = dataQualityTaskExecutionContext;
     }
 }

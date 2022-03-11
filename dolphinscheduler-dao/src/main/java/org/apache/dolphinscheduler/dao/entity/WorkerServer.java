@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -51,13 +50,11 @@ public class WorkerServer {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**
      * last heart beat time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date lastHeartbeatTime;
 
     public int getId() {

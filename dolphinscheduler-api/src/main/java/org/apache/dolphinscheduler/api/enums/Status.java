@@ -319,6 +319,9 @@ public enum Status {
 
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
 
+    // audit log
+    QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
+
     //plugin
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
     QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
@@ -347,7 +350,14 @@ public enum Status {
     QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment [{0}] ", "查询环境编码[{0}]不存在"),
     QUERY_ENVIRONMENT_ERROR(1200010, "login user query environment error", "分页查询环境列表错误"),
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
-
+    GET_RULE_FORM_CREATE_JSON_ERROR(1200012, "get rule form create json error", "获取规则 FROM-CREATE-JSON 错误"),
+    QUERY_RULE_LIST_PAGING_ERROR(1200013, "query rule list paging error", "获取规则分页列表错误"),
+    QUERY_RULE_LIST_ERROR(1200014, "query rule list error", "获取规则列表错误"),
+    QUERY_RULE_INPUT_ENTRY_LIST_ERROR(1200015, "query rule list error", "获取规则列表错误"),
+    QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(1200016, "query execute result list paging error", "获取数据质量任务结果分页错误"),
+    GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
+    GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
+    GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
     TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
     TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
     TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组已经被关闭"),
@@ -370,6 +380,16 @@ public enum Status {
     TASK_GROUP_STATUS_OPENED(130019,"The task group has been opened.","任务组已经被开启"),
     NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT(130020, "Not allow to disable your own account", "不能停用自己的账号"),
     NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP(130030, "Not allow to delete the default alarm group ", "不能删除默认告警组"),
+    TIME_ZONE_ILLEGAL(130031, "time zone [{0}] is illegal", "时区参数 [{0}] 不合法"),
+
+    QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR(1300001, "login user query k8s namespace list paging error", "分页查询k8s名称空间列表错误"),
+    K8S_NAMESPACE_EXIST(1300002, "k8s namespace {0} already exists", "k8s命名空间[{0}]已存在"),
+    CREATE_K8S_NAMESPACE_ERROR(1300003, "create k8s namespace error", "创建k8s命名空间错误"),
+    UPDATE_K8S_NAMESPACE_ERROR(1300004, "update k8s namespace error", "更新k8s命名空间信息错误"),
+    K8S_NAMESPACE_NOT_EXIST(1300005, "k8s namespace {0} not exists", "命名空间ID[{0}]不存在"),
+    K8S_CLIENT_OPS_ERROR(1300006, "k8s error with exception {0}", "k8s操作报错[{0}]"),
+    VERIFY_K8S_NAMESPACE_ERROR(1300007, "verify k8s and namespace error", "验证k8s命名空间信息错误"),
+    DELETE_K8S_NAMESPACE_BY_ID_ERROR(1300008, "delete k8s namespace by id error", "删除命名空间错误"),
     ;
 
     private final int code;

@@ -17,10 +17,14 @@
 
 import mapping from './mapping'
 import regex from './regex'
+import truncateText from './truncate-text'
+import log from './log'
 
 const utils = {
   mapping,
-  regex
+  regex,
+  truncateText,
+  log
 }
 
 export default utils

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_EMIT;
 import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
 import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_NAME;
 import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_PROPS;
@@ -78,6 +79,9 @@ public class PluginParams {
     @JsonProperty(STRING_PLUGIN_PARAM_VALIDATE)
     protected List<Validate> validateList;
 
+    @JsonProperty(STRING_PLUGIN_PARAM_EMIT)
+    protected List<String> emit;
+
     /**
      * whether to hide, the default value is false
      */
@@ -109,7 +113,7 @@ public class PluginParams {
         this.info = builder.info;
         this.display = builder.display;
         this.hidden = builder.hidden;
-
+        this.emit = builder.emit;
     }
 
     @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
@@ -131,6 +135,8 @@ public class PluginParams {
         protected String info;
 
         protected List<Validate> validateList;
+
+        protected List<String> emit;
 
         protected Boolean hidden;
 
@@ -157,6 +163,7 @@ public class PluginParams {
                        @JsonProperty("value") Object value,
                        @JsonProperty("name") String fieldName,
                        @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("emit") List<String> emit,
                        @JsonProperty("info") String info,
                        @JsonProperty("hidden") Boolean hidden,
                        @JsonProperty("display") Boolean display
@@ -171,6 +178,7 @@ public class PluginParams {
             this.value = value;
             this.validateList = validateList;
             this.fieldName = fieldName;
+            this.emit = emit;
             this.info = info;
             this.hidden = hidden;
             this.display = display;
@@ -207,6 +215,10 @@ public class PluginParams {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public List<String> getEmit() {
+        return emit;
     }
 
 }

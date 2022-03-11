@@ -32,49 +32,91 @@ export default {
     {
       path: '/security/tenant-manage',
       name: 'tenant-manage',
-      component: components['tenant-manage'],
+      component: components['security-tenant-manage'],
       meta: {
-        title: '租户管理'
+        title: '租户管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
       }
     },
     {
-      path: '/security/users',
-      name: 'users-manage',
-      component: components['home'],
+      path: '/security/user-manage',
+      name: 'user-manage',
+      component: components['security-user-manage'],
       meta: {
-        title: '用户管理'
+        title: '用户管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
       }
     },
     {
       path: '/security/alarm-group-manage',
       name: 'alarm-group-manage',
-      component: components['alarm-group-manage'],
+      component: components['security-alarm-group-manage'],
       meta: {
-        title: '告警组管理'
+        title: '告警组管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
       }
     },
     {
       path: '/security/worker-group-manage',
       name: 'worker-group-manage',
-      component: components['worker-group-manage'],
+      component: components['security-worker-group-manage'],
       meta: {
-        title: 'Worker分组管理'
+        title: 'Worker分组管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
       }
     },
     {
       path: '/security/yarn-queue-manage',
       name: 'yarn-queue-manage',
-      component: components['yarn-queue-manage'],
+      component: components['security-yarn-queue-manage'],
       meta: {
-        title: 'Yarn队列管理'
+        title: 'Yarn队列管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
       }
     },
     {
       path: '/security/environment-manage',
       name: 'environment-manage',
-      component: components['environment-manage'],
+      component: components['security-environment-manage'],
       meta: {
-        title: '环境管理'
+        title: '环境管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
+      }
+    },
+    {
+      path: '/security/token-manage',
+      name: 'token-manage',
+      component: components['security-token-manage'],
+      meta: {
+        title: '令牌管理管理',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/security/alarm-instance-manage',
+      name: 'alarm-instance-manage',
+      component: components['security-alarm-instance-manage'],
+      meta: {
+        title: '告警实例管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
+      }
+    },
+    {
+      path: '/security/k8s-namespace-manage',
+      name: 'k8s-namespace-manage',
+      component: components['security-k8s-namespace-manage'],
+      meta: {
+        title: 'K8S命名空间管理',
+        showSide: true,
+        auth: ['ADMIN_USER']
       }
     }
   ]

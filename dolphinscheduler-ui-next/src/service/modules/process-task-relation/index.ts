@@ -34,7 +34,7 @@ export function save(data: SaveReq, projectCode: ProjectCodeReq): any {
   })
 }
 
-export function moveRelation(data: MoveReq, projectCode: ProjectCodeReq): any {
+export function moveRelation(data: MoveReq, projectCode: number): any {
   return axios({
     url: `/projects/${projectCode}/process-task-relation/move`,
     method: 'post',

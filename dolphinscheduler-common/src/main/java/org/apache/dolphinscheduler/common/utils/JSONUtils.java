@@ -24,9 +24,12 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +72,8 @@ public class JSONUtils {
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .setTimeZone(TimeZone.getDefault());
+            .setTimeZone(TimeZone.getDefault())
+            .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
@@ -221,6 +225,31 @@ public class JSONUtils {
      */
     public static Map<String, String> toMap(String json) {
         return parseObject(json, new TypeReference<Map<String, String>>() {});
+    }
+
+    /**
+     * json to map
+     *
+     * @param json json
+     * @param classK classK
+     * @param classV classV
+     * @param <K> K
+     * @param <V> V
+     * @return to map
+     */
+    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
+        if (StringUtils.isEmpty(json)) {
+            return Collections.emptyMap();
+        }
+
+        try {
+            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
+            });
+        } catch (Exception e) {
+            logger.error("json to map exception!", e);
+        }
+
+        return Collections.emptyMap();
     }
 
     /**

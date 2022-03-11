@@ -35,7 +35,7 @@ const envConfigPlaceholder =
   'export HADOOP_CLASSPATH=`hadoop classpath`\n'
 
 const EnvironmentModal = defineComponent({
-  name: 'YarnQueueModal',
+  name: 'EnvironmentModal',
   props: {
     showModalRef: {
       type: Boolean as PropType<boolean>,
@@ -123,6 +123,8 @@ const EnvironmentModal = defineComponent({
           confirmDisabled={
             !this.model.name || !this.model.config || !this.model.description
           }
+          confirmClassName='btn-submit'
+          cancelClassName='btn-cancel'
         >
           {{
             default: () => (
@@ -136,6 +138,7 @@ const EnvironmentModal = defineComponent({
                   path='name'
                 >
                   <NInput
+                    class='input-environment-name'
                     placeholder={t(
                       'security.environment.environment_name_tips'
                     )}
@@ -147,6 +150,7 @@ const EnvironmentModal = defineComponent({
                   path='config'
                 >
                   <NInput
+                    class='input-environment-config'
                     placeholder={envConfigPlaceholder}
                     type='textarea'
                     autosize={{ minRows: 16 }}
@@ -158,6 +162,7 @@ const EnvironmentModal = defineComponent({
                   path='description'
                 >
                   <NInput
+                    class='input-environment-desc'
                     placeholder={t(
                       'security.environment.environment_description_tips'
                     )}
@@ -169,6 +174,7 @@ const EnvironmentModal = defineComponent({
                   path='workerGroups'
                 >
                   <NSelect
+                    class='input-environment-worker-group'
                     multiple
                     placeholder={t('security.environment.worker_group_tips')}
                     options={this.model.generalOptions}
