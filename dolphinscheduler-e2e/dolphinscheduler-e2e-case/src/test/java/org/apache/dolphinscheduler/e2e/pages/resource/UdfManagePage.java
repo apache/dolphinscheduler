@@ -141,7 +141,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-name"),
+                @FindBy(className = "input-directory-name"),
                 @FindBy(tagName = "input"),
         })
         private WebElement inputName;
