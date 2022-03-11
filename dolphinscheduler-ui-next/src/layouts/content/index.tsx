@@ -107,6 +107,7 @@ const Content = defineComponent({
             onHandleMenuClick={this.getSideMenuOptions}
             headerMenuOptions={this.headerMenuOptions}
             localesOptions={this.localesOptions}
+            timezoneOptions={this.timezoneOptions}
             userDropdownOptions={this.userDropdownOptions}
           />
         </NLayoutHeader>

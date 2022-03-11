@@ -24,11 +24,13 @@ import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { useMenuStore } from '@/store/menu/menu'
 import cookies from 'js-cookie'
+import { useTimezoneStore } from '@/store/timezone/timezone'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
   const menuStore = useMenuStore()
+  const timezoneStore = useTimezoneStore()
 
   const handleLogin = () => {
     state.loginFormRef.validate(async (valid: any) => {
@@ -39,6 +41,11 @@ export function useLogin(state: any) {
 
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
+
+        const timezone = userInfoRes.timeZone
+          ? userInfoRes.timeZone
+          : Intl.DateTimeFormat().resolvedOptions().timeZone
+        await timezoneStore.setTimezone(timezone)
 
         const key = menuStore.getMenuKey
 

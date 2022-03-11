@@ -135,7 +135,8 @@ const profile = {
   phone_tips: '请输入手机号',
   state_tips: '请选择状态',
   enable: '启用',
-  disable: '禁用'
+  disable: '禁用',
+  timezone_success: '时区更新成功'
 }
 
 const monitor = {

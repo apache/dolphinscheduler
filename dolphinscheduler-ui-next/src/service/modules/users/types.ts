@@ -35,6 +35,7 @@ interface UserReq {
   phone?: string
   queue?: string
   state?: number
+  timeZone?: string
 }
 
 interface IdReq {

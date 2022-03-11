@@ -136,7 +136,8 @@ const profile = {
   phone_tips: 'Please enter your phone',
   state_tips: 'Please choose your state',
   enable: 'Enable',
-  disable: 'Disable'
+  disable: 'Disable',
+  timezone_success: 'Time zone updated successful'
 }
 
 const monitor = {
