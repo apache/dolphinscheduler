@@ -18,6 +18,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { useDeployMode } from '.'
+import { removeUselessChildren } from '@/utils/tree-format'
 import type { IJsonItem } from '../types'
 
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
@@ -60,23 +61,6 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     removeUselessChildren(res)
     options.value = res || []
     loading.value = false
-  }
-
-  function removeUselessChildren(
-    list: { children?: []; fullName: string; id: number }[]
-  ) {
-    if (!list.length) return
-    list.forEach((item) => {
-      if (!item.children) {
-        return
-      }
-      if (item.children.length === 0) {
-        model.resourceFiles.push({ id: item.id, fullName: item.fullName })
-        delete item.children
-        return
-      }
-      removeUselessChildren(item.children)
-    })
   }
 
   onMounted(() => {

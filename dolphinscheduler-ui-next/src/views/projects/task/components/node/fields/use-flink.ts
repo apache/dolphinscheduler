@@ -17,7 +17,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
-import { removeUselessChildren } from './use-shell'
+import { removeUselessChildren } from '@/utils/tree-format'
 import { useCustomParams, useDeployMode } from '.'
 import type { IJsonItem, ProgramType } from '../types'
 
