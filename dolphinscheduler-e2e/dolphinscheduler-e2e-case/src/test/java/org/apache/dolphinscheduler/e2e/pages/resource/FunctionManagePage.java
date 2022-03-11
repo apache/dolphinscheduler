@@ -148,7 +148,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBys({
                 @FindBy(className = "input-description"),
-                @FindBy(tagName = "input"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
@@ -179,7 +179,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBys({
                 @FindBy(className = "input-description"),
-                @FindBy(tagName = "input"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 

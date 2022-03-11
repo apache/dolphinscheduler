@@ -148,7 +148,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBys({
                 @FindBy(className = "input-description"),
-                @FindBy(tagName = "input"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
@@ -192,7 +192,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBys({
                 @FindBy(className = "input-description"),
-                @FindBy(tagName = "input"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
