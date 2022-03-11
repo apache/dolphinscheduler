@@ -66,6 +66,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
         buttonCreateUdfFunction().click();
 
+        createUdfFunctionBox().radioFunctionType().click();
+
         createUdfFunctionBox().inputFunctionName().sendKeys(udfFunctionName);
 
         createUdfFunctionBox().inputClassName().sendKeys(className);
@@ -127,6 +129,12 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
+                @FindBy(className = "radio-function-type"),
+                @FindBy(tagName = "input"),
+        })
+        private WebElement radioFunctionType;
+
+        @FindBys({
                 @FindBy(className = "input-function-name"),
                 @FindBy(tagName = "input"),
         })
@@ -138,7 +146,10 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         })
         private WebElement inputClassName;
 
-        @FindBy(className = "btn-udf-resource-dropdown")
+        @FindBys({
+                @FindBy(className = "btn-udf-resource-dropdown"),
+                @FindBy(className = "n-base-selection"),
+        })
         private WebElement buttonUdfResourceDropDown;
 
         @FindBy(className = "n-tree-node-content")
