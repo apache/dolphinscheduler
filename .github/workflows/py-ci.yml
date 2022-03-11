@@ -59,7 +59,7 @@ jobs:
     name: Pytest
     needs:
       - lint
-      - sanity
+#      - sanity
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
