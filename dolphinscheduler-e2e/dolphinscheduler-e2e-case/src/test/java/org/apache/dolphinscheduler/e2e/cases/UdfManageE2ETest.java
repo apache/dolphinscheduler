@@ -91,9 +91,12 @@ public class UdfManageE2ETest {
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(tenant)));
 
-        tenantPage.goToNav(SecurityPage.class)
-            .goToTab(UserPage.class)
-            .update(user, user, password, email, phone, tenant)
+        UserPage userPage = tenantPage.goToNav(SecurityPage.class)
+            .goToTab(UserPage.class);
+
+        new WebDriverWait(userPage.driver(), 5).until(ExpectedConditions.urlContains("/user-manage"));
+
+        userPage.update(user, user, password, email, phone, tenant)
             .goToNav(ResourcePage.class)
             .goToTab(UdfManagePage.class);
     }
