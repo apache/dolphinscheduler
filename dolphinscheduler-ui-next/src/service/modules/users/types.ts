@@ -28,10 +28,10 @@ interface AlertGroupIdReq {
 }
 
 interface UserReq {
-  email?: string
-  tenantId?: number
-  userName?: string
-  userPassword?: string
+  email: string
+  tenantId: number
+  userName: string
+  userPassword: string
   phone?: string
   queue?: string
   state?: number
