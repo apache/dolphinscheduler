@@ -152,7 +152,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         })
         private WebElement buttonUdfResourceDropDown;
 
-        @FindBy(className = "n-tree-node-content")
+        @FindBy(className = "n-tree-node-content__text")
         private List<WebElement> selectUdfResource;
 
         @FindBys({
