@@ -111,21 +111,21 @@ export function deleteProcessInstanceById(id: number, code: number): any {
   })
 }
 
-export function queryTaskListByProcessId(id: IdReq, code: CodeReq): any {
+export function queryTaskListByProcessId(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/tasks`,
     method: 'get'
   })
 }
 
-export function vieGanttTree(id: IdReq, code: CodeReq): any {
+export function viewGanttTree(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-gantt`,
     method: 'get'
   })
 }
 
-export function viewVariables(id: IdReq, code: CodeReq): any {
+export function viewVariables(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-variables`,
     method: 'get'

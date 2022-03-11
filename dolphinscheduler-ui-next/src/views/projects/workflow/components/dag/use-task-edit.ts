@@ -36,10 +36,11 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-
   const { addNode, setNodeName } = useCellUpdate({ graph })
 
-  const taskDefinitions = ref<NodeData[]>([])
+  const taskDefinitions = ref<NodeData[]>(
+    definition.value?.taskDefinitionList || []
+  )
   const currTask = ref<NodeData>({
     taskType: 'SHELL',
     code: 0,
@@ -51,13 +52,36 @@ export function useTaskEdit(options: Options) {
    * Append a new task
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
-    addNode(code + '', type, '', coordinate)
+    addNode(code + '', type, '', 'YES', coordinate)
     taskDefinitions.value.push({
       code,
       taskType: type,
       name: ''
     })
     openTaskModal({ code, taskType: type, name: '' })
+  }
+
+  /**
+   * Copy a task
+   */
+  function copyTask(
+    name: string,
+    code: number,
+    targetCode: number,
+    type: TaskType,
+    flag: string,
+    coordinate: Coordinate
+  ) {
+    addNode(code + '', type, name, flag, coordinate)
+    const definition = taskDefinitions.value.find((t) => t.code === targetCode)
+
+    const newDefinition = {
+      ...definition,
+      code,
+      name
+    } as NodeData
+
+    taskDefinitions.value.push(newDefinition)
   }
 
   /**
@@ -76,6 +100,18 @@ export function useTaskEdit(options: Options) {
   }
 
   /**
+   * Edit task
+   * @param {number} code
+   */
+  function editTask(code: number) {
+    const definition = taskDefinitions.value.find((t) => t.code === code)
+    if (definition) {
+      currTask.value = definition
+    }
+    taskModalVisible.value = true
+  }
+
+  /**
    * The confirm event in task config modal
    * @param formRef
    * @param from
@@ -88,6 +124,7 @@ export function useTaskEdit(options: Options) {
         setNodeName(task.code + '', taskDef.name)
         return {
           ...taskDef,
+          version: task.version,
           code: task.code,
           taskType: currTask.value.taskType
         }
@@ -108,11 +145,7 @@ export function useTaskEdit(options: Options) {
     if (graph.value) {
       graph.value.on('cell:dblclick', ({ cell }) => {
         const code = Number(cell.id)
-        const definition = taskDefinitions.value.find((t) => t.code === code)
-        if (definition) {
-          currTask.value = definition
-        }
-        taskModalVisible.value = true
+        editTask(code)
       })
     }
   })
@@ -127,6 +160,8 @@ export function useTaskEdit(options: Options) {
     taskConfirm,
     taskCancel,
     appendTask,
+    editTask,
+    copyTask,
     taskDefinitions,
     removeTasks
   }

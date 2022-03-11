@@ -19,6 +19,8 @@ import { defineComponent, computed, ref, nextTick, provide } from 'vue'
 import {
   zhCN,
   enUS,
+  dateZhCN,
+  dateEnUS,
   NConfigProvider,
   darkTheme,
   GlobalThemeOverrides,
@@ -61,8 +63,11 @@ const App = defineComponent({
     return (
       <NConfigProvider
         theme={this.currentTheme}
-        themeOverrides={themeOverrides}
+        theme-overrides={themeOverrides}
         style={{ width: '100%', height: '100vh' }}
+        date-locale={
+          String(this.localesStore.getLocales) === 'zh_CN' ? dateZhCN : dateEnUS
+        }
         locale={String(this.localesStore.getLocales) === 'zh_CN' ? zhCN : enUS}
       >
         <NMessageProvider>

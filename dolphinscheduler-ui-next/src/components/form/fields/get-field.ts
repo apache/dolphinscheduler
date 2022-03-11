@@ -15,21 +15,40 @@
  * limitations under the License.
  */
 import * as Field from './index'
-import { camelCase, upperFirst } from 'lodash'
+import { camelCase, upperFirst, isFunction } from 'lodash'
 import type { FormRules, FormItemRule } from 'naive-ui'
 import type { IJsonItem } from '../types'
+
+const TYPES = [
+  'input',
+  'radio',
+  'editor',
+  'custom-parameters',
+  'switch',
+  'input-number',
+  'select',
+  'checkbox',
+  'tree-select',
+  'multi-input',
+  'custom',
+  'multi-condition'
+]
 
 const getField = (
   item: IJsonItem,
   fields: { [field: string]: any },
   rules?: FormRules
 ) => {
-  const { type = 'input' } = item
+  const { type = 'input', widget, field } = isFunction(item) ? item() : item
+  if (!TYPES.includes(type)) return null
   const renderTypeName = `render${upperFirst(camelCase(type))}`
+  if (type === 'custom') {
+    return widget || null
+  }
   // TODO Support other widgets later
   if (type === 'custom-parameters') {
     let fieldRules: { [key: string]: FormItemRule }[] = []
-    if (rules && !rules[item.field]) fieldRules = rules[item.field] = []
+    if (rules && !rules[field]) fieldRules = rules[field] = []
     // @ts-ignore
     return Field[renderTypeName](item, fields, fieldRules)
   }

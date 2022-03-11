@@ -18,8 +18,9 @@ import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
 import { removeUselessChildren } from './use-shell'
-import { PROGRAM_TYPES, SPARK_VERSIONS, DeployModes } from './use-spark'
-import type { IJsonItem } from '../types'
+import { PROGRAM_TYPES } from './use-spark'
+import { useCustomParams } from '.'
+import type { IJsonItem, ProgramType } from '../types'
 
 export function useMr(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -31,20 +32,18 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
   const mainJarOptions = ref([])
   const resources: { [field: string]: any } = {}
 
-  const getResourceList = async (programType: string) => {
+  const getResourceList = async (programType: ProgramType) => {
     if (resources[programType] !== void 0) {
       mainJarOptions.value = resources[programType]
       return
     }
-    try {
-      const res = await queryResourceByProgramType({
-        type: 'FILE',
-        programType
-      })
-      removeUselessChildren(res)
-      mainJarOptions.value = res || []
-      resources[programType] = res
-    } catch (err) {}
+    const res = await queryResourceByProgramType({
+      type: 'FILE',
+      programType
+    })
+    removeUselessChildren(res)
+    mainJarOptions.value = res || []
+    resources[programType] = res
   }
 
   onMounted(() => {
@@ -59,7 +58,7 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.program_type'),
       options: PROGRAM_TYPES,
       props: {
-        'on-update:value': (value: string) => {
+        'on-update:value': (value: ProgramType) => {
           model.mainJar = null
           model.mainClass = ''
           getResourceList(value)
@@ -150,47 +149,6 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
         labelField: 'name'
       }
     },
-    {
-      type: 'custom-parameters',
-      field: 'localParams',
-      name: t('project.node.custom_parameters'),
-      children: [
-        {
-          type: 'input',
-          field: 'prop',
-          span: 10,
-          props: {
-            placeholder: t('project.node.prop_tips'),
-            maxLength: 256
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true,
-            validator(validate: any, value: string) {
-              if (!value) {
-                return new Error(t('project.node.prop_tips'))
-              }
-
-              const sameItems = model.localParams.filter(
-                (item: { prop: string }) => item.prop === value
-              )
-
-              if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
-              }
-            }
-          }
-        },
-        {
-          type: 'input',
-          field: 'value',
-          span: 10,
-          props: {
-            placeholder: t('project.node.value_tips'),
-            maxLength: 256
-          }
-        }
-      ]
-    }
+    ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

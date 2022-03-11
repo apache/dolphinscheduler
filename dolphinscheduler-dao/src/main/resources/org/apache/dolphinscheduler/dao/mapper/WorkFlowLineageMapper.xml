@@ -42,6 +42,25 @@
         where tepd.project_code = #{projectCode} and tepd.code = #{workFlowCode}
     </select>
 
+    <select id="queryWorkFlowLineageByProcessDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        select tepd.code as work_flow_code,
+               tepd.name as work_flow_name,
+               tepd.release_state as work_flow_publish_status,
+               tes.start_time as schedule_start_time,
+               tes.end_time as schedule_end_time,
+               tes.crontab as crontab,
+               tes.release_state as schedule_publish_status
+        from t_ds_process_definition tepd
+        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
+        where 1=1
+        <if test="workFlowCodes != null and workFlowCodes.size() != 0 ">
+            and tepd.code in
+            <foreach collection="workFlowCodes" item="code" index="index" open="(" close=")" separator=",">
+                #{code}
+            </foreach>
+        </if>
+    </select>
+
     <select id="queryWorkFlowLineageByLineage" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
         select tepd.code as work_flow_code,tepd.name as work_flow_name,
                '' as source_work_flow_code,
@@ -87,5 +106,59 @@
          from t_ds_process_task_relation
          where project_code = #{projectCode}
                 and process_definition_code = #{processDefinitionCode}
+    </select>
+
+    <select id="queryUpstreamDependentParamsByProcessDefinitionCode"
+            resultType="org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition">
+        SELECT
+            DISTINCT c.task_params
+        FROM
+        t_ds_process_definition a
+        JOIN t_ds_process_task_relation b ON a.code = b.process_definition_code AND a.version = b.process_definition_version AND a.project_code = b.project_code
+        JOIN t_ds_task_definition c ON c.code = b.pre_task_code and c.version = b.pre_task_version
+        WHERE 1=1
+        AND a.code = #{code}
+        AND c.task_type = #{taskType}
+        ;
+    </select>
+
+    <select id="queryDownstreamLineageByProcessDefinitionCode"
+            resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        SELECT
+            c.code AS work_flow_code
+            ,c.name AS work_flow_name
+            ,c.release_state AS work_flow_publish_status
+            ,d.start_time AS schedule_start_time
+            ,d.end_time AS schedule_end_time
+            ,d.crontab AS crontab
+            ,d.release_state AS schedule_publish_status
+            ,'' AS source_work_flow_code
+        FROM
+        t_ds_task_definition a
+        JOIN t_ds_process_task_relation b ON a.code	= b.pre_task_code and a.version = b.pre_task_version
+        JOIN t_ds_process_definition c ON c.code = b.process_definition_code AND c.version = b.process_definition_version AND c.project_code = b.project_code
+        LEFT JOIN t_ds_schedules d ON d.process_definition_code = c.code
+        WHERE 1=1
+        <if test="code != null and code != ''">
+            AND a.task_params LIKE concat('%', #{code}, '%')
+        </if>
+        AND a.task_type = #{taskType}
+    </select>
+
+    <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="DependentProcessDefinition">
+        SELECT
+        c.code AS process_definition_code
+        ,c.name AS process_definition_name
+        ,a.code AS task_definition_code
+        ,a.task_params
+        FROM
+        t_ds_task_definition a
+        JOIN t_ds_process_task_relation b ON a.code	= b.pre_task_code and a.version = b.pre_task_version
+        JOIN t_ds_process_definition c ON c.code = b.process_definition_code AND c.version = b.process_definition_version AND c.project_code = b.project_code
+        WHERE 1=1
+        <if test="code != null and code != ''">
+            AND a.task_params LIKE concat('%', #{code}, '%')
+        </if>
+        AND a.task_type = 'DEPENDENT'
     </select>
 </mapper>

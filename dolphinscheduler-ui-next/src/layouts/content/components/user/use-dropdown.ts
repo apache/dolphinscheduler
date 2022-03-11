@@ -21,14 +21,14 @@ import { useUserStore } from '@/store/user/user'
 import { useMenuStore } from '@/store/menu/menu'
 import type { Router } from 'vue-router'
 import { DropdownOption } from 'naive-ui'
+import cookies from 'js-cookie'
 
 export function useDropDown() {
   const router: Router = useRouter()
   const userStore = useUserStore()
   const menuStore = useMenuStore()
 
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    menuStore.setMenuKey('')
+  const handleSelect = (key: string | number, unused: DropdownOption) => {
     if (key === 'logout') {
       useLogout()
     } else if (key === 'password') {
@@ -42,6 +42,8 @@ export function useDropDown() {
     logout().then(() => {
       userStore.setSessionId('')
       userStore.setUserInfo({})
+      cookies.remove('sessionId')
+
       router.push({ path: '/login' })
     })
   }

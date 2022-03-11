@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.spi.task;
 
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -65,5 +66,9 @@ public class TaskExecutionContextCacheManager {
     public static boolean updateTaskExecutionContext(TaskRequest request) {
         taskRequestContextCache.computeIfPresent(request.getTaskInstanceId(), (k, v) -> request);
         return taskRequestContextCache.containsKey(request.getTaskInstanceId());
+    }
+
+    public static Collection<TaskRequest> getAllTaskRequestList() {
+        return taskRequestContextCache.values();
     }
 }

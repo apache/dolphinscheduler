@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { useFlink } from './tasks/use-flink'
-import { useShell } from './tasks/use-shell'
-import { useSubProcess } from './tasks/use-sub-process'
-import { usePython } from './tasks/use-python'
-import { useSpark } from './tasks/use-spark'
-import { useMr } from './tasks/use-mr'
-import { useHttp } from './tasks/use-http'
-import { IJsonItem, INodeData, ITaskData } from './types'
+import { ref, Ref, watch } from 'vue'
+import nodes from './tasks'
+import getElementByJson from '@/components/form/get-elements-by-json'
+import { IFormItem, IJsonItem, INodeData, ITaskData, FormRules } from './types'
 
 export function useTask({
   data,
@@ -34,64 +29,39 @@ export function useTask({
   projectCode: number
   from?: number
   readonly?: boolean
-}): { json: IJsonItem[]; model: INodeData } {
-  const { taskType = 'SHELL' } = data
-  let node = {} as { json: IJsonItem[]; model: INodeData }
-  if (taskType === 'SHELL') {
-    node = useShell({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
+}): {
+  elementsRef: Ref<IFormItem[]>
+  rulesRef: Ref<FormRules>
+  model: INodeData
+} {
+  const jsonRef = ref([]) as Ref<IJsonItem[]>
+  const elementsRef = ref([]) as Ref<IFormItem[]>
+  const rulesRef = ref({})
+  const params = {
+    projectCode,
+    from,
+    readonly,
+    data,
+    jsonRef
   }
-  if (taskType === 'SUB_PROCESS') {
-    node = useSubProcess({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
+
+  const { model, json } = nodes[data.taskType || 'SHELL'](params)
+  jsonRef.value = json
+
+  const getElements = () => {
+    const { rules, elements } = getElementByJson(jsonRef.value, model)
+    elementsRef.value = elements
+    rulesRef.value = rules
   }
-  if (taskType === 'PYTHON') {
-    node = usePython({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'SPARK') {
-    node = useSpark({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'MR') {
-    node = useMr({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'FLINK') {
-    node = useFlink({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'HTTP') {
-    node = useHttp({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  return node
+
+  getElements()
+
+  watch(
+    () => jsonRef.value.length,
+    () => {
+      getElements()
+    }
+  )
+
+  return { elementsRef, rulesRef, model }
 }

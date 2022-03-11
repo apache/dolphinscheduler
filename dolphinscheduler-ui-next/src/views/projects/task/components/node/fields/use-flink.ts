@@ -18,7 +18,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
 import { removeUselessChildren } from './use-shell'
-import type { IJsonItem } from '../types'
+import { useCustomParams, useDeployMode } from '.'
+import type { IJsonItem, ProgramType } from '../types'
 
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -38,20 +39,18 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const mainJarOptions = ref([])
   const resources: { [field: string]: any } = {}
 
-  const getResourceList = async (programType: string) => {
+  const getResourceList = async (programType: ProgramType) => {
     if (resources[programType] !== void 0) {
       mainJarOptions.value = resources[programType]
       return
     }
-    try {
-      const res = await queryResourceByProgramType({
-        type: 'FILE',
-        programType
-      })
-      removeUselessChildren(res)
-      mainJarOptions.value = res || []
-      resources[programType] = res
-    } catch (err) {}
+    const res = await queryResourceByProgramType({
+      type: 'FILE',
+      programType
+    })
+    removeUselessChildren(res)
+    mainJarOptions.value = res || []
+    resources[programType] = res
   }
 
   onMounted(() => {
@@ -66,7 +65,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.program_type'),
       options: PROGRAM_TYPES,
       props: {
-        'on-update:value': (value: string) => {
+        'on-update:value': (value: ProgramType) => {
           model.mainJar = null
           model.mainClass = ''
           getResourceList(value)
@@ -115,12 +114,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       options: mainJarOptions
     },
-    {
-      type: 'radio',
-      field: 'deployMode',
-      name: t('project.node.deploy_mode'),
-      options: DeployModes
-    },
+    useDeployMode(),
     {
       type: 'select',
       field: 'flinkVersion',
@@ -260,48 +254,11 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
         labelField: 'name'
       }
     },
-    {
-      type: 'custom-parameters',
+    ...useCustomParams({
+      model,
       field: 'localParams',
-      name: t('project.node.custom_parameters'),
-      children: [
-        {
-          type: 'input',
-          field: 'prop',
-          span: 10,
-          props: {
-            placeholder: t('project.node.prop_tips'),
-            maxLength: 256
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true,
-            validator(validate: any, value: string) {
-              if (!value) {
-                return new Error(t('project.node.prop_tips'))
-              }
-
-              const sameItems = model.localParams.filter(
-                (item: { prop: string }) => item.prop === value
-              )
-
-              if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
-              }
-            }
-          }
-        },
-        {
-          type: 'input',
-          field: 'value',
-          span: 10,
-          props: {
-            placeholder: t('project.node.value_tips'),
-            maxLength: 256
-          }
-        }
-      ]
-    }
+      isSimple: true
+    })
   ]
 }
 
@@ -328,16 +285,5 @@ const FLINK_VERSIONS = [
   {
     label: '>=1.10',
     value: '>=1.10'
-  }
-]
-
-const DeployModes = [
-  {
-    label: 'cluster',
-    value: 'cluster'
-  },
-  {
-    label: 'local',
-    value: 'local'
   }
 ]

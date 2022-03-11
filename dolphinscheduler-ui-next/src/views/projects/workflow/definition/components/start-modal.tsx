@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, h, onMounted, ref } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  h,
+  onMounted,
+  ref,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
@@ -67,7 +75,8 @@ export default defineComponent({
       handleStartDefinition,
       getWorkerGroups,
       getAlertGroups,
-      getEnvironmentList
+      getEnvironmentList,
+      getStartParamsList
     } = useModal(startState, ctx)
 
     const hideModal = () => {
@@ -176,6 +185,11 @@ export default defineComponent({
       getEnvironmentList()
     })
 
+    watch(
+      () => props.row,
+      () => getStartParamsList(props.row.code)
+    )
+
     return {
       t,
       parallelismRef,
@@ -262,6 +276,7 @@ export default defineComponent({
                 item.workerGroups?.includes(this.startForm.workerGroup)
               )}
               v-model:value={this.startForm.environmentCode}
+              clearable
             />
           </NFormItem>
           <NFormItem
@@ -272,6 +287,7 @@ export default defineComponent({
               options={this.alertGroups}
               placeholder={t('project.workflow.please_choose')}
               v-model:value={this.startForm.warningGroupId}
+              clearable
             />
           </NFormItem>
           <NFormItem
@@ -280,56 +296,74 @@ export default defineComponent({
           >
             <NCheckbox
               checkedValue={'COMPLEMENT_DATA'}
-              uncheckedValue={undefined}
+              uncheckedValue={'START_PROCESS'}
               v-model:checked={this.startForm.execType}
             >
               {t('project.workflow.whether_complement_data')}
             </NCheckbox>
           </NFormItem>
-          {this.startForm.execType && (
-            <NSpace>
-              <NFormItem
-                label={t('project.workflow.mode_of_execution')}
-                path='runMode'
-              >
-                <NRadioGroup v-model:value={this.startForm.runMode}>
-                  <NSpace>
-                    <NRadio value={'RUN_MODE_SERIAL'}>
-                      {t('project.workflow.serial_execution')}
-                    </NRadio>
-                    <NRadio value={'RUN_MODE_PARALLEL'}>
-                      {t('project.workflow.parallel_execution')}
-                    </NRadio>
-                  </NSpace>
-                </NRadioGroup>
-              </NFormItem>
-              {this.startForm.runMode === 'RUN_MODE_PARALLEL' && (
+          {this.startForm.execType &&
+            this.startForm.execType !== 'START_PROCESS' && (
+              <NSpace>
                 <NFormItem
-                  label={t('project.workflow.parallelism')}
-                  path='expectedParallelismNumber'
+                  label={t('project.workflow.mode_of_dependent')}
+                  path='dependentMode'
                 >
-                  <NCheckbox v-model:checked={this.parallelismRef}>
-                    {t('project.workflow.custom_parallelism')}
-                  </NCheckbox>
-                  <NInput
-                    disabled={!this.parallelismRef}
-                    placeholder={t('project.workflow.please_enter_parallelism')}
-                    v-model:value={this.startForm.expectedParallelismNumber}
+                  <NRadioGroup v-model:value={this.startForm.dependentMode}>
+                    <NSpace>
+                      <NRadio value={'OFF_MODE'}>
+                        {t('project.workflow.close')}
+                      </NRadio>
+                      <NRadio value={'ALL_DEPENDENT'}>
+                        {t('project.workflow.open')}
+                      </NRadio>
+                    </NSpace>
+                  </NRadioGroup>
+                </NFormItem>
+                <NFormItem
+                  label={t('project.workflow.mode_of_execution')}
+                  path='runMode'
+                >
+                  <NRadioGroup v-model:value={this.startForm.runMode}>
+                    <NSpace>
+                      <NRadio value={'RUN_MODE_SERIAL'}>
+                        {t('project.workflow.serial_execution')}
+                      </NRadio>
+                      <NRadio value={'RUN_MODE_PARALLEL'}>
+                        {t('project.workflow.parallel_execution')}
+                      </NRadio>
+                    </NSpace>
+                  </NRadioGroup>
+                </NFormItem>
+                {this.startForm.runMode === 'RUN_MODE_PARALLEL' && (
+                  <NFormItem
+                    label={t('project.workflow.parallelism')}
+                    path='expectedParallelismNumber'
+                  >
+                    <NCheckbox v-model:checked={this.parallelismRef}>
+                      {t('project.workflow.custom_parallelism')}
+                    </NCheckbox>
+                    <NInput
+                      disabled={!this.parallelismRef}
+                      placeholder={t(
+                        'project.workflow.please_enter_parallelism'
+                      )}
+                      v-model:value={this.startForm.expectedParallelismNumber}
+                    />
+                  </NFormItem>
+                )}
+                <NFormItem
+                  label={t('project.workflow.schedule_date')}
+                  path='startEndTime'
+                >
+                  <NDatePicker
+                    type='datetimerange'
+                    clearable
+                    v-model:value={this.startForm.startEndTime}
                   />
                 </NFormItem>
-              )}
-              <NFormItem
-                label={t('project.workflow.schedule_date')}
-                path='startEndTime'
-              >
-                <NDatePicker
-                  type='datetimerange'
-                  clearable
-                  v-model:value={this.startForm.startEndTime}
-                />
-              </NFormItem>
-            </NSpace>
-          )}
+              </NSpace>
+            )}
           <NFormItem
             label={t('project.workflow.startup_parameter')}
             path='startup_parameter'
@@ -348,6 +382,7 @@ export default defineComponent({
                       pair
                       separator=':'
                       placeholder={['prop', 'value']}
+                      defaultValue={[item.prop, item.value]}
                       onUpdateValue={(param) =>
                         this.updateParamsList(index, param)
                       }

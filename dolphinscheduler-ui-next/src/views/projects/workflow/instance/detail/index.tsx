@@ -19,7 +19,6 @@ import { defineComponent, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
 import Dag from '../../components/dag'
-// import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
 import { queryProcessInstanceById } from '@/service/modules/process-instances'
 import { WorkflowDefinition } from '../../components/dag/types'
 import Styles from './index.module.scss'
@@ -33,9 +32,11 @@ export default defineComponent({
     const id = Number(route.params.id)
 
     const definition = ref<WorkflowDefinition>()
+    const instance = ref<any>()
 
     const refresh = () => {
       queryProcessInstanceById(id, projectCode).then((res: any) => {
+        instance.value = res
         if (res.dagData) {
           definition.value = res.dagData
         }
@@ -57,6 +58,7 @@ export default defineComponent({
         ]}
       >
         <Dag
+          instance={instance.value}
           definition={definition.value}
           onRefresh={refresh}
           projectCode={projectCode}

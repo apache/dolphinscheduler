@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +37,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -58,6 +60,9 @@ public class AlertServer implements Closeable {
     @Autowired
     private AlertConfig config;
 
+    @Value("${spring.jackson.time-zone:UTC}")
+    private String timezone;
+
     public AlertServer(PluginDao pluginDao, AlertDao alertDao, AlertPluginManager alertPluginManager, AlertSender alertSender, AlertRequestProcessor alertRequestProcessor) {
         this.pluginDao = pluginDao;
         this.alertDao = alertDao;
@@ -68,6 +73,11 @@ public class AlertServer implements Closeable {
 
     public static void main(String[] args) {
         SpringApplication.run(AlertServer.class, args);
+    }
+
+    @PostConstruct
+    public void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
     }
 
     @EventListener

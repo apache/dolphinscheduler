@@ -31,6 +31,7 @@ export function useSubProcess({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'SUB_PROCESS',
     name: '',
     flag: 'YES',
     description: '',
@@ -42,7 +43,7 @@ export function useSubProcess({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    processDefinitionCode: ''
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -74,7 +75,6 @@ export function useSubProcess({
       Fields.useChildNode({
         model,
         projectCode,
-        isCreate: !data?.id,
         from,
         processName: data?.processName,
         code: data?.code

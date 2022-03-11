@@ -29,10 +29,10 @@ import {
   release
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
-
 import { IDefinitionParam } from './types'
 import styles from './index.module.scss'
 import { NEllipsis, NTag } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 
 export function useTable() {
   const { t } = useI18n()
@@ -56,7 +56,7 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('project.workflow.id'),
+        title: '#',
         key: 'id',
         width: 50,
         render: (row, index) => index + 1
@@ -72,17 +72,15 @@ export function useTable() {
             {
               default: () =>
                 h(
-                  'a',
+                  ButtonLink,
                   {
-                    href: 'javascript:',
-                    class: styles.links,
                     onClick: () =>
-                      router.push({
+                      void router.push({
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })
                   },
-                  row.name
+                  { default: () => row.name }
                 ),
               tooltip: () => row.name
             }
@@ -146,12 +144,13 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 300,
+        width: 360,
         fixed: 'right',
         className: styles.operation,
         render: (row) =>
           h(TableAction, {
             row,
+            onEditWorkflow: () => editWorkflow(row),
             onStartWorkflow: () => startWorkflow(row),
             onTimingWorkflow: () => timingWorkflow(row),
             onVersionWorkflow: () => versionWorkflow(row),
@@ -159,11 +158,21 @@ export function useTable() {
             onReleaseWorkflow: () => releaseWorkflow(row),
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
-            onGotoTimingManage: () => gotoTimingManage(row)
+            onGotoTimingManage: () => gotoTimingManage(row),
+            onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
     ] as TableColumns<any>
   }
+
+  const editWorkflow = (row: any) => {
+    variables.row = row
+    router.push({
+      name: 'workflow-definition-detail',
+      params: { code: row.code }
+    })
+  }
+
   const startWorkflow = (row: any) => {
     variables.startShowRef = true
     variables.row = row
@@ -180,18 +189,14 @@ export function useTable() {
   }
 
   const deleteWorkflow = (row: any) => {
-    deleteByCode(variables.projectCode, row.code)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteByCode(variables.projectCode, row.code).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const releaseWorkflow = (row: any) => {
@@ -201,18 +206,14 @@ export function useTable() {
         | 'OFFLINE'
         | 'ONLINE'
     }
-    release(data, variables.projectCode, row.code)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    release(data, variables.projectCode, row.code).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const copyWorkflow = (row: any) => {
@@ -220,18 +221,14 @@ export function useTable() {
       codes: String(row.code),
       targetProjectCode: variables.projectCode
     }
-    batchCopyByCodes(data, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    batchCopyByCodes(data, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const downloadBlob = (data: any, fileNameS = 'json') => {
@@ -265,18 +262,21 @@ export function useTable() {
     const data = {
       codes: String(row.code)
     }
-    batchExportByCodes(data, variables.projectCode)
-      .then((res: any) => {
-        downloadBlob(res, fileName)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    batchExportByCodes(data, variables.projectCode).then((res: any) => {
+      downloadBlob(res, fileName)
+    })
   }
 
   const gotoTimingManage = (row: any) => {
     router.push({
       name: 'workflow-definition-timing',
+      params: { projectCode: variables.projectCode, definitionCode: row.code }
+    })
+  }
+
+  const gotoWorkflowTree = (row: any) => {
+    router.push({
+      name: 'workflow-definition-tree',
       params: { projectCode: variables.projectCode, definitionCode: row.code }
     })
   }

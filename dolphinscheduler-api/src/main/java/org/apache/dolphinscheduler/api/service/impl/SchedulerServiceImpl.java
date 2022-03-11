@@ -46,7 +46,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
+import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -105,6 +106,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private QuartzExecutor quartzExecutor;
 
     /**
      * save schedule
@@ -442,7 +446,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void setSchedule(int projectId, Schedule schedule) {
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
 
-        QuartzExecutors.getInstance().addJob(scheduler, ProcessScheduleJob.class, projectId, schedule);
+        quartzExecutor.addJob(ProcessScheduleJob.class, projectId, schedule);
     }
 
     /**
@@ -456,8 +460,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
-        String jobName = QuartzExecutors.buildJobName(scheduleId);
-        String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
+        String jobName = quartzExecutor.buildJobName(scheduleId);
+        String jobGroupName = quartzExecutor.buildJobGroupName(projectId);
 
         JobKey jobKey = new JobKey(jobName, jobGroupName);
         try {
@@ -562,7 +566,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime, cronExpression, Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
-        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(DateUtils::dateToString));
+        List<String> previewDateList = new ArrayList<>();
+        selfFireDateList.forEach(date -> previewDateList.add(DateUtils.dateToString(date, scheduleParam.getTimezoneId())));
+        result.put(Constants.DATA_LIST, previewDateList);
         putMsg(result, Status.SUCCESS);
         return result;
     }

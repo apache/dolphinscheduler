@@ -23,19 +23,16 @@ import {
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
 import type { IJsonItem } from '../types'
-import { number } from 'echarts'
 
 export function useChildNode({
   model,
   projectCode,
-  isCreate,
   from,
   processName,
   code
 }: {
   model: { [field: string]: any }
   projectCode: number
-  isCreate: boolean
   from?: number
   processName?: number
   code?: number
@@ -48,23 +45,17 @@ export function useChildNode({
   const getProcessList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const res = await querySimpleList(projectCode)
-      options.value = res.map((option: { name: string; code: number }) => ({
-        label: option.name,
-        value: option.code
-      }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const res = await querySimpleList(projectCode)
+    options.value = res.map((option: { name: string; code: number }) => ({
+      label: option.name,
+      value: option.code
+    }))
+    loading.value = false
   }
   const getProcessListByCode = async (processCode: number) => {
     if (!processCode) return
-    try {
-      const res = await queryProcessDefinitionByCode(processCode, projectCode)
-      getTaskOptions(res)
-    } catch (err) {}
+    const res = await queryProcessDefinitionByCode(processCode, projectCode)
+    getTaskOptions(res)
   }
   const getTaskOptions = (processDefinition: {
     processTaskRelationList: []
@@ -129,12 +120,11 @@ export function useChildNode({
 
   return {
     type: 'select',
-    field: 'processName',
+    field: 'processDefinitionCode',
     span: 24,
     name: t('project.node.child_node'),
     props: {
       loading: loading,
-      disabled: !isCreate,
       'on-update:value': onChange
     },
     options: options

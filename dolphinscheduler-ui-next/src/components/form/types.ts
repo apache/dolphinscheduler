@@ -34,6 +34,9 @@ type IType =
   | 'select'
   | 'checkbox'
   | 'tree-select'
+  | 'multi-input'
+  | 'custom'
+  | 'multi-condition'
 
 interface IOption extends SelectOption, TreeSelectOption {
   label: string
@@ -45,6 +48,8 @@ interface IFormItem {
   label?: string
   widget: any
   span?: number | Ref<number>
+  type?: 'custom'
+  class?: string
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
@@ -52,10 +57,10 @@ interface IMeta extends Omit<FormProps, 'model'> {
   model: object
 }
 
-interface IJsonItem {
+interface IJsonItemParams {
   field: string
   name?: string
-  props?: object
+  props?: any
   title?: string
   type?: IType
   validate?: FormItemRule
@@ -64,7 +69,13 @@ interface IJsonItem {
   children?: IJsonItem[]
   slots?: object
   span?: number | Ref<number>
+  widget?: any
+  class?: string
 }
+
+type IJsonItemFn = (i?: number) => IJsonItemParams
+
+type IJsonItem = IJsonItemParams | IJsonItemFn
 
 export {
   IMeta,
@@ -74,5 +85,6 @@ export {
   FormItemRule,
   FormRules,
   IFormItem,
-  GridProps
+  GridProps,
+  IJsonItemParams
 }
