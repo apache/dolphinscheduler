@@ -164,7 +164,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         fileList()
             .stream()
             .filter(it -> it.getText().contains(fileName))
-            .flatMap(it -> it.findElements(By.id("btnEdit")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))

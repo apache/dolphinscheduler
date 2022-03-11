@@ -47,7 +47,7 @@ public final class CodeEditor {
 
     public CodeEditor content(String content) {
         editor.click();
-//        editor.sendKeys(content);
+
         Actions actions = new Actions(this.driver);
         actions.moveToElement(editor).sendKeys(content).perform();
 
