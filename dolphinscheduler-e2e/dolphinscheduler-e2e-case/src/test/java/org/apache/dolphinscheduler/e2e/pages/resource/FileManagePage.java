@@ -302,9 +302,9 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         @FindBys({
                 @FindBy(className = "btn-upload"),
-                @FindBy(tagName = "button"),
+                @FindBy(tagName = "input"),
         })
-        WebElement buttonUpload;
+        private WebElement buttonUpload;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
