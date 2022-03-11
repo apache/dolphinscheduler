@@ -131,6 +131,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'tiny',
+                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -154,6 +155,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'tiny',
+                        class: 'download',
                         disabled: row?.directory ? true : false,
                         onClick: () => downloadResource(row.id)
                       },
@@ -184,7 +186,8 @@ export function useTable() {
                               tag: 'div',
                               circle: true,
                               type: 'error',
-                              size: 'tiny'
+                              size: 'tiny',
+                              class: 'delete',
                             },
                             {
                               icon: () => h(DeleteOutlined)
