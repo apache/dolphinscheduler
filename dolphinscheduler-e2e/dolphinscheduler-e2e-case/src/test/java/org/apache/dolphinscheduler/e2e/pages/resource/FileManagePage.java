@@ -54,9 +54,11 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final RenameBox renameBox;
 
-    private CreateFileBox createFileBox;
+    private final CreateFileBox createFileBox;
 
     private final UploadFileBox uploadFileBox;
+
+    private final EditFileBox editFileBox;
 
     @FindBy(className = "items")
     private List<WebElement> fileList;
@@ -77,6 +79,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         createFileBox = new CreateFileBox();
 
         uploadFileBox = new UploadFileBox();
+
+        editFileBox = new EditFileBox();
     }
 
     public FileManagePage createDirectory(String name, String description) {
@@ -170,8 +174,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))
             .click();
 
-        createFileBox().codeEditor().content(scripts);
-        createFileBox().buttonSubmit().click();
+        editFileBox().codeEditor().content(scripts);
+        editFileBox().buttonSubmit().click();
 
         return this;
     }
@@ -261,6 +265,21 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(tagName = "input"),
         })
         private WebElement inputFileName;
+
+        private final CodeEditor codeEditor = new CodeEditor(driver);
+
+        @FindBy(className = "btn-submit")
+        private WebElement buttonSubmit;
+
+        @FindBy(className = "btn-cancel")
+        private WebElement buttonCancel;
+    }
+
+    @Getter
+    public class EditFileBox {
+        EditFileBox() {
+            PageFactory.initElements(driver, this);
+        }
 
         private final CodeEditor codeEditor = new CodeEditor(driver);
 
