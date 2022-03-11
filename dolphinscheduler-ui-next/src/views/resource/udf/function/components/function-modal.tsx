@@ -267,6 +267,7 @@ export default defineComponent({
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}
+              class='input-description'
             />
           </NFormItem>
         </NForm>
