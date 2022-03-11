@@ -30,15 +30,16 @@ defaults:
     working-directory: dolphinscheduler-python/pydolphinscheduler
 
 jobs:
-  sanity:
-    name: Sanity
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Sanity Check
-        uses: ./.github/actions/sanity-check
+# todo
+#  sanity:
+#    name: Sanity
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          submodules: true
+#      - name: Sanity Check
+#        uses: ./.github/actions/sanity-check
   lint:
     name: Lint
     runs-on: ubuntu-latest
