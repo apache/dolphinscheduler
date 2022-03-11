@@ -267,22 +267,6 @@ public class FileManageE2ETest {
     }
 
     @Test
-    @Order(60)
-    void testUploadOver1GBFile() throws IOException {
-        FileManagePage page = new FileManagePage(browser);
-
-        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath.toFile(), "rw");
-        file.setLength((long) (1.5 * 1024 * 1024 * 1024));
-
-        page.uploadFile(testOver1GBFilePath.toFile().getAbsolutePath());
-
-        await().untilAsserted(() ->
-            assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("Upload File size cannot exceed 1g")
-        );
-    }
-
-    @Test
     @Order(65)
     void testUploadUnder1GBFile() throws IOException {
         FileManagePage page = new FileManagePage(browser);
