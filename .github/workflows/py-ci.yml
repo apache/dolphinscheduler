@@ -51,10 +51,10 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          pip install tox
+          python -m pip install --upgrade tox
       - name: Run All Lint Check
         run: |
-          tox -e lint
+          python -m tox -vv -e lint
   pytest:
     name: Pytest
 #    needs:
@@ -74,14 +74,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install TOX
         run: |
-          pip install tox
-      # TODO
-      - name: Set Tox Params
-        run: |
-          echo "TOXENV=$(echo "${{ matrix.python-version }}" | sed "s/\.//" | sed "s/^/py/")" >> $GITHUB_ENV
+          python -m pip install --upgrade tox
       - name: Run All Tests
         run: |
-          tox -vv -e code-test
+          python -m tox -vv -e code-test
   coverage:
     name: Tests Coverage
 #    needs:
@@ -95,10 +91,10 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          pip install tox
+          python -m pip install --upgrade tox
       - name: Run Tests Coverage
         run: |
-          tox -e coverage
+          python -m tox -vv -e coverage
   doc-build:
     name: Document Build Test
 #    needs: pytest
@@ -111,10 +107,10 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          pip install tox
+          python -m pip install --upgrade tox
       - name: Run Tests Coverage
         run: |
-          tox -e doc-build-test
+          python -m tox -vv -e doc-build-test
   # TODO remove it later just for test
   ci-local:
     name: Document Build Test
@@ -128,7 +124,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          pip install tox
+          python -m pip install --upgrade tox
       - name: Run Tests Coverage
         run: |
-          tox -e ci-local
+          python tox -vv -e ci-local
