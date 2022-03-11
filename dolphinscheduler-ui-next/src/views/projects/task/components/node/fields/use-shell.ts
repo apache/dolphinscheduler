@@ -18,6 +18,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { useCustomParams } from './use-custom-params'
+import { removeUselessChildren } from '@/utils/tree-format'
 import type { IJsonItem } from '../types'
 
 export function useShell(model: { [field: string]: any }): IJsonItem[] {
@@ -69,16 +70,4 @@ export function useShell(model: { [field: string]: any }): IJsonItem[] {
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
-}
-
-export function removeUselessChildren(list: { children?: [] }[]) {
-  if (!list.length) return
-  list.forEach((item) => {
-    if (!item.children) return
-    if (item.children.length === 0) {
-      delete item.children
-      return
-    }
-    removeUselessChildren(item.children)
-  })
 }
