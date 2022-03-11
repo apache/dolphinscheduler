@@ -165,7 +165,10 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(className = "btn-upload")
+        @FindBys({
+                @FindBy(className = "btn-upload"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement buttonUpload;
 
         @FindBy(className = "btn-submit")
