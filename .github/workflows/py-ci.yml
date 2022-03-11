@@ -89,7 +89,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox pip build
+          python -m pip install --upgrade tox pip build wheel setuptools
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e coverage
