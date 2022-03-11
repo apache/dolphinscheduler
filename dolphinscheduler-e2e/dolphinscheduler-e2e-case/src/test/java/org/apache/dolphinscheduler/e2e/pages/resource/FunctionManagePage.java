@@ -78,7 +78,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         createUdfFunctionBox().selectUdfResource()
             .stream()
-            .filter(it -> it.getText().contains(udfResourceName))
+            .filter(it -> it.getAttribute("innerHTML").contains(udfResourceName))
             .findFirst()
             .orElseThrow(() -> new RuntimeException(String.format("No %s in udf resource list", udfResourceName)))
             .click();
