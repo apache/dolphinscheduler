@@ -81,6 +81,7 @@ jobs:
           echo "TOXENV=$(echo "${{ matrix.python-version }}" | sed "s/\.//" | sed "s/^/py/")" >> $GITHUB_ENV
       - name: Run All Tests
         run: |
+          tox -e code-test
           tox -e ${{ env.TOXENV }}
   coverage:
     name: Tests Coverage
