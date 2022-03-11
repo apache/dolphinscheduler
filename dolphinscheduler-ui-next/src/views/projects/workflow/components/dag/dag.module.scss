@@ -107,6 +107,9 @@ $bgLight: #ffffff;
     &.icon-sub_process {
       background-image: url('@/assets/images/task-icons/sub_process.png');
     }
+    &.icon-data_quality {
+      background-image: url('@/assets/images/task-icons/data_quality.png');
+    }
     &.icon-procedure {
       background-image: url('@/assets/images/task-icons/procedure.png');
     }
@@ -161,6 +164,9 @@ $bgLight: #ffffff;
       }
       &.icon-sub_process {
         background-image: url('@/assets/images/task-icons/sub_process_hover.png');
+      }
+      &.icon-data_quality {
+        background-image: url('@/assets/images/task-icons/data_quality_hover.png');
       }
       &.icon-procedure {
         background-image: url('@/assets/images/task-icons/procedure_hover.png');
