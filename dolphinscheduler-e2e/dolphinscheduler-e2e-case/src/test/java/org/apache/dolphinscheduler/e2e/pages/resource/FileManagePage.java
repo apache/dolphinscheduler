@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -39,18 +41,18 @@ import java.util.List;
 
 @Getter
 public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
-    @FindBy(id = "btnCreateDirectory")
+    @FindBy(className = "btn-create-directory")
     private WebElement buttonCreateDirectory;
 
-    @FindBy(id = "btnCreateFile")
+    @FindBy(className = "btn-create-file")
     private WebElement buttonCreateFile;
 
-    @FindBy(id = "btnUploadFile")
+    @FindBy(className = "btn-upload-file")
     private WebElement buttonUploadFile;
 
     private final CreateDirectoryBox createDirectoryBox;
 
-    private final RenameDirectoryBox renameDirectoryBox;
+    private final RenameBox renameBox;
 
     private final CreateFileBox createFileBox;
 
@@ -59,21 +61,18 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(className = "items")
     private List<WebElement> fileList;
 
-    @FindBy(id = "delete")
-    private WebElement buttonDelete;
-
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     public FileManagePage(RemoteWebDriver driver) {
         super(driver);
 
         createDirectoryBox = new CreateDirectoryBox();
 
-        renameDirectoryBox = new RenameDirectoryBox();
+        renameBox = new RenameBox();
 
         createFileBox = new CreateFileBox();
 
@@ -104,15 +103,16 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         fileList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.id("btnRename")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-rename")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No rename button in file manage list"))
             .click();
 
-        renameDirectoryBox().inputName().clear();
-        renameDirectoryBox().inputName().sendKeys(AfterName);
-        renameDirectoryBox().buttonSubmit().click();
+        renameBox().inputName().sendKeys(Keys.CONTROL + "a");
+        renameBox().inputName().sendKeys(Keys.BACK_SPACE);
+        renameBox().inputName().sendKeys(AfterName);
+        renameBox().buttonSubmit().click();
 
         return this;
     }
@@ -139,18 +139,13 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         fileList()
             .stream()
             .filter(it -> it.getText().contains(name))
-            .flatMap(it -> it.findElements(By.id("delete")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -196,7 +191,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         fileList()
             .stream()
             .filter(it -> it.getText().contains(fileName))
-            .flatMap(it -> it.findElements(By.id("btnDownload")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-download")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No download button in file manage list"))
@@ -211,35 +206,47 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputDirectoryName")
+        @FindBys({
+                @FindBy(className = "input-directory-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDirectoryName;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
     @Getter
-    public class RenameDirectoryBox {
-        RenameDirectoryBox() {
+    public class RenameBox {
+        RenameBox() {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputName")
+        @FindBys({
+                @FindBy(className = "input-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputName;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
@@ -249,15 +256,18 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputFileName")
+        @FindBys({
+                @FindBy(className = "input-file-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputFileName;
 
         private final CodeEditor codeEditor = new CodeEditor(driver);
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
@@ -267,13 +277,13 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "btnUpload")
+        @FindBy(className = "btn-upload")
         private WebElement buttonUpload;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }

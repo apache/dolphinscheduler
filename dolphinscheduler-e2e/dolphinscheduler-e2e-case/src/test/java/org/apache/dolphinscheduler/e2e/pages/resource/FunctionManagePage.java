@@ -37,10 +37,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
-    @FindBy(id = "btnCreateUdfFunction")
+    @FindBy(className = "btn-create-udf-function")
     private WebElement buttonCreateUdfFunction;
 
-    @FindBy(className = "udf-function-items")
+    @FindBy(className = "items")
     private List<WebElement> functionList;
 
     @FindBys({
@@ -131,25 +131,34 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputFunctionName")
+        @FindBys({
+                @FindBy(className = "input-function-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputFunctionName;
 
-        @FindBy(id = "inputClassName")
+        @FindBys({
+                @FindBy(className = "input-class-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputClassName;
 
-        @FindBy(id = "btnUdfResourceDropDown")
+        @FindBy(className = "btn-udf-resource-dropdown")
         private WebElement buttonUdfResourceDropDown;
 
-        @FindBy(className = "vue-treeselect__menu")
+        @FindBy(className = "n-tree-node-content")
         private List<WebElement> selectUdfResource;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
@@ -159,19 +168,28 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputFunctionName")
+        @FindBys({
+                @FindBy(className = "input-function-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputFunctionName;
 
-        @FindBy(id = "inputClassName")
+        @FindBys({
+                @FindBy(className = "input-class-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputClassName;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }
