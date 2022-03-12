@@ -59,6 +59,7 @@ class YamlParser:
     """
 
     def __init__(self, content: str, delimiter: Optional[str] = "."):
+        self._content = content
         self.src_parser = content
         self._delimiter = delimiter
 
@@ -159,7 +160,7 @@ class YamlParser:
         else:
             return val
 
-    def to_string(self) -> str:
+    def __str__(self) -> str:
         """Transfer :class:`YamlParser` to string object.
 
         It is useful when users want to output the :class:`YamlParser` object they change just now.
@@ -167,3 +168,6 @@ class YamlParser:
         buf = io.StringIO()
         self._yaml.dump(self.src_parser, buf)
         return buf.getvalue()
+
+    def __repr__(self) -> str:
+        return f"YamlParser({str(self)})"

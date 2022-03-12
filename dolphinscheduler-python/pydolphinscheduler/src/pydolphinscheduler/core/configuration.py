@@ -53,7 +53,7 @@ def init_config_file() -> None:
             "in %s, if you wan to overwrite the exists configure please remove the exists file manually.",
             str(config_path()),
         )
-    file.write(content=get_configs().to_string(), to_path=str(config_path()))
+    file.write(content=str(get_configs()), to_path=str(config_path()))
 
 
 def get_single_config(key: str) -> Any:
@@ -115,7 +115,7 @@ def set_single_config(key: str, value: Any) -> None:
             "Configuration path %s do not exists. Can not set configuration.", key
         )
     config[key] = value
-    file.write(content=config.to_string(), to_path=str(config_path()), overwrite=True)
+    file.write(content=str(config), to_path=str(config_path()), overwrite=True)
 
 
 # Start Common Configuration Settings
