@@ -94,7 +94,8 @@ public class UdfManageE2ETest {
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), 5).until(ExpectedConditions.urlContains("/user-manage"));
+        new WebDriverWait(userPage.driver(), 5).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
 
         userPage.update(user, user, password, email, phone, tenant)
             .goToNav(ResourcePage.class)
