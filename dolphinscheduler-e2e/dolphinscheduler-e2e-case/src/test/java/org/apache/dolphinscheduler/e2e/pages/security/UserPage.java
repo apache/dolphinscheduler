@@ -83,7 +83,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone) {
+    public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone,
+                           String tenant) {
         userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
@@ -97,6 +98,18 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         editUserForm().inputUserName().sendKeys(editUser);
 
         editUserForm().inputUserPassword().sendKeys(editPassword);
+
+        createUserForm().btnSelectTenantDropdown().click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                "n-base-select-option__content")));
+
+        createUserForm().selectTenant()
+                .stream()
+                .filter(it -> it.getText().contains(tenant))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
+                .click();
 
         editUserForm().inputEmail().sendKeys(Keys.CONTROL+"a");
         editUserForm().inputEmail().sendKeys(Keys.BACK_SPACE);

@@ -65,6 +65,8 @@ export default defineComponent({
         title={t('resource.file.upload_files')}
         onCancel={this.hideModal}
         onConfirm={this.handleFile}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
       >
         <NForm
           rules={this.rules}
@@ -76,6 +78,7 @@ export default defineComponent({
             <NInput
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
+              class='input-file-name'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
@@ -83,12 +86,14 @@ export default defineComponent({
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}
+              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.upload_files')} path='file'>
             <NUpload
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
+              class='btn-upload'
             >
               <NButton>{t('resource.file.upload_files')}</NButton>
             </NUpload>
