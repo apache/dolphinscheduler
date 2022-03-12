@@ -73,7 +73,7 @@ name:
   mark:
     name_mark:
       key: value
-    """
+"""
 ]
 
 with open(path_default_config_yaml, "r") as f:
@@ -237,13 +237,20 @@ name:
         ),
     ],
 )
-def test_yaml_parser_to_string(src: str, setter: Dict, expect: str):
+def test_yaml_parser_str_repr(src: str, setter: Dict, expect: str):
     """Test function :func:`YamlParser.to_string`."""
     yaml_parser = YamlParser(src)
+
+    # Equal before change
+    assert f"YamlParser({src})" == repr(yaml_parser)
+    assert src == str(yaml_parser)
+
     for key, val in setter.items():
         yaml_parser[key] = val
 
-    assert expect == yaml_parser.to_string()
+    # Equal after changed
+    assert expect == str(yaml_parser)
+    assert f"YamlParser({expect})" == repr(yaml_parser)
 
 
 @pytest.mark.parametrize(
