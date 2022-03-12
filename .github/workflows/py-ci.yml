@@ -93,7 +93,7 @@ jobs:
   verify-local-ci:
     name: Local CI
     needs:
-      - lint
+      - pytest
       - doc-build
     runs-on: ubuntu-latest
     steps:
