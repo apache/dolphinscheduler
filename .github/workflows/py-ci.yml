@@ -25,22 +25,21 @@ on:
     paths:
       - 'dolphinscheduler-python/**'
 
+concurrency:
+  group: py-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: dolphinscheduler-python/pydolphinscheduler
 
+# We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
+env:
+  DEPENDENCES: pip setuptools wheel tox
+
 jobs:
-  sanity:
-    name: Sanity
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Sanity Check
-        uses: ./.github/actions/sanity-check
   lint:
-    name: Code Style
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -48,19 +47,15 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Development Dependences
-        run: pip install -e .[style]
-      - name: Run Isort Checking
-        run: isort --check .
-      - name: Run Black Checking
-        run: black --check .
-      - name: Run Flake8 Checking
-        run: flake8
+      - name: Install Dependences
+        run: |
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
+      - name: Run All Lint Check
+        run: |
+          python -m tox -vv -e lint
   pytest:
     name: Pytest
-    needs:
-      - lint
-      - sanity
+    needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -73,16 +68,33 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies & pydolphinscheduler
+      - name: Install Dependences
         run: |
-          pip install -e .[test]
-      - name: Run tests
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
+      - name: Run All Tests
         run: |
-          pytest
-  coverage:
-    name: Tests coverage
+          python -m tox -vv -e code-test
+  doc-build:
+    name: Docs Build Test
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Dependences
+        run: |
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
+      - name: Run Tests Build Docs
+        run: |
+          python -m tox -vv -e doc-build-test
+  verify-local-ci:
+    name: Local CI
     needs:
       - pytest
+      - doc-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -90,24 +102,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Development Dependences
+      - name: Install Dependences
         run: |
-          pip install -e .[test]
-      - name: Run Tests && Check coverage
-        run: coverage run && coverage report
-  doc-build:
-    name: Document Build Test
-    needs: pytest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.7
-      - name: Install Development Dependences
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
+      - name: Run Tests Build Docs
         run: |
-          pip install -e .[doc]
-      - name: Test Build Document
-        working-directory: dolphinscheduler-python/pydolphinscheduler/docs
-        run: make clean && make html
+          python -m tox -vv -e local-ci
