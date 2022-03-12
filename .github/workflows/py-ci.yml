@@ -29,6 +29,10 @@ defaults:
   run:
     working-directory: dolphinscheduler-python/pydolphinscheduler
 
+# We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
+env:
+  PKG_INSTALL_BEFORE_TOX: pip setuptools wheel tox
+
 jobs:
 # todo
 #  sanity:
@@ -51,7 +55,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox
+          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
       - name: Run All Lint Check
         run: |
           python -m tox -vv -e lint
@@ -73,7 +77,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox
+          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
       - name: Run All Tests
         run: |
           python -m tox -vv -e code-test
@@ -89,7 +93,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox
+          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e coverage
@@ -105,7 +109,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox
+          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e doc-build-test
@@ -122,7 +126,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox
+          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e ci-local
