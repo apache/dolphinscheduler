@@ -92,6 +92,9 @@ jobs:
           python -m tox -vv -e doc-build-test
   verify-local-ci:
     name: Local CI
+    needs:
+      - lint
+      - doc-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
