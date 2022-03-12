@@ -57,6 +57,7 @@ test = [
     "pytest>=6.2",
     "freezegun>=1.1",
     "coverage>=6.1",
+    "pytest-cov>=3.0",
 ]
 
 style = [

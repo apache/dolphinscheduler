@@ -38,16 +38,6 @@ env:
   DEPENDENCES: pip setuptools wheel tox
 
 jobs:
-# todo
-#  sanity:
-#    name: Sanity
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          submodules: true
-#      - name: Sanity Check
-#        uses: ./.github/actions/sanity-check
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -66,7 +56,6 @@ jobs:
   pytest:
     name: Pytest
     needs: lint
-#      - sanity
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -85,25 +74,9 @@ jobs:
       - name: Run All Tests
         run: |
           python -m tox -vv -e code-test
-  coverage:
-    name: Tests Coverage
-    needs: pytest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.7
-      - name: Install Dependences
-        run: |
-          python -m pip install --upgrade ${{ env.DEPENDENCES }}
-      - name: Run Tests Coverage
-        run: |
-          python -m tox -vv -e coverage
   doc-build:
-    name: Document Build Test
-    needs: pytest
+    name: Docs Build Test
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -114,13 +87,11 @@ jobs:
       - name: Install Dependences
         run: |
           python -m pip install --upgrade ${{ env.DEPENDENCES }}
-      - name: Run Tests Coverage
+      - name: Run Tests Build Docs
         run: |
           python -m tox -vv -e doc-build-test
-  # TODO remove it later just for test
-  ci-local:
-    name: Document Build Test
-    needs: pytest
+  verify-local-ci:
+    name: Local CI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -131,6 +102,6 @@ jobs:
       - name: Install Dependences
         run: |
           python -m pip install --upgrade ${{ env.DEPENDENCES }}
-      - name: Run Tests Coverage
+      - name: Run Tests Build Docs
         run: |
-          python -m tox -vv -e ci-local
+          python -m tox -vv -e local-ci
