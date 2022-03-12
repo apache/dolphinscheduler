@@ -25,13 +25,17 @@ on:
     paths:
       - 'dolphinscheduler-python/**'
 
+concurrency:
+  group: py-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: dolphinscheduler-python/pydolphinscheduler
 
 # We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
 env:
-  PKG_INSTALL_BEFORE_TOX: pip setuptools wheel tox
+  DEPENDENCES: pip setuptools wheel tox
 
 jobs:
 # todo
@@ -53,9 +57,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install TOX
+      - name: Install Dependences
         run: |
-          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
       - name: Run All Lint Check
         run: |
           python -m tox -vv -e lint
@@ -75,9 +79,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install TOX
+      - name: Install Dependences
         run: |
-          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
       - name: Run All Tests
         run: |
           python -m tox -vv -e code-test
@@ -91,9 +95,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install TOX
+      - name: Install Dependences
         run: |
-          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e coverage
@@ -107,9 +111,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install TOX
+      - name: Install Dependences
         run: |
-          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e doc-build-test
@@ -124,9 +128,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install TOX
+      - name: Install Dependences
         run: |
-          python -m pip install --upgrade $PKG_INSTALL_BEFORE_TOX
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e ci-local
