@@ -43,7 +43,8 @@ export function useColumns(onCallback: Function) {
       },
       {
         title: t('security.user.username'),
-        key: 'userName'
+        key: 'userName',
+        className: 'name'
       },
       {
         title: t('security.user.user_type'),
@@ -157,6 +158,7 @@ export function useColumns(onCallback: Function) {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        class: 'edit',
                         onClick: () => void onCallback({ rowData }, 'edit')
                       },
                       () => h(NIcon, null, () => h(EditOutlined))
