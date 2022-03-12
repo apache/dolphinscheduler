@@ -51,7 +51,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox pip build wheel setuptools
+          python -m pip install --upgrade tox
       - name: Run All Lint Check
         run: |
           python -m tox -vv -e lint
@@ -73,7 +73,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox pip build wheel setuptools
+          python -m pip install --upgrade tox
       - name: Run All Tests
         run: |
           python -m tox -vv -e code-test
@@ -89,7 +89,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox pip build wheel setuptools
+          python -m pip install --upgrade tox
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e coverage
@@ -105,7 +105,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox pip build wheel setuptools
+          python -m pip install --upgrade tox
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e doc-build-test
@@ -122,7 +122,7 @@ jobs:
           python-version: 3.7
       - name: Install TOX
         run: |
-          python -m pip install --upgrade tox pip build wheel setuptools
+          python -m pip install --upgrade tox
       - name: Run Tests Coverage
         run: |
           python -m tox -vv -e ci-local
