@@ -117,7 +117,7 @@ class UserE2ETest {
     void testEditUser() {
         UserPage page = new UserPage(browser);
 
-        new WebDriverWait(page.driver(), 5).until(ExpectedConditions.visibilityOfElementLocated(
+        new WebDriverWait(page.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         page.update(user, editUser, editPassword, editEmail, editPhone, tenant);
