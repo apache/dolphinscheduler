@@ -55,6 +55,7 @@ dolphinscheduler-worker/logs
 # ------------------
 # Cache
 __pycache__/
+.tox/
 
 # Build
 build/
