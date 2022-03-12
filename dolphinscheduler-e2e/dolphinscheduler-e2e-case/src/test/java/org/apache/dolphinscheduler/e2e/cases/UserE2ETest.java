@@ -37,6 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class UserE2ETest {
@@ -114,6 +116,8 @@ class UserE2ETest {
     @Order(30)
     void testEditUser() {
         UserPage page = new UserPage(browser);
+
+        new WebDriverWait(page.driver(), 5).until(ExpectedConditions.urlContains("/user-manage"));
 
         page.update(user, editUser, editPassword, editEmail, editPhone, tenant);
 
