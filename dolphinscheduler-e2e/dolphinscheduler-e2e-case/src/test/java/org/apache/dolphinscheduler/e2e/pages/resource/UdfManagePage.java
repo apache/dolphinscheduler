@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -36,20 +37,20 @@ import org.openqa.selenium.support.PageFactory;
 
 @Getter
 public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
-    @FindBy(id = "btnCreateDirectory")
+    @FindBy(className = "btn-create-directory")
     private WebElement buttonCreateDirectory;
 
-    @FindBy(id = "btnUploadUdf")
+    @FindBy(className = "btn-upload-udf")
     private WebElement buttonUploadUdf;
 
-    @FindBy(className = "udf-items")
+    @FindBy(className = "items")
     private List<WebElement> udfList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final UploadFileBox uploadFileBox;
 
@@ -92,7 +93,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(fileName))
-            .flatMap(it -> it.findElements(By.id("btnDownload")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-download")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No download button in udf manage list"))
@@ -105,7 +106,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.id("btnRename")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No rename button in udf manage list"))
@@ -122,18 +123,13 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(name))
-            .flatMap(it -> it.findElements(By.id("btnDelete")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in udf manage list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -144,16 +140,22 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputName")
+        @FindBys({
+                @FindBy(className = "input-directory-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputName;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "textarea"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
@@ -163,13 +165,16 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "btnUpload")
+        @FindBys({
+                @FindBy(className = "btn-upload"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement buttonUpload;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
@@ -179,16 +184,22 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputDirectoryName")
+        @FindBys({
+                @FindBy(className = "input-directory-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDirectoryName;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "textarea"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }

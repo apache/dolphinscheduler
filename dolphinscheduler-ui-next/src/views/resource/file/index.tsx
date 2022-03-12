@@ -188,13 +188,13 @@ export default defineComponent({
           <div class={styles['conditions-model']}>
             <NSpace>
               <NButtonGroup>
-                <NButton onClick={handleCreateFolder}>
+                <NButton onClick={handleCreateFolder} class="btn-create-directory">
                   {t('resource.file.create_folder')}
                 </NButton>
-                <NButton onClick={handleCreateFile}>
+                <NButton onClick={handleCreateFile} class="btn-create-file">
                   {t('resource.file.create_file')}
                 </NButton>
-                <NButton onClick={handleUploadFile}>
+                <NButton onClick={handleUploadFile} class="btn-upload-file">
                   {t('resource.file.upload_files')}
                 </NButton>
               </NButtonGroup>
@@ -226,6 +226,7 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles['table-box']}
+            row-class-name='items'
           />
           <div class={styles.pagination}>
             <NPagination

@@ -117,6 +117,11 @@ When you add a new package in pydolphinscheduler, you should also add the packag
 `dolphinscheduler-dist/release-docs/licenses/python-api-licenses`, and also add a short description to
 `dolphinscheduler-dist/release-docs/LICENSE`.
 
+## Update `UPDATING.md` when public class, method or interface is be changed
+
+When you change public class, method or interface, you should change the [UPDATING.md](./UPDATING.md) to notice
+users who may use it in other way.
+
 <!-- content -->
 [py4j]: https://www.py4j.org/index.html
 [pycharm]: https://www.jetbrains.com/pycharm
