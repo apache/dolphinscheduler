@@ -24,33 +24,35 @@ import lombok.Getter;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.security.Key;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 @Getter
 public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
-    @FindBy(id = "btnCreateDataSource")
+    @FindBy(className = "btn-create-data-source")
     private WebElement buttonCreateDataSource;
 
     @FindBy(className = "data-source-items")
     private List<WebElement> dataSourceItemsList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final CreateDataSourceForm createDataSourceForm;
 
@@ -66,7 +68,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(new By.ById("dialogCreateDataSource")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("dialog-create-data-source")));
 
         createDataSourceForm().selectDataSourceType()
             .stream()
@@ -78,7 +81,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
         createDataSourceForm().inputIP().sendKeys(ip);
-        createDataSourceForm().inputPort().clear();
+        createDataSourceForm().inputPort().sendKeys(Keys.CONTROL + "a");
+        createDataSourceForm().inputPort().sendKeys(Keys.BACK_SPACE);
         createDataSourceForm().inputPort().sendKeys(port);
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
@@ -97,18 +101,13 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         dataSourceItemsList()
             .stream()
             .filter(it -> it.getText().contains(name))
-            .flatMap(it -> it.findElements(By.id("btnDelete")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in data source list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -119,43 +118,70 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(className = "options-datasource-type")
+        @FindBy(className = "n-base-select-option__content")
         private List<WebElement> selectDataSourceType;
 
-        @FindBy(id = "btnDataSourceTypeDropDown")
+        @FindBys({
+                @FindBy(className = "btn-data-source-type-drop-down"),
+                @FindBy(className = "n-base-selection"),
+        })
         private WebElement btnDataSourceTypeDropdown;
 
-        @FindBy(id = "inputDataSourceName")
+        @FindBys({
+                @FindBy(className = "input-data-source-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDataSourceName;
 
-        @FindBy(id = "inputDataSourceDescription")
+        @FindBys({
+                @FindBy(className = "input-data-source-description"),
+                @FindBy(tagName = "textarea"),
+        })
         private WebElement inputDataSourceDescription;
 
-        @FindBy(id = "inputIP")
+        @FindBys({
+                @FindBy(className = "input-ip"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputIP;
 
-        @FindBy(id = "inputPort")
+        @FindBys({
+                @FindBy(className = "input-port"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputPort;
 
-        @FindBy(id = "inputUserName")
+        @FindBys({
+                @FindBy(className = "input-username"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputUserName;
 
-        @FindBy(id = "inputPassword")
+        @FindBys({
+                @FindBy(className = "input-password"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputPassword;
 
-        @FindBy(id = "inputDataBase")
+        @FindBys({
+                @FindBy(className = "input-data-base"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputDataBase;
 
-        @FindBy(id = "inputJdbcParams")
+        @FindBys({
+                @FindBy(className = "input-jdbc-params"),
+                @FindBy(tagName = "textarea"),
+        })
         private WebElement inputJdbcParams;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
 
-        @FindBy(id = "btnTestConnection")
+        @FindBy(className = "btn-test-connection")
         private WebElement btnTestConnection;
     }
 }

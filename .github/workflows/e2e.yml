@@ -93,16 +93,16 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.UdfManageE2ETest
           - name: FunctionManage
             class: org.apache.dolphinscheduler.e2e.cases.FunctionManageE2ETest
-#          - name: MysqlDataSource
-#            class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
-#          - name: ClickhouseDataSource
-#            class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
-#          - name: PostgresDataSource
-#            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
-#          - name: SqlServerDataSource
-#            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
-#          - name: HiveDataSource
-#            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
+          - name: MysqlDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
+          - name: ClickhouseDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
+          - name: PostgresDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
+          - name: SqlServerDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
+          - name: HiveDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
