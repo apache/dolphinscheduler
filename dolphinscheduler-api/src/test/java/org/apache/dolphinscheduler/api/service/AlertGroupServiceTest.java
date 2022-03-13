@@ -110,6 +110,7 @@ public class AlertGroupServiceTest {
         result = alertGroupService.createAlertgroup(user, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertNotNull(result.get(Constants.DATA_LIST));
     }
 
     @Test
