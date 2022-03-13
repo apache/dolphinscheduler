@@ -24,10 +24,12 @@ import lombok.Getter;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.security.Key;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -79,7 +81,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
         createDataSourceForm().inputIP().sendKeys(ip);
-        createDataSourceForm().inputPort().clear();
+        createDataSourceForm().inputPort().sendKeys(Keys.CONTROL + "a");
+        createDataSourceForm().inputPort().sendKeys(Keys.BACK_SPACE);
         createDataSourceForm().inputPort().sendKeys(port);
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
