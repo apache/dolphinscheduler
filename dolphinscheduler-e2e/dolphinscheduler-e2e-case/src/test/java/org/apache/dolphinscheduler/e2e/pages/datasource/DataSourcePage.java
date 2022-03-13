@@ -168,7 +168,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         @FindBys({
                 @FindBy(className = "input-jdbc-params"),
-                @FindBy(tagName = "input"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputJdbcParams;
 
