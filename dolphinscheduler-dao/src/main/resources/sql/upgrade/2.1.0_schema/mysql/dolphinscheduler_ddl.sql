@@ -31,6 +31,8 @@ alter table t_ds_task_definition add `task_group_priority` int(11) DEFAULT '0' C
 
 ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone';
 
+ALTER TABLE `t_ds_alert` ADD INDEX `idx_status` (`alert_status`) USING BTREE;
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --

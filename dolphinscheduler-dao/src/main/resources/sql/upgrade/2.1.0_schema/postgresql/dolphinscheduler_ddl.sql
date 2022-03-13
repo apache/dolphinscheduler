@@ -156,6 +156,9 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_relation
     CONSTRAINT t_ds_relation_rule_input_entry_pk PRIMARY KEY (id)
 )';
 
+EXECUTE 'DROP INDEX IF EXISTS "idx_alert_status"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_status ON ' || quote_ident(v_schema) ||'.t_ds_alert USING Btree("alert_status")';
+
 EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_project_code"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_project_code ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("project_code")';
 
