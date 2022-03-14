@@ -33,6 +33,7 @@ export function useFolder(state: any) {
     resetForm: () => void
   ) => {
     const pid = router.currentRoute.value.params.id || -1
+
     const currentDir = fileStore.getCurrentDir || '/'
     state.folderFormRef.validate(async (valid: any) => {
       if (!valid) {
