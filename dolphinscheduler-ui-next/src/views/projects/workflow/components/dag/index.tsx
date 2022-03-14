@@ -287,6 +287,7 @@ export default defineComponent({
           taskInstance={currentTaskInstance.value}
           onViewLog={handleViewLog}
           data={currTask.value as any}
+          definition={props.definition}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />

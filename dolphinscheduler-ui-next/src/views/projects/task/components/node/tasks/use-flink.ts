@@ -82,7 +82,7 @@ export function useFlink({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useFlink(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks(model, data?.code)
     ] as IJsonItem[],
     model
   }

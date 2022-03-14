@@ -80,7 +80,7 @@ export function useProcedure({
       Fields.useDatasourceType(model),
       Fields.useDatasource(model),
       ...Fields.useProcedure(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks(model, data?.code)
     ] as IJsonItem[],
     model
   }

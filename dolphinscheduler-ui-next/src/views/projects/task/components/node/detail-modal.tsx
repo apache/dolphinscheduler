@@ -60,6 +60,9 @@ const props = {
     type: Number as PropType<number>,
     default: 0
   },
+  definition: {
+    type: Object as PropType<any>
+  },
   processInstance: {
     type: Object as PropType<any>
   },
@@ -148,7 +151,8 @@ const NodeDetailModal = defineComponent({
         projectCode: props.projectCode,
         data: props.data,
         from: props.from,
-        readonly: props.readonly
+        readonly: props.readonly,
+        definition: props.definition
       }))
     )
 
@@ -156,7 +160,6 @@ const NodeDetailModal = defineComponent({
       () => [props.show, props.data],
       async () => {
         if (!props.show) return
-
         initHeaderLinks(props.processInstance, props.data.taskType)
         await nextTick()
         detailRef.value.value.setValues(formatModel(props.data))
