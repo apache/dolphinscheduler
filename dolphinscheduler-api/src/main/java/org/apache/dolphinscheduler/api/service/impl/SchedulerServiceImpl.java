@@ -168,6 +168,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
+        if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
+            logger.warn("The start time must smaller than end time");
+            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
+            return result;
+        }
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
@@ -649,6 +654,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
                 return;
             }
+            if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
+                logger.warn("The start time must smaller than end time");
+                putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
+                return;
+            }
+
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
             if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
