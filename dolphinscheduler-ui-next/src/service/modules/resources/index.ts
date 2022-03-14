@@ -55,9 +55,7 @@ export function queryResourceById(
   })
 }
 
-export function queryCurrentResourceById(
-    id: number
-): any {
+export function queryCurrentResourceById(id: number): any {
   return axios({
     url: `/resources/${id}/query`,
     method: 'get'

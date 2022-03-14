@@ -45,11 +45,9 @@ import ResourceRenameModal from './rename'
 import { IRenameFile } from './types'
 import type { Router } from 'vue-router'
 import styles from './index.module.scss'
-import {useFileStore} from "@/store/file/file"
-import {
-  queryCurrentResourceById
-} from '@/service/modules/resources'
-import {ResourceFile} from "@/service/modules/resources/types";
+import { useFileStore } from '@/store/file/file'
+import { queryCurrentResourceById } from '@/service/modules/resources'
+import { ResourceFile } from '@/service/modules/resources/types'
 
 export default defineComponent({
   name: 'File',
@@ -153,7 +151,6 @@ export default defineComponent({
       resourceListRef.value = getResourceListState(fileId.value)
     })
 
-
     watch(
       () => router.currentRoute.value.params.id,
       // @ts-ignore
@@ -208,13 +205,16 @@ export default defineComponent({
           <div class={styles['conditions-model']}>
             <NSpace>
               <NButtonGroup>
-                <NButton onClick={handleCreateFolder} class="btn-create-directory">
+                <NButton
+                  onClick={handleCreateFolder}
+                  class='btn-create-directory'
+                >
                   {t('resource.file.create_folder')}
                 </NButton>
-                <NButton onClick={handleCreateFile} class="btn-create-file">
+                <NButton onClick={handleCreateFile} class='btn-create-file'>
                   {t('resource.file.create_file')}
                 </NButton>
-                <NButton onClick={handleUploadFile} class="btn-upload-file">
+                <NButton onClick={handleUploadFile} class='btn-upload-file'>
                   {t('resource.file.upload_files')}
                 </NButton>
               </NButtonGroup>

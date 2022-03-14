@@ -253,15 +253,14 @@ export function useTable() {
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
-    deleteScheduleById(id, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteScheduleById(id, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
+    })
   }
 
   return {

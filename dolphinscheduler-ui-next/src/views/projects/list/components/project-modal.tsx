@@ -65,7 +65,9 @@ const ProjectModal = defineComponent({
       () => {
         if (props.statusRef === 0) {
           variables.model.projectName = ''
-          variables.model.userName = (userStore.getUserInfo as UserInfoRes).userName
+          variables.model.userName = (
+            userStore.getUserInfo as UserInfoRes
+          ).userName
           variables.model.description = ''
         } else {
           variables.model.projectName = props.row.name

@@ -99,10 +99,10 @@ export function useModal(
           ? JSON.stringify(startParams)
           : ''
 
-          await startProcessInstance(state.startForm, variables.projectCode)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
+        await startProcessInstance(state.startForm, variables.projectCode)
+        window.$message.success(t('project.workflow.success'))
+        ctx.emit('updateList')
+        ctx.emit('update:show')
       }
     })
   }
@@ -194,10 +194,11 @@ export function useModal(
   }
 
   const getStartParamsList = (code: number) => {
-    queryProcessDefinitionByCode(code, variables.projectCode)
-      .then((res: any) => {
+    queryProcessDefinitionByCode(code, variables.projectCode).then(
+      (res: any) => {
         variables.startParamsList = res.processDefinition.globalParamList
-      })
+      }
+    )
   }
 
   const getPreviewSchedule = () => {
@@ -219,10 +220,9 @@ export function useModal(
           endTime: end,
           crontab: state.timingForm.crontab
         })
-        previewSchedule({ schedule }, projectCode)
-          .then((res: any) => {
-            variables.schedulePreviewList = res
-          })
+        previewSchedule({ schedule }, projectCode).then((res: any) => {
+          variables.schedulePreviewList = res
+        })
       }
     })
   }
