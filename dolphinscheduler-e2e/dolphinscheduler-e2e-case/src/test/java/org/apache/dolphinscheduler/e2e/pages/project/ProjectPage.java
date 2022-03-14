@@ -98,7 +98,10 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(className = "input-project-name")
+        @FindBys({
+                @FindBy(className = "input-project-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputProjectName;
 
         @FindBy(className = "btn-submit")
