@@ -66,7 +66,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     public WorkflowDefinitionTab publish(String workflow) {
         workflowList()
             .stream()
-            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerHTML").equals(workflow))
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
             .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
