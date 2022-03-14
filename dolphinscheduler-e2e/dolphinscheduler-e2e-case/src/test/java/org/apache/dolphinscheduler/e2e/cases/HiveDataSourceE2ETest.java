@@ -79,7 +79,8 @@ public class HiveDataSourceE2ETest {
 
         page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, hivePassword, database, jdbcParams);
 
-        new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(new By.ById("dialogCreateDataSource")));
+        new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(
+                new By.ByClassName("dialog-create-data-source")));
 
         await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
             .as("DataSource list should contain newly-created database")
