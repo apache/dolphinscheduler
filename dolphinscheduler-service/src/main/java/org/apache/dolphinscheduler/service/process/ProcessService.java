@@ -886,10 +886,9 @@ public class ProcessService {
         //reset command parameter
         if (processInstance.getCommandParam() != null) {
             Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-            processCmdParam.forEach((k, v) -> {
-                String value = cmdParam.get(k);
-                if (StringUtils.isBlank(value)) {
-                    cmdParam.put(k, v);
+            processCmdParam.forEach((key, value) -> {
+                if (!cmdParam.containsKey(key)) {
+                    cmdParam.put(key, value);
                 }
             });
         }
