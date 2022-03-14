@@ -21,7 +21,7 @@ import {
   viewResource
 } from '@/service/modules/resources'
 import type { ResourceListRes } from '@/service/modules/resources/types'
-import { IResourceListState, ISetPagination } from './types'
+import {IResourceListState, ISetPagination} from './types'
 
 export function useFileState(
   setPagination: ISetPagination = {} as ISetPagination
