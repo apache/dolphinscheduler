@@ -63,7 +63,7 @@ public final class WorkflowSaveDialog {
     private List<WebElement> selectTenantOption;
 
     @FindBy(className = "input-global-params")
-    private List<WebElement> globalParamsItems;
+    private WebElement globalParamsItems;
 
     public WorkflowSaveDialog(WorkflowForm parent) {
         this.parent = parent;
@@ -93,20 +93,20 @@ public final class WorkflowSaveDialog {
     }
 
     public WorkflowSaveDialog addGlobalParam(String key, String value) {
-        final int len = globalParamsItems().get(0).findElements(By.tagName("input")).size();
+        final int len = globalParamsItems().findElements(By.tagName("input")).size();
 
         final WebDriver driver = parent().driver();
 
         if (len == 0) {
             buttonGlobalCustomParameters().click();
 
-            globalParamsItems().get(0).findElement(new By.ByTagName("input")).sendKeys(key);
-            globalParamsItems().get(1).findElement(new By.ByTagName("input")).sendKeys(value);
+            globalParamsItems().findElements(By.tagName("input")).get(0).sendKeys(key);
+            globalParamsItems().findElements(By.tagName("input")).get(1).sendKeys(value);
         } else {
-            globalParamsItems().get(len-1).findElements(new By.ByTagName("button")).get(1).click();
+            globalParamsItems().findElements(By.tagName("button")).get(len-1).click();
 
-            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(0).sendKeys(key);
-            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(1).sendKeys(value);
+            globalParamsItems().findElements(By.tagName("input")).get(len).sendKeys(key);
+            globalParamsItems().findElements(By.tagName("input")).get(len+1).sendKeys(value);
         }
 
         return this;
