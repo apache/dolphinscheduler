@@ -48,6 +48,7 @@ import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkArgsUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
