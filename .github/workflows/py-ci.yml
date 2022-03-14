@@ -40,6 +40,7 @@ env:
 jobs:
   lint:
     name: Lint
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -55,6 +56,7 @@ jobs:
           python -m tox -vv -e lint
   pytest:
     name: Pytest
+    timeout-minutes: 15
     needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
@@ -76,6 +78,7 @@ jobs:
           python -m tox -vv -e code-test
   doc-build:
     name: Docs Build Test
+    timeout-minutes: 15
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -92,6 +95,7 @@ jobs:
           python -m tox -vv -e doc-build-test
   verify-local-ci:
     name: Local CI
+    timeout-minutes: 15
     needs:
       - pytest
       - doc-build
