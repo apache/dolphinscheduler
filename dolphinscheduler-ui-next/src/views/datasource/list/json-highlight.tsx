@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, h } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { NText } from 'naive-ui'
 import { isBoolean, isNumber, isPlainObject } from 'lodash'
 import styles from './json-highlight.module.scss'

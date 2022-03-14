@@ -20,15 +20,25 @@ import {
   PropType,
   ref,
   reactive,
-  toRefs,
   watch,
-  nextTick
+  nextTick,
+  provide,
+  computed,
+  h
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import Detail from './detail'
 import { formatModel } from './format-data'
-import type { ITaskData } from './types'
+import type { ITaskData, ITaskType } from './types'
+import {
+  HistoryOutlined,
+  ProfileOutlined,
+  QuestionCircleTwotone
+} from '@vicons/antd'
+import { NIcon } from 'naive-ui'
+import { Router, useRouter } from 'vue-router'
+import { IWorkflowTaskInstance } from '@/views/projects/workflow/components/dag/types'
 
 const props = {
   show: {
@@ -50,89 +60,123 @@ const props = {
   from: {
     type: Number as PropType<number>,
     default: 0
+  },
+  processInstance: {
+    type: Object as PropType<any>
+  },
+  taskInstance: {
+    type: Object as PropType<IWorkflowTaskInstance>
   }
 }
 
 const NodeDetailModal = defineComponent({
   name: 'NodeDetailModal',
   props,
-  emits: ['cancel', 'submit'],
+  emits: ['cancel', 'submit', 'viewLog'],
   setup(props, { emit }) {
-    const { t } = useI18n()
-    const state = reactive({
-      saving: false,
-      detailRef: ref(),
-      linkEventShowRef: ref(),
-      linkEventTextRef: ref(),
-      linkUrlRef: ref()
-    })
+    const { t, locale } = useI18n()
+    const router: Router = useRouter()
+    const renderIcon = (icon: any) => {
+      return () => h(NIcon, null, { default: () => h(icon) })
+    }
+    const detailRef = ref()
 
     const onConfirm = async () => {
-      await state.detailRef.form.validate()
-      emit('submit', { data: state.detailRef.form.getValues() })
+      await detailRef.value.value.validate()
+      emit('submit', { data: detailRef.value.value.getValues() })
     }
     const onCancel = () => {
       emit('cancel')
     }
 
-    const onJumpLink = () => {
-      // TODO: onJumpLink
+    const headerLinks = ref([] as any)
+
+    const handleViewLog = () => {
+      if (props.taskInstance) {
+        emit('viewLog', props.taskInstance.id, props.taskInstance.taskType)
+      }
     }
 
-    const getLinkEventText = (status: boolean, text: string, url: 'string') => {
-      state.linkEventShowRef = status
-      state.linkEventTextRef = text
-      state.linkUrlRef = url
+    const initHeaderLinks = (
+      processInstance: any,
+      taskType: ITaskType | undefined
+    ) => {
+      headerLinks.value = [
+        {
+          text: t('project.node.instructions'),
+          show: taskType ? true : false,
+          action: () => {
+            const helpUrl =
+              'https://dolphinscheduler.apache.org/' +
+              locale.value.toLowerCase().replace('_', '-') +
+              '/docs/latest/user_doc/guide/task/' +
+              taskType?.toLowerCase() +
+              '.html'
+            window.open(helpUrl)
+          },
+          icon: renderIcon(QuestionCircleTwotone)
+        },
+        {
+          text: t('project.node.view_history'),
+          show: props.taskInstance ? true : false,
+          action: () => {
+            router.push({
+              name: 'task-instance',
+              params: { processInstanceId: processInstance.id }
+            })
+          },
+          icon: renderIcon(HistoryOutlined)
+        },
+        {
+          text: t('project.node.view_log'),
+          show: props.taskInstance ? true : false,
+          action: () => {
+            handleViewLog()
+          },
+          icon: renderIcon(ProfileOutlined)
+        }
+      ]
     }
+
+    const onTaskTypeChange = (taskType: ITaskType) => {
+      props.data.taskType = taskType
+    }
+
+    provide(
+      'data',
+      computed(() => ({
+        projectCode: props.projectCode,
+        data: props.data,
+        from: props.from,
+        readonly: props.readonly
+      }))
+    )
 
     watch(
-      () => props.data,
+      () => [props.show, props.data],
       async () => {
+        if (!props.show) return
+
+        initHeaderLinks(props.processInstance, props.data.taskType)
         await nextTick()
-        state.detailRef.form.setValues(formatModel(props.data))
+        detailRef.value.value.setValues(formatModel(props.data))
       }
     )
 
-    return {
-      t,
-      ...toRefs(state),
-      getLinkEventText,
-      onConfirm,
-      onCancel,
-      onJumpLink
-    }
-  },
-  render() {
-    const {
-      t,
-      show,
-      onConfirm,
-      onCancel,
-      projectCode,
-      data,
-      readonly,
-      from,
-      onJumpLink
-    } = this
-    return (
+    return () => (
       <Modal
-        show={show}
+        show={props.show}
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
         confirmLoading={false}
-        confirmDisabled={readonly}
+        confirmDisabled={props.readonly}
         onCancel={onCancel}
-        linkEventShow={this.linkEventShowRef}
-        linkEventText={this.linkEventTextRef}
-        onJumpLink={onJumpLink}
+        headerLinks={headerLinks}
       >
         <Detail
-          ref='detailRef'
-          data={data}
-          projectCode={projectCode}
-          readonly={readonly}
-          from={from}
-          onLinkEventText={this.getLinkEventText}
+          ref={detailRef}
+          onTaskTypeChange={onTaskTypeChange}
+          key={props.data.taskType}
         />
       </Modal>
     )

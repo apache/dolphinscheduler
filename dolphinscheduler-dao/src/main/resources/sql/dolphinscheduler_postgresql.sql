@@ -217,6 +217,8 @@ CREATE TABLE t_ds_alert (
   PRIMARY KEY (id)
 ) ;
 
+create index idx_status on t_ds_alert (alert_status);
+
 --
 -- Table structure for table t_ds_alertgroup
 --

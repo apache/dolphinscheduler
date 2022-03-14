@@ -19,7 +19,7 @@
 
 from typing import Optional
 
-from pydolphinscheduler.constants import ProcessDefinitionDefault
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 
 
@@ -34,7 +34,7 @@ class BaseSide(Base):
         cls,
         # TODO comment for avoiding cycle import
         # user: Optional[User] = ProcessDefinitionDefault.USER
-        user=ProcessDefinitionDefault.USER,
+        user=configuration.WORKFLOW_USER,
     ):
         """Create Base if not exists."""
         raise NotImplementedError

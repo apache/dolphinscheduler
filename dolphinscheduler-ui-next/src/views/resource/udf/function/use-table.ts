@@ -48,7 +48,7 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('resource.function.id'),
+        title: '#',
         key: 'id',
         width: 50,
         render: (_row, index) => index + 1
@@ -94,6 +94,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'tiny',
+                        class: 'btn-edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -124,7 +125,8 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'tiny'
+                              size: 'tiny',
+                              class: 'btn-delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)

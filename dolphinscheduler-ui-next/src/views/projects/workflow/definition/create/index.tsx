@@ -75,10 +75,11 @@ export default defineComponent({
           timeout: saveForm.timeoutFlag ? saveForm.timeout : 0
         },
         projectCode
-      ).then((res: any) => {
-        message.success(t('project.dag.success'))
-        router.push({ path: `/projects/${projectCode}/workflow-definition` })
-      })
+      )
+        .then((ignored: any) => {
+          message.success(t('project.dag.success'))
+          router.push({ path: `/projects/${projectCode}/workflow-definition` })
+        })
     }
 
     return () => (

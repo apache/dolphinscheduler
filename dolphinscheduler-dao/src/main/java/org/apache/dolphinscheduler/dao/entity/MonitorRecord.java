@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * monitor record for database
@@ -58,7 +57,6 @@ public class MonitorRecord {
     /**
      * start date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date date;
 
     public Flag getState() {

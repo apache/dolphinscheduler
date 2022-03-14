@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @TableName("t_ds_dq_execute_result")
 public class DqExecuteResult implements Serializable {
@@ -147,13 +146,11 @@ public class DqExecuteResult implements Serializable {
      * create_time
      */
     @TableField(value = "create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     /**
      * update_time
      */
     @TableField(value = "update_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public int getId() {

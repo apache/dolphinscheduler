@@ -59,6 +59,8 @@ export default defineComponent({
         title={t('resource.file.create_folder')}
         onCancel={this.hideModal}
         onConfirm={this.handleFolder}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
       >
         <NForm
           rules={this.rules}
@@ -70,6 +72,7 @@ export default defineComponent({
             <NInput
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
+              class='input-directory-name'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
@@ -77,6 +80,7 @@ export default defineComponent({
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}
+              class='input-description'
             />
           </NFormItem>
         </NForm>

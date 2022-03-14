@@ -21,6 +21,7 @@ import {
   deleteAlertPluginInstance
 } from '@/service/modules/alert-plugin'
 import { format } from 'date-fns'
+import { parseTime } from '@/utils/common'
 import type { IRecord } from './types'
 
 export function useTable() {
@@ -37,31 +38,24 @@ export function useTable() {
     if (data.loading) return
     data.loading = true
 
-    try {
-      const { totalList, total } = await queryAlertPluginInstanceListPaging({
-        pageNo: data.page,
-        pageSize: data.pageSize,
-        searchVal: data.searchVal
-      })
-      data.loading = false
-      if (!totalList) throw Error()
-      data.list = totalList.map((record: IRecord) => {
-        record.createTime = record.createTime
-          ? format(new Date(record.createTime), 'yyyy-MM-dd HH:mm:ss')
-          : ''
-        record.updateTime = record.updateTime
-          ? format(new Date(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
-          : ''
-        return record
-      })
+    const { totalList, total } = await queryAlertPluginInstanceListPaging({
+      pageNo: data.page,
+      pageSize: data.pageSize,
+      searchVal: data.searchVal
+    })
+    data.loading = false
+    if (!totalList) throw Error()
+    data.list = totalList.map((record: IRecord) => {
+      record.createTime = record.createTime
+        ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')
+        : ''
+      record.updateTime = record.updateTime
+        ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
+        : ''
+      return record
+    })
 
-      data.itemCount = total
-    } catch (e) {
-      if ((e as Error).message) window.$message.error((e as Error).message)
-      data.loading = false
-      data.list = []
-      data.itemCount = 0
-    }
+    data.itemCount = total
   }
 
   const updateList = () => {
@@ -72,12 +66,8 @@ export function useTable() {
   }
 
   const deleteRecord = async (id: number) => {
-    try {
-      const res = await deleteAlertPluginInstance(id)
-      updateList()
-    } catch (e) {
-      window.$message.error((e as Error).message)
-    }
+    const ignored = await deleteAlertPluginInstance(id)
+    updateList()
   }
 
   const changePage = (page: number) => {

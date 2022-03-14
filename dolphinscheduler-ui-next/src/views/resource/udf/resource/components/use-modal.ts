@@ -62,14 +62,10 @@ export function useModal(
   const submitRequest = (serviceHandle: any) => {
     state.folderFormRef.validate(async (valid: any) => {
       if (!valid) {
-        try {
-          await serviceHandle()
-          window.$message.success(t('resource.udf.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        await serviceHandle()
+        window.$message.success(t('resource.udf.success'))
+        ctx.emit('updateList')
+        ctx.emit('update:show')
       }
     })
   }
@@ -93,15 +89,11 @@ export function useModal(
         formData.append('currentDir', currentDir)
         formData.append('description', state.uploadForm.description)
 
-        try {
-          await createResource(formData as any)
-          window.$message.success(t('resource.udf.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-          resetUploadForm()
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        await createResource(formData as any)
+        window.$message.success(t('resource.udf.success'))
+        ctx.emit('updateList')
+        ctx.emit('update:show')
+        resetUploadForm()
       }
     })
   }

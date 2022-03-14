@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build:dev": "vue-tsc --noEmit && vite build --mode development",
     "build:prod": "vue-tsc --noEmit && vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint src --fix --ext .ts,.tsx,.vue",
@@ -16,9 +15,10 @@
     "axios": "^0.24.0",
     "date-fns": "^2.28.0",
     "echarts": "^5.3.0",
+    "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.31.1",
-    "naive-ui": "2.25.1",
+    "naive-ui": "^2.26.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.11",
     "pinia-plugin-persistedstate": "^1.2.2",
@@ -29,6 +29,7 @@
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.1",
     "@types/node": "^16.11.25",
     "@types/nprogress": "^0.2.0",
     "@types/qs": "^6.9.7",

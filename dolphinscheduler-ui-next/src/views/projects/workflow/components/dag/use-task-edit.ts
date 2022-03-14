@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import _ from 'lodash'
 import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
@@ -37,10 +36,11 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-
   const { addNode, setNodeName } = useCellUpdate({ graph })
 
-  const taskDefinitions = ref<NodeData[]>([])
+  const taskDefinitions = ref<NodeData[]>(
+    definition.value?.taskDefinitionList || []
+  )
   const currTask = ref<NodeData>({
     taskType: 'SHELL',
     code: 0,
@@ -52,7 +52,7 @@ export function useTaskEdit(options: Options) {
    * Append a new task
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
-    addNode(code + '', type, '', coordinate)
+    addNode(code + '', type, '', 'YES', coordinate)
     taskDefinitions.value.push({
       code,
       taskType: type,
@@ -69,9 +69,10 @@ export function useTaskEdit(options: Options) {
     code: number,
     targetCode: number,
     type: TaskType,
+    flag: string,
     coordinate: Coordinate
   ) {
-    addNode(code + '', type, name, coordinate)
+    addNode(code + '', type, name, flag, coordinate)
     const definition = taskDefinitions.value.find((t) => t.code === targetCode)
 
     const newDefinition = {
@@ -123,6 +124,7 @@ export function useTaskEdit(options: Options) {
         setNodeName(task.code + '', taskDef.name)
         return {
           ...taskDef,
+          version: task.version,
           code: task.code,
           taskType: currTask.value.taskType
         }

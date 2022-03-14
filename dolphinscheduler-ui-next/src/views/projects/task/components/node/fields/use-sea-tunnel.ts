@@ -17,26 +17,13 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
+import { useDeployMode } from '.'
+import { removeUselessChildren } from '@/utils/tree-format'
 import type { IJsonItem } from '../types'
 
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const options = ref([])
-
-  const deployModeOptions = [
-    {
-      label: 'client',
-      value: 'client'
-    },
-    {
-      label: 'cluster',
-      value: 'cluster'
-    },
-    {
-      label: 'local',
-      value: 'local'
-    }
-  ]
 
   const masterTypeOptions = [
     {
@@ -69,32 +56,11 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const getResourceList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      model.resourceFiles = []
-      const res = await queryResourceList({ type: 'FILE' })
-      removeUselessChildren(res)
-      options.value = res || []
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
-  }
-
-  function removeUselessChildren(
-    list: { children?: []; fullName: string; id: number }[]
-  ) {
-    if (!list.length) return
-    list.forEach((item) => {
-      if (!item.children) {
-        return
-      }
-      if (item.children.length === 0) {
-        model.resourceFiles.push({ id: item.id, fullName: item.fullName })
-        delete item.children
-        return
-      }
-      removeUselessChildren(item.children)
-    })
+    model.resourceFiles = []
+    const res = await queryResourceList({ type: 'FILE' })
+    removeUselessChildren(res)
+    options.value = res || []
+    loading.value = false
   }
 
   onMounted(() => {
@@ -117,12 +83,12 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const parseRawScript = () => {
     if (model.rawScript) {
       model.rawScript.split('\n').forEach((script: string) => {
-        let params = script.replace(baseScript, '').split('--')
+        const params = script.replace(baseScript, '').split('--')
         params?.forEach((param: string) => {
-          let pair = param.split(' ')
+          const pair = param.split(' ')
           if (pair && pair.length >= 2) {
             if (pair[0] === 'master') {
-              let prefix = pair[1].substring(0, 8)
+              const prefix = pair[1].substring(0, 8)
               if (pair[1] && (prefix === 'mesos://' || prefix === 'spark://')) {
                 model.master = prefix
                 model.masterUrl = pair[1].substring(8, pair[1].length)
@@ -148,13 +114,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   )
 
   return [
-    {
-      type: 'radio',
-      field: 'deployMode',
-      name: t('project.node.sea_tunnel_deploy_mode'),
-      options: deployModeOptions,
-      value: model.deployMode
-    },
+    useDeployMode(),
     {
       type: 'select',
       field: 'master',

@@ -27,6 +27,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -34,26 +35,27 @@ import lombok.Getter;
 
 @Getter
 public class SecurityPage extends NavBarPage implements NavBarItem {
-    @FindBy(className = "tab-tenant-manage")
+
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
     private WebElement menuTenantManage;
 
-    @FindBy(className = "tab-user-manage")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(2) > .n-menu-item-content")
     private WebElement menUserManage;
 
-    @FindBy(className = "tab-worker-group-manage")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(5) > .n-menu-item-content")
     private WebElement menWorkerGroupManage;
 
-    @FindBy(className = "tab-queue-manage")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(6) > .n-menu-item-content")
     private WebElement menuQueueManage;
 
-    @FindBy(className = "tab-environment-manage")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(7) > .n-menu-item-content")
     private WebElement menuEnvironmentManage;
 
-    @FindBy(className = "tab-token-manage")
-    private WebElement menuTokenManage;
-
-    @FindBy(className = "tab-namespace-manage")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(8) > .n-menu-item-content")
     private WebElement menuNamespaceManage;
+
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(9) > .n-menu-item-content")
+    private WebElement menuTokenManage;
 
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
@@ -61,40 +63,43 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
 
     public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
         if (tab == TenantPage.class) {
-            WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuTenantManageElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(menuTenantManage));
+            menuTenantManage.click();
             return tab.cast(new TenantPage(driver));
         }
+
         if (tab == UserPage.class) {
-            WebElement menUserManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menUserManage));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menUserManageElement);
-            new WebDriverWait(driver, 25).until(ExpectedConditions.urlContains("/#/security/users"));
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(menUserManage));
+            menUserManage.click();
             return tab.cast(new UserPage(driver));
         }
+
         if (tab == WorkerGroupPage.class) {
-            WebElement menWorkerGroupManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menWorkerGroupManageElement);
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
+            menWorkerGroupManage.click();
             return tab.cast(new WorkerGroupPage(driver));
         }
+
         if (tab == QueuePage.class) {
             menuQueueManage().click();
             return tab.cast(new QueuePage(driver));
         }
+
         if (tab == EnvironmentPage.class) {
             menuEnvironmentManage().click();
             return tab.cast(new EnvironmentPage(driver));
         }
+
         if (tab == TokenPage.class) {
             menuTokenManage().click();
             return tab.cast(new TokenPage(driver));
         }
+
         if (tab == NamespacePage.class) {
             menuNamespaceManage().click();
             return tab.cast(new NamespacePage(driver));
         }
+
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
 
