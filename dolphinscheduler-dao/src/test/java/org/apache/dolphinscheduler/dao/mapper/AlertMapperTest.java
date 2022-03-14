@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -156,6 +157,7 @@ public class AlertMapperTest extends BaseDaoTest {
         alert.setTitle("test alert");
         alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
         alert.setAlertStatus(alertStatus);
+        alert.setWarningType(WarningType.FAILURE);
         alert.setLog("success");
         alert.setCreateTime(DateUtils.getCurrentDate());
         alert.setUpdateTime(DateUtils.getCurrentDate());

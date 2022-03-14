@@ -31,6 +31,8 @@ public class AlertSendRequestCommand implements Serializable {
 
     private String content;
 
+    private int warnType;
+
     public int getGroupId() {
         return groupId;
     }
@@ -55,14 +57,23 @@ public class AlertSendRequestCommand implements Serializable {
         this.content = content;
     }
 
+    public int getWarnType() {
+        return warnType;
+    }
+
+    public void setWarnType(int warnType) {
+        this.warnType = warnType;
+    }
+
     public AlertSendRequestCommand(){
 
     }
 
-    public AlertSendRequestCommand(int groupId, String title, String content) {
+    public AlertSendRequestCommand(int groupId, String title, String content, int warnType) {
         this.groupId = groupId;
         this.title = title;
         this.content = content;
+        this.warnType = warnType;
     }
 
     /**

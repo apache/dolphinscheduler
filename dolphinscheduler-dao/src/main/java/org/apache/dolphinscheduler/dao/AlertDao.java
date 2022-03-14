@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -101,6 +102,7 @@ public class AlertDao {
 
         Alert alert = new Alert();
         alert.setTitle("Fault tolerance warning");
+        alert.setWarningType(WarningType.FAILURE);
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alert.setContent(content);
         alert.setAlertGroupId(alertGroupId);
@@ -140,6 +142,7 @@ public class AlertDao {
 
     private void saveTaskTimeoutAlert(Alert alert, String content, int alertGroupId) {
         alert.setAlertGroupId(alertGroupId);
+        alert.setWarningType(WarningType.FAILURE);
         alert.setContent(content);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());

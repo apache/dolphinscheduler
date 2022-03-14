@@ -281,6 +281,7 @@ CREATE TABLE `t_ds_alert` (
   `title` varchar(64) DEFAULT NULL COMMENT 'title',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
+  `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed',
   `log` text COMMENT 'log',
   `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',

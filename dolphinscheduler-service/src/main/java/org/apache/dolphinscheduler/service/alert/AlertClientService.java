@@ -84,8 +84,8 @@ public class AlertClientService implements AutoCloseable {
      * @param content
      * @return
      */
-    public AlertSendResponseCommand sendAlert(int groupId, String title,  String content) {
-        return this.sendAlert(this.host,this.port,groupId,title,content);
+    public AlertSendResponseCommand sendAlert(int groupId, String title,  String content, int strategy) {
+        return this.sendAlert(this.host,this.port,groupId,title,content,strategy);
     }
 
     /**
@@ -97,9 +97,9 @@ public class AlertClientService implements AutoCloseable {
      * @param content content
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title,  String content) {
-        logger.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} ", host, port, groupId, title);
-        AlertSendRequestCommand request = new AlertSendRequestCommand(groupId, title, content);
+    public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title,  String content, int strategy) {
+        logger.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} , strategy : {} ", host, port, groupId, title, strategy);
+        AlertSendRequestCommand request = new AlertSendRequestCommand(groupId, title, content, strategy);
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();

@@ -46,6 +46,8 @@ EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_code_version ON ' ||
 
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_user ADD COLUMN IF NOT EXISTS "time_zone" varchar(32) DEFAULT NULL';
 
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alert ADD COLUMN IF NOT EXISTS "warning_type" int DEFAULT 2';
+
 EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_dq_comparison_type" (
         id serial NOT NULL,
         "type" varchar NOT NULL,

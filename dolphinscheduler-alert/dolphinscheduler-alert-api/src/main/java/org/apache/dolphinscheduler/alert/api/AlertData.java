@@ -24,12 +24,14 @@ public class AlertData {
     private String title;
     private String content;
     private String log;
+    private int warnType;
 
-    public AlertData(int id, String title, String content, String log) {
+    public AlertData(int id, String title, String content, String log, int warnType) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.log = log;
+        this.warnType = warnType;
     }
 
     public AlertData() {
@@ -75,6 +77,14 @@ public class AlertData {
         return this;
     }
 
+    public int getWarnType() {
+        return warnType;
+    }
+
+    public void setWarnType(int warnType) {
+        this.warnType = warnType;
+    }
+
     public boolean equals(final Object o) {
         if (o == this) {
             return true;
@@ -87,6 +97,9 @@ public class AlertData {
             return false;
         }
         if (this.getId() != other.getId()) {
+            return false;
+        }
+        if (this.getWarnType() != other.getWarnType()) {
             return false;
         }
         final Object this$title = this.getTitle();
@@ -115,6 +128,7 @@ public class AlertData {
         final int PRIME = 59;
         int result = 1;
         result = result * PRIME + this.getId();
+        result = result * PRIME + this.getWarnType();
         final Object $title = this.getTitle();
         result = result * PRIME + ($title == null ? 43 : $title.hashCode());
         final Object $content = this.getContent();
@@ -125,7 +139,7 @@ public class AlertData {
     }
 
     public String toString() {
-        return "AlertData(id=" + this.getId() + ", title=" + this.getTitle() + ", content=" + this.getContent() + ", log=" + this.getLog() + ")";
+        return "AlertData(id=" + this.getId() + ", title=" + this.getTitle() + ", content=" + this.getContent() + ", log=" + this.getLog() + ", warnType=" + this.getWarnType() + ")";
     }
 
     public static class AlertDataBuilder {
@@ -133,6 +147,7 @@ public class AlertData {
         private String title;
         private String content;
         private String log;
+        private int warnType;
 
         AlertDataBuilder() {
         }
@@ -157,12 +172,18 @@ public class AlertData {
             return this;
         }
 
+        public AlertDataBuilder warnType(int warnType) {
+            this.warnType = warnType;
+            return this;
+        }
+
         public AlertData build() {
-            return new AlertData(id, title, content, log);
+            return new AlertData(id, title, content, log, warnType);
         }
 
         public String toString() {
-            return "AlertData.AlertDataBuilder(id=" + this.id + ", title=" + this.title + ", content=" + this.content + ", log=" + this.log + ")";
+            return "AlertData.AlertDataBuilder(id=" + this.id + ", title=" + this.title + ", content=" + this.content + ", log=" + this.log + ", warnType=" + this.warnType + ")";
         }
+
     }
 }
