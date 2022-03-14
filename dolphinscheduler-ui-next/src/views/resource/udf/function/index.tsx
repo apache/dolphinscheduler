@@ -94,7 +94,11 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.handleCreateFolder} class='btn-create-udf-function'>
+              <NButton
+                type='primary'
+                onClick={this.handleCreateFolder}
+                class='btn-create-udf-function'
+              >
                 {t('resource.function.create_udf_function')}
               </NButton>
             </NSpace>
