@@ -109,7 +109,13 @@ export default defineComponent({
           </NFormItem>
           <div class={styles['file-edit-content']}>
             <div class={styles.submit}>
-              <NButton type='info' size='small' round onClick={this.handleFile} class='btn-submit'>
+              <NButton
+                type='info'
+                size='small'
+                round
+                onClick={this.handleFile}
+                class='btn-submit'
+              >
                 {t('resource.file.save')}
               </NButton>
               <NButton

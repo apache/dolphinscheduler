@@ -19,7 +19,6 @@ import {
   defineComponent,
   PropType,
   ref,
-  reactive,
   watch,
   nextTick,
   provide,
@@ -139,6 +138,7 @@ const NodeDetailModal = defineComponent({
     }
 
     const onTaskTypeChange = (taskType: ITaskType) => {
+      // eslint-disable-next-line vue/no-mutating-props
       props.data.taskType = taskType
     }
 
