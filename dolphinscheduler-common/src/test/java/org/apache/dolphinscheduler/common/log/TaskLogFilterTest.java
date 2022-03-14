@@ -14,30 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.common.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
 import ch.qos.logback.core.spi.FilterReply;
-import org.apache.dolphinscheduler.common.Constants;
+
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Marker;
+
 import java.util.Map;
 
-public class MasterLogFilterTest {
+
+public class TaskLogFilterTest {
 
     @Test
     public void decide() {
-        MasterLogFilter masterLogFilter = new MasterLogFilter();
+        TaskLogFilter taskLogFilter = new TaskLogFilter();
 
 
-        FilterReply filterReply = masterLogFilter.decide(new ILoggingEvent() {
+        FilterReply filterReply = taskLogFilter.decide(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return Constants.THREAD_NAME_MASTER_SERVER;
+                return TaskConstants.TASK_APPID_LOG_FORMAT;
             }
 
             @Override
@@ -47,8 +51,7 @@ public class MasterLogFilterTest {
 
             @Override
             public String getMessage() {
-                return "master insert into queue success, task : shell2";
-//                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
+                return "raw script : echo 222";
             }
 
             @Override
@@ -58,12 +61,12 @@ public class MasterLogFilterTest {
 
             @Override
             public String getFormattedMessage() {
-                return "master insert into queue success, task : shell2";
+                return "raw script : echo 222";
             }
 
             @Override
             public String getLoggerName() {
-                return null;
+                return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
 
             @Override

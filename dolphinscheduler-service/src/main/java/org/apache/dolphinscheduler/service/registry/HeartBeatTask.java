@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.registry;
+package org.apache.dolphinscheduler.service.registry;
 
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
 

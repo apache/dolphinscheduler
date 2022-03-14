@@ -54,13 +54,6 @@
             <outputDirectory>.</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-log-server/target/logger-server</directory>
-            <includes>
-                <include>libs</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-        <fileSet>
             <directory>${basedir}/../dolphinscheduler-python-gateway/target/python-gateway</directory>
             <includes>
                 <include>libs</include>

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.common.log;
 
-import static org.apache.dolphinscheduler.server.log.SensitiveDataConverter.passwordHandler;
+import static org.apache.dolphinscheduler.common.log.SensitiveDataConverter.passwordHandler;
 
 import org.apache.dolphinscheduler.common.Constants;
 

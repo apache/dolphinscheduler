@@ -30,7 +30,6 @@ on:
       - 'dolphinscheduler-common/**'
       - 'dolphinscheduler-dao/**'
       - 'dolphinscheduler-rpc/**'
-      - 'dolphinscheduler-server/**'
   pull_request:
 
 concurrency:

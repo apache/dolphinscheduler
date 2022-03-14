@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
+import org.apache.dolphinscheduler.service.log.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
 import org.apache.commons.collections4.CollectionUtils;

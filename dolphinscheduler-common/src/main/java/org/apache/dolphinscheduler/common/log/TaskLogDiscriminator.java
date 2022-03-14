@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.common.log;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;

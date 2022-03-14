@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.common.log;
 
 import org.apache.dolphinscheduler.common.Constants;
 
