@@ -49,7 +49,8 @@ public final class CodeEditor {
 //        editor.click();
 
         Actions actions = new Actions(this.driver);
-        actions.moveToElement(editor).click().sendKeys(content).perform();
+        actions.moveToElement(editor).click().perform();
+        actions.moveToElement(editor).sendKeys(content).perform();
 
         return this;
     }

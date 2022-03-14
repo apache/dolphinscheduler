@@ -41,10 +41,6 @@ public final class ShellTaskForm extends TaskNodeForm {
     }
 
     public ShellTaskForm script(String script) {
-        JavascriptExecutor js = (JavascriptExecutor) this.driver;
-
-        js.executeScript("window.scrollBy(0,1000)");
-
         codeEditor().content(script);
 
         return this;
