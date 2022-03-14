@@ -31,6 +31,7 @@ export const useForm = () => {
       description: '',
       currentDir: '/'
     },
+    saving: false,
     rules: {
       name: {
         required: true,
@@ -53,6 +54,7 @@ export const useForm = () => {
       pid: -1,
       currentDir: '/'
     },
+    saving: false,
     rules: {
       name: {
         required: true,

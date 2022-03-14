@@ -67,6 +67,7 @@ export default defineComponent({
         onConfirm={this.handleFile}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
         <NForm
           rules={this.rules}

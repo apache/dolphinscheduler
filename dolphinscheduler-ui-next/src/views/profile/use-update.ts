@@ -23,21 +23,27 @@ export function useUpdate(state: any) {
   const userStore = useUserStore()
   const userInfo = userStore.userInfo as UserInfoRes
 
-  const handleUpdate = () => {
-    state.profileFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await updateUser({
-          userPassword: '',
-          id: userInfo.id,
-          userName: state.profileForm.username,
-          tenantId: userInfo.tenantId,
-          email: state.profileForm.email,
-          phone: state.profileForm.phone,
-          state: userInfo.state,
-          queue: userInfo.queue
-        })
-      }
-    })
+  const handleUpdate = async () => {
+    await state.profileFormRef.validate()
+
+    if (state.saving === true) return
+    state.saving = true
+
+    try {
+      await updateUser({
+        userPassword: '',
+        id: userInfo.id,
+        userName: state.profileForm.username,
+        tenantId: userInfo.tenantId,
+        email: state.profileForm.email,
+        phone: state.profileForm.phone,
+        state: userInfo.state,
+        queue: userInfo.queue
+      })
+      state.saving = false
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   return {

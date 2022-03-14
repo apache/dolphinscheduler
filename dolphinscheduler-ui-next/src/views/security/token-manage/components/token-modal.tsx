@@ -141,6 +141,7 @@ const TokenModal = defineComponent({
           }
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

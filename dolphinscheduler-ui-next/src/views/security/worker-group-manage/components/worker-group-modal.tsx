@@ -102,6 +102,7 @@ const WorkerGroupModal = defineComponent({
           confirmDisabled={!this.model.name || this.model.addrList.length < 1}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

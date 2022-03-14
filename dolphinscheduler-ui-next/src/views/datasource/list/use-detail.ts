@@ -56,30 +56,40 @@ export function useDetail(getFieldsValue: Function) {
   const testConnect = async () => {
     if (status.testing) return
     status.testing = true
-    const res = await connectDataSource(formatParams())
-    window.$message.success(
-      res
-        ? res.msg
-        : `${t('datasource.test_connect')} ${t('datasource.success')}`
-    )
-    status.testing = false
+    try {
+      const res = await connectDataSource(formatParams())
+      window.$message.success(
+        res
+          ? res.msg
+          : `${t('datasource.test_connect')} ${t('datasource.success')}`
+      )
+      status.testing = false
+    } catch (err) {
+      status.testing = false
+    }
   }
 
   const createOrUpdate = async (id?: number) => {
     const values = getFieldsValue()
+
     if (status.saving || !values.name) return false
     status.saving = true
 
-    if (PREV_NAME !== values.name) {
-      await verifyDataSourceName({ name: values.name })
+    try {
+      if (PREV_NAME !== values.name) {
+        await verifyDataSourceName({ name: values.name })
+      }
+
+      id
+        ? await updateDataSource(formatParams(), id)
+        : await createDataSource(formatParams())
+
+      status.saving = false
+      return true
+    } catch (err) {
+      status.saving = false
+      return false
     }
-
-    id
-      ? await updateDataSource(formatParams(), id)
-      : await createDataSource(formatParams())
-
-    status.saving = false
-    return true
   }
 
   return { status, queryById, testConnect, createOrUpdate }

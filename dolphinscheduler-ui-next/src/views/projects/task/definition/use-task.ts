@@ -62,23 +62,28 @@ export function useTask(projectCode: number) {
   const onTaskSave = async (data: INodeData) => {
     if (task.taskSaving) return
     task.taskSaving = true
-    if (data.id) {
-      data.code &&
-        (await updateWithUpstream(
+    try {
+      if (data.id) {
+        data.code &&
+          (await updateWithUpstream(
+            projectCode,
+            data.code,
+            formatParams({ ...data, code: data.code }, false)
+          ))
+      } else {
+        const taskCode = await getTaskCode()
+        await saveSingle(
           projectCode,
-          data.code,
-          formatParams({ ...data, code: data.code }, false)
-        ))
-    } else {
-      const taskCode = await getTaskCode()
-      await saveSingle(
-        projectCode,
-        formatParams({ ...data, code: taskCode }, true)
-      )
-    }
+          formatParams({ ...data, code: taskCode }, true)
+        )
+      }
 
-    task.taskSaving = false
-    return true
+      task.taskSaving = false
+      return true
+    } catch (err) {
+      task.taskSaving = false
+      return false
+    }
   }
 
   const onEditTask = async (row: IRecord, readonly: boolean) => {

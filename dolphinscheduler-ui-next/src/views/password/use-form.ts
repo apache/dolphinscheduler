@@ -28,6 +28,7 @@ export function useForm() {
       password: '',
       confirmPassword: ''
     },
+    saving: false,
     rules: {
       password: {
         trigger: ['input', 'blur'],

@@ -41,6 +41,7 @@ export function useModal(
       description: ref(''),
       generalOptions: []
     },
+    saving: false,
     rules: {
       groupName: {
         required: true,
@@ -83,14 +84,21 @@ export function useModal(
     return state
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.alertGroupFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitAlertGroupModal() : updateAlertGroupModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.alertGroupFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0
+        ? await submitAlertGroupModal()
+        : await updateAlertGroupModal()
+
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitAlertGroupModal = () => {

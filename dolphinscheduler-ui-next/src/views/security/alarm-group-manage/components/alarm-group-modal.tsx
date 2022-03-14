@@ -110,6 +110,7 @@ const AlarmGroupModal = defineComponent({
           confirmDisabled={
             !this.model.groupName || this.model.alertInstanceIds.length < 1
           }
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

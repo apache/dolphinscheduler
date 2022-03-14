@@ -37,6 +37,7 @@ export function useForm() {
   const state = reactive({
     uploadFormRef: ref(),
     uploadForm: defaultValue(),
+    saving: false,
     rules: {
       name: {
         required: true,

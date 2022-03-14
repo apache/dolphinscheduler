@@ -33,6 +33,7 @@ export const useForm = () => {
       description: '',
       resourceId: -1
     },
+    saving: false,
     rules: {
       type: {
         required: true,

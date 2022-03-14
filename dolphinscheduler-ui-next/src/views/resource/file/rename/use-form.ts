@@ -36,6 +36,7 @@ export function useForm(name: string, description: string) {
   const state = reactive({
     renameFormRef: ref(),
     renameForm: defaultValue(name, description),
+    saving: false,
     rules: {
       name: {
         required: true,

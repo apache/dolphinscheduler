@@ -40,6 +40,7 @@ export function useModal(
       limitsCpu: ref(''),
       limitsMemory: ref('')
     },
+    saving: false,
     rules: {
       namespace: {
         required: true,
@@ -62,14 +63,20 @@ export function useModal(
     }
   })
 
-  const handleValidate = (statusRef: number) => {
-    variables.k8sNamespaceFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitK8SNamespaceModal() : updateK8SNamespaceModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.k8sNamespaceFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0
+        ? await submitK8SNamespaceModal()
+        : await updateK8SNamespaceModal()
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitK8SNamespaceModal = () => {

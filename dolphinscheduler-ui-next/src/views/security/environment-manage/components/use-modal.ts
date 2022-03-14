@@ -41,6 +41,7 @@ export function useModal(
       workerGroups: ref<Array<string>>([]),
       generalOptions: []
     },
+    saving: false,
     rules: {
       name: {
         required: true,
@@ -90,14 +91,20 @@ export function useModal(
     return state
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.environmentFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitEnvironmentModal() : updateEnvironmentModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.environmentFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0
+        ? await submitEnvironmentModal()
+        : await updateEnvironmentModal()
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitEnvironmentModal = () => {

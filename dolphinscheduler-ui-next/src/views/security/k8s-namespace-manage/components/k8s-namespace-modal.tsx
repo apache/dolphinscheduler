@@ -115,6 +115,7 @@ const K8sNamespaceModal = defineComponent({
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
           confirmDisabled={!this.model.namespace || !this.model.k8s}
+          confirmLoading={this.saving}
         >
           {{
             default: () => (
