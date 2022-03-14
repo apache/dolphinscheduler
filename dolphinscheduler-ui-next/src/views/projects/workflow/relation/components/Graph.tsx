@@ -117,7 +117,7 @@ const GraphChart = defineComponent({
           },
           symbol: 'roundRect',
           symbolSize: 70,
-          roam: false,
+          roam: true,
           label: {
             show: props.labelShow,
             formatter: (val: any) => {
