@@ -19,10 +19,8 @@ import { axios } from '@/service/service'
 import {
   CodeReq,
   CodesReq,
-  FileReq,
   NameReq,
   ReleaseStateReq,
-  VersionReq,
   LimitReq,
   PageReq,
   ListReq,
@@ -233,8 +231,8 @@ export function deleteVersion(
 }
 
 export function viewTree(
-  code: CodeReq,
-  processCode: CodeReq,
+  code: number,
+  processCode: number,
   params: LimitReq
 ): any {
   return axios({

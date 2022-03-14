@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
@@ -398,6 +399,10 @@ public class TaskNode {
 
     public List<PreviousTaskNode> getPreTaskNodeList() {
         return preTaskNodeList;
+    }
+
+    public boolean isBlockingTask() {
+        return TASK_TYPE_BLOCKING.equalsIgnoreCase(this.getType());
     }
 
     public void setPreTaskNodeList(List<PreviousTaskNode> preTaskNodeList) {

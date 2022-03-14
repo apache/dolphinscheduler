@@ -64,6 +64,7 @@ jobs:
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
+    if: false
     needs: build
     runs-on: ubuntu-latest
     strategy:

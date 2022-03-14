@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
@@ -262,6 +263,7 @@ public class TaskInstance implements Serializable {
      * delay execution time.
      */
     private int delayTime;
+
 
     /**
      * task params
@@ -594,6 +596,10 @@ public class TaskInstance implements Serializable {
 
     public boolean isSwitchTask() {
         return TASK_TYPE_SWITCH.equalsIgnoreCase(this.taskType);
+    }
+
+    public boolean isBlockingTask() {
+        return TASK_TYPE_BLOCKING.equalsIgnoreCase(this.taskType);
     }
 
     /**

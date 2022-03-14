@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NLog } from 'naive-ui'
 import { useModal } from './use-modal'

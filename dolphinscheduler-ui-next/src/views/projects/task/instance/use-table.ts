@@ -23,7 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip } from 'naive-ui'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
@@ -31,7 +31,7 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute } from 'vue-router'
-import { downloadFile } from '@/service/service'
+import { parseTime } from '@/utils/common'
 import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
 
 export function useTable() {
@@ -60,7 +60,8 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.task.task_name'),
@@ -144,10 +145,13 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(CheckCircleOutlined)
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(CheckCircleOutlined)
+                          })
                       }
                     ),
-                  default: () => t('project.task.serial_wait')
+                  default: () => t('project.task.forced_success')
                 }
               ),
               h(
@@ -164,7 +168,10 @@ export function useTable() {
                         onClick: () => handleLog(row)
                       },
                       {
-                        icon: () => h(AlignLeftOutlined)
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(AlignLeftOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.view_log')
@@ -184,7 +191,8 @@ export function useTable() {
                         onClick: () => downloadLog(row.id)
                       },
                       {
-                        icon: () => h(DownloadOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DownloadOutlined) })
                       }
                     ),
                   default: () => t('project.task.download_log')
@@ -230,10 +238,10 @@ export function useTable() {
       host: params.host,
       stateType: params.stateType,
       startDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: params.executorName,
       processInstanceName: params.processInstanceName
@@ -242,18 +250,20 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
+          variables.tableData = res.totalList.map((item, unused) => {
             item.submitTime = format(
-              new Date(item.submitTime),
+              parseTime(item.submitTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             item.startTime = format(
-              new Date(item.startTime),
+              parseTime(item.startTime),
               'yyyy-MM-dd HH:mm:ss'
             )
-            item.endTime = format(new Date(item.endTime), 'yyyy-MM-dd HH:mm:ss')
+            item.endTime = format(
+              parseTime(item.endTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
             return {
-              index: index + 1,
               ...item
             }
           }) as any

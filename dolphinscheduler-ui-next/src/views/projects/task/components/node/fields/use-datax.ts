@@ -17,7 +17,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
-import { find, indexOf } from 'lodash'
+import { find } from 'lodash'
 import { TypeReq } from '@/service/modules/data-source/types'
 import { queryDataSourceList } from '@/service/modules/data-source'
 
@@ -171,7 +171,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       datasourceOptions.value.push({ label: item.name, value: String(item.id) })
     })
     if (datasourceOptions.value && model.dataSource) {
-      let item = find(datasourceOptions.value, {
+      const item = find(datasourceOptions.value, {
         value: String(model.dataSource)
       })
       if (!item) {
@@ -191,7 +191,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       })
     })
     if (destinationDatasourceOptions.value && model.dataTarget) {
-      let item = find(destinationDatasourceOptions.value, {
+      const item = find(destinationDatasourceOptions.value, {
         value: String(model.dataTarget)
       })
       if (!item) {

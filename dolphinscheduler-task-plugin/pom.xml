@@ -49,5 +49,6 @@
         <module>dolphinscheduler-task-switch</module>
         <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-emr</module>
+        <module>dolphinscheduler-task-blocking</module>
     </modules>
 </project>

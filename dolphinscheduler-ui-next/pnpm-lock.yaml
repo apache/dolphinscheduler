@@ -39,7 +39,7 @@ specifiers:
   eslint-plugin-vue: ^8.5.0
   lodash: ^4.17.21
   monaco-editor: ^0.31.1
-  naive-ui: 2.25.1
+  naive-ui: ^2.26.0
   nprogress: ^0.2.0
   pinia: ^2.0.11
   pinia-plugin-persistedstate: ^1.2.2
@@ -66,7 +66,7 @@ dependencies:
   echarts: 5.3.0
   lodash: 4.17.21
   monaco-editor: 0.31.1
-  naive-ui: 2.25.1_vue@3.2.31
+  naive-ui: 2.26.0_vue@3.2.31
   nprogress: 0.2.0
   pinia: 2.0.11_typescript@4.5.5+vue@3.2.31
   pinia-plugin-persistedstate: 1.2.2_pinia@2.0.11
@@ -3410,10 +3410,10 @@ packages:
     dev: true
     optional: true
 
-  /naive-ui/2.25.1_vue@3.2.31:
+  /naive-ui/2.26.0_vue@3.2.31:
     resolution:
       {
-        integrity: sha512-s/u0X8PO6AVj/XjCYVfYwPdXTyVDavvYOoIiBGBBpWZXuw5IcfRiSSYUHZOf4mdyLG7tafU9I8vpP1vdpBMNgQ==
+        integrity: sha512-4+78iqpQs1t8Xlq3Hrk1eSsm17d6ZScMNvnyo+KAiYdAWCfEsIdKb6ulkPGu7T0hpWL5A3TctJ5ioSbNlbN4LA==
       }
     peerDependencies:
       vue: ^3.0.0
@@ -3436,7 +3436,7 @@ packages:
       vfonts: 0.0.3
       vooks: 0.2.12_vue@3.2.31
       vue: 3.2.31
-      vueuc: 0.4.26_vue@3.2.31
+      vueuc: 0.4.27_vue@3.2.31
     dev: false
 
   /nanoid/3.3.1:
@@ -4833,10 +4833,10 @@ packages:
       '@vue/shared': 3.2.31
     dev: false
 
-  /vueuc/0.4.26_vue@3.2.31:
+  /vueuc/0.4.27_vue@3.2.31:
     resolution:
       {
-        integrity: sha512-IK6TV4468k7Hpj1SXXPYelT/aYqmfa/SYTLFospwJ/uMebRExS1fh5tx6ZT3fSA0OkmCOHmmi2OGke+eSseAgw==
+        integrity: sha512-wkIM6F1VT9cuzC2YOIzktPcTJ3eI8FoQ39KazAKwcdPv3GcXZGO1vBZc3TspBwap0AIn9eF8dxvQAW80yxhbHg==
       }
     peerDependencies:
       vue: ^3.0.11

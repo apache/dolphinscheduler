@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   DeleteOutlined,
@@ -46,7 +46,8 @@ export function useTable(onEdit: Function) {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.task.task_name'),
@@ -142,7 +143,8 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('project.task.edit')
@@ -168,7 +170,8 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(DragOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DragOutlined) })
                       }
                     ),
                   default: () => t('project.task.move')
@@ -191,7 +194,10 @@ export function useTable(onEdit: Function) {
                         }
                       },
                       {
-                        icon: () => h(ExclamationCircleOutlined)
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ExclamationCircleOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.version')
@@ -222,7 +228,10 @@ export function useTable(onEdit: Function) {
                                 row.processReleaseState === 'ONLINE'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('project.task.delete')
@@ -271,7 +280,7 @@ export function useTable(onEdit: Function) {
     const { state } = useAsyncState(
       queryTaskDefinitionListPaging({ ...params }, { projectCode }).then(
         (res: TaskDefinitionRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
+          variables.tableData = res.totalList.map((item, unused) => {
             if (Object.keys(item.upstreamTaskMap).length > 0) {
               item.upstreamTaskMap = Object.keys(item.upstreamTaskMap).map(
                 (code) => item.upstreamTaskMap[code]
@@ -281,7 +290,6 @@ export function useTable(onEdit: Function) {
             }
 
             return {
-              index: index + 1,
               ...item
             }
           }) as any

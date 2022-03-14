@@ -18,7 +18,14 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm, NEllipsis } from 'naive-ui'
+import {
+  NSpace,
+  NTooltip,
+  NButton,
+  NPopconfirm,
+  NEllipsis,
+  NIcon
+} from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -40,144 +47,8 @@ export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const columns: TableColumns<any> = [
-    {
-      title: t('project.workflow.id'),
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('project.workflow.workflow_name'),
-      key: 'processDefinitionName',
-      width: 200,
-      render: (_row) =>
-        h(
-          NEllipsis,
-          { style: 'max-width: 200px' },
-          {
-            default: () => _row.processDefinitionName
-          }
-        )
-    },
-    {
-      title: t('project.workflow.start_time'),
-      key: 'startTime'
-    },
-    {
-      title: t('project.workflow.end_time'),
-      key: 'endTime'
-    },
-    {
-      title: t('project.workflow.crontab'),
-      key: 'crontab'
-    },
-    {
-      title: t('project.workflow.failure_strategy'),
-      key: 'failureStrategy'
-    },
-    {
-      title: t('project.workflow.status'),
-      key: 'releaseState',
-      render: (_row) =>
-        _row.releaseState === 'ONLINE'
-          ? t('project.workflow.up_line')
-          : t('project.workflow.down_line')
-    },
-    {
-      title: t('project.workflow.create_time'),
-      key: 'createTime'
-    },
-    {
-      title: t('project.workflow.update_time'),
-      key: 'updateTime'
-    },
-    {
-      title: t('project.workflow.operation'),
-      key: 'operation',
-      fixed: 'right',
-      className: styles.operation,
-      render: (row) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NButton,
-              {
-                circle: true,
-                type: 'info',
-                size: 'tiny',
-                disabled: row.releaseState === 'ONLINE',
-                onClick: () => {
-                  handleEdit(row)
-                }
-              },
-              {
-                icon: () => h(EditOutlined)
-              }
-            ),
-            h(
-              NButton,
-              {
-                circle: true,
-                type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
-                size: 'tiny',
-                onClick: () => {
-                  handleReleaseState(row)
-                }
-              },
-              {
-                icon: () =>
-                  h(
-                    row.releaseState === 'ONLINE'
-                      ? ArrowDownOutlined
-                      : ArrowUpOutlined
-                  )
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleDelete(row.id)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'error',
-                            size: 'tiny'
-                          },
-                          {
-                            icon: () => h(DeleteOutlined)
-                          }
-                        ),
-                      default: () => t('project.workflow.delete')
-                    }
-                  ),
-                default: () => t('project.workflow.delete_confirm')
-              }
-            )
-          ]
-        })
-      }
-    }
-  ]
-
-  const handleEdit = (row: any) => {
-    variables.showRef = true
-    variables.row = row
-  }
-
   const variables = reactive({
-    columns,
+    columns: [],
     row: {},
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
@@ -187,6 +58,163 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false)
   })
+
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        width: 50,
+        render: (row: any, index: number) => index + 1
+      },
+      {
+        title: t('project.workflow.workflow_name'),
+        key: 'processDefinitionName',
+        width: 200,
+        render: (row: any) =>
+          h(
+            NEllipsis,
+            { style: 'max-width: 200px' },
+            {
+              default: () => row.processDefinitionName
+            }
+          )
+      },
+      {
+        title: t('project.workflow.start_time'),
+        key: 'startTime'
+      },
+      {
+        title: t('project.workflow.end_time'),
+        key: 'endTime'
+      },
+      {
+        title: t('project.workflow.crontab'),
+        key: 'crontab'
+      },
+      {
+        title: t('project.workflow.failure_strategy'),
+        key: 'failureStrategy'
+      },
+      {
+        title: t('project.workflow.status'),
+        key: 'releaseState',
+        render: (row: any) =>
+          row.releaseState === 'ONLINE'
+            ? t('project.workflow.up_line')
+            : t('project.workflow.down_line')
+      },
+      {
+        title: t('project.workflow.create_time'),
+        key: 'createTime'
+      },
+      {
+        title: t('project.workflow.update_time'),
+        key: 'updateTime'
+      },
+      {
+        title: t('project.workflow.operation'),
+        key: 'operation',
+        fixed: 'right',
+        className: styles.operation,
+        render: (row: any) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        disabled: row.releaseState === 'ONLINE',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () => h(EditOutlined)
+                      }
+                    ),
+                  default: () => t('project.workflow.edit')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                        size: 'small',
+                        onClick: () => {
+                          handleReleaseState(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(
+                            row.releaseState === 'ONLINE'
+                              ? ArrowDownOutlined
+                              : ArrowUpOutlined
+                          )
+                      }
+                    ),
+                  default: () =>
+                    row.releaseState === 'ONLINE'
+                      ? t('project.workflow.down_line')
+                      : t('project.workflow.up_line')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row.id)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'small'
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('project.workflow.delete')
+                      }
+                    ),
+                  default: () => t('project.workflow.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ]
+  }
+
+  const handleEdit = (row: any) => {
+    variables.showRef = true
+    variables.row = row
+  }
 
   const getTableData = (params: ISearchParam) => {
     const definitionCode = Number(
@@ -240,6 +268,7 @@ export function useTable() {
 
   return {
     variables,
+    createColumns,
     getTableData
   }
 }

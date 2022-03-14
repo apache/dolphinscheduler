@@ -25,6 +25,7 @@ type IDataBase =
   | 'SQLSERVER'
   | 'DB2'
   | 'PRESTO'
+  | 'REDSHIFT'
 
 interface IDataSource {
   id?: number

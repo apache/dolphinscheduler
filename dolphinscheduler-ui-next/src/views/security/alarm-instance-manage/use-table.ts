@@ -21,6 +21,7 @@ import {
   deleteAlertPluginInstance
 } from '@/service/modules/alert-plugin'
 import { format } from 'date-fns'
+import { parseTime } from '@/utils/common'
 import type { IRecord } from './types'
 
 export function useTable() {
@@ -47,10 +48,10 @@ export function useTable() {
       if (!totalList) throw Error()
       data.list = totalList.map((record: IRecord) => {
         record.createTime = record.createTime
-          ? format(new Date(record.createTime), 'yyyy-MM-dd HH:mm:ss')
+          ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')
           : ''
         record.updateTime = record.updateTime
-          ? format(new Date(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
+          ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
           : ''
         return record
       })
@@ -73,7 +74,7 @@ export function useTable() {
 
   const deleteRecord = async (id: number) => {
     try {
-      const res = await deleteAlertPluginInstance(id)
+      const ignored = await deleteAlertPluginInstance(id)
       updateList()
     } catch (e) {
       window.$message.error((e as Error).message)
