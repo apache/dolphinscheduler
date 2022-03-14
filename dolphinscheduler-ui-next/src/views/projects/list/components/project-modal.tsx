@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from './use-form'
 import Modal from '@/components/modal'
@@ -65,7 +65,9 @@ const ProjectModal = defineComponent({
       () => {
         if (props.statusRef === 0) {
           variables.model.projectName = ''
-          variables.model.userName = (userStore.getUserInfo as UserInfoRes).userName
+          variables.model.userName = (
+            userStore.getUserInfo as UserInfoRes
+          ).userName
           variables.model.description = ''
         } else {
           variables.model.projectName = props.row.name
