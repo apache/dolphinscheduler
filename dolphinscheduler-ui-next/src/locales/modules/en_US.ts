@@ -137,7 +137,8 @@ const profile = {
   state_tips: 'Please choose your state',
   enable: 'Enable',
   disable: 'Disable',
-  timezone_success: 'Time zone updated successful'
+  timezone_success: 'Time zone updated successful',
+  please_select_timezone: 'Choose timeZone'
 }
 
 const monitor = {

@@ -29,7 +29,7 @@ export function useDropDown(chooseVal: any) {
 
   const userInfo = userStore.userInfo as UserInfoRes
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (key: string) => {
     updateUser({
       userPassword: '',
       id: userInfo.id,
@@ -38,10 +38,10 @@ export function useDropDown(chooseVal: any) {
       email: '',
       phone: userInfo.phone,
       state: userInfo.state,
-      timeZone: value
+      timeZone: key
     }).then(() => {
-      chooseVal.value = value
-      timezoneStore.setTimezone(value as string)
+      chooseVal.value = key
+      timezoneStore.setTimezone(key as string)
       window.$message.success(t('profile.timezone_success'))
     })
   }
