@@ -32,12 +32,16 @@ import {
   EditOutlined
 } from '@vicons/antd'
 import type { Router } from 'vue-router'
+import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
+import { useTimezoneStore } from '@/store/timezone/timezone'
 import styles from '../index.module.scss'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const timezoneStore = useTimezoneStore()
+  const timeZone = timezoneStore.getTimezone
 
   const variables = reactive({
     columns: [],
@@ -50,6 +54,16 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false)
   })
+
+  const renderTime = (time: string) => {
+    const utc = format(new Date(time), 'zzz', {
+      timeZone
+    }).replace('GMT', 'UTC')
+    return h('span', [
+      h('span', null, time),
+      h('span', { style: 'color: #1890ff; margin-left: 5px' }, `(${utc})`)
+    ])
+  }
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -74,11 +88,13 @@ export function useTable() {
       },
       {
         title: t('project.workflow.start_time'),
-        key: 'startTime'
+        key: 'startTime',
+        render: (row: any) => renderTime(row.startTime)
       },
       {
         title: t('project.workflow.end_time'),
-        key: 'endTime'
+        key: 'endTime',
+        render: (row: any) => renderTime(row.endTime)
       },
       {
         title: t('project.workflow.crontab'),
