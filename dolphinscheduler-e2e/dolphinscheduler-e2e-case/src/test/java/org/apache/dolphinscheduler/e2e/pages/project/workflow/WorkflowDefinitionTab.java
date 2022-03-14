@@ -23,6 +23,7 @@ import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -34,17 +35,21 @@ import java.util.stream.Collectors;
 
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
-    @FindBy(id = "btnCreateProcess")
+    @FindBy(className = "btn-create-process")
     private WebElement buttonCreateProcess;
+
     @FindBy(className = "select-all")
     private WebElement checkBoxSelectAll;
+
     @FindBy(className = "btn-delete-all")
     private WebElement buttonDeleteAll;
+
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
+
     @FindBy(className = "items")
     private List<WebElement> workflowList;
 
@@ -61,8 +66,8 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     public WorkflowDefinitionTab publish(String workflow) {
         workflowList()
             .stream()
-            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").equals(workflow))
-            .flatMap(it -> it.findElements(By.className("button-publish")).stream())
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerHTML").equals(workflow))
+            .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Cannot find publish button in workflow definition"))
@@ -74,8 +79,8 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     public WorkflowRunDialog run(String workflow) {
         workflowList()
             .stream()
-            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").equals(workflow))
-            .flatMap(it -> it.findElements(By.className("button-run")).stream())
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerHTML").equals(workflow))
+            .flatMap(it -> it.findElements(By.className("btn-run")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Cannot find run button in workflow definition"))
@@ -88,7 +93,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
         final Supplier<List<WebElement>> cancelButtons = () ->
             workflowList()
                 .stream()
-                .flatMap(it -> it.findElements(By.className("btn-cancel-publish")).stream())
+                .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
                 .filter(WebElement::isDisplayed)
                 .collect(Collectors.toList());
 
@@ -109,12 +114,8 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
         checkBoxSelectAll().click();
         buttonDeleteAll().click();
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button is displayed"))
-            .click();
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }

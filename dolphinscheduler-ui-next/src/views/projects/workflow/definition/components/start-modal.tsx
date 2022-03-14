@@ -391,12 +391,13 @@ export default defineComponent({
                       text
                       type='error'
                       onClick={() => this.removeStartParams(index)}
+                      class='btn-cancel'
                     >
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
                     </NButton>
-                    <NButton text type='primary' onClick={this.addStartParams}>
+                    <NButton text type='primary' onClick={this.addStartParams} class='btn-submit'>
                       <NIcon>
                         <PlusCircleOutlined />
                       </NIcon>

@@ -172,6 +172,8 @@ const NodeDetailModal = defineComponent({
         confirmDisabled={props.readonly}
         onCancel={onCancel}
         headerLinks={headerLinks}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
       >
         <Detail
           ref={detailRef}

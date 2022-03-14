@@ -181,18 +181,20 @@ export default defineComponent({
           ref={formRef}
         >
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput v-model:value={formValue.value.name} />
+            <NInput v-model:value={formValue.value.name} class='input-name'/>
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
               type='textarea'
               v-model:value={formValue.value.description}
+              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('project.dag.tenant')} path='tenantCode'>
             <NSelect
               options={tenantsDropdown.value}
               v-model:value={formValue.value.tenantCode}
+              class='btn-select-tenant-code'
             />
           </NFormItem>
           <NFormItem label={t('project.dag.timeout_alert')} path='timeoutFlag'>
@@ -218,6 +220,7 @@ export default defineComponent({
               preset='pair'
               key-placeholder={t('project.dag.key')}
               value-placeholder={t('project.dag.value')}
+                class='input-global-params'
             />
           </NFormItem>
           {props.definition && (

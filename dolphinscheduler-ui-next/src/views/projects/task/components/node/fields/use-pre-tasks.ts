@@ -43,6 +43,7 @@ export function usePreTasks(model: { [field: string]: any }): IJsonItem {
     type: 'select',
     field: 'preTasks',
     span: 24,
+    class: 'pre-tasks-model',
     name: t('project.node.pre_tasks'),
     props: {
       multiple: true,
