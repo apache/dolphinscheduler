@@ -103,7 +103,7 @@ class WorkflowE2ETest {
     void testCreateWorkflow() {
         final String workflow = "test-workflow-1";
 
-        final WorkflowDefinitionTab workflowDefinitionPage =
+        WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
