@@ -32,6 +32,7 @@ jobs:
   build:
     name: E2E-Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
         with:
@@ -66,6 +67,7 @@ jobs:
     name: ${{ matrix.case.name }}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       matrix:
         case:
@@ -139,6 +141,7 @@ jobs:
   result:
     name: E2E
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [ e2e ]
     steps:
       - name: Status
