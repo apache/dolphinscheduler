@@ -41,7 +41,7 @@ public final class ShellTaskForm extends TaskNodeForm {
     }
 
     public ShellTaskForm script(String script) {
-        codeEditor().content(script);
+        codeEditor.content(script);
 
         return this;
     }
