@@ -93,7 +93,7 @@ public final class WorkflowSaveDialog {
     }
 
     public WorkflowSaveDialog addGlobalParam(String key, String value) {
-        final int len = globalParamsItems().size();
+        final int len = globalParamsItems().get(0).findElements(new By.ByTagName("input")).size();
 
         final WebDriver driver = parent().driver();
 
