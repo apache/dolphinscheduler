@@ -28,7 +28,7 @@ import org.openqa.selenium.WebDriver;
 
 @Getter
 public final class ShellTaskForm extends TaskNodeForm {
-    private CodeEditor codeEditor;
+    CodeEditor codeEditor;
 
     private WebDriver driver;
 
