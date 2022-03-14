@@ -34,12 +34,10 @@ export function useDatasource(
     if (loading.value) return
     loading.value = true
     const result = await queryDataSourceList({ type })
-    dataSourceList.value = result.map(
-      (item: { name: string; id: number }) => ({
-        label: item.name,
-        value: item.id
-      })
-    )
+    dataSourceList.value = result.map((item: { name: string; id: number }) => ({
+      label: item.name,
+      value: item.id
+    }))
     loading.value = false
   }
   onMounted(() => {

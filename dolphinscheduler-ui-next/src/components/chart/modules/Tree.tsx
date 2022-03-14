@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, ref, watch, reactive } from 'vue'
+import { defineComponent, PropType, ref, watch, reactive } from 'vue'
 import initChart from '@/components/chart'
 import type { Ref } from 'vue'
 import { IChartDataItem } from '@/components/chart/modules/types'

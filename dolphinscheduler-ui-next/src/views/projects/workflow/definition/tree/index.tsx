@@ -27,7 +27,7 @@ import { Router, useRouter } from 'vue-router'
 import { viewTree } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { find } from 'lodash'
-import { ITaskTypeNodeOption, ITaskStateOption } from './types'
+import { ITaskTypeNodeOption } from './types'
 
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
@@ -202,14 +202,14 @@ export default defineComponent({
     const initChartData = (node: any, newNode: any) => {
       newNode.children = []
       node?.children.map((child: any) => {
-        let newChild = {}
+        const newChild = {}
         initChartData(child, newChild)
         newNode.children.push(newChild)
       })
 
       newNode.name = node.name
       newNode.value = node.name === 'DAG' ? 'DAG' : node?.type
-      let taskTypeNodeOption = find(taskTypeNodeOptions.value, {
+      const taskTypeNodeOption = find(taskTypeNodeOptions.value, {
         taskType: newNode.value
       })
       if (taskTypeNodeOption) {
@@ -259,7 +259,7 @@ export default defineComponent({
     }
 
     const getWorkflowTreeData = async (limit: number) => {
-      if (projectCode && definitionCode) {
+      if (projectCode.value && definitionCode) {
         const res = await viewTree(projectCode.value, definitionCode.value, {
           limit: limit
         })
@@ -331,7 +331,7 @@ export default defineComponent({
           <NSpace align='center'>
             {taskTypeNodeOptions
               .filter((option: any) => option.image)
-              .map((option: any, index: number) => (
+              .map((option: any, unused: number) => (
                 <NButton text size='tiny' color={option.color}>
                   <NImage width='20' src={option.image} />
                   {option.taskType}

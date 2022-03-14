@@ -18,14 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import {
-  NSpace,
-  NTooltip,
-  NButton,
-  NPopconfirm,
-  NEllipsis,
-  NIcon
-} from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm, NEllipsis } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -39,7 +32,6 @@ import {
   EditOutlined
 } from '@vicons/antd'
 import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { ISearchParam } from './types'
 import styles from '../index.module.scss'
 
@@ -253,15 +245,14 @@ export function useTable() {
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
-    deleteScheduleById(id, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteScheduleById(id, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
+    })
   }
 
   return {

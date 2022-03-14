@@ -172,21 +172,23 @@ export function useTable(
   }
 
   const handleSwitchVersion = (version: number) => {
-    switchVersion(variables.projectCode, variables.row.code, version)
-      .then(() => {
+    switchVersion(variables.projectCode, variables.row.code, version).then(
+      () => {
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
         getTableData(variables.row)
-      })
+      }
+    )
   }
 
   const handleDeleteVersion = (version: number) => {
-    deleteVersion(variables.projectCode, variables.row.code, version)
-      .then(() => {
+    deleteVersion(variables.projectCode, variables.row.code, version).then(
+      () => {
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
         getTableData(variables.row)
-      })
+      }
+    )
   }
 
   return {

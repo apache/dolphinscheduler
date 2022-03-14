@@ -17,7 +17,14 @@
 
 import { defineComponent, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
-import { NInput, NButton, NSwitch, NForm, NFormItem, useMessage } from 'naive-ui'
+import {
+  NInput,
+  NButton,
+  NSwitch,
+  NForm,
+  NFormItem,
+  useMessage
+} from 'naive-ui'
 import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'

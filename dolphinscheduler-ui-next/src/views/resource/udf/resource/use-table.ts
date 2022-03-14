@@ -187,7 +187,7 @@ export function useTable() {
                               circle: true,
                               type: 'error',
                               size: 'tiny',
-                              class: 'btn-delete',
+                              class: 'btn-delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)
