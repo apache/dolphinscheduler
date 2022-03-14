@@ -81,6 +81,7 @@ export default defineComponent({
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
         <NForm
           rules={this.rules}

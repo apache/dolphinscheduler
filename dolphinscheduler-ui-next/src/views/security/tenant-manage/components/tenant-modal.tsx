@@ -103,6 +103,7 @@ const TenantModal = defineComponent({
           onConfirm={this.confirmModal}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (
