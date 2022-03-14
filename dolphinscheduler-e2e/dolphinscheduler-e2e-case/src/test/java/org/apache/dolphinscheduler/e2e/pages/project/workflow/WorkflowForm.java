@@ -76,7 +76,6 @@ public final class WorkflowForm {
 
         switch (type) {
             case SHELL:
-                driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
                 return (T) new ShellTaskForm(this);
             case SUB_PROCESS:
                 return (T) new SubWorkflowTaskForm(this);
