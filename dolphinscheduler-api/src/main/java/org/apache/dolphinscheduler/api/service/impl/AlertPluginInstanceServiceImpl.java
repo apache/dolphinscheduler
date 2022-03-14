@@ -91,8 +91,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         }
 
         int i = alertPluginInstanceMapper.insert(alertPluginInstance);
-
         if (i > 0) {
+            result.put(Constants.DATA_LIST, alertPluginInstance);
             putMsg(result, Status.SUCCESS);
             return result;
         }
