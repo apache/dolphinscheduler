@@ -32,6 +32,7 @@ export const useForm = () => {
       name: '',
       file: ''
     },
+    saving: false,
     importRules: {
       file: {
         required: true,
@@ -65,7 +66,8 @@ export const useForm = () => {
       startParams: null,
       expectedParallelismNumber: '',
       dryRun: 0
-    }
+    },
+    saving: false
   })
 
   const timingState = reactive({
@@ -83,7 +85,8 @@ export const useForm = () => {
       warningGroupId: '',
       workerGroup: 'default',
       environmentCode: null
-    }
+    },
+    saving: false
   })
   return {
     importState,
