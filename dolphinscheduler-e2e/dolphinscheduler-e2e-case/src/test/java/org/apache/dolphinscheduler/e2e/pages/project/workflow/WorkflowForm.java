@@ -52,7 +52,7 @@ public final class WorkflowForm {
     @FindBy(className = "graph-format")
     private WebElement formatBtn;
 
-    @FindBy(id = "btnSave")
+    @FindBy(className = "btn-save")
     private WebElement buttonSave;
 
     public WorkflowForm(WebDriver driver) {
