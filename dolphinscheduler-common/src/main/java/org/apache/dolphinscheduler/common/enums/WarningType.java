@@ -17,7 +17,13 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.Arrays;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.google.common.base.Functions;
 
 /**
  * types for whether to send warning when process ending;
@@ -49,5 +55,15 @@ public enum WarningType {
 
     public String getDescp() {
         return descp;
+    }
+
+    private static final Map<String, WarningType> WARNING_TYPE_MAP =
+        Arrays.stream(WarningType.values()).collect(toMap(WarningType::getDescp, Functions.identity()));
+
+    public static WarningType of(String descp) {
+        if (WARNING_TYPE_MAP.containsKey(descp)) {
+            return WARNING_TYPE_MAP.get(descp);
+        }
+        return null;
     }
 }
