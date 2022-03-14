@@ -60,7 +60,53 @@ pydolphinscheduler tasks object, we use tasks to define exact job we want Dolphi
 we only support `shell` task to execute shell task. [This link][all-task] list all tasks support in DolphinScheduler
 and would be implemented in the further.
 
-## Code Style
+## Test Your Code
+
+Linting and tests is very important for open source project, so we pay more attention to it. We have continuous
+integration service run by GitHub Action to test whether the patch is good or not, which you could jump to
+section [With GitHub Action](#with-github-action) see more detail.
+
+And to make more convenience to local tests, we also have the way to run your [test automated with tox](#automated-testing-with-tox)
+locally. It is helpful when your try to find out the detail when continuous integration in GitHub Action failed,
+or you have a great patch and want to test local first.
+
+Besides [automated testing with tox](#automated-testing-with-tox) locally, we also have a [manual way](#manually)
+run tests. And it is scattered commands to reproduce each step of the integration test we told about.
+
+* Remote
+  * [With GitHub Action](#with-github-action)
+* Local
+  * [Automated Testing With tox](#automated-testing-with-tox)
+  * [Manually](#manually)
+
+### With GitHub Action
+
+GitHub Action test in various environment for pydolphinscheduler, including different python version in
+`3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`. It will trigger and run automatically when you
+submit pull requests to `apache/dolphinscheduler`. 
+
+### Automated Testing With tox
+
+[tox](https://tox.wiki) is a package aims to automate and standardize testing in Python, both our continuous
+integration and local test use it to run actual task. To use it, you should install it first
+
+```shell
+python -m pip install --upgrade tox
+```
+
+After installation, you could run a single command to run all the tests, it is almost like test in GitHub Action
+but not so much different environment.
+
+```shell
+tox -e local-ci
+```
+
+It will take a while when you run it the first time, because it has to install dependencies and make some prepare,
+and the next time you run it will be faster.
+
+### Manually
+
+#### Code Style
 
 We use [isort][isort] to automatically keep Python imports alphabetically, and use [Black][black] for code
 formatter and [Flake8][flake8] for pep8 checker. If you use [pycharm][pycharm]or [IntelliJ IDEA][idea],
@@ -74,38 +120,46 @@ GitHub, you could also run static check locally.
 # but Flake8 just hint when code style not match pep8
 
 # Run Isort
-isort .
+python -m isort .
 
 # Run Black
-black .
+python -m black .
 
 # Run Flake8
-flake8
+python -m flake8
 ```
 
-## Testing
+#### Testing
 
-pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
-pull request or commit to dev branch, with python version `3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`.
-
-To test locally, you could directly run pytest after set `PYTHONPATH` 
+pydolphinscheduler using [pytest][pytest] to run all tests in directory `tests`. You could run tests by the commands
 
 ```shell
-PYTHONPATH=src/ pytest
+python -m pytest --cov=pydolphinscheduler --cov-config=.coveragerc tests/
 ```
 
-We try to keep pydolphinscheduler usable through unit test coverage. 90% test coverage is our target, but for
-now, we require test coverage up to 85%, and each pull request leas than 85% would fail our CI step
-`Tests coverage`. We use [coverage][coverage] to check our test coverage, and you could check it locally by
-run command.
+Besides run tests, it will also check the unit test [coverage][coverage] threshold, for now when test cover less than 90%
+will fail the coverage, as well as our GitHub Action.
+
+The command above will check test coverage automatically, and you could also test the coverage by command.
 
 ```shell
-coverage run && coverage report
+python -m coverage run && python -m  coverage report
 ```
 
 It would not only run unit test but also show each file coverage which cover rate less than 100%, and `TOTAL`
 line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
 this command output.
+
+## Add LICENSE When New Dependencies Adding
+
+When you add a new package in pydolphinscheduler, you should also add the package's LICENSE to directory
+`dolphinscheduler-dist/release-docs/licenses/python-api-licenses`, and also add a short description to
+`dolphinscheduler-dist/release-docs/LICENSE`.
+
+## Update `UPDATING.md` when public class, method or interface is be changed
+
+When you change public class, method or interface, you should change the [UPDATING.md](./UPDATING.md) to notice
+users who may use it in other way.
 
 <!-- content -->
 [py4j]: https://www.py4j.org/index.html

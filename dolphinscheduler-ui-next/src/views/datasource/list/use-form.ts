@@ -123,11 +123,7 @@ export function useForm(id?: number) {
     state.showConnectType = type === 'ORACLE'
 
     if (type === 'HIVE' || type === 'SPARK') {
-      try {
-        state.showPrincipal = await getKerberosStartupState()
-      } catch (e) {
-        window.$message.error((e as Error).message)
-      }
+      state.showPrincipal = await getKerberosStartupState()
     } else {
       state.showPrincipal = false
     }

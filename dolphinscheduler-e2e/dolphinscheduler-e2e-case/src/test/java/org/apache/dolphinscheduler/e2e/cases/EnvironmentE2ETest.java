@@ -44,12 +44,12 @@ class EnvironmentE2ETest {
     private static final String environmentName = "test_environment_name";
     private static final String environmentConfig = "test_environment_config";
     private static final String environmentDesc = "test_environment_desc";
-    private static final String environmentWorkerGroup = "[\"default\"]";
+    private static final String environmentWorkerGroup = "default";
 
     private static final String editEnvironmentName = "edit_environment_name";
     private static final String editEnvironmentConfig = "edit_environment_config";
     private static final String editEnvironmentDesc = "edit_environment_desc";
-    private static final String editEnvironmentWorkerGroup = "[\"default\"]";
+    private static final String editEnvironmentWorkerGroup = "default";
 
     private static RemoteWebDriver browser;
 
@@ -118,7 +118,9 @@ class EnvironmentE2ETest {
 
             assertThat(
                     page.environmentList()
-            ).noneMatch(
+            )
+            .as("Environment list should not contain deleted environment")
+            .noneMatch(
                     it -> it.getText().contains(environmentName) || it.getText().contains(editEnvironmentName)
             );
         });

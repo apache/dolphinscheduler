@@ -18,10 +18,13 @@
 import _ from 'lodash'
 import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { format } from 'date-fns'
-import { importProcessDefinition } from '@/service/modules/process-definition'
+import {
+  importProcessDefinition,
+  queryProcessDefinitionByCode
+} from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
@@ -39,9 +42,10 @@ export function useModal(
 ) {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const route = useRoute()
 
   const variables = reactive({
-    projectCode: Number(router.currentRoute.value.params.projectCode),
+    projectCode: Number(route.params.projectCode),
     workerGroups: [],
     alertGroups: [],
     environmentList: [],
@@ -57,18 +61,14 @@ export function useModal(
   const handleImportDefinition = () => {
     state.importFormRef.validate(async (valid: any) => {
       if (!valid) {
-        try {
-          const formData = new FormData()
-          formData.append('file', state.importForm.file)
-          const code = Number(router.currentRoute.value.params.projectCode)
-          await importProcessDefinition(formData, code)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-          resetImportForm()
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        const formData = new FormData()
+        formData.append('file', state.importForm.file)
+        const code = Number(router.currentRoute.value.params.projectCode)
+        await importProcessDefinition(formData, code)
+        window.$message.success(t('project.workflow.success'))
+        ctx.emit('updateList')
+        ctx.emit('update:show')
+        resetImportForm()
       }
     })
   }
@@ -99,14 +99,10 @@ export function useModal(
           ? JSON.stringify(startParams)
           : ''
 
-        try {
           await startProcessInstance(state.startForm, variables.projectCode)
           window.$message.success(t('project.workflow.success'))
           ctx.emit('updateList')
           ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
       }
     })
   }
@@ -117,14 +113,10 @@ export function useModal(
         const data: any = getTimingData()
         data.processDefinitionCode = code
 
-        try {
-          await createSchedule(data, variables.projectCode)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        await createSchedule(data, variables.projectCode)
+        window.$message.success(t('project.workflow.success'))
+        ctx.emit('updateList')
+        ctx.emit('update:show')
       }
     })
   }
@@ -135,14 +127,10 @@ export function useModal(
         const data: any = getTimingData()
         data.id = id
 
-        try {
-          await updateSchedule(data, variables.projectCode, id)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        await updateSchedule(data, variables.projectCode, id)
+        window.$message.success(t('project.workflow.success'))
+        ctx.emit('updateList')
+        ctx.emit('update:show')
       }
     })
   }
@@ -205,6 +193,13 @@ export function useModal(
     })
   }
 
+  const getStartParamsList = (code: number) => {
+    queryProcessDefinitionByCode(code, variables.projectCode)
+      .then((res: any) => {
+        variables.startParamsList = res.processDefinition.globalParamList
+      })
+  }
+
   const getPreviewSchedule = () => {
     state.timingFormRef.validate(async (valid: any) => {
       if (!valid) {
@@ -228,9 +223,6 @@ export function useModal(
           .then((res: any) => {
             variables.schedulePreviewList = res
           })
-          .catch((error: any) => {
-            window.$message.error(error.message)
-          })
       }
     })
   }
@@ -244,6 +236,7 @@ export function useModal(
     getWorkerGroups,
     getAlertGroups,
     getEnvironmentList,
+    getStartParamsList,
     getPreviewSchedule
   }
 }

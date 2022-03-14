@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -31,20 +33,22 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import lombok.Getter;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class UserPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btnCreateUser")
+    @FindBy(className = "btn-create-user")
     private WebElement buttonCreateUser;
 
     @FindBy(className = "items")
     private List<WebElement> userList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final UserForm createUserForm = new UserForm();
     private final UserForm editUserForm = new UserForm();
@@ -54,11 +58,24 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         super(driver);
     }
 
-    public UserPage create(String user, String password, String email, String phone) {
+    public UserPage create(String user, String password, String email, String phone, String tenant) {
         buttonCreateUser().click();
 
         createUserForm().inputUserName().sendKeys(user);
         createUserForm().inputUserPassword().sendKeys(password);
+
+        createUserForm().btnSelectTenantDropdown().click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                "n-base-select-option__content")));
+
+        createUserForm().selectTenant()
+            .stream()
+            .filter(it -> it.getText().contains(tenant))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
+            .click();
+
         createUserForm().inputEmail().sendKeys(email);
         createUserForm().inputPhone().sendKeys(phone);
         createUserForm().buttonSubmit().click();
@@ -66,9 +83,9 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone) {
-        List<WebElement> userList = driver.findElementsByClassName("items");
-        userList.stream()
+    public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone,
+                           String tenant) {
+        userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
@@ -76,17 +93,33 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in user list"))
             .click();
 
-        UserForm editUserForm = new UserForm();
+        editUserForm().inputUserName().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputUserName().sendKeys(editUser);
 
-        editUserForm.inputUserName().clear();
-        editUserForm.inputUserName().sendKeys(editUser);
-        editUserForm.inputUserPassword().clear();
-        editUserForm.inputUserPassword().sendKeys(editPassword);
-        editUserForm.inputEmail().clear();
-        editUserForm.inputEmail().sendKeys(editEmail);
-        editUserForm.inputPhone().clear();
-        editUserForm.inputPhone().sendKeys(editPhone);
-        editUserForm.buttonSubmit().click();
+        editUserForm().inputUserPassword().sendKeys(editPassword);
+
+        createUserForm().btnSelectTenantDropdown().click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                "n-base-select-option__content")));
+
+        createUserForm().selectTenant()
+                .stream()
+                .filter(it -> it.getText().contains(tenant))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
+                .click();
+
+        editUserForm().inputEmail().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputEmail().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputEmail().sendKeys(editEmail);
+
+        editUserForm().inputPhone().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputPhone().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputPhone().sendKeys(editPhone);
+
+        editUserForm().buttonSubmit().click();
 
         return this;
     }
@@ -101,12 +134,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .orElseThrow(() -> new RuntimeException("No delete button in user list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -117,34 +145,58 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputUserName")
+        @FindBys({
+            @FindBy(className = "input-username"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputUserName;
 
-        @FindBy(id = "inputUserPassword")
+        @FindBys({
+            @FindBy(className = "input-password"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputUserPassword;
 
-        @FindBy(id = "selectTenant")
-        private WebElement selectTenant;
+        @FindBys({
+            @FindBy(className = "select-tenant"),
+            @FindBy(className = "n-base-selection"),
+        })
+        private WebElement btnSelectTenantDropdown;
 
-        @FindBy(id = "selectQueue")
-        private WebElement selectQueue;
+        @FindBy(className = "n-base-select-option__content")
+        private List<WebElement> selectTenant;
 
-        @FindBy(id = "inputEmail")
+        @FindBys({
+                @FindBy(className = "select-queue"),
+                @FindBy(className = "n-base-selection"),
+        })
+        private WebElement btnSelectQueueDropdown;
+
+        @FindBy(className = "n-base-select-option__content")
+        private List<WebElement> selectQueue;
+
+        @FindBys({
+                @FindBy(className = "input-email"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputEmail;
 
-        @FindBy(id = "inputPhone")
+        @FindBys({
+                @FindBy(className = "input-phone"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputPhone;
 
-        @FindBy(id = "radioStateEnable")
+        @FindBy(className = "radio-state-enable")
         private WebElement radioStateEnable;
 
-        @FindBy(id = "radioStateDisable")
+        @FindBy(className = "radio-state-disable")
         private WebElement radioStateDisable;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }

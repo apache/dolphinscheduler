@@ -136,7 +136,8 @@ const profile = {
   phone_tips: 'Please enter your phone',
   state_tips: 'Please choose your state',
   enable: 'Enable',
-  disable: 'Disable'
+  disable: 'Disable',
+  timezone_success: 'Time zone updated successful'
 }
 
 const monitor = {
@@ -503,7 +504,9 @@ const project = {
     refresh_log: 'Refresh Log',
     enter_full_screen: 'Enter full screen',
     cancel_full_screen: 'Cancel full screen',
-    task_state: 'Task status'
+    task_state: 'Task status',
+    mode_of_dependent: 'Mode of dependent',
+    open: 'Open'
   },
   task: {
     task_name: 'Task Name',
@@ -885,7 +888,9 @@ const project = {
     enum_list: 'EnumList',
     begin_time: 'BeginTime',
     fix_value: 'FixValue',
-    required: 'required'
+    required: 'required',
+    emr_flow_define_json: 'jobFlowDefineJson',
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
   }
 }
 
@@ -1009,18 +1014,23 @@ const security = {
     authorize_udf: 'UDF Function Authorize',
     username: 'Username',
     username_exists: 'The username already exists',
-    username_rule_msg: 'Please enter username',
-    user_password: 'Please enter password',
-    user_password_rule_msg:
+    username_tips: 'Please enter username',
+    user_password: 'Password',
+    user_password_tips:
       'Please enter a password containing letters and numbers with a length between 6 and 20',
     user_type: 'User Type',
+    ordinary_user: 'Ordinary users',
+    administrator: 'Administrator',
     tenant_code: 'Tenant',
-    tenant_id_rule_msg: 'Please select tenant',
+    tenant_id_tips: 'Please select tenant',
     queue: 'Queue',
+    queue_tips: 'Please select a queue',
     email: 'Email',
-    email_rule_msg: 'Please enter valid email',
+    email_empty_tips: 'Please enter email',
+    emial_correct_tips: 'Please enter the correct email format',
     phone: 'Phone',
-    phone_rule_msg: 'Please enter valid phone number',
+    phone_empty_tips: 'Please enter phone number',
+    phone_correct_tips: 'Please enter the correct mobile phone format',
     state: 'State',
     state_enabled: 'Enabled',
     state_disabled: 'Disabled',
@@ -1033,7 +1043,9 @@ const security = {
     save_error_msg: 'Failed to save, please retry',
     delete_error_msg: 'Failed to delete, please retry',
     auth_error_msg: 'Failed to authorize, please retry',
-    auth_success_msg: 'Authorize succeeded'
+    auth_success_msg: 'Authorize succeeded',
+    enable: 'Enable',
+    disable: 'Disable'
   },
   alarm_instance: {
     search_input_tips: 'Please input the keywords',

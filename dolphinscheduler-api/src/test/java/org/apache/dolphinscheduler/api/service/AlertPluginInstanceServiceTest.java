@@ -163,6 +163,7 @@ public class AlertPluginInstanceServiceTest {
         Mockito.when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
         result = alertPluginInstanceService.create(user, 1, "test1", uiParams);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertNotNull(result.get(Constants.DATA_LIST));
     }
 
     @Test

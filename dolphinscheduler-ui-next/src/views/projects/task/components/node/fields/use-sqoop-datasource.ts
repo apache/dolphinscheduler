@@ -33,18 +33,14 @@ export function useDatasource(
   const getDataSource = async (type: IDataBase) => {
     if (loading.value) return
     loading.value = true
-    try {
-      const result = await queryDataSourceList({ type })
-      dataSourceList.value = result.map(
-        (item: { name: string; id: number }) => ({
-          label: item.name,
-          value: item.id
-        })
-      )
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const result = await queryDataSourceList({ type })
+    dataSourceList.value = result.map(
+      (item: { name: string; id: number }) => ({
+        label: item.name,
+        value: item.id
+      })
+    )
+    loading.value = false
   }
   onMounted(() => {
     getDataSource('MYSQL')
