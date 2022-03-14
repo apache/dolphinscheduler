@@ -115,6 +115,17 @@ maybe you could follow [Black-integration][black-editor] to configure them in yo
 Our Python API CI would automatically run code style checker and unittest when you submit pull request in
 GitHub, you could also run static check locally.
 
+We recommend [pre-commit](https://pre-commit.com/) to do the checker mentioned above before you develop locally. 
+You should install `pre-commit` by running
+
+```shell
+python -m pip install pre-commit 
+```
+
+in your development environment and then run `pre-commit install` to set up the git hooks scripts. After finish
+above steps, each time you run `git commit` or `git push` would run pre-commit check to make basic check before
+you create pull requests in GitHub.
+
 ```shell
 # We recommend you run isort and Black before Flake8, because Black could auto fix some code style issue
 # but Flake8 just hint when code style not match pep8
