@@ -49,7 +49,7 @@ public final class WorkflowSaveDialog {
 
     @FindBys({
             @FindBy(className = "input-global-params"),
-            @FindBy(className = "button"),
+            @FindBy(tagName = "button"),
     })
     private WebElement buttonGlobalCustomParameters;
 
@@ -103,12 +103,10 @@ public final class WorkflowSaveDialog {
             globalParamsItems().get(0).findElement(new By.ByTagName("input")).sendKeys(key);
             globalParamsItems().get(1).findElement(new By.ByTagName("input")).sendKeys(value);
         } else {
-            throw new RuntimeException(String.format("itemsSize: %s", len));
+            globalParamsItems().get(len-1).findElements(new By.ByTagName("button")).get(1).click();
 
-//            globalParamsItems().get(len-1).findElements(new By.ByTagName("button")).get(1).click();
-
-//            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(0).sendKeys(key);
-//            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(1).sendKeys(value);
+            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(0).sendKeys(key);
+            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(1).sendKeys(value);
         }
 
         return this;
