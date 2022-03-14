@@ -136,7 +136,8 @@ const profile = {
   state_tips: '请选择状态',
   enable: '启用',
   disable: '禁用',
-  timezone_success: '时区更新成功'
+  timezone_success: '时区更新成功',
+  please_select_timezone: '请选择时区'
 }
 
 const monitor = {
