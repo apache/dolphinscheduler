@@ -70,7 +70,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
             .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Cannot find publish button in workflow definition"))
+            .orElseThrow(() -> new RuntimeException("Can not find publish button in workflow definition"))
             .click();
 
         return this;
@@ -79,11 +79,11 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     public WorkflowRunDialog run(String workflow) {
         workflowList()
             .stream()
-            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerHTML").equals(workflow))
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
             .flatMap(it -> it.findElements(By.className("btn-run")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Cannot find run button in workflow definition"))
+            .orElseThrow(() -> new RuntimeException("Can not find run button in workflow definition"))
             .click();
 
         return new WorkflowRunDialog(this);
