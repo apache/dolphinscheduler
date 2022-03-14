@@ -83,12 +83,11 @@ public final class WorkflowSaveDialog {
 
         selectTenantOption()
                 .stream()
-                .filter(it -> it.getText().contains(tenant))
+                .filter(it -> it.getAttribute("innerText").contains(tenant))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(String.format("No %s in workflow save dialog tenant dropdown " +
                         "list", tenant)))
                 .click();
-        ;
 
         return this;
     }
