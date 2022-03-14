@@ -16,7 +16,7 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { defineComponent, ref, PropType, computed, h } from 'vue'
+import { defineComponent, ref, PropType, computed, h, inject } from 'vue'
 import { NIcon, NButton, NSelect, NDropdown, NTag } from 'naive-ui'
 import styles from './index.module.scss'
 import { DownOutlined } from '@vicons/antd'
@@ -25,6 +25,7 @@ import { useTimezoneStore } from '@/store/timezone/timezone'
 
 const Timezone = defineComponent({
   name: 'Timezone',
+  inject: ['reload'],
   props: {
     timezoneOptions: {
       type: Array as PropType<any>,
@@ -33,6 +34,7 @@ const Timezone = defineComponent({
   },
   setup(props) {
     const { t } = useI18n()
+    const reload: any = inject('reload')
     const timezoneStore = useTimezoneStore()
     const chooseVal = ref(
       props.timezoneOptions.filter(
@@ -87,7 +89,7 @@ const Timezone = defineComponent({
         : [{ label: chooseVal.value, key: chooseVal.value }, ...options]
     )
 
-    const { handleSelect } = useDropDown(chooseVal)
+    const { handleSelect } = useDropDown(chooseVal, reload)
 
     return { handleSelect, chooseVal, optionsVal, renderDropdownLabel }
   },
