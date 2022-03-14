@@ -37,7 +37,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -60,14 +63,18 @@ class WorkflowE2ETest {
 
     @BeforeAll
     public static void setup() {
-        new LoginPage(browser)
+        UserPage userPage = new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class)
                 .create(tenant)
                 .goToNav(SecurityPage.class)
-                .goToTab(UserPage.class)
-                .update(user, user, password, email, phone, tenant)
+                .goToTab(UserPage.class);
+
+        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
+
+        userPage.update(user, user, password, email, phone, tenant)
                 .goToNav(ProjectPage.class)
                 .create(project)
         ;
