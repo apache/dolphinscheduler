@@ -124,17 +124,15 @@ class WorkflowE2ETest {
             .submit()
         ;
 
-        await().untilAsserted(() -> {
-            assertThat(
-                workflowDefinitionPage.workflowList()
-            )
-            .as("Workflow list should contain newly-created workflow")
-            .anyMatch(
-                it -> it.getText().contains(workflow)
-            );
-        });
+//        await().untilAsserted(() -> {
+//            assertThat(workflowDefinitionPage.workflowList())
+//                    .as("Workflow list should contain newly-created workflow")
+//                    .anyMatch(
+//                            it -> it.getText().contains(workflow)
+//                    );
+//        });
 
-        workflowDefinitionPage.publish(workflow);
+//        workflowDefinitionPage.publish(workflow);
     }
 
 //    @Test
