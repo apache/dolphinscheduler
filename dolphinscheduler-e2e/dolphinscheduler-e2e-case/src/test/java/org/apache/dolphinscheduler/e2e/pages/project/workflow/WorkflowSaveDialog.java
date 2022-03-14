@@ -97,17 +97,17 @@ public final class WorkflowSaveDialog {
 
         final WebDriver driver = parent().driver();
 
-        if (len == 0) {
-            buttonGlobalCustomParameters().click();
-
-            globalParamsItems().findElements(By.tagName("input")).get(0).sendKeys(key);
-            globalParamsItems().findElements(By.tagName("input")).get(1).sendKeys(value);
-        } else {
-            globalParamsItems().findElements(By.tagName("button")).get(len-1).click();
-
-            globalParamsItems().findElements(By.tagName("input")).get(len).sendKeys(key);
-            globalParamsItems().findElements(By.tagName("input")).get(len+1).sendKeys(value);
-        }
+//        if (len == 0) {
+//            buttonGlobalCustomParameters().click();
+//
+//            globalParamsItems().findElements(By.tagName("input")).get(0).sendKeys(key);
+//            globalParamsItems().findElements(By.tagName("input")).get(1).sendKeys(value);
+//        } else {
+//            globalParamsItems().findElements(By.tagName("button")).get(len-1).click();
+//
+//            globalParamsItems().findElements(By.tagName("input")).get(len).sendKeys(key);
+//            globalParamsItems().findElements(By.tagName("input")).get(len+1).sendKeys(value);
+//        }
 
         return this;
     }
