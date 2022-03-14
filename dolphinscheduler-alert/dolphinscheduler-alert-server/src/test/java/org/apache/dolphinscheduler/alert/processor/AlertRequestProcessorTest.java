@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.alert.AlertRequestProcessor;
 import org.apache.dolphinscheduler.alert.AlertSender;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -44,7 +45,7 @@ public class AlertRequestProcessorTest {
     @Test
     public void testProcess() {
         Channel channel = mock(Channel.class);
-        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1, "title", "content");
+        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1, "title", "content", WarningType.FAILURE.getCode());
         Command reqCommand = alertSendRequestCommand.convert2Command();
         Assert.assertEquals(CommandType.ALERT_SEND_REQUEST, reqCommand.getType());
         alertRequestProcessor.process(channel, reqCommand);

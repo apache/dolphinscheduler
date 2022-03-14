@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
 import { updateUser } from '@/service/modules/users'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import { useUserStore } from '@/store/user/user'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
-export function useDropDown(chooseVal: any) {
-  const { t } = useI18n()
-
+export function useDropDown(chooseVal: any, reload: any) {
   const userStore = useUserStore()
   const timezoneStore = useTimezoneStore()
 
   const userInfo = userStore.userInfo as UserInfoRes
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (key: string) => {
     updateUser({
       userPassword: '',
       id: userInfo.id,
@@ -38,11 +35,11 @@ export function useDropDown(chooseVal: any) {
       email: '',
       phone: userInfo.phone,
       state: userInfo.state,
-      timeZone: value
+      timeZone: key
     }).then(() => {
-      chooseVal.value = value
-      timezoneStore.setTimezone(value as string)
-      window.$message.success(t('profile.timezone_success'))
+      chooseVal.value = key
+      timezoneStore.setTimezone(key as string)
+      reload()
     })
   }
 

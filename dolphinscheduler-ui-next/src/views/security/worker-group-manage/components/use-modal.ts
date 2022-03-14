@@ -37,6 +37,7 @@ export function useModal(
       addrList: ref<Array<number>>([]),
       generalOptions: []
     },
+    saving: false,
     rules: {
       name: {
         required: true,
@@ -77,14 +78,21 @@ export function useModal(
     return state
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.workerGroupFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitWorkerGroupModal() : updateWorkerGroupModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.workerGroupFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0
+        ? await submitWorkerGroupModal()
+        : await updateWorkerGroupModal()
+
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitWorkerGroupModal = () => {

@@ -19,7 +19,6 @@ import {
   defineComponent,
   PropType,
   ref,
-  reactive,
   watch,
   nextTick,
   provide,
@@ -66,6 +65,10 @@ const props = {
   },
   taskInstance: {
     type: Object as PropType<IWorkflowTaskInstance>
+  },
+  saving: {
+    type: Boolean,
+    default: false
   }
 }
 
@@ -139,6 +142,7 @@ const NodeDetailModal = defineComponent({
     }
 
     const onTaskTypeChange = (taskType: ITaskType) => {
+      // eslint-disable-next-line vue/no-mutating-props
       props.data.taskType = taskType
     }
 
@@ -168,7 +172,7 @@ const NodeDetailModal = defineComponent({
         show={props.show}
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
-        confirmLoading={false}
+        confirmLoading={props.saving}
         confirmDisabled={props.readonly}
         onCancel={onCancel}
         headerLinks={headerLinks}

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, watch } from 'vue'
+import { defineComponent, toRefs } from 'vue'
 import {
   NButton,
   NInput,

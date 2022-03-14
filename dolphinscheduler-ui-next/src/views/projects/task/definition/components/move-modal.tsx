@@ -83,6 +83,7 @@ const MoveModal = defineComponent({
         onCancel={cancelModal}
         onConfirm={confirmModal}
         confirmDisabled={!this.model.targetProcessDefinitionCode}
+        confirmLoading={this.saving}
       >
         <NForm
           model={this.model}
