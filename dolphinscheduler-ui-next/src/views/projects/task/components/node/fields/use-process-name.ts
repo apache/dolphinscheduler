@@ -28,15 +28,13 @@ export function useProcessName({
   projectCode,
   isCreate,
   from,
-  processName,
-  code
+  processName
 }: {
   model: { [field: string]: any }
   projectCode: number
   isCreate: boolean
   from?: number
   processName?: number
-  code?: number
 }): IJsonItem {
   const { t } = useI18n()
 

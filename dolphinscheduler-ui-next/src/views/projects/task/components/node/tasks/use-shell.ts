@@ -56,8 +56,7 @@ export function useShell({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
