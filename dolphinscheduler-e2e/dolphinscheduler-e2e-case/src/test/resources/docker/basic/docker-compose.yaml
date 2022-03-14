@@ -29,6 +29,8 @@ services:
       - 12345:12345
     networks:
       - e2e
+    volumes:
+      - /data/master/dolphinscheduler/ds_dev/dolphinscheduler-ui-next/dist:/opt/dolphinscheduler/ui
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
