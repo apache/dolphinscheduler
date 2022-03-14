@@ -132,6 +132,7 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles.table}
+            row-class-name='items'
           />
           <div class={styles.pagination}>
             <NPagination
