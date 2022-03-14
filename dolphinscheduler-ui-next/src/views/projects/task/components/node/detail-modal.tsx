@@ -66,6 +66,10 @@ const props = {
   },
   taskInstance: {
     type: Object as PropType<IWorkflowTaskInstance>
+  },
+  saving: {
+    type: Boolean,
+    default: false
   }
 }
 
@@ -168,7 +172,7 @@ const NodeDetailModal = defineComponent({
         show={props.show}
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
-        confirmLoading={false}
+        confirmLoading={props.saving}
         confirmDisabled={props.readonly}
         onCancel={onCancel}
         headerLinks={headerLinks}

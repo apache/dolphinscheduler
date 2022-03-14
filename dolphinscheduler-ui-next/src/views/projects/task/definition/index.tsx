@@ -196,6 +196,7 @@ const TaskDefinition = defineComponent({
           projectCode={this.projectCode}
           from={1}
           readonly={this.taskReadonly}
+          saving={this.taskSaving}
         />
       </>
     )

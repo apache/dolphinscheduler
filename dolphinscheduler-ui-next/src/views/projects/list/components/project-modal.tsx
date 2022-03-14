@@ -65,7 +65,9 @@ const ProjectModal = defineComponent({
       () => {
         if (props.statusRef === 0) {
           variables.model.projectName = ''
-          variables.model.userName = (userStore.getUserInfo as UserInfoRes).userName
+          variables.model.userName = (
+            userStore.getUserInfo as UserInfoRes
+          ).userName
           variables.model.description = ''
         } else {
           variables.model.projectName = props.row.name
@@ -99,6 +101,7 @@ const ProjectModal = defineComponent({
         onConfirm={this.confirmModal}
         onCancel={this.cancelModal}
         confirmDisabled={!this.model.projectName || !this.model.userName}
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='projectFormRef'>
           <NFormItem label={t('project.list.project_name')} path='projectName'>

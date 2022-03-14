@@ -217,6 +217,7 @@ export default defineComponent({
         title={t('project.workflow.set_parameters_before_starting')}
         onCancel={this.hideModal}
         onConfirm={this.handleStart}
+        confirmLoading={this.saving}
       >
         <NForm ref='startFormRef' label-placement='left' label-width='160'>
           <NFormItem

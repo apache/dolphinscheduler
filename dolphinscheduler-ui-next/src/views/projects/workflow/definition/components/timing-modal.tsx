@@ -235,6 +235,7 @@ export default defineComponent({
         title={t('project.workflow.set_parameters_before_timing')}
         onCancel={this.hideModal}
         onConfirm={this.handleTiming}
+        confirmLoading={this.saving}
       >
         <NForm ref='timingFormRef' label-placement='left' label-width='160'>
           <NFormItem
