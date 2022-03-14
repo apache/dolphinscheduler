@@ -21,8 +21,22 @@ import qs from 'qs'
 import _ from 'lodash'
 import cookies from 'js-cookie'
 import router from '@/router'
+import utils from '@/utils'
 
 const userStore = useUserStore()
+
+/**
+ * @description Log and display errors
+ * @param {Error} error Error object
+ */
+const handleError = (res: AxiosResponse<any, any>) => {
+  // Print to console
+  if (import.meta.env.MODE === 'development') {
+    utils.log.capsule('DolphinScheduler', 'UI-NEXT')
+    utils.log.error(res)
+  }
+  window.$message.error(res.data.msg)
+}
 
 const baseRequestConfig: AxiosRequestConfig = {
   baseURL:
@@ -76,7 +90,8 @@ service.interceptors.response.use((res: AxiosResponse) => {
     case 0:
       return res.data.data
     default:
-      throw new Error(`${res.data.msg}: ${res.config.url}`)
+      handleError(res)
+      throw new Error()
   }
 }, err)
 

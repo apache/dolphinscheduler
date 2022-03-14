@@ -50,6 +50,7 @@ import {
 } from '@vicons/antd'
 import { useMenuStore } from '@/store/menu/menu'
 import { useUserStore } from '@/store/user/user'
+import { timezoneList } from '@/utils/timezone'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useDataList() {
@@ -72,9 +73,13 @@ export function useDataList() {
     }
   ]
 
+  const timezoneOptions = () =>
+    timezoneList.map((item) => ({ label: item, value: item }))
+
   const state = reactive({
     isShowSide: false,
     localesOptions,
+    timezoneOptions: timezoneOptions(),
     userDropdownOptions: [],
     menuOptions: [],
     headerMenuOptions: [],

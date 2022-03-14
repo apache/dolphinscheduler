@@ -17,7 +17,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
-import { removeUselessChildren } from './use-shell'
+import { removeUselessChildren } from '@/utils/tree-format'
 import { PROGRAM_TYPES } from './use-spark'
 import { useCustomParams } from '.'
 import type { IJsonItem, ProgramType } from '../types'
@@ -37,15 +37,13 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
       mainJarOptions.value = resources[programType]
       return
     }
-    try {
-      const res = await queryResourceByProgramType({
-        type: 'FILE',
-        programType
-      })
-      removeUselessChildren(res)
-      mainJarOptions.value = res || []
-      resources[programType] = res
-    } catch (err) {}
+    const res = await queryResourceByProgramType({
+      type: 'FILE',
+      programType
+    })
+    removeUselessChildren(res)
+    mainJarOptions.value = res || []
+    resources[programType] = res
   }
 
   onMounted(() => {

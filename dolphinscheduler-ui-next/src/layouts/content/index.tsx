@@ -103,9 +103,11 @@ const Content = defineComponent({
       <NLayout style='height: 100%'>
         <NLayoutHeader style='height: 65px'>
           <NavBar
+            class='tab-horizontal'
             onHandleMenuClick={this.getSideMenuOptions}
             headerMenuOptions={this.headerMenuOptions}
             localesOptions={this.localesOptions}
+            timezoneOptions={this.timezoneOptions}
             userDropdownOptions={this.userDropdownOptions}
           />
         </NLayoutHeader>

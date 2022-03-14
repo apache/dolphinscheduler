@@ -21,7 +21,7 @@
     <sql id="baseSql">
         id
         , title, content, alert_status, log,
-        alertgroup_id, create_time, update_time
+        alertgroup_id, create_time, update_time, warning_type
     </sql>
     <select id="listAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select
@@ -31,8 +31,8 @@
     </select>
 
     <insert id="insertAlertWhenServerCrash">
-        insert into t_ds_alert(title, content, alert_status, log, alertgroup_id, create_time, update_time)
-        SELECT #{alert.title}, #{alert.content}, #{alert.alertStatus.code}, #{alert.log}, #{alert.alertGroupId},
+        insert into t_ds_alert(title, content, alert_status, warning_type, log, alertgroup_id, create_time, update_time)
+        SELECT #{alert.title}, #{alert.content}, #{alert.alertStatus.code}, #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId},
                #{alert.createTime}, #{alert.updateTime}
         from t_ds_alert
         where content = #{alert.content} and alert_status = #{alert.alertStatus.code}

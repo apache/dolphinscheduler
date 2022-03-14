@@ -20,6 +20,7 @@ import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
 import Locales from '../locales'
+import Timezone from '../timezone'
 import User from '../user'
 import Theme from '../theme'
 import { useMenuClick } from './use-menuClick'
@@ -33,6 +34,10 @@ const Navbar = defineComponent({
       default: []
     },
     localesOptions: {
+      type: Array as PropType<any>,
+      default: []
+    },
+    timezoneOptions: {
       type: Array as PropType<any>,
       default: []
     },
@@ -62,6 +67,7 @@ const Navbar = defineComponent({
         <div class={styles.settings}>
           <Theme />
           <Locales localesOptions={this.localesOptions} />
+          <Timezone timezoneOptions={this.timezoneOptions} />
           <User userDropdownOptions={this.userDropdownOptions} />
         </div>
       </div>

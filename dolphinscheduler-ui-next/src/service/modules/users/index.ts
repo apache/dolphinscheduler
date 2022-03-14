@@ -135,7 +135,7 @@ export function listAll(params?: ListAllReq): any {
   })
 }
 
-export function queryUserList(params: ListReq) {
+export function queryUserList(params: ListReq): any {
   return axios({
     url: '/users/list-paging',
     method: 'get',

@@ -18,6 +18,7 @@
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
+import ButtonLink from '@/components/button-link'
 import { queryProjectListPaging } from '@/service/modules/projects'
 import { parseTime } from '@/utils/common'
 import { deleteProject } from '@/service/modules/projects'
@@ -77,18 +78,14 @@ export function useTable() {
             {
               default: () =>
                 h(
-                  'a',
+                  ButtonLink,
                   {
                     onClick: () => {
                       menuStore.setProjectCode(row.code)
                       router.push({ path: `/projects/${row.code}` })
                     }
                   },
-                  {
-                    default: () => {
-                      return row.name
-                    }
-                  }
+                  { default: () => row.name }
                 ),
               tooltip: () => row.name
             }

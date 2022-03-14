@@ -21,12 +21,18 @@ import static java.lang.String.format;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
+import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,8 +57,21 @@ public final class AlertPluginManager {
 
     private final Map<Integer, AlertChannel> channelKeyedById = new HashMap<>();
 
+    private final PluginParams warningTypeParams = getWarningTypeParams();
+
     public AlertPluginManager(PluginDao pluginDao) {
         this.pluginDao = pluginDao;
+    }
+
+    public PluginParams getWarningTypeParams() {
+        return
+            RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                .setValue(WarningType.ALL.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
     }
 
     @EventListener
@@ -72,7 +91,9 @@ public final class AlertPluginManager {
 
             logger.info("Registered alert plugin: {}", name);
 
-            final List<PluginParams> params = factory.params();
+            final List<PluginParams> params = new ArrayList<>(factory.params());
+            params.add(0, warningTypeParams);
+
             final String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
             final PluginDefine pluginDefine = new PluginDefine(name, PluginType.ALERT.getDesc(), paramsJson);
