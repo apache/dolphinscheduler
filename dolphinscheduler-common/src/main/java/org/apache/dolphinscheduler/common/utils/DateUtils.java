@@ -45,6 +45,7 @@ public final class DateUtils {
     static final long C6 = C5 * 24L;
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
+    private static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS = DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
@@ -58,10 +59,7 @@ public final class DateUtils {
      */
     private static LocalDateTime date2LocalDateTime(Date date) {
         String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
-        ZoneId zoneId = ZoneId.systemDefault();
-        if (StringUtils.isNotEmpty(timezone)) {
-            zoneId = ZoneId.of(timezone);
-        }
+        ZoneId zoneId = StringUtils.isNotEmpty(timezone) ? ZoneId.of(timezone) : ZoneId.systemDefault();
         return date2LocalDateTime(date, zoneId);
     }
 
@@ -84,10 +82,7 @@ public final class DateUtils {
      */
     private static Date localDateTime2Date(LocalDateTime localDateTime) {
         String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
-        ZoneId zoneId = ZoneId.systemDefault();
-        if (StringUtils.isNotEmpty(timezone)) {
-            zoneId = ZoneId.of(timezone);
-        }
+        ZoneId zoneId = StringUtils.isNotEmpty(timezone) ? ZoneId.of(timezone) : ZoneId.systemDefault();
         return localDateTime2Date(localDateTime, zoneId);
     }
 
@@ -100,15 +95,6 @@ public final class DateUtils {
     private static Date localDateTime2Date(LocalDateTime localDateTime, ZoneId zoneId) {
         Instant instant = localDateTime.atZone(zoneId).toInstant();
         return Date.from(instant);
-    }
-
-    /**
-     * get current date str
-     *
-     * @return date string
-     */
-    public static String getCurrentTime() {
-        return getCurrentTime(Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
     /**
@@ -129,10 +115,12 @@ public final class DateUtils {
      * @return date string
      */
     public static String format(Date date, String format, String timezone) {
-        if (StringUtils.isEmpty(timezone)) {
-            return format(date2LocalDateTime(date), format);
-        }
-        return format(date2LocalDateTime(date, ZoneId.of(timezone)), format);
+        return format(date, DateTimeFormatter.ofPattern(format), timezone);
+    }
+
+    public static String format(Date date, DateTimeFormatter dateTimeFormatter, String timezone) {
+        LocalDateTime localDateTime = StringUtils.isEmpty(timezone) ? date2LocalDateTime(date) : date2LocalDateTime(date, ZoneId.of(timezone));
+        return format(localDateTime, dateTimeFormatter);
     }
 
     /**
@@ -143,7 +131,11 @@ public final class DateUtils {
      * @return date string
      */
     public static String format(LocalDateTime localDateTime, String format) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(format));
+        return format(localDateTime, DateTimeFormatter.ofPattern(format));
+    }
+
+    public static String format(LocalDateTime localDateTime, DateTimeFormatter dateTimeFormatter) {
+        return localDateTime.format(dateTimeFormatter);
     }
 
     /**
@@ -153,7 +145,7 @@ public final class DateUtils {
      * @return date string
      */
     public static String dateToString(Date date) {
-        return format(date, Constants.YYYY_MM_DD_HH_MM_SS, null);
+        return format(date, YYYY_MM_DD_HH_MM_SS, null);
     }
 
     /**
@@ -164,7 +156,7 @@ public final class DateUtils {
      * @return date string
      */
     public static String dateToString(Date date, String timezone) {
-        return format(date, Constants.YYYY_MM_DD_HH_MM_SS, timezone);
+        return format(date, YYYY_MM_DD_HH_MM_SS, timezone);
     }
 
     /**
@@ -176,8 +168,12 @@ public final class DateUtils {
      * @return date
      */
     public static Date parse(String date, String format, String timezone) {
+        return parse(date, DateTimeFormatter.ofPattern(format), timezone);
+    }
+
+    public static Date parse(String date, DateTimeFormatter dateTimeFormatter, String timezone) {
         try {
-            LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
+            LocalDateTime ldt = LocalDateTime.parse(date, dateTimeFormatter);
             if (StringUtils.isEmpty(timezone)) {
                 return localDateTime2Date(ldt);
             }
@@ -195,7 +191,7 @@ public final class DateUtils {
      * @return yyyy-MM-dd HH:mm:ss format
      */
     public static Date stringToDate(String date) {
-        return parse(date, Constants.YYYY_MM_DD_HH_MM_SS, null);
+        return parse(date, YYYY_MM_DD_HH_MM_SS, null);
     }
 
     /**
@@ -206,7 +202,7 @@ public final class DateUtils {
      * @return yyyy-MM-dd HH:mm:ss format
      */
     public static Date stringToDate(String date, String timezone) {
-        return parse(date, Constants.YYYY_MM_DD_HH_MM_SS, timezone);
+        return parse(date, YYYY_MM_DD_HH_MM_SS, timezone);
     }
 
     /**

@@ -26,10 +26,23 @@ import java.util.TimeZone;
 
 import javax.management.timer.Timer;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class DateUtilsTest {
+
+    @Before
+    public void before() {
+        ThreadLocalContext.getTimezoneThreadLocal().remove();
+    }
+
+    @After
+    public void after() {
+        ThreadLocalContext.getTimezoneThreadLocal().remove();
+    }
+
     @Test
     public void format2Readable() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -120,14 +133,16 @@ public class DateUtilsTest {
     public void getStartOfDay() {
         Date d1 = DateUtils.stringToDate("2019-01-31 11:59:59");
         Date curr = DateUtils.getStartOfDay(d1);
-        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 00:00:00");
+        String expected = new SimpleDateFormat("yyyy-MM-dd").format(d1) + " 00:00:00";
+        Assert.assertEquals(DateUtils.dateToString(curr), expected);
     }
 
     @Test
     public void getEndOfDay() {
         Date d1 = DateUtils.stringToDate("2019-01-31 11:00:59");
         Date curr = DateUtils.getEndOfDay(d1);
-        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 23:59:59");
+        String expected = new SimpleDateFormat("yyyy-MM-dd").format(d1) + " 23:59:59";
+        Assert.assertEquals(DateUtils.dateToString(curr), expected);
     }
 
     @Test
@@ -212,17 +227,17 @@ public class DateUtilsTest {
 
     @Test
     public void testTimezone() {
+
         String time = "2019-01-28 00:00:00";
         ThreadLocalContext.timezoneThreadLocal.set("UTC");
         Date utcDate = DateUtils.stringToDate(time);
-
         Assert.assertEquals(time, DateUtils.dateToString(utcDate));
 
         ThreadLocalContext.timezoneThreadLocal.set("Asia/Shanghai");
         Date shanghaiDate = DateUtils.stringToDate(time);
-
         Assert.assertEquals(time, DateUtils.dateToString(shanghaiDate));
 
         Assert.assertEquals(Timer.ONE_HOUR * 8, utcDate.getTime() - shanghaiDate.getTime());
+
     }
 }
