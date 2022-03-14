@@ -48,6 +48,7 @@ export function useModal(
       token: ref(''),
       generalOptions: []
     },
+    saving: false,
     rules: {
       userId: {
         required: true,
@@ -111,14 +112,18 @@ export function useModal(
     )
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.alertGroupFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitTokenModal() : updateTokenModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.alertGroupFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0 ? await submitTokenModal() : await updateTokenModal()
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitTokenModal = () => {
