@@ -33,7 +33,9 @@ echo "Begin $startStop $command......"
 
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
-DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
+export DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
+
+chmod 700 -R ${DOLPHINSCHEDULER_HOME}
 
 source /etc/profile
 set -a
