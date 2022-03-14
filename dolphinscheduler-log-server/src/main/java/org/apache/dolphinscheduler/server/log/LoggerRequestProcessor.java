@@ -46,6 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -146,10 +147,13 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      */
     private boolean checkPathSecurity(String path) {
         String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
-        if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
-            return true;
+        if (StringUtils.isBlank(path)) {
+            if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
+                return true;
+            }
+        } else {
+            logger.warn("path is null");
         }
-
         return false;
     }
 
