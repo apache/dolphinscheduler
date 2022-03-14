@@ -20,6 +20,7 @@ lockfileVersion: 5.3
 specifiers:
   '@antv/layout': ^0.1.31
   '@antv/x6': ^1.30.1
+  '@types/js-cookie': ^3.0.1
   '@types/node': ^16.11.25
   '@types/nprogress': ^0.2.0
   '@types/qs': ^6.9.7
@@ -37,6 +38,7 @@ specifiers:
   eslint-config-prettier: ^8.4.0
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-vue: ^8.5.0
+  js-cookie: ^3.0.1
   lodash: ^4.17.21
   monaco-editor: ^0.31.1
   naive-ui: ^2.26.0
@@ -64,6 +66,7 @@ dependencies:
   axios: 0.24.0
   date-fns: 2.28.0
   echarts: 5.3.0
+  js-cookie: 3.0.1
   lodash: 4.17.21
   monaco-editor: 0.31.1
   naive-ui: 2.26.0_vue@3.2.31
@@ -77,6 +80,7 @@ dependencies:
   vue-router: 4.0.12_vue@3.2.31
 
 devDependencies:
+  '@types/js-cookie': 3.0.1
   '@types/node': 16.11.25
   '@types/nprogress': 0.2.0
   '@types/qs': 6.9.7
@@ -845,6 +849,13 @@ packages:
       jest-diff: 27.5.1
       pretty-format: 27.5.1
     dev: false
+
+  /@types/js-cookie/3.0.1:
+    resolution:
+      {
+        integrity: sha512-7wg/8gfHltklehP+oyJnZrz9XBuX5ZPP4zB6UsI84utdlkRYLnOm2HfpLXazTwZA+fpGn0ir8tGNgVnMEleBGQ==
+      }
+    dev: true
 
   /@types/json-schema/7.0.9:
     resolution:
@@ -3070,6 +3081,14 @@ packages:
       {
         integrity: sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
       }
+    dev: false
+
+  /js-cookie/3.0.1:
+    resolution:
+      {
+        integrity: sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==
+      }
+    engines: { node: '>=12' }
     dev: false
 
   /js-stringify/1.0.2:

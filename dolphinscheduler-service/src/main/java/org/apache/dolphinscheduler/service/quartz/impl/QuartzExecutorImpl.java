@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz;
+package org.apache.dolphinscheduler.service.quartz.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.PROJECT_ID;
 import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_GROUP_PREFIX;
@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
+import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -49,22 +50,17 @@ import org.quartz.Scheduler;
 import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class QuartzExecutors {
-    private static final Logger logger = LoggerFactory.getLogger(QuartzExecutors.class);
+@Service
+public class QuartzExecutorImpl implements QuartzExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(QuartzExecutorImpl.class);
+
+    @Autowired
+    private Scheduler scheduler;
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-
-    private static final class Holder {
-        private static final QuartzExecutors instance = new QuartzExecutors();
-    }
-
-    private QuartzExecutors() {
-    }
-
-    public static QuartzExecutors getInstance() {
-        return Holder.instance;
-    }
 
     /**
      * add task trigger , if this task already exists, return this task with updated trigger
@@ -73,12 +69,12 @@ public class QuartzExecutors {
      * @param projectId projectId
      * @param schedule schedule
      */
-    public void addJob(Scheduler scheduler, Class<? extends Job> clazz, int projectId, final Schedule schedule) {
-        String jobName = QuartzExecutors.buildJobName(schedule.getId());
-        String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
+    public void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule) {
+        String jobName = this.buildJobName(schedule.getId());
+        String jobGroupName = this.buildJobGroupName(projectId);
         Date startDate = schedule.getStartTime();
         Date endDate = schedule.getEndTime();
-        Map<String, Object> jobDataMap = QuartzExecutors.buildDataMap(projectId, schedule);
+        Map<String, Object> jobDataMap = this.buildDataMap(projectId, schedule);
         String cronExpression = schedule.getCrontab();
         String timezoneId = schedule.getTimezoneId();
 
@@ -146,15 +142,19 @@ public class QuartzExecutors {
         }
     }
 
+    public String buildJobName(int scheduleId) {
+        return QUARTZ_JOB_PRIFIX + UNDERLINE + scheduleId;
     public static String buildJobName(int processId) {
         return QUARTZ_JOB_PREFIX + UNDERLINE + processId;
     }
 
+    public String buildJobGroupName(int projectId) {
+        return QUARTZ_JOB_GROUP_PRIFIX + UNDERLINE + projectId;
     public static String buildJobGroupName(int projectId) {
         return QUARTZ_JOB_GROUP_PREFIX + UNDERLINE + projectId;
     }
 
-    public static Map<String, Object> buildDataMap(int projectId, Schedule schedule) {
+    public Map<String, Object> buildDataMap(int projectId, Schedule schedule) {
         Map<String, Object> dataMap = new HashMap<>(8);
         dataMap.put(PROJECT_ID, projectId);
         dataMap.put(SCHEDULE_ID, schedule.getId());

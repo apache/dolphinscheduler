@@ -18,13 +18,21 @@
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
+import ButtonLink from '@/components/button-link'
 import { queryProjectListPaging } from '@/service/modules/projects'
 import { parseTime } from '@/utils/common'
 import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import { useMenuStore } from '@/store/menu/menu'
-import { NButton, NEllipsis, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import {
+  NButton,
+  NEllipsis,
+  NIcon,
+  NPopconfirm,
+  NSpace,
+  NTooltip
+} from 'naive-ui'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
@@ -55,7 +63,11 @@ export function useTable() {
 
   const createColumns = (variables: any) => {
     variables.columns = [
-      { title: '#', key: 'index', render: (row: any, index: number) => index + 1 },
+      {
+        title: '#',
+        key: 'index',
+        render: (row: any, index: number) => index + 1
+      },
       {
         title: t('project.list.project_name'),
         key: 'name',
@@ -66,18 +78,14 @@ export function useTable() {
             {
               default: () =>
                 h(
-                  'a',
+                  ButtonLink,
                   {
                     onClick: () => {
                       menuStore.setProjectCode(row.code)
                       router.push({ path: `/projects/${row.code}` })
                     }
                   },
-                  {
-                    default: () => {
-                      return row.name
-                    }
-                  }
+                  { default: () => row.name }
                 ),
               tooltip: () => row.name
             }

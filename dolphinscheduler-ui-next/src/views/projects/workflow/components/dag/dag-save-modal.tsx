@@ -133,9 +133,6 @@ export default defineComponent({
           ) {
             verifyName(params, projectCode)
               .then(() => context.emit('save', formValue.value))
-              .catch((error: any) => {
-                window.$message.error(error.message)
-              })
           } else {
             context.emit('save', formValue.value)
           }
@@ -151,7 +148,7 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode
+        formValue.value.tenantCode = process.tenantCode || 'default'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true
           formValue.value.timeout = process.timeout
@@ -179,11 +176,8 @@ export default defineComponent({
         autoFocus={false}
       >
         <NForm
-          label-width='100'
           model={formValue.value}
           rules={rule}
-          size='medium'
-          label-placement='left'
           ref={formRef}
         >
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
@@ -212,8 +206,7 @@ export default defineComponent({
                 min={0}
                 v-slots={{
                   suffix: () => '分'
-                }}
-              ></NInputNumber>
+                }} />
             </NFormItem>
           )}
           <NFormItem
@@ -228,7 +221,7 @@ export default defineComponent({
             />
           </NFormItem>
           {props.definition && (
-            <NFormItem label=' ' path='timeoutFlag'>
+            <NFormItem path='timeoutFlag'>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
               </NCheckbox>

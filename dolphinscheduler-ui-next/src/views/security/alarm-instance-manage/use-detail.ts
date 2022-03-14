@@ -45,35 +45,29 @@ export function useDetail(getFormValues: Function) {
     const values = getFormValues()
     if (status.saving) return false
     status.saving = true
-    try {
-      if (currentRecord?.instanceName !== values.instanceName) {
-        await verifyAlertInstanceName({
-          alertInstanceName: values.instanceName
-        })
-      }
-
-      currentRecord?.id
-        ? await updateAlertPluginInstance(
-            {
-              alertPluginInstanceId: values.pluginDefineId,
-              instanceName: values.instanceName,
-              pluginInstanceParams: formatParams(json, values)
-            },
-            currentRecord.id
-          )
-        : await createAlertPluginInstance({
-            instanceName: values.instanceName,
-            pluginDefineId: values.pluginDefineId,
-            pluginInstanceParams: formatParams(json, values)
-          })
-
-      status.saving = false
-      return true
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      status.saving = false
-      return false
+    if (currentRecord?.instanceName !== values.instanceName) {
+      await verifyAlertInstanceName({
+        alertInstanceName: values.instanceName
+      })
     }
+
+    currentRecord?.id
+      ? await updateAlertPluginInstance(
+          {
+            alertPluginInstanceId: values.pluginDefineId,
+            instanceName: values.instanceName,
+            pluginInstanceParams: formatParams(json, values)
+          },
+          currentRecord.id
+        )
+      : await createAlertPluginInstance({
+          instanceName: values.instanceName,
+          pluginDefineId: values.pluginDefineId,
+          pluginInstanceParams: formatParams(json, values)
+        })
+
+    status.saving = false
+    return true
   }
 
   return { status, createOrUpdate }

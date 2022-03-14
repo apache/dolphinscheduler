@@ -450,6 +450,7 @@ The following components are provided under a BSD license. See project link for 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     asm 3.1: https://github.com/jdf/javalin/tree/master/lib/asm-3.1, BSD
+    click 8.0: https://github.com/pallets/click, BSD 3-Clause
     curvesapi 1.06: https://mvnrepository.com/artifact/com.github.virtuald/curvesapi/1.06, BSD 3-clause
     javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD
     jline 0.9.94: https://github.com/jline/jline3, BSD
@@ -509,6 +510,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
 
     jul-to-slf4j 1.7.32: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j/1.7.32, MIT
     mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
+    ruamel.yaml 0.17: https://sourceforge.net/projects/ruamel-yaml, MIT
     slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.5, MIT
     animal-sniffer-annotations 1.14 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.14, MIT
     checker-compat-qual 2.0.0 https://mvnrepository.com/artifact/org.checkerframework/checker-compat-qual/2.0.0, MIT + GPLv2
@@ -573,13 +575,14 @@ MIT licenses
     vuex 3.0.0: https://github.com/vuejs/vuex MIT
     vuex-router-sync 4.1.2: https://github.com/vuejs/vuex-router-sync MIT
     dagre 0.8.5: https://github.com/dagrejs/dagre MIT
+    js-cookie 3.0.1 https://github.com/js-cookie/js-cookie MIT
+    @types/js-cookie 3.0.1 https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses
 ========================================
     echarts	4.1.0: https://github.com/apache/incubator-echarts	Apache-2.0
     remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
-
 
 ========================================
 BSD licenses

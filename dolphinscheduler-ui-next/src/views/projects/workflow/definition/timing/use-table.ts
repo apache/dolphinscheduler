@@ -152,7 +152,8 @@ export function useTable() {
                       NButton,
                       {
                         circle: true,
-                        type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                        type:
+                          row.releaseState === 'ONLINE' ? 'error' : 'warning',
                         size: 'small',
                         onClick: () => {
                           handleReleaseState(row)
@@ -260,9 +261,6 @@ export function useTable() {
           pageNo: variables.page,
           searchVal: variables.searchVal
         })
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
       })
   }
 
