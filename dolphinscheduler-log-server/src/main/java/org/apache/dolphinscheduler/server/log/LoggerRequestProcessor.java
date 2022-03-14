@@ -147,7 +147,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      */
     private boolean checkPathSecurity(String path) {
         String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
-        if (StringUtils.isBlank(path)) {
+        if (!StringUtils.isBlank(path)) {
             if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
                 return true;
             }
