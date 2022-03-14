@@ -38,7 +38,10 @@ public final class WorkflowSaveDialog {
     private final WebDriver driver;
     private final WorkflowForm parent;
 
-    @FindBy(className = "input-name")
+    @FindBys({
+            @FindBy(className = "input-name"),
+            @FindBy(tagName = "input")
+    })
     private WebElement inputName;
 
     @FindBy(className = "btn-submit")
@@ -59,7 +62,7 @@ public final class WorkflowSaveDialog {
     @FindBy(className = "n-base-select-option__content")
     private List<WebElement> selectTenantOption;
 
-    @FindBy(className = ".input-global-params")
+    @FindBy(className = "input-global-params")
     private List<WebElement> globalParamsItems;
 
     public WorkflowSaveDialog(WorkflowForm parent) {
