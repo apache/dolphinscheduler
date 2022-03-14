@@ -38,7 +38,7 @@ public class LoggerRequestProcessorTest {
 
     @Test
     public void testProcessViewWholeLogRequest() {
-        System.setProperty("DOLPHINSCHEDULER_HOME", System.getProperty("user.dir"));
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
         PowerMockito.mockStatic(LoggerUtils.class);
@@ -56,6 +56,7 @@ public class LoggerRequestProcessorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testProcessViewWholeLogRequestError() {
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
         PowerMockito.mockStatic(LoggerUtils.class);
@@ -73,6 +74,7 @@ public class LoggerRequestProcessorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testProcessViewWholeLogRequestErrorRelativePath() {
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
         PowerMockito.mockStatic(LoggerUtils.class);
@@ -90,6 +92,7 @@ public class LoggerRequestProcessorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testProcessViewWholeLogRequestErrorStartWith() {
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
         PowerMockito.mockStatic(LoggerUtils.class);
