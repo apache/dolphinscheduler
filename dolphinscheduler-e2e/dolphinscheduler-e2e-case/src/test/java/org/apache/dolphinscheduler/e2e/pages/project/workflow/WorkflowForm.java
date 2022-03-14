@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTa
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.openqa.selenium.By;
@@ -75,6 +76,7 @@ public final class WorkflowForm {
 
         switch (type) {
             case SHELL:
+                driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
                 return (T) new ShellTaskForm(this);
             case SUB_PROCESS:
                 return (T) new SubWorkflowTaskForm(this);
