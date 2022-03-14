@@ -93,7 +93,7 @@ public final class WorkflowSaveDialog {
     }
 
     public WorkflowSaveDialog addGlobalParam(String key, String value) {
-        final int len = globalParamsItems().get(0).findElements(new By.ByTagName("input")).size();
+        final int len = globalParamsItems().get(0).findElements(By.tagName("input")).size();
 
         final WebDriver driver = parent().driver();
 
@@ -103,10 +103,12 @@ public final class WorkflowSaveDialog {
             globalParamsItems().get(0).findElement(new By.ByTagName("input")).sendKeys(key);
             globalParamsItems().get(1).findElement(new By.ByTagName("input")).sendKeys(value);
         } else {
-            globalParamsItems().get(len-1).findElements(new By.ByTagName("button")).get(1).click();
+            throw new RuntimeException(String.format("itemsSize: %s", len));
 
-            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(0).sendKeys(key);
-            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(1).sendKeys(value);
+//            globalParamsItems().get(len-1).findElements(new By.ByTagName("button")).get(1).click();
+
+//            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(0).sendKeys(key);
+//            globalParamsItems().get(len).findElements(new By.ByTagName("input")).get(1).sendKeys(value);
         }
 
         return this;
