@@ -82,13 +82,13 @@ class WorkflowE2ETest {
 
     @AfterAll
     public static void cleanup() {
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .goTo(project)
-            .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .goTo(project)
+//            .goToTab(WorkflowDefinitionTab.class)
+//            .cancelPublishAll()
 //            .deleteAll()
-        ;
+//        ;
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .delete(project)
@@ -124,15 +124,13 @@ class WorkflowE2ETest {
             .submit()
         ;
 
-//        await().untilAsserted(() -> {
-//            assertThat(workflowDefinitionPage.workflowList())
-//                    .as("Workflow list should contain newly-created workflow")
-//                    .anyMatch(
-//                            it -> it.getText().contains(workflow)
-//                    );
-//        });
+        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+                .as("Workflow list should contain newly-created workflow")
+                .anyMatch(
+                        it -> it.getText().contains(workflow)
+                ));
 
-//        workflowDefinitionPage.publish(workflow);
+        workflowDefinitionPage.publish(workflow);
     }
 
 //    @Test
@@ -166,59 +164,59 @@ class WorkflowE2ETest {
 //        workflowDefinitionPage.publish(workflow);
 //    }
 
-//    @Test
-//    @Order(30)
-//    void testRunWorkflow() {
-//        final String workflow = "test-workflow-1";
-//
-//        final ProjectDetailPage projectPage =
-//                new ProjectPage(browser)
-//                        .goToNav(ProjectPage.class)
-//                        .goTo(project);
-//
-//        projectPage
-//                .goToTab(WorkflowInstanceTab.class)
-//                .deleteAll();
-//
-//        projectPage
-//                .goToTab(WorkflowDefinitionTab.class)
-//                .run(workflow)
-//                .submit();
-//
-//        await().untilAsserted(() -> {
-//            browser.navigate().refresh();
-//
-//            final Row row = projectPage
-//                    .goToTab(WorkflowInstanceTab.class)
-//                    .instances()
-//                    .iterator()
-//                    .next();
-//
-//            assertThat(row.isSuccess()).isTrue();
-//            assertThat(row.executionTime()).isEqualTo(1);
-//        });
-//
-//        // Test rerun
-//        projectPage
-//                .goToTab(WorkflowInstanceTab.class)
-//                .instances()
-//                .stream()
-//                .filter(it -> it.rerunButton().isDisplayed())
-//                .iterator()
-//                .next()
-//                .rerun();
-//
-//        await().untilAsserted(() -> {
-//            browser.navigate().refresh();
-//
-//            final Row row = projectPage
-//                    .goToTab(WorkflowInstanceTab.class)
-//                    .instances()
-//                    .iterator()
-//                    .next();
-//
-//            assertThat(row.isSuccess()).isTrue();
-//            assertThat(row.executionTime()).isEqualTo(2);
-//        });
-//    }
+    @Test
+    @Order(30)
+    void testRunWorkflow() {
+        final String workflow = "test-workflow-1";
+
+        final ProjectDetailPage projectPage =
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(project);
+
+        projectPage
+                .goToTab(WorkflowInstanceTab.class)
+                .deleteAll();
+
+        projectPage
+                .goToTab(WorkflowDefinitionTab.class)
+                .run(workflow)
+                .submit();
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            final Row row = projectPage
+                    .goToTab(WorkflowInstanceTab.class)
+                    .instances()
+                    .iterator()
+                    .next();
+
+            assertThat(row.isSuccess()).isTrue();
+            assertThat(row.executionTime()).isEqualTo(1);
+        });
+
+        // Test rerun
+        projectPage
+                .goToTab(WorkflowInstanceTab.class)
+                .instances()
+                .stream()
+                .filter(it -> it.rerunButton().isDisplayed())
+                .iterator()
+                .next()
+                .rerun();
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            final Row row = projectPage
+                    .goToTab(WorkflowInstanceTab.class)
+                    .instances()
+                    .iterator()
+                    .next();
+
+            assertThat(row.isSuccess()).isTrue();
+            assertThat(row.executionTime()).isEqualTo(2);
+        });
+    }
 }
