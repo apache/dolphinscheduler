@@ -26,7 +26,7 @@ import lombok.Getter;
 
 @Getter
 public final class ShellTaskForm extends TaskNodeForm {
-    private final CodeEditor codeEditor;
+    private CodeEditor codeEditor;
 
     public ShellTaskForm(WorkflowForm parent) {
         super(parent);
