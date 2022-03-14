@@ -36,5 +36,5 @@ ignore =
     # Conflict to Black
     W503   # W503: Line breaks before binary operators
 per-file-ignores =
-    src/pydolphinscheduler/side/__init__.py:F401
-    src/pydolphinscheduler/tasks/__init__.py:F401
+    */pydolphinscheduler/side/__init__.py:F401
+    */pydolphinscheduler/tasks/__init__.py:F401
