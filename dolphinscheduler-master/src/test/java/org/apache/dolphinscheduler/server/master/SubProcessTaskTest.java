@@ -17,20 +17,25 @@
 
 package org.apache.dolphinscheduler.server.master;
 
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +44,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Stopper.class })
@@ -102,6 +110,7 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = getTaskInstance(getTaskNode(), processInstance);
 
         ProcessInstance subProcessInstance = getSubProcessInstance(expectResult);
+        subProcessInstance.setVarPool(getProperty());
         // for SubProcessTaskExecThread.waitTaskQuit
         Mockito.when(processService
                 .findProcessInstanceById(subProcessInstance.getId()))
@@ -120,7 +129,32 @@ public class SubProcessTaskTest {
         //taskExecThread.call();
         //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
-
+    @Test
+    public void testFinish() {
+        TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
+        taskInstance.setVarPool(getProperty());
+        taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
+                "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
+                "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
+                "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
+                "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
+                "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
+                "\"waitStartTimeout\":{},\"switchResult\":{}}");
+        SubTaskProcessor subTaskProcessor = new SubTaskProcessor();
+        subTaskProcessor.init(taskInstance, processInstance);
+        subTaskProcessor.action(TaskAction.RUN);
+        ExecutionStatus status = taskInstance.getState();
+        Assert.assertEquals(ExecutionStatus.SUCCESS, status);
+    }
+    private String getProperty(){
+        List<Property> varPools = new ArrayList<>();
+        Property property = new Property();
+        property.setProp("key");
+        property.setValue("1");
+        property.setDirect(Direct.OUT);
+        varPools.add(property);
+        return JSONUtils.toJsonString(varPools);
+    }
     @Test
     public void testBasicFailure() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
