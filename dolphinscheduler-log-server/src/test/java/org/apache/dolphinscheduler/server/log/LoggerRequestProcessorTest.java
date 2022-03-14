@@ -38,6 +38,7 @@ public class LoggerRequestProcessorTest {
 
     @Test
     public void testProcessViewWholeLogRequest() {
+        System.setProperty("DOLPHINSCHEDULER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
         PowerMockito.mockStatic(LoggerUtils.class);
