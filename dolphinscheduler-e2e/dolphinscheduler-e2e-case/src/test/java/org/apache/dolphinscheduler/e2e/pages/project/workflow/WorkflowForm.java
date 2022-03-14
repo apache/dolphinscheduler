@@ -45,7 +45,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 @SuppressWarnings("UnstableApiUsage")
 @Getter
 public final class WorkflowForm {
-    private final WebDriver driver;
+    private WebDriver driver;
     private final WorkflowSaveDialog saveForm;
     private final WorkflowFormatDialog formatDialog;
 

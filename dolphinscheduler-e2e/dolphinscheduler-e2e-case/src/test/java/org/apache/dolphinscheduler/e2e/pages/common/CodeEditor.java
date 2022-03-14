@@ -38,7 +38,7 @@ public final class CodeEditor {
     })
     private WebElement editor;
 
-    private WebDriver driver;
+    WebDriver driver;
 
     public CodeEditor(WebDriver driver) {
         PageFactory.initElements(driver, this);
