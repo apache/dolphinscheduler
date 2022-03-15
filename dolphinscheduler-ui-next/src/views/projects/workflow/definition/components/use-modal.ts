@@ -37,8 +37,8 @@ import {
 import { parseTime } from '@/utils/common'
 
 export function useModal(
-  state: any,
-  ctx: SetupContext<('update:show' | 'update:row' | 'updateList')[]>
+    state: any,
+    ctx: SetupContext<('update:show' | 'update:row' | 'updateList')[]>
 ) {
   const { t } = useI18n()
   const router: Router = useRouter()
@@ -87,12 +87,12 @@ export function useModal(
       state.startForm.processDefinitionCode = code
       if (state.startForm.startEndTime) {
         const start = format(
-          new Date(state.startForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
+            new Date(state.startForm.startEndTime[0]),
+            'yyyy-MM-dd hh:mm:ss'
         )
         const end = format(
-          new Date(state.startForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
+            new Date(state.startForm.startEndTime[1]),
+            'yyyy-MM-dd hh:mm:ss'
         )
         state.startForm.scheduleTime = `${start},${end}`
       }
@@ -104,8 +104,8 @@ export function useModal(
         }
       }
       state.startForm.startParams = !_.isEmpty(startParams)
-        ? JSON.stringify(startParams)
-        : ''
+          ? JSON.stringify(startParams)
+          : ''
 
       await startProcessInstance(state.startForm, variables.projectCode)
       window.$message.success(t('project.workflow.success'))
@@ -157,12 +157,12 @@ export function useModal(
 
   const getTimingData = () => {
     const start = format(
-      parseTime(state.timingForm.startEndTime[0]),
-      'yyyy-MM-dd hh:mm:ss'
+        parseTime(state.timingForm.startEndTime[0]),
+        'yyyy-MM-dd hh:mm:ss'
     )
     const end = format(
-      parseTime(state.timingForm.startEndTime[1]),
-      'yyyy-MM-dd hh:mm:ss'
+        parseTime(state.timingForm.startEndTime[1]),
+        'yyyy-MM-dd hh:mm:ss'
     )
 
     const data = {
@@ -176,9 +176,9 @@ export function useModal(
       warningType: state.timingForm.warningType,
       processInstancePriority: state.timingForm.processInstancePriority,
       warningGroupId:
-        state.timingForm.warningGroupId === ''
-          ? 0
-          : state.timingForm.warningGroupId,
+          state.timingForm.warningGroupId === ''
+              ? 0
+              : state.timingForm.warningGroupId,
       workerGroup: state.timingForm.workerGroup,
       environmentCode: state.timingForm.environmentCode
     }
@@ -215,9 +215,9 @@ export function useModal(
 
   const getStartParamsList = (code: number) => {
     queryProcessDefinitionByCode(code, variables.projectCode).then(
-      (res: any) => {
-        variables.startParamsList = res.processDefinition.globalParamList
-      }
+        (res: any) => {
+          variables.startParamsList = res.processDefinition.globalParamList
+        }
     )
   }
 
@@ -227,12 +227,12 @@ export function useModal(
         const projectCode = Number(router.currentRoute.value.params.projectCode)
 
         const start = format(
-          new Date(state.timingForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
+            new Date(state.timingForm.startEndTime[0]),
+            'yyyy-MM-dd hh:mm:ss'
         )
         const end = format(
-          new Date(state.timingForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
+            new Date(state.timingForm.startEndTime[1]),
+            'yyyy-MM-dd hh:mm:ss'
         )
 
         const schedule = JSON.stringify({

@@ -55,6 +55,13 @@ export function queryResourceById(
   })
 }
 
+export function queryCurrentResourceById(id: number): any {
+  return axios({
+    url: `/resources/${id}/query`,
+    method: 'get'
+  })
+}
+
 export function createResource(
   data: CreateReq & FileNameReq & NameReq & ResourceTypeReq
 ): any {

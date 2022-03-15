@@ -231,4 +231,11 @@ public interface ResourcesService {
      */
     Map<String, Object> authorizedFile(User loginUser, Integer userId);
 
+    /**
+     * get resource by id
+     * @param resourceId resource id
+     * @return resource
+     */
+    Result<Object> queryResourceById(Integer resourceId);
+
 }

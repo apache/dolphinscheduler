@@ -28,9 +28,9 @@ export function useFolder(state: any) {
   const fileStore = useFileStore()
 
   const handleCreateFolder = async (
-    emit: IEmit,
-    hideModal: () => void,
-    resetForm: () => void
+      emit: IEmit,
+      hideModal: () => void,
+      resetForm: () => void
   ) => {
     await state.folderFormRef.validate()
 

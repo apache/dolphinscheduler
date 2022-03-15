@@ -45,6 +45,9 @@ import ResourceRenameModal from './rename'
 import { IRenameFile } from './types'
 import type { Router } from 'vue-router'
 import styles from './index.module.scss'
+import { useFileStore } from '@/store/file/file'
+import { queryCurrentResourceById } from '@/service/modules/resources'
+import { ResourceFile } from '@/service/modules/resources/types'
 
 export default defineComponent({
   name: 'File',
@@ -142,6 +145,7 @@ export default defineComponent({
         serachRef.value
       )
     }
+    const fileStore = useFileStore()
 
     onMounted(() => {
       resourceListRef.value = getResourceListState(fileId.value)
@@ -150,7 +154,20 @@ export default defineComponent({
     watch(
       () => router.currentRoute.value.params.id,
       // @ts-ignore
-      () => reload()
+      () => {
+        reload()
+        const currFileId = Number(router.currentRoute.value.params.id) || -1
+
+        if (currFileId === -1) {
+          fileStore.setCurrentDir('/')
+        } else {
+          queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
+            if (res.fullName) {
+              fileStore.setCurrentDir(res.fullName)
+            }
+          })
+        }
+      }
     )
 
     return {
