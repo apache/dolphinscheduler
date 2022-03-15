@@ -30,3 +30,18 @@ class Task(SourceTask):
     def gen_code_and_version(self):
         """Mock java gateway code and version, convenience method for unittest."""
         return uuid.uuid1().time, self.DEFAULT_VERSION
+
+
+class TaskWithCode(SourceTask):
+    """Mock class :class:`pydolphinscheduler.core.task.Task` and it return some code and version."""
+
+    def __init__(
+        self, name: str, task_type: str, code: int, version: int, *args, **kwargs
+    ):
+        self._constant_code = code
+        self._constant_version = version
+        super().__init__(name, task_type, *args, **kwargs)
+
+    def gen_code_and_version(self):
+        """Mock java gateway code and version, convenience method for unittest."""
+        return self._constant_code, self._constant_version
