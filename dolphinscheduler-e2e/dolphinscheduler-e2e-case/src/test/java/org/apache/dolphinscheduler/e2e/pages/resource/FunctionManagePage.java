@@ -66,10 +66,12 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
         buttonCreateUdfFunction().click();
 
-        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(
-                createUdfFunctionBox().radioFunctionType()));
+//        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(
+//                createUdfFunctionBox().radioFunctionType()));
 
-        createUdfFunctionBox().radioFunctionType().click();
+//        createUdfFunctionBox().radioFunctionType().click();
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createUdfFunctionBox().radioFunctionType());
 
         createUdfFunctionBox().inputFunctionName().sendKeys(udfFunctionName);
 
