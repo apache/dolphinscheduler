@@ -128,6 +128,6 @@ export function useChildNode({
       'on-update:value': onChange
     },
     options: options,
-    className: 'select-child-node'
+    class: 'select-child-node'
   }
 }
