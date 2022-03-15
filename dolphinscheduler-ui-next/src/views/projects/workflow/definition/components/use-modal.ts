@@ -54,8 +54,8 @@ export function useModal(
   })
 
   const resetImportForm = () => {
-    state.importFormRef.name = ''
-    state.importFormRef.file = ''
+    state.importForm.name = ''
+    state.importForm.file = ''
   }
 
   const handleImportDefinition = async () => {
