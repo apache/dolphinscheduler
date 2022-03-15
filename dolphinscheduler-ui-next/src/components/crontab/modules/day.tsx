@@ -477,8 +477,8 @@ export default defineComponent({
         </NRadio>
         <NRadio class={styles['crontab-list']} value={'WkintervalWeek'}>
           <div class={styles['crontab-list-item']}>
-            <div>{t('crontab.every')}</div>
-            <div>
+            <div class={styles['item-text']}>{t('crontab.every')}</div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}
@@ -487,10 +487,11 @@ export default defineComponent({
                 onUpdateValue={this.onWkintervalWeekPerform}
               />
             </div>
-            <div>{t('crontab.day_carried_out')}</div>
+            <div class={styles['item-text']}>
+              {t('crontab.day_carried_out')}
+            </div>
             <div>
               <NSelect
-                style={{ width: '150px' }}
                 options={this.weekOptions}
                 defaultValue={this.WkintervalWeekStartRef}
                 v-model:value={this.WkintervalWeekStartRef}
@@ -503,7 +504,7 @@ export default defineComponent({
         <NRadio class={styles['crontab-list']} value={'intervalDay'}>
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.every')}</div>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}
@@ -513,7 +514,7 @@ export default defineComponent({
               />
             </div>
             <div>{t('crontab.day_carried_out')}</div>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={1}
@@ -581,7 +582,7 @@ export default defineComponent({
         </NRadio>
         <NRadio class={styles['crontab-list']} value={'monthTailBefore'}>
           <div class={styles['crontab-list-item']}>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}
@@ -599,8 +600,9 @@ export default defineComponent({
         >
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.recent_business_day_to_month')}</div>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
+                style={{ width: '100px' }}
                 defaultValue={0}
                 min={0}
                 max={31}
@@ -608,13 +610,13 @@ export default defineComponent({
                 onUpdateValue={this.onRecentlyWorkingDaysMonth}
               />
             </div>
-            <div>{t('crontab.one_day')}</div>
+            <div style={{ width: '50px' }}>{t('crontab.one_day')}</div>
           </div>
         </NRadio>
         <NRadio class={styles['crontab-list']} value={'WkmonthNumWeeks'}>
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.in_this_months')}</div>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}
