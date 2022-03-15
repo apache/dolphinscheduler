@@ -149,6 +149,8 @@ class WorkflowE2ETest {
             .createWorkflow()
 
             .<SubWorkflowTaskForm> addTask(TaskType.SUB_PROCESS)
+            .childNode("test-workflow-1")
+            .name("test-sub-1")
             .submit()
 
             .submit()

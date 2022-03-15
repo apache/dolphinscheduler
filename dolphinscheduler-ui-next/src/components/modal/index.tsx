@@ -123,7 +123,7 @@ const Modal = defineComponent({
               <NSpace justify='end'>
                 {this.cancelShow && (
                   <NButton
-                    class={[this.cancelClassName, 'btn-cancel']}
+                    class={this.cancelClassName}
                     quaternary
                     size='small'
                     onClick={onCancel}
@@ -134,7 +134,7 @@ const Modal = defineComponent({
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
                 <NButton
-                  class={[this.confirmClassName, 'btn-submit']}
+                  class={this.confirmClassName}
                   type='info'
                   size='small'
                   onClick={onConfirm}

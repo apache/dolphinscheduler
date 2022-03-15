@@ -127,6 +127,7 @@ export function useChildNode({
       loading: loading,
       'on-update:value': onChange
     },
-    options: options
+    options: options,
+    className: 'select-child-node'
   }
 }
