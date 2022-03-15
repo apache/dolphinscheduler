@@ -80,24 +80,24 @@ class WorkflowE2ETest {
         ;
     }
 
-    @AfterAll
-    public static void cleanup() {
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .goTo(project)
-            .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
-            .deleteAll()
-        ;
-
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .delete(project)
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
-    }
+//    @AfterAll
+//    public static void cleanup() {
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .goTo(project)
+//            .goToTab(WorkflowDefinitionTab.class)
+//            .cancelPublishAll()
+//            .deleteAll()
+//        ;
+//
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .delete(project)
+//            .goToNav(SecurityPage.class)
+//            .goToTab(TenantPage.class)
+//            .delete(tenant)
+//        ;
+//    }
 
     @Test
     @Order(1)
