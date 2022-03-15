@@ -178,7 +178,7 @@ public class TaskPriorityQueueConsumer extends Thread {
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
-                changeTaskStateToDispatch(context);
+                changeTaskStateToDispatch(context, executionContext);
             }
         } catch (RuntimeException | ExecuteException e) {
             logger.error("dispatch error: {}", e.getMessage(), e);
@@ -189,11 +189,12 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * change task state to dispatch
      */
-    private void changeTaskStateToDispatch(TaskExecutionContext context) {
+    private void changeTaskStateToDispatch(TaskExecutionContext context, ExecutionContext executionContext) {
         WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(context.getProcessInstanceId());
         if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(context.getTaskInstanceId())) {
             TaskInstance taskInstance = workflowExecuteThread.getTaskInstance(context.getTaskInstanceId());
             taskInstance.setState(ExecutionStatus.DISPATCH);
+            taskInstance.setHost(executionContext.getHost().getAddress());
             processService.saveTaskInstance(taskInstance);
         }
     }
