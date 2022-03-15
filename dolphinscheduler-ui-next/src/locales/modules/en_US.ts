@@ -555,7 +555,8 @@ const project = {
     delay_execution: 'Delay Execution',
     forced_success: 'Forced Success',
     view_log: 'View Log',
-    download_log: 'Download Log'
+    download_log: 'Download Log',
+    refresh: 'Refresh'
   },
   dag: {
     create: 'Create Workflow',
