@@ -90,17 +90,14 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowDefinitionTab cancelPublishAll() {
-        final Supplier<List<WebElement>> cancelButtons = () ->
-            workflowList()
+        List<WebElement> cancelButtons = workflowList()
                 .stream()
                 .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
                 .filter(WebElement::isDisplayed)
                 .collect(Collectors.toList());
 
-        for (List<WebElement> buttons = cancelButtons.get();
-             !buttons.isEmpty();
-             buttons = cancelButtons.get()) {
-            buttons.forEach(WebElement::click);
+        for (WebElement cancelButton : cancelButtons) {
+            cancelButton.click();
             driver().navigate().refresh();
         }
 
