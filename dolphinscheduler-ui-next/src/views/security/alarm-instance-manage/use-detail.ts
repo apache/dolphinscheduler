@@ -45,6 +45,7 @@ export function useDetail(getFormValues: Function) {
     const values = getFormValues()
     if (status.saving) return false
     status.saving = true
+
     try {
       if (currentRecord?.instanceName !== values.instanceName) {
         await verifyAlertInstanceName({
@@ -69,8 +70,7 @@ export function useDetail(getFormValues: Function) {
 
       status.saving = false
       return true
-    } catch (e) {
-      window.$message.error((e as Error).message)
+    } catch (err) {
       status.saving = false
       return false
     }

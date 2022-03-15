@@ -513,7 +513,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-ui</artifactId>
+                <artifactId>dolphinscheduler-ui-next</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1034,9 +1034,6 @@
                             </goals>
                             <configuration>
                                 <skip>${docker.build.skip}</skip>
-                                <environmentVariables>
-                                    <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
-                                </environmentVariables>
                                 <executable>docker</executable>
                                 <workingDirectory>${project.basedir}</workingDirectory>
                                 <arguments>
@@ -1331,7 +1328,6 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-registry</module>
         <module>dolphinscheduler-task-plugin</module>
-        <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>

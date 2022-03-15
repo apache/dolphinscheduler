@@ -84,27 +84,31 @@ public class FunctionManageE2ETest {
     @SneakyThrows
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
-            .login(user, password)
-            .create(tenant);
+                .login(user, password)
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class)
+                .create(tenant);
 
         await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-            .as("Tenant list should contain newly-created tenant")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(tenant)));
+                .as("Tenant list should contain newly-created tenant")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(tenant)));
 
         downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
 
-        UdfManagePage udfManagePage = tenantPage.goToNav(SecurityPage.class)
-            .goToTab(UserPage.class)
-            .update(user, user, password, email, phone)
-            .goToNav(ResourcePage.class)
-            .goToTab(UdfManagePage.class)
-            .uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
+        UserPage userPage = tenantPage.goToNav(SecurityPage.class)
+                .goToTab(UserPage.class);
 
-        new WebDriverWait(browser, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
+        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
+
+        UdfManagePage udfManagePage = userPage.update(user, user, password, email, phone, tenant)
+                .goToNav(ResourcePage.class)
+                .goToTab(UdfManagePage.class)
+                .uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
 
         udfManagePage.goToNav(ResourcePage.class)
-            .goToTab(FunctionManagePage.class);
+                .goToTab(FunctionManagePage.class);
     }
 
     @AfterAll
@@ -140,9 +144,6 @@ public class FunctionManageE2ETest {
     @Order(10)
     void testCreateUdfFunction() {
         FunctionManagePage page = new FunctionManagePage(browser);
-
-        new WebDriverWait(page.driver(), 10)
-            .until(ExpectedConditions.elementToBeClickable(By.id("btnCreateUdfFunction")));
 
         page.createUdfFunction(testUdfFunctionName, testClassName, testUploadUdfFileName, testDescription);
 

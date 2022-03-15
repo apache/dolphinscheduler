@@ -84,22 +84,17 @@ export default defineComponent({
         taskInstanceId: props.taskInstanceId,
         skipLineNum: loadingIndex.value * 1000,
         limit: loadingIndex.value === 0 ? 1000 : (loadingIndex.value + 1) * 1000
-      })
-        .then((res: any) => {
-          setTimeout(() => {
-            loadingRef.value = false
-            if (res) {
-              window.$message.success(t('project.workflow.update_log_success'))
-            } else {
-              window.$message.warning(t('project.workflow.no_more_log'))
-            }
-          }, 1500)
-          textareaLog.value.innerHTML = res || t('project.workflow.no_log')
-        })
-        .catch((error: any) => {
-          window.$message.error(error.message || '')
+      }).then((res: any) => {
+        setTimeout(() => {
           loadingRef.value = false
-        })
+          if (res) {
+            window.$message.success(t('project.workflow.update_log_success'))
+          } else {
+            window.$message.warning(t('project.workflow.no_more_log'))
+          }
+        }, 1500)
+        textareaLog.value.innerHTML = res || t('project.workflow.no_log')
+      })
     }
 
     const showLog = () => {
@@ -107,28 +102,24 @@ export default defineComponent({
         taskInstanceId: props.taskInstanceId,
         skipLineNum: loadingIndex.value * 1000,
         limit: loadingIndex.value === 0 ? 1000 : (loadingIndex.value + 1) * 1000
+      }).then((res: any) => {
+        if (!res) {
+          isDataRef.value = false
+          setTimeout(() => {
+            window.$message.warning(t('project.workflow.no_more_log'))
+          }, 1000)
+          textareaLog.value.innerHTML =
+            contentRef.value || t('project.workflow.no_log')
+        } else {
+          isDataRef.value = true
+          contentRef.value = res
+          textareaLog.value.innerHTML =
+            contentRef.value || t('project.workflow.no_log')
+          setTimeout(() => {
+            textareaLog.value.scrollTop = 2
+          }, 800)
+        }
       })
-        .then((res: any) => {
-          if (!res) {
-            isDataRef.value = false
-            setTimeout(() => {
-              window.$message.warning(t('project.workflow.no_more_log'))
-            }, 1000)
-            textareaLog.value.innerHTML =
-              contentRef.value || t('project.workflow.no_log')
-          } else {
-            isDataRef.value = true
-            contentRef.value = res
-            textareaLog.value.innerHTML =
-              contentRef.value || t('project.workflow.no_log')
-            setTimeout(() => {
-              textareaLog.value.scrollTop = 2
-            }, 800)
-          }
-        })
-        .catch((error: any) => {
-          window.$message.error(error.message || '')
-        })
     }
 
     const initLog = () => {
@@ -259,7 +250,7 @@ export default defineComponent({
   render() {
     return (
       <div>
-        <span class={styles['log-model']}>
+        <span>
           {this.taskInstanceId && this.taskInstanceType !== 'SUB_PROCESS' && (
             <span>
               {renderSlot(this.$slots, 'history')}
@@ -349,7 +340,6 @@ export default defineComponent({
                   <div class={styles['content']} ref='logContent'>
                     <div class={styles['content-log-box']} ref='logContentBox'>
                       <textarea
-                        class={styles['textarea-ft']}
                         style={`width: 100%; height: ${this.textareaHeight}px`}
                         spellcheck='false'
                         ref='textareaLog'

@@ -270,6 +270,7 @@ interface ITaskParams {
   sparkParameters?: ISparkParameters
   ruleId?: number
   ruleInputParameter?: IRuleParameters
+  jobFlowDefineJson?: string
 }
 
 interface INodeData
@@ -314,6 +315,7 @@ interface INodeData
   masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
+  definition?: object
 }
 
 interface ITaskData

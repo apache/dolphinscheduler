@@ -32,6 +32,7 @@ export const useForm = () => {
       name: '',
       file: ''
     },
+    saving: false,
     importRules: {
       file: {
         required: true,
@@ -54,9 +55,10 @@ export const useForm = () => {
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       warningGroupId: null,
-      execType: '',
+      execType: 'START_PROCESS',
       startNodeList: '',
       taskDependType: 'TASK_POST',
+      dependentMode: 'OFF_MODE',
       runMode: 'RUN_MODE_SERIAL',
       processInstancePriority: 'MEDIUM',
       workerGroup: 'default',
@@ -64,7 +66,8 @@ export const useForm = () => {
       startParams: null,
       expectedParallelismNumber: '',
       dryRun: 0
-    }
+    },
+    saving: false
   })
 
   const timingState = reactive({
@@ -82,7 +85,8 @@ export const useForm = () => {
       warningGroupId: '',
       workerGroup: 'default',
       environmentCode: null
-    }
+    },
+    saving: false
   })
   return {
     importState,

@@ -124,6 +124,9 @@ export default defineComponent({
         }
         onCancel={this.hideModal}
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
         <NForm
           rules={this.rules}
@@ -135,6 +138,7 @@ export default defineComponent({
             <NRadioGroup
               v-model={[this.functionForm.type, 'value']}
               name='type'
+              class='radio-function-type'
             >
               <NRadio value='HIVE'>HIVE UDF</NRadio>
             </NRadioGroup>
@@ -146,6 +150,7 @@ export default defineComponent({
             <NInput
               v-model={[this.functionForm.funcName, 'value']}
               placeholder={t('resource.function.enter_udf_unction_name_tips')}
+              class='input-function-name'
             />
           </NFormItem>
           <NFormItem
@@ -155,6 +160,7 @@ export default defineComponent({
             <NInput
               v-model={[this.functionForm.className, 'value']}
               placeholder={t('resource.function.enter_package_name_tips')}
+              class='input-class-name'
             />
           </NFormItem>
           <NFormItem
@@ -173,6 +179,7 @@ export default defineComponent({
                 defaultValue={this.functionForm.resourceId}
                 disabled={this.uploadShow}
                 showPath={false}
+                class='btn-udf-resource-dropdown'
               ></NTreeSelect>
               <NButton
                 type='primary'
@@ -244,6 +251,7 @@ export default defineComponent({
                   type='textarea'
                   v-model={[this.uploadForm.description, 'value']}
                   placeholder={t('resource.function.enter_description_tips')}
+                  class='input-description'
                 />
               </NFormItem>
               <NFormItem label=' '>
@@ -260,6 +268,7 @@ export default defineComponent({
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}
+              class='input-description'
             />
           </NFormItem>
         </NForm>

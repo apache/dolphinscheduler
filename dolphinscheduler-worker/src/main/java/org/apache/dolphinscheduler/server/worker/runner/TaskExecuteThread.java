@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -189,12 +190,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
             // task handle
             this.task.handle();
 
+            responseCommand.setStatus(this.task.getExitStatus().getCode());
+
             // task result process
             if (this.task.getNeedAlert()) {
-                sendAlert(this.task.getTaskAlertInfo());
+                sendAlert(this.task.getTaskAlertInfo(), responseCommand.getStatus());
             }
 
-            responseCommand.setStatus(this.task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(this.task.getProcessId());
             responseCommand.setAppIds(this.task.getAppIds());
@@ -215,8 +217,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
     }
 
-    private void sendAlert(TaskAlertInfo taskAlertInfo) {
-        alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent());
+    private void sendAlert(TaskAlertInfo taskAlertInfo, int status) {
+        int strategy = status == ExecutionStatus.SUCCESS.getCode() ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
+        alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent(), strategy);
     }
 
     /**

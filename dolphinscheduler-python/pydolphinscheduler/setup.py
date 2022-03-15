@@ -38,7 +38,7 @@ version = "2.0.4"
 prod = [
     "click>=8.0.0",
     "py4j~=0.10",
-    "pyyaml",
+    "ruamel.yaml",
 ]
 
 build = [
@@ -57,6 +57,7 @@ test = [
     "pytest>=6.2",
     "freezegun>=1.1",
     "coverage>=6.1",
+    "pytest-cov>=3.0",
 ]
 
 style = [
@@ -144,7 +145,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     package_data={
-        "examples": ["examples.tutorial.py"],
+        "pydolphinscheduler": ["core/default_config.yaml"],
     },
     platforms=["any"],
     classifiers=[

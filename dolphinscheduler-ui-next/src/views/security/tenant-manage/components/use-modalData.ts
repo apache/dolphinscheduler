@@ -37,6 +37,7 @@ export function useModalData(
       queueId: ref<number>(-1),
       generalOptions: []
     },
+    saving: false,
     rules: {
       tenantCode: {
         required: true
@@ -64,14 +65,18 @@ export function useModalData(
     return state
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.tenantFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitTenantModal() : updateTenantModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.tenantFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0 ? await submitTenantModal() : await updateTenantModal()
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitTenantModal = () => {

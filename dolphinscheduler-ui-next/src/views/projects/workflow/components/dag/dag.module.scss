@@ -107,6 +107,9 @@ $bgLight: #ffffff;
     &.icon-sub_process {
       background-image: url('@/assets/images/task-icons/sub_process.png');
     }
+    &.icon-data_quality {
+      background-image: url('@/assets/images/task-icons/data_quality.png');
+    }
     &.icon-procedure {
       background-image: url('@/assets/images/task-icons/procedure.png');
     }
@@ -149,6 +152,9 @@ $bgLight: #ffffff;
     &.icon-switch {
       background-image: url('@/assets/images/task-icons/switch.png');
     }
+    &.icon-emr {
+      background-image: url('@/assets/images/task-icons/emr.png');
+    }
   }
 
   &:hover {
@@ -158,6 +164,9 @@ $bgLight: #ffffff;
       }
       &.icon-sub_process {
         background-image: url('@/assets/images/task-icons/sub_process_hover.png');
+      }
+      &.icon-data_quality {
+        background-image: url('@/assets/images/task-icons/data_quality_hover.png');
       }
       &.icon-procedure {
         background-image: url('@/assets/images/task-icons/procedure_hover.png');
@@ -200,6 +209,9 @@ $bgLight: #ffffff;
       }
       &.icon-switch {
         background-image: url('@/assets/images/task-icons/switch_hover.png');
+      }
+      &.icon-emr {
+        background-image: url('@/assets/images/task-icons/emr_hover.png');
       }
     }
   }

@@ -274,6 +274,7 @@ CREATE TABLE t_ds_alert
     title         varchar(64) DEFAULT NULL,
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
+    warning_type  tinyint(4) DEFAULT '2',
     log           text,
     alertgroup_id int(11) DEFAULT NULL,
     create_time   datetime    DEFAULT NULL,

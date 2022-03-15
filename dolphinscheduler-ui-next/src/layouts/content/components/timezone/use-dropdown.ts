@@ -15,44 +15,35 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
-import { reactive, ref } from 'vue'
+import { updateUser } from '@/service/modules/users'
+import { useTimezoneStore } from '@/store/timezone/timezone'
 import { useUserStore } from '@/store/user/user'
-import type { FormRules } from 'naive-ui'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
-export function useForm() {
-  const { t } = useI18n()
+export function useDropDown(chooseVal: any, reload: any) {
   const userStore = useUserStore()
+  const timezoneStore = useTimezoneStore()
 
-  const state = reactive({
-    projectFormRef: ref(),
-    projectForm: {
-      projectName: '',
-      description: '',
-      userName: (userStore.getUserInfo as UserInfoRes).userName
-    },
-    rules: {
-      projectName: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.projectForm.projectName === '') {
-            return new Error(t('project.list.project_tips'))
-          }
-        }
-      },
-      userName: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.projectForm.userName === '') {
-            return new Error(t('project.list.username_tips'))
-          }
-        }
-      }
-    } as FormRules
-  })
+  const userInfo = userStore.userInfo as UserInfoRes
 
-  return { state, t }
+  const handleSelect = (key: string) => {
+    updateUser({
+      userPassword: '',
+      id: userInfo.id,
+      userName: '',
+      tenantId: userInfo.tenantId,
+      email: '',
+      phone: userInfo.phone,
+      state: userInfo.state,
+      timeZone: key
+    }).then(() => {
+      chooseVal.value = key
+      timezoneStore.setTimezone(key as string)
+      reload()
+    })
+  }
+
+  return {
+    handleSelect
+  }
 }

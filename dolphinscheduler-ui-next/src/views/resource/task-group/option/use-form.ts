@@ -33,6 +33,7 @@ export function useForm() {
       status: 1,
       description: ''
     } as TaskGroupUpdateReq,
+    saving: false,
     rules: {
       name: {
         required: true,

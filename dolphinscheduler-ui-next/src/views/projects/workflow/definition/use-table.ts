@@ -29,10 +29,10 @@ import {
   release
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
-
 import { IDefinitionParam } from './types'
 import styles from './index.module.scss'
 import { NEllipsis, NTag } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 
 export function useTable() {
   const { t } = useI18n()
@@ -72,17 +72,15 @@ export function useTable() {
             {
               default: () =>
                 h(
-                  'a',
+                  ButtonLink,
                   {
-                    href: 'javascript:',
-                    class: styles.links,
                     onClick: () =>
-                      router.push({
+                      void router.push({
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })
                   },
-                  row.name
+                  { default: () => row.name }
                 ),
               tooltip: () => row.name
             }
@@ -191,18 +189,14 @@ export function useTable() {
   }
 
   const deleteWorkflow = (row: any) => {
-    deleteByCode(variables.projectCode, row.code)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteByCode(variables.projectCode, row.code).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const releaseWorkflow = (row: any) => {
@@ -212,18 +206,14 @@ export function useTable() {
         | 'OFFLINE'
         | 'ONLINE'
     }
-    release(data, variables.projectCode, row.code)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    release(data, variables.projectCode, row.code).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const copyWorkflow = (row: any) => {
@@ -231,18 +221,14 @@ export function useTable() {
       codes: String(row.code),
       targetProjectCode: variables.projectCode
     }
-    batchCopyByCodes(data, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    batchCopyByCodes(data, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const downloadBlob = (data: any, fileNameS = 'json') => {
@@ -276,13 +262,9 @@ export function useTable() {
     const data = {
       codes: String(row.code)
     }
-    batchExportByCodes(data, variables.projectCode)
-      .then((res: any) => {
-        downloadBlob(res, fileName)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    batchExportByCodes(data, variables.projectCode).then((res: any) => {
+      downloadBlob(res, fileName)
+    })
   }
 
   const gotoTimingManage = (row: any) => {

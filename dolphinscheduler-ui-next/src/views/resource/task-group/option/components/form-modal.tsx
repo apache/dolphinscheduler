@@ -67,13 +67,18 @@ const FormModal = defineComponent({
       }
     })
 
-    const onConfirm = () => {
-      ;(props.status === 1
-        ? updateTaskGroup(state.formData)
-        : createTaskGroup(state.formData)
-      ).then(() => {
+    const onConfirm = async () => {
+      if (state.saving) return
+      state.saving = true
+      try {
+        props.status === 1
+          ? await updateTaskGroup(state.formData)
+          : await createTaskGroup(state.formData)
+        state.saving = false
         emit('confirm')
-      })
+      } catch (err) {
+        state.saving = false
+      }
     }
 
     const onCancel = () => {
@@ -101,6 +106,7 @@ const FormModal = defineComponent({
           !this.formData.groupSize ||
           !this.formData.description
         }
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
           <NFormItem label={t('resource.task_group_option.name')} path='name'>

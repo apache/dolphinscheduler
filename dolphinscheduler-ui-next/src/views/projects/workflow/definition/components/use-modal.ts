@@ -18,10 +18,13 @@
 import _ from 'lodash'
 import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { format } from 'date-fns'
-import { importProcessDefinition } from '@/service/modules/process-definition'
+import {
+  importProcessDefinition,
+  queryProcessDefinitionByCode
+} from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
@@ -39,9 +42,10 @@ export function useModal(
 ) {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const route = useRoute()
 
   const variables = reactive({
-    projectCode: Number(router.currentRoute.value.params.projectCode),
+    projectCode: Number(route.params.projectCode),
     workerGroups: [],
     alertGroups: [],
     environmentList: [],
@@ -54,97 +58,101 @@ export function useModal(
     state.importFormRef.file = ''
   }
 
-  const handleImportDefinition = () => {
-    state.importFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        try {
-          const formData = new FormData()
-          formData.append('file', state.importForm.file)
-          const code = Number(router.currentRoute.value.params.projectCode)
-          await importProcessDefinition(formData, code)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-          resetImportForm()
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
-    })
+  const handleImportDefinition = async () => {
+    await state.importFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+    try {
+      const formData = new FormData()
+      formData.append('file', state.importForm.file)
+      const code = Number(router.currentRoute.value.params.projectCode)
+      await importProcessDefinition(formData, code)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+      resetImportForm()
+    } catch (err) {
+      state.saving = false
+    }
   }
 
-  const handleStartDefinition = (code: number) => {
-    state.startFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        state.startForm.processDefinitionCode = code
-        if (state.startForm.startEndTime) {
-          const start = format(
-            new Date(state.startForm.startEndTime[0]),
-            'yyyy-MM-dd hh:mm:ss'
-          )
-          const end = format(
-            new Date(state.startForm.startEndTime[1]),
-            'yyyy-MM-dd hh:mm:ss'
-          )
-          state.startForm.scheduleTime = `${start},${end}`
-        }
+  const handleStartDefinition = async (code: number) => {
+    await state.startFormRef.validate()
 
-        const startParams = {} as any
-        for (const item of variables.startParamsList) {
-          if (item.value !== '') {
-            startParams[item.prop] = item.value
-          }
-        }
-        state.startForm.startParams = !_.isEmpty(startParams)
-          ? JSON.stringify(startParams)
-          : ''
+    if (state.saving) return
+    state.saving = true
+    try {
+      state.startForm.processDefinitionCode = code
+      if (state.startForm.startEndTime) {
+        const start = format(
+          new Date(state.startForm.startEndTime[0]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+        const end = format(
+          new Date(state.startForm.startEndTime[1]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+        state.startForm.scheduleTime = `${start},${end}`
+      }
 
-        try {
-          await startProcessInstance(state.startForm, variables.projectCode)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
+      const startParams = {} as any
+      for (const item of variables.startParamsList) {
+        if (item.value !== '') {
+          startParams[item.prop] = item.value
         }
       }
-    })
+      state.startForm.startParams = !_.isEmpty(startParams)
+        ? JSON.stringify(startParams)
+        : ''
+
+      await startProcessInstance(state.startForm, variables.projectCode)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
-  const handleCreateTiming = (code: number) => {
-    state.timingFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        const data: any = getTimingData()
-        data.processDefinitionCode = code
+  const handleCreateTiming = async (code: number) => {
+    await state.timingFormRef.validate()
 
-        try {
-          await createSchedule(data, variables.projectCode)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
-    })
+    if (state.saving) return
+    state.saving = true
+    try {
+      const data: any = getTimingData()
+      data.processDefinitionCode = code
+
+      await createSchedule(data, variables.projectCode)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
-  const handleUpdateTiming = (id: number) => {
-    state.timingFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        const data: any = getTimingData()
-        data.id = id
+  const handleUpdateTiming = async (id: number) => {
+    await state.timingFormRef.validate()
 
-        try {
-          await updateSchedule(data, variables.projectCode, id)
-          window.$message.success(t('project.workflow.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
-    })
+    if (state.saving) return
+    state.saving = true
+    try {
+      const data: any = getTimingData()
+      data.id = id
+
+      await updateSchedule(data, variables.projectCode, id)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   const getTimingData = () => {
@@ -205,6 +213,14 @@ export function useModal(
     })
   }
 
+  const getStartParamsList = (code: number) => {
+    queryProcessDefinitionByCode(code, variables.projectCode).then(
+      (res: any) => {
+        variables.startParamsList = res.processDefinition.globalParamList
+      }
+    )
+  }
+
   const getPreviewSchedule = () => {
     state.timingFormRef.validate(async (valid: any) => {
       if (!valid) {
@@ -224,13 +240,9 @@ export function useModal(
           endTime: end,
           crontab: state.timingForm.crontab
         })
-        previewSchedule({ schedule }, projectCode)
-          .then((res: any) => {
-            variables.schedulePreviewList = res
-          })
-          .catch((error: any) => {
-            window.$message.error(error.message)
-          })
+        previewSchedule({ schedule }, projectCode).then((res: any) => {
+          variables.schedulePreviewList = res
+        })
       }
     })
   }
@@ -244,6 +256,7 @@ export function useModal(
     getWorkerGroups,
     getAlertGroups,
     getEnvironmentList,
+    getStartParamsList,
     getPreviewSchedule
   }
 }

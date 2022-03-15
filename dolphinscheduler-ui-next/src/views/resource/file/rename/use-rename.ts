@@ -22,30 +22,31 @@ import { updateResource } from '@/service/modules/resources'
 export function useRename(state: any) {
   const { t } = useI18n()
 
-  const handleRenameFile = (
+  const handleRenameFile = async (
     emit: IEmit,
     hideModal: () => void,
     resetForm: () => void
   ) => {
-    state.renameFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        try {
-          await updateResource(
-            {
-              ...state.renameForm
-            },
-            state.renameForm.id
-          )
-          window.$message.success(t('resource.file.success'))
-          emit('updateList')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
+    await state.renameFormRef.validate()
 
+    if (state.saving) return
+    state.saving = true
+
+    try {
+      await updateResource(
+        {
+          ...state.renameForm
+        },
+        state.renameForm.id
+      )
+      window.$message.success(t('resource.file.success'))
+      state.saving = false
+      emit('updateList')
       hideModal()
       resetForm()
-    })
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   return {

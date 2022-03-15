@@ -154,6 +154,20 @@ export default defineComponent({
       }
     })
 
+    const currentTaskInstance = ref()
+
+    watch(
+      () => taskModalVisible.value,
+      () => {
+        if (props.instance && taskModalVisible.value) {
+          const taskCode = currTask.value.code
+          currentTaskInstance.value = taskList.value.find(
+            (task: any) => task.taskCode === taskCode
+          )
+        }
+      }
+    )
+
     const statusTimerRef = ref()
     const { taskList, refreshTaskStatus } = useNodeStatus({ graph })
 
@@ -207,6 +221,11 @@ export default defineComponent({
         locations
       })
       saveModelToggle(false)
+    }
+
+    const handleViewLog = (taskId: number, taskType: string) => {
+      taskModalVisible.value = false
+      viewLog(taskId, taskType)
     }
 
     watch(
@@ -264,7 +283,11 @@ export default defineComponent({
           readonly={props.readonly}
           show={taskModalVisible.value}
           projectCode={props.projectCode}
+          processInstance={props.instance}
+          taskInstance={currentTaskInstance.value}
+          onViewLog={handleViewLog}
           data={currTask.value as any}
+          definition={props.definition}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />

@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -120,7 +121,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * batch dispatch with thread pool
      */
     private List<TaskPriority> batchDispatch(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
-        List<TaskPriority> failedDispatchTasks = new ArrayList<>();
+        List<TaskPriority> failedDispatchTasks = Collections.synchronizedList(new ArrayList<>());
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
         for (int i = 0; i < fetchTaskNum; i++) {
