@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
-import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
@@ -165,8 +165,8 @@ public class TaskResponseService {
         }
 
         switch (event) {
-            case ACK:
-                handleAckEvent(taskResponseEvent, taskInstance);
+            case RUNNING:
+                handleRunningEvent(taskResponseEvent, taskInstance);
                 break;
             case RESULT:
                 handleResultEvent(taskResponseEvent, taskInstance);
@@ -184,30 +184,32 @@ public class TaskResponseService {
     }
 
     /**
-     * handle ack event
+     * handle running event
      */
-    private void handleAckEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
+    private void handleRunningEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         Channel channel = taskResponseEvent.getChannel();
         try {
             if (taskInstance != null) {
                 if (taskInstance.getState().typeIsFinished()) {
                     logger.warn("task is finish, ack is meaningless, taskInstanceId:{}, state:{}", taskInstance.getId(), taskInstance.getState());
                 } else {
-                    processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
-                            taskResponseEvent.getStartTime(),
-                            taskResponseEvent.getWorkerAddress(),
-                            taskResponseEvent.getExecutePath(),
-                            taskResponseEvent.getLogPath()
-                    );
+                    taskInstance.setState(taskResponseEvent.getState());
+                    taskInstance.setStartTime(taskResponseEvent.getStartTime());
+                    taskInstance.setHost(taskResponseEvent.getWorkerAddress());
+                    taskInstance.setLogPath(taskResponseEvent.getLogPath());
+                    taskInstance.setExecutePath(taskResponseEvent.getExecutePath());
+                    taskInstance.setPid(taskResponseEvent.getProcessId());
+                    taskInstance.setAppLink(taskResponseEvent.getAppIds());
+                    processService.saveTaskInstance(taskInstance);
                 }
             }
             // if taskInstance is null (maybe deleted) or finish. retry will be meaningless . so ack success
-            DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
-            channel.writeAndFlush(taskAckCommand.convert2Command());
+            TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+            channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
         } catch (Exception e) {
             logger.error("worker ack master error", e);
-            DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
-            channel.writeAndFlush(taskAckCommand.convert2Command());
+            TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
+            channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
         }
     }
 
@@ -220,20 +222,25 @@ public class TaskResponseService {
             if (taskInstance != null) {
                 dataQualityResultOperator.operateDqExecuteResult(taskResponseEvent, taskInstance);
 
-                processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
-                        taskResponseEvent.getEndTime(),
-                        taskResponseEvent.getProcessId(),
-                        taskResponseEvent.getAppIds(),
-                        taskResponseEvent.getVarPool()
-                );
+                taskInstance.setStartTime(taskResponseEvent.getStartTime());
+                taskInstance.setHost(taskResponseEvent.getWorkerAddress());
+                taskInstance.setLogPath(taskResponseEvent.getLogPath());
+                taskInstance.setExecutePath(taskResponseEvent.getExecutePath());
+                taskInstance.setPid(taskResponseEvent.getProcessId());
+                taskInstance.setAppLink(taskResponseEvent.getAppIds());
+                taskInstance.setState(taskResponseEvent.getState());
+                taskInstance.setEndTime(taskResponseEvent.getEndTime());
+                taskInstance.setVarPool(taskResponseEvent.getVarPool());
+                processService.changeOutParam(taskInstance);
+                processService.saveTaskInstance(taskInstance);
             }
             // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
-            DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
-            channel.writeAndFlush(taskResponseCommand.convert2Command());
+            TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+            channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
         } catch (Exception e) {
             logger.error("worker response master error", e);
-            DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(), -1);
-            channel.writeAndFlush(taskResponseCommand.convert2Command());
+            TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
+            channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
         }
     }
 }

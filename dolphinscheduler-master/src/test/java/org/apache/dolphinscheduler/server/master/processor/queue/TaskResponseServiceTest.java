@@ -60,7 +60,7 @@ public class TaskResponseServiceTest {
     public void before() {
         taskRspService.start();
 
-        ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,
+        ackEvent = TaskResponseEvent.newRunningAck(ExecutionStatus.RUNNING_EXECUTION,
                 new Date(),
                 "127.*.*.*",
                 "path",
@@ -69,7 +69,7 @@ public class TaskResponseServiceTest {
                 channel,
                 1);
 
-        resultEvent = TaskResponseEvent.newResult(ExecutionStatus.SUCCESS,
+        resultEvent = TaskResponseEvent.newResultAck(ExecutionStatus.SUCCESS,
                 new Date(),
                 1,
                 "ids",

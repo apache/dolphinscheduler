@@ -69,24 +69,24 @@ public enum CommandType {
     TASK_EXECUTE_REQUEST,
 
     /**
-     * execute task ack
+     * task execute running, from worker to master
      */
-    TASK_EXECUTE_ACK,
+    TASK_EXECUTE_RUNNING,
 
     /**
-     * execute task response
+     * task execute running ack, from master to worker
+     */
+    TASK_EXECUTE_RUNNING_ACK,
+
+    /**
+     * task execute response, from worker to master
      */
     TASK_EXECUTE_RESPONSE,
 
     /**
-     * db task ack
+     * task execute response ack, from master to worker
      */
-    DB_TASK_ACK,
-
-    /**
-     * db task response
-     */
-    DB_TASK_RESPONSE,
+    TASK_EXECUTE_RESPONSE_ACK,
 
     /**
      * kill task

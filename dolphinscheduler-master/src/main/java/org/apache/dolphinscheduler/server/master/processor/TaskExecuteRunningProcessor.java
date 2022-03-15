@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
@@ -37,12 +37,12 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- * task ack processor
+ * task execute running processor
  */
 @Component
-public class TaskAckProcessor implements NettyRequestProcessor {
+public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskAckProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningProcessor.class);
 
     @Autowired
     private TaskResponseService taskResponseService;
@@ -55,23 +55,23 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteAckCommand taskAckCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteAckCommand.class);
-        logger.info("taskAckCommand : {}", taskAckCommand);
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING == command.getType(), String.format("invalid command type : %s", command.getType()));
+        TaskExecuteRunningCommand taskExecuteRunningCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
+        logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningCommand);
 
         String workerAddress = ChannelUtils.toAddress(channel).getAddress();
 
-        ExecutionStatus ackStatus = ExecutionStatus.of(taskAckCommand.getStatus());
+        ExecutionStatus ackStatus = ExecutionStatus.of(taskExecuteRunningCommand.getStatus());
 
         // TaskResponseEvent
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ackStatus,
-                taskAckCommand.getStartTime(),
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newRunningAck(ackStatus,
+                taskExecuteRunningCommand.getStartTime(),
                 workerAddress,
-                taskAckCommand.getExecutePath(),
-                taskAckCommand.getLogPath(),
-                taskAckCommand.getTaskInstanceId(),
+                taskExecuteRunningCommand.getExecutePath(),
+                taskExecuteRunningCommand.getLogPath(),
+                taskExecuteRunningCommand.getTaskInstanceId(),
                 channel,
-                taskAckCommand.getProcessInstanceId());
+                taskExecuteRunningCommand.getProcessInstanceId());
 
         taskResponseService.addResponse(taskResponseEvent);
     }

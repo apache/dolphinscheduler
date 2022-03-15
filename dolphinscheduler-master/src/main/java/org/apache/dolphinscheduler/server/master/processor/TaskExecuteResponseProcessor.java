@@ -36,12 +36,12 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- * task response processor
+ * task execute response processor
  */
 @Component
-public class TaskResponseProcessor implements NettyRequestProcessor {
+public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskResponseProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteResponseProcessor.class);
 
     @Autowired
     private TaskResponseService taskResponseService;
@@ -57,18 +57,18 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteResponseCommand.class);
-        logger.info("received command : {}", responseCommand);
+        TaskExecuteResponseCommand taskExecuteResponseCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteResponseCommand.class);
+        logger.info("received command : {}", taskExecuteResponseCommand);
 
         // TaskResponseEvent
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(ExecutionStatus.of(responseCommand.getStatus()),
-                responseCommand.getEndTime(),
-                responseCommand.getProcessId(),
-                responseCommand.getAppIds(),
-                responseCommand.getTaskInstanceId(),
-                responseCommand.getVarPool(),
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResultAck(ExecutionStatus.of(taskExecuteResponseCommand.getStatus()),
+                taskExecuteResponseCommand.getEndTime(),
+                taskExecuteResponseCommand.getProcessId(),
+                taskExecuteResponseCommand.getAppIds(),
+                taskExecuteResponseCommand.getTaskInstanceId(),
+                taskExecuteResponseCommand.getVarPool(),
                 channel,
-                responseCommand.getProcessInstanceId()
+                taskExecuteResponseCommand.getProcessInstanceId()
         );
         taskResponseService.addResponse(taskResponseEvent);
     }

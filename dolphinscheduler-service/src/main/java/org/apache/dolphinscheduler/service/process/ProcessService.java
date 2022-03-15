@@ -1796,6 +1796,7 @@ public class ProcessService {
     }
 
     /**
+<<<<<<< HEAD
      * change task state
      *
      * @param state       state
@@ -1819,6 +1820,8 @@ public class ProcessService {
     }
 
     /**
+=======
+>>>>>>> rebase dev
      * update process instance
      *
      * @param processInstance processInstance
@@ -1829,6 +1832,7 @@ public class ProcessService {
     }
 
     /**
+<<<<<<< HEAD
      * change task state
      *
      * @param state   state
@@ -1850,6 +1854,8 @@ public class ProcessService {
     }
 
     /**
+=======
+>>>>>>> rebase dev
      * for show in page of taskInstance
      */
     public void changeOutParam(TaskInstance taskInstance) {

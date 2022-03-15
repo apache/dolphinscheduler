@@ -91,7 +91,7 @@ public class TaskResponseEvent {
 
     private int processInstanceId;
     
-    public static TaskResponseEvent newAck(ExecutionStatus state,
+    public static TaskResponseEvent newRunningAck(ExecutionStatus state,
                                            Date startTime,
                                            String workerAddress,
                                            String executePath,
@@ -106,13 +106,13 @@ public class TaskResponseEvent {
         event.setExecutePath(executePath);
         event.setLogPath(logPath);
         event.setTaskInstanceId(taskInstanceId);
-        event.setEvent(Event.ACK);
+        event.setEvent(Event.RUNNING);
         event.setChannel(channel);
         event.setProcessInstanceId(processInstanceId);
         return event;
     }
 
-    public static TaskResponseEvent newResult(ExecutionStatus state,
+    public static TaskResponseEvent newResultAck(ExecutionStatus state,
                                               Date endTime,
                                               int processId,
                                               String appIds,
