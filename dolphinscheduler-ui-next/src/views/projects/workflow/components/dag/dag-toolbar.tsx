@@ -462,7 +462,7 @@ export default defineComponent({
           )}
           {/* Save workflow */}
           <NButton
-            class={Styles['toolbar-right-item']}
+            class={[Styles['toolbar-right-item'], 'btn-save']}
             type='info'
             secondary
             round
@@ -473,7 +473,7 @@ export default defineComponent({
             {t('project.dag.save')}
           </NButton>
           {/* Return to previous page */}
-          <NButton secondary round onClick={onClose}>
+          <NButton secondary round onClick={onClose} class='btn-close'>
             {t('project.dag.close')}
           </NButton>
         </div>

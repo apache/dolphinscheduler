@@ -51,9 +51,9 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     })
     private WebElement buttonConfirm;
 
-    private final CreateUdfFunctionBox createUdfFunctionBox;
+    private CreateUdfFunctionBox createUdfFunctionBox;
 
-    private final RenameUdfFunctionBox renameUdfFunctionBox;
+    private RenameUdfFunctionBox renameUdfFunctionBox;
 
     public FunctionManagePage(RemoteWebDriver driver) {
         super(driver);
@@ -66,7 +66,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
         buttonCreateUdfFunction().click();
 
-        createUdfFunctionBox().radioFunctionType().click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createUdfFunctionBox().radioFunctionType());
 
         createUdfFunctionBox().inputFunctionName().sendKeys(udfFunctionName);
 
