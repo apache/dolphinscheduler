@@ -51,9 +51,9 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     })
     private WebElement buttonConfirm;
 
-    private final CreateUdfFunctionBox createUdfFunctionBox;
+    private CreateUdfFunctionBox createUdfFunctionBox;
 
-    private final RenameUdfFunctionBox renameUdfFunctionBox;
+    private RenameUdfFunctionBox renameUdfFunctionBox;
 
     public FunctionManagePage(RemoteWebDriver driver) {
         super(driver);
@@ -67,7 +67,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonCreateUdfFunction().click();
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(
-                createUdfFunctionBox().radioFunctionType()));
+                createUdfFunctionBox.radioFunctionType));
 
         createUdfFunctionBox().radioFunctionType().click();
 
