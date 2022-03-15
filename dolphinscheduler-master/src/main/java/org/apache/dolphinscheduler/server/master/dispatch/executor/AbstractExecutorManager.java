@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 /**
  *  abstract executor manager
  */
-public abstract class AbstractExecutorManager<T> implements ExecutorManager<T>{
+public abstract class AbstractExecutorManager<T> implements ExecutorManager<T> {
 
     /**
      * before execute , add time monitor ， timeout

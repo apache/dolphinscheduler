@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import java.util.Date;
 import java.util.Map;
 
-
 /**
  * task main info
  */

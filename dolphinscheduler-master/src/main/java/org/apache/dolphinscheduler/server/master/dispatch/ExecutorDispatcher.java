@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch;
 
-
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -60,7 +59,7 @@ public class ExecutorDispatcher implements InitializingBean {
     /**
      * constructor
      */
-    public ExecutorDispatcher(){
+    public ExecutorDispatcher() {
         this.executorManagers = new ConcurrentHashMap<>();
     }
 
@@ -76,7 +75,7 @@ public class ExecutorDispatcher implements InitializingBean {
          * get executor manager
          */
         ExecutorManager<Boolean> executorManager = this.executorManagers.get(context.getExecutorType());
-        if(executorManager == null){
+        if (executorManager == null) {
             throw new ExecuteException("no ExecutorManager for type : " + context.getExecutorType());
         }
 
@@ -117,7 +116,7 @@ public class ExecutorDispatcher implements InitializingBean {
      * @param type executor type
      * @param executorManager executorManager
      */
-    public void register(ExecutorType type, ExecutorManager executorManager){
+    public void register(ExecutorType type, ExecutorManager executorManager) {
         executorManagers.put(type, executorManager);
     }
 }

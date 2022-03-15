@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HDFS_EXPORT_DIR;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHdfsParameter;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -38,7 +38,7 @@ public class HdfsSourceGenerator implements ISourceGenerator {
     private static final Logger logger = LoggerFactory.getLogger(HdfsSourceGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder hdfsSourceSb = new StringBuilder();
 
