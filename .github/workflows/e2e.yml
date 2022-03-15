@@ -140,6 +140,12 @@ jobs:
     name: E2E
     runs-on: ubuntu-latest
     needs: [ e2e ]
+    if: always()
     steps:
       - name: Status
-        run: echo "Passed!"
+        run: |
+          if [[ ${{ needs.e2e.result }} == 'success' ]]; then
+            echo "Passed!"
+          else
+            exit -1
+          fi
