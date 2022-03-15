@@ -17,6 +17,8 @@
 
 .crontab-list {
   display: flex;
+  vertical-align: middle;
+  align-items: center;
   .crontab-list-item {
     display: flex;
     vertical-align: middle;
@@ -24,6 +26,12 @@
     width: 460px;
     > div {
       margin: 5px;
+    }
+    .number-input {
+      width:100px;
+    }
+    .select-input {
+      width: 250px;
     }
   }
 }
