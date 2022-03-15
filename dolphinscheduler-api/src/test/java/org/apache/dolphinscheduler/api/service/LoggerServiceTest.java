@@ -187,7 +187,6 @@ public class LoggerServiceTest {
         loggerService.getLogBytes(loginUser, projectCode, 1);
     }
 
-
     @After
     public void close() {
         this.loggerService.close();

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
@@ -24,7 +25,6 @@ import java.sql.Connection;
  * db performance abstract class
  */
 public abstract class BaseDBPerformance {
-
 
     /**
      * return the current database performance

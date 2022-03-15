@@ -37,13 +37,13 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.RuleType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
 
 import java.util.ArrayList;
 import java.util.Date;

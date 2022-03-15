@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutor
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -99,6 +100,9 @@ public class MasterSchedulerService extends Thread {
 
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
+
+    @Autowired
+    private TaskPluginManager taskPluginManager;
 
     /**
      * constructor of MasterSchedulerService

@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Map;
 import java.util.StringJoiner;
@@ -45,7 +42,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
      *
      * @param taskRequest taskRequest
      */
-    protected AbstractTaskExecutor(TaskRequest taskRequest) {
+    protected AbstractTaskExecutor(TaskExecutionContext taskRequest) {
         super(taskRequest);
     }
 

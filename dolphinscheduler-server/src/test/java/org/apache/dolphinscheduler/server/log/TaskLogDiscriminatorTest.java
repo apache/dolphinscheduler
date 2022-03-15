@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;

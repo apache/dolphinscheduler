@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.util.Map;
 import java.util.Objects;

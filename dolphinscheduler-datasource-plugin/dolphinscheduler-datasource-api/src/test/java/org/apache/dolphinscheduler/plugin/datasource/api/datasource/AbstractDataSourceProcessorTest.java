@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
-import org.junit.Test;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
+import org.junit.Test;
 
 public class AbstractDataSourceProcessorTest {
 

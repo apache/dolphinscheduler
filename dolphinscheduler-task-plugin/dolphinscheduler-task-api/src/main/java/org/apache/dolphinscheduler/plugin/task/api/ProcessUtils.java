@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +46,7 @@ public final class ProcessUtils {
     /**
      * kill tasks according to different task types.
      */
-    public static void kill(TaskRequest request) {
+    public static void kill(TaskExecutionContext request) {
         try {
             int processId = request.getProcessId();
             if (processId == 0) {

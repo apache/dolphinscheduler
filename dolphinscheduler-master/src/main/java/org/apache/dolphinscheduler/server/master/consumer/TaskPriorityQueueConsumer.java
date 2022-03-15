@@ -21,6 +21,9 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -30,7 +33,7 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -155,7 +158,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         boolean result = false;
         try {
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
-            ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
+            ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, context.getWorkerGroup());
 
             if (isTaskNeedToCheck(taskPriority)) {
                 if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
@@ -169,6 +172,12 @@ public class TaskPriorityQueueConsumer extends Thread {
             logger.error("dispatch error: {}", e.getMessage(), e);
         }
         return result;
+    }
+
+    private Command toCommand(TaskExecutionContext taskExecutionContext) {
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
+        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
+        return requestCommand.convert2Command();
     }
 
     /**

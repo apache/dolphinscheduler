@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.Flag;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * DataX parameter
@@ -247,5 +251,33 @@ public class DataxParameters extends AbstractParameters {
                 + ", xms=" + xms
                 + ", xmx=" + xmx
                 + '}';
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+        resources.put(ResourceType.DATASOURCE, dataSource);
+        resources.put(ResourceType.DATASOURCE, dataTarget);
+        return resources;
+    }
+
+    public DataxTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+        DataSourceParameters dbSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataSource);
+        DataSourceParameters dbTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataTarget);
+
+        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+
+        if (Objects.nonNull(dbSource)) {
+            dataxTaskExecutionContext.setDataSourceId(dataSource);
+            dataxTaskExecutionContext.setSourcetype(dbSource.getType());
+            dataxTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());
+        }
+
+        if (Objects.nonNull(dbTarget)) {
+            dataxTaskExecutionContext.setDataTargetId(dataTarget);
+            dataxTaskExecutionContext.setTargetType(dbTarget.getType());
+            dataxTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());
+        }
+        return dataxTaskExecutionContext;
     }
 }

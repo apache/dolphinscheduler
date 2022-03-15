@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.mr;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.D;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAR;
 import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_NAME;
 import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_QUEUE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.D;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAR;
 
-import org.apache.dolphinscheduler.plugin.task.util.ArgsUtils;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;

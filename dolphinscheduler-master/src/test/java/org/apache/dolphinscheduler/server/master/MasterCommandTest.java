@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -40,9 +41,8 @@ public class MasterCommandTest {
 
     private ProcessDefinitionMapper processDefinitionMapper;
 
-
     @Test
-    public void StartFromFailedCommand(){
+    public void startFromFailedCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         cmd.setCommandParam("{\"ProcessInstanceId\":325}");
@@ -53,7 +53,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void RecoverSuspendCommand(){
+    public void recoverSuspendCommand() {
 
         Command cmd = new Command();
         cmd.setProcessDefinitionCode(44);
@@ -63,11 +63,8 @@ public class MasterCommandTest {
         commandMapper.insert(cmd);
     }
 
-
-
-
     @Test
-    public void startNewProcessCommand(){
+    public void startNewProcessCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_PROCESS);
         cmd.setProcessDefinitionCode(167);
@@ -80,7 +77,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void ToleranceCommand(){
+    public void toleranceCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setCommandParam("{\"ProcessInstanceId\":816}");
@@ -90,7 +87,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void insertCommand(){
+    public void insertCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_PROCESS);
         cmd.setFailureStrategy(FailureStrategy.CONTINUE);
@@ -99,6 +96,5 @@ public class MasterCommandTest {
         cmd.setExecutorId(10);
         commandMapper.insert(cmd);
     }
-
 
 }

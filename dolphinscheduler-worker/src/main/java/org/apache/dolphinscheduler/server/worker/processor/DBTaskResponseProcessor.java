@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
@@ -55,13 +55,11 @@ public class DBTaskResponseProcessor implements NettyRequestProcessor {
         }
         logger.info("dBTask Response command : {}", taskResponseCommand);
 
-
         if (taskResponseCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponseCache.get().removeResponseCache(taskResponseCommand.getTaskInstanceId());
             TaskCallbackService.remove(taskResponseCommand.getTaskInstanceId());
             logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskResponseCommand.getTaskInstanceId());
         }
     }
-
 
 }

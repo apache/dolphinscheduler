@@ -60,7 +60,6 @@ public class K8sManager {
         return clientMap.get(k8sName);
     }
 
-
     @EventListener
     public void buildApiClientAll(ApplicationReadyEvent readyEvent) throws RemotingException {
         QueryWrapper<K8s> nodeWrapper = new QueryWrapper<>();

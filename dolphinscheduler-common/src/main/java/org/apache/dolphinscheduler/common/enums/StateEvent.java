@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+
 import io.netty.channel.Channel;
 
 /**

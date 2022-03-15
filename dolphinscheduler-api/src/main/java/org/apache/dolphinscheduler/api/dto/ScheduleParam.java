@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
 
-
 /**
  * schedule parameters
  */

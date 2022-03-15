@@ -23,9 +23,9 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
@@ -59,7 +59,7 @@ public class EmrTask extends AbstractTaskExecutor {
     /**
      * taskExecutionContext
      */
-    private final TaskRequest taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
     /**
      * emr parameters
      */
@@ -92,7 +92,7 @@ public class EmrTask extends AbstractTaskExecutor {
      *
      * @param taskExecutionContext taskExecutionContext
      */
-    protected EmrTask(TaskRequest taskExecutionContext) {
+    protected EmrTask(TaskExecutionContext taskExecutionContext) {
 
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
@@ -226,7 +226,7 @@ public class EmrTask extends AbstractTaskExecutor {
     @Override
     public void cancelApplication(boolean status) throws Exception {
         super.cancelApplication(status);
-        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId() , clusterId);
+        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(), clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
         logger.info("the result of terminate job flow is:{}", terminateJobFlowsResult);

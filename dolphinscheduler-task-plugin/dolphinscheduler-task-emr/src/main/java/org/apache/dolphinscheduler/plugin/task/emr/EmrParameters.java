@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.emr;
 
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Collections;
@@ -44,7 +44,6 @@ public class EmrParameters extends AbstractParameters {
 
     }
 
-
     public String getJobFlowDefineJson() {
         return jobFlowDefineJson;
     }
@@ -55,8 +54,8 @@ public class EmrParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "EmrParameters{" +
-            "jobFlowDefineJson='" + jobFlowDefineJson + '\'' +
-            '}';
+        return "EmrParameters{"
+            + "jobFlowDefineJson='" + jobFlowDefineJson + '\''
+            + '}';
     }
 }

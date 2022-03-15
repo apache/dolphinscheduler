@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,7 +53,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         ProjectUser projectUser = insertOne();
         projectUser.setCreateTime(new Date());
@@ -65,7 +66,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         ProjectUser projectUserMap = insertOne();
         int delete = projectUserMapper.deleteById(projectUserMap.getId());
         Assert.assertEquals(delete, 1);

@@ -195,7 +195,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc = insertOne();
         //insertOne
         UdfFunc udfFunc1 = insertOne();
-        int[] idArray = new int[]{udfFunc.getId(), udfFunc1.getId()};
+        Integer[] idArray = new Integer[]{udfFunc.getId(), udfFunc1.getId()};
         //queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");
         Assert.assertNotEquals(udfFuncList.size(), 0);

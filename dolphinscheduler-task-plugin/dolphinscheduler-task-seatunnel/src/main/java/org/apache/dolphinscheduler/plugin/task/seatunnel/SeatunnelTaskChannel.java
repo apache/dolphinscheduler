@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class SeatunnelTaskChannel implements TaskChannel {
 
@@ -28,8 +32,18 @@ public class SeatunnelTaskChannel implements TaskChannel {
     }
 
     @Override
-    public SeatunnelTask createTask(TaskRequest taskRequest) {
+    public SeatunnelTask createTask(TaskExecutionContext taskRequest) {
         return new SeatunnelTask(taskRequest);
+    }
+
+    @Override
+    public AbstractParameters parseParameters(ParametersNode parametersNode) {
+        return JSONUtils.parseObject(parametersNode.getTaskParams(), SeatunnelParameters.class);
+    }
+
+    @Override
+    public ResourceParametersHelper getResources(String parameters) {
+        return null;
     }
 
 }

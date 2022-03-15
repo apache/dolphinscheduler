@@ -17,14 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopJobType;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * sqoop parameters
@@ -198,7 +204,41 @@ public class SqoopParameters  extends AbstractParameters {
     }
 
     @Override
-    public List<ResourceInfo> getResourceFilesList() {
-        return new ArrayList<>();
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+        if (SqoopJobType.TEMPLATE.getDescp().equals(this.getJobType())) {
+            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
+            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
+            resources.put(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
+            resources.put(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+        }
+        return resources;
+    }
+
+    public SqoopTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+
+        SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
+
+        if (SqoopJobType.TEMPLATE.getDescp().equals(this.getJobType())) {
+            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
+            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
+
+            DataSourceParameters dataSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
+            DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+
+            if (Objects.nonNull(dataSource)) {
+                sqoopTaskExecutionContext.setDataSourceId(sourceMysqlParameter.getSrcDatasource());
+                sqoopTaskExecutionContext.setSourcetype(dataSource.getType());
+                sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+            }
+
+            if (Objects.nonNull(dataTarget)) {
+                sqoopTaskExecutionContext.setDataTargetId(targetMysqlParameter.getTargetDatasource());
+                sqoopTaskExecutionContext.setTargetType(dataTarget.getType());
+                sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            }
+        }
+
+        return sqoopTaskExecutionContext;
     }
 }

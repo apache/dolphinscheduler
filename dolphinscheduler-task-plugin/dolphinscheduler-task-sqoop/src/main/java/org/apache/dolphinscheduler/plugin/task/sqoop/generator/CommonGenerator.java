@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.D;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.EQUAL_SIGN;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.D;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EQUAL_SIGN;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-import org.apache.dolphinscheduler.spi.task.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
 

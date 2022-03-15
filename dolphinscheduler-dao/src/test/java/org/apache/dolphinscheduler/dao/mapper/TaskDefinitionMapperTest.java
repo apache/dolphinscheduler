@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -48,7 +47,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");
         taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setTaskType("SHELL");
         taskDefinition.setUserId(userId);
         taskDefinition.setResourceIds("1");
         taskDefinition.setWorkerGroup("default");

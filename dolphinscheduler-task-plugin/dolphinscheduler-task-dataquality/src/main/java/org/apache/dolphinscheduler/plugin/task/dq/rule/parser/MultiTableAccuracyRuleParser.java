@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.rule.parser;
 
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.MAPPING_COLUMNS;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.ON_CLAUSE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.STATISTICS_TABLE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.WHERE_CLAUSE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.MAPPING_COLUMNS;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.ON_CLAUSE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.STATISTICS_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.WHERE_CLAUSE;
 
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.BaseConfig;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.RuleParserUtils;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
-import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;

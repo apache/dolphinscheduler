@@ -56,7 +56,6 @@ public class K8s {
     @TableField("update_time")
     private Date updateTime;
 
-
     public K8s() {
 
     }

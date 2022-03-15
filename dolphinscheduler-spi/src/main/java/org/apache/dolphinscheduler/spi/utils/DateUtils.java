@@ -167,6 +167,33 @@ public class DateUtils {
     }
 
     /**
+     * get the date of the specified date in the days before and after
+     *
+     * @param date date
+     * @param day  day
+     * @return the date of the specified date in the days before and after
+     */
+    public static Date getSomeDay(Date date, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, day);
+        return calendar.getTime();
+    }
+
+    /**
+     * get the hour of day.
+     *
+     * @param date date
+     * @return hour of day
+     */
+    public static int getHourIndex(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+
+    /**
      * compare two dates
      *
      * @param future future date
@@ -240,6 +267,25 @@ public class DateUtils {
     }
 
     /**
+     * get some hour of day
+     *
+     * @param date       date
+     * @param offsetHour hours
+     * @return some hour of day
+     */
+    public static Date getSomeHourOfDay(Date date, int offsetHour) {
+        Calendar cal = Calendar.getInstance();
+
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY) + offsetHour);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return cal.getTime();
+    }
+
+    /**
      * get last day of month
      *
      * @param date date
@@ -255,6 +301,77 @@ public class DateUtils {
         cal.add(Calendar.DAY_OF_MONTH, -1);
 
         return cal.getTime();
+    }
+
+    /**
+     * return YYYY-MM-DD 00:00:00
+     *
+     * @param inputDay date
+     * @return start day
+     */
+    public static Date getStartOfDay(Date inputDay) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(inputDay);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    /**
+     * return YYYY-MM-DD 23:59:59
+     *
+     * @param inputDay day
+     * @return end of day
+     */
+    public static Date getEndOfDay(Date inputDay) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(inputDay);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
+    }
+
+    /**
+     * return YYYY-MM-DD 00:00:00
+     *
+     * @param inputDay day
+     * @return start of hour
+     */
+    public static Date getStartOfHour(Date inputDay) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(inputDay);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    /**
+     * return YYYY-MM-DD 23:59:59
+     *
+     * @param inputDay day
+     * @return end of hour
+     */
+    public static Date getEndOfHour(Date inputDay) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(inputDay);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
+    }
+
+    /**
+     * get current date
+     *
+     * @return current date
+     */
+    public static Date getCurrentDate() {
+        return new Date();
     }
 
     public static Date addMonths(Date date, int amount) {

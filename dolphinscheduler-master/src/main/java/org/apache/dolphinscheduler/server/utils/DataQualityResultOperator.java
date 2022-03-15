@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.CheckType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqFailureStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OperatorType;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.spi.task.dq.enums.CheckType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqFailureStrategy;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
-import org.apache.dolphinscheduler.spi.task.dq.enums.OperatorType;
 
 import java.math.BigDecimal;
 
@@ -60,7 +60,7 @@ public class DataQualityResultOperator {
      * @param taskInstance
      */
     public void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
-        if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
+        if (TASK_TYPE_DATA_QUALITY.equals(taskInstance.getTaskType())) {
 
             ProcessInstance processInstance =
                     processService.findProcessInstanceDetailById(

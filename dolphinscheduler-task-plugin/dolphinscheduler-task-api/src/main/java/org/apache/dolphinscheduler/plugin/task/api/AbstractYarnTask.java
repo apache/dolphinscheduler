@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
 /**
  * abstract yarn task
@@ -34,7 +34,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      *
      * @param taskRequest taskRequest
      */
-    public AbstractYarnTask(TaskRequest taskRequest) {
+    public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,

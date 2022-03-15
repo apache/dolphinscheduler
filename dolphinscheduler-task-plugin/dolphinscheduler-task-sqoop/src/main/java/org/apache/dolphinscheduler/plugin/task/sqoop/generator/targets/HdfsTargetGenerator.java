@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_QUOTES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.COMPRESSION_CODEC;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DELETE_TARGET_DIR;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.FIELDS_TERMINATED_BY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.FIELD_NULL_PLACEHOLDER;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.LINES_TERMINATED_BY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TARGET_DIR;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SINGLE_QUOTES;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -44,7 +44,7 @@ public class HdfsTargetGenerator implements ITargetGenerator {
     private static final Logger logger = LoggerFactory.getLogger(HdfsTargetGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder hdfsTargetSb = new StringBuilder();
 

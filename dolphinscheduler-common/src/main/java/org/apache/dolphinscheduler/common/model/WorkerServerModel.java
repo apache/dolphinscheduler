@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.common.model;
 import java.util.Date;
 import java.util.Set;
 
-
 /**
  * server
  */

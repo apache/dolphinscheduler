@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
-import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -46,8 +44,10 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -103,6 +103,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private TaskPluginManager taskPluginManager;
+
     /**
      * create task definition
      *
@@ -129,7 +132,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-            if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionLog)) {
+            if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                    .taskType(taskDefinitionLog.getTaskType())
+                    .taskParams(taskDefinitionLog.getTaskParams())
+                    .dependence(taskDefinitionLog.getDependence())
+                    .build())) {
                 logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
@@ -186,7 +193,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
             return result;
         }
-        if (!CheckUtils.checkTaskDefinitionParameters(taskDefinition)) {
+        if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                .taskType(taskDefinition.getTaskType())
+                .taskParams(taskDefinition.getTaskParams())
+                .dependence(taskDefinition.getDependence())
+                .build())) {
             logger.error("task definition {} parameter invalid", taskDefinition.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinition.getName());
             return result;
@@ -411,7 +422,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
             return null;
         }
-        if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionToUpdate)) {
+        if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                .taskType(taskDefinitionToUpdate.getTaskType())
+                .taskParams(taskDefinitionToUpdate.getTaskParams())
+                .dependence(taskDefinitionToUpdate.getDependence())
+                .build())) {
             logger.error("task definition {} parameter invalid", taskDefinitionToUpdate.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
             return null;
@@ -643,7 +658,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                 long projectCode,
                                                 String searchWorkflowName,
                                                 String searchTaskName,
-                                                TaskType taskType,
+                                                String taskType,
                                                 Integer pageNo,
                                                 Integer pageSize) {
         Result result = new Result();
@@ -657,7 +672,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
         IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
-                searchTaskName, taskType == null ? StringUtils.EMPTY : taskType.getDesc());
+                searchTaskName, taskType == null ? StringUtils.EMPTY : taskType);
         List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
         if (!records.isEmpty()) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();

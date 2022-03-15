@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.rule.entity;
 
-import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 
 import java.io.Serializable;
 import java.util.Date;

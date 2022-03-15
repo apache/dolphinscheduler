@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.dto.treeview;
 
 import java.util.Date;
 
-
 /**
  * Instance
  */
@@ -96,7 +95,6 @@ public class Instance {
     public Instance(int id, String name, long code, String type, String state, Date startTime, Date endTime, String host, String duration) {
         this(id, name, code, type, state, startTime, endTime, host, duration, 0);
     }
-
 
     public int getId() {
         return id;

@@ -17,9 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.rule;
 
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.UNIQUE_CODE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_QUOTES;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.UNIQUE_CODE;
 
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
+import org.apache.dolphinscheduler.plugin.task.api.parser.BusinessTimeUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
@@ -30,11 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.SingleTableCustomS
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.SingleTableRuleParser;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.RuleParserUtils;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.RuleType;
-import org.apache.dolphinscheduler.spi.task.paramparser.BusinessTimeUtils;
-import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -109,7 +109,7 @@ public class RuleManager {
         inputParameterValueResult.putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date()));
         inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, NONE_COMPARISON_TYPE);
         inputParameterValueResult.put(UNIQUE_CODE,
-                StringUtils.wrapperSingleQuotes(RuleParserUtils.generateUniqueCode(inputParameterValueResult)));
+                SINGLE_QUOTES + RuleParserUtils.generateUniqueCode(inputParameterValueResult) + SINGLE_QUOTES);
 
         IRuleParser ruleParser = null;
         switch (RuleType.of(dataQualityTaskExecutionContext.getRuleType())) {

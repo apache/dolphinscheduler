@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Map;
 

@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.Date;
 

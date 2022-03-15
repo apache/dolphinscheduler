@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -49,7 +50,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         ProcessInstanceMap processInstanceMap = insertOne();
         //update
@@ -62,7 +63,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         ProcessInstanceMap processInstanceMap = insertOne();
         int delete = processInstanceMapMapper.deleteById(processInstanceMap.getId());
         Assert.assertEquals(1, delete);
@@ -89,10 +90,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         processInstanceMap.setParentProcessInstanceId(100);
         processInstanceMapMapper.updateById(processInstanceMap);
 
-
     }
-
-
 
     /**
      * test delete by parent process instance id
