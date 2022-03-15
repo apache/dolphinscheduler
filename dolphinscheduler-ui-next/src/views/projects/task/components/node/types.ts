@@ -271,6 +271,7 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  processDefinitionCode?: number
 }
 
 interface INodeData
