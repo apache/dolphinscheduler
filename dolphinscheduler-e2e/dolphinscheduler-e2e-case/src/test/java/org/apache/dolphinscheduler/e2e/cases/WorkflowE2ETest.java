@@ -134,38 +134,38 @@ class WorkflowE2ETest {
         workflowDefinitionPage.publish(workflow);
     }
 
-    @Test
-    @Order(10)
-    void testCreateSubWorkflow() {
-        final String workflow = "test-sub-workflow-1";
-
-        WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(project)
-                .goToTab(WorkflowDefinitionTab.class);
-
-        workflowDefinitionPage
-            .createWorkflow()
-
-            .<SubWorkflowTaskForm> addTask(TaskType.SUB_PROCESS)
-            .childNode("test-workflow-1")
-            .name("test-sub-1")
-            .submit()
-
-            .submit()
-            .name(workflow)
-            .tenant(tenant)
-            .addGlobalParam("global_param", "hello world")
-            .submit()
-        ;
-
-        await().untilAsserted(() -> assertThat(
-            workflowDefinitionPage.workflowList()
-        ).anyMatch(it -> it.getText().contains(workflow)));
-
-        workflowDefinitionPage.publish(workflow);
-    }
+//    @Test
+//    @Order(10)
+//    void testCreateSubWorkflow() {
+//        final String workflow = "test-sub-workflow-1";
+//
+//        WorkflowDefinitionTab workflowDefinitionPage =
+//            new ProjectPage(browser)
+//                .goToNav(ProjectPage.class)
+//                .goTo(project)
+//                .goToTab(WorkflowDefinitionTab.class);
+//
+//        workflowDefinitionPage
+//            .createWorkflow()
+//
+//            .<SubWorkflowTaskForm> addTask(TaskType.SUB_PROCESS)
+//            .childNode("test-workflow-1")
+//            .name("test-sub-1")
+//            .submit()
+//
+//            .submit()
+//            .name(workflow)
+//            .tenant(tenant)
+//            .addGlobalParam("global_param", "hello world")
+//            .submit()
+//        ;
+//
+//        await().untilAsserted(() -> assertThat(
+//            workflowDefinitionPage.workflowList()
+//        ).anyMatch(it -> it.getText().contains(workflow)));
+//
+//        workflowDefinitionPage.publish(workflow);
+//    }
 
     @Test
     @Order(30)
