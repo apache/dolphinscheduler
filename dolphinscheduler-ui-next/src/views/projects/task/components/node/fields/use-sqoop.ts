@@ -24,11 +24,6 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
   const customSpan = computed(() => (model.isCustomTask ? 24 : 0))
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
 
-  watch(
-    () => model.srcQueryType,
-    () => {}
-  )
-
   return [
     {
       type: 'switch',
