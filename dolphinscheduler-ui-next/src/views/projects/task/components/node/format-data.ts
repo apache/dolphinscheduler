@@ -32,6 +32,9 @@ export function formatParams(data: INodeData): {
   taskDefinitionJsonObj: object
 } {
   const taskParams: ITaskParams = {}
+  if (data.taskType === 'SUB_PROCESS') {
+    taskParams.processDefinitionCode = data.processDefinitionCode
+  }
   if (
     data.taskType === 'SPARK' ||
     data.taskType === 'MR' ||
@@ -455,6 +458,10 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.jobFlowDefineJson) {
     params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
+  if (data.taskParams?.processDefinitionCode) {
+    params.processDefinitionCode = data.taskParams.processDefinitionCode
   }
 
   return params
