@@ -17,7 +17,7 @@
 
 """DolphinScheduler Task and TaskRelation object."""
 
-import logging
+from logging import getLogger
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
@@ -33,6 +33,8 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.java_gateway import launch_gateway
+
+logger = getLogger(__name__)
 
 
 class TaskRelation(Base):
@@ -146,7 +148,7 @@ class Task(Base):
         ):
             self.process_definition.add_task(self)
         else:
-            logging.warning(
+            logger.warning(
                 "Task code %d already in process definition, prohibit re-add task.",
                 self.code,
             )
