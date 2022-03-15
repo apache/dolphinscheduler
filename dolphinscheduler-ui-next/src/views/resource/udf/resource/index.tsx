@@ -115,10 +115,19 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.handleCreateFolder} class='btn-create-directory'>
+              <NButton
+                type='primary'
+                onClick={this.handleCreateFolder}
+                class='btn-create-directory'
+              >
                 {t('resource.udf.create_folder')}
               </NButton>
-              <NButton strong secondary onClick={this.handleUploadFile} class='btn-upload-udf'>
+              <NButton
+                strong
+                secondary
+                onClick={this.handleUploadFile}
+                class='btn-upload-udf'
+              >
                 {t('resource.udf.upload_udf_resources')}
               </NButton>
             </NSpace>

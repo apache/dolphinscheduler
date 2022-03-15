@@ -131,8 +131,9 @@ export default defineComponent({
           if (
             props.definition?.processDefinition.name !== formValue.value.name
           ) {
-            verifyName(params, projectCode)
-              .then(() => context.emit('save', formValue.value))
+            verifyName(params, projectCode).then(() =>
+              context.emit('save', formValue.value)
+            )
           } else {
             context.emit('save', formValue.value)
           }
@@ -175,11 +176,7 @@ export default defineComponent({
         onCancel={onCancel}
         autoFocus={false}
       >
-        <NForm
-          model={formValue.value}
-          rules={rule}
-          ref={formRef}
-        >
+        <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
             <NInput v-model:value={formValue.value.name} class='input-name'/>
           </NFormItem>
@@ -208,7 +205,8 @@ export default defineComponent({
                 min={0}
                 v-slots={{
                   suffix: () => '分'
-                }} />
+                }}
+              />
             </NFormItem>
           )}
           <NFormItem

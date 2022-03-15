@@ -67,6 +67,7 @@ export default defineComponent({
         title={t('project.workflow.upload')}
         onCancel={this.hideModal}
         onConfirm={this.handleImport}
+        confirmLoading={this.saving}
       >
         <NForm
           rules={this.importRules}

@@ -54,8 +54,7 @@ export function usePigeon({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -74,7 +73,7 @@ export function usePigeon({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       Fields.useTargetTaskName(),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks(model, data?.code)
     ] as IJsonItem[],
     model
   }

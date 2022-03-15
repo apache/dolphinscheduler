@@ -127,7 +127,7 @@ export default defineComponent({
                 }
                 style={{ marginRight: '-5px' }}
                 circle
-                class="btn-rename"
+                class='btn-rename'
               >
                 <NIcon>
                   <EditOutlined />
