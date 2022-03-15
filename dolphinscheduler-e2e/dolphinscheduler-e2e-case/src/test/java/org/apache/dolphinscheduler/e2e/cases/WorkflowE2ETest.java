@@ -80,24 +80,24 @@ class WorkflowE2ETest {
         ;
     }
 
-    @AfterAll
-    public static void cleanup() {
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .goTo(project)
-            .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
-            .deleteAll()
-        ;
-
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .delete(project)
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
-    }
+//    @AfterAll
+//    public static void cleanup() {
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .goTo(project)
+//            .goToTab(WorkflowDefinitionTab.class)
+//            .cancelPublishAll()
+//            .deleteAll()
+//        ;
+//
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .delete(project)
+//            .goToNav(SecurityPage.class)
+//            .goToTab(TenantPage.class)
+//            .delete(tenant)
+//        ;
+//    }
 
     @Test
     @Order(1)
@@ -139,7 +139,7 @@ class WorkflowE2ETest {
     void testCreateSubWorkflow() {
         final String workflow = "test-sub-workflow-1";
 
-        final WorkflowDefinitionTab workflowDefinitionPage =
+        WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
                 .goTo(project)
