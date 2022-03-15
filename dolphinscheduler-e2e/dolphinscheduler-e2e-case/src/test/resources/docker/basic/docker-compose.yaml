@@ -23,10 +23,8 @@ services:
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
-#    expose:
-#      - 12345
-    ports:
-      - 12345:12345
+    expose:
+      - 12345
     networks:
       - e2e
     healthcheck:

@@ -116,6 +116,7 @@ export default defineComponent({
                 size='small'
                 type='info'
                 circle
+                class='btn-edit'
                 disabled={
                   (state !== 'SUCCESS' &&
                     state !== 'PAUSE' &&
@@ -143,6 +144,7 @@ export default defineComponent({
                   type='info'
                   circle
                   onClick={this.handleReRun}
+                  class='btn-rerun'
                   disabled={
                     (state !== 'SUCCESS' &&
                       state !== 'PAUSE' &&

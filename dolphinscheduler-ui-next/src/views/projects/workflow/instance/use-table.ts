@@ -63,7 +63,8 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        type: 'selection'
+        type: 'selection',
+        className: 'btn-selected'
       },
       {
         title: '#',
@@ -75,6 +76,7 @@ export function useTable() {
         title: t('project.workflow.workflow_name'),
         key: 'name',
         width: 200,
+        className: 'workflow-name',
         render: (row: IWorkflowInstance) =>
           h(
             ButtonLink,
@@ -92,13 +94,15 @@ export function useTable() {
       {
         title: t('project.workflow.status'),
         key: 'state',
+        className: 'workflow-status',
         render: (_row: IWorkflowInstance) => {
           const stateIcon = taskStateIcon[_row.state]
           const iconElement = h(
             NIcon,
             {
               size: '18px',
-              style: 'position: relative; top: 7.5px; left: 7.5px'
+              style: 'position: relative; top: 7.5px; left: 7.5px',
+              class: stateIcon.classNames
             },
             {
               default: () =>
@@ -134,6 +138,7 @@ export function useTable() {
       {
         title: t('project.workflow.run_type'),
         key: 'commandType',
+        className: 'workflow-run-type',
         render: (_row: IWorkflowInstance) =>
           (
             _.filter(runningType(t), (v) => v.code === _row.commandType)[0] ||
@@ -171,7 +176,8 @@ export function useTable() {
       },
       {
         title: t('project.workflow.run_times'),
-        key: 'runTimes'
+        key: 'runTimes',
+        className: 'workflow-run-times'
       },
       {
         title: t('project.workflow.fault_tolerant_sign'),

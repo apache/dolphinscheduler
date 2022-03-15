@@ -100,7 +100,7 @@ const list = defineComponent({
               size='small'
               onClick={this.handleModalChange}
               type='primary'
-              class='btn-create-tenant'
+              class='btn-create-project'
             >
               {t('project.list.create_project')}
             </NButton>

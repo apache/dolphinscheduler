@@ -37,26 +37,41 @@ import java.util.stream.Stream;
 
 @Getter
 public abstract class TaskNodeForm {
-    @FindBy(id = "inputNodeName")
+    @FindBys({
+            @FindBy(className = "input-node-name"),
+            @FindBy(tagName = "input")
+    })
     private WebElement inputNodeName;
-    @FindBy(id = "btnSubmit")
+
+    @FindBy(className = "btn-submit")
     private WebElement buttonSubmit;
+
     @FindBys({
         @FindBy(className = "input-param-key"),
         @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamKey;
-    @FindBys({
-        @FindBy(className = "input-param-val"),
-        @FindBy(tagName = "input"),
-    })
-    private List<WebElement> inputParamVal;
 
     @FindBys({
-        @FindBy(className = "pre_tasks-model"),
+        @FindBy(className = "input-param-value"),
         @FindBy(tagName = "input"),
     })
+    private List<WebElement> inputParamValue;
+
+    @FindBys({
+            @FindBy(className = "pre-tasks-model"),
+            @FindBy(className = "n-base-selection"),
+    })
     private WebElement selectPreTasks;
+
+    @FindBys({
+            @FindBy(className = "btn-custom-parameters"),
+            @FindBy(tagName = "button"),
+    })
+    private WebElement buttonCustomParameters;
+
+    @FindBy(className = "btn-create-custom-parameter")
+    private WebElement buttonCreateCustomParameters;
 
     private final WorkflowForm parent;
 
@@ -74,21 +89,24 @@ public abstract class TaskNodeForm {
         return this;
     }
 
-    public TaskNodeForm addParam(String key, String val) {
-        assert inputParamKey().size() == inputParamVal().size();
+    public TaskNodeForm addParam(String key, String value) {
+        assert inputParamKey().size() == inputParamValue().size();
 
         final int len = inputParamKey().size();
 
         final WebDriver driver = parent().driver();
-        Stream.concat(
-                  driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add"))).stream(),
-                  driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add-dp"))).stream())
-              .findFirst()
-              .orElseThrow(() -> new RuntimeException("Cannot find button to add param"))
-              .click();
 
-        inputParamKey().get(len).sendKeys(key);
-        inputParamVal().get(len).sendKeys(val);
+        if (len == 0) {
+            buttonCustomParameters().click();
+
+            inputParamKey().get(0).sendKeys(key);
+            inputParamValue().get(0).sendKeys(value);
+        } else {
+            buttonCreateCustomParameters().click();
+
+            inputParamKey().get(len).sendKeys(key);
+            inputParamValue().get(len).sendKeys(value);
+        }
 
         return this;
     }

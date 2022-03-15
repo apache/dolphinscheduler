@@ -99,7 +99,7 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.createDefinition}>
+              <NButton type='primary' onClick={this.createDefinition} class='btn-create-process'>
                 {t('project.workflow.create_workflow')}
               </NButton>
               <NButton strong secondary onClick={() => (this.showRef = true)}>
@@ -132,6 +132,7 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles.table}
+            row-class-name='items'
           />
           <div class={styles.pagination}>
             <NPagination

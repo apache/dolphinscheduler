@@ -65,6 +65,7 @@ export function useTable() {
         title: t('project.workflow.workflow_name'),
         key: 'name',
         width: 200,
+        className: 'workflow-name',
         render: (row) =>
           h(
             NEllipsis,

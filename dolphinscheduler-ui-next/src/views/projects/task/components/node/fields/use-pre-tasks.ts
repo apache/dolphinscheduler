@@ -57,6 +57,7 @@ export function usePreTasks(
     type: 'select',
     field: 'preTasks',
     span: 24,
+    class: 'pre-tasks-model',
     name: t('project.node.pre_tasks'),
     props: {
       multiple: true,

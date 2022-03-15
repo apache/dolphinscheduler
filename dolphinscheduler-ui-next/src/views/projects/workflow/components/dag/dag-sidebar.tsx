@@ -35,7 +35,7 @@ export default defineComponent({
       <div class={styles.sidebar}>
         {allTaskTypes.map((task) => (
           <div
-            class={styles.draggable}
+            class={[styles.draggable, `task-item-${task.type}`]}
             draggable='true'
             onDragstart={(e) => {
               context.emit('dragStart', e, task.type as TaskType)

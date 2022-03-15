@@ -23,19 +23,25 @@ import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import lombok.Getter;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 
 @Getter
 public final class ShellTaskForm extends TaskNodeForm {
-    private final CodeEditor codeEditor;
+    private CodeEditor codeEditor;
+
+    private WebDriver driver;
 
     public ShellTaskForm(WorkflowForm parent) {
         super(parent);
 
         this.codeEditor = new CodeEditor(parent.driver());
+
+        this.driver = parent.driver();
     }
 
     public ShellTaskForm script(String script) {
-        codeEditor().content(script);
+        codeEditor.content(script);
 
         return this;
     }

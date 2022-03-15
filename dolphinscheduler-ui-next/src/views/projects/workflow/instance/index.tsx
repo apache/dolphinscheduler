@@ -107,6 +107,7 @@ export default defineComponent({
             class={styles.table}
             scrollX={1800}
             v-model:checked-row-keys={this.checkedRowKeys}
+            row-class-name='items-workflow-instances'
           />
           <div class={styles.pagination}>
             <NPagination
@@ -129,6 +130,7 @@ export default defineComponent({
                   type='primary'
                   disabled={this.checkedRowKeys.length <= 0}
                   style='position: absolute; bottom: 10px; left: 10px;'
+                  class='btn-delete-all'
                 >
                   <NPopconfirm onPositiveClick={this.handleBatchDelete}>
                     {{

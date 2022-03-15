@@ -29,7 +29,7 @@ import lombok.Getter;
 public final class WorkflowRunDialog {
     private final WorkflowDefinitionTab parent;
 
-    @FindBy(id = "btnSubmit")
+    @FindBy(className = "btn-submit")
     private WebElement buttonSubmit;
 
     public WorkflowRunDialog(WorkflowDefinitionTab parent) {
