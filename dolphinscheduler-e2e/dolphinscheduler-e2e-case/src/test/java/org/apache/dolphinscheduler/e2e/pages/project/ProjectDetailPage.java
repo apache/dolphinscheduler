@@ -32,11 +32,13 @@ import lombok.Getter;
 
 @Getter
 public final class ProjectDetailPage extends NavBarPage {
-    @FindBy(className = "tab-process-definition")
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
     private WebElement menuProcessDefinition;
-    @FindBy(className = "tab-process-instance")
+
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(3) > .n-menu-item-content")
     private WebElement menuProcessInstances;
-    @FindBy(className = "tab-task-instance")
+
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(3) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
     private WebElement menuTaskInstances;
 
     public ProjectDetailPage(RemoteWebDriver driver) {
