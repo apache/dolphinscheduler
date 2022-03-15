@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
+import org.apache.dolphinscheduler.common.task.sparksql.SparkSqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
@@ -70,6 +71,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, MapReduceParameters.class);
             case "SPARK":
                 return JSONUtils.parseObject(parameter, SparkParameters.class);
+            case "SPARKSQL":
+                return JSONUtils.parseObject(parameter, SparkSqlParameters.class);
             case "PYTHON":
                 return JSONUtils.parseObject(parameter, PythonParameters.class);
             case "DEPENDENT":

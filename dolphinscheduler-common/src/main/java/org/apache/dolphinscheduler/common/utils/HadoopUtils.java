@@ -123,6 +123,8 @@ public class HadoopUtils implements Closeable {
     private void init() {
         try {
             configuration = new HdfsConfiguration();
+            configuration.addResource("core-site.xml");
+            configuration.addResource("hdfs-site.xml");
 
             String resourceStorageType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);

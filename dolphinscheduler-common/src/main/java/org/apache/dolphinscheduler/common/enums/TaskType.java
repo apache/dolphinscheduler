@@ -54,7 +54,8 @@ public enum TaskType {
     SQOOP(12, "SQOOP"),
     WATERDROP(13, "WATERDROP"),
     SWITCH(14, "SWITCH"),
-    PIGEON(15, "PIGEON");
+    PIGEON(15, "PIGEON"),
+    SPARKSQL(16,"SPARKSQL");
 
     TaskType(int code, String desc) {
         this.code = code;

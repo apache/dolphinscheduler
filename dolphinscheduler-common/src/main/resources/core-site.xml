@@ -1,0 +1,10 @@
+<configuration>
+    <property>
+      <name>hadoop.tmp.dir</name>
+      <value>/data/hadoop-2.7.2/hdfs/data</value>
+    </property>
+    <property>
+      <name>fs.defaultFS</name>
+      <value>hdfs://127.0.0.1:9000</value>
+    </property>
+</configuration>

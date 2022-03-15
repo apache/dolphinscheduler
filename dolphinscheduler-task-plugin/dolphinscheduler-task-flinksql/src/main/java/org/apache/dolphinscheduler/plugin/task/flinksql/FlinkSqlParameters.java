@@ -15,32 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.task.spark;
+package org.apache.dolphinscheduler.plugin.task.flinksql;
 
-import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * sparksql parameters
+ * flink parameters
  */
-public class SparkParameters extends AbstractParameters {
+public class FlinkSqlParameters extends AbstractParameters {
 
     /**
-     * main jar
+     * major jar
      */
     private ResourceInfo mainJar;
 
     /**
-     * main class
+     * major class
      */
     private String mainClass;
 
     /**
-     * deploy mode
+     * deploy mode  yarn-cluster yarn-local
      */
     private String deployMode;
 
@@ -50,35 +49,39 @@ public class SparkParameters extends AbstractParameters {
     private String mainArgs;
 
     /**
-     * driver-cores Number of cores used by the driver, only in cluster mode
+     * slot count
      */
-    private int driverCores;
+    private int slot;
 
     /**
-     * driver-memory Memory for driver
+     * parallelism
      */
-
-    private String driverMemory;
+    private int parallelism;
 
     /**
-     * num-executors Number of executors to launch
-     */
-    private int numExecutors;
-
-    /**
-     * executor-cores Number of cores per executor
-     */
-    private int executorCores;
-
-    /**
-     * Memory per executor
-     */
-    private String executorMemory;
-
-    /**
-     * app name
+     * yarn application name
      */
     private String appName;
+
+    /**
+     * taskManager count
+     */
+    private int taskManager;
+
+    /**
+     * job manager memory
+     */
+    private String jobManagerMemory;
+
+    /**
+     * task manager memory
+     */
+    private String taskManagerMemory;
+
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList = new ArrayList<>();
 
     /**
      * The YARN queue to submit to
@@ -91,20 +94,20 @@ public class SparkParameters extends AbstractParameters {
     private String others;
 
     /**
+     * flink version
+     */
+    private String flinkVersion;
+
+    /**
+     * flink sql file
+     */
+    private String flinksqlfile;
+
+    /**
      * program type
      * 0 JAVA,1 SCALA,2 PYTHON
      */
     private ProgramType programType;
-
-    /**
-     * spark version
-     */
-    private String sparkVersion;
-
-    /**
-     * resource list
-     */
-    private List<ResourceInfo> resourceList = new ArrayList<>();
 
     public ResourceInfo getMainJar() {
         return mainJar;
@@ -138,44 +141,20 @@ public class SparkParameters extends AbstractParameters {
         this.mainArgs = mainArgs;
     }
 
-    public int getDriverCores() {
-        return driverCores;
+    public int getSlot() {
+        return slot;
     }
 
-    public void setDriverCores(int driverCores) {
-        this.driverCores = driverCores;
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 
-    public String getDriverMemory() {
-        return driverMemory;
+    public int getParallelism() {
+        return parallelism;
     }
 
-    public void setDriverMemory(String driverMemory) {
-        this.driverMemory = driverMemory;
-    }
-
-    public int getNumExecutors() {
-        return numExecutors;
-    }
-
-    public void setNumExecutors(int numExecutors) {
-        this.numExecutors = numExecutors;
-    }
-
-    public int getExecutorCores() {
-        return executorCores;
-    }
-
-    public void setExecutorCores(int executorCores) {
-        this.executorCores = executorCores;
-    }
-
-    public String getExecutorMemory() {
-        return executorMemory;
-    }
-
-    public void setExecutorMemory(String executorMemory) {
-        this.executorMemory = executorMemory;
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
     }
 
     public String getAppName() {
@@ -186,20 +165,36 @@ public class SparkParameters extends AbstractParameters {
         this.appName = appName;
     }
 
+    public int getTaskManager() {
+        return taskManager;
+    }
+
+    public void setTaskManager(int taskManager) {
+        this.taskManager = taskManager;
+    }
+
+    public String getJobManagerMemory() {
+        return jobManagerMemory;
+    }
+
+    public void setJobManagerMemory(String jobManagerMemory) {
+        this.jobManagerMemory = jobManagerMemory;
+    }
+
+    public String getTaskManagerMemory() {
+        return taskManagerMemory;
+    }
+
+    public void setTaskManagerMemory(String taskManagerMemory) {
+        this.taskManagerMemory = taskManagerMemory;
+    }
+
     public String getQueue() {
         return queue;
     }
 
     public void setQueue(String queue) {
         this.queue = queue;
-    }
-
-    public String getOthers() {
-        return others;
-    }
-
-    public void setOthers(String others) {
-        this.others = others;
     }
 
     public List<ResourceInfo> getResourceList() {
@@ -210,6 +205,14 @@ public class SparkParameters extends AbstractParameters {
         this.resourceList = resourceList;
     }
 
+    public String getOthers() {
+        return others;
+    }
+
+    public void setOthers(String others) {
+        this.others = others;
+    }
+
     public ProgramType getProgramType() {
         return programType;
     }
@@ -218,12 +221,12 @@ public class SparkParameters extends AbstractParameters {
         this.programType = programType;
     }
 
-    public String getSparkVersion() {
-        return sparkVersion;
+    public String getFlinkVersion() {
+        return flinkVersion;
     }
 
-    public void setSparkVersion(String sparkVersion) {
-        this.sparkVersion = sparkVersion;
+    public void setFlinkVersion(String flinkVersion) {
+        this.flinkVersion = flinkVersion;
     }
 
     @Override
@@ -237,6 +240,14 @@ public class SparkParameters extends AbstractParameters {
             resourceList.add(mainJar);
         }
         return resourceList;
+    }
+
+    public String getFlinksqlfile() {
+        return flinksqlfile;
+    }
+
+    public void setFlinksqlfile(String flinksqlfile) {
+        this.flinksqlfile = flinksqlfile;
     }
 
 }

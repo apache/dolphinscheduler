@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.task.spark;
+package org.apache.dolphinscheduler.plugin.task.sparksql;
 
-import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * sparksql parameters
+ * spark parameters
  */
-public class SparkParameters extends AbstractParameters {
+public class SparkSqlParameters extends AbstractParameters {
 
     /**
      * main jar
@@ -92,7 +91,7 @@ public class SparkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * SCALA
      */
     private ProgramType programType;
 
@@ -100,6 +99,16 @@ public class SparkParameters extends AbstractParameters {
      * spark version
      */
     private String sparkVersion;
+
+    /**
+     * sql statement
+     */
+    private String sqlStatement;
+
+    /**
+     * sql file
+     */
+    private String SqlFile;
 
     /**
      * resource list
@@ -237,6 +246,22 @@ public class SparkParameters extends AbstractParameters {
             resourceList.add(mainJar);
         }
         return resourceList;
+    }
+
+    public String getSqlStatement() {
+        return sqlStatement;
+    }
+
+    public void setSqlStatement(String sqlStatement) {
+        this.sqlStatement = sqlStatement;
+    }
+
+    public String getSqlFile() {
+        return SqlFile;
+    }
+
+    public void setSqlFile(String sqlFile) {
+        SqlFile = sqlFile;
     }
 
 }

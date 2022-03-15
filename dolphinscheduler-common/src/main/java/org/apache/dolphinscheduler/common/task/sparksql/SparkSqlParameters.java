@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.task.spark;
+package org.apache.dolphinscheduler.common.task.sparksql;
 
-import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.common.enums.SqlProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * sparksql parameters
  */
-public class SparkParameters extends AbstractParameters {
+public class SparkSqlParameters extends AbstractParameters {
 
     /**
      * main jar
@@ -92,14 +93,24 @@ public class SparkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * SQL
      */
-    private ProgramType programType;
+    private SqlProgramType sqlProgramType;
 
     /**
      * spark version
      */
     private String sparkVersion;
+
+    /**
+     * sql statement
+     */
+    private String sqlStatement;
+
+    /**
+     * sql file
+     */
+    private String SqlFile;
 
     /**
      * resource list
@@ -210,12 +221,12 @@ public class SparkParameters extends AbstractParameters {
         this.resourceList = resourceList;
     }
 
-    public ProgramType getProgramType() {
-        return programType;
+    public SqlProgramType getProgramType() {
+        return sqlProgramType;
     }
 
-    public void setProgramType(ProgramType programType) {
-        this.programType = programType;
+    public void setProgramType(SqlProgramType programType) {
+        this.sqlProgramType = programType;
     }
 
     public String getSparkVersion() {
@@ -228,7 +239,7 @@ public class SparkParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return mainJar != null && programType != null;
+        return mainJar != null && sqlProgramType != null;
     }
 
     @Override
@@ -237,6 +248,22 @@ public class SparkParameters extends AbstractParameters {
             resourceList.add(mainJar);
         }
         return resourceList;
+    }
+
+    public String getSqlStatement() {
+        return sqlStatement;
+    }
+
+    public void setSqlStatement(String sqlStatement) {
+        this.sqlStatement = sqlStatement;
+    }
+
+    public String getSqlFile() {
+        return SqlFile;
+    }
+
+    public void setSqlFile(String sqlFile) {
+        SqlFile = sqlFile;
     }
 
 }
