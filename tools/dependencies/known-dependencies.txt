@@ -143,7 +143,7 @@ jetty-xml-9.4.44.v20210927.jar
 jline-0.9.94.jar
 jna-5.10.0.jar
 jna-platform-5.10.0.jar
-joda-time-2.9.4.jar
+joda-time-2.10.13.jar
 jpam-1.1.jar
 jsch-0.1.54.jar
 jsp-api-2.1.jar
