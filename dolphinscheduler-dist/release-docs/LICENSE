@@ -328,7 +328,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jetty-xml 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-xml/9.4.44.v20210927, Apache 2.0 and EPL 1.0
     jna 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.10.0,  Apache 2.0 and LGPL 2.1
     jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
-    joda-time 2.9.4: https://github.com/JodaOrg/joda-time, Apache 2.0
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
