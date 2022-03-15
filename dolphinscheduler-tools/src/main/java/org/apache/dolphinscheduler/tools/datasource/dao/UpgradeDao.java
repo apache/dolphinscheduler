@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;

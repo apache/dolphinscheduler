@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.api.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.task;
+package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
 /**
  * task timeout parameter

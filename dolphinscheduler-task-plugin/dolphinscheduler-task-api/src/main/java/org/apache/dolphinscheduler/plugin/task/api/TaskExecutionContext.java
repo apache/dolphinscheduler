@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 
 import java.util.Date;
 import java.util.Map;
