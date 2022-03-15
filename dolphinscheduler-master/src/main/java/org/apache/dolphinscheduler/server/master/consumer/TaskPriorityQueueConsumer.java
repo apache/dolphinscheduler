@@ -22,13 +22,16 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
@@ -79,6 +82,11 @@ public class TaskPriorityQueueConsumer extends Thread {
     @Autowired
     private ExecutorDispatcher dispatcher;
 
+    /**
+     * processInstance cache manager
+     */
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     /**
      * master config
@@ -168,10 +176,26 @@ public class TaskPriorityQueueConsumer extends Thread {
             }
 
             result = dispatcher.dispatch(executionContext);
+
+            if (result) {
+                changeTaskStateToDispatch(context);
+            }
         } catch (RuntimeException | ExecuteException e) {
             logger.error("dispatch error: {}", e.getMessage(), e);
         }
         return result;
+    }
+
+    /**
+     * change task state to dispatch
+     */
+    private void changeTaskStateToDispatch(TaskExecutionContext context) {
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(context.getProcessInstanceId());
+        if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(context.getTaskInstanceId())) {
+            TaskInstance taskInstance = workflowExecuteThread.getTaskInstance(context.getTaskInstanceId());
+            taskInstance.setState(ExecutionStatus.DISPATCH);
+            processService.saveTaskInstance(taskInstance);
+        }
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
