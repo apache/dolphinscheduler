@@ -16,13 +16,13 @@
  */
 
 import { ref, onMounted, watch } from 'vue'
-import type { Ref } from 'vue'
-import type { Graph } from '@antv/x6'
-import type { Coordinate, NodeData } from './types'
+import { remove } from 'lodash'
 import { TaskType } from '@/views/projects/task/constants/task-type'
 import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
-import { WorkflowDefinition } from './types'
+import type { Ref } from 'vue'
+import type { Graph } from '@antv/x6'
+import type { Coordinate, NodeData, WorkflowDefinition } from './types'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -36,8 +36,7 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-  const { addNode, setNodeName } = useCellUpdate({ graph })
-
+  const { addNode, setNodeName, setNodeEdge } = useCellUpdate({ graph })
   const taskDefinitions = ref<NodeData[]>(
     definition.value?.taskDefinitionList || []
   )
@@ -122,6 +121,7 @@ export function useTaskEdit(options: Options) {
     taskDefinitions.value = taskDefinitions.value.map((task) => {
       if (task.code === currTask.value?.code) {
         setNodeName(task.code + '', taskDef.name)
+        updatePreTasks(data.preTasks, task.code)
         return {
           ...taskDef,
           version: task.version,
@@ -139,6 +139,28 @@ export function useTaskEdit(options: Options) {
    */
   function taskCancel() {
     taskModalVisible.value = false
+  }
+
+  function updatePreTasks(preTasks: number[], code: number) {
+    if (!preTasks?.length) return
+    setNodeEdge(String(code), preTasks)
+    if (definition.value?.processTaskRelationList?.length) {
+      remove(
+        definition.value.processTaskRelationList,
+        (process) => process.postTaskCode === code
+      )
+    }
+    preTasks.forEach((task) => {
+      definition.value?.processTaskRelationList.push({
+        postTaskCode: code,
+        preTaskCode: task,
+        name: '',
+        preTaskVersion: 1,
+        postTaskVersion: 1,
+        conditionType: 'NONE',
+        conditionParams: {}
+      })
+    })
   }
 
   onMounted(() => {
