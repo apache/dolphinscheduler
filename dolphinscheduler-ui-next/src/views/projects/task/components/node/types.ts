@@ -315,6 +315,7 @@ interface INodeData
   masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
+  definition?: object
 }
 
 interface ITaskData

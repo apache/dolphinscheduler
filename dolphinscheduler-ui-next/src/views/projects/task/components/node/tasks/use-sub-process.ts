@@ -55,8 +55,7 @@ export function useSubProcess({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -79,7 +78,7 @@ export function useSubProcess({
         processName: data?.processName,
         code: data?.code
       }),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks(model, data?.code)
     ] as IJsonItem[],
     model
   }

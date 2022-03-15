@@ -26,6 +26,7 @@ interface IDetailPanel {
   readonly: false
   from: number
   detailRef?: Ref
+  definition?: object
 }
 
 const NodeDetail = defineComponent({
@@ -41,13 +42,14 @@ const NodeDetail = defineComponent({
       readonly: false,
       from: 0
     }
-    const { data, projectCode, from, readonly } = unref(detailData)
+    const { data, projectCode, from, readonly, definition } = unref(detailData)
 
     const { elementsRef, rulesRef, model } = useTask({
       data,
       projectCode,
       from,
-      readonly
+      readonly,
+      definition
     })
     watch(
       () => model.taskType,

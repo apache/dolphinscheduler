@@ -23,12 +23,14 @@ export function useTask({
   data,
   projectCode,
   from,
-  readonly
+  readonly,
+  definition
 }: {
   data: ITaskData
   projectCode: number
   from?: number
   readonly?: boolean
+  definition?: object
 }): {
   elementsRef: Ref<IFormItem[]>
   rulesRef: Ref<FormRules>
@@ -47,6 +49,7 @@ export function useTask({
 
   const { model, json } = nodes[data.taskType || 'SHELL'](params)
   jsonRef.value = json
+  model.definition = definition
 
   const getElements = () => {
     const { rules, elements } = getElementByJson(jsonRef.value, model)

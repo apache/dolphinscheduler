@@ -17,7 +17,6 @@
 
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { uniqBy } from 'lodash'
 import {
   querySimpleList,
   queryProcessDefinitionByCode
@@ -29,15 +28,13 @@ export function useProcessName({
   projectCode,
   isCreate,
   from,
-  processName,
-  code
+  processName
 }: {
   model: { [field: string]: any }
   projectCode: number
   isCreate: boolean
   from?: number
   processName?: number
-  code?: number
 }): IJsonItem {
   const { t } = useI18n()
 
@@ -57,56 +54,7 @@ export function useProcessName({
   const getProcessListByCode = async (processCode: number) => {
     if (!processCode) return
     const res = await queryProcessDefinitionByCode(processCode, projectCode)
-    getTaskOptions(res)
-  }
-  const getTaskOptions = (processDefinition: {
-    processTaskRelationList: []
-    taskDefinitionList: []
-  }) => {
-    const { processTaskRelationList = [], taskDefinitionList = [] } =
-      processDefinition
-
-    const preTaskOptions: { code: number; name: string }[] = []
-    const tasks: { [field: number]: string } = {}
-    taskDefinitionList.forEach(
-      (task: { code: number; taskType: string; name: string }) => {
-        tasks[task.code] = task.name
-        if (task.code === code) return
-        if (
-          task.taskType === 'CONDITIONS' &&
-          processTaskRelationList.filter(
-            (relation: { preTaskCode: number }) =>
-              relation.preTaskCode === task.code
-          ).length >= 2
-        ) {
-          return
-        }
-        preTaskOptions.push({
-          code: task.code,
-          name: task.name
-        })
-      }
-    )
-    model.preTaskOptions = uniqBy(preTaskOptions, 'code')
-
-    if (!code) return
-    const preTasks: number[] = []
-    const postTaskOptions: { code: number; name: string }[] = []
-    processTaskRelationList.forEach(
-      (relation: { preTaskCode: number; postTaskCode: number }) => {
-        if (relation.preTaskCode === code) {
-          postTaskOptions.push({
-            code: relation.postTaskCode,
-            name: tasks[relation.postTaskCode]
-          })
-        }
-        if (relation.postTaskCode === code && relation.preTaskCode !== 0) {
-          preTasks.push(relation.preTaskCode)
-        }
-      }
-    )
-    model.preTasks = preTasks
-    model.postTaskOptions = postTaskOptions
+    model.definition = res
   }
 
   const onChange = (code: number) => {
