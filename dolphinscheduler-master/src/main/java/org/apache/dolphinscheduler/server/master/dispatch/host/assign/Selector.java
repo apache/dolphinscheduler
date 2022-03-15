@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import java.util.Collection;
 
-
 /**
  * selector
  * @param <T> T

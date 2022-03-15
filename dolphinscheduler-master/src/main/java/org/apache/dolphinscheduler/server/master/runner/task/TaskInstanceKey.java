@@ -57,11 +57,11 @@ public class TaskInstanceKey {
 
     @Override
     public String toString() {
-        return "TaskKey{" +
-                "processInstanceId=" + processInstanceId +
-                ", taskCode=" + taskCode +
-                ", taskVersion=" + taskVersion +
-                '}';
+        return "TaskKey{"
+                + "processInstanceId=" + processInstanceId
+                + ", taskCode=" + taskCode
+                + ", taskVersion=" + taskVersion
+                + '}';
     }
 
     @Override
