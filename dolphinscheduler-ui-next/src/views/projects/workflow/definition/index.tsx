@@ -45,8 +45,14 @@ export default defineComponent({
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
 
-    const { variables, createColumns, getTableData, batchDeleteWorkflow } =
-      useTable()
+    const {
+      variables,
+      createColumns,
+      getTableData,
+      batchDeleteWorkflow,
+      batchExportWorkflow,
+      batchCopyWorkflow
+    } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -70,10 +76,6 @@ export default defineComponent({
       requestData()
     }
 
-    const handleBatchDelete = () => {
-      batchDeleteWorkflow()
-    }
-
     const createDefinition = () => {
       router.push({
         path: `/projects/${projectCode}/workflow/definitions/create`
@@ -95,7 +97,9 @@ export default defineComponent({
       handleUpdateList,
       createDefinition,
       handleChangePageSize,
-      handleBatchDelete,
+      batchDeleteWorkflow,
+      batchExportWorkflow,
+      batchCopyWorkflow,
       ...toRefs(variables)
     }
   },
@@ -171,10 +175,48 @@ export default defineComponent({
                   style='position: absolute; bottom: 10px; left: 10px;'
                   class='btn-delete-all'
                 >
-                  <NPopconfirm onPositiveClick={this.handleBatchDelete}>
+                  <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
                     {{
                       default: () => t('project.workflow.delete_confirm'),
                       trigger: () => t('project.workflow.delete')
+                    }}
+                  </NPopconfirm>
+                </NButton>
+              )
+            }}
+          </NTooltip>
+          <NTooltip>
+            {{
+              default: () => t('project.workflow.export'),
+              trigger: () => (
+                <NButton
+                  tag='div'
+                  type='primary'
+                  disabled={this.checkedRowKeys.length <= 0}
+                  onClick={this.batchExportWorkflow}
+                  style='position: absolute; bottom: 10px; left: 70px;'
+                  class='btn-delete-all'
+                >
+                  {t('project.workflow.export')}
+                </NButton>
+              )
+            }}
+          </NTooltip>
+          <NTooltip>
+            {{
+              default: () => t('project.workflow.batch_copy'),
+              trigger: () => (
+                <NButton
+                  tag='div'
+                  type='primary'
+                  disabled={this.checkedRowKeys.length <= 0}
+                  style='position: absolute; bottom: 10px; left: 130px;'
+                  class='btn-delete-all'
+                >
+                  <NPopconfirm onPositiveClick={this.batchCopyWorkflow}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => t('project.workflow.batch_copy')
                     }}
                   </NPopconfirm>
                 </NButton>

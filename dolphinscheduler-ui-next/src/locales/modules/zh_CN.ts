@@ -401,6 +401,7 @@ const project = {
     tree_view: '工作流树形图',
     tree_limit: '限制大小',
     export: '导出',
+    batch_copy: '批量复制',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',

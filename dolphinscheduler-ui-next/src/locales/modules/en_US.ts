@@ -404,6 +404,7 @@ const project = {
     tree_view: 'Tree View',
     tree_limit: 'Limit Size',
     export: 'Export',
+    batch_copy: 'Batch Copy',
     version_info: 'Version Info',
     version: 'Version',
     file_upload: 'File Upload',

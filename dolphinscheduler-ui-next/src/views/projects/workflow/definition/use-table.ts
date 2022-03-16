@@ -60,9 +60,7 @@ export function useTable() {
     variables.columns = [
       {
         type: 'selection',
-        disabled: (row) => {
-          return row.releaseState === 'ONLINE'
-        },
+        disabled: (row) => row.releaseState === 'ONLINE',
         className: 'btn-selected'
       },
       {
@@ -234,6 +232,21 @@ export function useTable() {
     })
   }
 
+  const batchExportWorkflow = () => {
+    const fileName = 'workflow_' + new Date().getTime()
+    const data = {
+      codes: _.join(variables.checkedRowKeys, ',')
+    }
+
+    batchExportByCodes(data, variables.projectCode).then((res: any) => {
+      downloadBlob(res, fileName)
+      window.$message.success(t('project.workflow.success'))
+      variables.checkedRowKeys = []
+    })
+  }
+
+  const batchCopyWorkflow = () => {}
+
   const releaseWorkflow = (row: any) => {
     const data = {
       name: row.name,
@@ -333,6 +346,8 @@ export function useTable() {
     variables,
     createColumns,
     getTableData,
-    batchDeleteWorkflow
+    batchDeleteWorkflow,
+    batchExportWorkflow,
+    batchCopyWorkflow
   }
 }
