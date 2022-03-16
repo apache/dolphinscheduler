@@ -403,6 +403,7 @@ const project = {
     tree_view: '工作流树形图',
     tree_limit: '限制大小',
     export: '导出',
+    batch_copy: '批量复制',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',
@@ -506,7 +507,11 @@ const project = {
     cancel_full_screen: '取消全屏',
     task_state: '任务状态',
     mode_of_dependent: '依赖模式',
-    open: '打开'
+    open: '打开',
+    project_name_required: '项目名称必填',
+    related_items: '关联项目',
+    project_name: '项目名称',
+    project_tips: '请选择项目'
   },
   task: {
     task_name: '任务名称',

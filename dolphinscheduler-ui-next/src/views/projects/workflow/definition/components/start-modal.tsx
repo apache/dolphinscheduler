@@ -398,7 +398,12 @@ export default defineComponent({
                         <DeleteOutlined />
                       </NIcon>
                     </NButton>
-                    <NButton text type='primary' onClick={this.addStartParams} class='btn-create-custom-parameter'>
+                    <NButton
+                      text
+                      type='primary'
+                      onClick={this.addStartParams}
+                      class='btn-create-custom-parameter'
+                    >
                       <NIcon>
                         <PlusCircleOutlined />
                       </NIcon>

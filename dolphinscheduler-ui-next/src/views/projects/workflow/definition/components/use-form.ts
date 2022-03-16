@@ -88,9 +88,30 @@ export const useForm = () => {
     },
     saving: false
   })
+
+  const copyState = reactive({
+    copyFormRef: ref(),
+    copyForm: {
+      projectCode: null
+    },
+    saving: false,
+    copyRules: {
+      projectCode: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (copyState.copyForm.projectCode === '') {
+            return new Error(t('project.workflow.project_name_required'))
+          }
+        }
+      }
+    } as FormRules
+  })
+
   return {
     importState,
     startState,
-    timingState
+    timingState,
+    copyState
   }
 }
