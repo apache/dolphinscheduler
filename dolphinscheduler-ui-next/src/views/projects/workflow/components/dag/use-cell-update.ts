@@ -22,6 +22,7 @@ import type { Coordinate } from './types'
 import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import { useCustomCellBuilder } from './dag-hooks'
 import utils from '@/utils'
+import type { Edge } from '@antv/x6'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -70,10 +71,19 @@ export function useCellUpdate(options: Options) {
     graph.value?.addNode(node)
   }
 
-  const setNodeEdge = (id: string, preTaskCode: number[]) => {
+  function removeNode(id: string) {
+    graph.value?.removeNode(id)
+  }
+
+  const getNodeEdge = (id: string): Edge[] => {
     const node = graph.value?.getCellById(id)
-    if (!node) return
+    if (!node) return []
     const edges = graph.value?.getConnectedEdges(node)
+    return edges || []
+  }
+
+  const setNodeEdge = (id: string, preTaskCode: number[]) => {
+    const edges = getNodeEdge(id)
     if (edges?.length) {
       edges.forEach((edge) => {
         graph.value?.removeEdge(edge)
@@ -84,9 +94,24 @@ export function useCellUpdate(options: Options) {
     })
   }
 
+  const getSources = (id: string): number[] => {
+    const edges = getNodeEdge(id)
+    if (!edges.length) return []
+    const targets = [] as number[]
+    edges.forEach((edge) => {
+      const targetNode = edge.getSourceNode()
+      if (targetNode) {
+        targets.push(Number(targetNode.id))
+      }
+    })
+    return targets
+  }
+
   return {
     setNodeName,
     setNodeEdge,
-    addNode
+    addNode,
+    removeNode,
+    getSources
   }
 }
