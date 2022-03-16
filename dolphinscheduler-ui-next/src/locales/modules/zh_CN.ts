@@ -505,7 +505,11 @@ const project = {
     cancel_full_screen: '取消全屏',
     task_state: '任务状态',
     mode_of_dependent: '依赖模式',
-    open: '打开'
+    open: '打开',
+    project_name_required: '项目名称必填',
+    related_items: '关联项目',
+    project_name: '项目名称',
+    project_tips: '请选择项目'
   },
   task: {
     task_name: '任务名称',

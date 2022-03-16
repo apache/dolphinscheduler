@@ -34,6 +34,7 @@ import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
 import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
+import CopyModal from './components/copy-modal'
 import { useRouter, useRoute } from 'vue-router'
 import type { Router } from 'vue-router'
 import styles from './index.module.scss'
@@ -63,6 +64,11 @@ export default defineComponent({
     }
 
     const handleUpdateList = () => {
+      requestData()
+    }
+
+    const handleCopyUpdateList = () => {
+      variables.checkedRowKeys = []
       requestData()
     }
 
@@ -100,6 +106,7 @@ export default defineComponent({
       batchDeleteWorkflow,
       batchExportWorkflow,
       batchCopyWorkflow,
+      handleCopyUpdateList,
       ...toRefs(variables)
     }
   },
@@ -210,15 +217,11 @@ export default defineComponent({
                   tag='div'
                   type='primary'
                   disabled={this.checkedRowKeys.length <= 0}
+                  onClick={() => (this.copyShowRef = true)}
                   style='position: absolute; bottom: 10px; left: 130px;'
                   class='btn-delete-all'
                 >
-                  <NPopconfirm onPositiveClick={this.batchCopyWorkflow}>
-                    {{
-                      default: () => t('project.workflow.delete_confirm'),
-                      trigger: () => t('project.workflow.batch_copy')
-                    }}
-                  </NPopconfirm>
+                  {t('project.workflow.batch_copy')}
                 </NButton>
               )
             }}
@@ -242,6 +245,11 @@ export default defineComponent({
           v-model:row={this.row}
           v-model:show={this.versionShowRef}
           onUpdateList={this.handleUpdateList}
+        />
+        <CopyModal
+          v-model:codes={this.checkedRowKeys}
+          v-model:show={this.copyShowRef}
+          onUpdateList={this.handleCopyUpdateList}
         />
       </div>
     )

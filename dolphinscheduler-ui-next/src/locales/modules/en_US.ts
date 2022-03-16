@@ -508,7 +508,11 @@ const project = {
     cancel_full_screen: 'Cancel full screen',
     task_state: 'Task status',
     mode_of_dependent: 'Mode of dependent',
-    open: 'Open'
+    open: 'Open',
+    project_name_required: 'Project name is required',
+    related_items: 'Related items',
+    project_name: 'Project Name',
+    project_tips: 'Please select project name'
   },
   task: {
     task_name: 'Task Name',

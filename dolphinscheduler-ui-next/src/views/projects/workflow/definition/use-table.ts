@@ -53,7 +53,8 @@ export function useTable() {
     showRef: ref(false),
     startShowRef: ref(false),
     timingShowRef: ref(false),
-    versionShowRef: ref(false)
+    versionShowRef: ref(false),
+    copyShowRef: ref(false)
   })
 
   const createColumns = (variables: any) => {

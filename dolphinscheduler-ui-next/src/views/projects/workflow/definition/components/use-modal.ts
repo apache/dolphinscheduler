@@ -22,6 +22,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { format } from 'date-fns'
 import {
+  batchCopyByCodes,
   importProcessDefinition,
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
@@ -155,6 +156,27 @@ export function useModal(
     }
   }
 
+  const handleBatchCopyDefinition = async (codes: Array<string>) => {
+    await state.copyFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+    try {
+      const data = {
+        codes: _.join(codes, ','),
+        targetProjectCode: state.copyForm.projectCode
+      }
+      await batchCopyByCodes(data, variables.projectCode)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+      state.copyForm.projectCode = ''
+    } catch (err) {
+      state.saving = false
+    }
+  }
+
   const getTimingData = () => {
     const start = format(
       parseTime(state.timingForm.startEndTime[0]),
@@ -253,6 +275,7 @@ export function useModal(
     handleStartDefinition,
     handleCreateTiming,
     handleUpdateTiming,
+    handleBatchCopyDefinition,
     getWorkerGroups,
     getAlertGroups,
     getEnvironmentList,
