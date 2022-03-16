@@ -31,8 +31,7 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
-
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
