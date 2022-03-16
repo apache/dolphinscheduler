@@ -40,6 +40,7 @@ import { useThemeStore } from '@/store/theme/theme'
 import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
+import { WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
   layoutToggle: {
@@ -48,12 +49,12 @@ const props = {
   },
   // If this prop is passed, it means from definition detail
   instance: {
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowInstance>,
     default: null
   },
   definition: {
     // The same as the structure responsed by the queryProcessDefinitionByCode api
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowDefinition>,
     default: null
   }
 }
