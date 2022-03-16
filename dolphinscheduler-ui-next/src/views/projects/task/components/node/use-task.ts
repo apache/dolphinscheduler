@@ -14,10 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, Ref, watch } from 'vue'
+import { ref, Ref, unref, watch } from 'vue'
 import nodes from './tasks'
 import getElementByJson from '@/components/form/get-elements-by-json'
-import { IFormItem, IJsonItem, INodeData, ITaskData, FormRules } from './types'
+import { useTaskNodeStore } from '@/store/project/task-node'
+import type {
+  IFormItem,
+  IJsonItem,
+  INodeData,
+  ITaskData,
+  FormRules,
+  EditWorkflowDefinition
+} from './types'
 
 export function useTask({
   data,
@@ -30,15 +38,19 @@ export function useTask({
   projectCode: number
   from?: number
   readonly?: boolean
-  definition?: object
+  definition?: EditWorkflowDefinition
 }): {
   elementsRef: Ref<IFormItem[]>
   rulesRef: Ref<FormRules>
   model: INodeData
 } {
+  const taskStore = useTaskNodeStore()
+  taskStore.updateDefinition(unref(definition), data?.code)
+
   const jsonRef = ref([]) as Ref<IJsonItem[]>
   const elementsRef = ref([]) as Ref<IFormItem[]>
   const rulesRef = ref({})
+
   const params = {
     projectCode,
     from,
@@ -49,7 +61,7 @@ export function useTask({
 
   const { model, json } = nodes[data.taskType || 'SHELL'](params)
   jsonRef.value = json
-  model.definition = definition
+  model.preTasks = taskStore.getPreTasks
 
   const getElements = () => {
     const { rules, elements } = getElementByJson(jsonRef.value, model)

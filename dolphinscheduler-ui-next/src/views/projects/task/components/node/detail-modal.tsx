@@ -23,13 +23,13 @@ import {
   nextTick,
   provide,
   computed,
-  h
+  h,
+  Ref
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import Detail from './detail'
 import { formatModel } from './format-data'
-import type { ITaskData, ITaskType } from './types'
 import {
   HistoryOutlined,
   ProfileOutlined,
@@ -38,10 +38,13 @@ import {
 import { NIcon } from 'naive-ui'
 import { TASK_TYPES_MAP } from '../../constants/task-type'
 import { Router, useRouter } from 'vue-router'
-import {
+import type {
+  ITaskData,
+  ITaskType,
+  EditWorkflowDefinition,
   IWorkflowTaskInstance,
   WorkflowInstance
-} from '@/views/projects/workflow/components/dag/types'
+} from './types'
 
 const props = {
   show: {
@@ -65,7 +68,7 @@ const props = {
     default: 0
   },
   definition: {
-    type: Object as PropType<any>
+    type: Object as PropType<Ref<EditWorkflowDefinition>>
   },
   processInstance: {
     type: Object as PropType<WorkflowInstance>

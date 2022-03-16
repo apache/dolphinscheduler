@@ -99,9 +99,9 @@ export function useCellUpdate(options: Options) {
     if (!edges.length) return []
     const targets = [] as number[]
     edges.forEach((edge) => {
-      const targetNode = edge.getSourceNode()
-      if (targetNode) {
-        targets.push(Number(targetNode.id))
+      const sourceNode = edge.getSourceNode()
+      if (sourceNode && sourceNode.id !== id) {
+        targets.push(Number(sourceNode.id))
       }
     })
     return targets
