@@ -151,11 +151,12 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         if (StringUtils.isBlank(dsHome)) {
             dsHome = System.getProperty("user.dir");
         }
-        if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
-            return true;
+        if (StringUtils.isBlank(path)) {
+            logger.warn("path is null");
+            return false;
+        } else {
+            return path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log");
         }
-
-        return false;
     }
 
     public ExecutorService getExecutor() {
