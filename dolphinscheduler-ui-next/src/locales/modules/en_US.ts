@@ -586,6 +586,7 @@ const project = {
     success: 'Success',
     delete_cell: 'Delete selected edges and nodes',
     online_directly: 'Whether to go online the process definition',
+    update_directly: 'Whether to update the process definition',
     dag_name_empty: 'DAG graph name cannot be empty',
     positive_integer: 'Please enter a positive integer greater than 0',
     prop_empty: 'prop is empty',

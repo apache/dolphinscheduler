@@ -29,7 +29,7 @@ import {
   NCheckbox
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
-import { SaveForm, WorkflowDefinition } from './types'
+import { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
@@ -43,6 +43,10 @@ const props = {
   // If this prop is passed, it means from definition detail
   definition: {
     type: Object as PropType<WorkflowDefinition>,
+    default: undefined
+  },
+  instance: {
+    type: Object as PropType<WorkflowInstance>,
     default: undefined
   }
 }
@@ -86,7 +90,8 @@ export default defineComponent({
       timeoutFlag: false,
       timeout: 0,
       globalParams: [],
-      release: false
+      release: false,
+      sync: false
     })
     const formRef = ref()
     const rule = {
@@ -178,7 +183,7 @@ export default defineComponent({
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput v-model:value={formValue.value.name} class='input-name'/>
+            <NInput v-model:value={formValue.value.name} class='input-name' />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
@@ -218,13 +223,20 @@ export default defineComponent({
               preset='pair'
               key-placeholder={t('project.dag.key')}
               value-placeholder={t('project.dag.value')}
-                class='input-global-params'
+              class='input-global-params'
             />
           </NFormItem>
-          {props.definition && (
+          {props.definition && !props.instance && (
             <NFormItem path='timeoutFlag'>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
+              </NCheckbox>
+            </NFormItem>
+          )}
+          {props.instance && (
+            <NFormItem path='sync'>
+              <NCheckbox v-model:checked={formValue.value.sync}>
+                {t('project.dag.update_directly')}
               </NCheckbox>
             </NFormItem>
           )}
