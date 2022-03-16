@@ -81,7 +81,7 @@ export function useSpark({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useSpark(model),
-      Fields.usePreTasks(model, data?.code)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

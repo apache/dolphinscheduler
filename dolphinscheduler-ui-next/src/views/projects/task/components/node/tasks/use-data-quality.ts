@@ -108,7 +108,7 @@ export function useDataQuality({
         field: 'localParams',
         isSimple: true
       }),
-      Fields.usePreTasks(model, data?.code)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }
