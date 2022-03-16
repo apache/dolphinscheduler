@@ -106,7 +106,7 @@ export default defineComponent({
       appendTask,
       editTask,
       copyTask,
-      taskDefinitions,
+      processDefinition,
       removeTasks
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
@@ -212,10 +212,14 @@ export default defineComponent({
         saveModelToggle(false)
         return
       }
-      const connects = getConnects(nodes, edges, taskDefinitions.value as any)
+      const connects = getConnects(
+        nodes,
+        edges,
+        processDefinition.value.taskDefinitionList as any
+      )
       const locations = getLocations(nodes)
       context.emit('save', {
-        taskDefinitions: taskDefinitions.value,
+        taskDefinitions: processDefinition.value.taskDefinitionList,
         saveForm,
         connects,
         locations
@@ -288,7 +292,7 @@ export default defineComponent({
           taskInstance={currentTaskInstance.value}
           onViewLog={handleViewLog}
           data={currTask.value as any}
-          definition={props.definition}
+          definition={processDefinition}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />
