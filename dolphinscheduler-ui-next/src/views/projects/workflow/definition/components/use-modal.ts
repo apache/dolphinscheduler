@@ -54,85 +54,105 @@ export function useModal(
   })
 
   const resetImportForm = () => {
-    state.importFormRef.name = ''
-    state.importFormRef.file = ''
+    state.importForm.name = ''
+    state.importForm.file = ''
   }
 
-  const handleImportDefinition = () => {
-    state.importFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        const formData = new FormData()
-        formData.append('file', state.importForm.file)
-        const code = Number(router.currentRoute.value.params.projectCode)
-        await importProcessDefinition(formData, code)
-        window.$message.success(t('project.workflow.success'))
-        ctx.emit('updateList')
-        ctx.emit('update:show')
-        resetImportForm()
+  const handleImportDefinition = async () => {
+    await state.importFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+    try {
+      const formData = new FormData()
+      formData.append('file', state.importForm.file)
+      const code = Number(router.currentRoute.value.params.projectCode)
+      await importProcessDefinition(formData, code)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+      resetImportForm()
+    } catch (err) {
+      state.saving = false
+    }
+  }
+
+  const handleStartDefinition = async (code: number) => {
+    await state.startFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+    try {
+      state.startForm.processDefinitionCode = code
+      if (state.startForm.startEndTime) {
+        const start = format(
+          new Date(state.startForm.startEndTime[0]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+        const end = format(
+          new Date(state.startForm.startEndTime[1]),
+          'yyyy-MM-dd hh:mm:ss'
+        )
+        state.startForm.scheduleTime = `${start},${end}`
       }
-    })
-  }
 
-  const handleStartDefinition = (code: number) => {
-    state.startFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        state.startForm.processDefinitionCode = code
-        if (state.startForm.startEndTime) {
-          const start = format(
-            new Date(state.startForm.startEndTime[0]),
-            'yyyy-MM-dd hh:mm:ss'
-          )
-          const end = format(
-            new Date(state.startForm.startEndTime[1]),
-            'yyyy-MM-dd hh:mm:ss'
-          )
-          state.startForm.scheduleTime = `${start},${end}`
+      const startParams = {} as any
+      for (const item of variables.startParamsList) {
+        if (item.value !== '') {
+          startParams[item.prop] = item.value
         }
-
-        const startParams = {} as any
-        for (const item of variables.startParamsList) {
-          if (item.value !== '') {
-            startParams[item.prop] = item.value
-          }
-        }
-        state.startForm.startParams = !_.isEmpty(startParams)
-          ? JSON.stringify(startParams)
-          : ''
-
-        await startProcessInstance(state.startForm, variables.projectCode)
-        window.$message.success(t('project.workflow.success'))
-        ctx.emit('updateList')
-        ctx.emit('update:show')
       }
-    })
+      state.startForm.startParams = !_.isEmpty(startParams)
+        ? JSON.stringify(startParams)
+        : ''
+
+      await startProcessInstance(state.startForm, variables.projectCode)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
-  const handleCreateTiming = (code: number) => {
-    state.timingFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        const data: any = getTimingData()
-        data.processDefinitionCode = code
+  const handleCreateTiming = async (code: number) => {
+    await state.timingFormRef.validate()
 
-        await createSchedule(data, variables.projectCode)
-        window.$message.success(t('project.workflow.success'))
-        ctx.emit('updateList')
-        ctx.emit('update:show')
-      }
-    })
+    if (state.saving) return
+    state.saving = true
+    try {
+      const data: any = getTimingData()
+      data.processDefinitionCode = code
+
+      await createSchedule(data, variables.projectCode)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
-  const handleUpdateTiming = (id: number) => {
-    state.timingFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        const data: any = getTimingData()
-        data.id = id
+  const handleUpdateTiming = async (id: number) => {
+    await state.timingFormRef.validate()
 
-        await updateSchedule(data, variables.projectCode, id)
-        window.$message.success(t('project.workflow.success'))
-        ctx.emit('updateList')
-        ctx.emit('update:show')
-      }
-    })
+    if (state.saving) return
+    state.saving = true
+    try {
+      const data: any = getTimingData()
+      data.id = id
+
+      await updateSchedule(data, variables.projectCode, id)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   const getTimingData = () => {

@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.rule.entity;
 
-import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 
 import java.io.Serializable;
 import java.util.Date;
-
 
 /**
  * RuleExecuteSql

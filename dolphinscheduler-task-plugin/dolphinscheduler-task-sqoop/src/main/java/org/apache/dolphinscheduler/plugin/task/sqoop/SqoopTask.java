@@ -18,14 +18,14 @@
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
-import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
@@ -44,9 +44,11 @@ public class SqoopTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private final TaskRequest taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    public SqoopTask(TaskRequest taskExecutionContext) {
+    private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+    public SqoopTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
     }
@@ -64,13 +66,15 @@ public class SqoopTask extends AbstractYarnTask {
         if (!sqoopParameters.checkParameters()) {
             throw new IllegalArgumentException("Sqoop Task params check fail");
         }
+
+        sqoopTaskExecutionContext = sqoopParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     @Override
     protected String buildCommand() {
         //get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters, taskExecutionContext);
+        String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());

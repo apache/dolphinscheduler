@@ -34,7 +34,7 @@ interface Options {
 export function useCellUpdate(options: Options) {
   const { graph } = options
 
-  const { buildNode } = useCustomCellBuilder()
+  const { buildNode, buildEdge } = useCustomCellBuilder()
 
   /**
    * Set node name by id
@@ -70,8 +70,23 @@ export function useCellUpdate(options: Options) {
     graph.value?.addNode(node)
   }
 
+  const setNodeEdge = (id: string, preTaskCode: number[]) => {
+    const node = graph.value?.getCellById(id)
+    if (!node) return
+    const edges = graph.value?.getConnectedEdges(node)
+    if (edges?.length) {
+      edges.forEach((edge) => {
+        graph.value?.removeEdge(edge)
+      })
+    }
+    preTaskCode.forEach((task) => {
+      graph.value?.addEdge(buildEdge(String(task), id))
+    })
+  }
+
   return {
     setNodeName,
+    setNodeEdge,
     addNode
   }
 }

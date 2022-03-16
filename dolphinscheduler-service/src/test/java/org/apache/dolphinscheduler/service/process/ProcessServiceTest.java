@@ -28,14 +28,11 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -47,10 +44,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -74,24 +69,22 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -685,7 +678,7 @@ public class ProcessServiceTest {
         taskDefinition.setCode(751500437479424L);
         taskDefinition.setName("aa");
         taskDefinition.setProjectCode(751485690568704L);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setTaskType("SHELL");
         taskDefinition.setUserId(-1);
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
@@ -722,7 +715,7 @@ public class ProcessServiceTest {
         taskDefinition.setCode(3L);
         taskDefinition.setName("1-test");
         taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setTaskType("SHELL");
         taskDefinition.setUserId(1);
         taskDefinition.setVersion(2);
         taskDefinition.setCreateTime(new Date());
@@ -732,7 +725,7 @@ public class ProcessServiceTest {
         td2.setCode(2L);
         td2.setName("unit-test");
         td2.setProjectCode(1L);
-        td2.setTaskType(TaskType.SHELL.getDesc());
+        td2.setTaskType("SHELL");
         td2.setUserId(1);
         td2.setVersion(1);
         td2.setCreateTime(new Date());
@@ -775,89 +768,6 @@ public class ProcessServiceTest {
                 + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
                 + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
         processService.changeOutParam(taskInstance);
-    }
-
-    @Test
-    public void testUpdateTaskDefinitionResources() throws Exception {
-        TaskDefinition taskDefinition = new TaskDefinition();
-        String taskParameters = "{\n"
-                + "    \"mainClass\": \"org.apache.dolphinscheduler.SparkTest\",\n"
-                + "    \"mainJar\": {\n"
-                + "        \"id\": 1\n"
-                + "    },\n"
-                + "    \"deployMode\": \"cluster\",\n"
-                + "    \"resourceList\": [\n"
-                + "        {\n"
-                + "            \"id\": 3\n"
-                + "        },\n"
-                + "        {\n"
-                + "            \"id\": 4\n"
-                + "        }\n"
-                + "    ],\n"
-                + "    \"localParams\": [],\n"
-                + "    \"driverCores\": 1,\n"
-                + "    \"driverMemory\": \"512M\",\n"
-                + "    \"numExecutors\": 2,\n"
-                + "    \"executorMemory\": \"2G\",\n"
-                + "    \"executorCores\": 2,\n"
-                + "    \"appName\": \"\",\n"
-                + "    \"mainArgs\": \"\",\n"
-                + "    \"others\": \"\",\n"
-                + "    \"programType\": \"JAVA\",\n"
-                + "    \"sparkVersion\": \"SPARK2\",\n"
-                + "    \"dependence\": {},\n"
-                + "    \"conditionResult\": {\n"
-                + "        \"successNode\": [\n"
-                + "            \"\"\n"
-                + "        ],\n"
-                + "        \"failedNode\": [\n"
-                + "            \"\"\n"
-                + "        ]\n"
-                + "    },\n"
-                + "    \"waitStartTimeout\": {}\n"
-                + "}";
-        taskDefinition.setTaskParams(taskParameters);
-
-        Map<Integer, Resource> resourceMap =
-                Stream.of(1, 3, 4)
-                        .map(i -> {
-                            Resource resource = new Resource();
-                            resource.setId(i);
-                            resource.setFileName("file" + i);
-                            resource.setFullName("/file" + i);
-                            return resource;
-                        })
-                        .collect(
-                                Collectors.toMap(
-                                        Resource::getId,
-                                        resource -> resource)
-                        );
-        for (Integer integer : Arrays.asList(1, 3, 4)) {
-            Mockito.when(resourceMapper.selectById(integer))
-                    .thenReturn(resourceMap.get(integer));
-        }
-
-        Whitebox.invokeMethod(processService,
-                "updateTaskDefinitionResources",
-                taskDefinition);
-
-        String taskParams = taskDefinition.getTaskParams();
-        SparkParameters sparkParameters = JSONUtils.parseObject(taskParams, SparkParameters.class);
-        ResourceInfo mainJar = sparkParameters.getMainJar();
-        Assert.assertEquals(1, mainJar.getId());
-        Assert.assertEquals("file1", mainJar.getRes());
-        Assert.assertEquals("/file1", mainJar.getResourceName());
-
-        Assert.assertEquals(2, sparkParameters.getResourceList().size());
-        ResourceInfo res1 = sparkParameters.getResourceList().get(0);
-        ResourceInfo res2 = sparkParameters.getResourceList().get(1);
-        Assert.assertEquals(3, res1.getId());
-        Assert.assertEquals("file3", res1.getRes());
-        Assert.assertEquals("/file3", res1.getResourceName());
-        Assert.assertEquals(4, res2.getId());
-        Assert.assertEquals("file4", res2.getRes());
-        Assert.assertEquals("/file4", res2.getResourceName());
-
     }
 
     @Test
