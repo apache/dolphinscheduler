@@ -103,7 +103,9 @@ const home = {
   waiting_depend: 'WAITING_DEPEND',
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
-  serial_wait: 'SERIAL_WAIT'
+  serial_wait: 'SERIAL_WAIT',
+  ready_block: 'READY_BLOCK',
+  block: 'BLOCK'
 }
 
 const password = {

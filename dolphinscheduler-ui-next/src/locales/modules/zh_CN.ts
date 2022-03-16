@@ -103,7 +103,9 @@ const home = {
   waiting_depend: '等待依赖完成',
   delay_execution: '延时执行',
   forced_success: '强制成功',
-  serial_wait: '串行等待'
+  serial_wait: '串行等待',
+  ready_block: '准备阻断',
+  block: '阻断'
 }
 
 const password = {
