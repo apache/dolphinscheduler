@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -147,14 +149,15 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      */
     private boolean checkPathSecurity(String path) {
         String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
-        if (!StringUtils.isBlank(path)) {
-            if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
-                return true;
-            }
-        } else {
-            logger.warn("path is null");
+        if (StringUtils.isBlank(dsHome)) {
+            dsHome = System.getProperty("user.dir");
         }
-        return false;
+        if (StringUtils.isBlank(path)) {
+            logger.warn("path is null");
+            return false;
+        } else {
+            return path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log");
+        }
     }
 
     public ExecutorService getExecutor() {
