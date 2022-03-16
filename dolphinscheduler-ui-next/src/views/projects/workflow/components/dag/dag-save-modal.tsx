@@ -29,11 +29,11 @@ import {
   NCheckbox
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
-import { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
+import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
   visible: {
