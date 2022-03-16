@@ -16,23 +16,43 @@
  */
 
 import { defineComponent, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
+import { useI18n } from 'vue-i18n'
 import Dag from '../../components/dag'
-import { queryProcessInstanceById } from '@/service/modules/process-instances'
-import { WorkflowDefinition } from '../../components/dag/types'
+import {
+  queryProcessInstanceById,
+  updateProcessInstance
+} from '@/service/modules/process-instances'
+import {
+  WorkflowDefinition,
+  WorkflowInstance,
+  SaveForm,
+  TaskDefinition,
+  Connect,
+  Location
+} from '../../components/dag/types'
 import Styles from './index.module.scss'
+
+interface SaveData {
+  saveForm: SaveForm
+  taskDefinitions: TaskDefinition[]
+  connects: Connect[]
+  locations: Location[]
+}
 
 export default defineComponent({
   name: 'WorkflowInstanceDetails',
   setup() {
     const theme = useThemeStore()
     const route = useRoute()
+    const router = useRouter()
+    const { t } = useI18n()
     const projectCode = Number(route.params.projectCode)
     const id = Number(route.params.id)
 
     const definition = ref<WorkflowDefinition>()
-    const instance = ref<any>()
+    const instance = ref<WorkflowInstance>()
 
     const refresh = () => {
       queryProcessInstanceById(id, projectCode).then((res: any) => {
@@ -43,7 +63,38 @@ export default defineComponent({
       })
     }
 
-    const save = () => {}
+    const save = ({
+      taskDefinitions,
+      saveForm,
+      connects,
+      locations
+    }: SaveData) => {
+      const globalParams = saveForm.globalParams.map((p) => {
+        return {
+          prop: p.key,
+          value: p.value,
+          direct: 'IN',
+          type: 'VARCHAR'
+        }
+      })
+
+      updateProcessInstance(
+        {
+          syncDefine: saveForm.sync,
+          globalParams: JSON.stringify(globalParams),
+          locations: JSON.stringify(locations),
+          taskDefinitionJson: JSON.stringify(taskDefinitions),
+          taskRelationJson: JSON.stringify(connects),
+          tenantCode: saveForm.tenantCode,
+          timeout: saveForm.timeoutFlag ? saveForm.timeout : 0
+        },
+        id,
+        projectCode
+      ).then((ignored: any) => {
+        window.$message.success(t('project.dag.success'))
+        router.push({ path: `/projects/${projectCode}/workflow/instances` })
+      })
+    }
 
     onMounted(() => {
       if (!id || !projectCode) return

@@ -583,6 +583,7 @@ const project = {
     success: '成功',
     delete_cell: '删除选中的线或节点',
     online_directly: '是否上线流程定义',
+    update_directly: '是否更新流程定义',
     dag_name_empty: 'DAG图名称不能为空',
     positive_integer: '请输入大于 0 的正整数',
     prop_empty: '自定义参数prop不能为空',
