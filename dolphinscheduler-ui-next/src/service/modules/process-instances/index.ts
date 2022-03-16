@@ -23,7 +23,6 @@ import {
   SubIdReq,
   TaskReq,
   LongestReq,
-  IdReq,
   ProcessInstanceReq
 } from './types'
 

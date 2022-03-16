@@ -29,7 +29,7 @@ import {
   NCheckbox
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
-import { SaveForm, WorkflowDefinition } from './types'
+import { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
@@ -46,7 +46,7 @@ const props = {
     default: undefined
   },
   instance: {
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowInstance>,
     default: undefined
   }
 }
@@ -183,7 +183,7 @@ export default defineComponent({
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput v-model:value={formValue.value.name} class='input-name'/>
+            <NInput v-model:value={formValue.value.name} class='input-name' />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
@@ -223,7 +223,7 @@ export default defineComponent({
               preset='pair'
               key-placeholder={t('project.dag.key')}
               value-placeholder={t('project.dag.value')}
-                class='input-global-params'
+              class='input-global-params'
             />
           </NFormItem>
           {props.definition && !props.instance && (

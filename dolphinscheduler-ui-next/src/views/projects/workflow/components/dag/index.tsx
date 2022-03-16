@@ -44,7 +44,7 @@ import {
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
-import { WorkflowDefinition } from './types'
+import { WorkflowDefinition, WorkflowInstance } from './types'
 import DagSaveModal from './dag-save-modal'
 import ContextMenuItem from './dag-context-menu'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
@@ -55,7 +55,7 @@ import './x6-style.scss'
 const props = {
   // If this prop is passed, it means from definition detail
   instance: {
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowInstance>,
     default: undefined
   },
   definition: {

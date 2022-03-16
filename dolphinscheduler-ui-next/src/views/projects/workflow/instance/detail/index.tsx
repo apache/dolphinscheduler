@@ -26,6 +26,7 @@ import {
 } from '@/service/modules/process-instances'
 import {
   WorkflowDefinition,
+  WorkflowInstance,
   SaveForm,
   TaskDefinition,
   Connect,
@@ -51,7 +52,7 @@ export default defineComponent({
     const id = Number(route.params.id)
 
     const definition = ref<WorkflowDefinition>()
-    const instance = ref<any>()
+    const instance = ref<WorkflowInstance>()
 
     const refresh = () => {
       queryProcessInstanceById(id, projectCode).then((res: any) => {

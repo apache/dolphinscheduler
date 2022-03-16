@@ -37,7 +37,10 @@ import {
 } from '@vicons/antd'
 import { NIcon } from 'naive-ui'
 import { Router, useRouter } from 'vue-router'
-import { IWorkflowTaskInstance } from '@/views/projects/workflow/components/dag/types'
+import {
+  IWorkflowTaskInstance,
+  WorkflowInstance
+} from '@/views/projects/workflow/components/dag/types'
 
 const props = {
   show: {
@@ -64,7 +67,7 @@ const props = {
     type: Object as PropType<any>
   },
   processInstance: {
-    type: Object as PropType<any>
+    type: Object as PropType<WorkflowInstance>
   },
   taskInstance: {
     type: Object as PropType<IWorkflowTaskInstance>

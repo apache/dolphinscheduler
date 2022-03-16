@@ -102,6 +102,19 @@ export interface WorkflowDefinition {
   taskDefinitionList: TaskDefinition[]
 }
 
+export interface WorkflowInstance {
+  name: string
+  state: string
+  dagData: WorkflowDefinition
+  commandType: string
+  commandParam: string
+  failureStrategy: string
+  processInstancePriority: string
+  workerGroup: string
+  warningType: string
+  warningGroupId: number
+}
+
 export interface Dragged {
   x: number
   y: number
