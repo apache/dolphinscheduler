@@ -115,6 +115,12 @@ export interface WorkflowInstance {
   warningGroupId: number
 }
 
+export interface EditWorkflowDefinition {
+  processDefinition: ProcessDefinition
+  processTaskRelationList: Connect[]
+  taskDefinitionList: NodeData[]
+}
+
 export interface Dragged {
   x: number
   y: number
