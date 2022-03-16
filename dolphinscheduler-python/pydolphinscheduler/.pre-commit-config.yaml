@@ -45,3 +45,12 @@ repos:
             --config, 
             dolphinscheduler-python/pydolphinscheduler/.flake8
         ]
+  - repo: https://github.com/pycqa/autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        args: [
+            --remove-all-unused-imports,
+            --ignore-init-module-imports,
+            --in-place
+        ]

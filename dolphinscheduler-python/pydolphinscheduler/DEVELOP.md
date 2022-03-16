@@ -104,6 +104,10 @@ tox -e local-ci
 It will take a while when you run it the first time, because it has to install dependencies and make some prepare,
 and the next time you run it will be faster.
 
+If you failed section `lint` when you run command `tox -e local-ci`, you could try to run command `tox -e auto-lint`
+which we provider fix as many lints as possible. When I finish, you could run command `tox -e local-ci` to see
+whether the linter pass or not, you have to fix it by yourself if linter still fail. 
+
 ### Manually
 
 #### Code Style
