@@ -126,6 +126,7 @@ export interface SaveForm {
   timeout: number
   globalParams: GlobalParam[]
   release: boolean
+  sync: boolean
 }
 
 export interface Location {

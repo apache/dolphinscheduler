@@ -44,6 +44,10 @@ const props = {
   definition: {
     type: Object as PropType<WorkflowDefinition>,
     default: undefined
+  },
+  instance: {
+    type: Object as PropType<any>,
+    default: undefined
   }
 }
 
@@ -86,7 +90,8 @@ export default defineComponent({
       timeoutFlag: false,
       timeout: 0,
       globalParams: [],
-      release: false
+      release: false,
+      sync: false
     })
     const formRef = ref()
     const rule = {
@@ -221,10 +226,17 @@ export default defineComponent({
                 class='input-global-params'
             />
           </NFormItem>
-          {props.definition && (
+          {props.definition && !props.instance && (
             <NFormItem path='timeoutFlag'>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
+              </NCheckbox>
+            </NFormItem>
+          )}
+          {props.instance && (
+            <NFormItem path='sync'>
+              <NCheckbox v-model:checked={formValue.value.sync}>
+                {t('project.dag.update_directly')}
               </NCheckbox>
             </NFormItem>
           )}

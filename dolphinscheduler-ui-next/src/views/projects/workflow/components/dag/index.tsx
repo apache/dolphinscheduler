@@ -278,6 +278,7 @@ export default defineComponent({
           v-model:show={saveModalShow.value}
           onSave={onSave}
           definition={props.definition}
+          instance={props.instance}
         />
         <TaskModal
           readonly={props.readonly}
