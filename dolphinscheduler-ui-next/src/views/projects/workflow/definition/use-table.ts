@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
+import _ from 'lodash'
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
 import { useAsyncState } from '@vueuse/core'
 import {
   batchCopyByCodes,
+  batchDeleteByCodes,
   batchExportByCodes,
   deleteByCode,
   queryListPaging,
@@ -40,6 +42,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    checkedRowKeys: [] as Array<RowKey>,
     row: {},
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
@@ -55,6 +58,13 @@ export function useTable() {
 
   const createColumns = (variables: any) => {
     variables.columns = [
+      {
+        type: 'selection',
+        disabled: (row) => {
+          return row.releaseState === 'ONLINE'
+        },
+        className: 'btn-selected'
+      },
       {
         title: '#',
         key: 'id',
@@ -200,6 +210,30 @@ export function useTable() {
     })
   }
 
+  const batchDeleteWorkflow = () => {
+    const data = {
+      codes: _.join(variables.checkedRowKeys, ',')
+    }
+
+    batchDeleteByCodes(data, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+
+      if (
+        variables.tableData.length === variables.checkedRowKeys.length &&
+        variables.page > 1
+      ) {
+        variables.page -= 1
+      }
+
+      variables.checkedRowKeys = []
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    })
+  }
+
   const releaseWorkflow = (row: any) => {
     const data = {
       name: row.name,
@@ -298,6 +332,7 @@ export function useTable() {
   return {
     variables,
     createColumns,
-    getTableData
+    getTableData,
+    batchDeleteWorkflow
   }
 }

@@ -23,7 +23,9 @@ import {
   NIcon,
   NInput,
   NPagination,
-  NSpace
+  NSpace,
+  NTooltip,
+  NPopconfirm
 } from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -43,7 +45,8 @@ export default defineComponent({
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
 
-    const { variables, createColumns, getTableData } = useTable()
+    const { variables, createColumns, getTableData, batchDeleteWorkflow } =
+      useTable()
 
     const requestData = () => {
       getTableData({
@@ -67,6 +70,10 @@ export default defineComponent({
       requestData()
     }
 
+    const handleBatchDelete = () => {
+      batchDeleteWorkflow()
+    }
+
     const createDefinition = () => {
       router.push({
         path: `/projects/${projectCode}/workflow/definitions/create`
@@ -88,6 +95,7 @@ export default defineComponent({
       handleUpdateList,
       createDefinition,
       handleChangePageSize,
+      handleBatchDelete,
       ...toRefs(variables)
     }
   },
@@ -99,7 +107,11 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.createDefinition} class='btn-create-process'>
+              <NButton
+                type='primary'
+                onClick={this.createDefinition}
+                class='btn-create-process'
+              >
                 {t('project.workflow.create_workflow')}
               </NButton>
               <NButton strong secondary onClick={() => (this.showRef = true)}>
@@ -127,11 +139,13 @@ export default defineComponent({
         </Card>
         <Card title={t('project.workflow.workflow_definition')}>
           <NDataTable
+            rowKey={(row) => row.code}
             columns={this.columns}
             data={this.tableData}
             striped
             size={'small'}
             class={styles.table}
+            v-model:checked-row-keys={this.checkedRowKeys}
             row-class-name='items'
           />
           <div class={styles.pagination}>
@@ -146,6 +160,27 @@ export default defineComponent({
               onUpdatePageSize={this.handleChangePageSize}
             />
           </div>
+          <NTooltip>
+            {{
+              default: () => t('project.workflow.delete'),
+              trigger: () => (
+                <NButton
+                  tag='div'
+                  type='primary'
+                  disabled={this.checkedRowKeys.length <= 0}
+                  style='position: absolute; bottom: 10px; left: 10px;'
+                  class='btn-delete-all'
+                >
+                  <NPopconfirm onPositiveClick={this.handleBatchDelete}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => t('project.workflow.delete')
+                    }}
+                  </NPopconfirm>
+                </NButton>
+              )
+            }}
+          </NTooltip>
         </Card>
         <ImportModal
           v-model:show={this.showRef}
