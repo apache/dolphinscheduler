@@ -171,61 +171,60 @@ export default defineComponent({
               onUpdatePageSize={this.handleChangePageSize}
             />
           </div>
-          <NTooltip>
-            {{
-              default: () => t('project.workflow.delete'),
-              trigger: () => (
-                <NButton
-                  tag='div'
-                  type='primary'
-                  disabled={this.checkedRowKeys.length <= 0}
-                  style='position: absolute; bottom: 10px; left: 10px;'
-                  class='btn-delete-all'
-                >
-                  <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
-                    {{
-                      default: () => t('project.workflow.delete_confirm'),
-                      trigger: () => t('project.workflow.delete')
-                    }}
-                  </NPopconfirm>
-                </NButton>
-              )
-            }}
-          </NTooltip>
-          <NTooltip>
-            {{
-              default: () => t('project.workflow.export'),
-              trigger: () => (
-                <NButton
-                  tag='div'
-                  type='primary'
-                  disabled={this.checkedRowKeys.length <= 0}
-                  onClick={this.batchExportWorkflow}
-                  style='position: absolute; bottom: 10px; left: 70px;'
-                  class='btn-delete-all'
-                >
-                  {t('project.workflow.export')}
-                </NButton>
-              )
-            }}
-          </NTooltip>
-          <NTooltip>
-            {{
-              default: () => t('project.workflow.batch_copy'),
-              trigger: () => (
-                <NButton
-                  tag='div'
-                  type='primary'
-                  disabled={this.checkedRowKeys.length <= 0}
-                  onClick={() => (this.copyShowRef = true)}
-                  style='position: absolute; bottom: 10px; left: 130px;'
-                  class='btn-delete-all'
-                >
-                  {t('project.workflow.batch_copy')}
-                </NButton>
-              )
-            }}
-          </NTooltip>
+          <div class={styles['batch-button']}>
+            <NTooltip>
+              {{
+                default: () => t('project.workflow.delete'),
+                trigger: () => (
+                  <NButton
+                    tag='div'
+                    type='primary'
+                    disabled={this.checkedRowKeys.length <= 0}
+                    class='btn-delete-all'
+                  >
+                    <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
+                      {{
+                        default: () => t('project.workflow.delete_confirm'),
+                        trigger: () => t('project.workflow.delete')
+                      }}
+                    </NPopconfirm>
+                  </NButton>
+                )
+              }}
+            </NTooltip>
+            <NTooltip>
+              {{
+                default: () => t('project.workflow.export'),
+                trigger: () => (
+                  <NButton
+                    tag='div'
+                    type='primary'
+                    disabled={this.checkedRowKeys.length <= 0}
+                    onClick={this.batchExportWorkflow}
+                    class='btn-delete-all'
+                  >
+                    {t('project.workflow.export')}
+                  </NButton>
+                )
+              }}
+            </NTooltip>
+            <NTooltip>
+              {{
+                default: () => t('project.workflow.batch_copy'),
+                trigger: () => (
+                  <NButton
+                    tag='div'
+                    type='primary'
+                    disabled={this.checkedRowKeys.length <= 0}
+                    onClick={() => (this.copyShowRef = true)}
+                    class='btn-delete-all'
+                  >
+                    {t('project.workflow.batch_copy')}
+                  </NButton>
+                )
+              }}
+            </NTooltip>
+          </div>
         </Card>
         <ImportModal
           v-model:show={this.showRef}
