@@ -87,7 +87,7 @@ export function useSql({
       Fields.useDatasource(model),
       Fields.useSqlType(model),
       ...Fields.useSql(model),
-      Fields.usePreTasks(model, data?.code)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }
