@@ -36,6 +36,7 @@ import {
   QuestionCircleTwotone
 } from '@vicons/antd'
 import { NIcon } from 'naive-ui'
+import { TASK_TYPES_MAP } from '../../constants/task-type'
 import { Router, useRouter } from 'vue-router'
 import { IWorkflowTaskInstance } from '@/views/projects/workflow/components/dag/types'
 
@@ -103,20 +104,20 @@ const NodeDetailModal = defineComponent({
       }
     }
 
-    const initHeaderLinks = (
-      processInstance: any,
-      taskType: ITaskType | undefined
-    ) => {
+    const initHeaderLinks = (processInstance: any, taskType?: ITaskType) => {
       headerLinks.value = [
         {
           text: t('project.node.instructions'),
-          show: taskType ? true : false,
+          show:
+            taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable
+              ? true
+              : false,
           action: () => {
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
               locale.value.toLowerCase().replace('_', '-') +
               '/docs/latest/user_doc/guide/task/' +
-              taskType?.toLowerCase() +
+              taskType?.toLowerCase().replace('_', '-') +
               '.html'
             window.open(helpUrl)
           },
@@ -147,6 +148,7 @@ const NodeDetailModal = defineComponent({
     const onTaskTypeChange = (taskType: ITaskType) => {
       // eslint-disable-next-line vue/no-mutating-props
       props.data.taskType = taskType
+      initHeaderLinks(props.processInstance, props.data.taskType)
     }
 
     provide(
