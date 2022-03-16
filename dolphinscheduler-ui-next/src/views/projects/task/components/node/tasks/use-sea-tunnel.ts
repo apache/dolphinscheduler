@@ -79,7 +79,7 @@ export function useSeaTunnel({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useSeaTunnel(model),
-      Fields.usePreTasks(model, data?.code)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

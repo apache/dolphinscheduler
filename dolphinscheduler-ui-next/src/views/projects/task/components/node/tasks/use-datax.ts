@@ -94,7 +94,7 @@ export function useDataX({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useDataX(model),
-      Fields.usePreTasks(model, data?.code)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

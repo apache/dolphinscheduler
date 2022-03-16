@@ -15,24 +15,12 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
-import { useTaskNodeStore } from '@/store/project/task-node'
-import type { IJsonItem } from '../types'
+import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
+import type { IOption } from '@/components/form/types'
 
-export function usePreTasks(): IJsonItem {
-  const { t } = useI18n()
-  const taskStore = useTaskNodeStore()
-
-  return {
-    type: 'select',
-    field: 'preTasks',
-    span: 24,
-    class: 'pre-tasks-model',
-    name: t('project.node.pre_tasks'),
-    props: {
-      multiple: true,
-      filterable: true
-    },
-    options: taskStore.getPreTaskOptions
-  }
+interface TaskNodeState {
+  postTaskOptions: IOption[]
+  preTaskOptions: IOption[]
+  preTasks: number[]
 }
+export { TaskNodeState, EditWorkflowDefinition, IOption }
