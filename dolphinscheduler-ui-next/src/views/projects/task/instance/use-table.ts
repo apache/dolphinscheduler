@@ -287,6 +287,7 @@ export function useTable() {
               ...item
             }
           }) as any
+          variables.totalPage = res.totalPage
         }
       ),
       {}
