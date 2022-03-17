@@ -26,11 +26,16 @@ export interface IOption {
   value: number
 }
 
+export interface IParam {
+  prop: string
+  value: string
+}
+
 export interface ITimingState {
   projectCode: number
   workerGroups: Array<IOption>
   alertGroups: Array<IOption>
   environmentList: Array<IEnvironmentOption>
-  startParamsList: Array<{ prop: string; value: string }>
+  startParamsList: Array<IParam>
   schedulePreviewList: Array<string>
 }
