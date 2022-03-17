@@ -560,7 +560,8 @@ const project = {
     forced_success: '强制成功',
     view_log: '查看日志',
     download_log: '下载日志',
-    refresh: '刷新'
+    refresh: '刷新',
+    serial_wait: '串行等待'
   },
   dag: {
     create: '创建工作流',

@@ -15,21 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.oracle;
+export interface IEnvironmentOption {
+  label: string
+  value: string
+  workerGroups: Array<string>
+}
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
+export interface IOption {
+  label: string
+  value: number
+}
 
-public class OracleDataSourceClient extends CommonDataSourceClient {
+export interface IParam {
+  prop: string
+  value: string
+}
 
-    public OracleDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
-    }
-
-    protected void setDefaultValidationQuery(BaseConnectionParam baseConnectionParam) {
-        baseConnectionParam.setValidationQuery(Constants.ORACLE_VALIDATION_QUERY);
-    }
-
+export interface ITimingState {
+  projectCode: number
+  workerGroups: Array<IOption>
+  alertGroups: Array<IOption>
+  environmentList: Array<IEnvironmentOption>
+  startParamsList: Array<IParam>
+  schedulePreviewList: Array<string>
 }
