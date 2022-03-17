@@ -209,7 +209,7 @@ export default defineComponent({
                 show-button={false}
                 min={0}
                 v-slots={{
-                  suffix: () => '分'
+                  suffix: () => t('project.dag.minute')
                 }}
               />
             </NFormItem>
