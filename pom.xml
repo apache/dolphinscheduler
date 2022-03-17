@@ -130,6 +130,7 @@
         <netty.version>4.1.53.Final</netty.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
+        <okhttp.version>4.9.3</okhttp.version>
     </properties>
 
     <dependencyManagement>
@@ -444,6 +445,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-sqoop</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-sdk</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -838,6 +844,12 @@
                 <artifactId>py4j</artifactId>
                 <version>${py4j.version}</version>
             </dependency>
+            <!-- okhttp3 -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1150,5 +1162,6 @@
         <module>dolphinscheduler-standalone-server</module>
         <module>dolphinscheduler-datasource-plugin</module>
         <module>dolphinscheduler-python</module>
+        <module>dolphinscheduler-sdk</module>
     </modules>
 </project>
