@@ -71,6 +71,16 @@
   }
 }
 
+.table-card {
+  > div div {
+    flex: none !important;
+  }
+}
+
+.breadcrumb {
+  padding-left: 10px;
+}
+
 .conditions-model {
   display: flex;
   justify-content: space-between;
