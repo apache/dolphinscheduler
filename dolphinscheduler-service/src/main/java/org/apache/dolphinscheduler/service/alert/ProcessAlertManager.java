@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Date;

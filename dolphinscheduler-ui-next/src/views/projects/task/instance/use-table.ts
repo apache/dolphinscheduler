@@ -24,19 +24,22 @@ import {
   downloadLog
 } from '@/service/modules/task-instances'
 import { NButton, NIcon, NSpace, NTooltip } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
   DownloadOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { parseTime } from '@/utils/common'
+import type { Router } from 'vue-router'
 import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
 
 export function useTable() {
   const { t } = useI18n()
   const route = useRoute()
+  const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
   const processInstanceId = Number(route.params.processInstanceId)
 
@@ -71,7 +74,23 @@ export function useTable() {
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        width: 250
+        width: 250,
+        render: (row: {
+          processInstanceId: number
+          processInstanceName: string
+        }) =>
+          h(
+            ButtonLink,
+            {
+              onClick: () =>
+                void router.push({
+                  name: 'workflow-instance-detail',
+                  params: { id: row.processInstanceId },
+                  query: { code: projectCode }
+                })
+            },
+            { default: () => row.processInstanceName }
+          )
       },
       {
         title: t('project.task.executor'),
@@ -268,6 +287,7 @@ export function useTable() {
               ...item
             }
           }) as any
+          variables.totalPage = res.totalPage
         }
       ),
       {}

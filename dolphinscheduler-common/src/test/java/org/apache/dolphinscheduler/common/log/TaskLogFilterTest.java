@@ -22,7 +22,7 @@ import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
 import ch.qos.logback.core.spi.FilterReply;
 
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -67,8 +67,7 @@ export function useDataQuality({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -109,7 +108,7 @@ export function useDataQuality({
         field: 'localParams',
         isSimple: true
       }),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

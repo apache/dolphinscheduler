@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -148,6 +148,7 @@ public class ProcessAlertContent implements Serializable {
             this.projectId = projectId;
             return this;
         }
+
         public Builder projectCode(Long projectCode) {
             this.projectCode = projectCode;
             return this;
@@ -167,6 +168,7 @@ public class ProcessAlertContent implements Serializable {
             this.processId = processId;
             return this;
         }
+
         public Builder processDefinitionCode(Long processDefinitionCode) {
             this.processDefinitionCode = processDefinitionCode;
             return this;

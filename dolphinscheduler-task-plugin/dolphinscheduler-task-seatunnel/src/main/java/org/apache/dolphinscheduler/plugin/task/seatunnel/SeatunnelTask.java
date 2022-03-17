@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.RWXR_XR_X;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
-import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.MapUtils;
@@ -62,14 +62,14 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     /**
      * taskExecutionContext
      */
-    private TaskRequest taskExecutionContext;
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
      */
-    public SeatunnelTask(TaskRequest taskExecutionContext) {
+    public SeatunnelTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;

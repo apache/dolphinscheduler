@@ -21,12 +21,13 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.service.log.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
@@ -37,8 +38,7 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -233,14 +233,14 @@ public class WorkerServer implements IStoppable {
      * kill all tasks which are running
      */
     public void killAllRunningTasks() {
-        Collection<TaskRequest> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
+        Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
         logger.info("ready to kill all cache job, job size:{}", taskRequests.size());
 
         if (CollectionUtils.isEmpty(taskRequests)) {
             return;
         }
 
-        for (TaskRequest taskRequest : taskRequests) {
+        for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
             org.apache.dolphinscheduler.plugin.task.api.ProcessUtils.kill(taskRequest);
         }

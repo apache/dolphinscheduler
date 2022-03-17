@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 import java.util.Date;

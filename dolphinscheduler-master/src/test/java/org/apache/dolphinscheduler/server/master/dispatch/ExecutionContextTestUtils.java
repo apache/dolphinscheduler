@@ -22,11 +22,14 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.mockito.Mockito;
 
@@ -34,7 +37,7 @@ import org.mockito.Mockito;
  * for test use only
  */
 public class ExecutionContextTestUtils {
-    public static ExecutionContext getExecutionContext(int port){
+    public static ExecutionContext getExecutionContext(int port) {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
         ProcessInstance processInstance = new ProcessInstance();
@@ -45,7 +48,12 @@ public class ExecutionContextTestUtils {
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
-        ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
+
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
+        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(context));
+        Command command = requestCommand.convert2Command();
+
+        ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER);
         executionContext.setHost(Host.of(NetUtils.getAddr(port)));
 
         return executionContext;

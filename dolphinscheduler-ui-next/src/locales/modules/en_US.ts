@@ -103,7 +103,9 @@ const home = {
   waiting_depend: 'WAITING_DEPEND',
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
-  serial_wait: 'SERIAL_WAIT'
+  serial_wait: 'SERIAL_WAIT',
+  ready_block: 'READY_BLOCK',
+  block: 'BLOCK'
 }
 
 const password = {
@@ -404,6 +406,7 @@ const project = {
     tree_view: 'Tree View',
     tree_limit: 'Limit Size',
     export: 'Export',
+    batch_copy: 'Batch Copy',
     version_info: 'Version Info',
     version: 'Version',
     file_upload: 'File Upload',
@@ -507,7 +510,11 @@ const project = {
     cancel_full_screen: 'Cancel full screen',
     task_state: 'Task status',
     mode_of_dependent: 'Mode of dependent',
-    open: 'Open'
+    open: 'Open',
+    project_name_required: 'Project name is required',
+    related_items: 'Related items',
+    project_name: 'Project Name',
+    project_tips: 'Please select project name'
   },
   task: {
     task_name: 'Task Name',
@@ -555,7 +562,9 @@ const project = {
     delay_execution: 'Delay Execution',
     forced_success: 'Forced Success',
     view_log: 'View Log',
-    download_log: 'Download Log'
+    download_log: 'Download Log',
+    refresh: 'Refresh',
+    serial_wait: 'Serial Wait'
   },
   dag: {
     create: 'Create Workflow',
@@ -585,6 +594,7 @@ const project = {
     success: 'Success',
     delete_cell: 'Delete selected edges and nodes',
     online_directly: 'Whether to go online the process definition',
+    update_directly: 'Whether to update the process definition',
     dag_name_empty: 'DAG graph name cannot be empty',
     positive_integer: 'Please enter a positive integer greater than 0',
     prop_empty: 'prop is empty',

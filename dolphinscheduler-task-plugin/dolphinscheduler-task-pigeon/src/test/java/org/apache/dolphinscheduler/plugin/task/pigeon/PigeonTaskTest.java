@@ -21,8 +21,8 @@ import static com.github.dreamhead.moco.Moco.file;
 import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
 import static com.github.dreamhead.moco.Runner.running;
 
-import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import org.apache.commons.io.IOUtils;
 
@@ -47,14 +47,14 @@ public class PigeonTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(PigeonTaskTest.class);
     private PigeonTask pigeonTask;
 
-    private TaskRequest taskExecutionContext;
+    private TaskExecutionContext taskExecutionContext;
 
     @Before
     public void before() throws Exception {
 
         String taskParams = "{\"targetJobName\":\"mysql_elastic\"}";
 
-        taskExecutionContext = Mockito.mock(TaskRequest.class);
+        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("pigeonlogger");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");

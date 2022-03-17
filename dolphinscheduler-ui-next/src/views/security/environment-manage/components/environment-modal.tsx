@@ -125,6 +125,7 @@ const EnvironmentModal = defineComponent({
           }
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

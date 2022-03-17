@@ -44,7 +44,7 @@ import {
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
-import { WorkflowDefinition } from './types'
+import { WorkflowDefinition, WorkflowInstance } from './types'
 import DagSaveModal from './dag-save-modal'
 import ContextMenuItem from './dag-context-menu'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
@@ -55,7 +55,7 @@ import './x6-style.scss'
 const props = {
   // If this prop is passed, it means from definition detail
   instance: {
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowInstance>,
     default: undefined
   },
   definition: {
@@ -106,7 +106,7 @@ export default defineComponent({
       appendTask,
       editTask,
       copyTask,
-      taskDefinitions,
+      processDefinition,
       removeTasks
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
@@ -212,10 +212,14 @@ export default defineComponent({
         saveModelToggle(false)
         return
       }
-      const connects = getConnects(nodes, edges, taskDefinitions.value as any)
+      const connects = getConnects(
+        nodes,
+        edges,
+        processDefinition.value.taskDefinitionList as any
+      )
       const locations = getLocations(nodes)
       context.emit('save', {
-        taskDefinitions: taskDefinitions.value,
+        taskDefinitions: processDefinition.value.taskDefinitionList,
         saveForm,
         connects,
         locations
@@ -278,6 +282,7 @@ export default defineComponent({
           v-model:show={saveModalShow.value}
           onSave={onSave}
           definition={props.definition}
+          instance={props.instance}
         />
         <TaskModal
           readonly={props.readonly}
@@ -287,6 +292,7 @@ export default defineComponent({
           taskInstance={currentTaskInstance.value}
           onViewLog={handleViewLog}
           data={currTask.value as any}
+          definition={processDefinition}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />

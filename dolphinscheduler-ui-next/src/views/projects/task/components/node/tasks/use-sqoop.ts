@@ -74,8 +74,7 @@ export function useSqoop({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -94,7 +93,7 @@ export function useSqoop({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useSqoop(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

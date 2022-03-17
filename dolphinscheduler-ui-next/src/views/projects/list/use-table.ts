@@ -71,6 +71,7 @@ export function useTable() {
       {
         title: t('project.list.project_name'),
         key: 'name',
+        className: 'project-name',
         render: (row: { code: string; name: any }) =>
           h(
             NEllipsis,

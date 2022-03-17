@@ -103,7 +103,9 @@ const home = {
   waiting_depend: '等待依赖完成',
   delay_execution: '延时执行',
   forced_success: '强制成功',
-  serial_wait: '串行等待'
+  serial_wait: '串行等待',
+  ready_block: '准备阻断',
+  block: '阻断'
 }
 
 const password = {
@@ -401,6 +403,7 @@ const project = {
     tree_view: '工作流树形图',
     tree_limit: '限制大小',
     export: '导出',
+    batch_copy: '批量复制',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',
@@ -504,7 +507,11 @@ const project = {
     cancel_full_screen: '取消全屏',
     task_state: '任务状态',
     mode_of_dependent: '依赖模式',
-    open: '打开'
+    open: '打开',
+    project_name_required: '项目名称必填',
+    related_items: '关联项目',
+    project_name: '项目名称',
+    project_tips: '请选择项目'
   },
   task: {
     task_name: '任务名称',
@@ -552,7 +559,9 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     view_log: '查看日志',
-    download_log: '下载日志'
+    download_log: '下载日志',
+    refresh: '刷新',
+    serial_wait: '串行等待'
   },
   dag: {
     create: '创建工作流',
@@ -582,6 +591,7 @@ const project = {
     success: '成功',
     delete_cell: '删除选中的线或节点',
     online_directly: '是否上线流程定义',
+    update_directly: '是否更新流程定义',
     dag_name_empty: 'DAG图名称不能为空',
     positive_integer: '请输入大于 0 的正整数',
     prop_empty: '自定义参数prop不能为空',
