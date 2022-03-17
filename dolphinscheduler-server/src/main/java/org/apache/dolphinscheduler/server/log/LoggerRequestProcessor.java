@@ -142,6 +142,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private boolean checkPathSecurity(String path) {
         String dsHome = System.getProperty("DOLPHINSCHEDULER_HOME");
+        // if we run server in IDE, user.dir is the DS Home.
         if (StringUtils.isBlank(dsHome)) {
             dsHome = System.getProperty("user.dir");
         }
