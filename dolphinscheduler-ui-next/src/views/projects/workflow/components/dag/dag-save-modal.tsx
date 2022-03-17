@@ -178,7 +178,7 @@ export default defineComponent({
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput v-model:value={formValue.value.name} class='input-name'/>
+            <NInput v-model:value={formValue.value.name} class='input-name' />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
@@ -218,7 +218,7 @@ export default defineComponent({
               preset='pair'
               key-placeholder={t('project.dag.key')}
               value-placeholder={t('project.dag.value')}
-                class='input-global-params'
+              class='input-global-params'
             />
           </NFormItem>
           {props.definition && (

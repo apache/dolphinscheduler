@@ -99,7 +99,11 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.createDefinition} class='btn-create-process'>
+              <NButton
+                type='primary'
+                onClick={this.createDefinition}
+                class='btn-create-process'
+              >
                 {t('project.workflow.create_workflow')}
               </NButton>
               <NButton strong secondary onClick={() => (this.showRef = true)}>
