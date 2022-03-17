@@ -86,7 +86,9 @@ export function useCellUpdate(options: Options) {
     const edges = getNodeEdge(id)
     if (edges?.length) {
       edges.forEach((edge) => {
-        graph.value?.removeEdge(edge)
+        if (edge.getTargetNode()?.id === id) {
+          graph.value?.removeEdge(edge)
+        }
       })
     }
     preTaskCode.forEach((task) => {
