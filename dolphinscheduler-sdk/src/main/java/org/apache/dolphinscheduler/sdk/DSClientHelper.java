@@ -49,7 +49,7 @@ public class DSClientHelper {
      * @param config
      * @return
      */
-    private DSClient getClient(final Config config) {
+    private static DSClient getClient(final Config config) {
         if (null == config.getMaxIdleConns()) {
             config.setMaxIdleConns(DEFAULT_MAX_IDLE_CONNECTIONS);
         }
@@ -85,8 +85,8 @@ public class DSClientHelper {
      * @param endpoint
      * @return
      */
-    public DSClient getClient(final String token, final String endpoint) {
+    public static DSClient getClient(final String token, final String endpoint) {
         Config config = new Config().setToken(token).setEndpoint(endpoint);
-        return this.getClient(config);
+        return getClient(config);
     }
 }
