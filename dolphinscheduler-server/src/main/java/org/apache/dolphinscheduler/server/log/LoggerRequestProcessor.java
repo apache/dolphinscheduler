@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -31,6 +32,9 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,27 +50,25 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.netty.channel.Channel;
-
 /**
  * logger request process logic
  */
-public class LoggerRequestProcessor implements NettyRequestProcessor {
+public class LoggerRequestProcessor
+        implements NettyRequestProcessor
+{
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
     private final ExecutorService executor;
 
-    public LoggerRequestProcessor() {
+    public LoggerRequestProcessor()
+    {
         this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
     }
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Command command)
+    {
         logger.info("received command : {}", command);
 
         /**
@@ -128,7 +130,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                     if (taskLogFile.exists()) {
                         status = taskLogFile.delete();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     status = false;
                 }
 
@@ -140,7 +143,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         }
     }
 
-    private boolean checkPathSecurity(String path) {
+    private boolean checkPathSecurity(String path)
+    {
         String dsHome = System.getProperty("DOLPHINSCHEDULER_HOME");
         // if we run server in IDE, user.dir is the DS Home.
         if (StringUtils.isBlank(dsHome)) {
@@ -150,13 +154,15 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
                 return true;
             }
-        } else {
+        }
+        else {
             logger.warn("path is null");
         }
         return false;
     }
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return this.executor;
     }
 
@@ -167,16 +173,18 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return byte array of file
      * @throws Exception exception
      */
-    private byte[] getFileContentBytes(String filePath) {
+    private byte[] getFileContentBytes(String filePath)
+    {
         try (InputStream in = new FileInputStream(filePath);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {
                 bos.write(buf, 0, len);
             }
             return bos.toByteArray();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("get file bytes error", e);
         }
         return new byte[0];
@@ -191,19 +199,21 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return part file content
      */
     private List<String> readPartFileContent(String filePath,
-                                             int skipLine,
-                                             int limit) {
+            int skipLine,
+            int limit)
+    {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
                 return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 logger.error("read file error", e);
             }
-        } else {
+        }
+        else {
             logger.info("file path: {} not exists", filePath);
         }
         return Collections.emptyList();
     }
-
 }

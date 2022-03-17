@@ -24,7 +24,9 @@ import ch.qos.logback.core.spi.FilterReply;
 /**
  * master log filter
  */
-public class MasterLogFilter extends Filter<ILoggingEvent> {
+public class MasterLogFilter
+        extends Filter<ILoggingEvent>
+{
     /**
      * log level
      */
@@ -32,18 +34,21 @@ public class MasterLogFilter extends Filter<ILoggingEvent> {
 
     /**
      * Accept or reject based on thread name
+     *
      * @param event event
      * @return FilterReply
      */
     @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
+    public FilterReply decide(ILoggingEvent event)
+    {
+        if (event.getThreadName().startsWith("Master-")) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(String level)
+    {
         this.level = Level.toLevel(level);
     }
 }
