@@ -114,6 +114,8 @@ jobs:
           python -m tox -vv -e local-ci
   build-image:
     name: Build Image
+    # Switch to project root directory to run mvnw command
+    working-directory: ../../
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
