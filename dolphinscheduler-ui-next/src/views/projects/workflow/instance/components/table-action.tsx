@@ -191,8 +191,8 @@ export default defineComponent({
         <NTooltip trigger={'hover'}>
           {{
             default: () =>
-              state === 'PAUSE'
-                ? t('project.workflow.recovery_failed')
+              state === 'STOP'
+                ? t('project.workflow.recovery_suspend')
                 : t('project.workflow.stop'),
             trigger: () => (
               <NButton
@@ -202,7 +202,7 @@ export default defineComponent({
                 circle
                 onClick={this.handleStop}
                 disabled={
-                  (state !== 'RUNNING_EXECUTION' && state !== 'PAUSE') ||
+                  (state !== 'RUNNING_EXECUTION' && state !== 'STOP') ||
                   this.row?.disabled
                 }
               >
