@@ -563,7 +563,8 @@ const project = {
     forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
-    refresh: 'Refresh'
+    refresh: 'Refresh',
+    serial_wait: 'Serial Wait'
   },
   dag: {
     create: 'Create Workflow',
