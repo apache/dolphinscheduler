@@ -34,14 +34,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LoggerUtils.class})
-public class LoggerRequestProcessorTest
-{
+public class LoggerRequestProcessorTest {
 
     private String dsHome;
 
     @Before
-    public void initDsHome()
-    {
+    public void initDsHome() {
         // DOLPHINSCHEDULER_HOME is be set in start.sh. if we run test in IDE user.dir is DS Home.
         dsHome = System.getProperty("DOLPHINSCHEDULER_HOME");
         if (StringUtils.isBlank(dsHome)) {
@@ -51,8 +49,7 @@ public class LoggerRequestProcessorTest
     }
 
     @Test
-    public void testProcessViewWholeLogRequest()
-    {
+    public void testProcessViewWholeLogRequest() {
         System.setProperty("DOLPHINSCHEDULER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
@@ -70,8 +67,7 @@ public class LoggerRequestProcessorTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testProcessViewWholeLogRequestError()
-    {
+    public void testProcessViewWholeLogRequestError() {
         System.setProperty("DOLPHINSCHEDULER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
@@ -89,8 +85,7 @@ public class LoggerRequestProcessorTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testProcessViewWholeLogRequestErrorRelativePath()
-    {
+    public void testProcessViewWholeLogRequestErrorRelativePath() {
         System.setProperty("DOLPHINSCHEDULER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
@@ -108,8 +103,7 @@ public class LoggerRequestProcessorTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testProcessViewWholeLogRequestErrorStartWith()
-    {
+    public void testProcessViewWholeLogRequestErrorStartWith() {
         System.setProperty("DOLPHINSCHEDULER_HOME", System.getProperty("user.dir"));
         Channel channel = PowerMockito.mock(Channel.class);
         PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
