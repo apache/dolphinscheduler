@@ -54,21 +54,18 @@ import java.util.stream.Stream;
  * logger request process logic
  */
 public class LoggerRequestProcessor
-        implements NettyRequestProcessor
-{
+        implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
     private final ExecutorService executor;
 
-    public LoggerRequestProcessor()
-    {
+    public LoggerRequestProcessor() {
         this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
     }
 
     @Override
-    public void process(Channel channel, Command command)
-    {
+    public void process(Channel channel, Command command) {
         logger.info("received command : {}", command);
 
         /**
@@ -143,8 +140,7 @@ public class LoggerRequestProcessor
         }
     }
 
-    private boolean checkPathSecurity(String path)
-    {
+    private boolean checkPathSecurity(String path) {
         String dsHome = System.getProperty("DOLPHINSCHEDULER_HOME");
         // if we run server in IDE, user.dir is the DS Home.
         if (StringUtils.isBlank(dsHome)) {
@@ -161,8 +157,7 @@ public class LoggerRequestProcessor
         return false;
     }
 
-    public ExecutorService getExecutor()
-    {
+    public ExecutorService getExecutor() {
         return this.executor;
     }
 
@@ -173,8 +168,7 @@ public class LoggerRequestProcessor
      * @return byte array of file
      * @throws Exception exception
      */
-    private byte[] getFileContentBytes(String filePath)
-    {
+    private byte[] getFileContentBytes(String filePath) {
         try (InputStream in = new FileInputStream(filePath);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
@@ -200,8 +194,7 @@ public class LoggerRequestProcessor
      */
     private List<String> readPartFileContent(String filePath,
             int skipLine,
-            int limit)
-    {
+            int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
