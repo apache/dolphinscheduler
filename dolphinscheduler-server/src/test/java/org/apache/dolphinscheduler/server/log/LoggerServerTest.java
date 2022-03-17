@@ -30,8 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class LoggerServerTest
-{
+public class LoggerServerTest {
 
     private LoggerServer loggerServer;
 
@@ -40,8 +39,7 @@ public class LoggerServerTest
     private String dsHome;
 
     @Before
-    public void startServerAndClient()
-    {
+    public void startServerAndClient() {
         this.loggerServer = new LoggerServer();
         this.loggerServer.start();
         this.logClientService = new LogClientService();
@@ -56,8 +54,7 @@ public class LoggerServerTest
 
     @Test
     public void testRollViewLog()
-            throws IOException
-    {
+            throws IOException {
         String expectedTmpDemoString = "testRolloViewLog";
         String testFile = dsHome + "/tmp/demo.log";
         org.apache.commons.io.FileUtils.writeStringToFile(new File(testFile), expectedTmpDemoString, Charset.defaultCharset());
@@ -72,8 +69,7 @@ public class LoggerServerTest
 
     @Test
     public void testRemoveTaskLog()
-            throws IOException
-    {
+            throws IOException {
         String expectedTmpRemoveString = "testRemoveTaskLog";
         String testFile = dsHome + "/tmp/remove.log";
         org.apache.commons.io.FileUtils.writeStringToFile(new File(testFile), expectedTmpRemoveString, Charset.defaultCharset());
@@ -88,8 +84,7 @@ public class LoggerServerTest
     }
 
     @After
-    public void stopServerAndClient()
-    {
+    public void stopServerAndClient() {
         this.loggerServer.stop();
         this.logClientService.close();
     }
