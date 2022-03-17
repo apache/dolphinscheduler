@@ -19,82 +19,84 @@ import { h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NButton, NIcon, NPopconfirm, NSpace } from 'naive-ui'
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
-import { TableColumns } from './types'
+import type { TableColumns } from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
 
-  const columnsRef: TableColumns = [
-    {
-      title: '#',
-      key: 'index',
-      render: (rowData, rowIndex) => rowIndex + 1
-    },
-    {
-      title: t('security.alarm_instance.alarm_instance_name'),
-      key: 'instanceName'
-    },
-    {
-      title: t('security.alarm_instance.alarm_plugin_name'),
-      key: 'alertPluginName'
-    },
-    {
-      title: t('security.alarm_instance.create_time'),
-      key: 'createTime'
-    },
-    {
-      title: t('security.alarm_instance.update_time'),
-      key: 'updateTime'
-    },
-    {
-      title: t('security.alarm_instance.operation'),
-      key: 'operation',
-      width: 150,
-      render: (rowData, unused) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NButton,
-              {
-                circle: true,
-                type: 'info',
-                onClick: () => void onCallback(rowData, 'edit')
-              },
-              {
-                default: () =>
-                  h(NIcon, null, { default: () => h(EditOutlined) })
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => void onCallback(rowData, 'delete'),
-                negativeText: t('security.alarm_instance.cancel'),
-                positiveText: t('security.alarm_instance.confirm')
-              },
-              {
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      circle: true,
-                      type: 'error'
-                    },
-                    {
-                      default: () =>
-                        h(NIcon, null, { default: () => h(DeleteOutlined) })
-                    }
-                  ),
-                default: () => t('security.alarm_instance.delete')
-              }
-            )
-          ]
-        })
+  const getColumns = (): TableColumns => {
+    return [
+      {
+        title: '#',
+        key: 'index',
+        render: (rowData, rowIndex) => rowIndex + 1
+      },
+      {
+        title: t('security.alarm_instance.alarm_instance_name'),
+        key: 'instanceName'
+      },
+      {
+        title: t('security.alarm_instance.alarm_plugin_name'),
+        key: 'alertPluginName'
+      },
+      {
+        title: t('security.alarm_instance.create_time'),
+        key: 'createTime'
+      },
+      {
+        title: t('security.alarm_instance.update_time'),
+        key: 'updateTime'
+      },
+      {
+        title: t('security.alarm_instance.operation'),
+        key: 'operation',
+        width: 150,
+        render: (rowData, unused) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NButton,
+                {
+                  circle: true,
+                  type: 'info',
+                  onClick: () => void onCallback(rowData, 'edit')
+                },
+                {
+                  default: () =>
+                    h(NIcon, null, { default: () => h(EditOutlined) })
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => void onCallback(rowData, 'delete'),
+                  negativeText: t('security.alarm_instance.cancel'),
+                  positiveText: t('security.alarm_instance.confirm')
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'error'
+                      },
+                      {
+                        default: () =>
+                          h(NIcon, null, { default: () => h(DeleteOutlined) })
+                      }
+                    ),
+                  default: () => t('security.alarm_instance.delete')
+                }
+              )
+            ]
+          })
+        }
       }
-    }
-  ]
+    ]
+  }
 
   return {
-    columnsRef
+    getColumns
   }
 }
