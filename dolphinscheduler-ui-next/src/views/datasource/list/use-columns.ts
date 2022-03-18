@@ -17,7 +17,14 @@
 
 import { h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NPopover, NButton, NIcon, NPopconfirm, NSpace } from 'naive-ui'
+import {
+  NPopover,
+  NButton,
+  NIcon,
+  NPopconfirm,
+  NSpace,
+  NTooltip
+} from 'naive-ui'
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
 import ButtonLink from '@/components/button-link'
@@ -81,42 +88,53 @@ export function useColumns(onCallback: Function) {
         render: (rowData, unused) => {
           return h(NSpace, null, {
             default: () => [
-              h(
-                NButton,
-                {
-                  circle: true,
-                  type: 'info',
-                  onClick: () => void onCallback(rowData.id, 'edit')
-                },
-                {
-                  default: () =>
-                    h(NIcon, null, { default: () => h(EditOutlined) })
-                }
-              ),
-              h(
-                NPopconfirm,
-                {
-                  onPositiveClick: () => void onCallback(rowData.id, 'delete'),
-                  negativeText: t('datasource.cancel'),
-                  positiveText: t('datasource.confirm')
-                },
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'error',
-                        class: 'btn-delete'
-                      },
-                      {
-                        default: () =>
-                          h(NIcon, null, { default: () => h(DeleteOutlined) })
-                      }
-                    ),
-                  default: () => t('datasource.delete')
-                }
-              )
+              h(NTooltip, null, {
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      circle: true,
+                      type: 'info',
+                      onClick: () => void onCallback(rowData.id, 'edit')
+                    },
+                    {
+                      default: () =>
+                        h(NIcon, null, { default: () => h(EditOutlined) })
+                    }
+                  ),
+                default: () => t('datasource.edit')
+              }),
+              h(NTooltip, null, {
+                trigger: () =>
+                  h(
+                    NPopconfirm,
+                    {
+                      onPositiveClick: () =>
+                        void onCallback(rowData.id, 'delete'),
+                      negativeText: t('datasource.cancel'),
+                      positiveText: t('datasource.confirm')
+                    },
+                    {
+                      trigger: () =>
+                        h(
+                          NButton,
+                          {
+                            circle: true,
+                            type: 'error',
+                            class: 'btn-delete'
+                          },
+                          {
+                            default: () =>
+                              h(NIcon, null, {
+                                default: () => h(DeleteOutlined)
+                              })
+                          }
+                        ),
+                      default: () => t('datasource.delete_confirm')
+                    }
+                  ),
+                default: () => t('datasource.delete')
+              })
             ]
           })
         }

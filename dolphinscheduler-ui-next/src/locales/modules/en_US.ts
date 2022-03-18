@@ -1157,6 +1157,7 @@ const datasource = {
   click_to_view: 'Click to view',
   delete: 'Delete',
   confirm: 'Confirm',
+  delete_confirm: 'Delete?',
   cancel: 'Cancel',
   create: 'Create',
   edit: 'Edit',
