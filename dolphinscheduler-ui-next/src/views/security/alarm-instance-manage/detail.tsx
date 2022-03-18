@@ -17,22 +17,21 @@
 
 import {
   defineComponent,
-  PropType,
   toRefs,
   watch,
   onMounted,
-  ref,
-  Ref
+  ref
 } from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
-import Modal from '@/components/modal'
-import Form from '@/components/form'
 import { useI18n } from 'vue-i18n'
 import { useForm } from './use-form'
 import { useDetail } from './use-detail'
+import Modal from '@/components/modal'
+import Form from '@/components/form'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import type { IRecord, FormRules, IFormItem } from './types'
+import type { PropType, Ref } from 'vue'
 
 interface IElements extends Omit<Ref, 'value'> {
   value: IFormItem[]
@@ -146,14 +145,14 @@ const DetailModal = defineComponent({
     return (
       <Modal
         show={show}
-        title={`${t(
+        title={t(
           currentRecord?.id
-            ? 'security.alarm_instance.edit'
-            : 'security.alarm_instance.create'
-        )} ${t('security.alarm_instance.alarm_instance')}`}
+            ? 'security.alarm_instance.edit_alarm_instance'
+            : 'security.alarm_instance.create_alarm_instance'
+        )}
         onConfirm={onSubmit}
         confirmLoading={saving || loading}
-        onCancel={() => void onCancel()}
+        onCancel={onCancel}
       >
         {{
           default: () => (

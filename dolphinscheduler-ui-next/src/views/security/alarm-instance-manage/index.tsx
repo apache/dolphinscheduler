@@ -116,8 +116,7 @@ const AlarmInstanceManage = defineComponent({
               <div class={styles['conditions']}>
                 {IS_ADMIN && (
                   <NButton onClick={onCreate} type='primary'>
-                    {t('security.alarm_instance.create') +
-                      t('security.alarm_instance.alarm_instance')}
+                    {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
                 )}
                 <NSpace
