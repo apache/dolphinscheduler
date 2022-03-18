@@ -311,7 +311,8 @@ export function renderStateCell(state: ITaskState, t: Function) {
     NIcon,
     {
       color: stateOption.color,
-      size: 18
+      size: 18,
+      class: stateOption.classNames
     },
     () => h(stateOption.icon)
   )
