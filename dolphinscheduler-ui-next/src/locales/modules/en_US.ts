@@ -1079,6 +1079,7 @@ const security = {
     instance_parameter_exception: 'Instance parameter exception',
     WebHook: 'WebHook',
     webHook: 'WebHook',
+    WarningType: 'Warning Type',
     IsEnableProxy: 'Enable Proxy',
     Proxy: 'Proxy',
     Port: 'Port',
