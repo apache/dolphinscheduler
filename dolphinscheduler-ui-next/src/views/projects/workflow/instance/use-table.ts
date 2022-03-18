@@ -20,7 +20,6 @@ import { format } from 'date-fns'
 import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import { NTooltip, NIcon, NSpin } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
@@ -32,11 +31,13 @@ import {
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import { runningType, tasksState } from '@/utils/common'
-import { IWorkflowInstance } from '@/service/modules/process-instances/types'
-import { ICountDownParam } from './types'
-import { ExecuteReq } from '@/service/modules/executors/types'
 import { parseTime } from '@/utils/common'
 import styles from './index.module.scss'
+import { renderStateCell } from '../../task/instance/use-table'
+import type { Router } from 'vue-router'
+import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
+import type { ICountDownParam } from './types'
+import type { ExecuteReq } from '@/service/modules/executors/types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -95,45 +96,7 @@ export function useTable() {
         title: t('project.workflow.status'),
         key: 'state',
         className: 'workflow-status',
-        render: (_row: IWorkflowInstance) => {
-          const stateIcon = taskStateIcon[_row.state]
-          const iconElement = h(
-            NIcon,
-            {
-              size: '18px',
-              style: 'position: relative; top: 7.5px; left: 7.5px',
-              class: stateIcon.classNames
-            },
-            {
-              default: () =>
-                h(stateIcon.icon, {
-                  color: stateIcon.color
-                })
-            }
-          )
-          return h(
-            NTooltip,
-            {},
-            {
-              trigger: () => {
-                if (stateIcon.isSpin) {
-                  return h(
-                    NSpin,
-                    {
-                      small: 'small'
-                    },
-                    {
-                      icon: () => iconElement
-                    }
-                  )
-                } else {
-                  return iconElement
-                }
-              },
-              default: () => stateIcon!.desc
-            }
-          )
-        }
+        render: (_row: IWorkflowInstance) => renderStateCell(_row.state, t)
       },
       {
         title: t('project.workflow.run_type'),

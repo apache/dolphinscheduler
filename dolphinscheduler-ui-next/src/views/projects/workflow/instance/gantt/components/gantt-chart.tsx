@@ -23,7 +23,7 @@ import initChart from '@/components/chart'
 import { tasksState } from '@/utils/common'
 import { format } from 'date-fns'
 import { parseTime } from '@/utils/common'
-import { ISeriesData } from '../type'
+import type { ISeriesData, ITaskState } from '../type'
 
 const props = {
   height: {
@@ -55,15 +55,16 @@ const GanttChart = defineComponent({
 
     const data: ISeriesData = {}
     Object.keys(state).forEach((key) => (data[key] = []))
+    const test = Object.keys(state)
     const series = Object.keys(state).map((key) => ({
       id: key,
       type: 'custom',
-      name: state[key].desc,
+      name: state[key as ITaskState].desc,
       renderItem: renderItem,
       itemStyle: {
         opacity: 0.8,
-        color: state[key].color,
-        color0: state[key].color
+        color: state[key as ITaskState].color,
+        color0: state[key as ITaskState].color
       },
       encode: {
         x: [1, 2],
@@ -85,7 +86,7 @@ const GanttChart = defineComponent({
           task.endDate[0] - task.startDate[0]
         ],
         itemStyle: {
-          color: state[task.status].color
+          color: state[task.status as ITaskState].color
         }
       })
     })
@@ -137,7 +138,7 @@ const GanttChart = defineComponent({
             (item) => item.taskName === taskName
           )
           let str = `taskName : ${taskName}</br>`
-          str += `status : ${state[data[0].status].desc} (${
+          str += `status : ${state[data[0].status as ITaskState].desc} (${
             data[0].status
           })</br>`
           str += `startTime : ${data[0].isoStart}</br>`

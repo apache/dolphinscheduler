@@ -34,7 +34,7 @@ import {
 } from '@vicons/antd'
 import { parseISO } from 'date-fns'
 import _ from 'lodash'
-import { ITaskState } from './types'
+import { ITaskStateConfig } from './types'
 
 /**
  * Intelligent display kb m
@@ -202,8 +202,7 @@ export const stateType = (t: any) => [
  * @icon icon
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
-// TODO: Looking for a more suitable icon
-export const tasksState = (t: any): ITaskState => ({
+export const tasksState = (t: any): ITaskStateConfig => ({
   SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${t('project.workflow.submit_success')}`,
