@@ -1070,6 +1070,7 @@ const security = {
     operation: 'Operation',
     edit: 'Edit',
     delete: 'Delete',
+    delete_confirm: 'Delete?',
     confirm: 'Confirm',
     cancel: 'Cancel',
     submit: 'Submit',
