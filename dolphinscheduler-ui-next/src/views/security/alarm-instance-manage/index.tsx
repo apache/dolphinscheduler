@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {defineComponent, onMounted, ref, toRefs, watch} from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -144,12 +144,7 @@ const AlarmInstanceManage = defineComponent({
           }}
         </Card>
         <Card title='' class={styles['mt-8']}>
-          <NDataTable
-            columns={columns}
-            data={list}
-            loading={loading}
-            striped
-          />
+          <NDataTable columns={columns} data={list} loading={loading} striped />
           <NPagination
             page={page}
             page-size={pageSize}
