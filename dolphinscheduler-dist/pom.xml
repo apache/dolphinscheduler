@@ -104,6 +104,20 @@
                                 </configuration>
                             </execution>
 
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>python</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+
                             <execution>
                                 <id>python</id>
                                 <phase>package</phase>
