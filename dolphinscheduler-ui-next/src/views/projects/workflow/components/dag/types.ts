@@ -16,6 +16,7 @@
  */
 
 import { TaskType } from '@/views/projects/task/constants/task-type'
+export type { ITaskState } from '@/utils/types'
 
 export interface ProcessDefinition {
   id: number

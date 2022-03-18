@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { ITaskState } from '@/utils/types'
 
 interface CodeReq {
   projectCode: number
@@ -85,7 +86,7 @@ interface ProcessInstanceReq {
 interface IWorkflowInstance {
   id: number
   name: string
-  state: string
+  state: ITaskState
   commandType: string
   scheduleTime?: string
   processDefinitionCode?: number

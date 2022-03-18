@@ -16,25 +16,22 @@
  */
 import { ITaskState } from '@/utils/types'
 
-interface ITask {
-  taskName: string
-  startDate: Array<number>
-  endDate: Array<number>
-  isoStart: string
-  isoEnd: string
-  status: string
-  duration: string
+export type { Router } from 'vue-router'
+export type { TaskInstancesRes } from '@/service/modules/task-instances/types'
+
+interface IRecord {
+  name: string
+  processInstanceName: string
+  executorName: string
+  taskType: string
+  state: ITaskState
+  submitTime: string
+  startTime: string
+  endTime: string
+  duration?: string
+  retryTimes: number
+  dryRun: number
+  host: string
 }
 
-interface IGanttRes {
-  height: number
-  taskNames: Array<number>
-  taskStatus: Object
-  tasks: Array<ITask>
-}
-
-interface ISeriesData {
-  [taskState: string]: Array<any>
-}
-
-export { ITask, IGanttRes, ISeriesData, ITaskState }
+export { ITaskState, IRecord }
