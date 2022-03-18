@@ -20,7 +20,6 @@ import { format } from 'date-fns'
 import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NTooltip, NIcon, NSpin } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
 import {
@@ -30,7 +29,7 @@ import {
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
-import { runningType, tasksState } from '@/utils/common'
+import { runningType } from '@/utils/common'
 import { parseTime } from '@/utils/common'
 import styles from './index.module.scss'
 import { renderStateCell } from '../../task/instance/use-table'
@@ -42,8 +41,6 @@ import type { ExecuteReq } from '@/service/modules/executors/types'
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-
-  const taskStateIcon = tasksState(t)
 
   const variables = reactive({
     columns: [],

@@ -55,7 +55,6 @@ const GanttChart = defineComponent({
 
     const data: ISeriesData = {}
     Object.keys(state).forEach((key) => (data[key] = []))
-    const test = Object.keys(state)
     const series = Object.keys(state).map((key) => ({
       id: key,
       type: 'custom',
