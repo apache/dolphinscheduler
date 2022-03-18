@@ -1066,6 +1066,7 @@ const security = {
     instance_parameter_exception: '实例参数异常',
     WebHook: 'Web钩子',
     webHook: 'Web钩子',
+    WarningType: '告警类型',
     IsEnableProxy: '启用代理',
     Proxy: '代理',
     Port: '端口',
