@@ -23,7 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -32,9 +32,8 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import { parseTime } from '@/utils/common'
-import type { Router } from 'vue-router'
-import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
+import { parseTime, tasksState } from '@/utils/common'
+import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -45,7 +44,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
-    tableData: [],
+    tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
@@ -102,7 +101,8 @@ export function useTable() {
       },
       {
         title: t('project.task.state'),
-        key: 'state'
+        key: 'state',
+        render: (row: IRecord) => renderStateCell(row.state, t)
       },
       {
         title: t('project.task.submit_time'),
@@ -302,4 +302,25 @@ export function useTable() {
     getTableData,
     createColumns
   }
+}
+
+export function renderStateCell(state: ITaskState, t: Function) {
+  const stateOption = tasksState(t)[state]
+
+  const Icon = h(
+    NIcon,
+    {
+      color: stateOption.color,
+      size: 18,
+      class: stateOption.classNames
+    },
+    () => h(stateOption.icon)
+  )
+  return h(NTooltip, null, {
+    trigger: () => {
+      if (!stateOption.isSpin) return Icon
+      return h(NSpin, { size: 'small' }, { icon: () => Icon })
+    },
+    default: () => stateOption.desc
+  })
 }
