@@ -68,7 +68,6 @@ export default defineComponent({
         autoFocus={false}
       >
         <NForm
-          label-width='80'
           model={formValue.value}
           rules={{}}
           size='medium'

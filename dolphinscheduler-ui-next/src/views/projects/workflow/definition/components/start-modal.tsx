@@ -219,7 +219,7 @@ export default defineComponent({
         onConfirm={this.handleStart}
         confirmLoading={this.saving}
       >
-        <NForm ref='startFormRef' label-width='160'>
+        <NForm ref='startFormRef'>
           <NFormItem
             label={t('project.workflow.workflow_name')}
             path='workflow_name'

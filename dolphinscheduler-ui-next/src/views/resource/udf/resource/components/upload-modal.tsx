@@ -73,7 +73,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='uploadFormRef'
-          label-width='160'
         >
           <NFormItem label={t('resource.udf.file_name')} path='name'>
             <NInput

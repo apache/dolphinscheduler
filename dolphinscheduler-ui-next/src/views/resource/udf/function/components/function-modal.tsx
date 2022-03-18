@@ -131,7 +131,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='functionFormRef'
-          label-width='160'
         >
           <NFormItem label={t('resource.function.type')} path='type'>
             <NRadioGroup
@@ -193,7 +192,6 @@ export default defineComponent({
             <NForm
               rules={this.uploadRules}
               ref='uploadFormRef'
-              label-width='160'
             >
               <NFormItem
                 label={t('resource.function.udf_resources_directory')}

@@ -111,7 +111,6 @@ const TenantModal = defineComponent({
                 model={this.model}
                 rules={this.rules}
                 ref='tenantFormRef'
-                label-width={140}
                 require-mark-placement='left'
                 size='small'
                 style="{ maxWidth: '240px' }"

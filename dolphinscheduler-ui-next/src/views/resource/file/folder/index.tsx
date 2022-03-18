@@ -66,7 +66,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='folderFormRef'
-          label-width='160'
         >
           <NFormItem label={t('resource.file.folder_name')} path='name'>
             <NInput
