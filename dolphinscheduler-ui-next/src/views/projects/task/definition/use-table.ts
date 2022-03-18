@@ -52,7 +52,6 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.task_name'),
         key: 'taskName',
-        width: 400,
         render: (row: IRecord) =>
           h(
             ButtonLink,
@@ -64,8 +63,7 @@ export function useTable(onEdit: Function) {
       },
       {
         title: t('project.task.workflow_name'),
-        key: 'processDefinitionName',
-        width: 400
+        key: 'processDefinitionName'
       },
       {
         title: t('project.task.workflow_state'),

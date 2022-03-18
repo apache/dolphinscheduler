@@ -66,6 +66,6 @@ export interface ISetPagination {
 }
 
 export interface BreadcrumbItem {
-  id: number,
+  id: number
   fullName: string
 }
