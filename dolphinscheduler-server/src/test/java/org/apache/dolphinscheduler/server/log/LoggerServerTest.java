@@ -17,20 +17,18 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class LoggerServerTest {
 
@@ -38,36 +36,49 @@ public class LoggerServerTest {
 
     private LogClientService logClientService;
 
+    private String dsHome;
+
     @Before
     public void startServerAndClient() {
         this.loggerServer = new LoggerServer();
         this.loggerServer.start();
         this.logClientService = new LogClientService();
+
+        // DOLPHINSCHEDULER_HOME is be set in start.sh. if we run test in IDE user.dir is DS Home.
+        dsHome = System.getProperty("DOLPHINSCHEDULER_HOME");
+        if (StringUtils.isBlank(dsHome)) {
+            dsHome = System.getProperty("user.dir");
+            System.setProperty("DOLPHINSCHEDULER_HOME", dsHome);
+        }
     }
 
     @Test
-    public void testRollViewLog() throws IOException {
+    public void testRollViewLog()
+            throws IOException {
         String expectedTmpDemoString = "testRolloViewLog";
-        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/demo.txt"), expectedTmpDemoString, Charset.defaultCharset());
+        String testFile = dsHome + "/tmp/demo.log";
+        org.apache.commons.io.FileUtils.writeStringToFile(new File(testFile), expectedTmpDemoString, Charset.defaultCharset());
 
         String resultTmpDemoString = this.logClientService.rollViewLog(
-                "localhost", Constants.RPC_PORT,"/tmp/demo.txt", 0, 1000);
+                "localhost", Constants.RPC_PORT, testFile, 0, 1000);
 
         Assert.assertEquals(expectedTmpDemoString, resultTmpDemoString.replaceAll("[\r|\n|\t]", StringUtils.EMPTY));
 
-        FileUtils.deleteFile("/tmp/demo.txt");
+        FileUtils.deleteFile(testFile);
     }
 
     @Test
-    public void testRemoveTaskLog() throws IOException {
+    public void testRemoveTaskLog()
+            throws IOException {
         String expectedTmpRemoveString = "testRemoveTaskLog";
-        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/remove.txt"), expectedTmpRemoveString, Charset.defaultCharset());
+        String testFile = dsHome + "/tmp/remove.log";
+        org.apache.commons.io.FileUtils.writeStringToFile(new File(testFile), expectedTmpRemoveString, Charset.defaultCharset());
 
-        Boolean b = this.logClientService.removeTaskLog("localhost", Constants.RPC_PORT,"/tmp/remove.txt");
+        Boolean b = this.logClientService.removeTaskLog("localhost", Constants.RPC_PORT, testFile);
 
         Assert.assertTrue(b);
 
-        String result = this.logClientService.viewLog("localhost", Constants.RPC_PORT,"/tmp/demo.txt");
+        String result = this.logClientService.viewLog("localhost", Constants.RPC_PORT, testFile);
 
         Assert.assertEquals(StringUtils.EMPTY, result);
     }
