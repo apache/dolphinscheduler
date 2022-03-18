@@ -58,6 +58,7 @@ test = [
     "freezegun>=1.1",
     "coverage>=6.1",
     "pytest-cov>=3.0",
+    "docker>=5.0.3",
 ]
 
 style = [

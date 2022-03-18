@@ -134,8 +134,8 @@ JAVA_GATEWAY_AUTO_CONVERT = configs.get_bool("java_gateway.auto_convert")
 USER_NAME = configs.get("default.user.name")
 USER_PASSWORD = configs.get("default.user.password")
 USER_EMAIL = configs.get("default.user.email")
-USER_PHONE = configs.get("default.user.phone")
-USER_STATE = configs.get("default.user.state")
+USER_PHONE = str(configs.get("default.user.phone"))
+USER_STATE = configs.get_int("default.user.state")
 
 # Workflow Settings
 WORKFLOW_PROJECT = configs.get("default.workflow.project")

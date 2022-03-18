@@ -163,7 +163,7 @@ def test_single_config_get_set_not_exists_key():
         ("USER_NAME", "userPythonGateway"),
         ("USER_PASSWORD", "userPythonGateway"),
         ("USER_EMAIL", "userPythonGateway@dolphinscheduler.com"),
-        ("USER_PHONE", 11111111111),
+        ("USER_PHONE", "11111111111"),
         ("USER_STATE", 1),
         ("WORKFLOW_PROJECT", "project-pydolphin"),
         ("WORKFLOW_TENANT", "tenant_pydolphin"),
