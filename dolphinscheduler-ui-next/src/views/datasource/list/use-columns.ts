@@ -85,7 +85,7 @@ export function useColumns(onCallback: Function) {
         title: t('datasource.operation'),
         key: 'operation',
         width: 150,
-        render: (rowData, unused) => {
+        render: (rowData) => {
           return h(NSpace, null, {
             default: () => [
               h(NTooltip, null, {
