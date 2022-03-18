@@ -17,7 +17,7 @@
 
 import { h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NButton, NIcon, NPopconfirm, NSpace } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import type { TableColumns } from './types'
 
@@ -51,44 +51,56 @@ export function useColumns(onCallback: Function) {
         title: t('security.alarm_instance.operation'),
         key: 'operation',
         width: 150,
-        render: (rowData, unused) => {
+        render: (rowData) => {
           return h(NSpace, null, {
             default: () => [
-              h(
-                NButton,
-                {
-                  circle: true,
-                  type: 'info',
-                  onClick: () => void onCallback(rowData, 'edit')
-                },
-                {
-                  default: () =>
-                    h(NIcon, null, { default: () => h(EditOutlined) })
-                }
-              ),
-              h(
-                NPopconfirm,
-                {
-                  onPositiveClick: () => void onCallback(rowData, 'delete'),
-                  negativeText: t('security.alarm_instance.cancel'),
-                  positiveText: t('security.alarm_instance.confirm')
-                },
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'error'
-                      },
-                      {
-                        default: () =>
-                          h(NIcon, null, { default: () => h(DeleteOutlined) })
-                      }
-                    ),
-                  default: () => t('security.alarm_instance.delete')
-                }
-              )
+              h(NTooltip, null, {
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      circle: true,
+                      type: 'info',
+                      size: 'small',
+                      onClick: () => void onCallback(rowData, 'edit')
+                    },
+                    {
+                      default: () =>
+                        h(NIcon, null, { default: () => h(EditOutlined) })
+                    }
+                  ),
+                default: () => t('security.alarm_instance.edit')
+              }),
+              h(NTooltip, null, {
+                trigger: () =>
+                  h(
+                    NPopconfirm,
+                    {
+                      onPositiveClick: () => void onCallback(rowData, 'delete'),
+                      negativeText: t('security.alarm_instance.cancel'),
+                      positiveText: t('security.alarm_instance.confirm')
+                    },
+                    {
+                      trigger: () =>
+                        h(
+                          NButton,
+                          {
+                            circle: true,
+                            type: 'error',
+                            size: 'small'
+                          },
+                          {
+                            default: () =>
+                              h(NIcon, null, {
+                                default: () => h(DeleteOutlined)
+                              })
+                          }
+                        ),
+                      default: () => t('security.alarm_instance.delete_confirm')
+                    }
+                  ),
+                default: () => t('security.alarm_instance.delete')
+              })
             ]
           })
         }

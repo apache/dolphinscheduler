@@ -1057,6 +1057,7 @@ const security = {
     operation: '操作',
     edit: '编辑',
     delete: '删除',
+    delete_confirm: '删除？',
     confirm: '确定',
     cancel: '取消',
     submit: '提交',
