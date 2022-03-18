@@ -1144,6 +1144,7 @@ const datasource = {
   click_to_view: '点击查看',
   delete: '删除',
   confirm: '确定',
+  delete_confirm: '删除？',
   cancel: '取消',
   create: '创建',
   edit: '编辑',
