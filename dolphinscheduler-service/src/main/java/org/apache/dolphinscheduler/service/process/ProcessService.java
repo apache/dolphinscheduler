@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -120,6 +119,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
@@ -2359,23 +2359,6 @@ public class ProcessService {
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLog.setOperator(operator.getId());
             taskDefinitionLog.setResourceIds(getResourceIds(taskDefinitionLog));
-            if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
-                TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
-                        .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
-                if (definitionCodeAndVersion != null) {
-                    if (!taskDefinitionLog.equals(definitionCodeAndVersion)) {
-                        taskDefinitionLog.setUserId(definitionCodeAndVersion.getUserId());
-                        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionLog.getCode());
-                        taskDefinitionLog.setVersion(version + 1);
-                        taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
-                        updateTaskDefinitionLogs.add(taskDefinitionLog);
-                    }
-                    continue;
-                }
-            }
-            taskDefinitionLog.setUserId(operator.getId());
-            taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
-            taskDefinitionLog.setCreateTime(now);
             if (taskDefinitionLog.getCode() == 0) {
                 try {
                     taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
@@ -2384,7 +2367,28 @@ public class ProcessService {
                     return Constants.DEFINITION_FAILURE;
                 }
             }
-            newTaskDefinitionLogs.add(taskDefinitionLog);
+            if (taskDefinitionLog.getVersion() == 0) {
+                // init first version
+                taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
+            }
+
+            TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
+                    .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+            if (definitionCodeAndVersion == null) {
+                taskDefinitionLog.setUserId(operator.getId());
+                taskDefinitionLog.setCreateTime(now);
+                newTaskDefinitionLogs.add(taskDefinitionLog);
+                continue;
+            }
+            if (taskDefinitionLog.equals(definitionCodeAndVersion)) {
+                // do nothing if equals
+                continue;
+            }
+            taskDefinitionLog.setUserId(definitionCodeAndVersion.getUserId());
+            Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionLog.getCode());
+            taskDefinitionLog.setVersion(version + 1);
+            taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
+            updateTaskDefinitionLogs.add(taskDefinitionLog);
         }
         int insertResult = 0;
         int updateResult = 0;
