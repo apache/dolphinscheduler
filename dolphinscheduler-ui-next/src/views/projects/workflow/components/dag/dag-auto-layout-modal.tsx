@@ -68,11 +68,9 @@ export default defineComponent({
         autoFocus={false}
       >
         <NForm
-          label-width='80'
           model={formValue.value}
           rules={{}}
           size='medium'
-          label-placement='left'
           ref={formRef}
         >
           <NFormItem label={t('project.dag.layout_type')} path='type'>
