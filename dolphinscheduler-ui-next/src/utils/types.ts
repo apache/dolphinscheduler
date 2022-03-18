@@ -14,9 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Component } from 'vue'
 
-interface ITaskState {
-  [key: string]: any
+export type ITaskState =
+  | 'SUBMITTED_SUCCESS'
+  | 'RUNNING_EXECUTION'
+  | 'READY_PAUSE'
+  | 'PAUSE'
+  | 'READY_STOP'
+  | 'STOP'
+  | 'FAILURE'
+  | 'SUCCESS'
+  | 'NEED_FAULT_TOLERANCE'
+  | 'KILL'
+  | 'WAITING_THREAD'
+  | 'WAITING_DEPEND'
+  | 'DELAY_EXECUTION'
+  | 'FORCED_SUCCESS'
+  | 'SERIAL_WAIT'
+
+export type ITaskStateConfig = {
+  [key in ITaskState]: {
+    id: number
+    desc: string
+    color: string
+    icon: Component
+    isSpin: boolean
+    classNames?: string
+  }
 }
-
-export { ITaskState }
