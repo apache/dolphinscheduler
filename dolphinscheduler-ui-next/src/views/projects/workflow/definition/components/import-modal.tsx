@@ -72,7 +72,6 @@ export default defineComponent({
         <NForm
           rules={this.importRules}
           ref='importFormRef'
-          label-placement='left'
           label-width='160'
         >
           <NFormItem label={t('project.workflow.upload_file')} path='file'>

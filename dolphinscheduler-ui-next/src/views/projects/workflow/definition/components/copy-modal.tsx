@@ -95,7 +95,6 @@ export default defineComponent({
         <NForm
           rules={this.copyRules}
           ref='copyFormRef'
-          label-placement='left'
           label-width='160'
         >
           <NFormItem

@@ -131,7 +131,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='functionFormRef'
-          label-placement='left'
           label-width='160'
         >
           <NFormItem label={t('resource.function.type')} path='type'>
@@ -194,7 +193,6 @@ export default defineComponent({
             <NForm
               rules={this.uploadRules}
               ref='uploadFormRef'
-              label-placement='left'
               label-width='160'
             >
               <NFormItem

@@ -72,7 +72,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='uploadFormRef'
-          label-placement='left'
           label-width='160'
         >
           <NFormItem label={t('resource.file.file_name')} path='name'>

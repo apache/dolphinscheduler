@@ -82,7 +82,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='renameFormRef'
-          label-placement='left'
           label-width='160'
         >
           <NFormItem label={t('resource.file.name')} path='name'>

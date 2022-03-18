@@ -68,7 +68,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='fileFormRef'
-          label-placement='left'
           label-width='160'
           class={styles['form-content']}
         >

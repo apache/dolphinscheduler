@@ -72,7 +72,6 @@ export default defineComponent({
           model={formValue.value}
           rules={{}}
           size='medium'
-          label-placement='left'
           ref={formRef}
         >
           <NFormItem label={t('project.dag.layout_type')} path='type'>
