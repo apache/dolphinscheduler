@@ -847,6 +847,7 @@ const project = {
     last_saturday: 'LastSaturday',
     last_sunday: 'LastSunday',
     this_month: 'ThisMonth',
+    this_month_begin: 'ThisMonthBegin',
     last_month: 'LastMonth',
     last_month_begin: 'LastMonthBegin',
     last_month_end: 'LastMonthEnd',
