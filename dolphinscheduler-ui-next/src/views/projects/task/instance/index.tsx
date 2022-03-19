@@ -92,7 +92,7 @@ const TaskInstance = defineComponent({
     return (
       <>
         <NCard>
-          <NSpace justify='end'>
+          <NSpace justify='end' wrap={false}>
             <NInput
               v-model={[this.searchVal, 'value']}
               size='small'

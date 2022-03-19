@@ -308,7 +308,10 @@ export function renderStateCell(state: ITaskState, t: Function) {
     {
       color: stateOption.color,
       size: 18,
-      class: stateOption.classNames
+      class: stateOption.classNames,
+      style: {
+        display: 'flex'
+      }
     },
     () => h(stateOption.icon)
   )
