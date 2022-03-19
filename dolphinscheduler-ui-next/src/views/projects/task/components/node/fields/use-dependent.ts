@@ -142,6 +142,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         label: t('project.node.this_month')
       },
       {
+        value: 'thisMonthBegin',
+        label: t('project.node.this_month_begin')
+      },
+      {
         value: 'lastMonth',
         label: t('project.node.last_month')
       },
