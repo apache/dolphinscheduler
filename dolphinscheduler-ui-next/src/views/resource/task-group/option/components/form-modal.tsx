@@ -63,7 +63,7 @@ const FormModal = defineComponent({
         state.formData.status = props.data.status
         state.formData.description = props.data.description
       } else {
-        state.formData.groupSize = 10
+        state.formData.groupSize = '10'
       }
     })
 
