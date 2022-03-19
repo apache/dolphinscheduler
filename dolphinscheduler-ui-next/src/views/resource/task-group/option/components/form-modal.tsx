@@ -82,7 +82,7 @@ const FormModal = defineComponent({
     }
 
     const onCancel = () => {
-      state.formData.projectCode = 0
+      state.formData.projectCode = ''
       state.formData.description = ''
       emit('cancel')
     }
