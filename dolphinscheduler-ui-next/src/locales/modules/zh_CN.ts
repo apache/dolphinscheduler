@@ -514,6 +514,8 @@ const project = {
     project_tips: '请选择项目'
   },
   task: {
+    online: '已上线',
+    offline: '已下线',
     task_name: '任务名称',
     task_type: '任务类型',
     create_task: '创建任务',
