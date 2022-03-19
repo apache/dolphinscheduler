@@ -837,6 +837,7 @@ const project = {
     last_saturday: '上周六',
     last_sunday: '上周日',
     this_month: '本月',
+    this_month_begin: '本月初',
     last_month: '上月',
     last_month_begin: '上月初',
     last_month_end: '上月末',
