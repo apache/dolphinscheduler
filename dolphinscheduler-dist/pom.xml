@@ -28,6 +28,7 @@
     <name>${project.artifactId}</name>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <python.sign.skip>false</python.sign.skip>
     </properties>
 
     <dependencies>
