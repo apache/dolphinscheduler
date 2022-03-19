@@ -73,7 +73,6 @@ export function useTable() {
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        width: 250,
         render: (row: {
           processInstanceId: number
           processInstanceName: string
@@ -106,18 +105,15 @@ export function useTable() {
       },
       {
         title: t('project.task.submit_time'),
-        key: 'submitTime',
-        width: 170
+        key: 'submitTime'
       },
       {
         title: t('project.task.start_time'),
-        key: 'startTime',
-        width: 170
+        key: 'startTime'
       },
       {
         title: t('project.task.end_time'),
-        key: 'endTime',
-        width: 170
+        key: 'endTime'
       },
       {
         title: t('project.task.duration'),
@@ -134,13 +130,13 @@ export function useTable() {
       },
       {
         title: t('project.task.host'),
-        key: 'host',
-        width: 160
+        key: 'host'
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
         width: 150,
+        fixed: 'right',
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
