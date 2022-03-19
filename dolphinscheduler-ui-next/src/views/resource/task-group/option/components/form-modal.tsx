@@ -59,11 +59,11 @@ const FormModal = defineComponent({
         state.formData.id = props.data.id
         state.formData.name = props.data.name
         state.formData.projectCode = props.data.projectCode
-        state.formData.groupSize = props.data.groupSize
+        state.formData.groupSize = String(props.data.groupSize)
         state.formData.status = props.data.status
         state.formData.description = props.data.description
       } else {
-        state.formData.groupSize = 10
+        state.formData.groupSize = '10'
       }
     })
 
