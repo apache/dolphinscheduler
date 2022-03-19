@@ -70,6 +70,9 @@
     <profiles>
         <profile>
             <id>release</id>
+            <properties>
+                <python.sign.skip>false</python.sign.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -103,6 +106,20 @@
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
                             </execution>
+
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>python</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
 
                             <execution>
                                 <id>python</id>

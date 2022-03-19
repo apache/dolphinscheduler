@@ -105,7 +105,7 @@
             </build>
         </profile>
         <profile>
-            <id>release</id>
+            <id>python</id>
             <build>
                 <plugins>
                     <plugin>
@@ -119,7 +119,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python3</executable>
+                                    <executable>python</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>-m</argument>
@@ -138,7 +138,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python3</executable>
+                                    <executable>python</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>setup.py</argument>
@@ -153,11 +153,45 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python3</executable>
+                                    <executable>python</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>-m</argument>
                                         <argument>build</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sign-source</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${python.sign.skip}</skip>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
+                                        <argument>gpg --armor --sign dist/*.tar.gz</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sign-wheel</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${python.sign.skip}</skip>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
+                                        <argument>gpg --armor --sign dist/*.whl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
