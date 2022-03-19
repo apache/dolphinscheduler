@@ -517,6 +517,8 @@ const project = {
     project_tips: 'Please select project name'
   },
   task: {
+    online: 'Online',
+    offline: 'Offline',
     task_name: 'Task Name',
     task_type: 'Task Type',
     create_task: 'Create Task',

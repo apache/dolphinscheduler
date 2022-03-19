@@ -79,10 +79,7 @@ export default defineComponent({
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='renameFormRef'
-        >
+        <NForm rules={this.rules} ref='renameFormRef'>
           <NFormItem label={t('resource.file.name')} path='name'>
             <NInput
               v-model={[this.renameForm.name, 'value']}
