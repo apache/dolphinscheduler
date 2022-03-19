@@ -92,10 +92,7 @@ export default defineComponent({
         onConfirm={this.handleCopy}
         confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.copyRules}
-          ref='copyFormRef'
-        >
+        <NForm rules={this.copyRules} ref='copyFormRef'>
           <NFormItem
             label={t('project.workflow.project_name')}
             path='projectCode'

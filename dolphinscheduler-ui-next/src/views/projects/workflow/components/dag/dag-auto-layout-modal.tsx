@@ -67,12 +67,7 @@ export default defineComponent({
         onCancel={cancel}
         autoFocus={false}
       >
-        <NForm
-          model={formValue.value}
-          rules={{}}
-          size='medium'
-          ref={formRef}
-        >
+        <NForm model={formValue.value} rules={{}} size='medium' ref={formRef}>
           <NFormItem label={t('project.dag.layout_type')} path='type'>
             <NRadioGroup
               v-model={[formValue.value.type, 'value']}

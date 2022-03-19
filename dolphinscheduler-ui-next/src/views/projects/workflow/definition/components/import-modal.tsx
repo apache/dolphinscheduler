@@ -69,10 +69,7 @@ export default defineComponent({
         onConfirm={this.handleImport}
         confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.importRules}
-          ref='importFormRef'
-        >
+        <NForm rules={this.importRules} ref='importFormRef'>
           <NFormItem label={t('project.workflow.upload_file')} path='file'>
             <NButton>
               <NUpload

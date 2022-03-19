@@ -15,13 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  toRefs,
-  watch,
-  onMounted,
-  ref
-} from 'vue'
+import { defineComponent, toRefs, watch, onMounted, ref } from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
