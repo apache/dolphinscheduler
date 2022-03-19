@@ -168,6 +168,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${python.sign.skip}</skip>
                                     <executable>bash</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
@@ -184,6 +185,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${python.sign.skip}</skip>
                                     <executable>bash</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
