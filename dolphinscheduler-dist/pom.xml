@@ -70,9 +70,9 @@
     <profiles>
         <profile>
             <id>release</id>
-              <properties>
+            <properties>
                 <python.sign.skip>false</python.sign.skip>
-              </properties>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
