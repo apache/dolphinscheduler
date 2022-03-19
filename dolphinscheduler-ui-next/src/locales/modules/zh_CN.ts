@@ -1056,6 +1056,7 @@ const security = {
     operation: '操作',
     edit_alarm_instance: '编辑告警实例',
     delete: '删除',
+    edit: '编辑',
     delete_confirm: '删除？',
     confirm: '确定',
     cancel: '取消',
