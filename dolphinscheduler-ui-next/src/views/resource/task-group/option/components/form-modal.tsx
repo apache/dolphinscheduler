@@ -115,18 +115,21 @@ const FormModal = defineComponent({
               placeholder={t('resource.task_group_option.please_enter_name')}
             />
           </NFormItem>
-          <NFormItem
-            label={t('resource.task_group_option.project_name')}
-            path='projectCode'
-          >
-            <NSelect
+          { this.status === 0 && (
+              <NFormItem
+              label={t('resource.task_group_option.project_name')}
+              path='projectCode'
+              >
+              <NSelect
               options={projectOptions}
               v-model:value={this.formData.projectCode}
               placeholder={t(
-                'resource.task_group_option.please_select_project'
+              'resource.task_group_option.please_select_project'
               )}
-            />
-          </NFormItem>
+              />
+              </NFormItem>
+            )
+          }
           <NFormItem
             label={t('resource.task_group_option.resource_pool_size')}
             path='groupSize'
