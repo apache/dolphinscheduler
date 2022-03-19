@@ -70,10 +70,7 @@ export default defineComponent({
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='uploadFormRef'
-        >
+        <NForm rules={this.rules} ref='uploadFormRef'>
           <NFormItem label={t('resource.udf.file_name')} path='name'>
             <NInput
               v-model={[this.uploadForm.name, 'value']}
