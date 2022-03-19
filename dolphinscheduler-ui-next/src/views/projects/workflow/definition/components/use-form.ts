@@ -82,9 +82,9 @@ export const useForm = () => {
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       processInstancePriority: 'MEDIUM',
-      warningGroupId: '',
+      warningGroupId: null as null | number,
       workerGroup: 'default',
-      environmentCode: null
+      environmentCode: null as null | string
     },
     saving: false
   })

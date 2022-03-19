@@ -22,7 +22,8 @@ import {
   h,
   onMounted,
   ref,
-  watch
+  watch,
+  computed
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -83,6 +84,12 @@ export default defineComponent({
       getPreviewSchedule
     } = useModal(timingState, ctx)
 
+    const environmentOptions = computed(() =>
+      variables.environmentList.filter((item: any) =>
+        item.workerGroups?.includes(timingState.timingForm.workerGroup)
+      )
+    )
+
     const hideModal = () => {
       ctx.emit('update:show')
     }
@@ -95,7 +102,7 @@ export default defineComponent({
       }
     }
 
-    const generalWarningTypeListOptions = () => [
+    const warningTypeOptions = [
       {
         value: 'NONE',
         label: t('project.workflow.none_send')
@@ -114,7 +121,7 @@ export default defineComponent({
       }
     ]
 
-    const generalPriorityList = () => [
+    const priorityOptions = [
       {
         value: 'HIGHEST',
         label: 'HIGHEST',
@@ -178,6 +185,24 @@ export default defineComponent({
       getPreviewSchedule()
     }
 
+    const initEnvironment = () => {
+      timingState.timingForm.environmentCode = null
+      variables.environmentList.forEach((item) => {
+        if (props.row.environmentCode === item.value) {
+          timingState.timingForm.environmentCode = item.value
+        }
+      })
+    }
+
+    const initWarningGroup = () => {
+      timingState.timingForm.warningGroupId = null
+      variables.alertGroups.forEach((item) => {
+        if (props.row.warningGroupId === item.value) {
+          timingState.timingForm.warningGroupId = item.value
+        }
+      })
+    }
+
     onMounted(() => {
       getWorkerGroups()
       getAlertGroups()
@@ -199,9 +224,9 @@ export default defineComponent({
         timingState.timingForm.warningType = props.row.warningType
         timingState.timingForm.processInstancePriority =
           props.row.processInstancePriority
-        timingState.timingForm.warningGroupId = props.row.warningGroupId
         timingState.timingForm.workerGroup = props.row.workerGroup
-        timingState.timingForm.environmentCode = props.row.environmentCode
+        initWarningGroup()
+        initEnvironment()
       }
     )
 
@@ -209,10 +234,11 @@ export default defineComponent({
       t,
       crontabRef,
       parallelismRef,
+      priorityOptions,
+      warningTypeOptions,
+      environmentOptions,
       hideModal,
       handleTiming,
-      generalWarningTypeListOptions,
-      generalPriorityList,
       timezoneOptions,
       renderLabel,
       updateWorkerGroup,
@@ -225,9 +251,6 @@ export default defineComponent({
 
   render() {
     const { t } = this
-    if (Number(this.timingForm.warningGroupId) === 0) {
-      this.timingForm.warningGroupId = ''
-    }
 
     return (
       <Modal
@@ -237,7 +260,7 @@ export default defineComponent({
         onConfirm={this.handleTiming}
         confirmLoading={this.saving}
       >
-        <NForm ref='timingFormRef' label-placement='left' label-width='160'>
+        <NForm ref='timingFormRef'>
           <NFormItem
             label={t('project.workflow.start_and_stop_time')}
             path='startEndTime'
@@ -318,7 +341,7 @@ export default defineComponent({
             path='warningType'
           >
             <NSelect
-              options={this.generalWarningTypeListOptions()}
+              options={this.warningTypeOptions}
               v-model:value={this.timingForm.warningType}
             />
           </NFormItem>
@@ -327,7 +350,7 @@ export default defineComponent({
             path='processInstancePriority'
           >
             <NSelect
-              options={this.generalPriorityList()}
+              options={this.priorityOptions}
               renderLabel={this.renderLabel}
               v-model:value={this.timingForm.processInstancePriority}
             />
@@ -347,9 +370,7 @@ export default defineComponent({
             path='environmentCode'
           >
             <NSelect
-              options={this.environmentList.filter((item: any) =>
-                item.workerGroups?.includes(this.timingForm.workerGroup)
-              )}
+              options={this.environmentOptions}
               v-model:value={this.timingForm.environmentCode}
               clearable
             />

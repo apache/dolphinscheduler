@@ -63,12 +63,7 @@ export default defineComponent({
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='folderFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='folderFormRef'>
           <NFormItem label={t('resource.file.folder_name')} path='name'>
             <NInput
               v-model={[this.folderForm.name, 'value']}

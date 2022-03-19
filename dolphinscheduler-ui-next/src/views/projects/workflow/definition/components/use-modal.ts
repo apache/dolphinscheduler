@@ -36,6 +36,8 @@ import {
   previewSchedule
 } from '@/service/modules/schedules'
 import { parseTime } from '@/utils/common'
+import { EnvironmentItem } from '@/service/modules/environment/types'
+import { ITimingState } from './types'
 
 export function useModal(
   state: any,
@@ -45,12 +47,12 @@ export function useModal(
   const router: Router = useRouter()
   const route = useRoute()
 
-  const variables = reactive({
+  const variables = reactive<ITimingState>({
     projectCode: Number(route.params.projectCode),
     workerGroups: [],
     alertGroups: [],
     environmentList: [],
-    startParamsList: [] as Array<{ prop: string; value: string }>,
+    startParamsList: [],
     schedulePreviewList: []
   })
 
@@ -197,10 +199,9 @@ export function useModal(
       failureStrategy: state.timingForm.failureStrategy,
       warningType: state.timingForm.warningType,
       processInstancePriority: state.timingForm.processInstancePriority,
-      warningGroupId:
-        state.timingForm.warningGroupId === ''
-          ? 0
-          : state.timingForm.warningGroupId,
+      warningGroupId: state.timingForm.warningGroupId
+        ? state.timingForm.warningGroupId
+        : 0,
       workerGroup: state.timingForm.workerGroup,
       environmentCode: state.timingForm.environmentCode
     }
@@ -217,8 +218,8 @@ export function useModal(
   }
 
   const getEnvironmentList = () => {
-    queryAllEnvironmentList().then((res: any) => {
-      variables.environmentList = res.map((item: any) => ({
+    queryAllEnvironmentList().then((res: Array<EnvironmentItem>) => {
+      variables.environmentList = res.map((item) => ({
         label: item.name,
         value: item.code,
         workerGroups: item.workerGroups

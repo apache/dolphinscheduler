@@ -182,7 +182,11 @@ const TaskInstance = defineComponent({
           </NSpace>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            columns={this.columns}
+            data={this.tableData}
+            scrollX={1800}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

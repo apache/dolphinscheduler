@@ -14,27 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ITaskState } from '@/utils/types'
 
-interface ITask {
-  taskName: string
-  startDate: Array<number>
-  endDate: Array<number>
-  isoStart: string
-  isoEnd: string
-  status: string
-  duration: string
+export interface IEnvironmentOption {
+  label: string
+  value: string
+  workerGroups: Array<string>
 }
 
-interface IGanttRes {
-  height: number
-  taskNames: Array<number>
-  taskStatus: Object
-  tasks: Array<ITask>
+export interface IOption {
+  label: string
+  value: number
 }
 
-interface ISeriesData {
-  [taskState: string]: Array<any>
+export interface IParam {
+  prop: string
+  value: string
 }
 
-export { ITask, IGanttRes, ISeriesData, ITaskState }
+export interface ITimingState {
+  projectCode: number
+  workerGroups: Array<IOption>
+  alertGroups: Array<IOption>
+  environmentList: Array<IEnvironmentOption>
+  startParamsList: Array<IParam>
+  schedulePreviewList: Array<string>
+}
