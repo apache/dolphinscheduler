@@ -1070,6 +1070,7 @@ const security = {
     operation: 'Operation',
     edit_alarm_instance: 'Edit Alarm Instance',
     delete: 'Delete',
+    edit: 'Edit',
     delete_confirm: 'Delete?',
     confirm: 'Confirm',
     cancel: 'Cancel',
