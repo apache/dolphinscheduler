@@ -15,37 +15,8 @@
  * limitations under the License.
  */
 
-import { defineStore } from 'pinia'
-import MenuState from './types'
+interface RouteState {
+  lastRoute: string
+}
 
-export const useMenuStore = defineStore({
-  id: 'menu',
-  state: (): MenuState => ({
-    menuKey: 'home',
-    isShowSide: false,
-    projectCode: ''
-  }),
-  persist: true,
-  getters: {
-    getMenuKey(): string {
-      return this.menuKey
-    },
-    getShowSideStatus(): boolean {
-      return this.isShowSide || false
-    },
-    getProjectCode(): string {
-      return this.projectCode || ''
-    }
-  },
-  actions: {
-    setMenuKey(menuKey: string): void {
-      this.menuKey = menuKey
-    },
-    setShowSideStatus(isShowSide: boolean): void {
-      this.isShowSide = isShowSide
-    },
-    setProjectCode(projectCode: string): void {
-      this.projectCode = projectCode
-    }
-  }
-})
+export default RouteState

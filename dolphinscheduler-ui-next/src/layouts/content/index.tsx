@@ -21,6 +21,7 @@ import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
 import { useLocalesStore } from '@/store/locales/locales'
+import { useRouteStore } from '@/store/route/route'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
@@ -32,6 +33,7 @@ const Content = defineComponent({
     const route = useRoute()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
+    const routeStore = useRouteStore()
     const {
       state,
       changeMenuOption,
@@ -67,6 +69,8 @@ const Content = defineComponent({
       () => route.path,
       () => {
         if (route.path !== '/login') {
+          routeStore.setLastRoute(route.path)
+
           state.isShowSide = route.meta.showSide as boolean
           if (route.matched[1].path === '/projects/:projectCode') {
             changeMenuOption(state)
@@ -75,7 +79,9 @@ const Content = defineComponent({
           getSideMenu(state)
 
           const currentSide = (
-            route.meta.activeSide ? route.meta.activeSide : route.path
+            route.meta.activeSide
+              ? route.meta.activeSide
+              : route.matched[1].path
           ) as string
           sideKeyRef.value = currentSide.includes(':projectCode')
             ? currentSide.replace(
