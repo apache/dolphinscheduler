@@ -52,6 +52,8 @@ const ProjectModal = defineComponent({
         variables.model.description = ''
       } else {
         variables.model.userName = props.row.userName
+        variables.model.projectName = props.row.name
+        variables.model.description = props.row.description
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
