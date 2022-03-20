@@ -82,6 +82,7 @@ export default {
       meta: {
         title: '定时管理',
         activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
         showSide: true,
         auth: []
       }
@@ -93,6 +94,7 @@ export default {
       meta: {
         title: '创建工作流定义',
         activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
         showSide: true,
         auth: []
       }
@@ -104,6 +106,7 @@ export default {
       meta: {
         title: '工作流定义详情',
         activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
         showSide: true,
         auth: []
       }
@@ -126,6 +129,7 @@ export default {
       meta: {
         title: '工作流实例详情',
         activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow/instances',
         showSide: true,
         auth: []
       }
@@ -137,6 +141,7 @@ export default {
       meta: {
         title: '工作流实例甘特图',
         activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow/instances',
         showSide: true,
         auth: []
       }
@@ -170,6 +175,7 @@ export default {
       meta: {
         title: '工作流定义树形图',
         activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
         showSide: true,
         auth: []
       }

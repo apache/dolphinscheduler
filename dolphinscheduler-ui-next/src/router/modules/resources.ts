@@ -47,6 +47,7 @@ export default {
       meta: {
         title: '文件创建',
         activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -58,6 +59,7 @@ export default {
       meta: {
         title: '文件编辑',
         activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -69,6 +71,7 @@ export default {
       meta: {
         title: '文件管理',
         activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -80,6 +83,7 @@ export default {
       meta: {
         title: '文件详情',
         activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -91,6 +95,7 @@ export default {
       meta: {
         title: '文件创建',
         activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -113,6 +118,7 @@ export default {
       meta: {
         title: '资源管理',
         activeMenu: 'resource',
+        activeSide: '/resource/resource-manage',
         showSide: true,
         auth: []
       }

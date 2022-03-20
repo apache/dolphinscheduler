@@ -71,13 +71,18 @@ const Content = defineComponent({
           if (route.matched[1].path === '/projects/:projectCode') {
             changeMenuOption(state)
           }
+
           getSideMenu(state)
-          sideKeyRef.value = route.matched[1].path.includes(':projectCode')
-            ? route.matched[1].path.replace(
+
+          const currentSide = (
+            route.meta.activeSide ? route.meta.activeSide : route.path
+          ) as string
+          sideKeyRef.value = currentSide.includes(':projectCode')
+            ? currentSide.replace(
                 ':projectCode',
                 route.params.projectCode as string
               )
-            : route.matched[1].path
+            : currentSide
         }
       },
       { immediate: true }
