@@ -1118,7 +1118,8 @@ const security = {
     username: 'Username',
     botToken: 'Bot Token',
     chatId: 'Channel Chat Id',
-    parseMode: 'Parse Mode'
+    parseMode: 'Parse Mode',
+    IntegrationKey: 'Integration Key'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
