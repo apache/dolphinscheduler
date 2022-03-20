@@ -1105,7 +1105,8 @@ const security = {
     username: '用户名',
     botToken: '机器人Token',
     chatId: '频道ID',
-    parseMode: '解析类型'
+    parseMode: '解析类型',
+    IntegrationKey: '集成密钥'
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
