@@ -30,7 +30,6 @@ const app = createApp(App)
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)
-
 app.config.globalProperties.echarts = echarts
 
 app.use(router)
