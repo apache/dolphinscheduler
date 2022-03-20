@@ -105,7 +105,6 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
         for (WebElement cancelButton : cancelButtons) {
             cancelButton.click();
-            driver().navigate().refresh();
         }
 
         return this;
