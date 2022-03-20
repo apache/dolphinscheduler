@@ -38,10 +38,17 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     @FindBy(className = "btn-create-process")
     private WebElement buttonCreateProcess;
 
-    @FindBy(className = "select-all")
+    @FindBys({
+            @FindBy(className = "btn-selected"),
+            @FindBy(className = "n-checkbox"),
+    })
     private WebElement checkBoxSelectAll;
 
-    @FindBy(className = "btn-delete-all")
+    @FindBys({
+            @FindBy(className = "btn-delete-all"),
+            @FindBy(className = "n-button__content"),
+            @FindBy(tagName = "span")
+    })
     private WebElement buttonDeleteAll;
 
     @FindBys({
