@@ -1119,7 +1119,13 @@ const security = {
     botToken: 'Bot Token',
     chatId: 'Channel Chat Id',
     parseMode: 'Parse Mode',
-    IntegrationKey: 'Integration Key'
+    IntegrationKey: 'Integration Key',
+    BotAccessToken:'Bot Access Token',
+    RoomId:'Room Id',
+    ToPersonId:'To Person Id',
+    ToPersonEmail:'To Person Email',
+    AtSomeoneInRoom:'At Someone In Room',
+    Destination:'Destination'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',

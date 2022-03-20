@@ -1106,7 +1106,13 @@ const security = {
     botToken: '机器人Token',
     chatId: '频道ID',
     parseMode: '解析类型',
-    IntegrationKey: '集成密钥'
+    IntegrationKey: '集成密钥',
+    BotAccessToken:'访问令牌',
+    RoomId:'房间',
+    ToPersonId:'用户',
+    ToPersonEmail:'用户邮箱',
+    AtSomeoneInRoom:'@房间中的成员',
+    Destination:'描述'
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
