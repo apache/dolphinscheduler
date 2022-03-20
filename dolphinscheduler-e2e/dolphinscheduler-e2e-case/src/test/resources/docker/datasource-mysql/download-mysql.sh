@@ -17,7 +17,7 @@
 
 set -ex
 
-DS_HOME=/opt/dolphinscheduler/libs
+DS_HOME=/opt/dolphinscheduler/libs/standalone-server
 MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
 MYSQL_DRIVER="mysql-connector-java-8.0.16.jar"
 
