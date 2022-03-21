@@ -113,7 +113,7 @@ export function useUserDetail() {
     const result = await queryList()
     state.queues = result.map((queue: { queueName: string; id: string }) => ({
       label: queue.queueName,
-      value: queue.id
+      value: queue.queueName
     }))
     if (state.queues.length) {
       initialValues.queue = state.queues[0].value
