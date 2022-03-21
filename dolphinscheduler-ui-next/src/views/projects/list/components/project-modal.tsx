@@ -52,6 +52,8 @@ const ProjectModal = defineComponent({
         variables.model.description = ''
       } else {
         variables.model.userName = props.row.userName
+        variables.model.projectName = props.row.name
+        variables.model.description = props.row.description
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -101,6 +103,8 @@ const ProjectModal = defineComponent({
         onConfirm={this.confirmModal}
         onCancel={this.cancelModal}
         confirmDisabled={!this.model.projectName || !this.model.userName}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='projectFormRef'>
@@ -108,6 +112,7 @@ const ProjectModal = defineComponent({
             <NInput
               v-model={[this.model.projectName, 'value']}
               placeholder={t('project.list.project_tips')}
+              class='input-project-name'
             />
           </NFormItem>
           <NFormItem label={t('project.list.owned_users')} path='userName'>

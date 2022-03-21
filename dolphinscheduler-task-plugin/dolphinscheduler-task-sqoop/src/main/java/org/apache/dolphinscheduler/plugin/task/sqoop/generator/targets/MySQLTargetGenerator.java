@@ -18,6 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets;
 
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DOUBLE_QUOTES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_QUOTES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.COLUMNS;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DB_CONNECT;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DB_PWD;
@@ -27,17 +30,14 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.LINES
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TABLE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.UPDATE_KEY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.UPDATE_MODE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_QUOTES;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SINGLE_QUOTES;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -52,7 +52,7 @@ public class MySQLTargetGenerator implements ITargetGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MySQLTargetGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder mysqlTargetSb = new StringBuilder();
 
@@ -64,8 +64,8 @@ public class MySQLTargetGenerator implements ITargetGenerator {
 
                 // get datasource
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        DbType.of(taskExecutionContext.getSqoopTaskExecutionContext().getTargetType()),
-                        taskExecutionContext.getSqoopTaskExecutionContext().getTargetConnectionParams());
+                        sqoopTaskExecutionContext.getTargetType(),
+                        sqoopTaskExecutionContext.getTargetConnectionParams());
 
                 if (null != baseDataSource) {
 

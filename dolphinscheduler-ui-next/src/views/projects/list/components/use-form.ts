@@ -29,6 +29,14 @@ export function useForm(
   const { t } = useI18n()
   const userStore = useUserStore()
 
+  const resetForm = () => {
+    variables.model = {
+      projectName: '',
+      description: '',
+      userName: (userStore.getUserInfo as UserInfoRes).userName
+    }
+  }
+
   const variables = reactive({
     projectFormRef: ref(),
     model: {
@@ -75,6 +83,7 @@ export function useForm(
     try {
       await createProject(variables.model)
       variables.saving = false
+      resetForm()
       ctx.emit('confirmModal', props.showModalRef)
     } catch (err) {
       variables.saving = false
@@ -87,6 +96,7 @@ export function useForm(
     try {
       await updateProject(variables.model, props.row.code)
       variables.saving = false
+      resetForm()
       ctx.emit('confirmModal', props.showModalRef)
     } catch (err) {
       variables.saving = false

@@ -92,7 +92,8 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => [model.sourceType, model.srcQueryType],
     ([sourceType, srcQueryType]) => {
-      getTargetTypesBySourceType(sourceType, srcQueryType)
+      targetTypes.value = getTargetTypesBySourceType(sourceType, srcQueryType)
+      model.targetType = targetTypes.value[0].value
     }
   )
 

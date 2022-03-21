@@ -17,7 +17,6 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-
 import type { TaskType } from '@/views/projects/task/constants/task-type'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
@@ -26,6 +25,11 @@ import type {
   FormRules,
   IJsonItemParams
 } from '@/components/form/types'
+export type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
+export type {
+  IWorkflowTaskInstance,
+  WorkflowInstance
+} from '@/views/projects/workflow/components/dag/types'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
@@ -271,6 +275,7 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  processDefinitionCode?: number
 }
 
 interface INodeData

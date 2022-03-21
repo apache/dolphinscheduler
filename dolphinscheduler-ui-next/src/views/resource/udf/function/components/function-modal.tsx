@@ -128,12 +128,7 @@ export default defineComponent({
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='functionFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='functionFormRef'>
           <NFormItem label={t('resource.function.type')} path='type'>
             <NRadioGroup
               v-model={[this.functionForm.type, 'value']}
@@ -191,12 +186,7 @@ export default defineComponent({
             </NInputGroup>
           </NFormItem>
           {this.uploadShow && (
-            <NForm
-              rules={this.uploadRules}
-              ref='uploadFormRef'
-              label-placement='left'
-              label-width='160'
-            >
+            <NForm rules={this.uploadRules} ref='uploadFormRef'>
               <NFormItem
                 label={t('resource.function.udf_resources_directory')}
                 path='pid'

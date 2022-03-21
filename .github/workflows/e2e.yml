@@ -77,16 +77,16 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
           - name: WorkerGroup
             class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
-#          - name: Project
-#            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
+          - name: Project
+            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
           - name: Queue
             class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
           - name: Environment
             class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
           - name: Token
             class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
-#          - name: Workflow
-#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
+          - name: Workflow
+            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
 #          - name: WorkflowForSwitch
 #            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
           - name: FileManage
@@ -143,6 +143,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [ e2e ]
+    if: always()
     steps:
       - name: Status
-        run: echo "Passed!"
+        run: |
+          if [[ ${{ needs.e2e.result }} == 'success' ]]; then
+            echo "Passed!"
+          else
+            exit -1
+          fi

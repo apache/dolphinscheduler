@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -38,8 +38,11 @@ const list = defineComponent({
     const { t } = useI18n()
     const showDetailModal = ref(false)
     const selectId = ref()
+    const columns = ref()
+    const { data, changePage, changePageSize, deleteRecord, updateList } =
+      useTable()
 
-    const { columnsRef } = useColumns((id: number, type: 'edit' | 'delete') => {
+    const { getColumns } = useColumns((id: number, type: 'edit' | 'delete') => {
       if (type === 'edit') {
         showDetailModal.value = true
         selectId.value = id
@@ -48,9 +51,6 @@ const list = defineComponent({
       }
     })
 
-    const { data, changePage, changePageSize, deleteRecord, updateList } =
-      useTable()
-
     const onCreate = () => {
       selectId.value = null
       showDetailModal.value = true
@@ -58,13 +58,18 @@ const list = defineComponent({
 
     onMounted(() => {
       changePage(1)
+      columns.value = getColumns()
+    })
+
+    watch(useI18n().locale, () => {
+      columns.value = getColumns()
     })
 
     return {
       t,
       showDetailModal,
       id: selectId,
-      columnsRef,
+      columns,
       ...toRefs(data),
       changePage,
       changePageSize,
@@ -77,7 +82,7 @@ const list = defineComponent({
       t,
       id,
       showDetailModal,
-      columnsRef,
+      columns,
       list,
       page,
       pageSize,
@@ -126,7 +131,7 @@ const list = defineComponent({
         <Card title='' class={styles['mt-8']}>
           <NDataTable
             row-class-name='data-source-items'
-            columns={columnsRef}
+            columns={columns}
             data={list}
             loading={loading}
             striped

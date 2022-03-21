@@ -93,7 +93,7 @@ jobs:
       - name: Run Tests Build Docs
         run: |
           python -m tox -vv -e doc-build-test
-  verify-local-ci:
+  local-ci:
     name: Local CI
     timeout-minutes: 15
     needs:
@@ -112,3 +112,67 @@ jobs:
       - name: Run Tests Build Docs
         run: |
           python -m tox -vv -e local-ci
+  build-image:
+    name: Build Image
+    runs-on: ubuntu-latest
+    # Switch to project root directory to run mvnw command
+    defaults:
+      run:
+        working-directory: ./
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Build Image
+        run: |
+          ./mvnw -B clean install \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Pdocker,release -Ddocker.tag=ci \
+          -pl dolphinscheduler-standalone-server -am
+      - name: Export Docker Images
+        run: |
+          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
+          && du -sh /tmp/standalone-image.tar
+      - uses: actions/upload-artifact@v2
+        name: Upload Docker Images
+        with:
+          name: standalone-image
+          path: /tmp/standalone-image.tar
+          retention-days: 1
+  integrate-test:
+    name: Integrate Test
+    timeout-minutes: 20
+    needs:
+      - build-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        name: Download Docker Images
+        with:
+          name: standalone-image
+          path: /tmp
+      - name: Load Docker Images
+        run: |
+          docker load -i /tmp/standalone-image.tar
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Dependences
+        run: |
+          python -m pip install --upgrade ${{ env.DEPENDENCES }}
+      - name: Run Tests Build Docs
+        run: |
+          python -m tox -vv -e integrate-test

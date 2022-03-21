@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { watch, computed, unref } from 'vue'
+import { computed, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useSourceType, useTargetType } from '.'
 import type { IJsonItem, ModelType } from '../types'
@@ -23,11 +23,6 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const customSpan = computed(() => (model.isCustomTask ? 24 : 0))
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
-
-  watch(
-    () => model.srcQueryType,
-    () => {}
-  )
 
   return [
     {

@@ -22,6 +22,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { format } from 'date-fns'
 import {
+  batchCopyByCodes,
   importProcessDefinition,
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
@@ -35,6 +36,8 @@ import {
   previewSchedule
 } from '@/service/modules/schedules'
 import { parseTime } from '@/utils/common'
+import { EnvironmentItem } from '@/service/modules/environment/types'
+import { ITimingState } from './types'
 
 export function useModal(
   state: any,
@@ -44,18 +47,18 @@ export function useModal(
   const router: Router = useRouter()
   const route = useRoute()
 
-  const variables = reactive({
+  const variables = reactive<ITimingState>({
     projectCode: Number(route.params.projectCode),
     workerGroups: [],
     alertGroups: [],
     environmentList: [],
-    startParamsList: [] as Array<{ prop: string; value: string }>,
+    startParamsList: [],
     schedulePreviewList: []
   })
 
   const resetImportForm = () => {
-    state.importFormRef.name = ''
-    state.importFormRef.file = ''
+    state.importForm.name = ''
+    state.importForm.file = ''
   }
 
   const handleImportDefinition = async () => {
@@ -155,6 +158,27 @@ export function useModal(
     }
   }
 
+  const handleBatchCopyDefinition = async (codes: Array<string>) => {
+    await state.copyFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+    try {
+      const data = {
+        codes: _.join(codes, ','),
+        targetProjectCode: state.copyForm.projectCode
+      }
+      await batchCopyByCodes(data, variables.projectCode)
+      window.$message.success(t('project.workflow.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+      state.copyForm.projectCode = ''
+    } catch (err) {
+      state.saving = false
+    }
+  }
+
   const getTimingData = () => {
     const start = format(
       parseTime(state.timingForm.startEndTime[0]),
@@ -175,10 +199,9 @@ export function useModal(
       failureStrategy: state.timingForm.failureStrategy,
       warningType: state.timingForm.warningType,
       processInstancePriority: state.timingForm.processInstancePriority,
-      warningGroupId:
-        state.timingForm.warningGroupId === ''
-          ? 0
-          : state.timingForm.warningGroupId,
+      warningGroupId: state.timingForm.warningGroupId
+        ? state.timingForm.warningGroupId
+        : 0,
       workerGroup: state.timingForm.workerGroup,
       environmentCode: state.timingForm.environmentCode
     }
@@ -195,8 +218,8 @@ export function useModal(
   }
 
   const getEnvironmentList = () => {
-    queryAllEnvironmentList().then((res: any) => {
-      variables.environmentList = res.map((item: any) => ({
+    queryAllEnvironmentList().then((res: Array<EnvironmentItem>) => {
+      variables.environmentList = res.map((item) => ({
         label: item.name,
         value: item.code,
         workerGroups: item.workerGroups
@@ -253,6 +276,7 @@ export function useModal(
     handleStartDefinition,
     handleCreateTiming,
     handleUpdateTiming,
+    handleBatchCopyDefinition,
     getWorkerGroups,
     getAlertGroups,
     getEnvironmentList,

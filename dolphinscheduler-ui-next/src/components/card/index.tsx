@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
+import { CSSProperties, defineComponent, PropType } from 'vue'
 import { NCard } from 'naive-ui'
 
 const headerStyle = {
@@ -26,9 +26,20 @@ const contentStyle = {
   padding: '8px 10px'
 }
 
+const headerExtraStyle = {}
+
 const props = {
   title: {
     type: String as PropType<string>
+  },
+  headerStyle: {
+    type: String as PropType<string | CSSProperties>
+  },
+  headerExtraStyle: {
+    type: String as PropType<string | CSSProperties>
+  },
+  contentStyle: {
+    type: String as PropType<string | CSSProperties>
   }
 }
 
@@ -41,8 +52,11 @@ const Card = defineComponent({
       <NCard
         title={title}
         size='small'
-        headerStyle={headerStyle}
-        contentStyle={contentStyle}
+        headerStyle={this.headerStyle ? this.headerStyle : headerStyle}
+        headerExtraStyle={
+          this.headerExtraStyle ? this.headerExtraStyle : headerExtraStyle
+        }
+        contentStyle={this.contentStyle ? this.contentStyle : contentStyle}
       >
         {$slots}
       </NCard>

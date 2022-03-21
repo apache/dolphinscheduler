@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Date;
