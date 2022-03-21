@@ -207,6 +207,13 @@ export function formatParams(data: INodeData): {
       relation: data.relation,
       dependTaskList: data.dependTaskList
     }
+    taskParams.conditionResult = {}
+    if (data.successBranch) {
+      taskParams.conditionResult.successNode = [data.successBranch]
+    }
+    if (data.failedBranch) {
+      taskParams.conditionResult.failedNode = [data.failedBranch]
+    }
   }
 
   if (data.taskType === 'DATAX') {
@@ -462,6 +469,13 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.processDefinitionCode) {
     params.processDefinitionCode = data.taskParams.processDefinitionCode
+  }
+
+  if (data.taskParams?.conditionResult?.successNode?.length) {
+    params.successBranch = data.taskParams?.conditionResult.successNode[0]
+  }
+  if (data.taskParams?.conditionResult?.failedNode?.length) {
+    params.failedBranch = data.taskParams?.conditionResult.failedNode[0]
   }
 
   return params
