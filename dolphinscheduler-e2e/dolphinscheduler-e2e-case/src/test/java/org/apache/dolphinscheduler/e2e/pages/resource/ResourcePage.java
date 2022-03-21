@@ -47,6 +47,7 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/file-manage"));
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fileManageTab());
             return tab.cast(new FileManagePage(driver));
