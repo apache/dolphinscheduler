@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { h, ref, watch, onMounted, Ref } from 'vue'
+import { h, ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NSpace,
