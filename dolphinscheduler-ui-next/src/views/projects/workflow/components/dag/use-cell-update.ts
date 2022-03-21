@@ -99,11 +99,24 @@ export function useCellUpdate(options: Options) {
   const getSources = (id: string): number[] => {
     const edges = getNodeEdge(id)
     if (!edges.length) return []
-    const targets = [] as number[]
+    const sources = [] as number[]
     edges.forEach((edge) => {
       const sourceNode = edge.getSourceNode()
       if (sourceNode && sourceNode.id !== id) {
-        targets.push(Number(sourceNode.id))
+        sources.push(Number(sourceNode.id))
+      }
+    })
+    return sources
+  }
+
+  const getTargets = (id: string): number[] => {
+    const edges = getNodeEdge(id)
+    if (!edges.length) return []
+    const targets = [] as number[]
+    edges.forEach((edge) => {
+      const targetNode = edge.getTargetNode()
+      if (targetNode && targetNode.id !== id) {
+        targets.push(Number(targetNode.id))
       }
     })
     return targets
@@ -114,6 +127,7 @@ export function useCellUpdate(options: Options) {
     setNodeEdge,
     addNode,
     removeNode,
-    getSources
+    getSources,
+    getTargets
   }
 }

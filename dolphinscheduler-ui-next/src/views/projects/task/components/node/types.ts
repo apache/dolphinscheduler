@@ -276,6 +276,10 @@ interface ITaskParams {
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
   processDefinitionCode?: number
+  conditionResult?: {
+    successNode?: number[]
+    failedNode?: number[]
+  }
 }
 
 interface INodeData
@@ -287,6 +291,7 @@ interface INodeData
       | 'sourceParams'
       | 'dependence'
       | 'sparkParameters'
+      | 'conditionResult'
     >,
     ISqoopTargetData,
     ISqoopSourceData,
@@ -321,6 +326,8 @@ interface INodeData
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
   definition?: object
+  successBranch?: number
+  failedBranch?: number
 }
 
 interface ITaskData
