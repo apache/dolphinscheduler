@@ -27,9 +27,9 @@ if [[ "$DOCKER" == "true" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
 fi
 
-CP=""
-for d in $DOLPHINSCHEDULER_HOME/libs/*; do
-  for f in $d/*.jar; do
+CP=$DOLPHINSCHEDULER_HOME/libs/standalone-server/*
+for d in alert-server api-server master-server python-gateway-server worker-server; do
+  for f in $DOLPHINSCHEDULER_HOME/../$d/libs/*.jar; do
     CP=$CP:$f
   done
 done

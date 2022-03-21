@@ -32,7 +32,9 @@ import {
   NButtonGroup,
   NButton,
   NPagination,
-  NInput
+  NInput,
+  NBreadcrumb,
+  NBreadcrumbItem
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
@@ -42,11 +44,14 @@ import { useFileState } from './use-file'
 import ResourceFolderModal from './folder'
 import ResourceUploadModal from './upload'
 import ResourceRenameModal from './rename'
-import { IRenameFile } from './types'
+import { BreadcrumbItem, IRenameFile } from './types'
 import type { Router } from 'vue-router'
 import styles from './index.module.scss'
 import { useFileStore } from '@/store/file/file'
-import { queryCurrentResourceById } from '@/service/modules/resources'
+import {
+  queryCurrentResourceById,
+  queryResourceById
+} from '@/service/modules/resources'
 import { ResourceFile } from '@/service/modules/resources/types'
 
 export default defineComponent({
@@ -151,6 +156,21 @@ export default defineComponent({
       resourceListRef.value = getResourceListState(fileId.value)
     })
 
+    const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
+      {
+        id: 1,
+        fullName: 'l1'
+      },
+      {
+        id: 2,
+        fullName: 'l2'
+      },
+      {
+        id: 4,
+        fullName: 'l3'
+      }
+    ])
+
     watch(
       () => router.currentRoute.value.params.id,
       // @ts-ignore
@@ -170,6 +190,42 @@ export default defineComponent({
       }
     )
 
+    const initBreadcrumb = async (dirs: string[]) => {
+      let index = 0
+      for (let dir of dirs) {
+        const newDir = dirs.slice(0, index + 1).join('/')
+        if (newDir) {
+          const id = 0
+          let resource = await queryResourceById(
+            {
+              id,
+              type: 'FILE',
+              fullName: newDir
+            },
+            id
+          )
+          breadcrumbItemsRef.value?.push({ id: resource.id, fullName: dir })
+        } else {
+          breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root' })
+        }
+        index = index + 1
+      }
+    }
+
+    onMounted(() => {
+      breadcrumbItemsRef.value = []
+      if (fileId.value != -1) {
+        queryCurrentResourceById(fileId.value).then((res: ResourceFile) => {
+          if (res.fullName) {
+            const dirs = res.fullName.split('/')
+            if (dirs && dirs.length > 1) {
+              initBreadcrumb(dirs)
+            }
+          }
+        })
+      }
+    })
+
     return {
       fileId,
       serachRef,
@@ -187,7 +243,8 @@ export default defineComponent({
       handleUpdatePage,
       handleUpdatePageSize,
       pagination: paginationReactive,
-      renameInfo
+      renameInfo,
+      breadcrumbItemsRef
     }
   },
   render() {
@@ -199,6 +256,7 @@ export default defineComponent({
       handleCreateFile,
       handleUploadFile
     } = this
+
     return (
       <div>
         <Card style={{ marginBottom: '8px' }}>
@@ -238,44 +296,64 @@ export default defineComponent({
             </div>
           </div>
         </Card>
-        <Card title={t('resource.file.file_manage')}>
-          <NDataTable
-            remote
-            columns={columnsRef}
-            data={this.resourceListRef?.value.table}
-            striped
-            size={'small'}
-            class={styles['table-box']}
-            row-class-name='items'
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.pagination.page}
-              v-model:pageSize={this.pagination.pageSize}
-              pageSizes={this.pagination.pageSizes}
-              item-count={this.pagination.itemCount}
-              onUpdatePage={this.handleUpdatePage}
-              onUpdatePageSize={this.handleUpdatePageSize}
-              show-quick-jumper
-              show-size-picker
-            />
-          </div>
-          <ResourceFolderModal
-            v-model:show={this.folderShowRef}
-            onUpdateList={this.updateList}
-          />
-          <ResourceUploadModal
-            v-model:show={this.uploadShowRef}
-            onUpdateList={this.updateList}
-          />
-          <ResourceRenameModal
-            v-model:show={this.renameShowRef}
-            id={this.renameInfo.id}
-            name={this.renameInfo.name}
-            description={this.renameInfo.description}
-            onUpdateList={this.updateList}
-          />
+        <Card
+          title={t('resource.file.file_manage')}
+          class={styles['table-card']}
+        >
+          {{
+            'header-extra': () => (
+              <NBreadcrumb separator='>' class={styles['breadcrumb']}>
+                {this.breadcrumbItemsRef?.map((item: BreadcrumbItem) => {
+                  return (
+                    <NBreadcrumbItem href={item.id.toString()}>
+                      {item.fullName}
+                    </NBreadcrumbItem>
+                  )
+                })}
+              </NBreadcrumb>
+            ),
+            default: () => (
+              <div>
+                <NDataTable
+                  remote
+                  columns={columnsRef}
+                  data={this.resourceListRef?.value.table}
+                  striped
+                  size={'small'}
+                  class={styles['table-box']}
+                  row-class-name='items'
+                />
+                <div class={styles.pagination}>
+                  <NPagination
+                    v-model:page={this.pagination.page}
+                    v-model:pageSize={this.pagination.pageSize}
+                    pageSizes={this.pagination.pageSizes}
+                    item-count={this.pagination.itemCount}
+                    onUpdatePage={this.handleUpdatePage}
+                    onUpdatePageSize={this.handleUpdatePageSize}
+                    show-quick-jumper
+                    show-size-picker
+                  />
+                </div>
+              </div>
+            )
+          }}
         </Card>
+        <ResourceFolderModal
+          v-model:show={this.folderShowRef}
+          onUpdateList={this.updateList}
+        />
+        <ResourceUploadModal
+          v-model:show={this.uploadShowRef}
+          onUpdateList={this.updateList}
+        />
+        <ResourceRenameModal
+          v-model:show={this.renameShowRef}
+          id={this.renameInfo.id}
+          name={this.renameInfo.name}
+          description={this.renameInfo.description}
+          onUpdateList={this.updateList}
+        />
       </div>
     )
   }

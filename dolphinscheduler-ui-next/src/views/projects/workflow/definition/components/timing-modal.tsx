@@ -260,7 +260,7 @@ export default defineComponent({
         onConfirm={this.handleTiming}
         confirmLoading={this.saving}
       >
-        <NForm ref='timingFormRef' label-placement='left' label-width='160'>
+        <NForm ref='timingFormRef'>
           <NFormItem
             label={t('project.workflow.start_and_stop_time')}
             path='startEndTime'
