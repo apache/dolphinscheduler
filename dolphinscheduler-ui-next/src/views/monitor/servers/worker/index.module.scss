@@ -23,29 +23,6 @@
   min-height: 400px;
 }
 
-.header-card {
-  margin-bottom: 8px;
-
-  .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .left {
-      margin-right: 20px;
-    }
-  }
-
-  .link-btn {
-    color: #579cd8;
-    cursor: pointer;
-
-    &:hover {
-      color: #80bef7;
-    }
-  }
-}
-
 .card {
   @include base;
 }
@@ -53,4 +30,13 @@
 .load-average {
   @include base;
   color: dodgerblue;
+}
+
+.link-btn {
+  color: #579cd8;
+  cursor: pointer;
+
+  &:hover {
+    color: #80bef7;
+  }
 }

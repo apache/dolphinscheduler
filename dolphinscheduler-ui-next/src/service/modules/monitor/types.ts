@@ -25,7 +25,7 @@ interface DatabaseRes {
   date: string
 }
 
-interface MasterRes {
+interface MasterNode {
   id: number
   host: string
   port: number
@@ -35,14 +35,14 @@ interface MasterRes {
   lastHeartbeatTime: string
 }
 
-interface WorkerRes {
+interface WorkerNode {
   id: number
   host: string
   port: number
-  zkDirectories: string[]
+  zkDirectories: Array<string>
   resInfo: string
   createTime: string
   lastHeartbeatTime: string
 }
 
-export { DatabaseRes, MasterRes, WorkerRes }
+export { DatabaseRes, MasterNode, WorkerNode }

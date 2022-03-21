@@ -15,14 +15,26 @@
  * limitations under the License.
  */
 
+import { reactive } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { listWorker } from '@/service/modules/monitor'
+import type { WorkerNode } from '@/service/modules/monitor/types'
 
 export function useWorker() {
-  const getWorker = () => {
-    const { state } = useAsyncState(listWorker(), [])
+  const variables = reactive({
+    data: []
+  })
+
+  const getTableWorker = () => {
+    const { state } = useAsyncState(
+      listWorker().then((res: Array<WorkerNode>) => {
+        variables.data = res as any
+      }),
+      []
+    )
+
     return state
   }
 
-  return { getWorker }
+  return { variables, getTableWorker }
 }
