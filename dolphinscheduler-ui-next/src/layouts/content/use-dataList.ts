@@ -48,14 +48,14 @@ import {
   BarsOutlined,
   CloudServerOutlined
 } from '@vicons/antd'
-import { useMenuStore } from '@/store/menu/menu'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
 import { timezoneList } from '@/utils/timezone'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useDataList() {
   const { t } = useI18n()
-  const menuStore = useMenuStore()
+  const route = useRoute()
   const userStore = useUserStore()
 
   const renderIcon = (icon: any) => {
@@ -87,6 +87,7 @@ export function useDataList() {
   })
 
   const changeMenuOption = (state: any) => {
+    const projectCode = route.params.projectCode || ''
     state.menuOptions = [
       {
         label: t('menu.home'),
@@ -100,7 +101,7 @@ export function useDataList() {
         children: [
           {
             label: t('menu.project_overview'),
-            key: `/projects/${menuStore.getProjectCode}`,
+            key: `/projects/${projectCode}`,
             icon: renderIcon(FundProjectionScreenOutlined)
           },
           {
@@ -110,15 +111,15 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.workflow_relation'),
-                key: `/projects/${menuStore.getProjectCode}/workflow/relation`
+                key: `/projects/${projectCode}/workflow/relation`
               },
               {
                 label: t('menu.workflow_definition'),
-                key: `/projects/${menuStore.getProjectCode}/workflow-definition`
+                key: `/projects/${projectCode}/workflow-definition`
               },
               {
                 label: t('menu.workflow_instance'),
-                key: `/projects/${menuStore.getProjectCode}/workflow/instances`
+                key: `/projects/${projectCode}/workflow/instances`
               }
             ]
           },
@@ -129,11 +130,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_definition'),
-                key: `/projects/${menuStore.getProjectCode}/task/definitions`
+                key: `/projects/${projectCode}/task/definitions`
               },
               {
                 label: t('menu.task_instance'),
-                key: `/projects/${menuStore.getProjectCode}/task/instances`
+                key: `/projects/${projectCode}/task/instances`
               }
             ]
           }

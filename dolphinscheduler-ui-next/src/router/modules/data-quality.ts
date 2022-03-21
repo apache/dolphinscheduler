@@ -35,6 +35,7 @@ export default {
       component: components['data-quality-task-result'],
       meta: {
         title: '数据质量-task-result',
+        activeMenu: 'data-quality',
         showSide: true,
         auth: []
       }
@@ -45,6 +46,7 @@ export default {
       component: components['data-quality-rule'],
       meta: {
         title: '数据质量-rule',
+        activeMenu: 'data-quality',
         showSide: true,
         auth: []
       }

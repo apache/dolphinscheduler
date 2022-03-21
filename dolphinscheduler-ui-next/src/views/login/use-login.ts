@@ -22,13 +22,13 @@ import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
 import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
-import { useMenuStore } from '@/store/menu/menu'
+import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
-  const menuStore = useMenuStore()
+  const routeStore = useRouteStore()
   const timezoneStore = useTimezoneStore()
 
   const handleLogin = () => {
@@ -45,9 +45,9 @@ export function useLogin(state: any) {
           : Intl.DateTimeFormat().resolvedOptions().timeZone
         await timezoneStore.setTimezone(timezone)
 
-        const key = menuStore.getMenuKey
+        const path = routeStore.lastRoute
 
-        router.push({ path: key || 'home' })
+        router.push({ path: path || 'home' })
       }
     })
   }

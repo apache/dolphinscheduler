@@ -45,6 +45,7 @@ const basePage: RouteRecordRaw[] = [
         component: components['home'],
         meta: {
           title: '首页',
+          activeMenu: 'home',
           auth: []
         }
       },

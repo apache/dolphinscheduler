@@ -192,7 +192,7 @@ export default defineComponent({
 
     const initBreadcrumb = async (dirs: string[]) => {
       let index = 0
-      for (let dir of dirs) {
+      for (const dir of dirs) {
         const newDir = dirs.slice(0, index + 1).join('/')
         if (newDir) {
           const id = 0
