@@ -52,7 +52,10 @@ export function useTaskGroup(
   watch(
     () => model.taskGroupId,
     (taskGroupId) => {
-      if (!taskGroupId) model.taskGroupPriority = 0
+      if (!taskGroupId) {
+        model.taskGroupId = null
+        model.taskGroupPriority = null
+      }
     }
   )
 
@@ -75,8 +78,7 @@ export function useTaskGroup(
         max: Math.pow(10, 60) - 1,
         disabled: priorityDisabled
       },
-      span: 12,
-      value: 0
+      span: 12
     }
   ]
 }
