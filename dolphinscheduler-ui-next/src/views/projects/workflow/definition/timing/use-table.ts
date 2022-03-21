@@ -31,11 +31,16 @@ import {
   DeleteOutlined,
   EditOutlined
 } from '@vicons/antd'
-import type { Router } from 'vue-router'
+import {
+  COLUMN_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-config'
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import styles from '../index.module.scss'
+import type { Router } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
@@ -45,6 +50,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
@@ -70,13 +76,13 @@ export function useTable() {
       {
         title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_CONFIG['index'],
         render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'processDefinitionName',
-        width: 200,
+        ...COLUMN_CONFIG['name'],
         render: (row: any) =>
           h(
             NEllipsis,
@@ -89,24 +95,29 @@ export function useTable() {
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
+        ...COLUMN_CONFIG['time'],
         render: (row: any) => renderTime(row.startTime)
       },
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
+        ...COLUMN_CONFIG['time'],
         render: (row: any) => renderTime(row.endTime)
       },
       {
         title: t('project.workflow.crontab'),
-        key: 'crontab'
+        key: 'crontab',
+        width: 140
       },
       {
         title: t('project.workflow.failure_strategy'),
-        key: 'failureStrategy'
+        key: 'failureStrategy',
+        width: 140
       },
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
+        ...COLUMN_CONFIG['state'],
         render: (row: any) =>
           row.releaseState === 'ONLINE'
             ? t('project.workflow.up_line')
@@ -114,16 +125,18 @@ export function useTable() {
       },
       {
         title: t('project.workflow.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        fixed: 'right',
+        ...COLUMN_CONFIG['operation'](3),
         className: styles.operation,
         render: (row: any) => {
           return h(NSpace, null, {
@@ -218,6 +231,9 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const handleEdit = (row: any) => {

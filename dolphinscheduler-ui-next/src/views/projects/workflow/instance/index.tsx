@@ -105,7 +105,7 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles.table}
-            scrollX={1800}
+            scrollX={this.tableWidth}
             v-model:checked-row-keys={this.checkedRowKeys}
             row-class-name='items-workflow-instances'
           />

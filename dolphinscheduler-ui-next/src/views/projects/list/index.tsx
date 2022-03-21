@@ -126,6 +126,7 @@ const list = defineComponent({
           <NDataTable
             columns={this.columns}
             data={this.tableData}
+            scrollX={this.tableWidth}
             row-class-name='items'
           />
           <div class={styles.pagination}>

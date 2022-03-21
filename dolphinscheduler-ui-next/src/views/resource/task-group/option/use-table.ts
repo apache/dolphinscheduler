@@ -18,12 +18,17 @@
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import { parseTime } from '@/utils/common'
+import {
+  COLUMN_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-config'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 export function useTable(
   updateItem = (
@@ -39,24 +44,51 @@ export function useTable(
   const { t } = useI18n()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index', render: (row, index) => index + 1 },
-    { title: t('resource.task_group_option.name'), key: 'name' },
-    { title: t('resource.task_group_option.project_name'), key: 'projectName' },
+    {
+      title: '#',
+      key: 'index',
+      render: (row, index) => index + 1,
+      ...COLUMN_CONFIG['index']
+    },
+    {
+      title: t('resource.task_group_option.name'),
+      key: 'name',
+      ...COLUMN_CONFIG['name']
+    },
+    {
+      title: t('resource.task_group_option.project_name'),
+      key: 'projectName',
+      ...COLUMN_CONFIG['name']
+    },
     {
       title: t('resource.task_group_option.resource_pool_size'),
-      key: 'groupSize'
+      key: 'groupSize',
+      width: 160
     },
     {
       title: t('resource.task_group_option.resource_used_pool_size'),
-      key: 'useSize'
+      key: 'useSize',
+      width: 140
     },
-    { title: t('resource.task_group_option.desc'), key: 'description' },
-    { title: t('resource.task_group_option.create_time'), key: 'createTime' },
-    { title: t('resource.task_group_option.update_time'), key: 'updateTime' },
+    {
+      title: t('resource.task_group_option.desc'),
+      key: 'description',
+      ...COLUMN_CONFIG['note']
+    },
+    {
+      title: t('resource.task_group_option.create_time'),
+      key: 'createTime',
+      ...COLUMN_CONFIG['time']
+    },
+    {
+      title: t('resource.task_group_option.update_time'),
+      key: 'updateTime',
+      ...COLUMN_CONFIG['time']
+    },
     {
       title: t('resource.task_group_option.actions'),
       key: 'actions',
-      width: 150,
+      ...COLUMN_CONFIG['operation'](3),
       render: (row: any) =>
         h(TableAction, {
           row,
@@ -82,6 +114,7 @@ export function useTable(
 
   const variables = reactive({
     tableData: [],
+    tableWidth: calculateTableWidth(columns) || DefaultTableWidth,
     page: ref(1),
     pageSize: ref(10),
     name: ref(null),

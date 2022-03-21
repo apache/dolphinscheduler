@@ -249,7 +249,10 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-    const { columnsRef } = useTable(this.handleRenameFile, this.updateList)
+    const { columnsRef, tableWidth } = useTable(
+      this.handleRenameFile,
+      this.updateList
+    )
     const {
       handleConditions,
       handleCreateFolder,
@@ -322,6 +325,7 @@ export default defineComponent({
                   size={'small'}
                   class={styles['table-box']}
                   row-class-name='items'
+                  scrollX={tableWidth}
                 />
                 <div class={styles.pagination}>
                   <NPagination

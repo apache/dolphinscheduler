@@ -180,6 +180,7 @@ const taskGroupOption = defineComponent({
               size={'small'}
               data={this.tableData}
               striped
+              scrollX={this.tableWidth}
             />
             <div class={styles.pagination}>
               <NPagination
