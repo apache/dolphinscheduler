@@ -41,10 +41,16 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-  const { addNode, removeNode, getSources, setNodeName, setNodeEdge } =
-    useCellUpdate({
-      graph
-    })
+  const {
+    addNode,
+    removeNode,
+    getSources,
+    getTargets,
+    setNodeName,
+    setNodeEdge
+  } = useCellUpdate({
+    graph
+  })
   const processDefinition = ref(
     definition?.value || {
       processDefinition: {},
@@ -107,6 +113,13 @@ export function useTaskEdit(options: Options) {
       processDefinition.value.taskDefinitionList.filter(
         (task) => !codes.includes(task.code)
       )
+    codes.forEach((code: number) => {
+      remove(
+        processDefinition.value.processTaskRelationList,
+        (process) =>
+          process.postTaskCode === code || process.preTaskCode === code
+      )
+    })
   }
 
   function openTaskModal(task: NodeData) {
@@ -126,6 +139,7 @@ export function useTaskEdit(options: Options) {
       currTask.value = definition
     }
     updatePreTasks(getSources(String(code)), code)
+    updatePostTasks(code)
     taskModalVisible.value = true
   }
 
@@ -188,6 +202,28 @@ export function useTaskEdit(options: Options) {
         conditionType: 'NONE',
         conditionParams: {}
       })
+    })
+  }
+
+  function updatePostTasks(code: number) {
+    const targets = getTargets(String(code))
+    targets.forEach((target: number) => {
+      if (
+        !processDefinition.value?.processTaskRelationList.find(
+          (relation) =>
+            relation.postTaskCode === target && relation.preTaskCode === code
+        )
+      ) {
+        processDefinition.value?.processTaskRelationList.push({
+          postTaskCode: target,
+          preTaskCode: code,
+          name: '',
+          preTaskVersion: 1,
+          postTaskVersion: 1,
+          conditionType: 'NONE',
+          conditionParams: {}
+        })
+      }
     })
   }
 

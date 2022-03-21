@@ -79,6 +79,16 @@ export const useTaskNodeStore = defineStore({
           }
           if (relation.postTaskCode === code && relation.preTaskCode !== 0) {
             preTasks.push(relation.preTaskCode)
+            if (
+              !this.preTaskOptions.find(
+                (item) => item.value === relation.preTaskCode
+              )
+            ) {
+              this.preTaskOptions.push({
+                value: relation.preTaskCode,
+                label: tasks[relation.preTaskCode]
+              })
+            }
           }
         }
       )
