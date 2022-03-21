@@ -305,7 +305,7 @@ export function formatParams(data: INodeData): {
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
       name: data.name,
-      taskGroupId: data.taskGroupId || 0,
+      taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
       taskParams: {
         localParams: data.localParams,
