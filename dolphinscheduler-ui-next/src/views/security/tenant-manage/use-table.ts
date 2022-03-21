@@ -24,6 +24,11 @@ import { reactive, h, ref } from 'vue'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
+import {
+  COLUMN_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-config'
 
 export function useTable() {
   const { t } = useI18n()
@@ -52,35 +57,39 @@ export function useTable() {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_CONFIG['index']
       },
       {
         title: t('security.tenant.tenant_code'),
         key: 'tenantCode',
-        className: 'tenant-code'
+        className: 'tenant-code',
+        ...COLUMN_CONFIG['userName']
       },
       {
         title: t('security.tenant.description'),
         key: 'description',
-        ellipsis: {
-          tooltip: true
-        }
+        ...COLUMN_CONFIG['note']
       },
       {
         title: t('security.tenant.queue_name'),
-        key: 'queueName'
+        key: 'queueName',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('security.tenant.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('security.tenant.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('security.tenant.actions'),
         key: 'actions',
+        ...COLUMN_CONFIG['operation'](2),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -148,10 +157,14 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [],
     page: ref(1),
     pageSize: ref(10),

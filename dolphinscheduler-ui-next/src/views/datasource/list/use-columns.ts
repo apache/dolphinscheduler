@@ -28,33 +28,43 @@ import {
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
 import ButtonLink from '@/components/button-link'
+import {
+  COLUMN_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-config'
 import type { TableColumns } from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
 
-  const getColumns = (): TableColumns => {
-    return [
+  const getColumns = (): { columns: TableColumns; tableWidth: number } => {
+    const columns = [
       {
         title: '#',
         key: 'index',
-        render: (rowData, rowIndex) => rowIndex + 1
+        render: (unused, rowIndex) => rowIndex + 1,
+        ...COLUMN_CONFIG['index']
       },
       {
         title: t('datasource.datasource_name'),
-        key: 'name'
+        key: 'name',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('datasource.datasource_user_name'),
-        key: 'userName'
+        key: 'userName',
+        ...COLUMN_CONFIG['userName']
       },
       {
         title: t('datasource.datasource_type'),
-        key: 'type'
+        key: 'type',
+        width: 180
       },
       {
         title: t('datasource.datasource_parameter'),
         key: 'parameter',
+        width: 180,
         render: (rowData) => {
           return h(
             NPopover,
@@ -71,20 +81,23 @@ export function useColumns(onCallback: Function) {
       },
       {
         title: t('datasource.description'),
-        key: 'note'
+        key: 'note',
+        ...COLUMN_CONFIG['note']
       },
       {
         title: t('datasource.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('datasource.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('datasource.operation'),
         key: 'operation',
-        width: 150,
+        ...COLUMN_CONFIG['operation'](2),
         render: (rowData) => {
           return h(NSpace, null, {
             default: () => [
@@ -139,7 +152,12 @@ export function useColumns(onCallback: Function) {
           })
         }
       }
-    ]
+    ] as TableColumns
+
+    return {
+      columns,
+      tableWidth: calculateTableWidth(columns) || DefaultTableWidth
+    }
   }
 
   return {

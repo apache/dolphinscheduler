@@ -27,24 +27,34 @@ import {
   NPopconfirm
 } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
-import { TableColumns, InternalRowData } from './types'
+import {
+  COLUMN_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-config'
+import type { TableColumns, InternalRowData } from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
 
-  const columnsRef = ref([]) as Ref<TableColumns>
+  const columnsRef = ref({
+    columns: [] as TableColumns,
+    tableWidth: DefaultTableWidth
+  })
 
   const createColumns = () => {
-    columnsRef.value = [
+    const columns = [
       {
         title: '#',
         key: 'index',
-        render: (rowData: InternalRowData, rowIndex: number) => rowIndex + 1
+        render: (rowData: InternalRowData, rowIndex: number) => rowIndex + 1,
+        ...COLUMN_CONFIG['index']
       },
       {
         title: t('security.user.username'),
         key: 'userName',
-        className: 'name'
+        className: 'name',
+        ...COLUMN_CONFIG['userName']
       },
       {
         title: t('security.user.user_type'),
@@ -52,27 +62,33 @@ export function useColumns(onCallback: Function) {
         render: (rowData: InternalRowData) =>
           rowData.userType === 'GENERAL_USER'
             ? t('security.user.ordinary_user')
-            : t('security.user.administrator')
+            : t('security.user.administrator'),
+        ...COLUMN_CONFIG['type']
       },
       {
         title: t('security.user.tenant_code'),
-        key: 'tenantCode'
+        key: 'tenantCode',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('security.user.queue'),
-        key: 'queue'
+        key: 'queue',
+        width: 120
       },
       {
         title: t('security.user.email'),
-        key: 'email'
+        key: 'email',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('security.user.phone'),
-        key: 'phone'
+        key: 'phone',
+        width: 140
       },
       {
         title: t('security.user.state'),
         key: 'state',
+        ...COLUMN_CONFIG['state'],
         render: (rowData: any, unused: number) =>
           h(
             NTag,
@@ -89,15 +105,18 @@ export function useColumns(onCallback: Function) {
       },
       {
         title: t('security.user.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('security.user.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_CONFIG['time']
       },
       {
         title: t('security.user.operation'),
         key: 'operation',
+        ...COLUMN_CONFIG['operation'](3),
         render: (rowData: any, unused: number) => {
           return h(NSpace, null, {
             default: () => [
@@ -204,6 +223,10 @@ export function useColumns(onCallback: Function) {
         }
       }
     ]
+    columnsRef.value = {
+      columns,
+      tableWidth: calculateTableWidth(columns)
+    }
   }
 
   onMounted(() => {

@@ -33,6 +33,11 @@ import {
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
 import { parseTime, tasksState } from '@/utils/common'
+import {
+  COLUMN_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {
@@ -44,6 +49,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
@@ -64,15 +70,18 @@ export function useTable() {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_CONFIG['index']
       },
       {
         title: t('project.task.task_name'),
-        key: 'name'
+        key: 'name',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
+        ...COLUMN_CONFIG['name'],
         render: (row: {
           processInstanceId: number
           processInstanceName: string
@@ -92,52 +101,61 @@ export function useTable() {
       },
       {
         title: t('project.task.executor'),
-        key: 'executorName'
+        key: 'executorName',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('project.task.node_type'),
-        key: 'taskType'
+        key: 'taskType',
+        ...COLUMN_CONFIG['type']
       },
       {
         title: t('project.task.state'),
         key: 'state',
+        ...COLUMN_CONFIG['state'],
         render: (row: IRecord) => renderStateCell(row.state, t)
       },
       {
         title: t('project.task.submit_time'),
+        ...COLUMN_CONFIG['time'],
         key: 'submitTime'
       },
       {
         title: t('project.task.start_time'),
+        ...COLUMN_CONFIG['time'],
         key: 'startTime'
       },
       {
         title: t('project.task.end_time'),
+        ...COLUMN_CONFIG['time'],
         key: 'endTime'
       },
       {
         title: t('project.task.duration'),
         key: 'duration',
+        ...COLUMN_CONFIG['duration'],
         render: (row: any) => h('span', null, row.duration ? row.duration : '-')
       },
       {
         title: t('project.task.retry_count'),
-        key: 'retryTimes'
+        key: 'retryTimes',
+        ...COLUMN_CONFIG['times']
       },
       {
         title: t('project.task.dry_run_flag'),
         key: 'dryRun',
+        ...COLUMN_CONFIG['dryRun'],
         render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.host'),
-        key: 'host'
+        key: 'host',
+        ...COLUMN_CONFIG['name']
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
-        width: 150,
-        fixed: 'right',
+        ...COLUMN_CONFIG['operation'](3),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -220,6 +238,9 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const handleLog = (row: any) => {
