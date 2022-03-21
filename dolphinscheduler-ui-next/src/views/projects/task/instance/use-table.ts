@@ -126,7 +126,8 @@ export function useTable() {
       },
       {
         title: t('project.task.dry_run_flag'),
-        key: 'dryRun'
+        key: 'dryRun',
+        render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.host'),
