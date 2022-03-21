@@ -53,6 +53,8 @@ public final class SubWorkflowTaskForm extends TaskNodeForm {
     }
 
     public SubWorkflowTaskForm childNode(String node) {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
+        
         btnSelectChildNodeDropdown().click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.className(
