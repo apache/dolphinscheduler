@@ -22,8 +22,6 @@ import {
   RouteLocationNormalized
 } from 'vue-router'
 import routes from './routes'
-
-import { useMenuStore } from '@/store/menu/menu'
 import { useUserStore } from '@/store/user/user'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
@@ -40,6 +38,7 @@ const router = createRouter({
 
 interface metaData {
   title?: string
+  activeMenu?: string
   showSide?: boolean
   auth?: Array<string>
 }
@@ -54,14 +53,12 @@ router.beforeEach(
     next: NavigationGuardNext
   ) => {
     NProgress.start()
-    const menuStore = useMenuStore()
     const userStore = useUserStore()
     const metaData: metaData = to.meta
-    menuStore.setShowSideStatus(metaData.showSide || false)
     if (
       metaData.auth?.includes('ADMIN_USER') &&
       (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' &&
-      menuStore.getMenuKey === 'security'
+      metaData.activeMenu === 'security'
     ) {
       to.fullPath = '/security/token-manage'
       next({ name: 'token-manage' })
