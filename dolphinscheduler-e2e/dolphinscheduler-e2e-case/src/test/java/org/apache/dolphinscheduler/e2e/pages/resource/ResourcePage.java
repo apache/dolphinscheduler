@@ -48,19 +48,19 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
-            fileManageTab.click();
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fileManageTab());
             return tab.cast(new FileManagePage(driver));
         }
 
         if (tab == UdfManagePage.class) {
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(udfManageTab));
-            udfManageTab.click();
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", udfManageTab());
             return tab.cast(new UdfManagePage(driver));
         }
 
         if (tab == FunctionManagePage.class) {
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(functionManageTab));
-            functionManageTab.click();
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", functionManageTab());
             return tab.cast(new FunctionManagePage(driver));
         }
 
