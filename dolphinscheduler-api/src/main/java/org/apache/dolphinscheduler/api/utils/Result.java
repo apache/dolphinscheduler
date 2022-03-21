@@ -50,16 +50,17 @@ public class Result<T> {
         this.msg = msg;
     }
 
-    private Result(T data) {
-        this.code = 0;
-        this.data = data;
-    }
-
     private Result(Status status) {
         if (status != null) {
             this.code = status.getCode();
             this.msg = status.getMsg();
         }
+    }
+    
+    public Result(Integer code, String msg, T data) {
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
     }
 
     /**
@@ -70,7 +71,11 @@ public class Result<T> {
      * @return resule
      */
     public static <T> Result<T> success(T data) {
-        return new Result<>(data);
+        return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
+    }
+    
+    public static Result success() {
+        return success(null);
     }
 
     public boolean isSuccess() {

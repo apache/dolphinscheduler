@@ -49,7 +49,7 @@ import org.springframework.stereotype.Service;
  *  netty executor manager
  */
 @Service
-public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
+public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
@@ -76,13 +76,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     /**
      * constructor
      */
-    public NettyExecutorManager(){
+    public NettyExecutorManager() {
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     @PostConstruct
-    public void init(){
+    public void init() {
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
@@ -182,13 +182,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @param context context
      * @return nodes
      */
-    private Set<String> getAllNodes(ExecutionContext context){
+    private Set<String> getAllNodes(ExecutionContext context) {
         Set<String> nodes = Collections.emptySet();
         /**
          * executor type
          */
         ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
+        switch (executorType) {
             case WORKER:
                 nodes = serverNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;

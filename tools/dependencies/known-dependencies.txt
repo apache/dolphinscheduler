@@ -270,6 +270,6 @@ jmespath-java-1.12.160.jar
 jackson-dataformat-cbor-2.12.5.jar
 ion-java-1.0.2.jar
 aws-java-sdk-s3-1.12.160.jar
-aws-java-sdk-core-1.12.160.jar
 aws-java-sdk-kms-1.12.160.jar
 aws-java-sdk-emr-1.12.160.jar
+aws-java-sdk-core-1.12.160.jar

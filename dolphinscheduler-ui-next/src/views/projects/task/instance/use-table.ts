@@ -23,26 +23,28 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
   DownloadOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
-import { useRoute } from 'vue-router'
-import { parseTime } from '@/utils/common'
-import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
+import { useRoute, useRouter } from 'vue-router'
+import { parseTime, tasksState } from '@/utils/common'
+import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {
   const { t } = useI18n()
   const route = useRoute()
+  const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
   const processInstanceId = Number(route.params.processInstanceId)
 
   const variables = reactive({
     columns: [],
-    tableData: [],
+    tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
@@ -71,7 +73,22 @@ export function useTable() {
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        width: 250
+        render: (row: {
+          processInstanceId: number
+          processInstanceName: string
+        }) =>
+          h(
+            ButtonLink,
+            {
+              onClick: () =>
+                void router.push({
+                  name: 'workflow-instance-detail',
+                  params: { id: row.processInstanceId },
+                  query: { code: projectCode }
+                })
+            },
+            { default: () => row.processInstanceName }
+          )
       },
       {
         title: t('project.task.executor'),
@@ -83,22 +100,20 @@ export function useTable() {
       },
       {
         title: t('project.task.state'),
-        key: 'state'
+        key: 'state',
+        render: (row: IRecord) => renderStateCell(row.state, t)
       },
       {
         title: t('project.task.submit_time'),
-        key: 'submitTime',
-        width: 170
+        key: 'submitTime'
       },
       {
         title: t('project.task.start_time'),
-        key: 'startTime',
-        width: 170
+        key: 'startTime'
       },
       {
         title: t('project.task.end_time'),
-        key: 'endTime',
-        width: 170
+        key: 'endTime'
       },
       {
         title: t('project.task.duration'),
@@ -111,17 +126,18 @@ export function useTable() {
       },
       {
         title: t('project.task.dry_run_flag'),
-        key: 'dryRun'
+        key: 'dryRun',
+        render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.host'),
-        key: 'host',
-        width: 160
+        key: 'host'
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
         width: 150,
+        fixed: 'right',
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -268,6 +284,7 @@ export function useTable() {
               ...item
             }
           }) as any
+          variables.totalPage = res.totalPage
         }
       ),
       {}
@@ -282,4 +299,28 @@ export function useTable() {
     getTableData,
     createColumns
   }
+}
+
+export function renderStateCell(state: ITaskState, t: Function) {
+  const stateOption = tasksState(t)[state]
+
+  const Icon = h(
+    NIcon,
+    {
+      color: stateOption.color,
+      size: 18,
+      class: stateOption.classNames,
+      style: {
+        display: 'flex'
+      }
+    },
+    () => h(stateOption.icon)
+  )
+  return h(NTooltip, null, {
+    trigger: () => {
+      if (!stateOption.isSpin) return Icon
+      return h(NSpin, { size: 'small' }, { icon: () => Icon })
+    },
+    default: () => stateOption.desc
+  })
 }

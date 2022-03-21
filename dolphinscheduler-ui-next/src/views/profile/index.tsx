@@ -78,6 +78,7 @@ const profile = defineComponent({
             !this.profileForm.email ||
             !utils.regex.email.test(this.profileForm.email)
           }
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

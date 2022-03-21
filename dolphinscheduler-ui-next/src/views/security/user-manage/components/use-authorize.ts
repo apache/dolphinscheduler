@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import { reactive } from 'vue'
-import { useI18n } from 'vue-i18n'
 import {
   queryAuthorizedProject,
   queryUnauthorizedProject
@@ -40,8 +39,6 @@ import { removeUselessChildren } from '@/utils/tree-format'
 import type { TAuthType, IResourceOption, IOption } from '../types'
 
 export function useAuthorize() {
-  const { t } = useI18n()
-
   const state = reactive({
     saving: false,
     loading: false,
@@ -124,13 +121,13 @@ export function useAuthorize() {
     ])
     state.loading = false
     removeUselessChildren(resources[0])
-    let udfResources = [] as IResourceOption[]
-    let fileResources = [] as IResourceOption[]
+    const udfResources = [] as IResourceOption[]
+    const fileResources = [] as IResourceOption[]
     resources[0].forEach((item: IResourceOption) => {
       item.type === 'FILE' ? fileResources.push(item) : udfResources.push(item)
     })
-    let udfTargets = [] as number[]
-    let fileTargets = [] as number[]
+    const udfTargets = [] as number[]
+    const fileTargets = [] as number[]
     resources[1].forEach((item: { type: string; id: number }) => {
       item.type === 'FILE'
         ? fileTargets.push(item.id)
@@ -138,7 +135,6 @@ export function useAuthorize() {
     })
     state.fileResources = fileResources
     state.udfResources = udfResources
-    console.log(fileResources)
     state.authorizedFileResources = fileTargets
     state.authorizedUdfResources = fileTargets
   }

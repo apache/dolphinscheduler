@@ -52,7 +52,6 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.task_name'),
         key: 'taskName',
-        width: 400,
         render: (row: IRecord) =>
           h(
             ButtonLink,
@@ -64,12 +63,26 @@ export function useTable(onEdit: Function) {
       },
       {
         title: t('project.task.workflow_name'),
-        key: 'processDefinitionName',
-        width: 400
+        key: 'processDefinitionName'
       },
       {
         title: t('project.task.workflow_state'),
-        key: 'processReleaseState'
+        key: 'processReleaseState',
+        render: (row: any) => {
+          if (row.processReleaseState === 'OFFLINE') {
+            return h(
+              NTag,
+              { type: 'error', size: 'small' },
+              t('project.task.offline')
+            )
+          } else if (row.processReleaseState === 'ONLINE') {
+            return h(
+              NTag,
+              { type: 'info', size: 'small' },
+              t('project.task.online')
+            )
+          }
+        }
       },
       {
         title: t('project.task.task_type'),

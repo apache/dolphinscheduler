@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { ITaskState } from '@/utils/types'
 
 interface CodeReq {
   projectCode: number
@@ -71,7 +72,7 @@ interface IdReq {
 }
 
 interface ProcessInstanceReq {
-  syncDefine: string
+  syncDefine: boolean
   flag?: string
   globalParams?: string
   locations?: string
@@ -79,13 +80,13 @@ interface ProcessInstanceReq {
   taskDefinitionJson?: string
   taskRelationJson?: string
   tenantCode?: string
-  timeout?: string
+  timeout?: number
 }
 
 interface IWorkflowInstance {
   id: number
   name: string
-  state: string
+  state: ITaskState
   commandType: string
   scheduleTime?: string
   processDefinitionCode?: number

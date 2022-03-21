@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

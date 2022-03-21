@@ -217,8 +217,9 @@ export default defineComponent({
         title={t('project.workflow.set_parameters_before_starting')}
         onCancel={this.hideModal}
         onConfirm={this.handleStart}
+        confirmLoading={this.saving}
       >
-        <NForm ref='startFormRef' label-placement='left' label-width='160'>
+        <NForm ref='startFormRef'>
           <NFormItem
             label={t('project.workflow.workflow_name')}
             path='workflow_name'
@@ -391,12 +392,18 @@ export default defineComponent({
                       text
                       type='error'
                       onClick={() => this.removeStartParams(index)}
+                      class='btn-delete-custom-parameter'
                     >
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
                     </NButton>
-                    <NButton text type='primary' onClick={this.addStartParams}>
+                    <NButton
+                      text
+                      type='primary'
+                      onClick={this.addStartParams}
+                      class='btn-create-custom-parameter'
+                    >
                       <NIcon>
                         <PlusCircleOutlined />
                       </NIcon>

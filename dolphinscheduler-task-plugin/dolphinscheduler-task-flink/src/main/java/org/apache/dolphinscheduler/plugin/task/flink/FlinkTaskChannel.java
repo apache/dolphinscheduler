@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class FlinkTaskChannel implements TaskChannel {
     @Override
@@ -27,7 +31,17 @@ public class FlinkTaskChannel implements TaskChannel {
     }
 
     @Override
-    public FlinkTask createTask(TaskRequest taskRequest) {
+    public FlinkTask createTask(TaskExecutionContext taskRequest) {
         return new FlinkTask(taskRequest);
+    }
+
+    @Override
+    public AbstractParameters parseParameters(ParametersNode parametersNode) {
+        return JSONUtils.parseObject(parametersNode.getTaskParams(), FlinkParameters.class);
+    }
+
+    @Override
+    public ResourceParametersHelper getResources(String parameters) {
+        return null;
     }
 }

@@ -16,11 +16,11 @@
  */
 
 import { defineComponent, PropType, renderSlot, Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { NModal, NCard, NButton, NSpace } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
-import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
-import { LinkOption } from '@/components/modal/types'
+import type { LinkOption } from '@/components/modal/types'
 
 const props = {
   show: {
@@ -123,7 +123,7 @@ const Modal = defineComponent({
               <NSpace justify='end'>
                 {this.cancelShow && (
                   <NButton
-                    class={this.cancelClassName}
+                    class={[this.cancelClassName, 'btn-cancel']}
                     quaternary
                     size='small'
                     onClick={onCancel}
@@ -134,7 +134,7 @@ const Modal = defineComponent({
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
                 <NButton
-                  class={this.confirmClassName}
+                  class={[this.confirmClassName, 'btn-submit']}
                   type='info'
                   size='small'
                   onClick={onConfirm}

@@ -87,7 +87,8 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => model.modelType,
     (modelType: ModelType) => {
-      getSourceTypesByModelType(modelType)
+      sourceTypes.value = getSourceTypesByModelType(modelType)
+      model.sourceType = sourceTypes.value[0].value
     }
   )
 

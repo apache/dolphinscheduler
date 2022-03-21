@@ -750,4 +750,26 @@ public class ResourcesController extends BaseController {
         Map<String, Object> result = resourceService.authorizedUDFFunction(loginUser, userId);
         return returnDataList(result);
     }
+
+    /**
+     * query resource by resource id
+     *
+     * @param loginUser login user
+     * @param id resource id
+     * @return resource
+     */
+    @ApiOperation(value = "queryResourceById", notes = "QUERY_BY_RESOURCE_NAME")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "10")
+    })
+    @GetMapping(value = "/{id}/query")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RESOURCE_NOT_EXIST)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryResourceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @PathVariable(value = "id", required = true) Integer id
+    ) {
+
+        return resourceService.queryResourceById(id);
+    }
 }

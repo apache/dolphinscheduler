@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, reactive, watch } from 'vue'
+import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
@@ -30,7 +30,6 @@ export function useDependent({
   readonly?: boolean
   data?: ITaskData
 }) {
-  const taskCodeOptions = ref([] as { label: string; value: number }[])
   const model = reactive({
     taskType: 'DEPENDENT',
     name: '',
@@ -61,26 +60,10 @@ export function useDependent({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
-
-  watch(
-    () => model.preTasks,
-    () => {
-      taskCodeOptions.value =
-        model.preTaskOptions
-          ?.filter((task: { code: number }) =>
-            model.preTasks?.includes(task.code)
-          )
-          .map((task: { code: number; name: string }) => ({
-            value: task.code,
-            label: task.name
-          })) || []
-    }
-  )
 
   return {
     json: [
@@ -94,7 +77,7 @@ export function useDependent({
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       ...Fields.useDependent(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

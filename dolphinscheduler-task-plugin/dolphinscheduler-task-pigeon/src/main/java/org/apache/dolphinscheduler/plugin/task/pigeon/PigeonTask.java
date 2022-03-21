@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.pigeon;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -51,13 +51,13 @@ import org.java_websocket.handshake.ServerHandshake;
 public class PigeonTask extends AbstractTaskExecutor {
 
     public static final String KEY_POOL_VAR_PIGEON_HOST = "p_host";
-    private final TaskRequest taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     private PigeonParameters parameters;
     private BizResult triggerResult;
     private final PigeonConfig config;
 
-    public PigeonTask(TaskRequest taskExecutionContext) {
+    public PigeonTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
         this.config = PigeonConfig.getInstance();

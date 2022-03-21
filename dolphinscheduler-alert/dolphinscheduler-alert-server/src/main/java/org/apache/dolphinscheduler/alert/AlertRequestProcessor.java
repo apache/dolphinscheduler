@@ -54,7 +54,8 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
         AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(
             alertSendRequestCommand.getGroupId(),
             alertSendRequestCommand.getTitle(),
-            alertSendRequestCommand.getContent());
+            alertSendRequestCommand.getContent(),
+            alertSendRequestCommand.getWarnType());
         channel.writeAndFlush(alertSendResponseCommand.convert2Command(command.getOpaque()));
     }
 }

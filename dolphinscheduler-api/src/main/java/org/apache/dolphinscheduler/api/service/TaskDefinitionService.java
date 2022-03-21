@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -178,7 +177,7 @@ public interface TaskDefinitionService {
                                          long projectCode,
                                          String searchWorkflowName,
                                          String searchTaskName,
-                                         TaskType taskType,
+                                         String taskType,
                                          Integer pageNo,
                                          Integer pageSize);
 

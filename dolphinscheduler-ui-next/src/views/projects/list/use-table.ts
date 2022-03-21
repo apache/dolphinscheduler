@@ -24,7 +24,6 @@ import { parseTime } from '@/utils/common'
 import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
-import { useMenuStore } from '@/store/menu/menu'
 import {
   NButton,
   NEllipsis,
@@ -40,7 +39,6 @@ import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-  const menuStore = useMenuStore()
 
   const handleEdit = (row: any) => {
     variables.showModalRef = true
@@ -71,6 +69,7 @@ export function useTable() {
       {
         title: t('project.list.project_name'),
         key: 'name',
+        className: 'project-name',
         render: (row: { code: string; name: any }) =>
           h(
             NEllipsis,
@@ -81,7 +80,6 @@ export function useTable() {
                   ButtonLink,
                   {
                     onClick: () => {
-                      menuStore.setProjectCode(row.code)
                       router.push({ path: `/projects/${row.code}` })
                     }
                   },

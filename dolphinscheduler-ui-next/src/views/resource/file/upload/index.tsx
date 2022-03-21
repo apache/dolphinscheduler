@@ -67,13 +67,9 @@ export default defineComponent({
         onConfirm={this.handleFile}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='uploadFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='uploadFormRef'>
           <NFormItem label={t('resource.file.file_name')} path='name'>
             <NInput
               v-model={[this.uploadForm.name, 'value']}

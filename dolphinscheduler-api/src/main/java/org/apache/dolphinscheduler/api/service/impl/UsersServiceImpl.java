@@ -39,6 +39,22 @@ import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -847,6 +863,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
             }
+        }
+
+        // add system default timezone if not user timezone
+        if (StringUtils.isEmpty(user.getTimeZone())) {
+            user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
         result.put(Constants.DATA_LIST, user);

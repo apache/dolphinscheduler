@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ITaskState } from '@/utils/types'
 
 interface ITask {
   taskName: string
@@ -36,4 +37,4 @@ interface ISeriesData {
   [taskState: string]: Array<any>
 }
 
-export { ITask, IGanttRes, ISeriesData }
+export { ITask, IGanttRes, ISeriesData, ITaskState }

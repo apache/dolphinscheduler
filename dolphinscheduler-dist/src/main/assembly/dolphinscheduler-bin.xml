@@ -58,6 +58,19 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
             <outputDirectory>standalone-server</outputDirectory>
+            <excludes>
+                <exclude>libs/</exclude>
+                <exclude>bin/</exclude>
+                <exclude>dist-bin/</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/libs/standalone-server</directory>
+            <outputDirectory>standalone-server/libs/standalone-server</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/dist-bin</directory>
+            <outputDirectory>standalone-server/bin</outputDirectory>
         </fileSet>
 
         <fileSet>
@@ -71,7 +84,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
+            <directory>${basedir}/../dolphinscheduler-ui-next/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
 

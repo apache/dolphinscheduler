@@ -210,6 +210,7 @@ CREATE TABLE t_ds_alert (
   title varchar(64) DEFAULT NULL ,
   content text ,
   alert_status int DEFAULT '0' ,
+  warning_type int DEFAULT '2' ,
   log text ,
   alertgroup_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,

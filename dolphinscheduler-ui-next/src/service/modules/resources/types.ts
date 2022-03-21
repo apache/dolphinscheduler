@@ -137,5 +137,6 @@ export {
   ResourceIdReq,
   UdfFuncReq,
   ResourceListRes,
-  ResourceViewRes
+  ResourceViewRes,
+  ResourceFile
 }

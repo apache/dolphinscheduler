@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.spi.task.dq.enums.RuleType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

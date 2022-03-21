@@ -103,7 +103,9 @@ const home = {
   waiting_depend: 'WAITING_DEPEND',
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
-  serial_wait: 'SERIAL_WAIT'
+  serial_wait: 'SERIAL_WAIT',
+  ready_block: 'READY_BLOCK',
+  block: 'BLOCK'
 }
 
 const password = {
@@ -137,7 +139,8 @@ const profile = {
   state_tips: 'Please choose your state',
   enable: 'Enable',
   disable: 'Disable',
-  timezone_success: 'Time zone updated successful'
+  timezone_success: 'Time zone updated successful',
+  please_select_timezone: 'Choose timeZone'
 }
 
 const monitor = {
@@ -403,6 +406,7 @@ const project = {
     tree_view: 'Tree View',
     tree_limit: 'Limit Size',
     export: 'Export',
+    batch_copy: 'Batch Copy',
     version_info: 'Version Info',
     version: 'Version',
     file_upload: 'File Upload',
@@ -506,9 +510,15 @@ const project = {
     cancel_full_screen: 'Cancel full screen',
     task_state: 'Task status',
     mode_of_dependent: 'Mode of dependent',
-    open: 'Open'
+    open: 'Open',
+    project_name_required: 'Project name is required',
+    related_items: 'Related items',
+    project_name: 'Project Name',
+    project_tips: 'Please select project name'
   },
   task: {
+    online: 'Online',
+    offline: 'Offline',
     task_name: 'Task Name',
     task_type: 'Task Type',
     create_task: 'Create Task',
@@ -554,7 +564,9 @@ const project = {
     delay_execution: 'Delay Execution',
     forced_success: 'Forced Success',
     view_log: 'View Log',
-    download_log: 'Download Log'
+    download_log: 'Download Log',
+    refresh: 'Refresh',
+    serial_wait: 'Serial Wait'
   },
   dag: {
     create: 'Create Workflow',
@@ -584,6 +596,7 @@ const project = {
     success: 'Success',
     delete_cell: 'Delete selected edges and nodes',
     online_directly: 'Whether to go online the process definition',
+    update_directly: 'Whether to update the process definition',
     dag_name_empty: 'DAG graph name cannot be empty',
     positive_integer: 'Please enter a positive integer greater than 0',
     prop_empty: 'prop is empty',
@@ -836,6 +849,7 @@ const project = {
     last_saturday: 'LastSaturday',
     last_sunday: 'LastSunday',
     this_month: 'ThisMonth',
+    this_month_begin: 'ThisMonthBegin',
     last_month: 'LastMonth',
     last_month_begin: 'LastMonthBegin',
     last_month_end: 'LastMonthEnd',
@@ -1050,24 +1064,26 @@ const security = {
   alarm_instance: {
     search_input_tips: 'Please input the keywords',
     alarm_instance_manage: 'Alarm instance manage',
-    alarm_instance: 'Alarm Instance',
     alarm_instance_name: 'Alarm instance name',
     alarm_instance_name_tips: 'Please enter alarm plugin instance name',
     alarm_plugin_name: 'Alarm plugin name',
     create_time: 'Create Time',
     update_time: 'Update Time',
     operation: 'Operation',
-    edit: 'Edit',
+    edit_alarm_instance: 'Edit Alarm Instance',
     delete: 'Delete',
+    edit: 'Edit',
+    delete_confirm: 'Delete?',
     confirm: 'Confirm',
     cancel: 'Cancel',
     submit: 'Submit',
-    create: 'Create',
+    create_alarm_instance: 'Create Alarm Instance',
     select_plugin: 'Select plugin',
     select_plugin_tips: 'Select Alarm plugin',
     instance_parameter_exception: 'Instance parameter exception',
     WebHook: 'WebHook',
     webHook: 'WebHook',
+    WarningType: 'Warning Type',
     IsEnableProxy: 'Enable Proxy',
     Proxy: 'Proxy',
     Port: 'Port',
@@ -1102,7 +1118,14 @@ const security = {
     username: 'Username',
     botToken: 'Bot Token',
     chatId: 'Channel Chat Id',
-    parseMode: 'Parse Mode'
+    parseMode: 'Parse Mode',
+    IntegrationKey: 'Integration Key',
+    BotAccessToken:'Bot Access Token',
+    RoomId:'Room Id',
+    ToPersonId:'To Person Id',
+    ToPersonEmail:'To Person Email',
+    AtSomeoneInRoom:'At Someone In Room',
+    Destination:'Destination'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
@@ -1146,6 +1169,7 @@ const datasource = {
   click_to_view: 'Click to view',
   delete: 'Delete',
   confirm: 'Confirm',
+  delete_confirm: 'Delete?',
   cancel: 'Cancel',
   create: 'Create',
   edit: 'Edit',
