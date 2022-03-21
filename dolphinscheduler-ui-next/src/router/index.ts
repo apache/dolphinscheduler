@@ -58,7 +58,7 @@ router.beforeEach(
     if (
       metaData.auth?.includes('ADMIN_USER') &&
       (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' &&
-      metaData === 'security'
+      metaData.activeMenu === 'security'
     ) {
       to.fullPath = '/security/token-manage'
       next({ name: 'token-manage' })
