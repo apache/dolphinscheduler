@@ -138,6 +138,7 @@ const environmentManage = defineComponent({
             row-class-name='items'
             columns={this.columns}
             data={this.tableData}
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination
