@@ -21,9 +21,6 @@ import static org.apache.dolphinscheduler.common.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.Constants.CONTENT;
 import static org.apache.dolphinscheduler.common.Constants.JAR;
 
-import com.baomidou.mybatisplus.extension.api.R;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -36,7 +33,6 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -53,6 +49,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.collections.CollectionUtils;
@@ -84,6 +81,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 
 /**
@@ -259,7 +257,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             String[] splits = resource.getFullName().split("/");
             for (int i = 1; i < splits.length; i++) {
                 String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits, 0, i));
-                if(StringUtils.isNotBlank(parentFullName)) {
+                if (StringUtils.isNotBlank(parentFullName)) {
                     List<Resource> resources = resourcesMapper.queryResource(parentFullName, resource.getType().ordinal());
                     if (CollectionUtils.isNotEmpty(resources)) {
                         Resource parentResource = resources.get(0);
@@ -268,7 +266,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         } else {
                             parentResource.setSize(0L);
                         }
-                        resourcesMapper.updateById(parentResource);
+//                        resourcesMapper.updateById(parentResource);
                     }
                 }
             }

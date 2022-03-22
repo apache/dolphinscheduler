@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.P;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
@@ -170,6 +171,21 @@ public abstract class UpgradeDao {
     public void upgradeDolphinSchedulerTo200(String schemaDir) {
         processDefinitionJsonSplit();
         upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl_post.sql");
+    }
+
+    /**
+     * upgrade DolphinScheduler to 2.0.6
+     */
+    public void upgradeDolphinSchedulerResourceFileSize() {
+        ResourceDao resourceDao = new ResourceDao();
+        try {
+            // update the size of the folder that is the type of file.
+            resourceDao.updateResourceFolderSizeByFileType(dataSource.getConnection(), 0);
+            // update the size of the folder that is the type of udf.
+            resourceDao.updateResourceFolderSizeByFileType(dataSource.getConnection(), 1);
+        } catch (Exception ex) {
+            logger.error("Failed to upgrade because of failing to update the folder's size of resource files.");
+        }
     }
 
     /**
