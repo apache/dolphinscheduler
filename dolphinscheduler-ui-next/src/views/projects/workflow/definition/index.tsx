@@ -154,10 +154,10 @@ export default defineComponent({
             columns={this.columns}
             data={this.tableData}
             striped
-            size={'small'}
             class={styles.table}
             v-model:checked-row-keys={this.checkedRowKeys}
             row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

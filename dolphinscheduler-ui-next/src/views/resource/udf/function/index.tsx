@@ -129,6 +129,7 @@ export default defineComponent({
             size={'small'}
             class={styles.table}
             row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

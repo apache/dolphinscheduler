@@ -92,6 +92,7 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles.table}
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

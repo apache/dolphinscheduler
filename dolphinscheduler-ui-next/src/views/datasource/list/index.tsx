@@ -31,6 +31,7 @@ import { useI18n } from 'vue-i18n'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import styles from './index.module.scss'
+import type { TableColumns } from './types'
 
 const list = defineComponent({
   name: 'list',
@@ -38,7 +39,7 @@ const list = defineComponent({
     const { t } = useI18n()
     const showDetailModal = ref(false)
     const selectId = ref()
-    const columns = ref()
+    const columns = ref({ columns: [] as TableColumns, tableWidth: 0 })
     const { data, changePage, changePageSize, deleteRecord, updateList } =
       useTable()
 
@@ -131,10 +132,11 @@ const list = defineComponent({
         <Card title='' class={styles['mt-8']}>
           <NDataTable
             row-class-name='data-source-items'
-            columns={columns}
+            columns={columns.columns}
             data={list}
             loading={loading}
             striped
+            scrollX={columns.tableWidth}
           />
           <NPagination
             page={page}

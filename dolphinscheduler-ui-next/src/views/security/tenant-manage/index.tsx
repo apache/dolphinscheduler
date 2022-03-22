@@ -127,6 +127,7 @@ const tenementManage = defineComponent({
             columns={this.columns}
             data={this.tableData}
             row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

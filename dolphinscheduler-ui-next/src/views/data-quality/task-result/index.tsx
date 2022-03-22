@@ -155,7 +155,11 @@ const TaskResult = defineComponent({
           </NSpace>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            columns={this.columns}
+            data={this.tableData}
+            scrollX={this.tableWidth}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}
