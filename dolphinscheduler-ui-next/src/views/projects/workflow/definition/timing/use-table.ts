@@ -32,10 +32,10 @@ import {
   EditOutlined
 } from '@vicons/antd'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
 import { useTimezoneStore } from '@/store/timezone/timezone'
@@ -76,13 +76,13 @@ export function useTable() {
       {
         title: '#',
         key: 'id',
-        ...COLUMN_CONFIG['index'],
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'processDefinitionName',
-        ...COLUMN_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['name'],
         render: (row: any) =>
           h(
             NEllipsis,
@@ -95,13 +95,13 @@ export function useTable() {
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (row: any) => renderTime(row.startTime)
       },
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (row: any) => renderTime(row.endTime)
       },
       {
@@ -117,7 +117,7 @@ export function useTable() {
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
-        ...COLUMN_CONFIG['state'],
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row: any) =>
           row.releaseState === 'ONLINE'
             ? t('project.workflow.up_line')
@@ -126,17 +126,17 @@ export function useTable() {
       {
         title: t('project.workflow.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         className: styles.operation,
         render: (row: any) => {
           return h(NSpace, null, {

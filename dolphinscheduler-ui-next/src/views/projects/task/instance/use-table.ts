@@ -34,10 +34,10 @@ import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
 import { parseTime, tasksState } from '@/utils/common'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {
@@ -71,17 +71,17 @@ export function useTable() {
         title: '#',
         key: 'index',
         render: (row: any, index: number) => index + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('project.task.task_name'),
         key: 'name',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        ...COLUMN_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['name'],
         render: (row: {
           processInstanceId: number
           processInstanceName: string
@@ -102,60 +102,60 @@ export function useTable() {
       {
         title: t('project.task.executor'),
         key: 'executorName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.node_type'),
         key: 'taskType',
-        ...COLUMN_CONFIG['type']
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('project.task.state'),
         key: 'state',
-        ...COLUMN_CONFIG['state'],
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row: IRecord) => renderStateCell(row.state, t)
       },
       {
         title: t('project.task.submit_time'),
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         key: 'submitTime'
       },
       {
         title: t('project.task.start_time'),
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         key: 'startTime'
       },
       {
         title: t('project.task.end_time'),
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         key: 'endTime'
       },
       {
         title: t('project.task.duration'),
         key: 'duration',
-        ...COLUMN_CONFIG['duration'],
+        ...COLUMN_WIDTH_CONFIG['duration'],
         render: (row: any) => h('span', null, row.duration ? row.duration : '-')
       },
       {
         title: t('project.task.retry_count'),
         key: 'retryTimes',
-        ...COLUMN_CONFIG['times']
+        ...COLUMN_WIDTH_CONFIG['times']
       },
       {
         title: t('project.task.dry_run_flag'),
         key: 'dryRun',
-        ...COLUMN_CONFIG['dryRun'],
+        ...COLUMN_WIDTH_CONFIG['dryRun'],
         render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.host'),
         key: 'host',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [

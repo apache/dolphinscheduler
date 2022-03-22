@@ -28,10 +28,10 @@ import {
   deleteUdfFunc
 } from '@/service/modules/resources'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { IUdfFunctionParam } from './types'
 
 export function useTable() {
@@ -57,42 +57,42 @@ export function useTable() {
         title: '#',
         key: 'id',
         render: (_row, index) => index + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('resource.function.udf_function_name'),
         key: 'funcName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('resource.function.class_name'),
         key: 'className',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('resource.function.type'),
         key: 'type',
-        ...COLUMN_CONFIG['type']
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('resource.function.description'),
         key: 'description',
-        ...COLUMN_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('resource.function.jar_package'),
         key: 'resourceName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('resource.function.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.function.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render: (row) => {
           return h(NSpace, null, {
             default: () => [

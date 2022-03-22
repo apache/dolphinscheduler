@@ -35,10 +35,10 @@ import styles from './index.module.scss'
 import { NEllipsis, NTag } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { IDefinitionParam } from './types'
 
 export function useTable() {
@@ -69,19 +69,19 @@ export function useTable() {
         type: 'selection',
         disabled: (row) => row.releaseState === 'ONLINE',
         className: 'btn-selected',
-        ...COLUMN_CONFIG['selection']
+        ...COLUMN_WIDTH_CONFIG['selection']
       },
       {
         title: '#',
         key: 'id',
-        ...COLUMN_CONFIG['index'],
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (row, index) => index + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
         className: 'workflow-name',
-        ...COLUMN_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['name'],
         render: (row) =>
           h(
             NEllipsis,
@@ -106,7 +106,7 @@ export function useTable() {
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
-        ...COLUMN_CONFIG['state'],
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) =>
           row.releaseState === 'ONLINE'
             ? t('project.workflow.up_line')
@@ -115,32 +115,32 @@ export function useTable() {
       {
         title: t('project.workflow.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.description'),
         key: 'description',
-        ...COLUMN_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('project.workflow.create_user'),
         key: 'userName',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.modify_user'),
         key: 'modifyBy',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.schedule_publish_status'),
         key: 'scheduleReleaseState',
-        ...COLUMN_CONFIG['state'],
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) => {
           if (row.scheduleReleaseState === 'ONLINE') {
             return h(
@@ -166,7 +166,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](8.5),
+        ...COLUMN_WIDTH_CONFIG['operation'](8.5),
         className: styles.operation,
         render: (row) =>
           h(TableAction, {

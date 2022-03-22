@@ -24,10 +24,10 @@ import TableAction from './table-action'
 import { IRenameFile } from '../types'
 import ButtonLink from '@/components/button-link'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
@@ -51,13 +51,13 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
     {
       title: '#',
       key: 'id',
-      ...COLUMN_CONFIG['index'],
+      ...COLUMN_WIDTH_CONFIG['index'],
       render: (_row, index) => index + 1
     },
     {
       title: t('resource.file.name'),
       key: 'name',
-      ...COLUMN_CONFIG['name'],
+      ...COLUMN_WIDTH_CONFIG['name'],
       render: (row) =>
         h(
           ButtonLink,
@@ -69,35 +69,35 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
     },
     {
       title: t('resource.file.user_name'),
-      ...COLUMN_CONFIG['userName'],
+      ...COLUMN_WIDTH_CONFIG['userName'],
       key: 'user_name'
     },
     {
       title: t('resource.file.whether_directory'),
       key: 'whether_directory',
-      ...COLUMN_CONFIG['yesOrNo'],
+      ...COLUMN_WIDTH_CONFIG['yesOrNo'],
       render: (row) =>
         row.directory ? t('resource.file.yes') : t('resource.file.no')
     },
     {
       title: t('resource.file.file_name'),
-      ...COLUMN_CONFIG['name'],
+      ...COLUMN_WIDTH_CONFIG['name'],
       key: 'file_name'
     },
     {
       title: t('resource.file.description'),
-      ...COLUMN_CONFIG['note'],
+      ...COLUMN_WIDTH_CONFIG['note'],
       key: 'description'
     },
     {
       title: t('resource.file.size'),
       key: 'size',
-      ...COLUMN_CONFIG['size'],
+      ...COLUMN_WIDTH_CONFIG['size'],
       render: (row) => bytesToSize(row.size)
     },
     {
       title: t('resource.file.update_time'),
-      ...COLUMN_CONFIG['time'],
+      ...COLUMN_WIDTH_CONFIG['time'],
       key: 'update_time'
     },
     {
@@ -110,7 +110,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
             renameResource(id, name, description),
           onUpdateList: () => updateList()
         }),
-      ...COLUMN_CONFIG['operation'](4)
+      ...COLUMN_WIDTH_CONFIG['operation'](4)
     }
   ]
 

@@ -21,10 +21,10 @@ import { useAsyncState } from '@vueuse/core'
 import { queryExecuteResultListPaging } from '@/service/modules/data-quality'
 import { format } from 'date-fns'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type {
   ResultItem,
   ResultListRes
@@ -53,17 +53,17 @@ export function useTable() {
         title: '#',
         key: 'index',
         render: (row: any, index: number) => index + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('data_quality.task_result.task_name'),
         key: 'userName',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.workflow_instance'),
         key: 'processInstanceName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('data_quality.task_result.rule_type'),
@@ -79,12 +79,12 @@ export function useTable() {
             return t('data_quality.task_result.multi_table_comparison')
           }
         },
-        ...COLUMN_CONFIG['ruleType']
+        ...COLUMN_WIDTH_CONFIG['ruleType']
       },
       {
         title: t('data_quality.task_result.rule_name'),
         key: 'ruleName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('data_quality.task_result.state'),
@@ -98,7 +98,7 @@ export function useTable() {
             return t('data_quality.task_result.failure')
           }
         },
-        ...COLUMN_CONFIG['state']
+        ...COLUMN_WIDTH_CONFIG['state']
       },
       {
         title: t('data_quality.task_result.actual_value'),
@@ -124,7 +124,7 @@ export function useTable() {
             return t('data_quality.task_result.expected_and_actual_or_expected')
           }
         },
-        ...COLUMN_CONFIG['type']
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('data_quality.task_result.operator'),
@@ -144,7 +144,7 @@ export function useTable() {
             return '!='
           }
         },
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.threshold'),
@@ -172,17 +172,17 @@ export function useTable() {
       {
         title: t('data_quality.task_result.username'),
         key: 'userName',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('data_quality.task_result.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       }
     ]
     if (variables.tableWidth) {

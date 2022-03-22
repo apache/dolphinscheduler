@@ -28,10 +28,10 @@ import {
 } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { TableColumns, InternalRowData } from './types'
 
 export function useColumns(onCallback: Function) {
@@ -48,13 +48,13 @@ export function useColumns(onCallback: Function) {
         title: '#',
         key: 'index',
         render: (rowData: InternalRowData, rowIndex: number) => rowIndex + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('security.user.username'),
         key: 'userName',
         className: 'name',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('security.user.user_type'),
@@ -63,12 +63,12 @@ export function useColumns(onCallback: Function) {
           rowData.userType === 'GENERAL_USER'
             ? t('security.user.ordinary_user')
             : t('security.user.administrator'),
-        ...COLUMN_CONFIG['type']
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('security.user.tenant_code'),
         key: 'tenantCode',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.user.queue'),
@@ -78,7 +78,7 @@ export function useColumns(onCallback: Function) {
       {
         title: t('security.user.email'),
         key: 'email',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.user.phone'),
@@ -88,7 +88,7 @@ export function useColumns(onCallback: Function) {
       {
         title: t('security.user.state'),
         key: 'state',
-        ...COLUMN_CONFIG['state'],
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (rowData: any, unused: number) =>
           h(
             NTag,
@@ -106,17 +106,17 @@ export function useColumns(onCallback: Function) {
       {
         title: t('security.user.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.user.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.user.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render: (rowData: any, unused: number) => {
           return h(NSpace, null, {
             default: () => [

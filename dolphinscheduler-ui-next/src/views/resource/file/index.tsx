@@ -196,7 +196,7 @@ export default defineComponent({
         const newDir = dirs.slice(0, index + 1).join('/')
         if (newDir) {
           const id = 0
-          let resource = await queryResourceById(
+          const resource = await queryResourceById(
             {
               id,
               type: 'FILE',

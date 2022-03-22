@@ -26,10 +26,10 @@ import {
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import { parseTime } from '@/utils/common'
 
 export function useTable(
@@ -43,27 +43,27 @@ export function useTable(
       title: '#',
       key: 'index',
       render: (row, index) => index + 1,
-      ...COLUMN_CONFIG['index']
+      ...COLUMN_WIDTH_CONFIG['index']
     },
     {
       title: t('resource.task_group_queue.project_name'),
       key: 'projectName',
-      ...COLUMN_CONFIG['name']
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_queue.task_name'),
       key: 'taskName',
-      ...COLUMN_CONFIG['name']
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_queue.process_instance_name'),
       key: 'processInstanceName',
-      ...COLUMN_CONFIG['name']
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_queue.task_group_name'),
       key: 'taskGroupName',
-      ...COLUMN_CONFIG['name']
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_queue.priority'),
@@ -73,7 +73,7 @@ export function useTable(
     {
       title: t('resource.task_group_queue.force_starting_status'),
       key: 'forceStart',
-      ...COLUMN_CONFIG['state']
+      ...COLUMN_WIDTH_CONFIG['state']
     },
     {
       title: t('resource.task_group_queue.in_queue'),
@@ -83,22 +83,22 @@ export function useTable(
     {
       title: t('resource.task_group_queue.task_status'),
       key: 'status',
-      ...COLUMN_CONFIG['state']
+      ...COLUMN_WIDTH_CONFIG['state']
     },
     {
       title: t('resource.task_group_queue.create_time'),
       key: 'createTime',
-      ...COLUMN_CONFIG['time']
+      ...COLUMN_WIDTH_CONFIG['time']
     },
     {
       title: t('resource.task_group_queue.update_time'),
       key: 'updateTime',
-      ...COLUMN_CONFIG['time']
+      ...COLUMN_WIDTH_CONFIG['time']
     },
     {
       title: t('resource.task_group_queue.actions'),
       key: 'actions',
-      ...COLUMN_CONFIG['operation'](2),
+      ...COLUMN_WIDTH_CONFIG['operation'](2),
       render: (row: any) =>
         h(TableAction, {
           row,

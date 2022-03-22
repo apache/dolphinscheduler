@@ -33,10 +33,10 @@ import {
 } from '@/service/modules/resources'
 import ButtonLink from '@/components/button-link'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { IUdfResourceParam } from './types'
 
 const goSubFolder = (router: Router, item: any) => {
@@ -74,7 +74,7 @@ export function useTable() {
       {
         title: '#',
         key: 'id',
-        ...COLUMN_CONFIG['index'],
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (_row, index) => index + 1
       },
       {
@@ -96,40 +96,40 @@ export function useTable() {
       {
         title: t('resource.udf.whether_directory'),
         key: 'whether_directory',
-        ...COLUMN_CONFIG['yesOrNo'],
+        ...COLUMN_WIDTH_CONFIG['yesOrNo'],
         render: (row) =>
           row.directory ? t('resource.file.yes') : t('resource.file.no')
       },
       {
         title: t('resource.udf.file_name'),
-        ...COLUMN_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['name'],
         key: 'fileName'
       },
       {
         title: t('resource.udf.file_size'),
         key: 'size',
-        ...COLUMN_CONFIG['size'],
+        ...COLUMN_WIDTH_CONFIG['size'],
         render: (row) => bytesToSize(row.size)
       },
       {
         title: t('resource.udf.description'),
         key: 'description',
-        ...COLUMN_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('resource.udf.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.udf.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.udf.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render: (row) => {
           return h(NSpace, null, {
             default: () => [

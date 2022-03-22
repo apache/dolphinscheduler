@@ -21,7 +21,7 @@ import type {
   CommonColumnInfo
 } from 'naive-ui/es/data-table/src/interface'
 
-export const COLUMN_CONFIG = {
+export const COLUMN_WIDTH_CONFIG = {
   selection: {
     width: 50
   },

@@ -33,10 +33,10 @@ import {
   NTooltip
 } from 'naive-ui'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
@@ -69,14 +69,14 @@ export function useTable() {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1,
-        ...COLUMN_CONFIG['index']
+        render: (unused: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('project.list.project_name'),
         key: 'name',
         className: 'project-name',
-        ...COLUMN_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['name'],
         render: (row: { code: string; name: any }) =>
           h(
             NEllipsis,
@@ -99,7 +99,7 @@ export function useTable() {
       {
         title: t('project.list.owned_users'),
         key: 'userName',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.list.workflow_define_count'),
@@ -120,22 +120,22 @@ export function useTable() {
       {
         title: t('project.list.description'),
         key: 'description',
-        ...COLUMN_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('project.list.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.list.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.list.operation'),
         key: 'actions',
-        ...COLUMN_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
