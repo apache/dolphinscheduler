@@ -54,7 +54,7 @@ jobs:
       - name: test
         id: test
         run: |
-          git diff upstream/dev HEAD
+          git diff dev HEAD
 
   lint:
     name: Lint
