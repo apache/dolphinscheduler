@@ -32,6 +32,7 @@ export function useModal(
       queue: ref(''),
       queueName: ref('')
     },
+    saving: false,
     rules: {
       queue: {
         required: true,
@@ -54,14 +55,21 @@ export function useModal(
     }
   })
 
-  const handleValidate = (statusRef: number) => {
-    variables.yarnQueueFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitYarnQueueModal() : updateYarnQueueModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.yarnQueueFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0
+        ? await submitYarnQueueModal()
+        : await updateYarnQueueModal()
+
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitYarnQueueModal = () => {
@@ -76,7 +84,7 @@ export function useModal(
 
   const updateYarnQueueModal = () => {
     updateQueue({ ...variables.model }, { id: variables.model.id }).then(
-      (res: any) => {
+      (ignored: any) => {
         ctx.emit('confirmModal', props.showModalRef)
       }
     )

@@ -42,6 +42,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -293,6 +294,19 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<Resource> resourceList = (List<Resource>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(resourceList));
+
+        // test udf
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(0, 0))
+                .thenReturn(Arrays.asList(Integer.valueOf(10), Integer.valueOf(11)));
+        Mockito.when(resourcesMapper.queryResourceListById(Arrays.asList(Integer.valueOf(10), Integer.valueOf(11))))
+                .thenReturn(Arrays.asList(getResource(10, ResourceType.FILE), getResource(11, ResourceType.UDF)));
+        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 1)).thenReturn(getResourceList());
+        result = resourcesService.queryResourceList(loginUser, ResourceType.UDF);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        resourceList = (List<Resource>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(resourceList.size() == 4);
     }
 
     @Test
@@ -752,6 +766,19 @@ public class ResourcesServiceTest {
         resource.setAlias("ResourcesServiceTest.jar");
         resource.setFullName("/ResourcesServiceTest.jar");
         resource.setType(ResourceType.FILE);
+        return resource;
+    }
+
+    private Resource getResource(int resourceId,ResourceType type) {
+
+        Resource resource = new Resource();
+        resource.setId(resourceId);
+        resource.setPid(-1);
+        resource.setUserId(1);
+        resource.setDescription("ResourcesServiceTest.jar");
+        resource.setAlias("ResourcesServiceTest.jar");
+        resource.setFullName("/ResourcesServiceTest.jar");
+        resource.setType(type);
         return resource;
     }
 

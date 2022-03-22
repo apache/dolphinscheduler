@@ -94,7 +94,11 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.handleCreateFolder}>
+              <NButton
+                type='primary'
+                onClick={this.handleCreateFolder}
+                class='btn-create-udf-function'
+              >
                 {t('resource.function.create_udf_function')}
               </NButton>
             </NSpace>
@@ -124,6 +128,8 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles.table}
+            row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

@@ -43,5 +43,12 @@
         <module>dolphinscheduler-task-pigeon</module>
         <module>dolphinscheduler-task-dataquality</module>
         <module>dolphinscheduler-task-seatunnel</module>
+        <module>dolphinscheduler-task-conditions</module>
+        <module>dolphinscheduler-task-dependent</module>
+        <module>dolphinscheduler-task-subprocess</module>
+        <module>dolphinscheduler-task-switch</module>
+        <module>dolphinscheduler-task-all</module>
+        <module>dolphinscheduler-task-emr</module>
+        <module>dolphinscheduler-task-blocking</module>
     </modules>
 </project>

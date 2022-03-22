@@ -15,34 +15,28 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, reactive } from 'vue'
-import {
-  NCard,
-  NButton,
-  NInput,
-  NIcon,
-  NDataTable,
-  NPagination
-} from 'naive-ui'
-import { SearchOutlined } from '@vicons/antd'
-import { useI18n } from 'vue-i18n'
-import { useTable } from './use-table'
-import styles from './index.module.scss'
 import Card from '@/components/card'
+import { SearchOutlined } from '@vicons/antd'
+import {
+  NButton,
+  NCard,
+  NDataTable,
+  NIcon,
+  NInput,
+  NPagination,
+  NSpace
+} from 'naive-ui'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ProjectModal from './components/project-modal'
+import styles from './index.module.scss'
+import { useTable } from './use-table'
 
 const list = defineComponent({
   name: 'list',
   setup() {
-    const showModalRef = ref(false)
-    const modelStatusRef = ref(0)
     const { t } = useI18n()
-    const { variables, getTableData } = useTable()
-    let updateProjectData = reactive({
-      code: 0,
-      projectName: '',
-      description: ''
-    })
+    const { variables, getTableData, createColumns } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -52,120 +46,77 @@ const list = defineComponent({
       })
     }
 
-    const onCancel = () => {
-      showModalRef.value = false
+    const handleModalChange = () => {
+      variables.showModalRef = true
+      variables.statusRef = 0
     }
 
-    const onConfirm = () => {
-      showModalRef.value = false
-      updateProjectData = {
-        code: 0,
-        projectName: '',
-        description: ''
-      }
-      resetTableData()
-    }
-
-    const onOpen = () => {
-      modelStatusRef.value = 0
-      showModalRef.value = true
-    }
-
-    const resetTableData = () => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
-    }
-
-    const onSearch = () => {
+    const handleSearch = () => {
       variables.page = 1
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
+      requestData()
     }
 
-    const onUpdatePageSize = () => {
+    const onCancelModal = () => {
+      variables.showModalRef = false
+    }
+
+    const onConfirmModal = () => {
+      variables.showModalRef = false
+      requestData()
+    }
+
+    const handleChangePageSize = () => {
       variables.page = 1
-      resetTableData()
-    }
-
-    const updateProjectItem = (
-      code: number,
-      projectName: string,
-      description: string
-    ) => {
-      modelStatusRef.value = 1
-      showModalRef.value = true
-      updateProjectData.code = code
-      updateProjectData.projectName = projectName
-      updateProjectData.description = description
+      requestData()
     }
 
     onMounted(() => {
+      createColumns(variables)
       requestData()
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
     })
 
     return {
       t,
-      showModalRef,
       ...toRefs(variables),
-      onCancel,
-      onConfirm,
-      onOpen,
-      updateProjectItem,
-      resetTableData,
-      onUpdatePageSize,
-      onSearch,
-      updateProjectData,
-      modelStatusRef
+      requestData,
+      handleModalChange,
+      handleSearch,
+      onCancelModal,
+      onConfirmModal,
+      handleChangePageSize
     }
   },
   render() {
-    const {
-      t,
-      showModalRef,
-      onCancel,
-      onConfirm,
-      onOpen,
-      updateProjectItem,
-      resetTableData,
-      onUpdatePageSize,
-      onSearch,
-      updateProjectData,
-      modelStatusRef
-    } = this
-    const { columns } = useTable(updateProjectItem, resetTableData)
-
+    const { t } = this
     return (
       <div>
         <NCard>
           <div class={styles['search-card']}>
-            <div>
-              <NButton size='small' type='primary' onClick={onOpen}>
-                {t('project.list.create_project')}
-              </NButton>
-            </div>
-            <div class={styles.box}>
+            <NButton
+              size='small'
+              onClick={this.handleModalChange}
+              type='primary'
+              class='btn-create-project'
+            >
+              {t('project.list.create_project')}
+            </NButton>
+            <NSpace>
               <NInput
                 size='small'
-                v-model:value={this.searchVal}
+                v-model={[this.searchVal, 'value']}
                 placeholder={t('project.list.project_tips')}
                 clearable
               />
-              <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+              <NButton size='small' type='primary' onClick={this.handleSearch}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card
@@ -173,10 +124,10 @@ const list = defineComponent({
           class={styles['table-card']}
         >
           <NDataTable
-            columns={columns}
-            size={'small'}
+            columns={this.columns}
             data={this.tableData}
-            striped
+            scrollX={this.tableWidth}
+            row-class-name='items'
           />
           <div class={styles.pagination}>
             <NPagination
@@ -186,20 +137,18 @@ const list = defineComponent({
               show-size-picker
               page-sizes={[10, 30, 50]}
               show-quick-jumper
-              onUpdatePage={resetTableData}
-              onUpdatePageSize={onUpdatePageSize}
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
             />
           </div>
         </Card>
-        {showModalRef && (
-          <ProjectModal
-            show={showModalRef}
-            onCancel={onCancel}
-            onConfirm={onConfirm}
-            data={updateProjectData}
-            status={modelStatusRef}
-          />
-        )}
+        <ProjectModal
+          showModalRef={this.showModalRef}
+          statusRef={this.statusRef}
+          row={this.row}
+          onCancelModal={this.onCancelModal}
+          onConfirmModal={this.onConfirmModal}
+        />
       </div>
     )
   }

@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, renderSlot } from 'vue'
-import { NModal, NCard, NButton, NSpace } from 'naive-ui'
+import { defineComponent, PropType, renderSlot, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { NModal, NCard, NButton, NSpace } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 import styles from './index.module.scss'
+import type { LinkOption } from '@/components/modal/types'
 
 const props = {
   show: {
@@ -59,11 +61,9 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: true
   },
-  linkEventShow: {
-    type: Boolean as PropType<boolean>
-  },
-  linkEventText: {
-    type: String as PropType<string>
+  headerLinks: {
+    type: Object as PropType<Ref<Array<LinkOption>>>,
+    default: [] as LinkOption[]
   }
 }
 
@@ -82,22 +82,11 @@ const Modal = defineComponent({
       ctx.emit('confirm')
     }
 
-    const onJumpLink = () => {
-      ctx.emit('jumpLink')
-    }
-
-    return { t, onCancel, onConfirm, onJumpLink }
+    return { t, onCancel, onConfirm }
   },
   render() {
-    const {
-      $slots,
-      t,
-      onCancel,
-      onConfirm,
-      confirmDisabled,
-      confirmLoading,
-      onJumpLink
-    } = this
+    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading } =
+      this
 
     return (
       <NModal
@@ -115,18 +104,26 @@ const Modal = defineComponent({
             default: () => renderSlot($slots, 'default'),
             'header-extra': () => (
               <NSpace justify='end'>
-                {this.linkEventShow && (
-                  <NButton text onClick={onJumpLink}>
-                    {this.linkEventText}
-                  </NButton>
-                )}
+                {this.headerLinks.value &&
+                  this.headerLinks.value
+                    .filter((item: any) => item.show)
+                    .map((item: any) => {
+                      return (
+                        <ButtonLink onClick={item.action}>
+                          {{
+                            default: () => item.text,
+                            icon: () => item.icon()
+                          }}
+                        </ButtonLink>
+                      )
+                    })}
               </NSpace>
             ),
             footer: () => (
               <NSpace justify='end'>
                 {this.cancelShow && (
                   <NButton
-                    class={this.cancelClassName}
+                    class={[this.cancelClassName, 'btn-cancel']}
                     quaternary
                     size='small'
                     onClick={onCancel}
@@ -137,7 +134,7 @@ const Modal = defineComponent({
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
                 <NButton
-                  class={this.confirmClassName}
+                  class={[this.confirmClassName, 'btn-submit']}
                   type='info'
                   size='small'
                   onClick={onConfirm}

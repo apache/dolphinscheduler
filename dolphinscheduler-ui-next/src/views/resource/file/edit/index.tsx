@@ -15,46 +15,46 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { defineComponent, toRefs, watch } from 'vue'
 import { NButton, NForm, NFormItem, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import { useForm } from './use-form'
 import { useEdit } from './use-edit'
-
 import styles from '../index.module.scss'
-import type { Router } from 'vue-router'
 
 export default defineComponent({
   name: 'ResourceFileEdit',
   setup() {
-    const router: Router = useRouter()
+    const route = useRoute()
+    const router = useRouter()
 
-    const resourceViewRef = ref()
-    const routeNameRef = ref(router.currentRoute.value.name)
-    const idRef = ref(Number(router.currentRoute.value.params.id))
+    const componentName = route.name
+    const fileId = Number(route.params.id)
 
     const { state } = useForm()
     const { getResourceView, handleUpdateContent } = useEdit(state)
 
     const handleFileContent = () => {
       state.fileForm.content = resourceViewRef.value.content
-      handleUpdateContent(idRef.value)
+      handleUpdateContent(fileId)
     }
 
     const handleReturn = () => {
       router.go(-1)
     }
 
-    onMounted(() => {
-      resourceViewRef.value = getResourceView(idRef.value)
-    })
+    const resourceViewRef = getResourceView(fileId)
+
+    watch(
+      () => resourceViewRef.value.content,
+      () => (state.fileForm.content = resourceViewRef.value.content)
+    )
 
     return {
-      idRef,
-      routeNameRef,
+      componentName,
       resourceViewRef,
       handleReturn,
       handleFileContent,
@@ -67,7 +67,7 @@ export default defineComponent({
       <Card title={t('resource.file.file_details')}>
         <div class={styles['file-edit-content']}>
           <h2>
-            <span>{this.resourceViewRef.value?.alias}</span>
+            <span>{this.resourceViewRef.alias}</span>
           </h2>
           <NForm
             rules={this.rules}
@@ -75,18 +75,13 @@ export default defineComponent({
             class={styles['form-content']}
           >
             <NFormItem path='content'>
-              <div
-                class={styles.cont}
-                style={{
-                  width: '90%'
-                }}
-              >
+              <div style={{ width: '90%' }}>
                 <MonacoEditor
-                  v-model={[this.resourceViewRef.value?.content, 'value']}
+                  v-model={[this.resourceViewRef.content, 'value']}
                 />
               </div>
             </NFormItem>
-            {this.routeNameRef === 'resource-file-edit' && (
+            {this.componentName === 'resource-file-edit' && (
               <NSpace>
                 <NButton
                   type='info'
@@ -94,6 +89,7 @@ export default defineComponent({
                   text
                   style={{ marginRight: '15px' }}
                   onClick={this.handleReturn}
+                  class='btn-cancel'
                 >
                   {t('resource.file.return')}
                 </NButton>
@@ -102,6 +98,7 @@ export default defineComponent({
                   size='small'
                   round
                   onClick={() => this.handleFileContent()}
+                  class='btn-submit'
                 >
                   {t('resource.file.save')}
                 </NButton>

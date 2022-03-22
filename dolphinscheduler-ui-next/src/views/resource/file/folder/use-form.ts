@@ -37,6 +37,7 @@ export function useForm() {
   const state = reactive({
     folderFormRef: ref(),
     folderForm: defaultValue(),
+    saving: false,
     rules: {
       name: {
         required: true,

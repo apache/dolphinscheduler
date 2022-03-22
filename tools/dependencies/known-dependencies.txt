@@ -268,3 +268,8 @@ jackson-dataformat-yaml-2.12.5.jar
 logging-interceptor-3.14.9.jar
 okhttp-3.14.9.jar
 okio-1.17.2.jar
+jmespath-java-1.12.160.jar
+jackson-dataformat-cbor-2.12.5.jar
+ion-java-1.0.2.jar
+aws-java-sdk-core-1.12.160.jar
+aws-java-sdk-emr-1.12.160.jar

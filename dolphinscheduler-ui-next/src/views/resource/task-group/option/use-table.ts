@@ -15,51 +15,80 @@
  * limitations under the License.
  */
 
-import { useAsyncState, useAsyncQueue } from '@vueuse/core'
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
+import { parseTime } from '@/utils/common'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 export function useTable(
   updateItem = (
-    id: number,
-    name: string,
-    projectCode: number,
-    groupSize: number,
-    description: string,
-    status: number
+    unusedId: number,
+    unusedName: string,
+    unusedProjectCode: number,
+    unusedGroupSize: number,
+    unusedDescription: string,
+    unusedStatus: number
   ): void => {},
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
-  const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
-    { title: t('resource.task_group_option.id'), key: 'index' },
-    { title: t('resource.task_group_option.name'), key: 'name' },
-    { title: t('resource.task_group_option.project_name'), key: 'projectName' },
+    {
+      title: '#',
+      key: 'index',
+      render: (row, index) => index + 1,
+      ...COLUMN_WIDTH_CONFIG['index']
+    },
+    {
+      title: t('resource.task_group_option.name'),
+      key: 'name',
+      ...COLUMN_WIDTH_CONFIG['name']
+    },
+    {
+      title: t('resource.task_group_option.project_name'),
+      key: 'projectName',
+      ...COLUMN_WIDTH_CONFIG['name']
+    },
     {
       title: t('resource.task_group_option.resource_pool_size'),
-      key: 'groupSize'
+      key: 'groupSize',
+      width: 160
     },
     {
       title: t('resource.task_group_option.resource_used_pool_size'),
-      key: 'useSize'
+      key: 'useSize',
+      width: 140
     },
-    { title: t('resource.task_group_option.desc'), key: 'description' },
-    { title: t('resource.task_group_option.create_time'), key: 'createTime' },
-    { title: t('resource.task_group_option.update_time'), key: 'updateTime' },
+    {
+      title: t('resource.task_group_option.desc'),
+      key: 'description',
+      ...COLUMN_WIDTH_CONFIG['note']
+    },
+    {
+      title: t('resource.task_group_option.create_time'),
+      key: 'createTime',
+      ...COLUMN_WIDTH_CONFIG['time']
+    },
+    {
+      title: t('resource.task_group_option.update_time'),
+      key: 'updateTime',
+      ...COLUMN_WIDTH_CONFIG['time']
+    },
     {
       title: t('resource.task_group_option.actions'),
       key: 'actions',
-      width: 150,
+      ...COLUMN_WIDTH_CONFIG['operation'](3),
       render: (row: any) =>
         h(TableAction, {
           row,
@@ -85,6 +114,7 @@ export function useTable(
 
   const variables = reactive({
     tableData: [],
+    tableWidth: calculateTableWidth(columns) || DefaultTableWidth,
     page: ref(1),
     pageSize: ref(10),
     name: ref(null),
@@ -96,10 +126,10 @@ export function useTable(
       (values: any[]) => {
         variables.totalPage = values[0].totalPage
         variables.tableData = values[0].totalList.map(
-          (item: any, index: number) => {
+          (item: any, unused: number) => {
             let projectName = ''
             if (values[1]) {
-              let project = _.find(values[1], { code: item.projectCode })
+              const project = _.find(values[1], { code: item.projectCode })
               if (project) {
                 projectName = project.name
               }
@@ -107,15 +137,14 @@ export function useTable(
 
             item.projectName = projectName
             item.createTime = format(
-              new Date(item.createTime),
+              parseTime(item.createTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             item.updateTime = format(
-              new Date(item.updateTime),
+              parseTime(item.updateTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             return {
-              index: index + 1,
               ...item
             }
           }

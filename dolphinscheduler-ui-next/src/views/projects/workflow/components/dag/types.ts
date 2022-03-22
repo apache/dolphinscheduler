@@ -16,6 +16,7 @@
  */
 
 import { TaskType } from '@/views/projects/task/constants/task-type'
+export type { ITaskState } from '@/utils/types'
 
 export interface ProcessDefinition {
   id: number
@@ -102,6 +103,25 @@ export interface WorkflowDefinition {
   taskDefinitionList: TaskDefinition[]
 }
 
+export interface WorkflowInstance {
+  name: string
+  state: string
+  dagData: WorkflowDefinition
+  commandType: string
+  commandParam: string
+  failureStrategy: string
+  processInstancePriority: string
+  workerGroup: string
+  warningType: string
+  warningGroupId: number
+}
+
+export interface EditWorkflowDefinition {
+  processDefinition: ProcessDefinition
+  processTaskRelationList: Connect[]
+  taskDefinitionList: NodeData[]
+}
+
 export interface Dragged {
   x: number
   y: number
@@ -126,10 +146,27 @@ export interface SaveForm {
   timeout: number
   globalParams: GlobalParam[]
   release: boolean
+  sync: boolean
 }
 
 export interface Location {
   taskCode: number
   x: number
   y: number
+}
+
+export interface IStartupParam {
+  commandType: string
+  commandParam: string
+  failureStrategy: string
+  processInstancePriority: string
+  workerGroup: string
+  warningType: string
+  warningGroupId: number
+}
+
+export interface IWorkflowTaskInstance {
+  id: number
+  taskCode: number
+  taskType: string
 }

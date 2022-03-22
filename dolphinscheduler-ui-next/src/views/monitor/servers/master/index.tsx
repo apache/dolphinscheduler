@@ -23,7 +23,7 @@ import styles from './index.module.scss'
 import Card from '@/components/card'
 import Gauge from '@/components/chart/modules/Gauge'
 import Modal from '@/components/modal'
-import type { MasterRes } from '@/service/modules/monitor/types'
+import type { MasterNode } from '@/service/modules/monitor/types'
 import type { Ref } from 'vue'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
@@ -33,7 +33,7 @@ const master = defineComponent({
     const showModalRef = ref(false)
     const { t } = useI18n()
     const { getMaster } = useMaster()
-    const masterRef: Ref<Array<MasterRes>> = ref(getMaster())
+    const masterRef: Ref<Array<MasterNode>> = ref(getMaster())
     const columnsRef: TableColumns<any> = [
       { title: '#', key: 'index' },
       { title: t('monitor.master.directory'), key: 'directory' }

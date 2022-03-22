@@ -18,100 +18,223 @@
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
+import ButtonLink from '@/components/button-link'
 import { queryProjectListPaging } from '@/service/modules/projects'
+import { parseTime } from '@/utils/common'
+import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
-import TableAction from './components/table-action'
-import styles from './index.module.scss'
+import {
+  NButton,
+  NEllipsis,
+  NIcon,
+  NPopconfirm,
+  NSpace,
+  NTooltip
+} from 'naive-ui'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import { useMenuStore } from '@/store/menu/menu'
+import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 
-export function useTable(
-  updateProjectItem = (
-    code: number,
-    name: string,
-    description: string
-  ): void => {},
-  resetTableData = () => {}
-) {
+export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-  const menuStore = useMenuStore()
 
-  const columns: TableColumns<any> = [
-    { title: '#', key: 'index' },
-    {
-      title: t('project.list.project_name'),
-      key: 'name',
-      render: (row) =>
-        h(
-          'a',
-          {
-            class: styles.links,
-            onClick: () => {
-              menuStore.setProjectCode(row.code)
-              router.push({ path: `/projects/${row.code}` })
+  const handleEdit = (row: any) => {
+    variables.showModalRef = true
+    variables.statusRef = 1
+    variables.row = row
+  }
+
+  const handleDelete = (row: any) => {
+    deleteProject(row.code).then(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo:
+          variables.tableData.length === 1 && variables.page > 1
+            ? variables.page - 1
+            : variables.page,
+        searchVal: variables.searchVal
+      })
+    })
+  }
+
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'index',
+        render: (unused: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
+      },
+      {
+        title: t('project.list.project_name'),
+        key: 'name',
+        className: 'project-name',
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: { code: string; name: any }) =>
+          h(
+            NEllipsis,
+            { style: 'max-width: 200px; color: #2080f0' },
+            {
+              default: () =>
+                h(
+                  ButtonLink,
+                  {
+                    onClick: () => {
+                      router.push({ path: `/projects/${row.code}` })
+                    }
+                  },
+                  { default: () => row.name }
+                ),
+              tooltip: () => row.name
             }
-          },
-          {
-            default: () => {
-              return row.name
-            }
-          }
-        )
-    },
-    { title: t('project.list.owned_users'), key: 'userName' },
-    { title: t('project.list.workflow_define_count'), key: 'defCount' },
-    {
-      title: t('project.list.process_instance_running_count'),
-      key: 'instRunningCount'
-    },
-    { title: t('project.list.description'), key: 'description' },
-    { title: t('project.list.create_time'), key: 'createTime' },
-    { title: t('project.list.update_time'), key: 'updateTime' },
-    {
-      title: t('project.list.operation'),
-      key: 'actions',
-      render: (row: any) =>
-        h(TableAction, {
-          row,
-          onResetTableData: () => {
-            if (variables.page > 1 && variables.tableData.length === 1) {
-              variables.page -= 1
-            }
-            resetTableData()
-          },
-          onUpdateProjectItem: (code, name, description) =>
-            updateProjectItem(code, name, description)
-        })
+          )
+      },
+      {
+        title: t('project.list.owned_users'),
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
+      },
+      {
+        title: t('project.list.workflow_define_count'),
+        key: 'defCount',
+        width: 120,
+        ellipsis: {
+          tooltip: true
+        }
+      },
+      {
+        title: t('project.list.process_instance_running_count'),
+        key: 'instRunningCount',
+        width: 120,
+        ellipsis: {
+          tooltip: true
+        }
+      },
+      {
+        title: t('project.list.description'),
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
+      },
+      {
+        title: t('project.list.create_time'),
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('project.list.update_time'),
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('project.list.operation'),
+        key: 'actions',
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
+        render(row: any) {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        class: 'edit',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
+                      }
+                    ),
+                  default: () => t('project.list.edit')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'small',
+                              class: 'delete'
+                            },
+                            {
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
+                            }
+                          ),
+                        default: () => t('project.list.delete')
+                      }
+                    ),
+                  default: () => t('project.list.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
     }
-  ]
+  }
 
   const variables = reactive({
+    columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    showModalRef: ref(false),
+    statusRef: ref(0),
+    row: {}
   })
 
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryProjectListPaging(params).then((res: ProjectRes) => {
         variables.totalPage = res.totalPage
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            new Date(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any
@@ -121,5 +244,9 @@ export function useTable(
     return state
   }
 
-  return { getTableData, variables, columns }
+  return {
+    variables,
+    getTableData,
+    createColumns
+  }
 }

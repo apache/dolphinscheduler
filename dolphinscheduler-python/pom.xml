@@ -104,5 +104,101 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>python</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>python-api-prepare</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>python</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-m</argument>
+                                        <argument>pip</argument>
+                                        <argument>install</argument>
+                                        <argument>--upgrade</argument>
+                                        <argument>pip</argument>
+                                        <argument>.[build]</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-api-clean</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>python</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>setup.py</argument>
+                                        <argument>pre_clean</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-api-build</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>python</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-m</argument>
+                                        <argument>build</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sign-source</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${python.sign.skip}</skip>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
+                                        <argument>gpg --armor --sign dist/*.tar.gz</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sign-wheel</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${python.sign.skip}</skip>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
+                                        <argument>gpg --armor --sign dist/*.whl</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

@@ -18,7 +18,7 @@
 import { defineComponent, ref, inject, PropType, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
-import { NTooltip, NIcon, NButton, NSelect } from 'naive-ui'
+import { NTooltip, NIcon, NButton, NSelect, NPopover, NText } from 'naive-ui'
 import {
   SearchOutlined,
   DownloadOutlined,
@@ -27,14 +27,20 @@ import {
   InfoCircleOutlined,
   FormatPainterOutlined,
   CopyOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  RightCircleOutlined,
+  FundViewOutlined,
+  SyncOutlined
 } from '@vicons/antd'
 import { useNodeSearch, useTextCopy } from './dag-hooks'
 import { DataUri } from '@antv/x6'
 import { useFullscreen } from '@vueuse/core'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
 import type { Graph } from '@antv/x6'
+import StartupParam from './dag-startup-param'
+import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
+import { WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
   layoutToggle: {
@@ -42,9 +48,13 @@ const props = {
     default: () => {}
   },
   // If this prop is passed, it means from definition detail
+  instance: {
+    type: Object as PropType<WorkflowInstance>,
+    default: null
+  },
   definition: {
     // The same as the structure responsed by the queryProcessDefinitionByCode api
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowDefinition>,
     default: null
   }
 }
@@ -52,14 +62,18 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle', 'saveModelToggle', 'removeTasks'],
+  emits: ['versionToggle', 'saveModelToggle', 'removeTasks', 'refresh'],
   setup(props, context) {
     const { t } = useI18n()
+
+    const startupPopoverRef = ref(false)
+    const paramPopoverRef = ref(false)
 
     const themeStore = useThemeStore()
 
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
+    const route = useRoute()
 
     /**
      * Node search and navigate
@@ -149,22 +163,114 @@ export default defineComponent({
           Styles[themeStore.darkTheme ? 'toolbar-dark' : 'toolbar-light']
         ]}
       >
-        <div>
-          <span class={Styles['workflow-name']}>
-            {props.definition?.processDefinition?.name ||
+        <span class={Styles['workflow-name']}>
+          {route.name === 'workflow-instance-detail'
+            ? props.instance?.name
+            : props.definition?.processDefinition?.name ||
               t('project.dag.create')}
-          </span>
-          {props.definition?.processDefinition?.name && (
-            <NButton
-              quaternary
-              circle
-              onClick={() => copy(props.definition?.processDefinition?.name)}
-              class={Styles['copy-btn']}
-            >
-              <NIcon>
-                <CopyOutlined />
-              </NIcon>
-            </NButton>
+        </span>
+        {props.definition?.processDefinition?.name && (
+          <NTooltip
+            v-slots={{
+              trigger: () => (
+                <NButton
+                  quaternary
+                  circle
+                  onClick={() => {
+                    const name =
+                      route.name === 'workflow-instance-detail'
+                        ? props.instance?.name
+                        : props.definition?.processDefinition?.name
+                    copy(name)
+                  }}
+                  class={Styles['toolbar-btn']}
+                >
+                  <NIcon>
+                    <CopyOutlined />
+                  </NIcon>
+                </NButton>
+              ),
+              default: () => t('project.dag.copy_name')
+            }}
+          ></NTooltip>
+        )}
+        <div class={Styles['toolbar-left-part']}>
+          {route.name === 'workflow-instance-detail' && (
+            <>
+              <NTooltip
+                v-slots={{
+                  trigger: () => (
+                    <NPopover
+                      show={paramPopoverRef.value}
+                      placement='bottom'
+                      trigger='manual'
+                    >
+                      {{
+                        trigger: () => (
+                          <NButton
+                            quaternary
+                            circle
+                            onClick={() =>
+                              (paramPopoverRef.value = !paramPopoverRef.value)
+                            }
+                            class={Styles['toolbar-btn']}
+                          >
+                            <NIcon>
+                              <FundViewOutlined />
+                            </NIcon>
+                          </NButton>
+                        ),
+                        header: () => (
+                          <NText strong depth={1}>
+                            {t('project.workflow.parameters_variables')}
+                          </NText>
+                        ),
+                        default: () => <VariablesView onCopy={copy} />
+                      }}
+                    </NPopover>
+                  ),
+                  default: () => t('project.dag.view_variables')
+                }}
+              ></NTooltip>
+              <NTooltip
+                v-slots={{
+                  trigger: () => (
+                    <NPopover
+                      show={startupPopoverRef.value}
+                      placement='bottom'
+                      trigger='manual'
+                    >
+                      {{
+                        trigger: () => (
+                          <NButton
+                            quaternary
+                            circle
+                            onClick={() =>
+                              (startupPopoverRef.value =
+                                !startupPopoverRef.value)
+                            }
+                            class={Styles['toolbar-btn']}
+                          >
+                            <NIcon>
+                              <RightCircleOutlined />
+                            </NIcon>
+                          </NButton>
+                        ),
+                        header: () => (
+                          <NText strong depth={1}>
+                            {t('project.workflow.startup_parameter')}
+                          </NText>
+                        ),
+                        default: () => (
+                          <StartupParam startupParam={props.instance} />
+                        )
+                      }}
+                    </NPopover>
+                  ),
+                  default: () => t('project.dag.startup_parameter')
+                }}
+              ></NTooltip>
+            </>
           )}
         </div>
         <div class={Styles['toolbar-right-part']}>
@@ -227,6 +333,33 @@ export default defineComponent({
               default: () => t('project.dag.download_png')
             }}
           ></NTooltip>
+          {/* Refresh */}
+          {props.instance && (
+            <NTooltip
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    class={Styles['toolbar-right-item']}
+                    strong
+                    secondary
+                    circle
+                    type='info'
+                    onClick={() => {
+                      context.emit('refresh')
+                    }}
+                    v-slots={{
+                      icon: () => (
+                        <NIcon>
+                          <SyncOutlined />
+                        </NIcon>
+                      )
+                    }}
+                  />
+                ),
+                default: () => t('project.dag.refresh_dag_status')
+              }}
+            ></NTooltip>
+          )}
           {/* Delete */}
           <NTooltip
             v-slots={{
@@ -330,7 +463,7 @@ export default defineComponent({
           )}
           {/* Save workflow */}
           <NButton
-            class={Styles['toolbar-right-item']}
+            class={[Styles['toolbar-right-item'], 'btn-save']}
             type='info'
             secondary
             round
@@ -341,7 +474,7 @@ export default defineComponent({
             {t('project.dag.save')}
           </NButton>
           {/* Return to previous page */}
-          <NButton secondary round onClick={onClose}>
+          <NButton secondary round onClick={onClose} class='btn-close'>
             {t('project.dag.close')}
           </NButton>
         </div>

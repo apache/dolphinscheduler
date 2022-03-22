@@ -27,30 +27,31 @@ export function useFolder(state: any) {
   const router: Router = useRouter()
   const fileStore = useFileStore()
 
-  const handleCreateFolder = (
+  const handleCreateFolder = async (
     emit: IEmit,
     hideModal: () => void,
     resetForm: () => void
   ) => {
-    const pid = router.currentRoute.value.params.id || -1
-    const currentDir = fileStore.getCurrentDir || '/'
-    state.folderFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        try {
-          await createDirectory({
-            ...state.folderForm,
-            ...{ pid, currentDir }
-          })
+    await state.folderFormRef.validate()
 
-          window.$message.success(t('resource.file.success'))
-          emit('updateList')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-        hideModal()
-        resetForm()
-      }
-    })
+    if (state.saving) return
+    state.saving = true
+
+    try {
+      const pid = router.currentRoute.value.params.id || -1
+      const currentDir = fileStore.getCurrentDir || '/'
+      await createDirectory({
+        ...state.folderForm,
+        ...{ pid, currentDir }
+      })
+      window.$message.success(t('resource.file.success'))
+      state.saving = false
+      emit('updateList')
+      hideModal()
+      resetForm()
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   return {

@@ -59,19 +59,21 @@ export function useModal(
     })
   }
 
-  const submitRequest = (serviceHandle: any) => {
-    state.folderFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        try {
-          await serviceHandle()
-          window.$message.success(t('resource.udf.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
-    })
+  const submitRequest = async (serviceHandle: any) => {
+    await state.folderFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+
+    try {
+      await serviceHandle()
+      window.$message.success(t('resource.udf.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   const resetUploadForm = () => {
@@ -80,30 +82,32 @@ export function useModal(
     state.uploadForm.description = ''
   }
 
-  const handleUploadFile = () => {
-    state.uploadFormRef.validate(async (valid: any) => {
+  const handleUploadFile = async () => {
+    await state.uploadFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+
+    try {
       const pid = router.currentRoute.value.params.id || -1
       const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
-      if (!valid) {
-        const formData = new FormData()
-        formData.append('file', state.uploadForm.file)
-        formData.append('type', 'UDF')
-        formData.append('name', state.uploadForm.name)
-        formData.append('pid', String(pid))
-        formData.append('currentDir', currentDir)
-        formData.append('description', state.uploadForm.description)
 
-        try {
-          await createResource(formData as any)
-          window.$message.success(t('resource.udf.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-          resetUploadForm()
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
-    })
+      const formData = new FormData()
+      formData.append('file', state.uploadForm.file)
+      formData.append('type', 'UDF')
+      formData.append('name', state.uploadForm.name)
+      formData.append('pid', String(pid))
+      formData.append('currentDir', currentDir)
+      formData.append('description', state.uploadForm.description)
+
+      await createResource(formData as any)
+      window.$message.success(t('resource.udf.success'))
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+      resetUploadForm()
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   return {

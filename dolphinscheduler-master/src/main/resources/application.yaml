@@ -19,6 +19,9 @@ spring:
     banner-mode: off
   application:
     name: master-server
+  jackson:
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   cache:
     # default enable cache, you can disable by `type: none`
     type: none
@@ -120,6 +123,9 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+metrics:
+  enabled: true
 
 # Override by profile
 

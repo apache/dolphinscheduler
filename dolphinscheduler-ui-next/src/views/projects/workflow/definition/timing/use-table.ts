@@ -31,153 +31,26 @@ import {
   DeleteOutlined,
   EditOutlined
 } from '@vicons/antd'
-import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
+import { useTimezoneStore } from '@/store/timezone/timezone'
 import styles from '../index.module.scss'
+import type { Router } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-
-  const columns: TableColumns<any> = [
-    {
-      title: t('project.workflow.id'),
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('project.workflow.workflow_name'),
-      key: 'processDefinitionName',
-      width: 200,
-      render: (_row) =>
-        h(
-          NEllipsis,
-          { style: 'max-width: 200px' },
-          {
-            default: () => _row.processDefinitionName
-          }
-        )
-    },
-    {
-      title: t('project.workflow.start_time'),
-      key: 'startTime'
-    },
-    {
-      title: t('project.workflow.end_time'),
-      key: 'endTime'
-    },
-    {
-      title: t('project.workflow.crontab'),
-      key: 'crontab'
-    },
-    {
-      title: t('project.workflow.failure_strategy'),
-      key: 'failureStrategy'
-    },
-    {
-      title: t('project.workflow.status'),
-      key: 'releaseState',
-      render: (_row) =>
-        _row.releaseState === 'ONLINE'
-          ? t('project.workflow.up_line')
-          : t('project.workflow.down_line')
-    },
-    {
-      title: t('project.workflow.create_time'),
-      key: 'createTime'
-    },
-    {
-      title: t('project.workflow.update_time'),
-      key: 'updateTime'
-    },
-    {
-      title: t('project.workflow.operation'),
-      key: 'operation',
-      fixed: 'right',
-      className: styles.operation,
-      render: (row) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NButton,
-              {
-                circle: true,
-                type: 'info',
-                size: 'tiny',
-                disabled: row.releaseState === 'ONLINE',
-                onClick: () => {
-                  handleEdit(row)
-                }
-              },
-              {
-                icon: () => h(EditOutlined)
-              }
-            ),
-            h(
-              NButton,
-              {
-                circle: true,
-                type: row.releaseState === 'ONLINE' ? 'error' : 'warning',
-                size: 'tiny',
-                onClick: () => {
-                  handleReleaseState(row)
-                }
-              },
-              {
-                icon: () =>
-                  h(
-                    row.releaseState === 'ONLINE'
-                      ? ArrowDownOutlined
-                      : ArrowUpOutlined
-                  )
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleDelete(row.id)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'error',
-                            size: 'tiny'
-                          },
-                          {
-                            icon: () => h(DeleteOutlined)
-                          }
-                        ),
-                      default: () => t('project.workflow.delete')
-                    }
-                  ),
-                default: () => t('project.workflow.delete_confirm')
-              }
-            )
-          ]
-        })
-      }
-    }
-  ]
-
-  const handleEdit = (row: any) => {
-    variables.showRef = true
-    variables.row = row
-  }
+  const timezoneStore = useTimezoneStore()
+  const timeZone = timezoneStore.getTimezone
 
   const variables = reactive({
-    columns,
+    columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
@@ -187,6 +60,186 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false)
   })
+
+  const renderTime = (time: string) => {
+    const utc = format(new Date(time), 'zzz', {
+      timeZone
+    }).replace('GMT', 'UTC')
+    return h('span', [
+      h('span', null, time),
+      h('span', { style: 'color: #1890ff; margin-left: 5px' }, `(${utc})`)
+    ])
+  }
+
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        ...COLUMN_WIDTH_CONFIG['index'],
+        render: (row: any, index: number) => index + 1
+      },
+      {
+        title: t('project.workflow.workflow_name'),
+        key: 'processDefinitionName',
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: any) =>
+          h(
+            NEllipsis,
+            { style: 'max-width: 200px' },
+            {
+              default: () => row.processDefinitionName
+            }
+          )
+      },
+      {
+        title: t('project.workflow.start_time'),
+        key: 'startTime',
+        ...COLUMN_WIDTH_CONFIG['time'],
+        render: (row: any) => renderTime(row.startTime)
+      },
+      {
+        title: t('project.workflow.end_time'),
+        key: 'endTime',
+        ...COLUMN_WIDTH_CONFIG['time'],
+        render: (row: any) => renderTime(row.endTime)
+      },
+      {
+        title: t('project.workflow.crontab'),
+        key: 'crontab',
+        width: 140
+      },
+      {
+        title: t('project.workflow.failure_strategy'),
+        key: 'failureStrategy',
+        width: 140
+      },
+      {
+        title: t('project.workflow.status'),
+        key: 'releaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
+        render: (row: any) =>
+          row.releaseState === 'ONLINE'
+            ? t('project.workflow.up_line')
+            : t('project.workflow.down_line')
+      },
+      {
+        title: t('project.workflow.create_time'),
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('project.workflow.update_time'),
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('project.workflow.operation'),
+        key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        className: styles.operation,
+        render: (row: any) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        disabled: row.releaseState === 'ONLINE',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () => h(EditOutlined)
+                      }
+                    ),
+                  default: () => t('project.workflow.edit')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type:
+                          row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                        size: 'small',
+                        onClick: () => {
+                          handleReleaseState(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(
+                            row.releaseState === 'ONLINE'
+                              ? ArrowDownOutlined
+                              : ArrowUpOutlined
+                          )
+                      }
+                    ),
+                  default: () =>
+                    row.releaseState === 'ONLINE'
+                      ? t('project.workflow.down_line')
+                      : t('project.workflow.up_line')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row.id)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'small'
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('project.workflow.delete')
+                      }
+                    ),
+                  default: () => t('project.workflow.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
+  }
+
+  const handleEdit = (row: any) => {
+    variables.showRef = true
+    variables.row = row
+  }
 
   const getTableData = (params: ISearchParam) => {
     const definitionCode = Number(
@@ -224,22 +277,19 @@ export function useTable() {
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
-    deleteScheduleById(id, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteScheduleById(id, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   return {
     variables,
+    createColumns,
     getTableData
   }
 }

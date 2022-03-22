@@ -32,7 +32,9 @@ import {
   GlobalOutlined,
   IssuesCloseOutlined
 } from '@vicons/antd'
-import { ITaskState } from './types'
+import { parseISO } from 'date-fns'
+import _ from 'lodash'
+import { ITaskStateConfig } from './types'
 
 /**
  * Intelligent display kb m
@@ -200,15 +202,14 @@ export const stateType = (t: any) => [
  * @icon icon
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
-// TODO: Looking for a more suitable icon
-export const tasksState = (t: any): ITaskState => ({
+export const tasksState = (t: any): ITaskStateConfig => ({
   SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${t('project.workflow.submit_success')}`,
     color: '#A9A9A9',
     icon: IssuesCloseOutlined,
     isSpin: false,
-    classNames: 'submitted'
+    classNames: 'submitted_success'
   },
   RUNNING_EXECUTION: {
     id: 1,
@@ -216,7 +217,7 @@ export const tasksState = (t: any): ITaskState => ({
     color: '#0097e0',
     icon: SettingFilled,
     isSpin: true,
-    classNames: 'executing'
+    classNames: 'running_execution'
   },
   READY_PAUSE: {
     id: 2,
@@ -224,7 +225,7 @@ export const tasksState = (t: any): ITaskState => ({
     color: '#07b1a3',
     icon: SettingOutlined,
     isSpin: false,
-    classNames: 'submitted'
+    classNames: 'ready_pause'
   },
   PAUSE: {
     id: 3,
@@ -239,14 +240,16 @@ export const tasksState = (t: any): ITaskState => ({
     desc: `${t('project.workflow.ready_to_stop')}`,
     color: '#FE0402',
     icon: StopFilled,
-    isSpin: false
+    isSpin: false,
+    classNames: 'ready_stop'
   },
   STOP: {
     id: 5,
     desc: `${t('project.workflow.stop')}`,
     color: '#e90101',
     icon: StopOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'stop'
   },
   FAILURE: {
     id: 6,
@@ -259,7 +262,7 @@ export const tasksState = (t: any): ITaskState => ({
   SUCCESS: {
     id: 7,
     desc: `${t('project.workflow.success')}`,
-    color: '#33cc00',
+    color: '#95DF96',
     icon: CheckCircleOutlined,
     isSpin: false,
     classNames: 'success'
@@ -269,49 +272,56 @@ export const tasksState = (t: any): ITaskState => ({
     desc: `${t('project.workflow.need_fault_tolerance')}`,
     color: '#FF8C00',
     icon: EditOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'need_fault_tolerance'
   },
   KILL: {
     id: 9,
     desc: `${t('project.workflow.kill')}`,
     color: '#a70202',
     icon: MinusCircleOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'kill'
   },
   WAITING_THREAD: {
     id: 10,
     desc: `${t('project.workflow.waiting_for_thread')}`,
     color: '#912eed',
     icon: ClockCircleOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'waiting_thread'
   },
   WAITING_DEPEND: {
     id: 11,
     desc: `${t('project.workflow.waiting_for_dependence')}`,
     color: '#5101be',
     icon: GlobalOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'waiting_depend'
   },
   DELAY_EXECUTION: {
     id: 12,
     desc: `${t('project.workflow.delay_execution')}`,
     color: '#5102ce',
     icon: PauseCircleFilled,
-    isSpin: false
+    isSpin: false,
+    classNames: 'delay_execution'
   },
   FORCED_SUCCESS: {
     id: 13,
     desc: `${t('project.workflow.forced_success')}`,
     color: '#5102ce',
     icon: CheckCircleFilled,
-    isSpin: false
+    isSpin: false,
+    classNames: 'forced_success'
   },
   SERIAL_WAIT: {
     id: 14,
     desc: `${t('project.workflow.serial_wait')}`,
     color: '#5102ce',
     icon: LoadingOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'serial_wait'
   }
 })
 
@@ -330,4 +340,31 @@ export function uuid(prefix: string) {
       ? prefix.replace(/%\{s\}/g, id)
       : prefix + id
     : id
+}
+
+export const warningTypeList = [
+  {
+    id: 'NONE',
+    code: 'project.workflow.none_send'
+  },
+  {
+    id: 'SUCCESS',
+    code: 'project.workflow.success_send'
+  },
+  {
+    id: 'FAILURE',
+    code: 'project.workflow.failure_send'
+  },
+  {
+    id: 'ALL',
+    code: 'project.workflow.all_send'
+  }
+]
+
+export const parseTime = (dateTime: string | number) => {
+  if (_.isString(dateTime) === true) {
+    return parseISO(dateTime as string)
+  } else {
+    return new Date(dateTime)
+  }
 }

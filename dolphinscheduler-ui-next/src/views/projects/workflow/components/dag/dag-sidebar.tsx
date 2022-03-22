@@ -20,7 +20,7 @@ import {
   TaskType,
   TASK_TYPES_MAP
 } from '@/views/projects/task/constants/task-type'
-import Styles from './dag.module.scss'
+import styles from './dag.module.scss'
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
@@ -32,10 +32,10 @@ export default defineComponent({
     }))
 
     return () => (
-      <div class={Styles.sidebar}>
+      <div class={styles.sidebar}>
         {allTaskTypes.map((task) => (
           <div
-            class={Styles.draggable}
+            class={[styles.draggable, `task-item-${task.type}`]}
             draggable='true'
             onDragstart={(e) => {
               context.emit('dragStart', e, task.type as TaskType)
@@ -43,10 +43,10 @@ export default defineComponent({
           >
             <em
               class={[
-                Styles['sidebar-icon'],
-                Styles['icon-' + task.type.toLocaleLowerCase()]
+                styles['sidebar-icon'],
+                styles['icon-' + task.type.toLocaleLowerCase()]
               ]}
-            ></em>
+            />
             <span>{task.alias}</span>
           </div>
         ))}

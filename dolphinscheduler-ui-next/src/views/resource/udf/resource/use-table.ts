@@ -31,8 +31,13 @@ import {
   deleteResource,
   queryResourceById
 } from '@/service/modules/resources'
-import { IUdfResourceParam } from './types'
-import styles from './index.module.scss'
+import ButtonLink from '@/components/button-link'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { IUdfResourceParam } from './types'
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
@@ -51,6 +56,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     breadList: [],
@@ -66,64 +72,64 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('resource.udf.id'),
+        title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (_row, index) => index + 1
       },
       {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
+        width: 60,
         render: (row) => {
-          if (!row.directory) {
-            return row.alias
-          } else {
-            return h(
-              'a',
-              {
-                href: 'javascript:',
-                class: styles.links,
-                onClick: () => goSubFolder(router, row)
-              },
-              {
-                default: () => {
-                  return row.alias
-                }
-              }
-            )
-          }
+          return !row.directory
+            ? row.alias
+            : h(
+                ButtonLink,
+                {
+                  onClick: () => void goSubFolder(router, row)
+                },
+                { default: () => row.alias }
+              )
         }
       },
       {
         title: t('resource.udf.whether_directory'),
         key: 'whether_directory',
+        ...COLUMN_WIDTH_CONFIG['yesOrNo'],
         render: (row) =>
           row.directory ? t('resource.file.yes') : t('resource.file.no')
       },
       {
         title: t('resource.udf.file_name'),
+        ...COLUMN_WIDTH_CONFIG['name'],
         key: 'fileName'
       },
       {
         title: t('resource.udf.file_size'),
         key: 'size',
+        ...COLUMN_WIDTH_CONFIG['size'],
         render: (row) => bytesToSize(row.size)
       },
       {
         title: t('resource.udf.description'),
-        key: 'description'
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('resource.udf.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.udf.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.udf.operation'),
         key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render: (row) => {
           return h(NSpace, null, {
             default: () => [
@@ -139,6 +145,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'tiny',
+                        class: 'btn-edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -162,6 +169,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'tiny',
+                        class: 'btn-download',
                         disabled: row?.directory ? true : false,
                         onClick: () => downloadResource(row.id)
                       },
@@ -192,7 +200,8 @@ export function useTable() {
                               tag: 'div',
                               circle: true,
                               type: 'error',
-                              size: 'tiny'
+                              size: 'tiny',
+                              class: 'btn-delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)
@@ -209,6 +218,9 @@ export function useTable() {
         }
       }
     ] as TableColumns<any>
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const getTableData = (params: IUdfResourceParam) => {
@@ -265,14 +277,10 @@ export function useTable() {
         fullName
       },
       id
-    )
-      .then((res: any) => {
-        fileStore.setCurrentDir(res.fullName)
-        router.push({ name: 'resource-sub-manage', params: { id: res.id } })
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    ).then((res: any) => {
+      fileStore.setCurrentDir(res.fullName)
+      router.push({ name: 'resource-sub-manage', params: { id: res.id } })
+    })
   }
 
   return {

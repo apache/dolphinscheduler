@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -51,6 +51,7 @@ public class LoggerUtils {
 
     /**
      * build job id
+     *
      * @return task id format
      */
     public static String buildTaskId(Date firstSubmitTime,
@@ -59,8 +60,9 @@ public class LoggerUtils {
                                      int processInstId,
                                      int taskId) {
         // like TaskAppId=TASK-20211107-798_1-4084-15210
-        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD);
-        return String.format("%s=%s-%s-%s_%s-%s-%s", TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
+        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null);
+        return String.format("%s=%s-%s-%s_%s-%s-%s",
+                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**

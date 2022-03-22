@@ -60,14 +60,6 @@ const taskGroupQueue = defineComponent({
       priority: 0
     })
 
-    const requestData = () => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        groupId: variables.groupId
-      })
-    }
-
     const resetTableData = () => {
       getTableData({
         pageSize: variables.pageSize,
@@ -120,7 +112,10 @@ const taskGroupQueue = defineComponent({
             if (!searchParamRef.groupId) {
               searchParamRef.groupId = item.id
             }
-            let option: SelectMixedOption = { label: item.name, value: item.id }
+            const option: SelectMixedOption = {
+              label: item.name,
+              value: item.id
+            }
             taskGroupOptions.value.push(option)
           })
         }
@@ -201,6 +196,7 @@ const taskGroupQueue = defineComponent({
               size={'small'}
               data={this.tableData}
               striped
+              scrollX={this.tableWidth}
             />
             <div class={styles.pagination}>
               <NPagination

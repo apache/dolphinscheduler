@@ -22,7 +22,10 @@ import type { IJsonItem } from '../types'
 import { TypeReq } from '@/service/modules/data-source/types'
 import { find } from 'lodash'
 
-export function useDatasource(model: { [field: string]: any }): IJsonItem {
+export function useDatasource(
+  model: { [field: string]: any },
+  field?: string
+): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
@@ -32,12 +35,8 @@ export function useDatasource(model: { [field: string]: any }): IJsonItem {
   const getDatasources = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      await refreshOptions()
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    await refreshOptions()
+    loading.value = false
   }
 
   const refreshOptions = async () => {
@@ -50,7 +49,7 @@ export function useDatasource(model: { [field: string]: any }): IJsonItem {
       options.value.push({ label: item.name, value: String(item.id) })
     })
     if (options.value && model.datasource) {
-      let item = find(options.value, { value: String(model.datasource) })
+      const item = find(options.value, { value: String(model.datasource) })
       if (!item) {
         model.datasource = null
       }
@@ -71,9 +70,9 @@ export function useDatasource(model: { [field: string]: any }): IJsonItem {
   })
   return {
     type: 'select',
-    field: 'datasource',
+    field: field ? field : 'datasource',
     span: 12,
-    name: t('project.node.datasource'),
+    name: t('project.node.datasource_instances'),
     props: {
       loading: loading
     },

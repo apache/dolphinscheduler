@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-import { useAsyncState, useAsyncQueue } from '@vueuse/core'
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import {
   queryTaskGroupListPaging,
@@ -28,39 +25,80 @@ import {
 } from '@/service/modules/task-group'
 import TableAction from './components/table-action'
 import _ from 'lodash'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import { parseTime } from '@/utils/common'
 
 export function useTable(
-  updatePriority = (queueId: number, priority: number): void => {},
+  updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
-  const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
-    { title: t('resource.task_group_queue.id'), key: 'index' },
-    { title: t('resource.task_group_queue.project_name'), key: 'projectName' },
-    { title: t('resource.task_group_queue.task_name'), key: 'taskName' },
+    {
+      title: '#',
+      key: 'index',
+      render: (row, index) => index + 1,
+      ...COLUMN_WIDTH_CONFIG['index']
+    },
+    {
+      title: t('resource.task_group_queue.project_name'),
+      key: 'projectName',
+      ...COLUMN_WIDTH_CONFIG['name']
+    },
+    {
+      title: t('resource.task_group_queue.task_name'),
+      key: 'taskName',
+      ...COLUMN_WIDTH_CONFIG['name']
+    },
     {
       title: t('resource.task_group_queue.process_instance_name'),
-      key: 'processInstanceName'
+      key: 'processInstanceName',
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_queue.task_group_name'),
-      key: 'taskGroupName'
+      key: 'taskGroupName',
+      ...COLUMN_WIDTH_CONFIG['name']
     },
-    { title: t('resource.task_group_queue.priority'), key: 'priority' },
+    {
+      title: t('resource.task_group_queue.priority'),
+      key: 'priority',
+      width: 120
+    },
     {
       title: t('resource.task_group_queue.force_starting_status'),
-      key: 'forceStart'
+      key: 'forceStart',
+      ...COLUMN_WIDTH_CONFIG['state']
     },
-    { title: t('resource.task_group_queue.in_queue'), key: 'inQueue' },
-    { title: t('resource.task_group_queue.task_status'), key: 'status' },
-    { title: t('resource.task_group_queue.create_time'), key: 'createTime' },
-    { title: t('resource.task_group_queue.update_time'), key: 'updateTime' },
+    {
+      title: t('resource.task_group_queue.in_queue'),
+      key: 'inQueue',
+      width: 120
+    },
+    {
+      title: t('resource.task_group_queue.task_status'),
+      key: 'status',
+      ...COLUMN_WIDTH_CONFIG['state']
+    },
+    {
+      title: t('resource.task_group_queue.create_time'),
+      key: 'createTime',
+      ...COLUMN_WIDTH_CONFIG['time']
+    },
+    {
+      title: t('resource.task_group_queue.update_time'),
+      key: 'updateTime',
+      ...COLUMN_WIDTH_CONFIG['time']
+    },
     {
       title: t('resource.task_group_queue.actions'),
       key: 'actions',
-      width: 150,
+      ...COLUMN_WIDTH_CONFIG['operation'](2),
       render: (row: any) =>
         h(TableAction, {
           row,
@@ -79,6 +117,7 @@ export function useTable(
 
   const variables = reactive({
     tableData: [],
+    tableWidth: calculateTableWidth(columns) || DefaultTableWidth,
     page: ref(1),
     pageSize: ref(10),
     groupId: ref(3),
@@ -97,10 +136,10 @@ export function useTable(
       const taskGroupList = values[1].totalList
       variables.totalPage = values[0].totalPage
       variables.tableData = values[0].totalList.map(
-        (item: any, index: number) => {
+        (item: any, unused: number) => {
           let taskGroupName = ''
           if (taskGroupList) {
-            let taskGroup = _.find(taskGroupList, { id: item.groupId })
+            const taskGroup = _.find(taskGroupList, { id: item.groupId })
             if (taskGroup) {
               taskGroupName = taskGroup.name
             }
@@ -108,15 +147,14 @@ export function useTable(
 
           item.taskGroupName = taskGroupName
           item.createTime = format(
-            new Date(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }

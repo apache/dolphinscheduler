@@ -18,16 +18,16 @@
 import { h, ref, reactive, SetupContext } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
 import {
   deleteVersion,
   queryVersions,
   switchVersion
 } from '@/service/modules/process-definition'
+import { DeleteOutlined, ExclamationCircleOutlined } from '@vicons/antd'
+import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
+import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import { DeleteOutlined, ExclamationCircleOutlined } from '@vicons/antd'
-import styles from '../index.module.scss'
 
 export function useTable(
   ctx: SetupContext<('update:show' | 'update:row' | 'updateList')[]>
@@ -37,7 +37,7 @@ export function useTable(
 
   const columns: TableColumns<any> = [
     {
-      title: t('project.workflow.id'),
+      title: '#',
       key: 'id',
       width: 50,
       render: (_row, index) => index + 1
@@ -149,46 +149,46 @@ export function useTable(
     columns,
     row: {} as any,
     tableData: [],
+    page: ref(1),
+    totalPage: ref(1),
+    pageSize: ref(10),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode))
   })
 
   const getTableData = (row: any) => {
     variables.row = row
-    const params = {
-      pageSize: 10,
-      pageNo: 1
-    }
     queryVersions(
-      { ...params },
+      {
+        pageSize: variables.pageSize,
+        pageNo: variables.page
+      },
       variables.projectCode,
       variables.row.code
     ).then((res: any) => {
       variables.tableData = res.totalList.map((item: any) => ({ ...item }))
+
+      variables.totalPage = res.totalPage
     })
   }
 
   const handleSwitchVersion = (version: number) => {
-    switchVersion(variables.projectCode, variables.row.code, version)
-      .then(() => {
+    switchVersion(variables.projectCode, variables.row.code, version).then(
+      () => {
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
         getTableData(variables.row)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+      }
+    )
   }
 
   const handleDeleteVersion = (version: number) => {
-    deleteVersion(variables.projectCode, variables.row.code, version)
-      .then(() => {
+    deleteVersion(variables.projectCode, variables.row.code, version).then(
+      () => {
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
         getTableData(variables.row)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+      }
+    )
   }
 
   return {

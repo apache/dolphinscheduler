@@ -75,9 +75,10 @@ $bgLight: #ffffff;
 
 .workflow-name {
   font-size: 14px;
+  font-weight: 700;
 }
 
-.copy-btn {
+.toolbar-btn {
   margin-left: 5px;
 }
 
@@ -105,6 +106,9 @@ $bgLight: #ffffff;
     }
     &.icon-sub_process {
       background-image: url('@/assets/images/task-icons/sub_process.png');
+    }
+    &.icon-data_quality {
+      background-image: url('@/assets/images/task-icons/data_quality.png');
     }
     &.icon-procedure {
       background-image: url('@/assets/images/task-icons/procedure.png');
@@ -148,6 +152,9 @@ $bgLight: #ffffff;
     &.icon-switch {
       background-image: url('@/assets/images/task-icons/switch.png');
     }
+    &.icon-emr {
+      background-image: url('@/assets/images/task-icons/emr.png');
+    }
   }
 
   &:hover {
@@ -157,6 +164,9 @@ $bgLight: #ffffff;
       }
       &.icon-sub_process {
         background-image: url('@/assets/images/task-icons/sub_process_hover.png');
+      }
+      &.icon-data_quality {
+        background-image: url('@/assets/images/task-icons/data_quality_hover.png');
       }
       &.icon-procedure {
         background-image: url('@/assets/images/task-icons/procedure_hover.png');
@@ -200,6 +210,9 @@ $bgLight: #ffffff;
       &.icon-switch {
         background-image: url('@/assets/images/task-icons/switch_hover.png');
       }
+      &.icon-emr {
+        background-image: url('@/assets/images/task-icons/emr_hover.png');
+      }
     }
   }
 }
@@ -226,6 +239,12 @@ $bgLight: #ffffff;
   bottom: 0px;
   border: dashed 1px #e4e4e4;
   z-index: 9;
+}
+
+.toolbar-left-part {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .toolbar-right-part {

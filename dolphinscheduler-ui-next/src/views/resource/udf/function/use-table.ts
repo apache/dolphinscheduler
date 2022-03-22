@@ -27,7 +27,12 @@ import {
   queryUdfFuncListPaging,
   deleteUdfFunc
 } from '@/service/modules/resources'
-import { IUdfFunctionParam } from './types'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { IUdfFunctionParam } from './types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -35,6 +40,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     id: ref(Number(router.currentRoute.value.params.id) || -1),
@@ -48,38 +54,45 @@ export function useTable() {
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('resource.function.id'),
+        title: '#',
         key: 'id',
-        width: 50,
-        render: (_row, index) => index + 1
+        render: (_row, index) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('resource.function.udf_function_name'),
-        key: 'funcName'
+        key: 'funcName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('resource.function.class_name'),
-        key: 'className'
+        key: 'className',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('resource.function.type'),
-        key: 'type'
+        key: 'type',
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('resource.function.description'),
-        key: 'description'
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('resource.function.jar_package'),
-        key: 'resourceName'
+        key: 'resourceName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('resource.function.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.function.operation'),
         key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render: (row) => {
           return h(NSpace, null, {
             default: () => [
@@ -94,6 +107,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'tiny',
+                        class: 'btn-edit',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -124,7 +138,8 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'tiny'
+                              size: 'tiny',
+                              class: 'btn-delete'
                             },
                             {
                               icon: () => h(DeleteOutlined)
@@ -141,6 +156,9 @@ export function useTable() {
         }
       }
     ] as TableColumns<any>
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const getTableData = (params: IUdfFunctionParam) => {

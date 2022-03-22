@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
@@ -29,6 +29,12 @@ import type {
   NamespaceListRes,
   NamespaceItem
 } from '@/service/modules/k8s-namespace/types'
+import { parseTime } from '@/utils/common'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 
 export function useTable() {
   const { t } = useI18n()
@@ -56,43 +62,54 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('security.k8s_namespace.k8s_namespace'),
-        key: 'namespace'
+        key: 'namespace',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.k8s_namespace.k8s_cluster'),
-        key: 'k8s'
+        key: 'k8s',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.k8s_namespace.owner'),
-        key: 'owner'
+        key: 'owner',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('security.k8s_namespace.tag'),
-        key: 'tag'
+        key: 'tag',
+        ...COLUMN_WIDTH_CONFIG['tag']
       },
       {
         title: t('security.k8s_namespace.limit_cpu'),
-        key: 'limitsCpu'
+        key: 'limitsCpu',
+        width: 140
       },
       {
         title: t('security.k8s_namespace.limit_memory'),
-        key: 'limitsMemory'
+        key: 'limitsMemory',
+        width: 140
       },
       {
         title: t('security.k8s_namespace.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.k8s_namespace.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.k8s_namespace.operation'),
         key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render(row: NamespaceItem) {
           return h(NSpace, null, {
             default: () => [
@@ -112,7 +129,8 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.k8s_namespace.edit')
@@ -140,7 +158,10 @@ export function useTable() {
                               size: 'small'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.k8s_namespace.delete')
@@ -154,11 +175,15 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const variables = reactive({
     columns: [],
     tableData: [],
+    tableWidth: DefaultTableWidth,
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
@@ -171,17 +196,16 @@ export function useTable() {
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
       queryNamespaceListPaging({ ...params }).then((res: NamespaceListRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(
-            new Date(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           return {
-            index: index + 1,
             ...item
           }
         }) as any

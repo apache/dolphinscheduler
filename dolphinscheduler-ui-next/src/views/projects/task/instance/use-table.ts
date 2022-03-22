@@ -23,29 +23,38 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
+import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
   DownloadOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
-import { useRoute } from 'vue-router'
-import { downloadFile } from '@/service/service'
-import type { TaskInstancesRes } from '@/service/modules/task-instances/types'
+import { useRoute, useRouter } from 'vue-router'
+import { parseTime, tasksState } from '@/utils/common'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {
   const { t } = useI18n()
   const route = useRoute()
+  const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
+  const processInstanceId = Number(route.params.processInstanceId)
 
   const variables = reactive({
     columns: [],
-    tableData: [],
+    tableWidth: DefaultTableWidth,
+    tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
-    processInstanceId: ref(null),
+    processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),
@@ -60,66 +69,93 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('project.task.task_name'),
-        key: 'name'
+        key: 'name',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        width: 250
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: {
+          processInstanceId: number
+          processInstanceName: string
+        }) =>
+          h(
+            ButtonLink,
+            {
+              onClick: () =>
+                void router.push({
+                  name: 'workflow-instance-detail',
+                  params: { id: row.processInstanceId },
+                  query: { code: projectCode }
+                })
+            },
+            { default: () => row.processInstanceName }
+          )
       },
       {
         title: t('project.task.executor'),
-        key: 'executorName'
+        key: 'executorName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.node_type'),
-        key: 'taskType'
+        key: 'taskType',
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('project.task.state'),
-        key: 'state'
+        key: 'state',
+        ...COLUMN_WIDTH_CONFIG['state'],
+        render: (row: IRecord) => renderStateCell(row.state, t)
       },
       {
         title: t('project.task.submit_time'),
-        key: 'submitTime',
-        width: 170
+        ...COLUMN_WIDTH_CONFIG['time'],
+        key: 'submitTime'
       },
       {
         title: t('project.task.start_time'),
-        key: 'startTime',
-        width: 170
+        ...COLUMN_WIDTH_CONFIG['time'],
+        key: 'startTime'
       },
       {
         title: t('project.task.end_time'),
-        key: 'endTime',
-        width: 170
+        ...COLUMN_WIDTH_CONFIG['time'],
+        key: 'endTime'
       },
       {
         title: t('project.task.duration'),
         key: 'duration',
+        ...COLUMN_WIDTH_CONFIG['duration'],
         render: (row: any) => h('span', null, row.duration ? row.duration : '-')
       },
       {
         title: t('project.task.retry_count'),
-        key: 'retryTimes'
+        key: 'retryTimes',
+        ...COLUMN_WIDTH_CONFIG['times']
       },
       {
         title: t('project.task.dry_run_flag'),
-        key: 'dryRun'
+        key: 'dryRun',
+        ...COLUMN_WIDTH_CONFIG['dryRun'],
+        render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.host'),
         key: 'host',
-        width: 160
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
-        width: 150,
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -144,10 +180,13 @@ export function useTable() {
                         }
                       },
                       {
-                        icon: () => h(CheckCircleOutlined)
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(CheckCircleOutlined)
+                          })
                       }
                     ),
-                  default: () => t('project.task.serial_wait')
+                  default: () => t('project.task.forced_success')
                 }
               ),
               h(
@@ -164,7 +203,10 @@ export function useTable() {
                         onClick: () => handleLog(row)
                       },
                       {
-                        icon: () => h(AlignLeftOutlined)
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(AlignLeftOutlined)
+                          })
                       }
                     ),
                   default: () => t('project.task.view_log')
@@ -184,7 +226,8 @@ export function useTable() {
                         onClick: () => downloadLog(row.id)
                       },
                       {
-                        icon: () => h(DownloadOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DownloadOutlined) })
                       }
                     ),
                   default: () => t('project.task.download_log')
@@ -195,6 +238,9 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const handleLog = (row: any) => {
@@ -230,10 +276,10 @@ export function useTable() {
       host: params.host,
       stateType: params.stateType,
       startDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: params.executorName,
       processInstanceName: params.processInstanceName
@@ -242,21 +288,24 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
-          variables.tableData = res.totalList.map((item, index) => {
+          variables.tableData = res.totalList.map((item, unused) => {
             item.submitTime = format(
-              new Date(item.submitTime),
+              parseTime(item.submitTime),
               'yyyy-MM-dd HH:mm:ss'
             )
             item.startTime = format(
-              new Date(item.startTime),
+              parseTime(item.startTime),
               'yyyy-MM-dd HH:mm:ss'
             )
-            item.endTime = format(new Date(item.endTime), 'yyyy-MM-dd HH:mm:ss')
+            item.endTime = format(
+              parseTime(item.endTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
             return {
-              index: index + 1,
               ...item
             }
           }) as any
+          variables.totalPage = res.totalPage
         }
       ),
       {}
@@ -271,4 +320,28 @@ export function useTable() {
     getTableData,
     createColumns
   }
+}
+
+export function renderStateCell(state: ITaskState, t: Function) {
+  const stateOption = tasksState(t)[state]
+
+  const Icon = h(
+    NIcon,
+    {
+      color: stateOption.color,
+      size: 18,
+      class: stateOption.classNames,
+      style: {
+        display: 'flex'
+      }
+    },
+    () => h(stateOption.icon)
+  )
+  return h(NTooltip, null, {
+    trigger: () => {
+      if (!stateOption.isSpin) return Icon
+      return h(NSpin, { size: 'small' }, { icon: () => Icon })
+    },
+    default: () => stateOption.desc
+  })
 }

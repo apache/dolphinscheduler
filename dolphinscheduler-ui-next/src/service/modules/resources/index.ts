@@ -18,7 +18,6 @@
 import { axios, downloadFile } from '@/service/service'
 import {
   ResourceTypeReq,
-  UdfTypeReq,
   NameReq,
   FileNameReq,
   FullNameReq,
@@ -53,6 +52,13 @@ export function queryResourceById(
     url: `/resources/${id}`,
     method: 'get',
     params
+  })
+}
+
+export function queryCurrentResourceById(id: number): any {
+  return axios({
+    url: `/resources/${id}/query`,
+    method: 'get'
   })
 }
 

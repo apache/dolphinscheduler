@@ -18,6 +18,9 @@
 spring:
   application:
     name: standalone-server
+  jackson:
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   main:
     banner-mode: off
   cache:
@@ -59,8 +62,6 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-  jackson:
-    time-zone: GMT+8
   servlet:
     multipart:
       max-file-size: 1024MB
@@ -178,6 +179,9 @@ management:
       application: ${spring.application.name}
 
 audit:
+  enabled: true
+
+metrics:
   enabled: true
 
 # Override by profile

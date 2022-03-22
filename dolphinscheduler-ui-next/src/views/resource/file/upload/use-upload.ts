@@ -27,35 +27,36 @@ export function useUpload(state: any) {
   const router: Router = useRouter()
   const fileStore = useFileStore()
 
-  const handleUploadFile = (
+  const handleUploadFile = async (
     emit: IEmit,
     hideModal: () => void,
     resetForm: () => void
   ) => {
-    state.uploadFormRef.validate(async (valid: any) => {
+    await state.uploadFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+    try {
       const pid = router.currentRoute.value.params.id || -1
       const currentDir = fileStore.getCurrentDir || '/'
-      if (!valid) {
-        const formData = new FormData()
-        formData.append('file', state.uploadForm.file)
-        formData.append('type', 'FILE')
-        formData.append('name', state.uploadForm.name)
-        formData.append('pid', String(pid))
-        formData.append('currentDir', currentDir)
-        formData.append('description', state.uploadForm.description)
+      const formData = new FormData()
+      formData.append('file', state.uploadForm.file)
+      formData.append('type', 'FILE')
+      formData.append('name', state.uploadForm.name)
+      formData.append('pid', String(pid))
+      formData.append('currentDir', currentDir)
+      formData.append('description', state.uploadForm.description)
 
-        try {
-          await createResource(formData as any)
-          window.$message.success(t('resource.file.success'))
-          emit('updateList')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+      await createResource(formData as any)
+      window.$message.success(t('resource.file.success'))
+      state.saving = false
+      emit('updateList')
 
-        hideModal()
-        resetForm()
-      }
-    })
+      hideModal()
+      resetForm()
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   return {

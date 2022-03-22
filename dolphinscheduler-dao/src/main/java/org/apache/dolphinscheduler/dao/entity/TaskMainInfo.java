@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import java.util.Date;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * task main info
  */
@@ -52,13 +50,11 @@ public class TaskMainInfo {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date taskCreateTime;
 
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date taskUpdateTime;
 
     /**

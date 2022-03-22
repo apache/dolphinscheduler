@@ -32,13 +32,12 @@ public class ResponseCache {
 
     private ResponseCache(){}
 
-    public static ResponseCache get(){
+    public static ResponseCache get() {
         return instance;
     }
 
     private Map<Integer,Command> ackCache = new ConcurrentHashMap<>();
     private Map<Integer,Command> responseCache = new ConcurrentHashMap<>();
-
 
     /**
      * cache response
@@ -46,8 +45,8 @@ public class ResponseCache {
      * @param command command
      * @param event event ACK/RESULT
      */
-    public void cache(Integer taskInstanceId, Command command, Event event){
-        switch (event){
+    public void cache(Integer taskInstanceId, Command command, Event event) {
+        switch (event) {
             case ACK:
                 ackCache.put(taskInstanceId,command);
                 break;
@@ -59,12 +58,11 @@ public class ResponseCache {
         }
     }
 
-
     /**
      * remove ack cache
      * @param taskInstanceId taskInstanceId
      */
-    public void removeAckCache(Integer taskInstanceId){
+    public void removeAckCache(Integer taskInstanceId) {
         ackCache.remove(taskInstanceId);
     }
 
@@ -72,7 +70,7 @@ public class ResponseCache {
      * remove reponse cache
      * @param taskInstanceId taskInstanceId
      */
-    public void removeResponseCache(Integer taskInstanceId){
+    public void removeResponseCache(Integer taskInstanceId) {
         responseCache.remove(taskInstanceId);
     }
 
@@ -80,7 +78,7 @@ public class ResponseCache {
      * getAckCache
      * @return getAckCache
      */
-    public Map<Integer,Command> getAckCache(){
+    public Map<Integer,Command> getAckCache() {
         return ackCache;
     }
 
@@ -88,7 +86,7 @@ public class ResponseCache {
      * getResponseCache
      * @return getResponseCache
      */
-    public Map<Integer,Command> getResponseCache(){
+    public Map<Integer,Command> getResponseCache() {
         return responseCache;
     }
 }

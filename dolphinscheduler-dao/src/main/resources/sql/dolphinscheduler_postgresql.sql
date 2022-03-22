@@ -210,12 +210,15 @@ CREATE TABLE t_ds_alert (
   title varchar(64) DEFAULT NULL ,
   content text ,
   alert_status int DEFAULT '0' ,
+  warning_type int DEFAULT '2' ,
   log text ,
   alertgroup_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
+create index idx_status on t_ds_alert (alert_status);
 
 --
 -- Table structure for table t_ds_alertgroup
@@ -462,6 +465,8 @@ CREATE TABLE t_ds_process_task_relation (
 ) ;
 
 create index process_task_relation_idx_project_code_process_definition_code on t_ds_process_task_relation (project_code,process_definition_code);
+create index process_task_relation_idx_pre_task_code_version on t_ds_process_task_relation (pre_task_code, pre_task_version);
+create index process_task_relation_idx_post_task_code_version on t_ds_process_task_relation (post_task_code, post_task_version);
 
 --
 -- Table structure for table t_ds_process_task_relation_log

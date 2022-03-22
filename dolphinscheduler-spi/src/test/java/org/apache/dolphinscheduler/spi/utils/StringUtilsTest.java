@@ -108,11 +108,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testWrapperSingleQuotes() {
-        assertEquals("'a'", StringUtils.wrapperSingleQuotes("a"));
-    }
-
-    @Test
     public void testReplaceDoubleBrackets() {
         assertEquals("{ {a} }", StringUtils.replaceDoubleBrackets("{{a}}"));
     }

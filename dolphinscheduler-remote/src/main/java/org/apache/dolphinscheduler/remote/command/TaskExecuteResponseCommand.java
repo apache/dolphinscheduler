@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  *  execute task response command
  */
@@ -56,7 +54,6 @@ public class TaskExecuteResponseCommand implements Serializable {
     /**
      *  end time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
 

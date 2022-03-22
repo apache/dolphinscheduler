@@ -33,6 +33,7 @@ export function useForm() {
       email: userInfo.email,
       phone: userInfo.phone
     },
+    saving: false,
     rules: {
       username: {
         trigger: ['input', 'blur'],

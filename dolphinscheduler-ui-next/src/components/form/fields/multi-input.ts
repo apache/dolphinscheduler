@@ -25,6 +25,7 @@ import {
   NGridItem,
   NInput
 } from 'naive-ui'
+import { isFunction } from 'lodash'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import type { IJsonItem, FormItemRule } from '../types'
 
@@ -70,33 +71,34 @@ const MultiInput = defineComponent({
 export function renderMultiInput(
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules: { [key: string]: FormItemRule }[]
+  unused: { [key: string]: FormItemRule }[]
 ) {
-  let ruleItem: { [key: string]: FormItemRule } = {}
-
+  const { field } = isFunction(item) ? item() : item
   // the fields is the data of the task definition.
   // the item is the options of this component in the form.
 
   const getChild = (value: string, i: number) => {
+    const mergedItem = isFunction(item) ? item() : item
     return h(
       NFormItemGi,
       {
         showLabel: false,
-        path: `${item.field}[${i}]`,
-        span: unref(item.span)
+        path: `${mergedItem.field}[${i}]`,
+        span: unref(mergedItem.span)
       },
       () =>
         h(NInput, {
-          ...item.props,
+          ...mergedItem.props,
           value: value,
-          onUpdateValue: (value: string) => void (fields[item.field][i] = value)
+          onUpdateValue: (value: string) =>
+            void (fields[mergedItem.field][i] = value)
         })
     )
   }
 
   //initialize the component by using data
-  const getChildren = ({ disabled }: { disabled: boolean }) =>
-    fields[item.field].map((value: string, i: number) => {
+  const getChildren = ({ disabled }: { disabled: boolean }) => {
+    return fields[field].map((value: string, i: number) => {
       return h(NGrid, { xGap: 10 }, () => [
         getChild(value, i),
         h(
@@ -113,7 +115,7 @@ export function renderMultiInput(
                 size: 'small',
                 disabled,
                 onClick: () => {
-                  fields[item.field].splice(i, 1)
+                  fields[field].splice(i, 1)
                 }
               },
               {
@@ -123,13 +125,14 @@ export function renderMultiInput(
         )
       ])
     })
+  }
 
   return h(
     MultiInput,
     {
-      name: item.field,
+      name: field,
       onAdd: () => {
-        fields[item.field].push('')
+        fields[field].push('')
       }
     },
     {

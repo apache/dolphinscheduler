@@ -31,18 +31,18 @@ export function usePigeon({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'PIGEON',
     name: '',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
-    localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    targetJobName: ''
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -54,8 +54,7 @@ export function usePigeon({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -74,7 +73,7 @@ export function usePigeon({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       Fields.useTargetTaskName(),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

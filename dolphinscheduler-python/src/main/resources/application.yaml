@@ -67,6 +67,9 @@ management:
     tags:
       application: ${spring.application.name}
 
+metrics:
+  enabled: true
+
 # Override by profile
 ---
 spring:

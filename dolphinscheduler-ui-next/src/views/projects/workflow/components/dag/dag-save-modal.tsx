@@ -29,8 +29,11 @@ import {
   NCheckbox
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
-import { SaveForm, WorkflowDefinition } from './types'
+import { useRoute } from 'vue-router'
+import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
+import { positiveIntegerRegex } from '@/utils/regex'
+import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
   visible: {
@@ -40,6 +43,10 @@ const props = {
   // If this prop is passed, it means from definition detail
   definition: {
     type: Object as PropType<WorkflowDefinition>,
+    default: undefined
+  },
+  instance: {
+    type: Object as PropType<WorkflowInstance>,
     default: undefined
   }
 }
@@ -54,8 +61,10 @@ export default defineComponent({
   props,
   emits: ['update:show', 'save'],
   setup(props, context) {
+    const route = useRoute()
     const { t } = useI18n()
 
+    const projectCode = Number(route.params.projectCode)
     const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
       if (tenants.value) {
@@ -81,38 +90,87 @@ export default defineComponent({
       timeoutFlag: false,
       timeout: 0,
       globalParams: [],
-      release: false
+      release: false,
+      sync: false
     })
     const formRef = ref()
     const rule = {
       name: {
-        required: true
+        required: true,
+        message: t('project.dag.dag_name_empty')
+      },
+      timeout: {
+        validator() {
+          if (
+            formValue.value.timeoutFlag &&
+            !positiveIntegerRegex.test(String(formValue.value.timeout))
+          ) {
+            return new Error(t('project.dag.positive_integer'))
+          }
+        }
+      },
+      globalParams: {
+        validator() {
+          const props = new Set()
+          for (const param of formValue.value.globalParams) {
+            const prop = param.value
+            if (!prop) {
+              return new Error(t('project.dag.prop_empty'))
+            }
+
+            if (props.has(prop)) {
+              return new Error(t('project.dag.prop_repeat'))
+            }
+
+            props.add(prop)
+          }
+        }
       }
     }
     const onSubmit = () => {
-      context.emit('save', formValue.value)
+      formRef.value.validate(async (valid: any) => {
+        if (!valid) {
+          const params = {
+            name: formValue.value.name
+          }
+          if (
+            props.definition?.processDefinition.name !== formValue.value.name
+          ) {
+            verifyName(params, projectCode).then(() =>
+              context.emit('save', formValue.value)
+            )
+          } else {
+            context.emit('save', formValue.value)
+          }
+        }
+      })
     }
     const onCancel = () => {
       context.emit('update:show', false)
     }
 
-    watch(
-      () => props.definition,
-      () => {
-        const process = props.definition?.processDefinition
-        if (process) {
-          formValue.value.name = process.name
-          formValue.value.description = process.description
-          formValue.value.tenantCode = process.tenantCode
-          if (process.timeout && process.timeout > 0) {
-            formValue.value.timeoutFlag = true
-            formValue.value.timeout = process.timeout
-          }
-          formValue.value.globalParams = process.globalParamList.map(
-            (param) => ({ key: param.prop, value: param.value })
-          )
+    const updateModalData = () => {
+      const process = props.definition?.processDefinition
+      if (process) {
+        formValue.value.name = process.name
+        formValue.value.description = process.description
+        formValue.value.tenantCode = process.tenantCode || 'default'
+        if (process.timeout && process.timeout > 0) {
+          formValue.value.timeoutFlag = true
+          formValue.value.timeout = process.timeout
         }
+        formValue.value.globalParams = process.globalParamList.map((param) => ({
+          key: param.prop,
+          value: param.value
+        }))
       }
+    }
+
+    onMounted(() => updateModalData())
+
+    watch(
+      () => props.definition?.processDefinition,
+      () => updateModalData()
     )
 
     return () => (
@@ -123,27 +181,22 @@ export default defineComponent({
         onCancel={onCancel}
         autoFocus={false}
       >
-        <NForm
-          label-width='100'
-          model={formValue.value}
-          rules={rule}
-          size='medium'
-          label-placement='left'
-          ref={formRef}
-        >
+        <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput v-model:value={formValue.value.name} />
+            <NInput v-model:value={formValue.value.name} class='input-name' />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
               type='textarea'
               v-model:value={formValue.value.description}
+              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('project.dag.tenant')} path='tenantCode'>
             <NSelect
               options={tenantsDropdown.value}
               v-model:value={formValue.value.tenantCode}
+              class='btn-select-tenant-code'
             />
           </NFormItem>
           <NFormItem label={t('project.dag.timeout_alert')} path='timeoutFlag'>
@@ -156,9 +209,9 @@ export default defineComponent({
                 show-button={false}
                 min={0}
                 v-slots={{
-                  suffix: () => '分'
+                  suffix: () => t('project.dag.minute')
                 }}
-              ></NInputNumber>
+              />
             </NFormItem>
           )}
           <NFormItem
@@ -170,12 +223,20 @@ export default defineComponent({
               preset='pair'
               key-placeholder={t('project.dag.key')}
               value-placeholder={t('project.dag.value')}
+              class='input-global-params'
             />
           </NFormItem>
-          {props.definition && (
-            <NFormItem label=' ' path='timeoutFlag'>
+          {props.definition && !props.instance && (
+            <NFormItem path='timeoutFlag'>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
+              </NCheckbox>
+            </NFormItem>
+          )}
+          {props.instance && (
+            <NFormItem path='sync'>
+              <NCheckbox v-model:checked={formValue.value.sync}>
+                {t('project.dag.update_directly')}
               </NCheckbox>
             </NFormItem>
           )}

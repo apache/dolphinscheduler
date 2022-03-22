@@ -115,10 +115,19 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.handleCreateFolder}>
+              <NButton
+                type='primary'
+                onClick={this.handleCreateFolder}
+                class='btn-create-directory'
+              >
                 {t('resource.udf.create_folder')}
               </NButton>
-              <NButton strong secondary onClick={this.handleUploadFile}>
+              <NButton
+                strong
+                secondary
+                onClick={this.handleUploadFile}
+                class='btn-upload-udf'
+              >
                 {t('resource.udf.upload_udf_resources')}
               </NButton>
             </NSpace>
@@ -151,6 +160,8 @@ export default defineComponent({
                   striped
                   size={'small'}
                   class={styles.table}
+                  row-class-name='items'
+                  scrollX={this.tableWidth}
                 />
                 <div class={styles.pagination}>
                   <NPagination

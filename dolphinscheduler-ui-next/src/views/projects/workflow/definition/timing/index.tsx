@@ -18,7 +18,7 @@
 import Card from '@/components/card'
 import { ArrowLeftOutlined } from '@vicons/antd'
 import { NButton, NDataTable, NIcon, NPagination } from 'naive-ui'
-import { defineComponent, onMounted, toRefs } from 'vue'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
@@ -29,7 +29,7 @@ import styles from '../index.module.scss'
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
   setup() {
-    const { variables, getTableData } = useTable()
+    const { variables, createColumns, getTableData } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -54,7 +54,12 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      createColumns(variables)
       requestData()
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
     })
 
     return {
@@ -87,6 +92,7 @@ export default defineComponent({
             striped
             size={'small'}
             class={styles.table}
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

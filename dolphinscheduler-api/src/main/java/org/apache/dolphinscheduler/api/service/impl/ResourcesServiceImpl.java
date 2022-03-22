@@ -816,6 +816,24 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     /**
+     * get resource by id
+     * @param id        resource id
+     * @return resource
+     */
+    @Override
+    public Result<Object> queryResourceById(Integer id) {
+        Result<Object> result = new Result<>();
+        Resource resource = resourcesMapper.selectById(id);
+        if (resource == null) {
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        putMsg(result, Status.SUCCESS);
+        result.setData(resource);
+        return result;
+    }
+
+    /**
      * view resource file online
      *
      * @param resourceId resource id
@@ -1346,9 +1364,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             // query resource relation
             relationResources = queryResourceList(userId, 0);
         }
+        // filter by resource type
+        List<Resource> relationTypeResources =
+                relationResources.stream().filter(rs -> rs.getType() == type).collect(Collectors.toList());
 
         List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        ownResourceList.addAll(relationResources);
+        ownResourceList.addAll(relationTypeResources);
 
         return ownResourceList;
     }

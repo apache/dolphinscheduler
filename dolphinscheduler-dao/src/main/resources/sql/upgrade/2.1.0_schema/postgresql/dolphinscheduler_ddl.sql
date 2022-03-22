@@ -32,6 +32,12 @@ BEGIN
 EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_idx_project_code_process_definition_code"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_idx_project_code_process_definition_code ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("project_code","process_definition_code")';
 
+EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_idx_pre_task_code_version"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_idx_pre_task_code_version ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("pre_task_code","pre_task_version")';
+
+EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_idx_post_task_code_version"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_idx_post_task_code_version ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("post_task_code","post_task_version")';
+
 EXECUTE 'DROP INDEX IF EXISTS "process_task_relation_log_idx_project_code_process_definition_code"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_log_idx_project_code_process_definition_code ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation_log USING Btree("project_code","process_definition_code")';
 
@@ -39,6 +45,8 @@ EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_code_version"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_code_version ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("code","version")';
 
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_user ADD COLUMN IF NOT EXISTS "time_zone" varchar(32) DEFAULT NULL';
+
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alert ADD COLUMN IF NOT EXISTS "warning_type" int DEFAULT 2';
 
 EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_dq_comparison_type" (
         id serial NOT NULL,
@@ -149,6 +157,9 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_relation
     update_time timestamp NULL,
     CONSTRAINT t_ds_relation_rule_input_entry_pk PRIMARY KEY (id)
 )';
+
+EXECUTE 'DROP INDEX IF EXISTS "idx_alert_status"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_status ON ' || quote_ident(v_schema) ||'.t_ds_alert USING Btree("alert_status")';
 
 EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_project_code"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_project_code ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("project_code")';

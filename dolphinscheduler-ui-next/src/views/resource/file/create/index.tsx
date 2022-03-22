@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, toRefs } from 'vue'
+import { defineComponent, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { NForm, NFormItem, NInput, NSelect, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -68,8 +68,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='fileFormRef'
-          label-placement='left'
-          label-width='160'
           class={styles['form-content']}
         >
           <NFormItem label={t('resource.file.file_name')} path='fileName'>
@@ -77,6 +75,7 @@ export default defineComponent({
               v-model={[this.fileForm.fileName, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               style={{ width: '300px' }}
+              class='input-file-name'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.file_format')} path='suffix'>
@@ -85,6 +84,7 @@ export default defineComponent({
               v-model={[this.fileForm.suffix, 'value']}
               options={this.fileSuffixOptions}
               style={{ width: '100px' }}
+              class='select-file-format'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
@@ -93,11 +93,11 @@ export default defineComponent({
               v-model={[this.fileForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}
               style={{ width: '430px' }}
+              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.file_content')} path='content'>
             <div
-              class={styles.cont}
               style={{
                 width: '90%'
               }}
@@ -107,7 +107,13 @@ export default defineComponent({
           </NFormItem>
           <div class={styles['file-edit-content']}>
             <div class={styles.submit}>
-              <NButton type='info' size='small' round onClick={this.handleFile}>
+              <NButton
+                type='info'
+                size='small'
+                round
+                onClick={this.handleFile}
+                class='btn-submit'
+              >
                 {t('resource.file.save')}
               </NButton>
               <NButton
@@ -116,6 +122,7 @@ export default defineComponent({
                 text
                 style={{ marginLeft: '15px' }}
                 onClick={this.handleReturn}
+                class='btn-cancel'
               >
                 {t('resource.file.return')}
               </NButton>

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -28,7 +28,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * RuleInputEntry
@@ -121,13 +120,11 @@ public class DqRuleInputEntry implements Serializable {
      * create_time
      */
     @TableField(value = "create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     /**
      * update_time
      */
     @TableField(value = "update_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public int getId() {

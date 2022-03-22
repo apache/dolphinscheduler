@@ -58,19 +58,21 @@ export function useModal(
     })
   }
 
-  const submitRequest = (serviceHandle: any) => {
-    state.functionFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        try {
-          await serviceHandle()
-          window.$message.success(t('resource.udf.success'))
-          ctx.emit('updateList')
-          ctx.emit('update:show')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-      }
-    })
+  const submitRequest = async (serviceHandle: any) => {
+    await state.functionFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+
+    try {
+      await serviceHandle()
+      window.$message.success(t('resource.udf.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   const variables = reactive({
@@ -160,16 +162,12 @@ export function useModal(
         formData.append('currentDir', uploadState.uploadForm.currentDir)
         formData.append('description', uploadState.uploadForm.description)
 
-        try {
-          const res = await createResource(formData as any)
-          window.$message.success(t('resource.function.success'))
-          variables.uploadShow = false
-          resetUploadForm()
-          getUdfList()
-          state.functionForm.resourceId = res.id
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        const res = await createResource(formData as any)
+        window.$message.success(t('resource.function.success'))
+        variables.uploadShow = false
+        resetUploadForm()
+        getUdfList()
+        state.functionForm.resourceId = res.id
       }
     })
   }

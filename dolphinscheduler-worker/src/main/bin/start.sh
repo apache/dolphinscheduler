@@ -19,6 +19,9 @@
 BIN_DIR=$(dirname $0)
 DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
+chmod -R 700 ${DOLPHINSCHEDULER_HOME}/config
+export DOLPHINSCHEDULER_WORK_HOME=${DOLPHINSCHEDULER_HOME}
+
 JAVA_OPTS=${JAVA_OPTS:-"-server -Xms4g -Xmx4g -Xmn2g -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
 if [[ "$DOCKER" == "true" ]]; then

@@ -14,14 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 @TableName("t_ds_access_token")
 public class AccessToken {
@@ -162,14 +163,14 @@ public class AccessToken {
 
     @Override
     public String toString() {
-        return "AccessToken{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", token='" + token + '\'' +
-                ", userName='" + userName + '\'' +
-                ", expireTime=" + expireTime +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "AccessToken{"
+                + "id=" + id
+                + ", userId=" + userId
+                + ", token='" + token + '\''
+                + ", userName='" + userName + '\''
+                + ", expireTime=" + expireTime
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }

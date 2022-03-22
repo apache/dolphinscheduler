@@ -16,13 +16,14 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 
 export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const timeoutSpan = computed(() => (model.timeoutSetting ? 12 : 0))
 
-  const HTTP_CHECK_CONDITIONs = [
+  const HTTP_CHECK_CONDITIONS = [
     {
       label: t('project.node.status_code_default'),
       value: 'STATUS_CODE_DEFAULT'
@@ -87,7 +88,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
                 return new Error(t('project.node.prop_tips'))
               }
 
-              const sameItems = model.localParams.filter(
+              const sameItems = model.httpParams.filter(
                 (item: { prop: string }) => item.prop === value
               )
 
@@ -128,7 +129,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'httpCheckCondition',
       name: t('project.node.http_check_condition'),
-      options: HTTP_CHECK_CONDITIONs
+      options: HTTP_CHECK_CONDITIONS
     },
     {
       type: 'input',
@@ -190,48 +191,11 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    {
-      type: 'custom-parameters',
+    ...useCustomParams({
+      model,
       field: 'localParams',
-      name: t('project.node.custom_parameters'),
-      children: [
-        {
-          type: 'input',
-          field: 'prop',
-          span: 6,
-          props: {
-            placeholder: t('project.node.prop_tips'),
-            maxLength: 256
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true,
-            validator(validate: any, value: string) {
-              if (!value) {
-                return new Error(t('project.node.prop_tips'))
-              }
-
-              const sameItems = model.localParams.filter(
-                (item: { prop: string }) => item.prop === value
-              )
-
-              if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
-              }
-            }
-          }
-        },
-        {
-          type: 'input',
-          field: 'value',
-          span: 6,
-          props: {
-            placeholder: t('project.node.value_tips'),
-            maxLength: 256
-          }
-        }
-      ]
-    }
+      isSimple: true
+    })
   ]
 }
 

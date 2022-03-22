@@ -66,6 +66,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -566,9 +567,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        //if the selected projectIds are empty, delete all items associated with the user
+        projectUserMapper.deleteProjectRelation(0, userId);
+
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
-            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 
@@ -884,6 +885,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
             }
+        }
+
+        // add system default timezone if not user timezone
+        if (StringUtils.isEmpty(user.getTimeZone())) {
+            user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
         result.put(Constants.DATA_LIST, user);

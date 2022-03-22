@@ -35,6 +35,7 @@ export default {
       component: components['security-tenant-manage'],
       meta: {
         title: '租户管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -45,6 +46,7 @@ export default {
       component: components['security-user-manage'],
       meta: {
         title: '用户管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -55,6 +57,7 @@ export default {
       component: components['security-alarm-group-manage'],
       meta: {
         title: '告警组管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -65,6 +68,7 @@ export default {
       component: components['security-worker-group-manage'],
       meta: {
         title: 'Worker分组管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -75,6 +79,7 @@ export default {
       component: components['security-yarn-queue-manage'],
       meta: {
         title: 'Yarn队列管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -85,6 +90,7 @@ export default {
       component: components['security-environment-manage'],
       meta: {
         title: '环境管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -95,6 +101,7 @@ export default {
       component: components['security-token-manage'],
       meta: {
         title: '令牌管理管理',
+        activeMenu: 'security',
         showSide: true,
         auth: []
       }
@@ -105,6 +112,7 @@ export default {
       component: components['security-alarm-instance-manage'],
       meta: {
         title: '告警实例管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }
@@ -115,6 +123,7 @@ export default {
       component: components['security-k8s-namespace-manage'],
       meta: {
         title: 'K8S命名空间管理',
+        activeMenu: 'security',
         showSide: true,
         auth: ['ADMIN_USER']
       }

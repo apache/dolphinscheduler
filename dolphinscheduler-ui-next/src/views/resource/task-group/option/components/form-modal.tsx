@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  toRefs,
-  onMounted,
-  ref,
-  toRaw,
-  Ref
-} from 'vue'
+import { defineComponent, PropType, toRefs, onMounted, ref, Ref } from 'vue'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
@@ -56,7 +48,10 @@ const FormModal = defineComponent({
     onMounted(() => {
       queryAllProjectList().then((res: any[]) => {
         res.map((item) => {
-          let option: SelectMixedOption = { label: item.name, value: item.code }
+          const option: SelectMixedOption = {
+            label: item.name,
+            value: item.code
+          }
           projectOptions.value.push(option)
         })
       })
@@ -64,25 +59,30 @@ const FormModal = defineComponent({
         state.formData.id = props.data.id
         state.formData.name = props.data.name
         state.formData.projectCode = props.data.projectCode
-        state.formData.groupSize = props.data.groupSize
+        state.formData.groupSize = String(props.data.groupSize)
         state.formData.status = props.data.status
         state.formData.description = props.data.description
       } else {
-        state.formData.groupSize = 10
+        state.formData.groupSize = '10'
       }
     })
 
-    const onConfirm = () => {
-      ;(props.status === 1
-        ? updateTaskGroup(state.formData)
-        : createTaskGroup(state.formData)
-      ).then(() => {
+    const onConfirm = async () => {
+      if (state.saving) return
+      state.saving = true
+      try {
+        props.status === 1
+          ? await updateTaskGroup(state.formData)
+          : await createTaskGroup(state.formData)
+        state.saving = false
         emit('confirm')
-      })
+      } catch (err) {
+        state.saving = false
+      }
     }
 
     const onCancel = () => {
-      state.formData.projectCode = 0
+      state.formData.projectCode = ''
       state.formData.description = ''
       emit('cancel')
     }
@@ -106,6 +106,7 @@ const FormModal = defineComponent({
           !this.formData.groupSize ||
           !this.formData.description
         }
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
           <NFormItem label={t('resource.task_group_option.name')} path='name'>
@@ -114,18 +115,20 @@ const FormModal = defineComponent({
               placeholder={t('resource.task_group_option.please_enter_name')}
             />
           </NFormItem>
-          <NFormItem
-            label={t('resource.task_group_option.project_name')}
-            path='projectCode'
-          >
-            <NSelect
-              options={projectOptions}
-              v-model:value={this.formData.projectCode}
-              placeholder={t(
-                'resource.task_group_option.please_select_project'
-              )}
-            />
-          </NFormItem>
+          {this.status === 0 && (
+            <NFormItem
+              label={t('resource.task_group_option.project_name')}
+              path='projectCode'
+            >
+              <NSelect
+                options={projectOptions}
+                v-model:value={this.formData.projectCode}
+                placeholder={t(
+                  'resource.task_group_option.please_select_project'
+                )}
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('resource.task_group_option.resource_pool_size')}
             path='groupSize'

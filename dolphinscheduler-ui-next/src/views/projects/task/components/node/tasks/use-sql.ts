@@ -65,8 +65,7 @@ export function useSql({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -88,7 +87,7 @@ export function useSql({
       Fields.useDatasource(model),
       Fields.useSqlType(model),
       ...Fields.useSql(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

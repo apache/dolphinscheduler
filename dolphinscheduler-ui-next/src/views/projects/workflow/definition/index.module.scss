@@ -87,10 +87,11 @@
   }
 }
 
-.links {
-  color: #2080f0;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
+.batch-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  > div {
+    margin-right: 5px;
   }
 }

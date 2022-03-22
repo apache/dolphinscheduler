@@ -20,13 +20,12 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -56,10 +55,8 @@ public class ProcessAlertContent implements Serializable {
     private Flag recovery;
     @JsonProperty("runTimes")
     private Integer runTimes;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("processStartTime")
     private Date processStartTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("processEndTime")
     private Date processEndTime;
     @JsonProperty("processHost")
@@ -78,10 +75,8 @@ public class ProcessAlertContent implements Serializable {
     private Integer retryTimes;
     @JsonProperty("taskState")
     private ExecutionStatus taskState;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("taskStartTime")
     private Date taskStartTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("taskEndTime")
     private Date taskEndTime;
     @JsonProperty("taskHost")
@@ -153,6 +148,7 @@ public class ProcessAlertContent implements Serializable {
             this.projectId = projectId;
             return this;
         }
+
         public Builder projectCode(Long projectCode) {
             this.projectCode = projectCode;
             return this;
@@ -172,6 +168,7 @@ public class ProcessAlertContent implements Serializable {
             this.processId = processId;
             return this;
         }
+
         public Builder processDefinitionCode(Long processDefinitionCode) {
             this.processDefinitionCode = processDefinitionCode;
             return this;
