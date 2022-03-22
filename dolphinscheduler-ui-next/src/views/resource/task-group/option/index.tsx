@@ -41,7 +41,7 @@ const taskGroupOption = defineComponent({
 
     const searchParamRef = ref()
 
-    let updateItemData = reactive({
+    const updateItemData = reactive({
       id: 0,
       name: '',
       projectCode: 0,

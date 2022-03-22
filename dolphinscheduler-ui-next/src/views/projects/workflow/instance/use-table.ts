@@ -34,10 +34,10 @@ import { parseTime } from '@/utils/common'
 import styles from './index.module.scss'
 import { renderStateCell } from '../../task/instance/use-table'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { Router } from 'vue-router'
 import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import type { ICountDownParam } from './types'
@@ -69,18 +69,18 @@ export function useTable() {
       {
         type: 'selection',
         className: 'btn-selected',
-        ...COLUMN_CONFIG['selection']
+        ...COLUMN_WIDTH_CONFIG['selection']
       },
       {
         title: '#',
         key: 'id',
-        ...COLUMN_CONFIG['index'],
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
-        ...COLUMN_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['name'],
         className: 'workflow-name',
         render: (row: IWorkflowInstance) =>
           h(
@@ -99,7 +99,7 @@ export function useTable() {
       {
         title: t('project.workflow.status'),
         key: 'state',
-        ...COLUMN_CONFIG['state'],
+        ...COLUMN_WIDTH_CONFIG['state'],
         className: 'workflow-status',
         render: (_row: IWorkflowInstance) => renderStateCell(_row.state, t)
       },
@@ -117,7 +117,7 @@ export function useTable() {
       {
         title: t('project.workflow.scheduling_time'),
         key: 'scheduleTime',
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (_row: IWorkflowInstance) =>
           _row.scheduleTime
             ? format(parseTime(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
@@ -126,7 +126,7 @@ export function useTable() {
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (_row: IWorkflowInstance) =>
           _row.startTime
             ? format(parseTime(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
@@ -135,7 +135,7 @@ export function useTable() {
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
-        ...COLUMN_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (_row: IWorkflowInstance) =>
           _row.endTime
             ? format(parseTime(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
@@ -144,13 +144,13 @@ export function useTable() {
       {
         title: t('project.workflow.duration'),
         key: 'duration',
-        ...COLUMN_CONFIG['duration'],
+        ...COLUMN_WIDTH_CONFIG['duration'],
         render: (_row: IWorkflowInstance) => _row.duration || '-'
       },
       {
         title: t('project.workflow.run_times'),
         key: 'runTimes',
-        ...COLUMN_CONFIG['times'],
+        ...COLUMN_WIDTH_CONFIG['times'],
         className: 'workflow-run-times'
       },
       {
@@ -161,23 +161,23 @@ export function useTable() {
       {
         title: t('project.workflow.dry_run_flag'),
         key: 'dryRun',
-        ...COLUMN_CONFIG['dryRun'],
+        ...COLUMN_WIDTH_CONFIG['dryRun'],
         render: (_row: IWorkflowInstance) => (_row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.workflow.executor'),
         key: 'executorName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.host'),
         key: 'host',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](6),
+        ...COLUMN_WIDTH_CONFIG['operation'](6),
         className: styles.operation,
         render: (_row: IWorkflowInstance, index: number) =>
           h(TableAction, {

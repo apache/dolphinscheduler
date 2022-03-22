@@ -31,10 +31,10 @@ import type {
 } from '@/service/modules/k8s-namespace/types'
 import { parseTime } from '@/utils/common'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 
 export function useTable() {
   const { t } = useI18n()
@@ -64,27 +64,27 @@ export function useTable() {
         title: '#',
         key: 'index',
         render: (row: any, index: number) => index + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('security.k8s_namespace.k8s_namespace'),
         key: 'namespace',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.k8s_namespace.k8s_cluster'),
         key: 'k8s',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.k8s_namespace.owner'),
         key: 'owner',
-        ...COLUMN_CONFIG['userName']
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('security.k8s_namespace.tag'),
         key: 'tag',
-        ...COLUMN_CONFIG['tag']
+        ...COLUMN_WIDTH_CONFIG['tag']
       },
       {
         title: t('security.k8s_namespace.limit_cpu'),
@@ -99,17 +99,17 @@ export function useTable() {
       {
         title: t('security.k8s_namespace.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.k8s_namespace.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.k8s_namespace.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render(row: NamespaceItem) {
           return h(NSpace, null, {
             default: () => [

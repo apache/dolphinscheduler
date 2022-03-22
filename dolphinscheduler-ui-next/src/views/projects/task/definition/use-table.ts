@@ -32,10 +32,10 @@ import {
 } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type {
   TaskDefinitionItem,
   TaskDefinitionRes
@@ -53,7 +53,7 @@ export function useTable(onEdit: Function) {
         title: '#',
         key: 'index',
         render: (row: any, index: number) => index + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('project.task.task_name'),
@@ -66,12 +66,12 @@ export function useTable(onEdit: Function) {
             },
             { default: () => row.taskName }
           ),
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.workflow_name'),
         key: 'processDefinitionName',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.workflow_state'),
@@ -87,19 +87,19 @@ export function useTable(onEdit: Function) {
             )
           }
         },
-        ...COLUMN_CONFIG['state']
+        ...COLUMN_WIDTH_CONFIG['state']
       },
       {
         title: t('project.task.task_type'),
         key: 'taskType',
-        ...COLUMN_CONFIG['type']
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('project.task.version'),
         key: 'taskVersion',
         render: (row: TaskDefinitionItem) =>
           h('span', null, 'v' + row.taskVersion),
-        ...COLUMN_CONFIG['version']
+        ...COLUMN_WIDTH_CONFIG['version']
       },
       {
         title: t('project.task.upstream_tasks'),
@@ -126,17 +126,17 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.create_time'),
         key: 'taskCreateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.task.update_time'),
         key: 'taskUpdateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](4),
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [

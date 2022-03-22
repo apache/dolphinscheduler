@@ -24,10 +24,10 @@ import TableAction from './components/table-action'
 import _ from 'lodash'
 import { parseTime } from '@/utils/common'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 export function useTable(
@@ -48,17 +48,17 @@ export function useTable(
       title: '#',
       key: 'index',
       render: (row, index) => index + 1,
-      ...COLUMN_CONFIG['index']
+      ...COLUMN_WIDTH_CONFIG['index']
     },
     {
       title: t('resource.task_group_option.name'),
       key: 'name',
-      ...COLUMN_CONFIG['name']
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_option.project_name'),
       key: 'projectName',
-      ...COLUMN_CONFIG['name']
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_option.resource_pool_size'),
@@ -73,22 +73,22 @@ export function useTable(
     {
       title: t('resource.task_group_option.desc'),
       key: 'description',
-      ...COLUMN_CONFIG['note']
+      ...COLUMN_WIDTH_CONFIG['note']
     },
     {
       title: t('resource.task_group_option.create_time'),
       key: 'createTime',
-      ...COLUMN_CONFIG['time']
+      ...COLUMN_WIDTH_CONFIG['time']
     },
     {
       title: t('resource.task_group_option.update_time'),
       key: 'updateTime',
-      ...COLUMN_CONFIG['time']
+      ...COLUMN_WIDTH_CONFIG['time']
     },
     {
       title: t('resource.task_group_option.actions'),
       key: 'actions',
-      ...COLUMN_CONFIG['operation'](3),
+      ...COLUMN_WIDTH_CONFIG['operation'](3),
       render: (row: any) =>
         h(TableAction, {
           row,

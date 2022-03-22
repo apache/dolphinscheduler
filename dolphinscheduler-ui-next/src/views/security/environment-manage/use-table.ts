@@ -31,10 +31,10 @@ import type {
 } from '@/service/modules/environment/types'
 import { parseTime } from '@/utils/common'
 import {
-  COLUMN_CONFIG,
+  COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-config'
+} from '@/utils/column-width-config'
 
 export function useTable() {
   const { t } = useI18n()
@@ -51,28 +51,28 @@ export function useTable() {
         title: '#',
         key: 'index',
         render: (row: any, index: number) => index + 1,
-        ...COLUMN_CONFIG['index']
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('security.environment.environment_name'),
         key: 'name',
         className: 'environment-name',
-        ...COLUMN_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.environment.environment_config'),
         key: 'config',
-        ...COLUMN_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('security.environment.environment_desc'),
         key: 'description',
-        ...COLUMN_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('security.environment.worker_groups'),
         key: 'workerGroups',
-        ...COLUMN_CONFIG['tag'],
+        ...COLUMN_WIDTH_CONFIG['tag'],
         render: (row: EnvironmentItem) =>
           h(NSpace, null, {
             default: () =>
@@ -88,17 +88,17 @@ export function useTable() {
       {
         title: t('security.environment.create_time'),
         key: 'createTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.environment.update_time'),
         key: 'updateTime',
-        ...COLUMN_CONFIG['time']
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.environment.operation'),
         key: 'operation',
-        ...COLUMN_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
