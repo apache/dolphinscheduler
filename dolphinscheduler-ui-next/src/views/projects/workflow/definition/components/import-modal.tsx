@@ -78,7 +78,7 @@ export default defineComponent({
                 showFileList={false}
               >
                 <NButton text>
-                  上传
+                  {t('project.workflow.upload')}
                   <NIcon>
                     <CloudUploadOutlined />
                   </NIcon>
