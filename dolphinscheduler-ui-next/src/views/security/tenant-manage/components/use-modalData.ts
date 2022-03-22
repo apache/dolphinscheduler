@@ -34,7 +34,7 @@ export function useModalData(
       id: ref<number>(-1),
       tenantCode: ref(''),
       description: ref(''),
-      queueId: ref<number>(-1),
+      queueId: ref<number | null>(null),
       generalOptions: []
     },
     saving: false,
@@ -48,7 +48,7 @@ export function useModalData(
     }
   })
 
-  const getListData = () => {
+  const getListData = (status: number) => {
     const { state } = useAsyncState(
       queryList().then((res: any) => {
         variables.model.generalOptions = res.map((item: any) => {
@@ -57,7 +57,9 @@ export function useModalData(
             value: item.id
           }
         })
-        variables.model.queueId = res[0].id
+        if (status === 0) {
+          variables.model.queueId = res[0].id
+        }
       }),
       {}
     )
@@ -84,13 +86,14 @@ export function useModalData(
       (unused: any) => {
         const data = {
           tenantCode: variables.model.tenantCode,
-          queueId: variables.model.queueId,
+          queueId: variables.model.queueId as number,
           description: variables.model.description
         }
         createTenant(data).then(
           (unused: any) => {
             variables.model.tenantCode = ''
             variables.model.description = ''
+            variables.model.queueId = null
             ctx.emit('confirmModal', props.showModalRef)
           },
           (unused: any) => {
