@@ -139,14 +139,18 @@ const GraphChart = defineComponent({
                 Number(item.schedulePublishStatus),
                 Number(item.workFlowPublishStatus)
               ),
-              workFlowPublishStatus: Number(item.workFlowPublishStatus) === 0
-                ? t('project.workflow.offline')
-                : t('project.workflow.online'),
-              schedulePublishStatus: Number(item.schedulePublishStatus) === 0
-                ? t('project.workflow.offline')
-                : t('project.workflow.online'),
+              workFlowPublishStatus:
+                Number(item.workFlowPublishStatus) === 0
+                  ? t('project.workflow.offline')
+                  : t('project.workflow.online'),
+              schedulePublishStatus:
+                Number(item.schedulePublishStatus) === 0
+                  ? t('project.workflow.offline')
+                  : t('project.workflow.online'),
               crontab: item.crontab,
-              scheduleStartTime: item.scheduleStartTime ? item.scheduleStartTime : '-',
+              scheduleStartTime: item.scheduleStartTime
+                ? item.scheduleStartTime
+                : '-',
               scheduleEndTime: item.scheduleEndTime ? item.scheduleEndTime : '-'
             }
           }),
