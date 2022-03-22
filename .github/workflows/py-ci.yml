@@ -39,8 +39,8 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.py-ut.outputs.run-py-ut }}
-      output2: ${{ steps.py-it.outputs.run-py-it }}
+      run-py-ut: ${{ steps.py-ut.outputs.run-py-ut }}
+      run-py-it: ${{ steps.py-it.outputs.run-py-it }}
     steps:
       - uses: actions/checkout@v2
       - name: Python Unit Test
