@@ -19,11 +19,7 @@ on:
   push:
     branches:
       - dev
-    paths:
-      - 'dolphinscheduler-python/**'
   pull_request:
-    paths:
-      - 'dolphinscheduler-python/**'
 
 concurrency:
   group: py-${{ github.event.pull_request.number || github.ref }}
@@ -38,8 +34,28 @@ env:
   DEPENDENCES: pip setuptools wheel tox
 
 jobs:
+  modify-check:
+    name: pre-task
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.py-ut.outputs.run-py-ut }}
+      output2: ${{ steps.py-it.outputs.run-py-it }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Unit Test
+        id: py-ut
+        run: |
+          echo "::set-output name=run-py-ut::true"
+      - name: Python Integrate Test
+        id: py-it
+        run: |
+          echo "::set-output name=py-it::true"
+
   lint:
     name: Lint
+    needs: modify-check
+    if: needs.modify-check.outputs.run-py-ut == 'true'
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
@@ -114,6 +130,8 @@ jobs:
           python -m tox -vv -e local-ci
   build-image:
     name: Build Image
+    needs: modify-check
+    if: needs.modify-check.outputs.run-py-it == 'true'
     runs-on: ubuntu-latest
     # Switch to project root directory to run mvnw command
     defaults:
