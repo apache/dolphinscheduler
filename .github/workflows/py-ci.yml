@@ -46,11 +46,11 @@ jobs:
       - name: Python Unit Test
         id: py-ut
         run: |
-          echo "::set-output name=run-py-ut::true"
+          echo "::set-output name=run-py-ut::false"
       - name: Python Integrate Test
         id: py-it
         run: |
-          echo "::set-output name=py-it::true"
+          echo "::set-output name=py-it::false"
 
   lint:
     name: Lint
