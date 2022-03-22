@@ -51,6 +51,10 @@ jobs:
         id: py-it
         run: |
           echo "::set-output name=py-it::false"
+      - name: remote
+        id: remote
+        run: |
+          git remote -vv
       - name: branch
         id: branch
         run: |
