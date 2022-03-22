@@ -253,7 +253,10 @@ export default defineComponent({
                 disabled={releaseState === 'ONLINE'}
                 class='btn-delete'
               >
-                <NPopconfirm onPositiveClick={this.handleDeleteWorkflow}>
+                <NPopconfirm
+                  disabled={releaseState === 'ONLINE'}
+                  onPositiveClick={this.handleDeleteWorkflow}
+                >
                   {{
                     default: () => t('project.workflow.delete_confirm'),
                     icon: () => (
