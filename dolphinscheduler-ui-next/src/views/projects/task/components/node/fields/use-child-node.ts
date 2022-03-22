@@ -54,6 +54,7 @@ export function useChildNode({
     loading.value = false
     if (!model.processDefinitionCode) {
       model.processDefinitionCode = options.value[0].value
+      if (!model.name) model.name = options.value[0].label
     }
   }
   const getProcessListByCode = async (processCode: number) => {
@@ -63,7 +64,7 @@ export function useChildNode({
   }
 
   const onChange = (code: number, options: { label: string }) => {
-    model.name = options.label
+    if (!model.name) model.name = options.label
   }
 
   onMounted(() => {
