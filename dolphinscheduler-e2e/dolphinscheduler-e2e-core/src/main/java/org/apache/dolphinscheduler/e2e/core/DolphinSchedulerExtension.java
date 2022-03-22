@@ -59,12 +59,13 @@ import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 
 import lombok.extern.slf4j.Slf4j;
+import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
-final class DolphinSchedulerExtension
-    implements BeforeAllCallback, AfterAllCallback,
-    BeforeEachCallback {
+final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
     private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
+
+    private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
 
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
@@ -73,11 +74,15 @@ final class DolphinSchedulerExtension
     private HostAndPort address;
     private String rootPath;
 
+    private Path record;
+
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
         Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
+
+        setRecordPath();
 
         if (LOCAL_MODE) {
             runInLocal();
@@ -85,24 +90,8 @@ final class DolphinSchedulerExtension
             runInDockerContainer(context);
         }
 
-        final Path record;
-        if (!Strings.isNullOrEmpty(System.getenv("RECORDING_PATH"))) {
-            record = Paths.get(System.getenv("RECORDING_PATH"));
-            if (!record.toFile().exists()) {
-                if (!record.toFile().mkdir()) {
-                    throw new IOException("Failed to create recording directory: " + record.toAbsolutePath());
-                }
-            }
-        } else {
-            record = Files.createTempDirectory("record-");
-        }
+        setBrowserContainerByOsName();
 
-        browser = new BrowserWebDriverContainer<>()
-            .withCapabilities(new ChromeOptions())
-            .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
-            .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                                Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
-            .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         if (network != null) {
             browser.withNetwork(network);
         }
@@ -128,8 +117,8 @@ final class DolphinSchedulerExtension
     }
 
     private void runInLocal() {
-        Testcontainers.exposeHostPorts(8888);
-        address = HostAndPort.fromParts("host.testcontainers.internal", 8888);
+        Testcontainers.exposeHostPorts(3000);
+        address = HostAndPort.fromParts("host.testcontainers.internal", 3000);
         rootPath = "/";
     }
 
@@ -157,6 +146,41 @@ final class DolphinSchedulerExtension
         };
         address = HostAndPort.fromParts("dolphinscheduler", 12345);
         rootPath = "/dolphinscheduler/ui/";
+    }
+
+    private void setBrowserContainerByOsName() {
+        DockerImageName imageName;
+
+        if (LOCAL_MODE && M1_CHIP_FLAG) {
+            imageName = DockerImageName.parse("seleniarm/standalone-chromium:4.1.2-20220227")
+                    .asCompatibleSubstituteFor("selenium/standalone-chrome");
+
+            browser = new BrowserWebDriverContainer<>(imageName)
+                    .withCapabilities(new ChromeOptions())
+                    .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
+                    .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
+        } else {
+            browser = new BrowserWebDriverContainer<>()
+                    .withCapabilities(new ChromeOptions())
+                    .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
+                    .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                    .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
+        }
+    }
+
+    private void setRecordPath() throws IOException {
+        if (!Strings.isNullOrEmpty(System.getenv("RECORDING_PATH"))) {
+            record = Paths.get(System.getenv("RECORDING_PATH"));
+            if (!record.toFile().exists()) {
+                if (!record.toFile().mkdir()) {
+                    throw new IOException("Failed to create recording directory: " + record.toAbsolutePath());
+                }
+            }
+        } else {
+            record = Files.createTempDirectory("record-");
+        }
     }
 
     @Override
