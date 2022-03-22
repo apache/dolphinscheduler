@@ -454,7 +454,6 @@ public class ProcessService {
 
     /**
      * recursive delete all task instance by process instance id
-     * @param processInstanceId
      */
     public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
         List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
@@ -1337,6 +1336,9 @@ public class ProcessService {
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
+        if (taskInstance.getSubmitTime() == null) {
+            taskInstance.setSubmitTime(new Date());
+        }
         if (taskInstance.getFirstSubmitTime() == null) {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
@@ -1717,9 +1719,9 @@ public class ProcessService {
      * @reutrn
      */
     public boolean changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
-                                String executePath,
-                                String logPath,
-                                int taskInstId) {
+                                   String executePath,
+                                   String logPath,
+                                   int taskInstId) {
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
         taskInstance.setHost(host);
@@ -1745,14 +1747,13 @@ public class ProcessService {
      * @param endTime endTime
      * @param taskInstId taskInstId
      * @param varPool varPool
-     * @return
      */
     public boolean changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
-                                Date endTime,
-                                int processId,
-                                String appIds,
-                                int taskInstId,
-                                String varPool) {
+                                   Date endTime,
+                                   int processId,
+                                   String appIds,
+                                   int taskInstId,
+                                   String varPool) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
@@ -2464,7 +2465,7 @@ public class ProcessService {
                 taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
             }
         }
-        taskCodeVersionMap.forEach((code,version) -> {
+        taskCodeVersionMap.forEach((code, version) -> {
             taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
         });
         return taskDefinitionLogs;
