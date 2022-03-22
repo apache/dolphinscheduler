@@ -107,11 +107,6 @@
         <dependencySet>
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <outputDirectory>libs/standalone-server</outputDirectory>
-            <excludes>
-                <exclude>com.amazonaws:aws-java-sdk-emr</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-core</exclude>
-            </excludes>
-            <outputDirectory>libs</outputDirectory>
         </dependencySet>
     </dependencySets>
 </assembly>
