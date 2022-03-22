@@ -35,7 +35,7 @@ env:
 
 jobs:
   modify-check:
-    name: pre-task
+    name: modify-check
     timeout-minutes: 5
     runs-on: ubuntu-latest
     outputs:
@@ -51,6 +51,10 @@ jobs:
         id: py-it
         run: |
           echo "::set-output name=py-it::false"
+      - name: test
+        id: test
+        run: |
+          git diff upstream/dev HEAD
 
   lint:
     name: Lint
