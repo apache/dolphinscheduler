@@ -61,7 +61,10 @@ export function useTable() {
       },
       {
         title: t('security.tenant.description'),
-        key: 'description'
+        key: 'description',
+        ellipsis: {
+          tooltip: true
+        }
       },
       {
         title: t('security.tenant.queue_name'),
