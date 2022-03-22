@@ -21,6 +21,9 @@ import static org.apache.dolphinscheduler.common.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.Constants.CONTENT;
 import static org.apache.dolphinscheduler.common.Constants.JAR;
 
+import com.baomidou.mybatisplus.extension.api.R;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -221,6 +224,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         try {
             resourcesMapper.insert(resource);
+            updateParentResourceSize(resource, resource.getSize());
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<>();
@@ -242,6 +246,33 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
         }
         return result;
+    }
+
+    /**
+     * update the folder's size of the resource
+     *
+     * @param resource the current resource
+     * @param size size
+     */
+    private void updateParentResourceSize(Resource resource, long size) {
+        if (resource.getSize() > 0) {
+            String[] splits = resource.getFullName().split("/");
+            for (int i = 1; i < splits.length; i++) {
+                String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits, 0, i));
+                if(StringUtils.isNotBlank(parentFullName)) {
+                    List<Resource> resources = resourcesMapper.queryResource(parentFullName, resource.getType().ordinal());
+                    if (CollectionUtils.isNotEmpty(resources)) {
+                        Resource parentResource = resources.get(0);
+                        if (parentResource.getSize() + size >= 0) {
+                            parentResource.setSize(parentResource.getSize() + size);
+                        } else {
+                            parentResource.setSize(0L);
+                        }
+                        resourcesMapper.updateById(parentResource);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -360,6 +391,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // updateResource data
         Date now = new Date();
+        long originFileSize = resource.getSize();
 
         resource.setAlias(name);
         resource.setFileName(name);
@@ -445,6 +477,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     throw new ServiceException(String.format("delete resource: %s failed.", originFullName));
                 }
             }
+
+            updateParentResourceSize(resource, resource.getSize() - originFileSize);
             return result;
         }
 
@@ -727,11 +761,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
         //delete data in database
+        resourcesMapper.selectBatchIds(Arrays.asList(needDeleteResourceIdArray)).forEach(item -> {
+            updateParentResourceSize(item, item.getSize() * -1);
+        });
         resourcesMapper.deleteIds(needDeleteResourceIdArray);
         resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
 
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, true);
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -941,6 +979,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Resource resource = new Resource(pid,name,fullName,false,desc,name,loginUser.getId(),type,content.getBytes().length,now,now);
 
         resourcesMapper.insert(resource);
+        updateParentResourceSize(resource, resource.getSize());
 
         putMsg(result, Status.SUCCESS);
         Map<Object, Object> dataMap = new BeanMap(resource);
@@ -1035,9 +1074,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (StringUtils.isEmpty(tenantCode)) {
             return  result;
         }
+        long originFileSize = resource.getSize();
         resource.setSize(content.getBytes().length);
         resource.setUpdateTime(new Date());
         resourcesMapper.updateById(resource);
+
+        updateParentResourceSize(resource, resource.getSize() - originFileSize);
 
         result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
