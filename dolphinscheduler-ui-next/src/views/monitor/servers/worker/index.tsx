@@ -27,8 +27,8 @@ import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { WorkerNode } from '@/service/modules/monitor/types'
 
-const master = defineComponent({
-  name: 'master',
+const worker = defineComponent({
+  name: 'worker',
   setup() {
     const showModalRef = ref(false)
     const { t } = useI18n()
@@ -149,4 +149,4 @@ const master = defineComponent({
   }
 })
 
-export default master
+export default worker
