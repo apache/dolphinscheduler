@@ -94,11 +94,10 @@ export default defineComponent({
         },
         code,
         projectCode
-      )
-        .then((ignored: any) => {
-          message.success(t('project.dag.success'))
-          router.push({ path: `/projects/${projectCode}/workflow-definition` })
-        })
+      ).then((ignored: any) => {
+        message.success(t('project.dag.success'))
+        router.push({ path: `/projects/${projectCode}/workflow-definition` })
+      })
     }
 
     onMounted(() => {

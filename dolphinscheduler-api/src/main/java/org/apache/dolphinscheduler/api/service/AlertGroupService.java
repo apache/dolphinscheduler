@@ -42,6 +42,7 @@ public interface AlertGroupService {
      * @return one alert group
      */
     Map<String, Object> queryAlertGroupById(User loginUser, Integer id);
+
     /**
      * paging query alarm group list
      *

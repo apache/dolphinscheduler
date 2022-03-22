@@ -103,7 +103,9 @@ const home = {
   waiting_depend: '等待依赖完成',
   delay_execution: '延时执行',
   forced_success: '强制成功',
-  serial_wait: '串行等待'
+  serial_wait: '串行等待',
+  ready_block: '准备阻断',
+  block: '阻断'
 }
 
 const password = {
@@ -136,7 +138,8 @@ const profile = {
   state_tips: '请选择状态',
   enable: '启用',
   disable: '禁用',
-  timezone_success: '时区更新成功'
+  timezone_success: '时区更新成功',
+  please_select_timezone: '请选择时区'
 }
 
 const monitor = {
@@ -400,6 +403,7 @@ const project = {
     tree_view: '工作流树形图',
     tree_limit: '限制大小',
     export: '导出',
+    batch_copy: '批量复制',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',
@@ -503,9 +507,15 @@ const project = {
     cancel_full_screen: '取消全屏',
     task_state: '任务状态',
     mode_of_dependent: '依赖模式',
-    open: '打开'
+    open: '打开',
+    project_name_required: '项目名称必填',
+    related_items: '关联项目',
+    project_name: '项目名称',
+    project_tips: '请选择项目'
   },
   task: {
+    online: '已上线',
+    offline: '已下线',
     task_name: '任务名称',
     task_type: '任务类型',
     create_task: '创建任务',
@@ -551,7 +561,9 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     view_log: '查看日志',
-    download_log: '下载日志'
+    download_log: '下载日志',
+    refresh: '刷新',
+    serial_wait: '串行等待'
   },
   dag: {
     create: '创建工作流',
@@ -581,6 +593,7 @@ const project = {
     success: '成功',
     delete_cell: '删除选中的线或节点',
     online_directly: '是否上线流程定义',
+    update_directly: '是否更新流程定义',
     dag_name_empty: 'DAG图名称不能为空',
     positive_integer: '请输入大于 0 的正整数',
     prop_empty: '自定义参数prop不能为空',
@@ -826,6 +839,7 @@ const project = {
     last_saturday: '上周六',
     last_sunday: '上周日',
     this_month: '本月',
+    this_month_begin: '本月初',
     last_month: '上月',
     last_month_begin: '上月初',
     last_month_end: '上月末',
@@ -1037,24 +1051,26 @@ const security = {
   alarm_instance: {
     search_input_tips: '请输入关键字',
     alarm_instance_manage: '告警实例管理',
-    alarm_instance: '告警实例',
     alarm_instance_name: '告警实例名称',
     alarm_instance_name_tips: '请输入告警实例名称',
     alarm_plugin_name: '告警插件名称',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
-    edit: '编辑',
+    edit_alarm_instance: '编辑告警实例',
     delete: '删除',
+    edit: '编辑',
+    delete_confirm: '删除？',
     confirm: '确定',
     cancel: '取消',
     submit: '提交',
-    create: '创建',
+    create_alarm_instance: '创建告警实例',
     select_plugin: '选择插件',
     select_plugin_tips: '请选择告警插件',
     instance_parameter_exception: '实例参数异常',
     WebHook: 'Web钩子',
     webHook: 'Web钩子',
+    WarningType: '告警类型',
     IsEnableProxy: '启用代理',
     Proxy: '代理',
     Port: '端口',
@@ -1089,7 +1105,14 @@ const security = {
     username: '用户名',
     botToken: '机器人Token',
     chatId: '频道ID',
-    parseMode: '解析类型'
+    parseMode: '解析类型',
+    IntegrationKey: '集成密钥',
+    BotAccessToken: '访问令牌',
+    RoomId: '房间',
+    ToPersonId: '用户',
+    ToPersonEmail: '用户邮箱',
+    AtSomeoneInRoom: '@房间中的成员',
+    Destination: '描述'
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
@@ -1133,6 +1156,7 @@ const datasource = {
   click_to_view: '点击查看',
   delete: '删除',
   confirm: '确定',
+  delete_confirm: '删除？',
   cancel: '取消',
   create: '创建',
   edit: '编辑',

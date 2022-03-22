@@ -128,6 +128,7 @@ export default defineComponent({
                 circle
                 onClick={this.handleEditWorkflow}
                 disabled={releaseState === 'ONLINE'}
+                class='btn-edit'
                 /* TODO: Edit workflow */
               >
                 <NIcon>
@@ -148,6 +149,7 @@ export default defineComponent({
                 circle
                 onClick={this.handleStartWorkflow}
                 disabled={releaseState === 'OFFLINE'}
+                class='btn-run'
               >
                 <NIcon>
                   <PlayCircleOutlined />
@@ -188,6 +190,7 @@ export default defineComponent({
                 tag='div'
                 circle
                 onClick={this.handleReleaseWorkflow}
+                class='btn-publish'
               >
                 <NIcon>
                   {releaseState === 'ONLINE' ? (
@@ -248,8 +251,12 @@ export default defineComponent({
                 tag='div'
                 circle
                 disabled={releaseState === 'ONLINE'}
+                class='btn-delete'
               >
-                <NPopconfirm onPositiveClick={this.handleDeleteWorkflow}>
+                <NPopconfirm
+                  disabled={releaseState === 'ONLINE'}
+                  onPositiveClick={this.handleDeleteWorkflow}
+                >
                   {{
                     default: () => t('project.workflow.delete_confirm'),
                     icon: () => (

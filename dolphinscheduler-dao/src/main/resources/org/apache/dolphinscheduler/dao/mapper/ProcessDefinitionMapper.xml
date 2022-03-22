@@ -145,7 +145,7 @@
                 and ptr.project_code=pd.project_code and  pd.release_state = 1
         join t_ds_task_definition td
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
         WHERE  td.resource_ids is not null and td.resource_ids != ''
     </select>
 
@@ -157,7 +157,7 @@
                 and ptr.project_code=pd.project_code and  pd.release_state = 1
         join t_ds_task_definition td
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
         WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
     </select>
 

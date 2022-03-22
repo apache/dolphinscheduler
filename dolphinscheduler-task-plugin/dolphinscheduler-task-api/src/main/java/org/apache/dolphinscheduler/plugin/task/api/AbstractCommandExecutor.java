@@ -17,16 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
-import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.hadoop.hive.common.LogUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -97,10 +93,10 @@ public abstract class AbstractCommandExecutor {
     /**
      * taskRequest
      */
-    protected TaskRequest taskRequest;
+    protected TaskExecutionContext taskRequest;
 
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                   TaskRequest taskRequest,
+                                   TaskExecutionContext taskRequest,
                                    Logger logger) {
         this.logHandler = logHandler;
         this.taskRequest = taskRequest;
@@ -414,7 +410,7 @@ public abstract class AbstractCommandExecutor {
      * @param line
      * @return
      */
-    private String findVarPool(String line){
+    private String findVarPool(String line) {
         Matcher matcher = SETVALUE_REGEX.matcher(line);
         if (matcher.find()) {
             return matcher.group(1);

@@ -23,6 +23,7 @@ export function useName(): IJsonItem {
   return {
     type: 'input',
     field: 'name',
+    class: 'input-node-name',
     name: t('project.node.name'),
     props: {
       placeholder: t('project.node.name_tips'),

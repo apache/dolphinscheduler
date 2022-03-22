@@ -19,18 +19,15 @@ package org.apache.dolphinscheduler.server.builder;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 /**
  *  TaskExecutionContext builder
@@ -109,58 +106,13 @@ public class TaskExecutionContextBuilder {
         return this;
     }
 
-    /**
-     * build SQLTask related info
-     *
-     * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildSQLTaskRelatedInfo(SQLTaskExecutionContext sqlTaskExecutionContext) {
-        taskExecutionContext.setSqlTaskExecutionContext(sqlTaskExecutionContext);
-        return this;
-    }
-
-    /**
-     * build DataxTask related info
-     *
-     * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildDataxTaskRelatedInfo(DataxTaskExecutionContext dataxTaskExecutionContext) {
-        taskExecutionContext.setDataxTaskExecutionContext(dataxTaskExecutionContext);
-        return this;
-    }
-
-    /**
-     * build procedureTask related info
-     *
-     * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildProcedureTaskRelatedInfo(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
-        taskExecutionContext.setProcedureTaskExecutionContext(procedureTaskExecutionContext);
-        return this;
-    }
-
-    /**
-     * build sqoopTask related info
-     *
-     * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildSqoopTaskRelatedInfo(SqoopTaskExecutionContext sqoopTaskExecutionContext) {
-        taskExecutionContext.setSqoopTaskExecutionContext(sqoopTaskExecutionContext);
-        return this;
-    }
-
-    /**
-     * build DataQualityTask related info
-     *
-     * @param dataQualityTaskExecutionContext dataQualityTaskExecutionContext
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildDataQualityTaskRelatedInfo(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+    public TaskExecutionContextBuilder buildDataQualityTaskExecutionContext(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         taskExecutionContext.setDataQualityTaskExecutionContext(dataQualityTaskExecutionContext);
+        return this;
+    }
+
+    public TaskExecutionContextBuilder buildResourceParametersInfo(ResourceParametersHelper parametersHelper) {
+        taskExecutionContext.setResourceParametersHelper(parametersHelper);
         return this;
     }
 

@@ -58,15 +58,21 @@ export function useModal(
     })
   }
 
-  const submitRequest = (serviceHandle: any) => {
-    state.functionFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await serviceHandle()
-        window.$message.success(t('resource.udf.success'))
-        ctx.emit('updateList')
-        ctx.emit('update:show')
-      }
-    })
+  const submitRequest = async (serviceHandle: any) => {
+    await state.functionFormRef.validate()
+
+    if (state.saving) return
+    state.saving = true
+
+    try {
+      await serviceHandle()
+      window.$message.success(t('resource.udf.success'))
+      state.saving = false
+      ctx.emit('updateList')
+      ctx.emit('update:show')
+    } catch (err) {
+      state.saving = false
+    }
   }
 
   const variables = reactive({

@@ -103,6 +103,7 @@ const TenantModal = defineComponent({
           onConfirm={this.confirmModal}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (
@@ -110,8 +111,6 @@ const TenantModal = defineComponent({
                 model={this.model}
                 rules={this.rules}
                 ref='tenantFormRef'
-                label-placement='left'
-                label-width={140}
                 require-mark-placement='left'
                 size='small'
                 style="{ maxWidth: '240px' }"

@@ -24,7 +24,6 @@ import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

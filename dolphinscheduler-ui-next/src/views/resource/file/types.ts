@@ -64,3 +64,8 @@ export interface PaginationProps {
 export interface ISetPagination {
   (itemCount: number): void
 }
+
+export interface BreadcrumbItem {
+  id: number
+  fullName: string
+}

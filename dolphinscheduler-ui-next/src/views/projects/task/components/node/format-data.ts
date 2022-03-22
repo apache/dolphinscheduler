@@ -32,6 +32,9 @@ export function formatParams(data: INodeData): {
   taskDefinitionJsonObj: object
 } {
   const taskParams: ITaskParams = {}
+  if (data.taskType === 'SUB_PROCESS') {
+    taskParams.processDefinitionCode = data.processDefinitionCode
+  }
   if (
     data.taskType === 'SPARK' ||
     data.taskType === 'MR' ||
@@ -204,6 +207,13 @@ export function formatParams(data: INodeData): {
       relation: data.relation,
       dependTaskList: data.dependTaskList
     }
+    taskParams.conditionResult = {}
+    if (data.successBranch) {
+      taskParams.conditionResult.successNode = [data.successBranch]
+    }
+    if (data.failedBranch) {
+      taskParams.conditionResult.failedNode = [data.failedBranch]
+    }
   }
 
   if (data.taskType === 'DATAX') {
@@ -295,7 +305,7 @@ export function formatParams(data: INodeData): {
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
       name: data.name,
-      taskGroupId: data.taskGroupId || 0,
+      taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
       taskParams: {
         localParams: data.localParams,
@@ -455,6 +465,17 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.jobFlowDefineJson) {
     params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
+  if (data.taskParams?.processDefinitionCode) {
+    params.processDefinitionCode = data.taskParams.processDefinitionCode
+  }
+
+  if (data.taskParams?.conditionResult?.successNode?.length) {
+    params.successBranch = data.taskParams?.conditionResult.successNode[0]
+  }
+  if (data.taskParams?.conditionResult?.failedNode?.length) {
+    params.failedBranch = data.taskParams?.conditionResult.failedNode[0]
   }
 
   return params

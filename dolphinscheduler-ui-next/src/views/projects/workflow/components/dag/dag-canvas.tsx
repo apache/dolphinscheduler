@@ -37,7 +37,7 @@ export default defineComponent({
     return () => (
       <div
         ref={container}
-        class={Styles.canvas}
+        class={[Styles.canvas, 'dag-container']}
         onDrop={(e) => {
           context.emit('drop', e)
         }}
