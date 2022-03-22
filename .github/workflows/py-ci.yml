@@ -54,6 +54,7 @@ jobs:
       - name: remote
         id: remote
         run: |
+          git fetch --no-tags --prune --depth=1 origin dev
           git remote -vv
       - name: branch
         id: branch
@@ -62,7 +63,6 @@ jobs:
       - name: test
         id: test
         run: |
-          git fetch --no-tags --prune --depth=1 origin dev
           git diff --name-only origin/dev HEAD
 
   lint:
