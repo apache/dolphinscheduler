@@ -25,23 +25,27 @@ import java.util.Objects;
 
 public class ResourceParametersHelper {
 
-    private Map<ResourceType, Map<Integer, AbstractResourceParameters>> map = new HashMap<>();
+    private Map<ResourceType, Map<Integer, AbstractResourceParameters>> resourceMap = new HashMap<>();
 
     public void put(ResourceType resourceType, Integer id) {
         put(resourceType, id, null);
     }
 
     public void put(ResourceType resourceType, Integer id, AbstractResourceParameters parameters) {
-        Map<Integer, AbstractResourceParameters> resourceParametersMap = map.get(resourceType);
+        Map<Integer, AbstractResourceParameters> resourceParametersMap = resourceMap.get(resourceType);
         if (Objects.isNull(resourceParametersMap)) {
             resourceParametersMap = new HashMap<>();
-            map.put(resourceType, resourceParametersMap);
+            resourceMap.put(resourceType, resourceParametersMap);
         }
         resourceParametersMap.put(id, parameters);
     }
 
+    public void setResourceMap(Map<ResourceType, Map<Integer, AbstractResourceParameters>> resourceMap) {
+        this.resourceMap = resourceMap;
+    }
+
     public Map<ResourceType, Map<Integer, AbstractResourceParameters>> getResourceMap() {
-        return map;
+        return resourceMap;
     }
 
     public Map<Integer, AbstractResourceParameters> getResourceMap(ResourceType resourceType) {
