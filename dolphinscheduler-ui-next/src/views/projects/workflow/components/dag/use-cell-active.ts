@@ -24,9 +24,6 @@ import {
   PORT_HOVER,
   PORT_SELECTED,
   PORT,
-  NODE,
-  NODE_HOVER,
-  NODE_SELECTED,
   EDGE,
   EDGE_SELECTED,
   EDGE_HOVER
@@ -89,29 +86,17 @@ export function useCellActive(options: Options) {
       PORT_SELECTED.groups[X6_PORT_OUT_NAME].attrs
     )
     const portDefault = _.cloneDeep(PORT.groups[X6_PORT_OUT_NAME].attrs)
-    const nodeHover = _.merge(_.cloneDeep(NODE.attrs), NODE_HOVER.attrs)
-    const nodeSelected = _.merge(_.cloneDeep(NODE.attrs), NODE_SELECTED.attrs)
 
-    let img = null
-    let nodeAttrs = null
     let portAttrs = null
-
     if (isHover || isSelected) {
-      img = `/src/assets/images/task-icons/${node.data.taskType.toLocaleLowerCase()}_hover.png`
       if (isHover) {
-        nodeAttrs = nodeHover
         portAttrs = _.merge(portDefault, portHover)
       } else {
-        nodeAttrs = nodeSelected
         portAttrs = _.merge(portDefault, portSelected)
       }
     } else {
-      img = `/src/assets/images/task-icons/${node.data.taskType.toLocaleLowerCase()}.png`
-      nodeAttrs = NODE.attrs
       portAttrs = portDefault
     }
-    node.setAttrByPath('image/xlink:href', img)
-    node.setAttrs(nodeAttrs)
     node.setPortProp(X6_PORT_OUT_NAME, 'attrs', portAttrs)
   }
 

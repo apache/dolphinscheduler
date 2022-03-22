@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import type { Node, Edge } from '@antv/x6'
-import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
+import { Ref } from 'vue'
+import { X6_EDGE_NAME, NODE } from './dag-config'
 import utils from '@/utils'
-import { WorkflowDefinition, Coordinate } from './types'
+import type { Node, Edge, Graph } from '@antv/x6'
+import type { WorkflowDefinition, Coordinate } from './types'
 
-export function useCustomCellBuilder() {
+export function useCustomCellBuilder(graph: Ref<Graph | undefined>) {
   /**
    * Convert locationStr to JSON
    * @param {string} locationStr
@@ -69,27 +69,41 @@ export function useCustomCellBuilder() {
     flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
   ): Node.Metadata {
-    const truncation = taskName ? utils.truncateText(taskName, 18) : id
     return {
+      ...NODE,
       id: id,
-      shape: X6_NODE_NAME,
+      shape: 'html',
       x: coordinate.x,
       y: coordinate.y,
       data: {
         taskType: type,
         taskName: taskName || id,
-        flag: flag
+        flag: flag,
+        id,
+        isSelected: false
       },
-      attrs: {
-        image: {
-          // Use href instead of xlink:href, you may lose the icon when downloadPNG
-          'xlink:href': `/src/assets/images/task-icons/${type.toLocaleLowerCase()}.png`
+      html: {
+        render: (node: Node) => {
+          const data = node.getData()
+          const truncation = data.taskName
+            ? utils.truncateText(data.taskName, 18)
+            : data.id
+          return `
+            <div class="task-node ${
+              data.isSelected ? 'task-node-selected' : ''
+            }">
+              <div class="task-icon task-icon-${type.toLocaleLowerCase()}"></div>
+              <div class="task-node-name">${truncation}</div>
+            </div>
+          `
         },
-        title: {
-          text: truncation
-        },
-        rect: {
-          fill: flag === 'NO' ? '#f3f3f5' : '#ffffff'
+        shouldComponentUpdate: (node: Node) => {
+          const data = node.getData()
+          if (data.isSelected !== graph.value?.isSelected(node)) {
+            data.isSelected = graph.value?.isSelected(node)
+            return true
+          }
+          return node.hasChanged('data')
         }
       }
     }

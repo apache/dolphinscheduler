@@ -35,7 +35,7 @@ interface Options {
 export function useCellUpdate(options: Options) {
   const { graph } = options
 
-  const { buildNode, buildEdge } = useCustomCellBuilder()
+  const { buildNode, buildEdge } = useCustomCellBuilder(graph)
 
   /**
    * Set node name by id

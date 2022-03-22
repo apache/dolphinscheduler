@@ -23,7 +23,6 @@ const EDGE_COLOR = '#999999'
 const BG_BLUE = '#DFE9F7'
 const BG_WHITE = '#FFFFFF'
 const NODE_BORDER = '#CCCCCC'
-const TITLE = '#333333'
 const STROKE_BLUE = '#288FFF'
 const NODE_SHADOW = 'drop-shadow(3px 3px 4px rgba(0, 0, 0, 0.2))'
 const EDGE_SHADOW = 'drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2))'
@@ -142,56 +141,6 @@ export const NODE_STATUS_MARKUP = [
 export const NODE = {
   width: 220,
   height: 48,
-  markup: [
-    {
-      tagName: 'rect',
-      selector: 'body',
-      className: 'dag-task-body'
-    },
-    {
-      tagName: 'image',
-      selector: 'image'
-    },
-    {
-      tagName: 'text',
-      selector: 'title'
-    }
-  ],
-  attrs: {
-    body: {
-      refWidth: '100%',
-      refHeight: '100%',
-      rx: 6,
-      ry: 6,
-      pointerEvents: 'visiblePainted',
-      fill: BG_WHITE,
-      stroke: NODE_BORDER,
-      strokeWidth: 1,
-      strokeDasharray: 'none',
-      filter: 'none'
-    },
-    image: {
-      width: 30,
-      height: 30,
-      refX: 12,
-      refY: 9
-    },
-    title: {
-      refX: 45,
-      refY: 18,
-      fontFamily: 'Microsoft Yahei',
-      fontSize: 12,
-      fontWeight: 'bold',
-      fill: TITLE,
-      strokeWidth: 0
-    },
-    fo: {
-      refX: '46%',
-      refY: -25,
-      width: 18,
-      height: 18
-    }
-  },
   ports: {
     ...PORT,
     items: [

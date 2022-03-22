@@ -17,7 +17,7 @@
 
 import Card from '@/components/card'
 import { ArrowLeftOutlined } from '@vicons/antd'
-import { NButton, NFormItem, NIcon, NSelect, NSpace, NImage } from 'naive-ui'
+import { NButton, NFormItem, NIcon, NSelect, NSpace } from 'naive-ui'
 import { defineComponent, onMounted, Ref, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
@@ -55,82 +55,82 @@ export default defineComponent({
       {
         taskType: 'SHELL',
         color: '#646464',
-        image: '/src/assets/images/task-icons/shell.png'
+        image: true
       },
       {
         taskType: 'SUB_PROCESS',
         color: '#4295DA',
-        image: '/src/assets/images/task-icons/sub_process.png'
+        image: true
       },
       {
         taskType: 'PROCEDURE',
         color: '#545CC6',
-        image: '/src/assets/images/task-icons/procedure.png'
+        image: true
       },
       {
         taskType: 'SQL',
         color: '#8097A0',
-        image: '/src/assets/images/task-icons/sql.png'
+        image: true
       },
       {
         taskType: 'SPARK',
         color: '#a16435',
-        image: '/src/assets/images/task-icons/spark.png'
+        image: true
       },
       {
         taskType: 'FLINK',
         color: '#d68f5b',
-        image: '/src/assets/images/task-icons/flink.png'
+        image: true
       },
       {
         taskType: 'MR',
         color: '#A1A5C9',
-        image: '/src/assets/images/task-icons/mr.png'
+        image: true
       },
       {
         taskType: 'PYTHON',
         color: '#60BCD5',
-        image: '/src/assets/images/task-icons/python.png'
+        image: true
       },
       {
         taskType: 'DEPENDENT',
         color: '#60BCD5',
-        image: '/src/assets/images/task-icons/dependent.png'
+        image: true
       },
       {
         taskType: 'HTTP',
         color: '#7f3903',
-        image: '/src/assets/images/task-icons/http.png'
+        image: true
       },
       {
         taskType: 'DATAX',
         color: '#75CC71',
-        image: '/src/assets/images/task-icons/datax.png'
+        image: true
       },
       {
         taskType: 'PIGEON',
         color: '#5EC459',
-        image: '/src/assets/images/task-icons/pigeon.png'
+        image: true
       },
       {
         taskType: 'SQOOP',
         color: '#f98b3d',
-        image: '/src/assets/images/task-icons/sqoop.png'
+        image: true
       },
       {
         taskType: 'CONDITIONS',
         color: '#b99376',
-        image: '/src/assets/images/task-icons/conditions.png'
+        image: true
       },
       {
         taskType: 'SWITCH',
         color: '#ff6f00',
-        image: '/src/assets/images/task-icons/switch.png'
+        image: true
       },
       {
         taskType: 'SEATUNNEL',
         color: '#8c8c8f',
-        image: '/src/assets/images/task-icons/seatunnel.png'
+        image: true
       },
       { taskType: 'DAG', color: '#bbdde9' }
     ])
@@ -333,7 +333,13 @@ export default defineComponent({
               .filter((option: any) => option.image)
               .map((option: any, unused: number) => (
                 <NButton text size='tiny' color={option.color}>
-                  <NImage width='20' src={option.image} />
+                  <div
+                    class={[
+                      styles['side-icon'],
+                      'task-icon',
+                      `task-icon-${option.taskType.toLocaleLowerCase()}`
+                    ]}
+                  />
                   {option.taskType}
                 </NButton>
               ))}

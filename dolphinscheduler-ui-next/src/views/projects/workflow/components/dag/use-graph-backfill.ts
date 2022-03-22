@@ -31,7 +31,7 @@ interface Options {
 export function useGraphBackfill(options: Options) {
   const { graph, definition } = options
 
-  const { buildGraph } = useCustomCellBuilder()
+  const { buildGraph } = useCustomCellBuilder(graph)
 
   watch([graph, definition], () => {
     if (graph.value && definition.value) {

@@ -17,7 +17,7 @@
 export interface ITaskTypeNodeOption {
   taskType: string
   color?: string
-  image?: string
+  image?: boolean
 }
 
 export interface ITaskStateOption {

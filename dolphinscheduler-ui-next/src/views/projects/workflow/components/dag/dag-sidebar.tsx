@@ -44,7 +44,8 @@ export default defineComponent({
             <em
               class={[
                 styles['sidebar-icon'],
-                styles['icon-' + task.type.toLocaleLowerCase()]
+                'task-icon',
+                `task-icon-${task.type.toLocaleLowerCase()}`
               ]}
             />
             <span>{task.alias}</span>

@@ -18,7 +18,7 @@
 import type { Node } from '@antv/x6'
 import { ref, onMounted, Ref } from 'vue'
 import { Graph } from '@antv/x6'
-import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
+import { EDGE, X6_EDGE_NAME } from './dag-config'
 import { debounce } from 'lodash'
 import { useResizeObserver } from '@vueuse/core'
 import ContextMenuTool from './dag-context-menu'
@@ -199,9 +199,7 @@ export function useCanvasInit(options: Options) {
    * Register custom cells
    */
   function registerCustomCells() {
-    Graph.unregisterNode(X6_NODE_NAME)
     Graph.unregisterEdge(X6_EDGE_NAME)
-    Graph.registerNode(X6_NODE_NAME, { ...NODE })
     Graph.registerEdge(X6_EDGE_NAME, { ...EDGE })
   }
   onMounted(() => {

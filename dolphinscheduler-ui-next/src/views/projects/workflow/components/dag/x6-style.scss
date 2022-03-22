@@ -17,6 +17,17 @@
 
 $STROKE_BLUE: #288fff;
 $BG_WHITE: #ffffff;
+@mixin nodeSelected {
+  border-color: #288fff;
+  border-style: dashed;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.1);
+  .task-node-image {
+    filter: grayscale(0%);
+  }
+  .task-node-name {
+    color: #288fff;
+  }
+}
 
 .x6-node[data-shape='dag-task'] {
   &.available {
@@ -31,4 +42,86 @@ $BG_WHITE: #ffffff;
       }
     }
   }
+}
+.task-node {
+  width: 220px;
+  line-height: 48px;
+  border-radius: 6px;
+  background-color: #fff;
+  border: 2px solid #e3e3e3;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: #dfe9f7;
+    @include nodeSelected();
+  }
+  .task-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+}
+.task-icon {
+  background-size: 100%;
+  background-repeat: no-repeat;
+  filter: grayscale(100%);
+}
+.task-icon-shell {
+  background-image: url('@/assets/images/task-icons/shell_hover.png');
+}
+.task-icon-sub_process {
+  background-image: url('@/assets/images/task-icons/sub_process_hover.png');
+}
+.task-icon-data_quality {
+  background-image: url('@/assets/images/task-icons/data_quality_hover.png');
+}
+.task-icon-procedure {
+  background-image: url('@/assets/images/task-icons/procedure_hover.png');
+}
+.task-icon-sql {
+  background-image: url('@/assets/images/task-icons/sql_hover.png');
+}
+.task-icon-flink {
+  background-image: url('@/assets/images/task-icons/flink_hover.png');
+}
+.task-icon-mr {
+  background-image: url('@/assets/images/task-icons/mr_hover.png');
+}
+.task-icon-python {
+  background-image: url('@/assets/images/task-icons/python_hover.png');
+}
+.task-icon-dependent {
+  background-image: url('@/assets/images/task-icons/dependent_hover.png');
+}
+.task-icon-http {
+  background-image: url('@/assets/images/task-icons/http_hover.png');
+}
+.task-icon-datax {
+  background-image: url('@/assets/images/task-icons/datax_hover.png');
+}
+.task-icon-pigeon {
+  background-image: url('@/assets/images/task-icons/pigeon_hover.png');
+}
+.task-icon-sqoop {
+  background-image: url('@/assets/images/task-icons/sqoop_hover.png');
+}
+.task-icon-conditions {
+  background-image: url('@/assets/images/task-icons/conditions_hover.png');
+}
+.task-icon-seatunnel {
+  background-image: url('@/assets/images/task-icons/seatunnel_hover.png');
+}
+.task-icon-spark {
+  background-image: url('@/assets/images/task-icons/spark_hover.png');
+}
+.task-icon-switch {
+  background-image: url('@/assets/images/task-icons/switch_hover.png');
+}
+.task-icon-emr {
+  background-image: url('@/assets/images/task-icons/emr_hover.png');
+}
+.task-node-selected {
+  @include nodeSelected();
 }

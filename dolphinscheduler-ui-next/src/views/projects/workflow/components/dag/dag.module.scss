@@ -101,118 +101,12 @@ $bgLight: #ffffff;
     height: 18px;
     background-size: 100% 100%;
     margin-right: 10px;
-    &.icon-shell {
-      background-image: url('@/assets/images/task-icons/shell.png');
-    }
-    &.icon-sub_process {
-      background-image: url('@/assets/images/task-icons/sub_process.png');
-    }
-    &.icon-data_quality {
-      background-image: url('@/assets/images/task-icons/data_quality.png');
-    }
-    &.icon-procedure {
-      background-image: url('@/assets/images/task-icons/procedure.png');
-    }
-    &.icon-sql {
-      background-image: url('@/assets/images/task-icons/sql.png');
-    }
-    &.icon-flink {
-      background-image: url('@/assets/images/task-icons/flink.png');
-    }
-    &.icon-mr {
-      background-image: url('@/assets/images/task-icons/mr.png');
-    }
-    &.icon-python {
-      background-image: url('@/assets/images/task-icons/python.png');
-    }
-    &.icon-dependent {
-      background-image: url('@/assets/images/task-icons/dependent.png');
-    }
-    &.icon-http {
-      background-image: url('@/assets/images/task-icons/http.png');
-    }
-    &.icon-datax {
-      background-image: url('@/assets/images/task-icons/datax.png');
-    }
-    &.icon-pigeon {
-      background-image: url('@/assets/images/task-icons/pigeon.png');
-    }
-    &.icon-sqoop {
-      background-image: url('@/assets/images/task-icons/sqoop.png');
-    }
-    &.icon-conditions {
-      background-image: url('@/assets/images/task-icons/conditions.png');
-    }
-    &.icon-seatunnel {
-      background-image: url('@/assets/images/task-icons/seatunnel.png');
-    }
-    &.icon-spark {
-      background-image: url('@/assets/images/task-icons/spark.png');
-    }
-    &.icon-switch {
-      background-image: url('@/assets/images/task-icons/switch.png');
-    }
-    &.icon-emr {
-      background-image: url('@/assets/images/task-icons/emr.png');
-    }
+    filter: grayscale(100%);
   }
 
   &:hover {
     .sidebar-icon {
-      &.icon-shell {
-        background-image: url('@/assets/images/task-icons/shell_hover.png');
-      }
-      &.icon-sub_process {
-        background-image: url('@/assets/images/task-icons/sub_process_hover.png');
-      }
-      &.icon-data_quality {
-        background-image: url('@/assets/images/task-icons/data_quality_hover.png');
-      }
-      &.icon-procedure {
-        background-image: url('@/assets/images/task-icons/procedure_hover.png');
-      }
-      &.icon-sql {
-        background-image: url('@/assets/images/task-icons/sql_hover.png');
-      }
-      &.icon-flink {
-        background-image: url('@/assets/images/task-icons/flink_hover.png');
-      }
-      &.icon-mr {
-        background-image: url('@/assets/images/task-icons/mr_hover.png');
-      }
-      &.icon-python {
-        background-image: url('@/assets/images/task-icons/python_hover.png');
-      }
-      &.icon-dependent {
-        background-image: url('@/assets/images/task-icons/dependent_hover.png');
-      }
-      &.icon-http {
-        background-image: url('@/assets/images/task-icons/http_hover.png');
-      }
-      &.icon-datax {
-        background-image: url('@/assets/images/task-icons/datax_hover.png');
-      }
-      &.icon-pigeon {
-        background-image: url('@/assets/images/task-icons/pigeon_hover.png');
-      }
-      &.icon-sqoop {
-        background-image: url('@/assets/images/task-icons/sqoop_hover.png');
-      }
-      &.icon-conditions {
-        background-image: url('@/assets/images/task-icons/conditions_hover.png');
-      }
-      &.icon-seatunnel {
-        background-image: url('@/assets/images/task-icons/seatunnel_hover.png');
-      }
-      &.icon-spark {
-        background-image: url('@/assets/images/task-icons/spark_hover.png');
-      }
-      &.icon-switch {
-        background-image: url('@/assets/images/task-icons/switch_hover.png');
-      }
-      &.icon-emr {
-        background-image: url('@/assets/images/task-icons/emr_hover.png');
-      }
+      filter: grayscale(0%);
     }
   }
 }
