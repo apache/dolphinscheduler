@@ -298,6 +298,7 @@ public enum Status {
     NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
+    STORAGE_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
     /**
      * for monitor
      */

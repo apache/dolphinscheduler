@@ -17,39 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.AWS_END_POINT;
-import static org.apache.dolphinscheduler.common.Constants.BUCKET_NAME;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.jets3t.service.ServiceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -57,14 +24,26 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.jets3t.service.ServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 public class S3Utils implements Closeable, StorageOperate {
 
@@ -201,7 +180,9 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
-        return false;
+        s3Client.copyObject(BUCKET_NAME, srcPath, BUCKET_NAME, dstPath);
+        s3Client.deleteObject(BUCKET_NAME, srcPath);
+        return true;
     }
 
     @Override
@@ -242,10 +223,6 @@ public class S3Utils implements Closeable, StorageOperate {
             }
     }
 
-
-
-
-
     private void
     createFolder( String folderName) {
         ObjectMetadata metadata = new ObjectMetadata();
@@ -263,9 +240,7 @@ public class S3Utils implements Closeable, StorageOperate {
     private void deleteTenantCode(String tenantCode) {
         deleteDirectory(getResDir(tenantCode));
         deleteDirectory(getUdfDir(tenantCode));
-
     }
-
 
     /**
      * xxx   untest
@@ -315,4 +290,8 @@ public class S3Utils implements Closeable, StorageOperate {
         }
     }
 
+    @Override
+    public ResUploadType returnStorageType() {
+        return ResUploadType.S3;
+    }
 }

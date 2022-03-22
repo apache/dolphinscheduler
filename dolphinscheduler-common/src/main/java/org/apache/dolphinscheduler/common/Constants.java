@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.regex.Pattern;
 

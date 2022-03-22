@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.storage;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -148,13 +149,21 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public List<String> vimFile(String tenantCode,String filePath, int skipLineNums, int limit) throws IOException;
+    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException;
 
     /**
      * delete the files and directory of the tenant
+     *
      * @param tenantCode
      * @throws Exception
      */
     public void deleteTenant(String tenantCode) throws Exception;
+
+    /**
+     * return the storageType
+     *
+     * @return
+     */
+    public ResUploadType returnStorageType();
 
 }

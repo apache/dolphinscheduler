@@ -93,7 +93,16 @@
             </exclusions>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -266,7 +275,6 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

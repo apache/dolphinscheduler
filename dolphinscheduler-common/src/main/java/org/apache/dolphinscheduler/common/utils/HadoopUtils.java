@@ -24,7 +24,6 @@ import com.google.common.cache.LoadingCache;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
@@ -734,5 +733,10 @@ public class HadoopUtils implements Closeable , StorageOperate {
             delete(tenantCode, tenantPath, true);
 
         }
+    }
+
+    @Override
+    public ResUploadType returnStorageType() {
+        return ResUploadType.HDFS;
     }
 }

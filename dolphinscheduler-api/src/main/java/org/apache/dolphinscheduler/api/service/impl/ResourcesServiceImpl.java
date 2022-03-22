@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -267,11 +268,18 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
+
+        if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3) && !resource.getFileName().equals(name)) {
+            putMsg(result, Status.STORAGE_CANNOT_RENAME);
+            return result;
+        }
+
         if (!canOperator(loginUser, resource.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -305,10 +313,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         // verify whether the resource exists in storage
         // get the path of origin file in storage
-        String originHdfsFileName = storageOperate.getFileName(resource.getType(), tenantCode, originFullName);
+        String originFileName = storageOperate.getFileName(resource.getType(), tenantCode, originFullName);
         try {
-            if (!storageOperate.exists(tenantCode, originHdfsFileName)) {
-                logger.error("{} not exist", originHdfsFileName);
+            if (!storageOperate.exists(tenantCode, originFileName)) {
+                logger.error("{} not exist", originFileName);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
@@ -426,7 +434,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
             if (!fullName.equals(originFullName)) {
                 try {
-                    storageOperate.delete(tenantCode, originHdfsFileName, false);
+                    storageOperate.delete(tenantCode, originFileName, false);
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                     throw new ServiceException(String.format("delete resource: %s failed.", originFullName));
@@ -439,10 +447,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String destHdfsFileName = storageOperate.getFileName(resource.getType(), tenantCode, fullName);
 
         try {
-            logger.info("start hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
-            storageOperate.copy(originHdfsFileName, destHdfsFileName, true, true);
+            logger.info("start  copy {} -> {}", originFileName, destHdfsFileName);
+            storageOperate.copy(originFileName, destHdfsFileName, true, true);
         } catch (Exception e) {
-            logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
+            logger.error(MessageFormat.format(" copy {0} -> {1} fail", originFileName, destHdfsFileName), e);
             putMsg(result, Status.HDFS_COPY_FAIL);
             throw new ServiceException(Status.HDFS_COPY_FAIL);
         }
