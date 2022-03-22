@@ -51,10 +51,10 @@ jobs:
         id: py-it
         run: |
           echo "::set-output name=py-it::false"
-      - name: test
-        id: test
-        run: |
-          git diff dev HEAD
+#      - name: test
+#        id: test
+#        run: |
+#          git diff ${{ github.ref }} HEAD
 
   lint:
     name: Lint
