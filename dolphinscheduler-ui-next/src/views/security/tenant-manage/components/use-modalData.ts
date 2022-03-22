@@ -48,7 +48,7 @@ export function useModalData(
     }
   })
 
-  const getListData = () => {
+  const getListData = (status: number) => {
     const { state } = useAsyncState(
       queryList().then((res: any) => {
         variables.model.generalOptions = res.map((item: any) => {
@@ -57,6 +57,9 @@ export function useModalData(
             value: item.id
           }
         })
+        if (status === 0) {
+          variables.model.queueId = res[0].id
+        }
       }),
       {}
     )
