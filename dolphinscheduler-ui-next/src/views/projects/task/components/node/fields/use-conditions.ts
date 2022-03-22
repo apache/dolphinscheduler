@@ -51,6 +51,14 @@ export function useConditions(model: { [field: string]: any }): IJsonItem[] {
       props: {
         clearable: true
       },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator: (unuse, value) => {
+          if (value && value === model.failedBranch) {
+            return new Error(t('project.node.branch_tips'))
+          }
+        }
+      },
       options: taskStore.getPostTaskOptions
     },
     {
@@ -70,6 +78,14 @@ export function useConditions(model: { [field: string]: any }): IJsonItem[] {
       span: 12,
       props: {
         clearable: true
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator: (unuse, value) => {
+          if (value && value === model.successBranch) {
+            return new Error(t('project.node.branch_tips'))
+          }
+        }
       },
       options: taskStore.getPostTaskOptions
     },
