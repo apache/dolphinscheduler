@@ -19,7 +19,6 @@ import { defineComponent, PropType, ref } from 'vue'
 import initChart from '@/components/chart'
 import { useI18n } from 'vue-i18n'
 import type { Ref } from 'vue'
-import { format } from 'date-fns'
 
 const props = {
   height: {
