@@ -63,9 +63,9 @@ import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
-    private final boolean LOCAL_MODE = Objects.equals(System.getenv("local"), "true");
+    private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
 
-    private final boolean M1_CHIP_FLAG = Objects.equals(System.getenv("m1_chip"), "true");
+    private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
 
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
@@ -74,10 +74,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private HostAndPort address;
     private String rootPath;
 
-    private DockerImageName imageName;
-
     private Path record;
-
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -85,7 +82,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
         Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
 
-        getRecordPath();
+        setRecordPath();
 
         if (LOCAL_MODE) {
             runInLocal();
@@ -93,7 +90,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             runInDockerContainer(context);
         }
 
-        getBrowserContainerByOsName();
+        setBrowserContainerByOsName();
 
         if (network != null) {
             browser.withNetwork(network);
@@ -151,7 +148,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         rootPath = "/dolphinscheduler/ui/";
     }
 
-    private void getBrowserContainerByOsName() {
+    private void setBrowserContainerByOsName() {
+        DockerImageName imageName;
+
         if (LOCAL_MODE && M1_CHIP_FLAG) {
             imageName = DockerImageName.parse("seleniarm/standalone-chromium:4.1.2-20220227")
                     .asCompatibleSubstituteFor("selenium/standalone-chrome");
@@ -171,7 +170,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         }
     }
 
-    private void getRecordPath() throws IOException {
+    private void setRecordPath() throws IOException {
         if (!Strings.isNullOrEmpty(System.getenv("RECORDING_PATH"))) {
             record = Paths.get(System.getenv("RECORDING_PATH"));
             if (!record.toFile().exists()) {
