@@ -42,7 +42,7 @@ jobs:
       run-py-ut: ${{ steps.py-ut.outputs.run-py-ut }}
       run-py-it: ${{ steps.py-it.outputs.run-py-it }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Python Unit Test
         id: py-ut
         run: |
