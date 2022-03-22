@@ -46,13 +46,11 @@ jobs:
       - name: Python Unit Test
         id: py-ut
         run: |
-#          echo "::set-output name=run-py-ut::false"
-          echo "::set-output name=run-py-ut1::false"
+          echo "::set-output name=run-py-ut-t::false"
       - name: Python Integrate Test
         id: py-it
         run: |
-#          echo "::set-output name=py-it::false"
-          echo "::set-output name=py-it1::false"
+          echo "::set-output name=py-it-t::false"
       - name: remote
         id: remote
         run: |
