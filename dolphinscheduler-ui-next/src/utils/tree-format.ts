@@ -20,7 +20,7 @@ export function removeUselessChildren(
 ) {
   if (!list.length) return
   list.forEach((item) => {
-    if (item.dirctory) item.disabled = true
+    if (item.dirctory && item.children?.length === 0) item.disabled = true
     if (!item.children) return
     if (item.children.length === 0) {
       delete item.children
