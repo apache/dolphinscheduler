@@ -74,5 +74,4 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("endTime") Date endTime
     );
 
-    int updateHostAndSubmitTimeById(@Param("id") int id, @Param("host") String host, @Param("submitTime") Date submitTime);
 }

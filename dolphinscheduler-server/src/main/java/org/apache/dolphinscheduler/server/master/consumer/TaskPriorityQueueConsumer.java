@@ -137,9 +137,6 @@ public class TaskPriorityQueueConsumer extends Thread {
             } else {
                 result = dispatcher.dispatch(executionContext);
             }
-            if (result) {
-                processService.updateHostAndSubmitTimeById(taskPriority.getTaskId(), executionContext.getHost().getAddress(), new Date());
-            }
         } catch (ExecuteException e) {
             logger.error("ExecuteException dispatch error: {}", e.getMessage(), e);
         } catch (Throwable t) {

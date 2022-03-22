@@ -165,10 +165,4 @@
         </if>
         order by instance.start_time desc
     </select>
-    <update id="updateHostAndSubmitTimeById">
-        update t_ds_task_instance
-        set host        = #{host},
-            submit_time = #{submitTime}
-        where id = #{id}
-    </update>
 </mapper>

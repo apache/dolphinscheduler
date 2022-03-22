@@ -1454,10 +1454,6 @@ public class ProcessService {
         }
     }
 
-    public boolean updateHostAndSubmitTimeById(int id, String host, Date date) {
-        int count = taskInstanceMapper.updateHostAndSubmitTimeById(id, host, date);
-        return count > 0;
-    }
 
     /**
      * insert task instance
