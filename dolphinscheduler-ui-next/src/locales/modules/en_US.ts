@@ -1125,7 +1125,11 @@ const security = {
     ToPersonId: 'To Person Id',
     ToPersonEmail: 'To Person Email',
     AtSomeoneInRoom: 'At Someone In Room',
-    Destination: 'Destination'
+    Destination: 'Destination',
+    AtMobiles: 'At User Mobiles',
+    AtUserIds: 'At User Ids',
+    MsgType: 'Msg Type',
+    IsAtAll: '@All'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
