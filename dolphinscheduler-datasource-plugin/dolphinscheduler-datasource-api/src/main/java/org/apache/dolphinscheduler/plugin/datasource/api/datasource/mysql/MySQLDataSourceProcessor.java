@@ -32,8 +32,9 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        mysqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        mysqlDatasourceParamDTO.setOther(parseOther(getDbType(), connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -85,7 +86,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         mysqlConnectionParam.setPassword(PasswordUtils.encodePassword(mysqlDatasourceParam.getPassword()));
         mysqlConnectionParam.setDriverClassName(getDatasourceDriver());
         mysqlConnectionParam.setValidationQuery(getValidationQuery());
-        mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
+        mysqlConnectionParam.setOther(transformOther(getDbType(), mysqlDatasourceParam.getOther()));
         mysqlConnectionParam.setProps(mysqlDatasourceParam.getOther());
 
         return mysqlConnectionParam;
@@ -138,7 +139,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return DbType.MYSQL;
     }
 
-    private String transformOther(Map<String, String> paramMap) {
+    @Override
+    public String transformOther(DbType type, Map<String, String> paramMap) {
         if (MapUtils.isEmpty(paramMap)) {
             return null;
         }
@@ -152,9 +154,9 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s&", key, value)));
-        return stringBuilder.toString();
+        List<String> list = new ArrayList<>();
+        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+        return String.join("&", list);
     }
 
     private static boolean checkKeyIsLegitimate(String key) {
@@ -162,17 +164,6 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
                 && !key.contains(AUTO_DESERIALIZE)
                 && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
                 && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
     }
 
 }

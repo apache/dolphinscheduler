@@ -26,14 +26,11 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -46,7 +43,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
         SQLServerDataSourceParamDTO sqlServerDatasourceParamDTO = new SQLServerDataSourceParamDTO();
         sqlServerDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         sqlServerDatasourceParamDTO.setUserName(connectionParams.getUser());
-        sqlServerDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        sqlServerDatasourceParamDTO.setOther(parseOther(getDbType(), connectionParams.getOther()));
         sqlServerDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         sqlServerDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         return sqlServerDatasourceParamDTO;
@@ -62,7 +59,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
         sqlServerConnectionParam.setAddress(address);
         sqlServerConnectionParam.setDatabase(sqlServerParam.getDatabase());
         sqlServerConnectionParam.setJdbcUrl(jdbcUrl);
-        sqlServerConnectionParam.setOther(transformOther(sqlServerParam.getOther()));
+        sqlServerConnectionParam.setOther(transformOther(getDbType(), sqlServerParam.getOther()));
         sqlServerConnectionParam.setUser(sqlServerParam.getUserName());
         sqlServerConnectionParam.setPassword(PasswordUtils.encodePassword(sqlServerParam.getPassword()));
         sqlServerConnectionParam.setDriverClassName(getDatasourceDriver());
@@ -109,23 +106,4 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
         return DbType.SQLSERVER;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s;", key, value)));
-        return stringBuilder.toString();
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split(";")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

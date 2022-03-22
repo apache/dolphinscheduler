@@ -26,14 +26,11 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -43,7 +40,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         PostgreSQLDataSourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
         postgreSqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         postgreSqlDatasourceParamDTO.setUserName(connectionParams.getUser());
-        postgreSqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        postgreSqlDatasourceParamDTO.setOther(parseOther(getDbType(), connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -68,7 +65,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         postgreSqlConnectionParam.setPassword(PasswordUtils.encodePassword(postgreSqlParam.getPassword()));
         postgreSqlConnectionParam.setDriverClassName(getDatasourceDriver());
         postgreSqlConnectionParam.setValidationQuery(getValidationQuery());
-        postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
+        postgreSqlConnectionParam.setOther(transformOther(getDbType(), postgreSqlParam.getOther()));
         postgreSqlConnectionParam.setProps(postgreSqlParam.getOther());
 
         return postgreSqlConnectionParam;
@@ -111,24 +108,4 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return DbType.POSTGRESQL;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s&", key, value)));
-        return stringBuilder.toString();
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            String[] split = config.split("=");
-            otherMap.put(split[0], split[1]);
-        }
-        return otherMap;
-    }
 }

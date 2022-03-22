@@ -26,13 +26,9 @@ import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections4.MapUtils;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -43,7 +39,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         ClickHouseDataSourceParamDTO clickHouseDatasourceParamDTO = new ClickHouseDataSourceParamDTO();
         clickHouseDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         clickHouseDatasourceParamDTO.setUserName(connectionParams.getUser());
-        clickHouseDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        clickHouseDatasourceParamDTO.setOther(parseOther(getDbType(), connectionParams.getOther()));
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
@@ -67,7 +63,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         clickhouseConnectionParam.setPassword(PasswordUtils.encodePassword(clickHouseParam.getPassword()));
         clickhouseConnectionParam.setDriverClassName(getDatasourceDriver());
         clickhouseConnectionParam.setValidationQuery(getValidationQuery());
-        clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
+        clickhouseConnectionParam.setOther(transformOther(getDbType(), clickHouseParam.getOther()));
         clickhouseConnectionParam.setProps(clickHouseParam.getOther());
         return clickhouseConnectionParam;
     }
@@ -110,24 +106,4 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         return DbType.CLICKHOUSE;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s%s", key, value, "&")));
-        return stringBuilder.toString();
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

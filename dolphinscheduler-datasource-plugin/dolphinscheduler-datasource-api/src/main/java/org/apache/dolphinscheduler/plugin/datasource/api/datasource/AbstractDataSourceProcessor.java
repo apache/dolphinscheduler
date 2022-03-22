@@ -20,10 +20,14 @@ package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -85,5 +89,62 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         return MessageFormat.format("{0}@{1}@{2}", dbType.getDescp(), baseConnectionParam.getUser(), baseConnectionParam.getJdbcUrl());
+    }
+
+    /**
+     * transform other parameter
+     *
+     * @param type     type
+     * @param otherMap otherMap
+     */
+    protected String transformOther(DbType type, Map<String, String> otherMap) {
+        if (MapUtils.isEmpty(otherMap)) {
+            return null;
+        }
+        List<String> list = new ArrayList<>();
+        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+        return String.join(getDbSeparator(type), list);
+    }
+
+    /**
+     * parse Other
+     *
+     * @param type  type
+     * @param other other
+     */
+    protected Map<String, String> parseOther(DbType type, String other) {
+        if (StringUtils.isEmpty(other)) {
+            return null;
+        }
+        Map<String, String> otherMap = new LinkedHashMap<>();
+        String[] configs = other.split(getDbSeparator(type));
+        for (String config : configs) {
+            otherMap.put(config.split("=")[0], config.split("=")[1]);
+        }
+        return otherMap;
+    }
+
+    /**
+     * get db separator
+     *
+     * @param type type
+     */
+    private String getDbSeparator(DbType type) {
+        String separator = "";
+        if (DbType.MYSQL.name().equals(type.name())
+                || DbType.POSTGRESQL.name().equals(type.name())
+                || DbType.CLICKHOUSE.name().equals(type.name())
+                || DbType.ORACLE.name().equals(type.name())
+                || DbType.PRESTO.name().equals(type.name())) {
+            separator = "&";
+        } else if (DbType.HIVE.name().equals(type.name())
+                || DbType.SPARK.name().equals(type.name())
+                || DbType.DB2.name().equals(type.name())
+                || DbType.SQLSERVER.name().equals(type.name())) {
+            separator = ";";
+        } else {
+            throw new IllegalArgumentException("datasource type illegal!");
+        }
+        return separator;
     }
 }
