@@ -140,23 +140,15 @@ const GraphChart = defineComponent({
                 Number(item.schedulePublishStatus),
                 Number(item.workFlowPublishStatus)
               ),
-              workFlowPublishStatus: format(
-                new Date(item.workFlowPublishStatus),
-                'yyyy-MM-dd HH:mm:ss'
-              ),
-              schedulePublishStatus: format(
-                new Date(item.schedulePublishStatus),
-                'yyyy-MM-dd HH:mm:ss'
-              ),
+              workFlowPublishStatus: Number(item.workFlowPublishStatus) === 0
+                ? t('project.workflow.offline')
+                : t('project.workflow.online'),
+              schedulePublishStatus: Number(item.schedulePublishStatus) === 0
+                ? t('project.workflow.offline')
+                : t('project.workflow.online'),
               crontab: item.crontab,
-              scheduleStartTime:
-                Number(item.scheduleStartTime) === 0
-                  ? t('project.workflow.offline')
-                  : t('project.workflow.online'),
-              scheduleEndTime:
-                Number(item.scheduleEndTime) === 0
-                  ? t('project.workflow.offline')
-                  : t('project.workflow.online')
+              scheduleStartTime: item.scheduleStartTime ? item.scheduleStartTime : '-',
+              scheduleEndTime: item.scheduleEndTime ? item.scheduleEndTime : '-'
             }
           }),
           categories: legendData
