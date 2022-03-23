@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -35,13 +34,32 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.UDFUser;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -53,17 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -419,60 +426,61 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setUpdateTime(now);
 
         //if user switches the tenant, the user's resources need to be copied to the new tenant
-        if (user.getTenantId() != tenantId) {
-            Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
-            //query tenant
-            Tenant newTenant = tenantMapper.queryById(tenantId);
-            // if hdfs startup
-            if (null != newTenant && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
-                String newTenantCode = newTenant.getTenantCode();
-                String oldResourcePath = storageOperate.getResDir(oldTenant.getTenantCode());
-                String oldUdfsPath = storageOperate.getUdfDir(oldTenant.getTenantCode());
-
-                try {// if old tenant dir exists
-                    if (storageOperate.exists(oldTenant.getTenantCode(), oldResourcePath)) {
-                        String newResourcePath = storageOperate.getResDir(newTenantCode);
-                        String newUdfsPath = storageOperate.getUdfDir(newTenantCode);
-
-                        //file resources list
-                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.FILE.ordinal());
-                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldResourcePath, newResourcePath);
-                        }
-
-                        //udf resources
-                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.UDF.ordinal());
-                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldUdfsPath, newUdfsPath);
-                        }
-
-                    } else {
-                        // if old tenant dir not exists , create
-                        storageOperate.createTenantDirIfNotExists(oldTenant.getTenantCode());
-
-                        if (!storageOperate.exists(newTenant.getTenantCode(), storageOperate.getDir(null,newTenant.getTenantCode()))) {
-                            storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("create tenant {} failed ,the reason is {}", oldTenant, e.getMessage());
-                }
-
-            user.setTenantId(tenantId);
-            try {
-                storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
-            } catch (Exception e) {
-                logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
-            }
-            }
-        }
-
+//        if (user.getTenantId() != tenantId) {
+//            Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
+//            //query tenant
+//            Tenant newTenant = tenantMapper.queryById(tenantId);
+//            // if hdfs startup
+//            if (null != newTenant && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
+//                String newTenantCode = newTenant.getTenantCode();
+//                String oldResourcePath = storageOperate.getResDir(oldTenant.getTenantCode());
+//                String oldUdfsPath = storageOperate.getUdfDir(oldTenant.getTenantCode());
+//
+//                try {// if old tenant dir exists
+//                    if (storageOperate.exists(oldTenant.getTenantCode(), oldResourcePath)) {
+//                        String newResourcePath = storageOperate.getResDir(newTenantCode);
+//                        String newUdfsPath = storageOperate.getUdfDir(newTenantCode);
+//
+//                        //file resources list
+//                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
+//                                null, userId, ResourceType.FILE.ordinal());
+//                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
+//                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
+//                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
+//                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldResourcePath, newResourcePath);
+//                        }
+//
+//                        //udf resources
+//                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
+//                                null, userId, ResourceType.UDF.ordinal());
+//                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
+//                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
+//                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
+//                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldUdfsPath, newUdfsPath);
+//                        }
+//
+//                    } else {
+//                        // if old tenant dir not exists , create
+//                        storageOperate.createTenantDirIfNotExists(oldTenant.getTenantCode());
+//
+//                        if (!storageOperate.exists(newTenant.getTenantCode(), storageOperate.getDir(null,newTenant.getTenantCode()))) {
+//                            storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    logger.error("create tenant {} failed ,the reason is {}", oldTenant, e.getMessage());
+//                }
+//
+//
+//            try {
+//                storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
+//            } catch (Exception e) {
+//                logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
+//            }
+//            }
+//            user.setTenantId(tenantId);
+//        }
+        user.setTenantId(tenantId);
         // updateProcessInstance user
         userMapper.updateById(user);
         putMsg(result, Status.SUCCESS);

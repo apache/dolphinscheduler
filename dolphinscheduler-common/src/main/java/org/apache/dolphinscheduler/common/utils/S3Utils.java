@@ -225,11 +225,13 @@ public class S3Utils implements Closeable, StorageOperate {
 
     private void
     createFolder( String folderName) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(0);
-        InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-        PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName + FOLDER_SEPARATOR, emptyContent, metadata);
-        s3Client.putObject(putObjectRequest);
+        if (!s3Client.doesObjectExist(BUCKET_NAME, folderName + FOLDER_SEPARATOR)) {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(0);
+            InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName + FOLDER_SEPARATOR, emptyContent, metadata);
+            s3Client.putObject(putObjectRequest);
+        }
     }
 
     @Override
