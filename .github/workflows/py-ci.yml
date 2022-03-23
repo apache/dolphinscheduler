@@ -68,7 +68,7 @@ jobs:
         # When only directory `env.DIR_INVERT_PY_IT` changed, will set output `run-py-it` equal to `false`.
         run: |
           git diff --quiet origin/dev HEAD -- ${{ env.DIR_PY_UT }} || echo "::set-output name=run-py-ut::true"
-          if git diff --name-only | cut -d '/' -f 1 | sort | uniq | grep -qv -E ${{ env.DIR_INVERT_RE_PY_IT }}; then
+          if git diff --name-only | cut -d '/' -f 1 | sort | uniq | grep -qv -E "${{ env.DIR_INVERT_RE_PY_IT }}"; then
             echo "::set-output name=run-py-it::false"
           else
             echo "::set-output name=run-py-it::true"
