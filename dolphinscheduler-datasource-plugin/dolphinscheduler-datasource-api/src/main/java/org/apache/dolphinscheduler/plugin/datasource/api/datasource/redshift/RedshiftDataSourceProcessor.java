@@ -26,16 +26,11 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -53,7 +48,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         redshiftDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         redshiftDatasourceParamDTO.setUserName(connectionParams.getUser());
-        redshiftDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        redshiftDatasourceParamDTO.setOther(parseOther(getDbType(), connectionParams.getOther()));
 
         return redshiftDatasourceParamDTO;
     }
@@ -68,7 +63,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
             redshiftConnectionParam = new RedshiftConnectionParam();
         redshiftConnectionParam.setUser(redshiftParam.getUserName());
         redshiftConnectionParam.setPassword(PasswordUtils.encodePassword(redshiftParam.getPassword()));
-        redshiftConnectionParam.setOther(transformOther(redshiftParam.getOther()));
+        redshiftConnectionParam.setOther(transformOther(getDbType(), redshiftParam.getOther()));
         redshiftConnectionParam.setAddress(address);
         redshiftConnectionParam.setJdbcUrl(jdbcUrl);
         redshiftConnectionParam.setDatabase(redshiftParam.getDatabase());
@@ -117,24 +112,4 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         return DbType.REDSHIFT;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isNotEmpty(otherMap)) {
-            List<String> list = new ArrayList<>(otherMap.size());
-            otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-            return String.join(Constants.SEMICOLON, list);
-        }
-        return null;
-    }
-
-    private Map<String, String> parseOther(String other) {
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        if (StringUtils.isEmpty(other)) {
-            return otherMap;
-        }
-        String[] configs = other.split(Constants.SEMICOLON);
-        for (String config : configs) {
-            otherMap.put(config.split(Constants.EQUAL_SIGN)[0], config.split(Constants.EQUAL_SIGN)[1]);
-        }
-        return otherMap;
-    }
 }

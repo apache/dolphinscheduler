@@ -140,7 +140,8 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         } else if (DbType.HIVE.name().equals(type.name())
                 || DbType.SPARK.name().equals(type.name())
                 || DbType.DB2.name().equals(type.name())
-                || DbType.SQLSERVER.name().equals(type.name())) {
+                || DbType.SQLSERVER.name().equals(type.name())
+                || DbType.REDSHIFT.name().equals(type.name())) {
             separator = ";";
         } else {
             throw new IllegalArgumentException("datasource type illegal!");
