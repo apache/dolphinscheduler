@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
+import java.sql.SQLException;
+import java.util.Objects;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -107,6 +109,16 @@ public class ResourceDao {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
+        } finally {
+            if (Objects.nonNull(pstmt)) {
+                try {
+                    if (!pstmt.isClosed()) {
+                        pstmt.close();
+                    }
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
         }
         return resourceSizeMap;
     }
@@ -120,18 +132,29 @@ public class ResourceDao {
         Map<String, Long> resourceSizeMap = listAllResourcesByFileType(conn, type);
 
         String sql = "UPDATE t_ds_resources SET size=? where type=? and full_name=? and is_directory = true";
+        PreparedStatement pstmt = null;
         try {
+            pstmt = conn.prepareStatement(sql);
             for (Map.Entry<String, Long> entry : resourceSizeMap.entrySet()) {
-                PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setLong(1, entry.getValue());
                 pstmt.setInt(2, type);
                 pstmt.setString(3, entry.getKey());
-                pstmt.executeUpdate();
+                pstmt.addBatch();
             }
+            pstmt.executeBatch();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
+            if (Objects.nonNull(pstmt)) {
+                try {
+                    if (!pstmt.isClosed()) {
+                        pstmt.close();
+                    }
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
             ConnectionUtils.releaseResource(conn);
         }
     }
