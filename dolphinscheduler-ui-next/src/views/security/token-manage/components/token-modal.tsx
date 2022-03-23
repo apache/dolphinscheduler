@@ -67,6 +67,10 @@ const TokenModal = defineComponent({
             : ''
         variables.model.expireTime = Date.now()
         variables.model.token = ''
+      } else {
+        variables.model.userId = props.row.userId
+        variables.model.expireTime = new Date(props.row.expireTime).getTime()
+        variables.model.token = props.row.token
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -76,7 +80,9 @@ const TokenModal = defineComponent({
     }
 
     const changeUser = () => {
-      variables.model.token = ''
+      if (props.statusRef !== 0) {
+        variables.model.token = ''
+      }
     }
 
     watch(
