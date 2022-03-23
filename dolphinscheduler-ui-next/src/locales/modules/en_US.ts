@@ -914,7 +914,10 @@ const project = {
     title_tips: 'Please enter the title of email',
     alarm_group: 'Alarm group',
     alarm_group_tips: 'Alarm group required',
-    integer_tips: 'Please enter a positive integer'
+    integer_tips: 'Please enter a positive integer',
+    sql_parameter: 'SQL Parameter',
+    format_tips: 'Please enter format',
+    udf_function: 'UDF Function'
   }
 }
 

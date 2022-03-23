@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { removeUselessChildren } from '@/utils/tree-format'
+import { useUdfs } from './use-udfs'
 import type { IJsonItem } from '../types'
 
 export function useSql(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const options = ref([])
-
   const loading = ref(false)
+  const hiveSpan = computed(() => (model.type === 'HIVE' ? 24 : 0))
 
   const getResourceList = async () => {
     if (loading.value) return
@@ -41,6 +42,16 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
 
   return [
     {
+      type: 'input',
+      field: 'connParams',
+      name: t('project.node.sql_parameter'),
+      props: {
+        placeholder:
+          t('project.node.format_tips') + ' key1=value1;key2=value2...'
+      },
+      span: hiveSpan
+    },
+    {
       type: 'editor',
       field: 'sql',
       name: t('project.node.sql_statement'),
@@ -50,6 +61,7 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.sql_empty_tips')
       }
     },
+    useUdfs(model),
     {
       type: 'tree-select',
       field: 'resourceList',
