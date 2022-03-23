@@ -102,11 +102,11 @@ export function useAuthorize() {
     ])
     state.loading = false
     state.authorizedUdfs = udfs[0].map(
-      (item: { name: string; id: number }) => item.id
+      (item: { funcName: string; id: number }) => item.id
     )
     state.unauthorizedUdfs = [...udfs[0], ...udfs[1]].map(
-      (item: { name: string; id: number }) => ({
-        label: item.name,
+      (item: { funcName: string; id: number }) => ({
+        label: item.funcName,
         value: item.id
       })
     )
@@ -202,7 +202,7 @@ export function useAuthorize() {
     if (type === 'authorize_udf') {
       await grantUDFFunc({
         userId,
-        udfIds: state.authorizedUdfResources.join(',')
+        udfIds: state.authorizedUdfs.join(',')
       })
     }
     if (type === 'authorize_resource') {
