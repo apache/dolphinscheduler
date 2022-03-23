@@ -32,9 +32,9 @@ defaults:
 env:
   # We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
   DEPENDENCES: pip setuptools wheel tox
-  # Space delimiter for files or directories
+  # Regexp files or directories, will run unit test if any of those files changed.
   DIR_PY_UT: ^.github/workflows/py-ci.yml$|^dolphinscheduler-python/pydolphinscheduler
-  # Regexp for directories, only root directory support for now.
+  # Regexp files or directories, will not run integrate tests if only those changed.
   DIR_INVERT_RE_PY_IT: ^dolphinscheduler-ui|^dolphinscheduler-ui-next|^dolphinscheduler-e2e
 
 jobs:
@@ -54,13 +54,14 @@ jobs:
         id: py-ut
         # When directory `env.DIR_PY_UT` changed, will set output `run-py-ut` equal to `true`.
         run: |
-          git diff origin/dev HEAD -- "${{ env.DIR_PY_UT }}"
-          git diff --quiet origin/dev HEAD -- "${{ env.DIR_PY_UT }}" || echo "::set-output name=run-py-ut::true"
+          if git diff --name-only | grep -q -E "${{ env.DIR_PY_UT }}"; then
+            echo "::set-output name=run-py-ut::true"
+          fi
       - name: Python Integrate Test
         id: py-it
         # When only directory `env.DIR_INVERT_PY_IT` changed, will set output `run-py-it` equal to `false`, else `true`.
         run: |
-          if git diff --name-only | cut -d '/' -f 1 | sort | uniq | grep -qv -E "${{ env.DIR_INVERT_RE_PY_IT }}"; then
+          if git diff --name-only | grep -qv -E "${{ env.DIR_INVERT_RE_PY_IT }}"; then
             echo "::set-output name=run-py-it::false"
           else
             echo "::set-output name=run-py-it::true"
