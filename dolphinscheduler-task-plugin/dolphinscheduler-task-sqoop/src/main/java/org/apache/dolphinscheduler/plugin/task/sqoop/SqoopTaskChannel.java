@@ -45,6 +45,6 @@ public class SqoopTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return null;
+        return JSONUtils.parseObject(parameters, SqoopParameters.class).getResources();
     }
 }
