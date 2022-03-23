@@ -37,7 +37,7 @@ env:
 
 jobs:
   modify-check:
-    name: modify-check
+    name: Modify Check
     timeout-minutes: 5
     runs-on: ubuntu-latest
     outputs:
