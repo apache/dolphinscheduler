@@ -80,7 +80,7 @@ export function useTable() {
       {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
-        width: 60,
+        width: 220,
         render: (row) => {
           return !row.directory
             ? row.alias
