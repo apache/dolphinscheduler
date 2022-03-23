@@ -96,7 +96,7 @@ public class ResourceDao {
                 if (StringUtils.isNotBlank(fullName) && !isDirectory) {
                     String[] splits = fullName.split("/");
                     for (int i = 1; i < splits.length; i++) {
-                        String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits,0, splits.length - 1));
+                        String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits,0, splits.length - i));
                         if (Strings.isNotEmpty(parentFullName)) {
                             long size = resourceSizeMap.getOrDefault(parentFullName, 0L);
                             resourceSizeMap.put(parentFullName, size + fileSize);
@@ -121,7 +121,7 @@ public class ResourceDao {
 
         String sql = "UPDATE t_ds_resources SET size=? where type=? and full_name=? and is_directory = true";
         try {
-            for(Map.Entry<String, Long> entry : resourceSizeMap.entrySet()) {
+            for (Map.Entry<String, Long> entry : resourceSizeMap.entrySet()) {
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setLong(1, entry.getValue());
                 pstmt.setInt(2, type);

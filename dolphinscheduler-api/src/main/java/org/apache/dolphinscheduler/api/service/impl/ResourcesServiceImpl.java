@@ -266,7 +266,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         } else {
                             parentResource.setSize(0L);
                         }
-//                        resourcesMapper.updateById(parentResource);
+                        resourcesMapper.updateById(parentResource);
                     }
                 }
             }

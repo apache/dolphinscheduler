@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.P;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
@@ -27,7 +26,6 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -43,6 +41,7 @@ import org.apache.dolphinscheduler.dao.upgrade.ScheduleDao;
 import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
 import org.apache.dolphinscheduler.dao.upgrade.WorkerGroupDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections.CollectionUtils;
