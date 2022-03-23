@@ -237,6 +237,10 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
+  sendEmail?: boolean
+  displayRows?: number
+  title?: string
+  groupId?: string
   preStatements?: string[]
   postStatements?: string[]
   method?: string

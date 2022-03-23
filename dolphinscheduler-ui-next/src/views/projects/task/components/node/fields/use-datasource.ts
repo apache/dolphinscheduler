@@ -28,7 +28,7 @@ export function useDatasource(
 ): IJsonItem {
   const { t } = useI18n()
 
-  const options = ref([] as { label: string; value: string }[])
+  const options = ref([] as { label: string; value: number }[])
   const loading = ref(false)
   const defaultValue = ref(null)
 
@@ -45,11 +45,12 @@ export function useDatasource(
     defaultValue.value = null
     options.value = []
 
-    res.map((item: any) => {
-      options.value.push({ label: item.name, value: String(item.id) })
-    })
-    if (options.value && model.datasource) {
-      const item = find(options.value, { value: String(model.datasource) })
+    options.value = res.map((item: any) => ({
+      label: item.name,
+      value: item.id
+    }))
+    if (options.value.length && model.datasource) {
+      const item = find(options.value, { value: model.datasource })
       if (!item) {
         model.datasource = null
       }
@@ -70,7 +71,7 @@ export function useDatasource(
   })
   return {
     type: 'select',
-    field: field ? field : 'datasource',
+    field: field || 'datasource',
     span: 12,
     name: t('project.node.datasource_instances'),
     props: {
@@ -79,6 +80,7 @@ export function useDatasource(
     options: options,
     validate: {
       trigger: ['input', 'blur'],
+      type: 'number',
       required: true
     }
   }

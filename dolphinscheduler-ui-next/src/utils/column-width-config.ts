@@ -38,7 +38,7 @@ export const COLUMN_WIDTH_CONFIG = {
     width: 120
   },
   type: {
-    width: 120
+    width: 130
   },
   version: {
     width: 80
