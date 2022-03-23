@@ -54,14 +54,14 @@ jobs:
         id: py-ut
         # When directory `env.DIR_PY_UT` changed, will set output `run-py-ut` equal to `true`.
         run: |
-          if git diff --name-only | grep -q -E "${{ env.DIR_PY_UT }}"; then
+          if git diff --name-only origin/dev HEAD | grep -q -E "${{ env.DIR_PY_UT }}"; then
             echo "::set-output name=run-py-ut::true"
           fi
       - name: Python Integrate Test
         id: py-it
         # When only directory `env.DIR_INVERT_PY_IT` changed, will set output `run-py-it` equal to `false`, else `true`.
         run: |
-          if git diff --name-only | grep -qv -E "${{ env.DIR_INVERT_RE_PY_IT }}"; then
+          if git diff --name-only origin/dev HEAD | grep -qv -E "${{ env.DIR_INVERT_RE_PY_IT }}"; then
             echo "::set-output name=run-py-it::false"
           else
             echo "::set-output name=run-py-it::true"
