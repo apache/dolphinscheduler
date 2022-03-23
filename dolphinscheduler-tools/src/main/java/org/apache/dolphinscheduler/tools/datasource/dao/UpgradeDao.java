@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -42,6 +41,7 @@ import org.apache.dolphinscheduler.dao.upgrade.ScheduleDao;
 import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
 import org.apache.dolphinscheduler.dao.upgrade.WorkerGroupDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -170,6 +170,21 @@ public abstract class UpgradeDao {
     public void upgradeDolphinSchedulerTo200(String schemaDir) {
         processDefinitionJsonSplit();
         upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl_post.sql");
+    }
+
+    /**
+     * upgrade DolphinScheduler to 2.0.6
+     */
+    public void upgradeDolphinSchedulerResourceFileSize() {
+        ResourceDao resourceDao = new ResourceDao();
+        try {
+            // update the size of the folder that is the type of file.
+            resourceDao.updateResourceFolderSizeByFileType(dataSource.getConnection(), 0);
+            // update the size of the folder that is the type of udf.
+            resourceDao.updateResourceFolderSizeByFileType(dataSource.getConnection(), 1);
+        } catch (Exception ex) {
+            logger.error("Failed to upgrade because of failing to update the folder's size of resource files.");
+        }
     }
 
     /**
