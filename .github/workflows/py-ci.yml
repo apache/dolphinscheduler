@@ -33,7 +33,7 @@ env:
   # We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
   DEPENDENCES: pip setuptools wheel tox
   # Space delimiter for files or directories
-  DIR_PY_UT: .github/workflows/py-ci.yml dolphinscheduler-python/pydolphinscheduler
+  DIR_PY_UT: ^.github/workflows/py-ci.yml$|^dolphinscheduler-python/pydolphinscheduler
   # Regexp for directories, only root directory support for now.
   DIR_INVERT_RE_PY_IT: ^dolphinscheduler-ui|^dolphinscheduler-ui-next|^dolphinscheduler-e2e
 
@@ -54,8 +54,8 @@ jobs:
         id: py-ut
         # When directory `env.DIR_PY_UT` changed, will set output `run-py-ut` equal to `true`.
         run: |
-          git diff origin/dev HEAD -- ${{ env.DIR_PY_UT }}
-          git diff --quiet origin/dev HEAD -- ${{ env.DIR_PY_UT }} || echo "::set-output name=run-py-ut::true"
+          git diff origin/dev HEAD -- "${{ env.DIR_PY_UT }}"
+          git diff --quiet origin/dev HEAD -- "${{ env.DIR_PY_UT }}" || echo "::set-output name=run-py-ut::true"
       - name: Python Integrate Test
         id: py-it
         # When only directory `env.DIR_INVERT_PY_IT` changed, will set output `run-py-it` equal to `false`, else `true`.
