@@ -97,7 +97,9 @@ export function useCellActive(options: Options) {
     let portAttrs = null
 
     if (isHover || isSelected) {
-      img = `/src/assets/images/task-icons/${node.data.taskType.toLocaleLowerCase()}_hover.png`
+      img = `${
+        import.meta.env.BASE_URL
+      }images/task-icons/${node.data.taskType.toLocaleLowerCase()}_hover.png`
       if (isHover) {
         nodeAttrs = nodeHover
         portAttrs = _.merge(portDefault, portHover)
@@ -106,7 +108,9 @@ export function useCellActive(options: Options) {
         portAttrs = _.merge(portDefault, portSelected)
       }
     } else {
-      img = `/src/assets/images/task-icons/${node.data.taskType.toLocaleLowerCase()}.png`
+      img = `${
+        import.meta.env.BASE_URL
+      }images/task-icons/${node.data.taskType.toLocaleLowerCase()}.png`
       nodeAttrs = NODE.attrs
       portAttrs = portDefault
     }
