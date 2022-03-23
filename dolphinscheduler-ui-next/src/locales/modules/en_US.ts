@@ -906,7 +906,15 @@ const project = {
     fix_value: 'FixValue',
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    send_email: 'Send Email',
+    log_display: 'Log display',
+    rows_of_result: 'rows of result',
+    title: 'Title',
+    title_tips: 'Please enter the title of email',
+    alarm_group: 'Alarm group',
+    alarm_group_tips: 'Alarm group required',
+    integer_tips: 'Please enter a positive integer'
   }
 }
 
