@@ -55,82 +55,82 @@ export default defineComponent({
       {
         taskType: 'SHELL',
         color: '#646464',
-        image: '/src/assets/images/task-icons/shell.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/shell.png`
       },
       {
         taskType: 'SUB_PROCESS',
         color: '#4295DA',
-        image: '/src/assets/images/task-icons/sub_process.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/sub_process.png`
       },
       {
         taskType: 'PROCEDURE',
         color: '#545CC6',
-        image: '/src/assets/images/task-icons/procedure.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/procedure.png`
       },
       {
         taskType: 'SQL',
         color: '#8097A0',
-        image: '/src/assets/images/task-icons/sql.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/sql.png`
       },
       {
         taskType: 'SPARK',
         color: '#a16435',
-        image: '/src/assets/images/task-icons/spark.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/spark.png`
       },
       {
         taskType: 'FLINK',
         color: '#d68f5b',
-        image: '/src/assets/images/task-icons/flink.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/flink.png`
       },
       {
         taskType: 'MR',
         color: '#A1A5C9',
-        image: '/src/assets/images/task-icons/mr.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/mr.png`
       },
       {
         taskType: 'PYTHON',
         color: '#60BCD5',
-        image: '/src/assets/images/task-icons/python.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/python.png`
       },
       {
         taskType: 'DEPENDENT',
         color: '#60BCD5',
-        image: '/src/assets/images/task-icons/dependent.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/dependent.png`
       },
       {
         taskType: 'HTTP',
         color: '#7f3903',
-        image: '/src/assets/images/task-icons/http.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/http.png`
       },
       {
         taskType: 'DATAX',
         color: '#75CC71',
-        image: '/src/assets/images/task-icons/datax.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/datax.png`
       },
       {
         taskType: 'PIGEON',
         color: '#5EC459',
-        image: '/src/assets/images/task-icons/pigeon.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/pigeon.png`
       },
       {
         taskType: 'SQOOP',
         color: '#f98b3d',
-        image: '/src/assets/images/task-icons/sqoop.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/sqoop.png`
       },
       {
         taskType: 'CONDITIONS',
         color: '#b99376',
-        image: '/src/assets/images/task-icons/conditions.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/conditions.png`
       },
       {
         taskType: 'SWITCH',
         color: '#ff6f00',
-        image: '/src/assets/images/task-icons/switch.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/switch.png`
       },
       {
         taskType: 'SEATUNNEL',
         color: '#8c8c8f',
-        image: '/src/assets/images/task-icons/seatunnel.png'
+        image: `${import.meta.env.BASE_URL}images/task-icons/seatunnel.png`
       },
       { taskType: 'DAG', color: '#bbdde9' }
     ])
