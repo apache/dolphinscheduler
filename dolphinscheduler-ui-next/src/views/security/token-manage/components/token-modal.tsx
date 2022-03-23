@@ -75,6 +75,10 @@ const TokenModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
+    const changeUser = () => {
+      variables.model.token = ''
+    }
+
     watch(
       () => props.showModalRef,
       () => {
@@ -119,11 +123,12 @@ const TokenModal = defineComponent({
       cancelModal,
       confirmModal,
       getToken,
+      changeUser,
       userStore
     }
   },
   render() {
-    const { t, getToken, userStore } = this
+    const { t, getToken, changeUser, userStore } = this
 
     return (
       <div>
@@ -171,6 +176,7 @@ const TokenModal = defineComponent({
                       placeholder={t('security.token.user_tips')}
                       options={this.model.generalOptions}
                       v-model={[this.model.userId, 'value']}
+                      onUpdateValue={changeUser}
                     />
                   </NFormItem>
                 )}
