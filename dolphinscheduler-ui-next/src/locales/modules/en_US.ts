@@ -1142,7 +1142,8 @@ const security = {
     AtMobiles: 'At User Mobiles',
     AtUserIds: 'At User Ids',
     MsgType: 'Msg Type',
-    IsAtAll: '@All'
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}All"
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
