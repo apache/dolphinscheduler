@@ -114,7 +114,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       options: mainJarOptions
     },
-    useDeployMode(),
+    useDeployMode(24, false),
     {
       type: 'select',
       field: 'flinkVersion',
