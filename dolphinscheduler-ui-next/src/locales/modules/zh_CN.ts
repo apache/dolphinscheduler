@@ -904,7 +904,10 @@ const project = {
     title_tips: '请输入邮件主题',
     alarm_group: '告警组',
     alarm_group_tips: '告警组必填',
-    integer_tips: '请输入一个正整数'
+    integer_tips: '请输入一个正整数',
+    sql_parameter: 'sql参数',
+    format_tips: '请输入格式为',
+    udf_function: 'UDF函数'
   }
 }
 
