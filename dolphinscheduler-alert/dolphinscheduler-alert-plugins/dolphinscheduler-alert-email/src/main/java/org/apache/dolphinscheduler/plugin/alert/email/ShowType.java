@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.dolphinscheduler.alert.api;
+package org.apache.dolphinscheduler.plugin.alert.email;
 
 public enum ShowType {
     /**

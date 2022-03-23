@@ -110,4 +110,8 @@ public final class AlertPluginManager {
     public int size() {
         return channelKeyedById.size();
     }
+
+    boolean checkPluginDefineTableExist() {
+        return pluginDao.checkPluginDefineTableExist();
+    }
 }

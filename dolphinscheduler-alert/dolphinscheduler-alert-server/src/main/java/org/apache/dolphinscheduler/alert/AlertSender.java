@@ -54,6 +54,11 @@ public final class AlertSender {
         this.alertPluginManager = alertPluginManager;
     }
 
+    void sendPendingAlerts() {
+        final List<Alert> alerts = alertDao.listPendingAlerts();
+        this.send(alerts);
+    }
+
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
             //get alert group from alert
