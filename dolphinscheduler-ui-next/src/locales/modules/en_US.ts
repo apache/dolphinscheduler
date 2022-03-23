@@ -285,7 +285,9 @@ const resource = {
       'Please select UDF resources directory',
     enter_instructions_tips: 'Please enter a instructions',
     enter_name_tips: 'Please enter name',
-    enter_description_tips: 'Please enter description'
+    enter_description_tips: 'Please enter description',
+    upload: 'Upload',
+    upload_udf_resources: 'Upload UDF Resources'
   },
   task_group_option: {
     manage: 'Task group manage',
