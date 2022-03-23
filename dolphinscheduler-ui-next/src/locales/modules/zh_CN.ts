@@ -513,7 +513,9 @@ const project = {
     project_name_required: '项目名称必填',
     related_items: '关联项目',
     project_name: '项目名称',
-    project_tips: '请选择项目'
+    project_tips: '请选择项目',
+    workflow_relation_no_data_result_title: '工作流关系不存在',
+    workflow_relation_no_data_result_desc: '目前没有任何工作流，请先创建工作流，再访问该页面',
   },
   task: {
     online: '已上线',
