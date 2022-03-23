@@ -50,7 +50,7 @@
     <logger name="org.apache.hbase" level="WARN"/>
     <logger name="org.apache.hadoop" level="WARN"/>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <if condition="${DOCKER:-false}">
             <then>
                 <appender-ref ref="STDOUT"/>
