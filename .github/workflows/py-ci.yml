@@ -45,29 +45,18 @@ jobs:
       run-py-it: ${{ steps.py-it.outputs.run-py-it }}
     steps:
       - uses: actions/checkout@v3
-      - name: Python Unit Test
-        id: py-ut
-        run: |
-          echo "::set-output name=run-py-ut-t::false"
-      - name: Python Integrate Test
-        id: py-it
-        run: |
-          echo "::set-output name=py-it-t::false"
-      - name: remote
-        id: remote
+      - name: Get Branch origin/dev
         run: |
           git fetch --no-tags --prune --depth=1 origin dev
-          git remote -vv
-      - name: branch
-        id: branch
-        run: |
-          git branch -a -vv
-      - name: test
-        id: test
+      - name: Python Unit Test
+        id: py-ut
         # When directory `env.DIR_PY_UT` changed, will set output `run-py-ut` equal to `true`.
-        # When only directory `env.DIR_INVERT_PY_IT` changed, will set output `run-py-it` equal to `false`.
         run: |
           git diff --quiet origin/dev HEAD -- ${{ env.DIR_PY_UT }} || echo "::set-output name=run-py-ut::true"
+      - name: Python Integrate Test
+        id: py-it
+        # When only directory `env.DIR_INVERT_PY_IT` changed, will set output `run-py-it` equal to `false`, else `true`.
+        run: |
           if git diff --name-only | cut -d '/' -f 1 | sort | uniq | grep -qv -E "${{ env.DIR_INVERT_RE_PY_IT }}"; then
             echo "::set-output name=run-py-it::false"
           else
