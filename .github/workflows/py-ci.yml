@@ -29,10 +29,12 @@ defaults:
   run:
     working-directory: dolphinscheduler-python/pydolphinscheduler
 
-# We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
 env:
+  # We have to update setuptools wheel to package with package_data, LICENSE, NOTICE
   DEPENDENCES: pip setuptools wheel tox
+  # Space delimiter for files or directories
   DIR_PY_UT: .github/workflows/py-ci.yml dolphinscheduler-python/pydolphinscheduler
+  # Regexp for files or directories
   DIR_INVERT_RE_PY_IT: ^dolphinscheduler-ui|^dolphinscheduler-ui-next|^dolphinscheduler-e2e
 
 jobs:
