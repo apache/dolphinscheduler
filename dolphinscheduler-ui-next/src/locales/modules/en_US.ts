@@ -516,7 +516,9 @@ const project = {
     project_name_required: 'Project name is required',
     related_items: 'Related items',
     project_name: 'Project Name',
-    project_tips: 'Please select project name'
+    project_tips: 'Please select project name',
+    workflow_relation_no_data_result_title: 'Can not find any relations of workflows.',
+    workflow_relation_no_data_result_desc: 'There is not any workflows. Please create a workflow, and then visit this page again.',
   },
   task: {
     online: 'Online',
