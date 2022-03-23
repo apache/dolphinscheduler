@@ -1118,7 +1118,18 @@ const security = {
     username: 'Username',
     botToken: 'Bot Token',
     chatId: 'Channel Chat Id',
-    parseMode: 'Parse Mode'
+    parseMode: 'Parse Mode',
+    IntegrationKey: 'Integration Key',
+    BotAccessToken: 'Bot Access Token',
+    RoomId: 'Room Id',
+    ToPersonId: 'To Person Id',
+    ToPersonEmail: 'To Person Email',
+    AtSomeoneInRoom: 'At Someone In Room',
+    Destination: 'Destination',
+    AtMobiles: 'At User Mobiles',
+    AtUserIds: 'At User Ids',
+    MsgType: 'Msg Type',
+    IsAtAll: '@All'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
@@ -1278,7 +1289,7 @@ const data_quality = {
     timeliness_check: 'TimelinessCheck',
     enumeration_check: 'EnumerationCheck',
     table_count_check: 'TableCountCheck',
-    All: 'All',
+    all: 'All',
     FixValue: 'FixValue',
     DailyAvg: 'DailyAvg',
     WeeklyAvg: 'WeeklyAvg',

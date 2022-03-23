@@ -35,6 +35,7 @@ export default {
       component: components['resource-file'],
       meta: {
         title: '文件管理',
+        activeMenu: 'resource',
         showSide: true,
         auth: []
       }
@@ -45,6 +46,8 @@ export default {
       component: components['resource-file-create'],
       meta: {
         title: '文件创建',
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -55,6 +58,8 @@ export default {
       component: components['resource-file-edit'],
       meta: {
         title: '文件编辑',
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -65,6 +70,8 @@ export default {
       component: components['resource-file'],
       meta: {
         title: '文件管理',
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -75,6 +82,8 @@ export default {
       component: components['resource-file-edit'],
       meta: {
         title: '文件详情',
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -85,6 +94,8 @@ export default {
       component: components['resource-file-create'],
       meta: {
         title: '文件创建',
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
         showSide: true,
         auth: []
       }
@@ -95,6 +106,7 @@ export default {
       component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
+        activeMenu: 'resource',
         showSide: true,
         auth: []
       }
@@ -105,6 +117,8 @@ export default {
       component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
+        activeMenu: 'resource',
+        activeSide: '/resource/resource-manage',
         showSide: true,
         auth: []
       }
@@ -115,6 +129,7 @@ export default {
       component: components['resource-udf-function'],
       meta: {
         title: '函数管理',
+        activeMenu: 'resource',
         showSide: true,
         auth: []
       }
@@ -125,6 +140,7 @@ export default {
       component: components['resource-task-group-option'],
       meta: {
         title: '任务组配置',
+        activeMenu: 'resource',
         showSide: true,
         auth: []
       }
@@ -135,6 +151,7 @@ export default {
       component: components['resource-task-group-queue'],
       meta: {
         title: '任务组队列',
+        activeMenu: 'resource',
         showSide: true,
         auth: []
       }

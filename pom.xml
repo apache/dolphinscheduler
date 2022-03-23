@@ -138,6 +138,8 @@
         <docker.tag>${project.version}</docker.tag>
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
+
+        <python.sign.skip>true</python.sign.skip>
     </properties>
 
     <dependencyManagement>

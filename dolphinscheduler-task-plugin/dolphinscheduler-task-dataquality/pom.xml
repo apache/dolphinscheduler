@@ -44,6 +44,11 @@
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-data-quality</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -92,7 +92,7 @@ const TaskInstance = defineComponent({
     return (
       <>
         <NCard>
-          <NSpace justify='end'>
+          <NSpace justify='end' wrap={false}>
             <NInput
               v-model={[this.searchVal, 'value']}
               size='small'
@@ -185,7 +185,7 @@ const TaskInstance = defineComponent({
           <NDataTable
             columns={this.columns}
             data={this.tableData}
-            scrollX={1800}
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination
