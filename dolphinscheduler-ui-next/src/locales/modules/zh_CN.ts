@@ -283,7 +283,9 @@ const resource = {
     enter_select_udf_resources_directory_tips: '请选择UDF资源目录',
     enter_instructions_tips: '请输入使用说明',
     enter_name_tips: '请输入名称',
-    enter_description_tips: '请输入描述'
+    enter_description_tips: '请输入描述',
+    upload: '上传',
+    upload_udf_resources: '上传UDF资源'
   },
   task_group_option: {
     manage: '任务组管理',
