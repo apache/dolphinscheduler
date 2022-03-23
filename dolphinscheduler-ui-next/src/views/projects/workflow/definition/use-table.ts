@@ -32,7 +32,7 @@ import {
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
-import { NEllipsis, NTag } from 'naive-ui'
+import { NTag } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   COLUMN_WIDTH_CONFIG,
