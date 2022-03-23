@@ -16,7 +16,10 @@
  */
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryResourceByProgramType } from '@/service/modules/resources'
+import {
+  queryResourceByProgramType,
+  queryResourceList
+} from '@/service/modules/resources'
 import { removeUselessChildren } from '@/utils/tree-format'
 import {
   useCustomParams,
@@ -35,13 +38,14 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' ? 0 : 24
   )
-
+  const resourcesOptions = ref([])
+  const resourcesLoading = ref(false)
   const mainJarOptions = ref([])
-  const resources: { [field: string]: any } = {}
+  const mainJarOptionsStore: { [field: string]: any } = {}
 
-  const getResourceList = async (programType: ProgramType) => {
-    if (resources[programType] !== void 0) {
-      mainJarOptions.value = resources[programType]
+  const getMainJars = async (programType: ProgramType) => {
+    if (mainJarOptionsStore[programType] !== void 0) {
+      mainJarOptions.value = mainJarOptionsStore[programType]
       return
     }
     const res = await queryResourceByProgramType({
@@ -50,11 +54,21 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     })
     removeUselessChildren(res)
     mainJarOptions.value = res || []
-    resources[programType] = res
+    mainJarOptionsStore[programType] = res
+  }
+
+  const getResources = async () => {
+    if (resourcesLoading.value) return
+    resourcesLoading.value = true
+    const res = await queryResourceList({ type: 'FILE' })
+    removeUselessChildren(res)
+    resourcesOptions.value = res || []
+    resourcesLoading.value = false
   }
 
   onMounted(() => {
-    getResourceList(model.programType)
+    getMainJars(model.programType)
+    getResources()
   })
 
   return [
@@ -68,18 +82,16 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         'on-update:value': (value: ProgramType) => {
           model.mainJar = null
           model.mainClass = ''
-          getResourceList(value)
+          getMainJars(value)
         }
-      },
-      value: model.programType
+      }
     },
     {
       type: 'select',
       field: 'sparkVersion',
       span: 12,
       name: t('project.node.spark_version'),
-      options: SPARK_VERSIONS,
-      value: model.sparkVersion
+      options: SPARK_VERSIONS
     },
     {
       type: 'input',
@@ -158,7 +170,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       type: 'tree-select',
       field: 'resourceList',
       name: t('project.node.resources'),
-      options: mainJarOptions,
+      options: resourcesOptions,
       props: {
         multiple: true,
         checkable: true,
@@ -167,7 +179,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         checkStrategy: 'child',
         placeholder: t('project.node.resources_tips'),
         keyField: 'id',
-        labelField: 'name'
+        labelField: 'name',
+        loading: resourcesLoading
       }
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
