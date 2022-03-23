@@ -283,7 +283,9 @@ const resource = {
     enter_select_udf_resources_directory_tips: '请选择UDF资源目录',
     enter_instructions_tips: '请输入使用说明',
     enter_name_tips: '请输入名称',
-    enter_description_tips: '请输入描述'
+    enter_description_tips: '请输入描述',
+    upload: '上传',
+    upload_udf_resources: '上传UDF资源'
   },
   task_group_option: {
     manage: '任务组管理',
@@ -894,7 +896,15 @@ const project = {
     fix_value: '固定值',
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: '请输入工作流定义'
+    emr_flow_define_json_tips: '请输入工作流定义',
+    send_email: '发送邮件',
+    log_display: '日志显示',
+    rows_of_result: '行查询结果',
+    title: '主题',
+    title_tips: '请输入邮件主题',
+    alarm_group: '告警组',
+    alarm_group_tips: '告警组必填',
+    integer_tips: '请输入一个正整数'
   }
 }
 
@@ -1112,7 +1122,11 @@ const security = {
     ToPersonId: '用户',
     ToPersonEmail: '用户邮箱',
     AtSomeoneInRoom: '@房间中的成员',
-    Destination: '描述'
+    Destination: '描述',
+    AtMobiles: '被@人的手机号',
+    AtUserIds: '被@人的用户ID',
+    MsgType: '消息类型',
+    IsAtAll: '@所有人'
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',

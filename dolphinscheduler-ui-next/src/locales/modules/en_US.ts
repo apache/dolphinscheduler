@@ -285,7 +285,9 @@ const resource = {
       'Please select UDF resources directory',
     enter_instructions_tips: 'Please enter a instructions',
     enter_name_tips: 'Please enter name',
-    enter_description_tips: 'Please enter description'
+    enter_description_tips: 'Please enter description',
+    upload: 'Upload',
+    upload_udf_resources: 'Upload UDF Resources'
   },
   task_group_option: {
     manage: 'Task group manage',
@@ -904,7 +906,15 @@ const project = {
     fix_value: 'FixValue',
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    send_email: 'Send Email',
+    log_display: 'Log display',
+    rows_of_result: 'rows of result',
+    title: 'Title',
+    title_tips: 'Please enter the title of email',
+    alarm_group: 'Alarm group',
+    alarm_group_tips: 'Alarm group required',
+    integer_tips: 'Please enter a positive integer'
   }
 }
 
@@ -1125,7 +1135,11 @@ const security = {
     ToPersonId: 'To Person Id',
     ToPersonEmail: 'To Person Email',
     AtSomeoneInRoom: 'At Someone In Room',
-    Destination: 'Destination'
+    Destination: 'Destination',
+    AtMobiles: 'At User Mobiles',
+    AtUserIds: 'At User Ids',
+    MsgType: 'Msg Type',
+    IsAtAll: '@All'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
