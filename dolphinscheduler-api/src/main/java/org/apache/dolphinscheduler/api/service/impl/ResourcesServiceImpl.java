@@ -581,6 +581,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
             return false;
         }
+        logger.info(loginUser.toString());
         // query tenant
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
         // random file name
