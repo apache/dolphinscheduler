@@ -88,12 +88,10 @@ export function useCellActive(options: Options) {
     const portDefault = _.cloneDeep(PORT.groups[X6_PORT_OUT_NAME].attrs)
 
     let portAttrs = null
-    if (isHover || isSelected) {
-      if (isHover) {
-        portAttrs = _.merge(portDefault, portHover)
-      } else {
-        portAttrs = _.merge(portDefault, portSelected)
-      }
+    if (isHover) {
+      portAttrs = _.merge(portDefault, portHover)
+    } else if (isSelected) {
+      portAttrs = _.merge(portDefault, portSelected)
     } else {
       portAttrs = portDefault
     }

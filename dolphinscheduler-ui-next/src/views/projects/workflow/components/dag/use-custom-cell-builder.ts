@@ -92,7 +92,7 @@ export function useCustomCellBuilder(graph: Ref<Graph | undefined>) {
             <div class="task-node ${
               data.isSelected ? 'task-node-selected' : ''
             }">
-              <div class="task-icon task-icon-${type.toLocaleLowerCase()}"></div>
+              <div class="task-icon task-icon-${data.taskType.toLocaleLowerCase()}"></div>
               <div class="task-node-name">${truncation}</div>
             </div>
           `
