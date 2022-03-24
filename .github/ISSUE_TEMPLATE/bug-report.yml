@@ -25,7 +25,7 @@ body:
       value: |
         Please make sure what you are reporting is indeed a bug with reproducible steps, if you want to ask questions
         or share ideas, you can head to our
-        [Discussions](https://github.com/apache/dolphinscheduler/discussions) tab, you also can [subscribe to our mailing list](mailto:dev-subscribe@dolphinscheduler.apache.org) and send 
+        [Discussions](https://github.com/apache/dolphinscheduler/discussions) tab, you can also [subscribe to our mailing list](mailto:dev-subscribe@dolphinscheduler.apache.org) and send 
         emails to [our mailing list](mailto:dev@dolphinscheduler.apache.org)
 
         For better global communication, Please write in English.
