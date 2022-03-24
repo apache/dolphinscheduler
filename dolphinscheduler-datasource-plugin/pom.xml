@@ -36,6 +36,8 @@
         <module>dolphinscheduler-datasource-mysql</module>
         <module>dolphinscheduler-datasource-oracle</module>
         <module>dolphinscheduler-datasource-postgresql</module>
+        <module>dolphinscheduler-datasource-spark</module>
+        <module>dolphinscheduler-datasource-presto</module>
         <module>dolphinscheduler-datasource-api</module>
         <module>dolphinscheduler-datasource-all</module>
         <module>dolphinscheduler-datasource-redshift</module>
