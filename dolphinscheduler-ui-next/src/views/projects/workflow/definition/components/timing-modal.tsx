@@ -305,6 +305,7 @@ export default defineComponent({
             <NSelect
               v-model:value={this.timingForm.timezoneId}
               options={this.timezoneOptions()}
+              filterable
             />
           </NFormItem>
           <NFormItem label=' ' showFeedback={false}>
