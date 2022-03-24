@@ -15,20 +15,30 @@
  * limitations under the License.
 */
 
--- uc_dolphin_T_t_ds_resources_R_full_name
 delimiter d//
-CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_resources_R_full_name() RETURNS void AS $$
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+    )
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
 BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
-        WHERE TABLE_NAME='t_ds_resources'
-        AND COLUMN_NAME ='full_name')
-    THEN
-ALTER TABLE t_ds_resources ALTER COLUMN full_name type varchar(128);
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
+    ---get schema name
+    v_schema =current_schema();
 
-delimiter ;
-SELECT uc_dolphin_T_t_ds_resources_R_full_name();
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_resources_R_full_name();
+    --- alter column
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
+
+    return 'Success!';
+    exception when others then
+        ---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+
+select dolphin_update_metadata();
+
+d//
