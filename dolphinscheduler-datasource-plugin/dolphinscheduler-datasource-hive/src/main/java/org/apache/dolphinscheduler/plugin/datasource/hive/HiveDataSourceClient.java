@@ -158,7 +158,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     public void close() {
         super.close();
 
-        logger.info("close HiveDataSourceClient.");
+        logger.info("close {}.", this.getClass().getSimpleName());
         kerberosRenewalService.shutdown();
         this.ugi = null;
 
