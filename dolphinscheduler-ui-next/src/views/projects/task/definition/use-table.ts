@@ -108,7 +108,7 @@ export function useTable(onEdit: Function) {
           row.upstreamTaskMap.map((item: string, index: number) => {
             return h(
               'p',
-              { type: 'info', size: 'small' },
+              null,
               { default: () => `[${index + 1}] ${item}` }
             )
           }),
