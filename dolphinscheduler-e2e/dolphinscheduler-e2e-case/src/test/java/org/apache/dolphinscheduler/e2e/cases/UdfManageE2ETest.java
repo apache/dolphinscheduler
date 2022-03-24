@@ -152,7 +152,7 @@ public class UdfManageE2ETest {
     void testDeleteDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        page.delete(testRenameDirectoryName);
+        page.delete(testDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -160,7 +160,7 @@ public class UdfManageE2ETest {
             assertThat(
                 page.udfList()
             ).noneMatch(
-                it -> it.getText().contains(testRenameDirectoryName)
+                it -> it.getText().contains(testDirectoryName)
             );
         });
     }

@@ -197,7 +197,7 @@ public class FileManageE2ETest {
 
         page.goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class)
-            .delete(testRenameDirectoryName);
+            .delete(testDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -205,7 +205,7 @@ public class FileManageE2ETest {
             assertThat(
                     page.fileList()
             ).noneMatch(
-                    it -> it.getText().contains(testRenameDirectoryName)
+                    it -> it.getText().contains(testDirectoryName)
             );
         });
     }
