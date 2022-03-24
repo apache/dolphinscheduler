@@ -48,7 +48,6 @@ export function useHttp({
     httpParams: [],
     url: '',
     condition: '',
-    timeoutSetting: false,
     connectTimeout: 60000,
     socketTimeout: 60000
   } as INodeData)

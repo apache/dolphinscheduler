@@ -368,12 +368,6 @@ export function formatModel(data: ITaskData) {
       (item: { id: number }) => item.id
     )
   }
-  if (
-    data.taskParams?.connectTimeout !== 60000 ||
-    data.taskParams?.socketTimeout !== 60000
-  ) {
-    params.timeoutSetting = true
-  }
   if (data.taskParams?.mainJar) {
     params.mainJar = data.taskParams?.mainJar.id
   }
