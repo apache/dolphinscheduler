@@ -31,9 +31,10 @@ def test_gateway_connect():
 def test_jvm_simple():
     """Test use JVM build-in object and operator from java gateway."""
     gateway = JavaGateway()
-    smaller = gateway.jvm.java.lang.Integer.MIN_VALUE
-    bigger = gateway.jvm.java.lang.Integer.MAX_VALUE
-    assert bigger > smaller
+    smallest = gateway.jvm.java.lang.Integer.MIN_VALUE
+    biggest = gateway.jvm.java.lang.Integer.MAX_VALUE
+    assert smallest is not None and biggest is not None
+    assert biggest > smallest
 
 
 def test_python_client_java_import_single():
