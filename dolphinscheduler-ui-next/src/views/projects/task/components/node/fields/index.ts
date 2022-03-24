@@ -46,6 +46,8 @@ export { useDriverMemory } from './use-driver-memory'
 export { useExecutorNumber } from './use-executor-number'
 export { useExecutorMemory } from './use-executor-memory'
 export { useExecutorCores } from './use-executor-cores'
+export { useMainJar } from './use-main-jar'
+export { useResources } from './use-resources'
 
 export { useShell } from './use-shell'
 export { useSpark } from './use-spark'
