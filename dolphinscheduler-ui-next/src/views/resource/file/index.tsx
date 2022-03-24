@@ -66,7 +66,7 @@ export default defineComponent({
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
     const renameShowRef = ref(false)
-    const serachRef = ref()
+    const searchRef = ref()
 
     const renameInfo = reactive({
       id: -1,
@@ -85,7 +85,7 @@ export default defineComponent({
       paginationReactive.page = page
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value,
+        searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
       )
@@ -96,7 +96,7 @@ export default defineComponent({
       paginationReactive.pageSize = pageSize
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value,
+        searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
       )
@@ -115,7 +115,7 @@ export default defineComponent({
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value
+        searchRef.value
       )
     }
 
@@ -147,7 +147,7 @@ export default defineComponent({
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value
+        searchRef.value
       )
     }
     const fileStore = useFileStore()
@@ -228,7 +228,7 @@ export default defineComponent({
 
     return {
       fileId,
-      serachRef,
+      searchRef,
       folderShowRef,
       uploadShowRef,
       renameShowRef,
@@ -292,7 +292,7 @@ export default defineComponent({
                 <div class={styles.list}>
                   <NInput
                     placeholder={t('resource.file.enter_keyword_tips')}
-                    v-model={[this.serachRef, 'value']}
+                    v-model={[this.searchRef, 'value']}
                   />
                 </div>
               </div>

@@ -36,6 +36,8 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     model.deployMode === 'cluster' ? 12 : 0
   )
 
+  const appNameSpan = computed(() => (model.deployMode === 'cluster' ? 24 : 0))
+
   const mainJarOptions = ref([])
   const resources: { [field: string]: any } = {}
 
@@ -114,14 +116,14 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       options: mainJarOptions
     },
-    useDeployMode(),
+    useDeployMode(24, false),
     {
       type: 'select',
       field: 'flinkVersion',
-      span: 12,
       name: t('project.node.flink_version'),
       options: FLINK_VERSIONS,
-      value: model.flinkVersion
+      value: model.flinkVersion,
+      span: deployModeSpan
     },
     {
       type: 'input',
@@ -129,7 +131,8 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.app_name'),
       props: {
         placeholder: t('project.node.app_name_tips')
-      }
+      },
+      span: appNameSpan
     },
     {
       type: 'input',
