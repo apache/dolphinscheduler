@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -52,6 +53,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.server.config.PythonGatewayConfig;
@@ -59,6 +61,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +144,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     @Autowired
     private PythonGatewayConfig pythonGatewayConfig;
+
+    @Autowired
+    private ProjectUserMapper projectUserMapper;
 
     @Value("${spring.jackson.time-zone:UTC}")
     private String timezone;
@@ -231,8 +237,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType) {
         User user = usersService.queryUser(userName);
-        Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
+
         ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, name);
         long processDefinitionCode;
         // create or update process definition
@@ -349,9 +356,38 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     }
 
     // side object
-    public Map<String, Object> createProject(String userName, String name, String desc) {
+    /*
+      Grant project's permission to user. Use when project's created user not current but
+      Python API use it to change process definition.
+     */
+    private Integer grantProjectToUser(Project project, User user) {
+        Date now = new Date();
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setUserId(user.getId());
+        projectUser.setProjectId(project.getId());
+        projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+        projectUser.setCreateTime(now);
+        projectUser.setUpdateTime(now);
+        return projectUserMapper.insert(projectUser);
+    }
+
+    /*
+      Grant or create project. Create a new project if project do not exists, and grant the project
+      permission to user if project exists but without permission to this user.
+     */
+    public void createOrGrantProject(String userName, String name, String desc) {
         User user = usersService.queryUser(userName);
-        return projectService.createProject(user, name, desc);
+
+        Project project;
+        project = projectMapper.queryByName(name);
+        if (project == null) {
+            projectService.createProject(user, name, desc);
+        } else if (project.getUserId() != user.getId()) {
+            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
+            if (projectUser == null) {
+                grantProjectToUser(project, user);
+            }
+        }
     }
 
     public Map<String, Object> createQueue(String name, String queueName) {

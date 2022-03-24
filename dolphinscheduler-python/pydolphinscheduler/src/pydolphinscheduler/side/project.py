@@ -37,6 +37,6 @@ class Project(BaseSide):
     def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
         """Create Project if not exists."""
         gateway = launch_gateway()
-        gateway.entry_point.createProject(user, self.name, self.description)
+        gateway.entry_point.createOrGrantProject(user, self.name, self.description)
         # TODO recover result checker
         # gateway_result_checker(result, None)

@@ -309,15 +309,12 @@ def test_process_definition_simple_separate():
     "user_attrs",
     [
         {"tenant": "tenant_specific"},
-        {"queue": "queue_specific"},
-        {"tenant": "tenant_specific", "queue": "queue_specific"},
     ],
 )
 def test_set_process_definition_user_attr(user_attrs):
     """Test user with correct attributes if we specific assigned to process definition object."""
     default_value = {
         "tenant": configuration.WORKFLOW_TENANT,
-        "queue": configuration.WORKFLOW_QUEUE,
     }
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, **user_attrs) as pd:
         user = pd.user
