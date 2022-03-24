@@ -18,9 +18,30 @@
 import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
 import type { IOption } from '@/components/form/types'
 
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+
+interface IResource {
+  id: number
+  name: string
+  children?: IResource[]
+}
+interface IMainJar {
+  id: number
+  fullName: string
+  children: IMainJar[]
+}
 interface TaskNodeState {
   postTaskOptions: IOption[]
   preTaskOptions: IOption[]
   preTasks: number[]
+  resources: IResource[]
+  mainJars: { [key in ProgramType]?: IMainJar[] }
 }
-export { TaskNodeState, EditWorkflowDefinition, IOption }
+export {
+  TaskNodeState,
+  EditWorkflowDefinition,
+  IOption,
+  IResource,
+  ProgramType,
+  IMainJar
+}
