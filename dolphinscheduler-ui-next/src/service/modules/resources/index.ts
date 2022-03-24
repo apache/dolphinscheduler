@@ -142,7 +142,7 @@ export function queryUdfFuncListPaging(params: ListReq): any {
   })
 }
 
-export function queryUdfFuncList(params: IdReq & ListReq): any {
+export function queryUdfFuncList(params: { type: 'HIVE' | 'SPARK' }): any {
   return axios({
     url: '/resources/udf-func/list',
     method: 'get',

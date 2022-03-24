@@ -44,6 +44,6 @@ public class ProcedureTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return null;
+        return JSONUtils.parseObject(parameters, ProcedureParameters.class).getResources();
     }
 }

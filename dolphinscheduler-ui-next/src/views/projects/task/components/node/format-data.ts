@@ -179,6 +179,16 @@ export function formatParams(data: INodeData): {
     taskParams.sqlType = data.sqlType
     taskParams.preStatements = data.preStatements
     taskParams.postStatements = data.postStatements
+    taskParams.sendEmail = data.sendEmail
+    taskParams.displayRows = data.displayRows
+    if (data.sendEmail) {
+      taskParams.title = data.title
+      taskParams.groupId = data.groupId
+    }
+    if (data.type === 'HIVE') {
+      if (data.udfs) taskParams.udfs = data.udfs.join(',')
+      taskParams.connParams = data.connParams
+    }
   }
 
   if (data.taskType === 'PROCEDURE') {
@@ -472,12 +482,14 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.conditionResult?.successNode?.length) {
-    params.successBranch = data.taskParams?.conditionResult.successNode[0]
+    params.successBranch = data.taskParams.conditionResult.successNode[0]
   }
   if (data.taskParams?.conditionResult?.failedNode?.length) {
-    params.failedBranch = data.taskParams?.conditionResult.failedNode[0]
+    params.failedBranch = data.taskParams.conditionResult.failedNode[0]
   }
-
+  if (data.taskParams?.udfs) {
+    params.udfs = data.taskParams.udfs?.split(',')
+  }
   return params
 }
 

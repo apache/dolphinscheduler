@@ -87,7 +87,7 @@ export function useTable(onEdit: Function) {
             )
           }
         },
-        ...COLUMN_WIDTH_CONFIG['state']
+        width: 130
       },
       {
         title: t('project.task.task_type'),

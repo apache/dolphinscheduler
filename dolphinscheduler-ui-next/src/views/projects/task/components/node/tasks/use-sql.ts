@@ -44,16 +44,13 @@ export function useSql({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    type: data?.taskParams?.type ? data?.taskParams?.type : 'MYSQL',
-    datasource: data?.taskParams?.datasource,
-    sql: data?.taskParams?.sql,
-    sqlType: data?.taskParams?.sqlType,
-    preStatements: data?.taskParams?.preStatements
-      ? data?.taskParams?.preStatements
-      : [],
-    postStatements: data?.taskParams?.postStatements
-      ? data?.taskParams?.postStatements
-      : []
+    type: 'MYSQL',
+    displayRows: 10,
+    sql: '',
+    sqlType: '0',
+    preStatements: [],
+    postStatements: [],
+    udfs: []
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -85,7 +82,7 @@ export function useSql({
       ...Fields.useTimeoutAlarm(model),
       Fields.useDatasourceType(model),
       Fields.useDatasource(model),
-      Fields.useSqlType(model),
+      ...Fields.useSqlType(model),
       ...Fields.useSql(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
