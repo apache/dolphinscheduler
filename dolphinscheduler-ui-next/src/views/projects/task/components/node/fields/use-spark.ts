@@ -14,13 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  queryResourceByProgramType,
-  queryResourceList
-} from '@/service/modules/resources'
-import { removeUselessChildren } from '@/utils/tree-format'
 import {
   useCustomParams,
   useDeployMode,
@@ -28,48 +23,17 @@ import {
   useDriverMemory,
   useExecutorNumber,
   useExecutorMemory,
-  useExecutorCores
+  useExecutorCores,
+  useMainJar,
+  useResources
 } from '.'
-import type { IJsonItem, ProgramType } from '../types'
+import type { IJsonItem } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' ? 0 : 24
   )
-  const resourcesOptions = ref([])
-  const resourcesLoading = ref(false)
-  const mainJarOptions = ref([])
-  const mainJarOptionsStore: { [field: string]: any } = {}
-
-  const getMainJars = async (programType: ProgramType) => {
-    if (mainJarOptionsStore[programType] !== void 0) {
-      mainJarOptions.value = mainJarOptionsStore[programType]
-      return
-    }
-    const res = await queryResourceByProgramType({
-      type: 'FILE',
-      programType
-    })
-    removeUselessChildren(res)
-    mainJarOptions.value = res || []
-    mainJarOptionsStore[programType] = res
-  }
-
-  const getResources = async () => {
-    if (resourcesLoading.value) return
-    resourcesLoading.value = true
-    const res = await queryResourceList({ type: 'FILE' })
-    removeUselessChildren(res)
-    resourcesOptions.value = res || []
-    resourcesLoading.value = false
-  }
-
-  onMounted(() => {
-    getMainJars(model.programType)
-    getResources()
-  })
 
   return [
     {
@@ -79,10 +43,9 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.program_type'),
       options: PROGRAM_TYPES,
       props: {
-        'on-update:value': (value: ProgramType) => {
+        'on-update:value': () => {
           model.mainJar = null
           model.mainClass = ''
-          getMainJars(value)
         }
       }
     },
@@ -111,29 +74,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    {
-      type: 'tree-select',
-      field: 'mainJar',
-      name: t('project.node.main_package'),
-      props: {
-        cascade: true,
-        showPath: true,
-        checkStrategy: 'child',
-        placeholder: t('project.node.main_package_tips'),
-        keyField: 'id',
-        labelField: 'fullName'
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: model.programType !== 'PYTHON',
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.main_package_tips'))
-          }
-        }
-      },
-      options: mainJarOptions
-    },
+    useMainJar(model),
     useDeployMode(),
     {
       type: 'input',
@@ -166,23 +107,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.option_parameters_tips')
       }
     },
-    {
-      type: 'tree-select',
-      field: 'resourceList',
-      name: t('project.node.resources'),
-      options: resourcesOptions,
-      props: {
-        multiple: true,
-        checkable: true,
-        cascade: true,
-        showPath: true,
-        checkStrategy: 'child',
-        placeholder: t('project.node.resources_tips'),
-        keyField: 'id',
-        labelField: 'name',
-        loading: resourcesLoading
-      }
-    },
+    useResources(),
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
