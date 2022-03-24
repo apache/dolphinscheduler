@@ -176,19 +176,19 @@ export default defineComponent({
               {{
                 default: () => t('project.workflow.delete'),
                 trigger: () => (
-                  <NButton
-                    tag='div'
-                    type='primary'
-                    disabled={this.checkedRowKeys.length <= 0}
-                    class='btn-delete-all'
-                  >
                     <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
                       {{
                         default: () => t('project.workflow.delete_confirm'),
-                        trigger: () => t('project.workflow.delete')
+                        trigger: () => (
+                          <NButton
+                            tag='div'
+                            type='primary'
+                            disabled={this.checkedRowKeys.length <= 0}
+                            class='btn-delete-all'
+                          >{t('project.workflow.delete')}</NButton>
+                        )
                       }}
                     </NPopconfirm>
-                  </NButton>
                 )
               }}
             </NTooltip>

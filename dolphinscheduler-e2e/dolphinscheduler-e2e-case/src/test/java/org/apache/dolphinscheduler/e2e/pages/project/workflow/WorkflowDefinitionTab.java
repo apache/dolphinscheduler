@@ -47,7 +47,6 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     @FindBys({
             @FindBy(className = "btn-delete-all"),
             @FindBy(className = "n-button__content"),
-            @FindBy(tagName = "span")
     })
     private WebElement buttonDeleteAll;
 
