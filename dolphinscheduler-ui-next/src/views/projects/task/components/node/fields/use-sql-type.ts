@@ -24,7 +24,9 @@ import type { IJsonItem } from '../types'
 export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const querySpan = computed(() => (model.sqlType === '0' ? 6 : 0))
-  const emailSpan = computed(() => (model.sendEmail ? 24 : 0))
+  const emailSpan = computed(() =>
+    model.sqlType === '0' && model.sendEmail ? 24 : 0
+  )
   const groups = ref([])
   const groupsLoading = ref(false)
   const SQL_TYPES = [
