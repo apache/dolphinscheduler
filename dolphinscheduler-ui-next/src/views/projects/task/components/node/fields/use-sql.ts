@@ -16,7 +16,7 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useResources, useCustomParams } from '.'
+import { useCustomParams } from '.'
 import { useUdfs } from './use-udfs'
 import type { IJsonItem } from '../types'
 
@@ -46,7 +46,6 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useUdfs(model),
-    useResources(),
     ...useCustomParams({ model, field: 'localParams', isSimple: false }),
     {
       type: 'multi-input',
