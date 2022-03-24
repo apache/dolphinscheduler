@@ -105,23 +105,14 @@ export function useTable(onEdit: Function) {
         title: t('project.task.upstream_tasks'),
         key: 'upstreamTaskMap',
         render: (row: TaskDefinitionItem) =>
-          h(
-            'span',
-            null,
-            row.upstreamTaskMap.length < 1
-              ? '-'
-              : h(NSpace, null, {
-                  default: () =>
-                    row.upstreamTaskMap.map((item: string) => {
-                      return h(
-                        NTag,
-                        { type: 'info', size: 'small' },
-                        { default: () => item }
-                      )
-                    })
-                })
-          ),
-        width: 140
+          row.upstreamTaskMap.map((item: string, index: number) => {
+            return h(
+              'p',
+              { type: 'info', size: 'small' },
+              { default: () => `[${index + 1}] ${item}` }
+            )
+          }),
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.create_time'),
