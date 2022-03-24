@@ -237,6 +237,10 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
+  sendEmail?: boolean
+  displayRows?: number
+  title?: string
+  groupId?: string
   preStatements?: string[]
   postStatements?: string[]
   method?: string
@@ -280,6 +284,8 @@ interface ITaskParams {
     successNode?: number[]
     failedNode?: number[]
   }
+  udfs?: string
+  connParams?: string
 }
 
 interface INodeData
@@ -292,6 +298,7 @@ interface INodeData
       | 'dependence'
       | 'sparkParameters'
       | 'conditionResult'
+      | 'udfs'
     >,
     ISqoopTargetData,
     ISqoopSourceData,
@@ -328,6 +335,7 @@ interface INodeData
   definition?: object
   successBranch?: number
   failedBranch?: number
+  udfs?: string[]
 }
 
 interface ITaskData

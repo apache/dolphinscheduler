@@ -14,34 +14,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { queryUdfFuncList } from '@/service/modules/resources'
 import type { IJsonItem } from '../types'
 
-export function useDeployMode(span = 24, showClient = true): IJsonItem {
+export function useUdfs(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
+  const options = ref([])
+  const loading = ref(false)
+  const span = computed(() => (['HIVE', 'SPARK'].includes(model.type) ? 24 : 0))
+
+  const getUdfs = async () => {
+    if (loading.value) return
+    loading.value = true
+    const res = await queryUdfFuncList({ type: model.type })
+    options.value = res.map((udf: { id: number; funcName: string }) => ({
+      value: udf.id,
+      label: udf.funcName
+    }))
+    loading.value = false
+  }
+
+  watch(
+    () => model.type,
+    (value) => {
+      if (['HIVE', 'SPARK'].includes(value)) {
+        getUdfs()
+      }
+    }
+  )
 
   return {
-    type: 'radio',
-    field: 'deployMode',
-    name: t('project.node.deploy_mode'),
-    options: DEPLOY_MODES.filter((option) =>
-      option.value === 'client' ? showClient : true
-    ),
+    type: 'select',
+    field: 'udfs',
+    options: options,
+    name: t('project.node.udf_function'),
+    props: {
+      multiple: true,
+      loading
+    },
     span
   }
 }
-
-export const DEPLOY_MODES = [
-  {
-    label: 'cluster',
-    value: 'cluster'
-  },
-  {
-    label: 'client',
-    value: 'client'
-  },
-  {
-    label: 'local',
-    value: 'local'
-  }
-]

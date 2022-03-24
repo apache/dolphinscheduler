@@ -32,7 +32,7 @@ import {
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
-import { NEllipsis, NTag } from 'naive-ui'
+import { NTag } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -82,26 +82,17 @@ export function useTable() {
         key: 'name',
         className: 'workflow-name',
         ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row) =>
-          h(
-            NEllipsis,
-            { style: 'max-width: 200px; color: #2080f0' },
-            {
-              default: () =>
-                h(
-                  ButtonLink,
-                  {
-                    onClick: () =>
-                      void router.push({
-                        name: 'workflow-definition-detail',
-                        params: { code: row.code }
-                      })
-                  },
-                  { default: () => row.name }
-                ),
-              tooltip: () => row.name
-            }
-          )
+        render: (row) => h(
+          ButtonLink,
+          {
+            onClick: () =>
+              void router.push({
+                name: 'workflow-definition-detail',
+                params: { code: row.code }
+              })
+          },
+          { default: () => row.name }
+        )
       },
       {
         title: t('project.workflow.status'),
