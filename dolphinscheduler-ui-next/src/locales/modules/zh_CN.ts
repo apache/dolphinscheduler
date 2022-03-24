@@ -513,7 +513,9 @@ const project = {
     project_name_required: '项目名称必填',
     related_items: '关联项目',
     project_name: '项目名称',
-    project_tips: '请选择项目'
+    project_tips: '请选择项目',
+    workflow_relation_no_data_result_title: '工作流关系不存在',
+    workflow_relation_no_data_result_desc: '目前没有任何工作流，请先创建工作流，再访问该页面',
   },
   task: {
     online: '已上线',
@@ -1124,12 +1126,16 @@ const security = {
     RoomId: '房间',
     ToPersonId: '用户',
     ToPersonEmail: '用户邮箱',
-    AtSomeoneInRoom: '@房间中的成员',
+    // eslint-disable-next-line quotes
+    AtSomeoneInRoom: "{'@'}房间中的成员",
     Destination: '描述',
-    AtMobiles: '被@人的手机号',
-    AtUserIds: '被@人的用户ID',
+    // eslint-disable-next-line quotes
+    AtMobiles: "被{'@'}人的手机号",
+    // eslint-disable-next-line quotes
+    AtUserIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
-    IsAtAll: '@所有人'
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}所有人"
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
