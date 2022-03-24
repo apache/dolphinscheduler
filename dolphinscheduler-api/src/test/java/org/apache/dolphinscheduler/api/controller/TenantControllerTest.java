@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TenantControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
 
-    //    @Test
+    @Test
     public void testCreateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("tenantCode","hayden");

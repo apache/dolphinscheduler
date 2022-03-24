@@ -73,13 +73,6 @@ public interface BaseService {
      */
     boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm);
 
-//    /**
-//     * create tenant dir if not exists
-//     *
-//     * @param tenantCode tenant code
-//     * @throws IOException if hdfs operation exception
-//     */
-//    void createTenantDirIfNotExists(String tenantCode) throws IOException;
 
     /**
      * Verify that the operator has permissions

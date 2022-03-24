@@ -298,7 +298,7 @@ public enum Status {
     NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
-    STORAGE_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
+    S3_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
     /**
      * for monitor
      */
@@ -391,9 +391,8 @@ public enum Status {
     K8S_CLIENT_OPS_ERROR(1300006, "k8s error with exception {0}", "k8s操作报错[{0}]"),
     VERIFY_K8S_NAMESPACE_ERROR(1300007, "verify k8s and namespace error", "验证k8s命名空间信息错误"),
     DELETE_K8S_NAMESPACE_BY_ID_ERROR(1300008, "delete k8s namespace by id error", "删除命名空间错误"),
-    VERIFY_PARAMETER_NAME_FAILED(503,"The file name verify  failed","文件命名校验失败"),
-    STORE_OPERATE_CREATE_ERROR(504,"create the resource failed","存储操作失败")
-    ;
+    VERIFY_PARAMETER_NAME_FAILED(1300009, "The file name verify  failed", "文件命名校验失败"),
+    STORE_OPERATE_CREATE_ERROR(1300010, "create the resource failed", "存储操作失败");
 
     private final int code;
     private final String enMsg;

@@ -310,11 +310,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    //XXX
                     String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
-
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    //XXX
                     storageOperate.download(tenantCode,resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);

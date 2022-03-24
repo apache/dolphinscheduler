@@ -29,13 +29,12 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 
 
 /**
- * @version since 2.0.4
+ * choose the impl of storage by RESOURCE_STORAGE_TYPE
  */
 
 @Component
 @Configuration
 public class StoreConfiguration {
-
 
     @Bean
     public StorageOperate storageOperate() {

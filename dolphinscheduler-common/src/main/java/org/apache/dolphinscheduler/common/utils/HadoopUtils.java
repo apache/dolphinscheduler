@@ -55,10 +55,10 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  * hadoop utils
  * single instance
  */
-public class HadoopUtils implements Closeable , StorageOperate {
+public class HadoopUtils implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
-    private  String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
+    private String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
     public static final String RM_HA_IDS = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
     public static final String APP_ADDRESS = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
     public static final String JOB_HISTORY_ADDRESS = PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
@@ -112,51 +112,40 @@ public class HadoopUtils implements Closeable , StorageOperate {
         try {
             configuration = new HdfsConfiguration();
 
-//            String resourceStorageType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
-//            ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
+            if (CommonUtils.loadKerberosConf(configuration)) {
+                hdfsUser = "";
+            }
 
-//            if (resUploadType == ResUploadType.HDFS) {
-                if (CommonUtils.loadKerberosConf(configuration)) {
-                    hdfsUser = "";
-                }
-
-                String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
-                //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
-                // the default is the local file system
-                if (defaultFS.startsWith("file")) {
-                    String defaultFSProp = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
-                    if (StringUtils.isNotBlank(defaultFSProp)) {
-                        Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
-                        configuration.set(Constants.FS_DEFAULT_FS, defaultFSProp);
-                        fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
-                    } else {
-                        logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
-                        throw new NullPointerException(
-                                String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
-                        );
-                    }
+            String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
+            //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
+            // the default is the local file system
+            if (defaultFS.startsWith("file")) {
+                String defaultFSProp = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+                if (StringUtils.isNotBlank(defaultFSProp)) {
+                    Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
+                    configuration.set(Constants.FS_DEFAULT_FS, defaultFSProp);
+                    fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
                 } else {
-                    logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS, defaultFS);
+                    logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
+                    throw new NullPointerException(
+                            String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
+                    );
                 }
+            } else {
+                logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS, defaultFS);
+            }
 
-                if (StringUtils.isNotEmpty(hdfsUser)) {
-                    UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
-                    ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
-                        fs = FileSystem.get(configuration);
-                        return true;
-                    });
-                } else {
-                    logger.warn("hdfs.root.user is not set value!");
+            if (StringUtils.isNotEmpty(hdfsUser)) {
+                UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
+                ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
                     fs = FileSystem.get(configuration);
-                }
-//            } else if (resUploadType == ResUploadType.S3) {
-//                System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);
-//                configuration.set(Constants.FS_DEFAULT_FS, PropertyUtils.getString(Constants.FS_DEFAULT_FS));
-//                configuration.set(Constants.FS_S3A_ENDPOINT, PropertyUtils.getString(Constants.FS_S3A_ENDPOINT));
-//                configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
-//                configuration.set(Constants.FS_S3A_SECRET_KEY, PropertyUtils.getString(Constants.FS_S3A_SECRET_KEY));
-//                fs = FileSystem.get(configuration);
-//            }
+                    return true;
+                });
+            } else {
+                logger.warn("hdfs.root.user is not set value!");
+                fs = FileSystem.get(configuration);
+            }
+//
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -249,14 +238,14 @@ public class HadoopUtils implements Closeable , StorageOperate {
     }
 
     @Override
-    public List<String> vimFile(String bucketName,String hdfsFilePath, int skipLineNums, int limit)throws IOException{
-        return catFile(hdfsFilePath,skipLineNums,limit);
+    public List<String> vimFile(String bucketName, String hdfsFilePath, int skipLineNums, int limit) throws IOException {
+        return catFile(hdfsFilePath, skipLineNums, limit);
     }
 
     @Override
-    public void createTenantDirIfNotExists(String tenantCode) throws IOException{
-        getInstance().mkdir(tenantCode,getHdfsResDir(tenantCode));
-        getInstance().mkdir(tenantCode,getHdfsUdfDir(tenantCode));
+    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
+        getInstance().mkdir(tenantCode, getHdfsResDir(tenantCode));
+        getInstance().mkdir(tenantCode, getHdfsUdfDir(tenantCode));
     }
 
     @Override
@@ -279,23 +268,23 @@ public class HadoopUtils implements Closeable , StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean mkdir(String bucketName,String hdfsPath) throws IOException {
+    public boolean mkdir(String bucketName, String hdfsPath) throws IOException {
         return fs.mkdirs(new Path(hdfsPath));
     }
 
     @Override
     public String getResourceFileName(String tenantCode, String fullName) {
-        return getHdfsResourceFileName(tenantCode,fullName);
+        return getHdfsResourceFileName(tenantCode, fullName);
     }
 
     @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
-        return getHdfsFileName(resourceType,tenantCode,fileName);
+        return getHdfsFileName(resourceType, tenantCode, fileName);
     }
 
     @Override
-    public void download(String bucketName,String srcHdfsFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException{
-            copyHdfsToLocal(srcHdfsFilePath,dstFile,deleteSource,overwrite);
+    public void download(String bucketName, String srcHdfsFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
+        copyHdfsToLocal(srcHdfsFilePath, dstFile, deleteSource, overwrite);
     }
 
     /**
@@ -334,8 +323,8 @@ public class HadoopUtils implements Closeable , StorageOperate {
     }
 
     @Override
-    public boolean upload(String buckName,String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException{
-        return copyLocalToHdfs(srcFile,dstPath,deleteSource,overwrite);
+    public boolean upload(String buckName, String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+        return copyLocalToHdfs(srcFile, dstPath, deleteSource, overwrite);
     }
 
     /*
@@ -363,7 +352,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
         }
 
         if (!dstPath.getParentFile().exists() && !dstPath.getParentFile().mkdirs()) {
-                return false;
+            return false;
         }
 
         return FileUtil.copy(fs, srcPath, dstPath, deleteSource, fs.getConf());
@@ -385,7 +374,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean delete(String tenantCode,String hdfsFilePath, boolean recursive) throws IOException {
+    public boolean delete(String tenantCode, String hdfsFilePath, boolean recursive) throws IOException {
         return fs.delete(new Path(hdfsFilePath), recursive);
     }
 
@@ -397,7 +386,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean exists(String tenantCode,String hdfsFilePath) throws IOException {
+    public boolean exists(String tenantCode, String hdfsFilePath) throws IOException {
         return fs.exists(new Path(hdfsFilePath));
     }
 
@@ -537,8 +526,8 @@ public class HadoopUtils implements Closeable , StorageOperate {
     }
 
     @Override
-    public String getDir(ResourceType resourceType, String tenantCode){
-        return getHdfsDir(resourceType,tenantCode);
+    public String getDir(ResourceType resourceType, String tenantCode) {
+        return getHdfsDir(resourceType, tenantCode);
     }
 
 
@@ -570,7 +559,7 @@ public class HadoopUtils implements Closeable , StorageOperate {
      * @return get udf dir on hdfs
      */
     public static String getHdfsUdfDir(String tenantCode) {
-        return String.format("%s/"+RESOURCE_TYPE_UDF, getHdfsTenantDir(tenantCode));
+        return String.format("%s/" + RESOURCE_TYPE_UDF, getHdfsTenantDir(tenantCode));
     }
 
     /**

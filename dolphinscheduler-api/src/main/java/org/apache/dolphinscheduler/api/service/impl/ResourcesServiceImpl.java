@@ -328,7 +328,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3) && !resource.getFileName().equals(name)) {
-            putMsg(result, Status.STORAGE_CANNOT_RENAME);
+            putMsg(result, Status.S3_CANNOT_RENAME);
             return result;
         }
 
