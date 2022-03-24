@@ -14,3 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+interface DatabaseRes {
+  dbType: string
+  state: string
+  maxConnections: number
+  maxUsedConnections: number
+  threadsConnections: number
+  threadsRunningConnections: number
+  date: string
+}
+
+interface MasterNode {
+  id: number
+  host: string
+  port: number
+  zkDirectory: string
+  resInfo: string
+  createTime: string
+  lastHeartbeatTime: string
+}
+
+interface WorkerNode {
+  id: number
+  host: string
+  port: number
+  zkDirectories: Array<string>
+  resInfo: string
+  createTime: string
+  lastHeartbeatTime: string
+}
+
+export { DatabaseRes, MasterNode, WorkerNode }

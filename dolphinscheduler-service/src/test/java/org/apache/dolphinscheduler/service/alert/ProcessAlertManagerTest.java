@@ -18,14 +18,15 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
@@ -90,4 +91,25 @@ public class ProcessAlertManagerTest {
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstanceList, projectUser);
     }
 
+    /**
+     * send blocking alert
+     */
+    @Test
+    public void sendBlockingAlertTest() {
+        // process instance
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setName("test-process-01");
+        processInstance.setCommandType(CommandType.START_PROCESS);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setRunTimes(0);
+        processInstance.setStartTime(new Date());
+        processInstance.setEndTime(new Date());
+        processInstance.setHost("127.0.0.1");
+        processInstance.setWarningGroupId(1);
+
+        ProjectUser projectUser = new ProjectUser();
+
+        processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+    }
 }

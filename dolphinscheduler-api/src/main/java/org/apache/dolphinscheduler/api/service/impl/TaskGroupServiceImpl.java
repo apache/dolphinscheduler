@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -70,7 +71,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> createTaskGroup(User loginUser, String name, String description, int groupSize) {
+    public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -82,18 +83,23 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (groupSize <= 0) {
             putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
             return result;
-
         }
         TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
         if (taskGroup1 != null) {
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        TaskGroup taskGroup = new TaskGroup(name, description,
-                groupSize, loginUser.getId(),Flag.YES.getCode());
-        int insert = taskGroupMapper.insert(taskGroup);
-        logger.info("insert result:{}", insert);
-        putMsg(result, Status.SUCCESS);
+        TaskGroup taskGroup = new TaskGroup(name, projectCode, description,
+            groupSize, loginUser.getId(), Flag.YES.getCode());
+
+        taskGroup.setCreateTime(new Date());
+        taskGroup.setUpdateTime(new Date());
+        if (taskGroupMapper.insert(taskGroup) > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
+            return result;
+        }
 
         return result;
     }
@@ -113,6 +119,19 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
+        if (name == null) {
+            putMsg(result, Status.NAME_NULL);
+            return result;
+        }
+        if (groupSize <= 0) {
+            putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
+            return result;
+        }
+        Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda().eq(TaskGroup::getName, name).ne(TaskGroup::getId, id));
+        if (exists > 0) {
+            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
+            return result;
+        }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() != Flag.YES.getCode()) {
             putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
@@ -120,6 +139,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         taskGroup.setGroupSize(groupSize);
         taskGroup.setDescription(description);
+        taskGroup.setUpdateTime(new Date());
         if (StringUtils.isNotEmpty(name)) {
             taskGroup.setName(name);
         }
@@ -137,7 +157,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public boolean isTheTaskGroupAvailable(int id) {
-        return taskGroupMapper.selectCountByIdStatus(id,Flag.YES.getCode()) == 1;
+        return taskGroupMapper.selectCountByIdStatus(id, Flag.YES.getCode()) == 1;
     }
 
     /**
@@ -149,8 +169,8 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> queryAllTaskGroup(User loginUser, int pageNo, int pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), null, 0);
+    public Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize) {
+        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), name, status);
     }
 
     /**
@@ -173,12 +193,28 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @param loginUser login user
      * @param pageNo    page no
      * @param pageSize  page size
-     * @param name      name
+     * @param projectCode project code
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> queryTaskGroupByName(User loginUser, int pageNo, int pageSize, String name) {
-        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), name, 0);
+    public Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        Page<TaskGroup> page = new Page<>(pageNo, pageSize);
+        IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
+
+        return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
+    }
+
+    private Map<String, Object> getStringObjectMap(int pageNo, int pageSize, Map<String, Object> result, IPage<TaskGroup> taskGroupPaging) {
+        PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        int total = taskGroupPaging == null ? 0 : (int) taskGroupPaging.getTotal();
+        List<TaskGroup> list = taskGroupPaging == null ? new ArrayList<TaskGroup>() : taskGroupPaging.getRecords();
+        pageInfo.setTotal(total);
+        pageInfo.setTotalList(list);
+
+        result.put(Constants.DATA_LIST, pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -191,9 +227,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> queryTaskGroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         result.put(Constants.DATA_LIST, taskGroup);
         putMsg(result, Status.SUCCESS);
@@ -210,26 +243,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @param status   status
      * @return the result code and msg
      */
-
     @Override
-    public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, int status) {
+    public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, Integer status) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPaging(page, userId, name, status);
 
-        PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        int total = taskGroupPaging == null ? 0 : (int) taskGroupPaging.getTotal();
-        List<TaskGroup> list = taskGroupPaging == null ? new ArrayList<TaskGroup>() : taskGroupPaging.getRecords();
-        pageInfo.setTotal(total);
-        pageInfo.setTotalList(list);
-
-        result.put(Constants.DATA_LIST, pageInfo);
-        logger.info("select result:{}", taskGroupPaging);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
     }
 
     /**
@@ -239,7 +259,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @param id        task group id
      * @return the result code and msg
      */
-
     @Override
     public Map<String, Object> closeTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
@@ -247,6 +266,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
+        if (taskGroup.getStatus() == Flag.NO.getCode()) {
+            putMsg(result, Status.TASK_GROUP_STATUS_CLOSED);
+            return result;
+        }
         taskGroup.setStatus(Flag.NO.getCode());
         taskGroupMapper.updateById(taskGroup);
         putMsg(result, Status.SUCCESS);
@@ -267,11 +290,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        if (taskGroup.getStatus() == 1) {
-            putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
+        if (taskGroup.getStatus() == Flag.YES.getCode()) {
+            putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
             return result;
         }
-        taskGroup.setStatus(1);
+        taskGroup.setStatus(Flag.YES.getCode());
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int update = taskGroupMapper.updateById(taskGroup);
         putMsg(result, Status.SUCCESS);
@@ -282,16 +305,27 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * wake a task manually
      *
      * @param loginUser
-     * @param taskId    task id
+     * @param queueId   task group queue id
      * @return result
      */
     @Override
-    public Map<String, Object> wakeTaskcompulsively(User loginUser, int taskId) {
+    public Map<String, Object> forceStartTask(User loginUser, int queueId) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        taskGroupQueueService.forceStartTask(taskId,Flag.YES.getCode());
+        taskGroupQueueService.forceStartTask(queueId, Flag.YES.getCode());
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority) {
+        Map<String, Object> result = new HashMap<>();
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        taskGroupQueueService.modifyPriority(queueId, priority);
         putMsg(result, Status.SUCCESS);
         return result;
     }

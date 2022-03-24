@@ -30,20 +30,59 @@ export default {
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/monitor/servers/master',
+      path: '/monitor/master',
       name: 'servers-master',
-      component: components['home'],
+      component: components['monitor-servers-master'],
       meta: {
         title: '服务管理-Master',
-      },
+        activeMenu: 'monitor',
+        showSide: true,
+        auth: []
+      }
     },
     {
-      path: '/monitor/servers/worker',
+      path: '/monitor/worker',
       name: 'servers-worker',
-      component: components['home'],
+      component: components['monitor-servers-worker'],
       meta: {
         title: '服务管理-Worker',
-      },
+        activeMenu: 'monitor',
+        showSide: true,
+        auth: []
+      }
     },
-  ],
+    {
+      path: '/monitor/db',
+      name: 'servers-db',
+      component: components['monitor-servers-db'],
+      meta: {
+        title: '服务管理-DB',
+        activeMenu: 'monitor',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/monitor/statistics',
+      name: 'statistics-statistics',
+      component: components['monitor-statistics-statistics'],
+      meta: {
+        title: '统计管理-Statistics',
+        activeMenu: 'monitor',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/monitor/audit-log',
+      name: 'statistics-audit-log',
+      component: components['monitor-statistics-audit-log'],
+      meta: {
+        title: '审计日志-AuditLog',
+        activeMenu: 'monitor',
+        showSide: true,
+        auth: []
+      }
+    }
+  ]
 }

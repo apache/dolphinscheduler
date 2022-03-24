@@ -19,16 +19,12 @@ package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * schedule parameters
  */
 public class ScheduleParam {
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     private String crontab;
     private String timezoneId;

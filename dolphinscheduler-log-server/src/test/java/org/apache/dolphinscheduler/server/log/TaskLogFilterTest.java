@@ -21,7 +21,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
 import ch.qos.logback.core.spi.FilterReply;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Marker;
@@ -39,7 +41,7 @@ public class TaskLogFilterTest {
         FilterReply filterReply = taskLogFilter.decide(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return LoggerUtils.TASK_LOGGER_THREAD_NAME;
+                return TaskConstants.TASK_APPID_LOG_FORMAT;
             }
 
             @Override
@@ -64,7 +66,7 @@ public class TaskLogFilterTest {
 
             @Override
             public String getLoggerName() {
-                return null;
+                return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
 
             @Override

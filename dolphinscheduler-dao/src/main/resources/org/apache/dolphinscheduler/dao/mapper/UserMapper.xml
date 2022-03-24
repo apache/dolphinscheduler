@@ -19,11 +19,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UserMapper">
     <sql id="baseSql">
-       id, user_name, user_password, user_type, email, phone, tenant_id, create_time, update_time, queue, state
+       id, user_name, user_password, user_type, email, phone, tenant_id, create_time, update_time, queue, state, time_zone
     </sql>
     <sql id="baseSqlV2">
        ${alias}.id, ${alias}.user_name, ${alias}.user_password, ${alias}.user_type, ${alias}.email, ${alias}.phone, ${alias}.tenant_id,
-       ${alias}.create_time, ${alias}.update_time, ${alias}.queue, ${alias}.state
+       ${alias}.create_time, ${alias}.update_time, ${alias}.queue, ${alias}.state, ${alias}.time_zone
     </sql>
     <select id="queryAllGeneralUser" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select

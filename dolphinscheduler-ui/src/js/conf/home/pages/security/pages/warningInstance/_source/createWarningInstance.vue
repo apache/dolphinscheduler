@@ -30,7 +30,7 @@
                     v-model="instanceName"
                     maxlength="60"
                     size="small"
-                    :placeholder="$t('Please enter group name')">
+                    :placeholder="$t('Please enter alarm plugin instance name')">
             </el-input>
           </template>
         </m-list-box-f>
@@ -108,7 +108,7 @@
       _verification () {
         // group name
         if (!this.instanceName.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter group name')}`)
+          this.$message.warning(`${i18n.$t('Please enter alarm plugin instance name')}`)
           return false
         }
         if (!this.pluginDefineId) {

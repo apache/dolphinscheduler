@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -36,9 +37,12 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
@@ -56,6 +60,9 @@ public class AlertServer implements Closeable {
     @Autowired
     private AlertConfig config;
 
+    @Value("${spring.jackson.time-zone:UTC}")
+    private String timezone;
+
     public AlertServer(PluginDao pluginDao, AlertDao alertDao, AlertPluginManager alertPluginManager, AlertSender alertSender, AlertRequestProcessor alertRequestProcessor) {
         this.pluginDao = pluginDao;
         this.alertDao = alertDao;
@@ -69,16 +76,16 @@ public class AlertServer implements Closeable {
     }
 
     @PostConstruct
-    public void start() {
+    public void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
+    }
+
+    @EventListener
+    public void start(ApplicationReadyEvent readyEvent) {
         logger.info("Starting Alert server");
 
         checkTable();
         startServer();
-
-        if (alertPluginManager.size() == 0) {
-            logger.warn("No alert plugin, alert sender will exit.");
-            return;
-        }
 
         Executors.newScheduledThreadPool(1)
                  .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);

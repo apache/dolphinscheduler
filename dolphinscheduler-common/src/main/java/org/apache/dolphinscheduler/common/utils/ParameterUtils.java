@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +67,7 @@ public class ParameterUtils {
         if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
             //Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
-            cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME);
+            cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME, null);
         } else {
             cronTime = new Date();
         }
@@ -152,7 +153,7 @@ public class ParameterUtils {
      */
     public static Map<String, String> convert(Map<String, Property> paramsMap) {
         Map<String, String> map = new HashMap<>();
-        Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
+        Iterator<Entry<String, Property>> iter = paramsMap.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
             map.put(en.getKey(), en.getValue().getValue());

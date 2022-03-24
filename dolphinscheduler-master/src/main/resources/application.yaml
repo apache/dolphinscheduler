@@ -19,6 +19,9 @@ spring:
     banner-mode: off
   application:
     name: master-server
+  jackson:
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   cache:
     # default enable cache, you can disable by `type: none`
     type: none
@@ -104,8 +107,10 @@ master:
   max-cpu-load-avg: -1
   # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
   reserved-memory: 0.3
-  # use task logger, default true; if true, it will create log for every task; if false, the task log will append to master log file
-  task-logger: true
+  # failover interval, the unit is minute
+  failover-interval: 10
+  # kill yarn jon when failover taskInstance, default true
+  kill-yarn-job-when-task-failover: true
 
 server:
   port: 5679
@@ -118,6 +123,9 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+metrics:
+  enabled: true
 
 # Override by profile
 

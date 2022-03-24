@@ -66,6 +66,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -349,6 +350,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param tenantId tenant id
      * @param phone phone
      * @param queue queue
+     * @param state state
+     * @param timeZone timeZone
      * @return update result code
      * @throws Exception exception
      */
@@ -360,7 +363,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws IOException {
+                                          int state,
+                                          String timeZone) throws IOException {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
@@ -407,6 +411,20 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
             return result;
         }
+
+        if (state == 0 && user.getState() != state && loginUser.getId() == user.getId()) {
+            putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
+            return result;
+        }
+
+        if (StringUtils.isNotEmpty(timeZone)) {
+            if (!CheckUtils.checkTimeZone(timeZone)) {
+                putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
+                return result;
+            }
+            user.setTimeZone(timeZone);
+        }
+
         user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);
@@ -542,11 +560,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
-            return result;
-        }
-
         //check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
@@ -554,9 +567,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        //if the selected projectIds are empty, delete all items associated with the user
+        projectUserMapper.deleteProjectRelation(0, userId);
+
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
-            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 
@@ -567,7 +580,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             ProjectUser projectUser = new ProjectUser();
             projectUser.setUserId(userId);
             projectUser.setProjectId(Integer.parseInt(projectId));
-            projectUser.setPerm(7);
+            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
             projectUserMapper.insert(projectUser);
@@ -674,10 +687,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
-            return result;
-        }
+
         User user = userMapper.selectById(userId);
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
@@ -772,10 +782,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>();
 
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
-            return result;
-        }
         User user = userMapper.selectById(userId);
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
@@ -795,7 +801,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             UDFUser udfUser = new UDFUser();
             udfUser.setUserId(userId);
             udfUser.setUdfId(Integer.parseInt(udfId));
-            udfUser.setPerm(7);
+            udfUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             udfUser.setCreateTime(now);
             udfUser.setUpdateTime(now);
             udfUserMapper.insert(udfUser);
@@ -820,10 +826,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
-            return result;
-        }
         User user = userMapper.selectById(userId);
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
@@ -844,7 +846,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             DatasourceUser datasourceUser = new DatasourceUser();
             datasourceUser.setUserId(userId);
             datasourceUser.setDatasourceId(Integer.parseInt(datasourceId));
-            datasourceUser.setPerm(7);
+            datasourceUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             datasourceUser.setCreateTime(now);
             datasourceUser.setUpdateTime(now);
             datasourceUserMapper.insert(datasourceUser);
@@ -883,6 +885,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
             }
+        }
+
+        // add system default timezone if not user timezone
+        if (StringUtils.isEmpty(user.getTimeZone())) {
+            user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
         result.put(Constants.DATA_LIST, user);

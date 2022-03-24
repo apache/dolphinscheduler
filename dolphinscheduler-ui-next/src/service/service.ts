@@ -16,27 +16,64 @@
  */
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import { useUserStore } from '@/store/user/user'
 import qs from 'qs'
+import _ from 'lodash'
+import cookies from 'js-cookie'
+import router from '@/router'
+import utils from '@/utils'
+
+const userStore = useUserStore()
+
+/**
+ * @description Log and display errors
+ * @param {Error} error Error object
+ */
+const handleError = (res: AxiosResponse<any, any>) => {
+  // Print to console
+  if (import.meta.env.MODE === 'development') {
+    utils.log.capsule('DolphinScheduler', 'UI-NEXT')
+    utils.log.error(res)
+  }
+  window.$message.error(res.data.msg)
+}
 
 const baseRequestConfig: AxiosRequestConfig = {
-  baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
+  baseURL:
+    import.meta.env.MODE === 'development'
+      ? '/dolphinscheduler'
+      : import.meta.env.VITE_APP_PROD_WEB_URL + '/dolphinscheduler',
   timeout: 10000,
   transformRequest: (params) => {
-    return qs.stringify(params, { arrayFormat: 'repeat' })
+    if (_.isPlainObject(params)) {
+      return qs.stringify(params, { arrayFormat: 'repeat' })
+    } else {
+      return params
+    }
   },
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
-  },
+  }
 }
 
 const service = axios.create(baseRequestConfig)
 
 const err = (err: AxiosError): Promise<AxiosError> => {
+  if (err.response?.status === 401 || err.response?.status === 504) {
+    userStore.setSessionId('')
+    userStore.setUserInfo({})
+    router.push({ path: '/login' })
+  }
+
   return Promise.reject(err)
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  console.log('config', config)
+  config.headers && (config.headers.sessionId = userStore.getSessionId)
+  const language = cookies.get('language')
+  config.headers = config.headers || {}
+  if (language) config.headers.language = language
+
   return config
 }, err)
 
@@ -51,8 +88,51 @@ service.interceptors.response.use((res: AxiosResponse) => {
     case 0:
       return res.data.data
     default:
-      throw new Error(`${res.data.msg}: ${res.config.url}`)
+      handleError(res)
+      throw new Error()
   }
 }, err)
 
-export { service as axios }
+const apiPrefix = '/dolphinscheduler'
+const reSlashPrefix = /^\/+/
+
+const resolveURL = (url: string) => {
+  if (url.indexOf('http') === 0) {
+    return url
+  }
+  if (url.charAt(0) !== '/') {
+    return `${apiPrefix}/${url.replace(reSlashPrefix, '')}`
+  }
+
+  return url
+}
+
+/**
+ * download file
+ */
+const downloadFile = (url: string, obj?: any) => {
+  const param: any = {
+    url: resolveURL(url),
+    obj: obj || {}
+  }
+
+  const form = document.createElement('form')
+  form.action = param.url
+  form.method = 'get'
+  form.style.display = 'none'
+  Object.keys(param.obj).forEach((key) => {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = key
+    input.value = param.obj[key]
+    form.appendChild(input)
+  })
+  const button = document.createElement('input')
+  button.type = 'submit'
+  form.appendChild(button)
+  document.body.appendChild(form)
+  form.submit()
+  document.body.removeChild(form)
+}
+
+export { service as axios, downloadFile }

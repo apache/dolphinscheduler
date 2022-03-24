@@ -31,6 +31,7 @@
           <template slot="name"><strong>*</strong>{{$t('UDF Function Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputFunctionName"
                     type="input"
                     maxlength="40"
                     v-model="funcName"
@@ -43,6 +44,7 @@
           <template slot="name"><strong>*</strong>{{$t('Package Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputClassName"
                     type="input"
                     maxlength="100"
                     v-model="className"
@@ -54,7 +56,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
-            <treeselect style="width:535px;float:left;" v-model="resourceId" maxHeight="200" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
+            <treeselect id="btnUdfResourceDropDown" style="width:535px;float:left;" v-model="resourceId" maxHeight="200" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
               <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
             <el-button type="primary" size="small" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</el-button>
@@ -82,6 +84,7 @@
           <template slot="name">{{$t('Instructions')}}</template>
           <template slot="content">
             <el-input
+                    id="inputDescription"
                     type="textarea"
                     v-model="description"
                     size="small"

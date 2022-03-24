@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -61,6 +61,9 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
+
+    @Autowired
+    private StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
      * multi-thread filter, avoid handling workflow at the same time
@@ -118,10 +121,17 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
 
             @Override
             public void onSuccess(Object result) {
-                if (workflowExecuteThread.workFlowFinish()) {
-                    processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
-                    notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                    logger.info("process instance {} finished.", processInstanceId);
+                // if an exception occurs, first, the error message cannot be printed in the log;
+                // secondly, the `multiThreadFilterMap` cannot be remove the `workflowExecuteThread`, resulting in the state of process instance cannot be changed and memory leak
+                try {
+                    if (workflowExecuteThread.workFlowFinish()) {
+                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
+                        processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
+                        notifyProcessChanged(workflowExecuteThread.getProcessInstance());
+                        logger.info("process instance {} finished.", processInstanceId);
+                    }
+                } catch (Exception e) {
+                    logger.error("handle events {} success, but notify changed error", processInstanceId, e);
                 }
                 multiThreadFilterMap.remove(workflowExecuteThread.getKey());
             }

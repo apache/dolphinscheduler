@@ -23,6 +23,7 @@ import resourcesPage from './modules/resources'
 import datasourcePage from './modules/datasource'
 import monitorPage from './modules/monitor'
 import securityPage from './modules/security'
+import dataQualityPage from './modules/data-quality'
 
 // All TSX files under the views folder automatically generate mapping relationship
 const modules = import.meta.glob('/src/views/**/**.tsx')
@@ -44,15 +45,36 @@ const basePage: RouteRecordRaw[] = [
         component: components['home'],
         meta: {
           title: '首页',
-        },
+          activeMenu: 'home',
+          auth: []
+        }
       },
-    ],
+      {
+        path: '/password',
+        name: 'password',
+        component: components['password'],
+        meta: {
+          title: '修改密码',
+          auth: []
+        }
+      },
+      {
+        path: '/profile',
+        name: 'profile',
+        component: components['profile'],
+        meta: {
+          title: '用户信息',
+          auth: []
+        }
+      }
+    ]
   },
   projectsPage,
   resourcesPage,
   datasourcePage,
   monitorPage,
   securityPage,
+  dataQualityPage
 ]
 
 /**
@@ -63,7 +85,10 @@ const loginPage: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: components['login'],
-  },
+    meta: {
+      auth: []
+    }
+  }
 ]
 
 const routes: RouteRecordRaw[] = [...basePage, ...loginPage]

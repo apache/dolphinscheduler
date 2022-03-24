@@ -147,7 +147,10 @@ BEGIN
                      AND TABLE_SCHEMA=(SELECT DATABASE())
                      AND COLUMN_NAME ='code')
     THEN
-           alter table t_ds_project add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `name`;
+        alter table t_ds_project add `code` bigint(20) COMMENT 'encoding' AFTER `name`;
+        -- update default value for not null
+        UPDATE t_ds_project SET code = id;
+        alter table t_ds_project modify `code` bigint(20) NOT NULL;
     END IF;
 END;
 
@@ -365,6 +368,20 @@ CREATE TABLE `t_ds_worker_group` (
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `resource_type` int(11) NOT NULL COMMENT 'resource type',
+  `operation` int(11) NOT NULL COMMENT 'operation',
+  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
+
 -- t_ds_command
 alter table t_ds_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
 alter table t_ds_command add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
@@ -412,7 +429,10 @@ alter table t_ds_schedules add timezone_id varchar(40) DEFAULT NULL COMMENT 'tim
 alter table t_ds_schedules add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
 
 -- t_ds_process_definition
-alter table t_ds_process_definition add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `id`;
+alter table t_ds_process_definition add `code` bigint(20) COMMENT 'encoding' AFTER `id`;
+-- update default value for not null
+UPDATE t_ds_process_definition SET code = id;
+alter table t_ds_process_definition modify `code` bigint(20) NOT NULL;
 alter table t_ds_process_definition change project_id project_code bigint(20) NOT NULL COMMENT 'project code' AFTER `description`;
 alter table t_ds_process_definition add `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `locations`;
 alter table t_ds_process_definition add UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;

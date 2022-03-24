@@ -26,10 +26,13 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLD
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.redshift.RedshiftDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.sql.Connection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,7 @@ public class DataSourceUtils {
     private static final DataSourceProcessor sqlServerProcessor = new SQLServerDataSourceProcessor();
     private static final DataSourceProcessor db2PROCESSOR = new Db2DataSourceProcessor();
     private static final DataSourceProcessor prestoPROCESSOR = new PrestoDataSourceProcessor();
+    private static final DataSourceProcessor redshiftProcessor = new RedshiftDataSourceProcessor();
 
     /**
      * check datasource param
@@ -82,6 +86,18 @@ public class DataSourceUtils {
         return getDatasourceProcessor(dbType).getJdbcUrl(baseConnectionParam);
     }
 
+    public static Connection getConnection(DbType dbType, ConnectionParam connectionParam) {
+        try {
+            return getDatasourceProcessor(dbType).getConnection(connectionParam);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getDatasourceDriver(DbType dbType) {
+        return getDatasourceProcessor(dbType).getDatasourceDriver();
+    }
+
     public static BaseDataSourceParamDTO buildDatasourceParamDTO(DbType dbType, String connectionParams) {
         return getDatasourceProcessor(dbType).createDatasourceParamDTO(connectionParams);
     }
@@ -106,6 +122,8 @@ public class DataSourceUtils {
                 return db2PROCESSOR;
             case PRESTO:
                 return prestoPROCESSOR;
+            case REDSHIFT:
+                return redshiftProcessor;
             default:
                 throw new IllegalArgumentException("datasource type illegal:" + dbType);
         }

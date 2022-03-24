@@ -33,7 +33,8 @@ spring:
   main:
     banner-mode: off
   jackson:
-    time-zone: GMT+8
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   servlet:
     multipart:
       max-file-size: 1024MB
@@ -100,6 +101,12 @@ registry:
     connection-timeout: 9s
     block-until-connected: 600ms
     digest: ~
+
+audit:
+  enabled: false
+
+metrics:
+  enabled: true
 
 # Override by profile
 

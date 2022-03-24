@@ -22,58 +22,48 @@ import type { Ref } from 'vue'
 const props = {
   height: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: 590
   },
   width: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: '100%'
   },
+  data: {
+    type: Array as PropType<Array<any>>
+  }
 }
 
 const PieChart = defineComponent({
   name: 'PieChart',
   props,
-  setup() {
+  setup(props) {
     const pieChartRef: Ref<HTMLDivElement | null> = ref(null)
 
     const option = {
       tooltip: {
         trigger: 'item',
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
       },
       legend: {
-        top: '5%',
-        left: 'center',
+        bottom: '0%',
+        left: 'center'
       },
       series: [
         {
-          name: 'Access From',
           type: 'pie',
-          radius: ['40%', '70%'],
+          radius: ['35%', '60%'],
+          center: ['50%', '40%'],
           avoidLabelOverlap: false,
           label: {
             show: false,
-            position: 'center',
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: '40',
-              fontWeight: 'bold',
-            },
+            position: 'center'
           },
           labelLine: {
-            show: false,
+            show: false
           },
-          data: [
-            { value: 1048, name: 'Search Engine' },
-            { value: 735, name: 'Direct' },
-            { value: 580, name: 'Email' },
-            { value: 484, name: 'Union Ads' },
-            { value: 300, name: 'Video Ads' },
-          ],
-        },
-      ],
+          data: props.data
+        }
+      ]
     }
 
     initChart(pieChartRef, option)
@@ -87,11 +77,11 @@ const PieChart = defineComponent({
         ref='pieChartRef'
         style={{
           height: typeof height === 'number' ? height + 'px' : height,
-          width: typeof width === 'number' ? width + 'px' : width,
+          width: typeof width === 'number' ? width + 'px' : width
         }}
       />
     )
-  },
+  }
 })
 
 export default PieChart

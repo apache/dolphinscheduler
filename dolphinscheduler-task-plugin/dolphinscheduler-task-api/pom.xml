@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -32,6 +32,11 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-annotation</artifactId>
+            <version>${mybatis-plus.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -271,6 +276,20 @@
                 <exclusion>
                     <artifactId>commons-lang</artifactId>
                     <groupId>commons-lang</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>com.sun.jersey</artifactId>
+                    <groupId>jersey-json</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

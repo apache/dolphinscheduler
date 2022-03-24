@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.DATASOURCE_ENCRYPTION_ENABLE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.DATASOURCE_ENCRYPTION_ENABLE;
 
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
@@ -97,7 +97,7 @@ public class CommonUtilsTest {
         PowerMockito.mockStatic(PropertyUtils.class);
         PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.TRUE);
 
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+        PropertyUtils.setValue(DATASOURCE_ENCRYPTION_ENABLE, "true");
 
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.decodePassword("bnVsbE1USXpORFUy")).thenReturn("123456");

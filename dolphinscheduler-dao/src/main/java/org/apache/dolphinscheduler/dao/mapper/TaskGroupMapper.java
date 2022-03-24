@@ -23,6 +23,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * the Dao interfaces of task group
@@ -60,7 +61,7 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      * @return result page
      */
     IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("userId") int userId,
-                                          @Param("name") String name, @Param("status") int status);
+                                          @Param("name") String name, @Param("status") Integer status);
 
     /**
      * query by task group name
@@ -75,4 +76,5 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
     int selectCountByIdStatus(@Param("id") int id,@Param("status") int status);
 
+    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("projectCode") Long projectCode);
 }

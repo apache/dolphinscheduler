@@ -329,12 +329,16 @@ const tasksType = {
     desc: 'CONDITIONS',
     color: '#E46F13'
   },
+  DATA_QUALITY: {
+    desc: 'DATA_QUALITY',
+    color: '#E46F13'
+  },
   SWITCH: {
     desc: 'SWITCH',
     color: '#E46F13'
   },
-  WATERDROP: {
-    desc: 'WATERDROP',
+  SEATUNNEL: {
+    desc: 'SEATUNNEL',
     color: '#646465',
     helperLinkDisable: true
   }

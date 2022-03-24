@@ -19,14 +19,15 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
@@ -34,21 +35,19 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -57,6 +56,7 @@ import io.netty.channel.Channel;
 /**
  * worker request processor
  */
+@Component
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
@@ -64,30 +64,29 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     /**
      * worker config
      */
-    private final WorkerConfig workerConfig;
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      * task callback service
      */
-    private final TaskCallbackService taskCallbackService;
+    @Autowired
+    private TaskCallbackService taskCallbackService;
 
     /**
      * alert client service
      */
+    @Autowired
     private AlertClientService alertClientService;
 
+    @Autowired
     private TaskPluginManager taskPluginManager;
 
-    /*
+    /**
      * task execute manager
      */
-    private final WorkerManagerThread workerManager;
-
-    public TaskExecuteProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
-    }
+    @Autowired
+    private WorkerManagerThread workerManager;
 
     /**
      * Pre-cache task to avoid extreme situations when kill task. There is no such task in the cache
@@ -97,14 +96,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private void setTaskCache(TaskExecutionContext taskExecutionContext) {
         TaskExecutionContext preTaskCache = new TaskExecutionContext();
         preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
-    }
-
-    public TaskExecuteProcessor(AlertClientService alertClientService, TaskPluginManager taskPluginManager) {
-        this();
-        this.alertClientService = alertClientService;
-        this.taskPluginManager = taskPluginManager;
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
     }
 
     @Override
@@ -115,12 +107,11 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
                 command.getBody(), TaskExecuteRequestCommand.class);
 
-        logger.info("received command : {}", taskRequestCommand);
-
         if (taskRequestCommand == null) {
             logger.error("task execute request command is null");
             return;
         }
+        logger.info("task execute request command : {}", taskRequestCommand);
 
         String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
@@ -178,7 +169,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private void doAck(TaskExecutionContext taskExecutionContext) {
         // tell master that task is in executing
         TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command(), Event.ACK);
+        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command(), Event.ACK);
         taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
     }
 
@@ -195,11 +186,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
-            ackCommand.setExecutePath(null);
-        } else {
-            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
-        }
+
+        ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
+
         taskExecutionContext.setLogPath(ackCommand.getLogPath());
         ackCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
 

@@ -23,12 +23,16 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -189,6 +193,7 @@ public class ProcessAlertManager {
             alert.setTitle("worker fault tolerance");
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
+            alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alertDao.addAlert(alert);
@@ -219,6 +224,7 @@ public class ProcessAlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
+        alert.setWarningType(processInstance.getState().typeIsSuccess() ? WarningType.SUCCESS : WarningType.FAILURE);
         String content = getContentProcessInstance(processInstance, taskInstances,projectUser);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
@@ -270,7 +276,125 @@ public class ProcessAlertManager {
         alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
     }
 
+    /**
+     * send data quality task alert
+     */
+    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result, ProcessInstance processInstance) {
+        Alert alert = new Alert();
+        String state = DqTaskState.of(result.getState()).getDescription();
+        alert.setTitle("DataQualityResult [" + result.getTaskName() + "] " + state);
+        String content = getDataQualityAlterContent(result);
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alertDao.addAlert(alert);
+        logger.info("add alert to db , alert: {}", alert);
+    }
+
+    /**
+     * send data quality task error alert
+     */
+    public void sendTaskErrorAlert(TaskInstance taskInstance,ProcessInstance processInstance) {
+        Alert alert = new Alert();
+        alert.setTitle("Task [" + taskInstance.getName() + "] Failure Warning");
+        String content = getTaskAlterContent(taskInstance);
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alertDao.addAlert(alert);
+        logger.info("add alert to db , alert: {}", alert);
+    }
+
+    /**
+     * getDataQualityAlterContent
+     * @param result DqExecuteResult
+     * @return String String
+     */
+    public String getDataQualityAlterContent(DqExecuteResult result) {
+
+        DqExecuteResultAlertContent content = DqExecuteResultAlertContent.newBuilder()
+                .processDefinitionId(result.getProcessDefinitionId())
+                .processDefinitionName(result.getProcessDefinitionName())
+                .processInstanceId(result.getProcessInstanceId())
+                .processInstanceName(result.getProcessInstanceName())
+                .taskInstanceId(result.getTaskInstanceId())
+                .taskName(result.getTaskName())
+                .ruleType(result.getRuleType())
+                .ruleName(result.getRuleName())
+                .statisticsValue(result.getStatisticsValue())
+                .comparisonValue(result.getComparisonValue())
+                .checkType(result.getCheckType())
+                .threshold(result.getThreshold())
+                .operator(result.getOperator())
+                .failureStrategy(result.getFailureStrategy())
+                .userId(result.getUserId())
+                .userName(result.getUserName())
+                .state(result.getState())
+                .errorDataPath(result.getErrorOutputPath())
+                .build();
+
+        return JSONUtils.toJsonString(content);
+    }
+
+    /**
+     * getTaskAlterContent
+     * @param taskInstance TaskInstance
+     * @return String String
+     */
+    public String getTaskAlterContent(TaskInstance taskInstance) {
+
+        TaskAlertContent content = TaskAlertContent.newBuilder()
+                .processInstanceName(taskInstance.getProcessInstanceName())
+                .processInstanceId(taskInstance.getProcessInstanceId())
+                .taskInstanceId(taskInstance.getId())
+                .taskName(taskInstance.getName())
+                .taskType(taskInstance.getTaskType())
+                .state(taskInstance.getState())
+                .startTime(taskInstance.getStartTime())
+                .endTime(taskInstance.getEndTime())
+                .host(taskInstance.getHost())
+                .logPath(taskInstance.getLogPath())
+                .build();
+
+        return JSONUtils.toJsonString(content);
+    }
+
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
         alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
+    }
+
+    /**
+     *
+     * check node type and process blocking flag, then insert a block record into db
+     *
+     * @param processInstance process instance
+     * @param projectUser the project owner
+     */
+    public void sendProcessBlockingAlert(ProcessInstance processInstance,
+                                         ProjectUser projectUser) {
+        Alert alert = new Alert();
+        String cmdName = getCommandCnName(processInstance.getCommandType());
+        List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
+        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .projectId(projectUser.getProjectId())
+                .projectName(projectUser.getProjectName())
+                .owner(projectUser.getUserName())
+                .processId(processInstance.getId())
+                .processName(processInstance.getName())
+                .processType(processInstance.getCommandType())
+                .processState(processInstance.getState())
+                .runTimes(processInstance.getRunTimes())
+                .processStartTime(processInstance.getStartTime())
+                .processEndTime(processInstance.getEndTime())
+                .processHost(processInstance.getHost())
+                .build();
+        blockingNodeList.add(processAlertContent);
+        String content = JSONUtils.toJsonString(blockingNodeList);
+        alert.setTitle(cmdName + " Blocked");
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alertDao.addAlert(alert);
+        logger.info("add alert to db, alert: {}",alert);
     }
 }

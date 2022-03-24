@@ -17,12 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.procedure;
 
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * procedure parameter
@@ -38,6 +47,8 @@ public class ProcedureParameters extends AbstractParameters {
      * data source id
      */
     private int datasource;
+
+    private Map<String, Property> outProperty;
 
     /**
      * procedure name
@@ -85,5 +96,48 @@ public class ProcedureParameters extends AbstractParameters {
                 + ", datasource=" + datasource
                 + ", method='" + method + '\''
                 + '}';
+    }
+
+    public void dealOutParam4Procedure(Object result, String pop) {
+        Map<String, Property> properties = getOutProperty();
+        if (this.outProperty == null) {
+            return;
+        }
+        properties.get(pop).setValue(String.valueOf(result));
+        varPool.add(properties.get(pop));
+    }
+
+    public Map<String, Property> getOutProperty() {
+        if (this.outProperty != null) {
+            return this.outProperty;
+        }
+        if (CollectionUtils.isEmpty(localParams)) {
+            return null;
+        }
+        List<Property> outPropertyList = getOutProperty(localParams);
+        Map<String, Property> outProperty = new HashMap<>();
+        for (Property info : outPropertyList) {
+            outProperty.put(info.getProp(), info);
+        }
+        this.outProperty = outProperty;
+        return this.outProperty;
+    }
+
+    public void setOutProperty(Map<String, Property> outProperty) {
+        this.outProperty = outProperty;
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+        resources.put(ResourceType.DATASOURCE, datasource);
+        return resources;
+    }
+
+    public ProcedureTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+        DataSourceParameters dataSourceParameters = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
+        procedureTaskExecutionContext.setConnectionParams(Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
+        return procedureTaskExecutionContext;
     }
 }

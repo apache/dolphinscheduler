@@ -48,19 +48,24 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
-        argsIgnorePattern: '^h$',
-        varsIgnorePattern: '^h$'
+        argsIgnorePattern: '^(unused|ignored).*$',
+        varsIgnorePattern: '^(unused|ignored).*$'
       }
     ],
     'no-unused-vars': [
       'error',
       {
-        argsIgnorePattern: '^h$',
-        varsIgnorePattern: '^h$'
+        argsIgnorePattern: '^(unused|ignored).*$',
+        varsIgnorePattern: '^(unused|ignored).*$'
       }
     ],
     'space-before-function-paren': 'off',
     quotes: ['error', 'single'],
-    'comma-dangle': ['error', 'never']
+    'comma-dangle': ['error', 'never'],
+    'vue/multi-word-component-names': 'off',
+    'vue/component-definition-name-casing': 'off',
+    'vue/require-valid-default-prop': 'off',
+    'no-console': 'error',
+    'vue/no-setup-props-destructure': 'off'
   }
 }

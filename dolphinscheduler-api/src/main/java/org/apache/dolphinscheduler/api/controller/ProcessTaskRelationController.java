@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_R
 import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_EDGE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.MOVE_PROCESS_TASK_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
@@ -102,46 +101,6 @@ public class ProcessTaskRelationController extends BaseController {
     }
 
     /**
-     * move task to other processDefinition
-     *
-     * @param loginUser login user info
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param targetProcessDefinitionCode target process definition code
-     * @param taskCode the current task code (the post task code)
-     * @return move result code
-     */
-    @ApiOperation(value = "moveRelation", notes = "MOVE_TASK_TO_OTHER_PROCESS_DEFINITION_NOTES")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "targetProcessDefinitionCode", value = "TARGET_PROCESS_DEFINITION_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
-    })
-    @PostMapping(value = "/move")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(MOVE_PROCESS_TASK_RELATION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result moveTaskProcessRelation(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                          @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
-                                          @RequestParam(name = "targetProcessDefinitionCode", required = true) long targetProcessDefinitionCode,
-                                          @RequestParam(name = "taskCode", required = true) long taskCode) {
-        Map<String, Object> result = new HashMap<>();
-        if (processDefinitionCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
-        } else if (targetProcessDefinitionCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "targetProcessDefinitionCode");
-        } else if (taskCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "taskCode");
-        } else {
-            result = processTaskRelationService.moveTaskProcessRelation(loginUser, projectCode, processDefinitionCode,
-                targetProcessDefinitionCode, taskCode);
-        }
-        return returnDataList(result);
-    }
-
-    /**
      * delete process task relation (delete task from workflow)
      *
      * @param loginUser login user
@@ -179,7 +138,7 @@ public class ProcessTaskRelationController extends BaseController {
     @ApiOperation(value = "deleteUpstreamRelation", notes = "DELETE_UPSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "preTaskCodes", value = "PRE_TASK_CODES", required = true, type = "String", example = "3,4"),
+        @ApiImplicitParam(name = "preTaskCodes", value = "PRE_TASK_CODES", required = true, type = "String", example = "1,2"),
         @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @DeleteMapping(value = "/{taskCode}/upstream")
@@ -205,7 +164,7 @@ public class ProcessTaskRelationController extends BaseController {
     @ApiOperation(value = "deleteDownstreamRelation", notes = "DELETE_DOWNSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "postTaskCodes", value = "POST_TASK_CODES", required = true, type = "String", example = "3,4"),
+        @ApiImplicitParam(name = "postTaskCodes", value = "POST_TASK_CODES", required = true, type = "String", example = "1,2"),
         @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @DeleteMapping(value = "/{taskCode}/downstream")

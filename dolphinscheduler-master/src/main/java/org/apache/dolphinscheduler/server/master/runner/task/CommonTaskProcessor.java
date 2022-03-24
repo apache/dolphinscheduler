@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -32,15 +30,17 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
+import com.google.auto.service.AutoService;
+
 /**
  * common task processor
  */
+@AutoService(ITaskProcessor.class)
 public class CommonTaskProcessor extends BaseTaskProcessor {
 
     private TaskPriorityQueue taskUpdateQueue;
@@ -48,42 +48,32 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval, boolean isTaskLogger) {
-        this.processInstance = processInstance;
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, maxRetryTimes, commitInterval);
+    protected boolean submitTask() {
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-        setTaskExecutionLogger(isTaskLogger);
-        int taskGroupId = task.getTaskGroupId();
+        this.setTaskExecutionLogger();
+        int taskGroupId = taskInstance.getTaskGroupId();
         if (taskGroupId > 0) {
-            boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
-                    task.getName(),
+            boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
+                    taskInstance.getName(),
                     taskGroupId,
-                    task.getProcessInstanceId(),
-                    task.getTaskInstancePriority().getCode());
+                    taskInstance.getProcessInstanceId(),
+                    taskInstance.getTaskInstancePriority().getCode());
             if (!acquireTaskGroup) {
                 logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
                 return true;
             }
         }
-        dispatchTask(taskInstance, processInstance);
+        dispatchTask();
         return true;
     }
 
     @Override
-    public ExecutionStatus taskState() {
-        return this.taskInstance.getState();
-    }
-
-    @Override
-    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
-        this.dispatchTask(taskInstance, processInstance);
-    }
-
-    @Override
-    public void run() {
+    public boolean runTask() {
+        return true;
     }
 
     @Override
@@ -104,8 +94,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         return Constants.COMMON_TASK_TYPE;
     }
 
-    private boolean dispatchTask(TaskInstance taskInstance, ProcessInstance processInstance) {
-
+    @Override
+    public boolean dispatchTask() {
         try {
             if (taskUpdateQueue == null) {
                 this.initQueue();
@@ -133,8 +123,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
             return true;
         } catch (Exception e) {
-            logger.error("submit task  Exception: ", e);
-            logger.error("task error : {}", JSONUtils.toJsonString(taskInstance));
+            logger.error("submit task error", e);
             return false;
         }
     }

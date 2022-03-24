@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -32,11 +31,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class TenantE2ETest {
     private static final String tenant = System.getProperty("user.name");
+    private static final String editDescription = "This is a test";
 
     private static RemoteWebDriver browser;
 
@@ -52,7 +53,13 @@ class TenantE2ETest {
     @Test
     @Order(10)
     void testCreateTenant() {
-        new TenantPage(browser).create(tenant);
+        final TenantPage page = new TenantPage(browser);
+        page.create(tenant);
+
+        await().untilAsserted(() -> assertThat(page.tenantList())
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
     }
 
     @Test
@@ -67,17 +74,34 @@ class TenantE2ETest {
                 .contains("already exists")
         );
 
-        page.createTenantForm().buttonCancel().click();
+        page.tenantForm().buttonCancel().click();
     }
 
     @Test
     @Order(30)
+    void testUpdateTenant() {
+        TenantPage page = new TenantPage(browser);
+
+        page.update(tenant, editDescription);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+            assertThat(page.tenantList())
+                .as("Tenant list should contain newly-modified tenant")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(tenant));
+        });
+    }
+
+    @Test
+    @Order(40)
     void testDeleteTenant() {
         final TenantPage page = new TenantPage(browser);
         page.delete(tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
+
             assertThat(
                 page.tenantList()
             ).noneMatch(

@@ -157,7 +157,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         // insert
         try {
             int insert = alertGroupMapper.insert(alertGroup);
-            putMsg(result, insert > 0 ? Status.SUCCESS : Status.CREATE_ALERT_GROUP_ERROR);
+            if (insert > 0) {
+                result.put(Constants.DATA_LIST, alertGroup);
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
+            }
         } catch (DuplicateKeyException ex) {
             logger.error("Create alert group error.", ex);
             putMsg(result, Status.ALERT_GROUP_EXIST);
@@ -228,12 +233,20 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
+
+        // Not allow to delete the default alarm group ,because the module of service need to use it.
+        if (id == 1) {
+            putMsg(result, Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
+            return result;
+        }
+
         //check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
         }
+
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;

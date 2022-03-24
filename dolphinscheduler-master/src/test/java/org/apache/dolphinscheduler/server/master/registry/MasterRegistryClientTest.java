@@ -86,6 +86,7 @@ public class MasterRegistryClientTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setHost("127.0.0.1:8080");
+        processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString())).willReturn(Arrays.asList(processInstance));
@@ -102,6 +103,7 @@ public class MasterRegistryClientTest {
         server.setPort(8080);
         server.setCreateTime(new Date());
         given(registryClient.getServerList(NodeType.WORKER)).willReturn(Arrays.asList(server));
+        given(registryClient.getServerList(NodeType.MASTER)).willReturn(Arrays.asList(server));
     }
 
     @Test
@@ -118,9 +120,9 @@ public class MasterRegistryClientTest {
 
     @Test
     public void removeNodePathTest() {
-        masterRegistryClient.removeNodePath("/path", NodeType.MASTER, false);
-        masterRegistryClient.removeNodePath("/path", NodeType.MASTER, true);
+        masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, false);
+        masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, true);
         //Cannot mock static methods
-        masterRegistryClient.removeNodePath("/path", NodeType.WORKER, true);
+        masterRegistryClient.removeWorkerNodePath("/path", NodeType.WORKER, true);
     }
 }

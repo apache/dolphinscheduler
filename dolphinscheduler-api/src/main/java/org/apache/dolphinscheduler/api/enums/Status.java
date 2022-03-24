@@ -166,7 +166,7 @@ public enum Status {
     NAME_EXIST(10135, "name {0} already exists", "名称[{0}]已存在"),
     SAVE_ERROR(10136, "save error", "保存错误"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!", "请先删除全部工作流定义"),
-    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error", "批量删除工作流实例错误"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error", "批量删除工作流实例错误: {0}"),
     PREVIEW_SCHEDULE_ERROR(10139, "preview schedule error", "预览调度配置错误"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140, "parse cron to cron expression error", "解析调度表达式错误"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141, "The start time must not be the same as the end", "开始时间不能和结束时间一样"),
@@ -251,6 +251,7 @@ public enum Status {
     COUNT_PROCESS_INSTANCE_STATE_ERROR(50012, "count process instance state error", "查询各状态流程实例数错误"),
     COUNT_PROCESS_DEFINITION_USER_ERROR(50013, "count process definition user error", "查询各用户流程定义数错误"),
     START_PROCESS_INSTANCE_ERROR(50014, "start process instance error", "运行工作流实例错误"),
+    BATCH_START_PROCESS_INSTANCE_ERROR(50014, "batch start process instance error: {0}", "批量运行工作流实例错误: {0}"),
     EXECUTE_PROCESS_INSTANCE_ERROR(50015, "execute process instance error", "操作工作流实例错误"),
     CHECK_PROCESS_DEFINITION_ERROR(50016, "check process definition error", "工作流定义错误"),
     QUERY_RECIPIENTS_AND_COPYERS_BY_PROCESS_DEFINITION_ERROR(50017, "query recipients and copyers by process definition error", "查询收件人和抄送人错误"),
@@ -258,7 +259,7 @@ public enum Status {
     DATA_IS_NULL(50018, "data {0} is null", "数据[{0}]不能为空"),
     PROCESS_NODE_HAS_CYCLE(50019, "process node has cycle", "流程节点间存在循环依赖"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020, "process node {0} parameter invalid", "流程节点[{0}]参数无效"),
-    PROCESS_DEFINE_STATE_ONLINE(50021, "process definition {0} is already on line", "工作流定义[{0}]已上线"),
+    PROCESS_DEFINE_STATE_ONLINE(50021, "process definition [{0}] is already on line", "工作流定义[{0}]已上线"),
     DELETE_PROCESS_DEFINE_BY_CODE_ERROR(50022, "delete process definition by code error", "删除工作流定义错误"),
     SCHEDULE_CRON_STATE_ONLINE(50023, "the status of schedule {0} is already on line", "调度配置[{0}]已上线"),
     DELETE_SCHEDULE_CRON_BY_ID_ERROR(50024, "delete schedule by id error", "删除调度配置错误"),
@@ -268,9 +269,9 @@ public enum Status {
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028, "export process definition by id error", "导出工作流定义错误"),
     BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028, "batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029, "import process definition error", "导入工作流定义错误"),
-    TASK_DEFINE_NOT_EXIST(50030, "task definition {0} does not exist", "任务定义[{0}]不存在"),
+    TASK_DEFINE_NOT_EXIST(50030, "task definition [{0}] does not exist", "任务定义[{0}]不存在"),
     CREATE_PROCESS_TASK_RELATION_ERROR(50032, "create process task relation error", "创建工作流任务关系错误"),
-    PROCESS_TASK_RELATION_NOT_EXIST(50033, "process task relation {0} does not exist", "工作流任务关系[{0}]不存在"),
+    PROCESS_TASK_RELATION_NOT_EXIST(50033, "process task relation [{0}] does not exist", "工作流任务关系[{0}]不存在"),
     PROCESS_TASK_RELATION_EXIST(50034, "process task relation is already exist, processCode:[{0}]", "工作流任务关系已存在, processCode:[{0}]"),
     PROCESS_DAG_IS_EMPTY(50035, "process dag is empty", "工作流dag是空"),
     CHECK_PROCESS_TASK_RELATION_ERROR(50036, "check process task relation error", "工作流任务关系参数错误"),
@@ -293,6 +294,8 @@ public enum Status {
     MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
     PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
     DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
+    NOT_SUPPORT_UPDATE_TASK_DEFINITION(50056, "task state does not support modification", "当前任务不支持修改"),
+    NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
@@ -316,6 +319,9 @@ public enum Status {
 
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
 
+    // audit log
+    QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
+
     //plugin
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
     QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
@@ -334,9 +340,9 @@ public enum Status {
     PROCESS_DEFINITION_VERSION_IS_USED(110013,"this process definition version is used","此工作流定义版本被使用"),
 
     CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
-    ENVIRONMENT_NAME_EXISTS(120002,"this enviroment name [{0}] already exists","环境名称[{0}]已经存在"),
-    ENVIRONMENT_NAME_IS_NULL(120003,"this enviroment name shouldn't be empty.","环境名称不能为空"),
-    ENVIRONMENT_CONFIG_IS_NULL(120004,"this enviroment config shouldn't be empty.","环境配置信息不能为空"),
+    ENVIRONMENT_NAME_EXISTS(120002,"this environment name [{0}] already exists","环境名称[{0}]已经存在"),
+    ENVIRONMENT_NAME_IS_NULL(120003,"this environment name shouldn't be empty.","环境名称不能为空"),
+    ENVIRONMENT_CONFIG_IS_NULL(120004,"this environment config shouldn't be empty.","环境配置信息不能为空"),
     UPDATE_ENVIRONMENT_ERROR(120005, "update environment [{0}] info error", "更新环境[{0}]信息失败"),
     DELETE_ENVIRONMENT_ERROR(120006, "delete environment error", "删除环境信息失败"),
     DELETE_ENVIRONMENT_RELATED_TASK_EXISTS(120007, "this environment has been used in tasks,so you can't delete it.", "该环境已经被任务使用，所以不能删除该环境信息"),
@@ -344,13 +350,20 @@ public enum Status {
     QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment [{0}] ", "查询环境编码[{0}]不存在"),
     QUERY_ENVIRONMENT_ERROR(1200010, "login user query environment error", "分页查询环境列表错误"),
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
-
+    GET_RULE_FORM_CREATE_JSON_ERROR(1200012, "get rule form create json error", "获取规则 FROM-CREATE-JSON 错误"),
+    QUERY_RULE_LIST_PAGING_ERROR(1200013, "query rule list paging error", "获取规则分页列表错误"),
+    QUERY_RULE_LIST_ERROR(1200014, "query rule list error", "获取规则列表错误"),
+    QUERY_RULE_INPUT_ENTRY_LIST_ERROR(1200015, "query rule list error", "获取规则列表错误"),
+    QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(1200016, "query execute result list paging error", "获取数据质量任务结果分页错误"),
+    GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
+    GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
+    GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
     TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
     TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
     TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组已经被关闭"),
     TASK_GROUP_FULL(130004,"task group is full","任务组已经满了"),
     TASK_GROUP_USED_SIZE_ERROR(130005,"the used size number of task group is dirty","任务组使用的容量发生了变化"),
-    TASK_GROUP_QUEUE_RELEASE_ERROR(130006,"relase task group queue failed","任务组资源释放时出现了错误"),
+    TASK_GROUP_QUEUE_RELEASE_ERROR(130006,"failed to release task group queue","任务组资源释放时出现了错误"),
     TASK_GROUP_QUEUE_AWAKE_ERROR(130007,"awake waiting task failed","任务组使唤醒等待任务时发生了错误"),
     CREATE_TASK_GROUP_ERROR(130008,"create task group error","创建任务组错误"),
     UPDATE_TASK_GROUP_ERROR(130009,"update task group list error","更新任务组错误"),
@@ -362,7 +375,21 @@ public enum Status {
     ENVIRONMENT_WORKER_GROUPS_IS_INVALID(130015, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
     UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
             "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
-    TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源")
+    TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源"),
+    TASK_GROUP_STATUS_CLOSED(130018,"The task group has been closed.","任务组已经被关闭"),
+    TASK_GROUP_STATUS_OPENED(130019,"The task group has been opened.","任务组已经被开启"),
+    NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT(130020, "Not allow to disable your own account", "不能停用自己的账号"),
+    NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP(130030, "Not allow to delete the default alarm group ", "不能删除默认告警组"),
+    TIME_ZONE_ILLEGAL(130031, "time zone [{0}] is illegal", "时区参数 [{0}] 不合法"),
+
+    QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR(1300001, "login user query k8s namespace list paging error", "分页查询k8s名称空间列表错误"),
+    K8S_NAMESPACE_EXIST(1300002, "k8s namespace {0} already exists", "k8s命名空间[{0}]已存在"),
+    CREATE_K8S_NAMESPACE_ERROR(1300003, "create k8s namespace error", "创建k8s命名空间错误"),
+    UPDATE_K8S_NAMESPACE_ERROR(1300004, "update k8s namespace error", "更新k8s命名空间信息错误"),
+    K8S_NAMESPACE_NOT_EXIST(1300005, "k8s namespace {0} not exists", "命名空间ID[{0}]不存在"),
+    K8S_CLIENT_OPS_ERROR(1300006, "k8s error with exception {0}", "k8s操作报错[{0}]"),
+    VERIFY_K8S_NAMESPACE_ERROR(1300007, "verify k8s and namespace error", "验证k8s命名空间信息错误"),
+    DELETE_K8S_NAMESPACE_BY_ID_ERROR(1300008, "delete k8s namespace by id error", "删除命名空间错误"),
     ;
 
     private final int code;

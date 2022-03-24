@@ -17,10 +17,10 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="userName" :label="$t('User')"></el-table-column>
-        <el-table-column prop="token" label="Token" width="300"></el-table-column>
+        <el-table-column prop="userName" :label="$t('User')" class-name="userName"></el-table-column>
+        <el-table-column prop="token" label="Token" width="300" class-name="token"></el-table-column>
         <el-table-column :label="$t('Expiration time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.expireTime | formatDate}}</span>
@@ -39,7 +39,7 @@
         <el-table-column :label="$t('Operation')" width="130">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle class="edit"></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
@@ -50,7 +50,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" class="delete"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+
 import io.netty.channel.Channel;
 
 /**
@@ -35,6 +37,8 @@ public class StateEvent {
 
     private int taskInstanceId;
 
+    private long taskCode;
+
     private int processInstanceId;
 
     private String context;
@@ -51,6 +55,10 @@ public class StateEvent {
 
     public int getTaskInstanceId() {
         return taskInstanceId;
+    }
+
+    public long getTaskCode() {
+        return taskCode;
     }
 
     public int getProcessInstanceId() {
@@ -71,6 +79,10 @@ public class StateEvent {
 
     public void setTaskInstanceId(int taskInstanceId) {
         this.taskInstanceId = taskInstanceId;
+    }
+
+    public void setTaskCode(long taskCode) {
+        this.taskCode = taskCode;
     }
 
     public Channel getChannel() {

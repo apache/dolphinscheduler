@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
@@ -27,6 +26,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
@@ -185,8 +185,9 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "tenantId") int tenantId,
                              @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state) throws Exception {
-        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state);
+                             @RequestParam(value = "state", required = false) int state,
+                             @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state, timeZone);
         return returnDataList(result);
     }
 

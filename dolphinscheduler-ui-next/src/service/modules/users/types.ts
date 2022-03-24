@@ -35,6 +35,7 @@ interface UserReq {
   phone?: string
   queue?: string
   state?: number
+  timeZone?: string
 }
 
 interface IdReq {
@@ -88,6 +89,32 @@ interface RegisterUserReq {
   userPassword: string
 }
 
+interface UserInfoRes extends UserReq, IdReq {
+  userType: string
+  tenantCode?: any
+  queueName?: any
+  alertGroup?: any
+  createTime: string
+  updateTime: string
+}
+
+interface UserListRes {
+  id: number
+  userName: string
+  userPassword: string
+  email: string
+  phone: string
+  userType: string
+  tenantId: number
+  state: number
+  tenantCode?: any
+  queueName?: any
+  alertGroup?: any
+  queue: string
+  createTime: string
+  updateTime: string
+}
+
 export {
   UserNameReq,
   UserNamesReq,
@@ -103,4 +130,6 @@ export {
   ListAllReq,
   ListReq,
   RegisterUserReq,
+  UserInfoRes,
+  UserListRes
 }

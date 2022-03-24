@@ -187,7 +187,7 @@ public final class MailSender {
             } catch (Exception e) {
                 handleException(alertResult, e);
             }
-        } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
+        } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLE_ATTACHMENT.getDescp())) {
             try {
 
                 String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp())

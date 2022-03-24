@@ -23,15 +23,15 @@ on:
       - dev
     paths:
       - '.github/workflows/frontend.yml'
-      - 'dolphinscheduler-ui/**'
+      - 'dolphinscheduler-ui-next/**'
   pull_request:
     paths:
       - '.github/workflows/frontend.yml'
-      - 'dolphinscheduler-ui/**'
+      - 'dolphinscheduler-ui-next/**'
 
 defaults:
   run:
-    working-directory: dolphinscheduler-ui
+    working-directory: dolphinscheduler-ui-next
 
 concurrency:
   group: frontend-${{ github.event.pull_request.number || github.ref }}
@@ -41,6 +41,7 @@ jobs:
   build:
     name: Build
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
@@ -54,10 +55,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 8
+          node-version: 16
       - name: Compile and Build
         run: |
-          npm install node-sass --unsafe-perm
           npm install
           npm run lint
-          npm run build
+          npm run build:prod

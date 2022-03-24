@@ -18,6 +18,9 @@
 spring:
   application:
     name: standalone-server
+  jackson:
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   main:
     banner-mode: off
   cache:
@@ -39,17 +42,6 @@ spring:
     url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
     username: sa
     password: ""
-    hikari:
-      connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
-      pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -70,14 +62,15 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-  jackson:
-    time-zone: GMT+8
   servlet:
     multipart:
       max-file-size: 1024MB
       max-request-size: 1024MB
   messages:
     basename: i18n/messages
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 registry:
   type: zookeeper
@@ -116,8 +109,10 @@ master:
   max-cpu-load-avg: -1
   # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
   reserved-memory: 0.3
-  # use task logger, default true; if true, it will create log for every task; if false, the task log will append to master log file
-  task-logger: true
+  # failover interval, the unit is minute
+  failover-interval: 10
+  # kill yarn jon when failover taskInstance, default true
+  kill-yarn-job-when-task-failover: true
 
 worker:
   # worker listener port
@@ -144,6 +139,24 @@ worker:
 alert:
   port: 50052
 
+python-gateway:
+  # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
+  # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
+  gateway-server-address: 0.0.0.0
+  # The port of Python gateway server start. Define which port you could connect to Python gateway server from
+  # Python API side.
+  gateway-server-port: 25333
+  # The address of Python callback client.
+  python-address: 127.0.0.1
+  # The port of Python callback client.
+  python-port: 25334
+  # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
+  # and socket server would never close even though no requests accept
+  connect-timeout: 0
+  # Close each active connection of socket server if python program not active after x milliseconds. Define value is
+  # (0 = infinite), and socket server would never close even though no requests accept
+  read-timeout: 0
+
 server:
   port: 12345
   servlet:
@@ -164,6 +177,12 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+audit:
+  enabled: true
+
+metrics:
+  enabled: true
 
 # Override by profile
 ---

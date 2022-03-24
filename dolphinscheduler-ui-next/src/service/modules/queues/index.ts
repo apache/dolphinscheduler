@@ -20,39 +20,39 @@ import { ListReq, QueueReq, IdReq } from './types'
 
 export function queryQueueListPaging(params: ListReq): any {
   return axios({
-    url: `/queues`,
+    url: '/queues',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function createQueue(data: QueueReq): any {
   return axios({
-    url: `/queues`,
+    url: '/queues',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryList(): any {
   return axios({
-    url: `/queues/list`,
-    method: 'get',
+    url: '/queues/list',
+    method: 'get'
   })
 }
 
 export function verifyQueue(data: QueueReq): any {
   return axios({
-    url: `/queues/verify`,
+    url: '/queues/verify',
     method: 'post',
-    data,
+    data
   })
 }
 
-export function updateQueue(data: QueueReq, id: IdReq): any {
+export function updateQueue(data: QueueReq, idReq: IdReq): any {
   return axios({
-    url: `/queues/${id}`,
+    url: `/queues/${idReq.id}`,
     method: 'put',
-    data,
+    data
   })
 }

@@ -44,6 +44,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
     public TaskGroup insertOne() {
         TaskGroup taskGroup = new TaskGroup();
         taskGroup.setName("task group");
+        taskGroup.setId(1);
         taskGroup.setUserId(1);
         taskGroup.setStatus(1);
         taskGroup.setGroupSize(10);
@@ -52,7 +53,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         taskGroup.setUpdateTime(date);
         taskGroup.setUpdateTime(date);
 
-        taskGroupMapper.insert(taskGroup);
+        int i = taskGroupMapper.insert(taskGroup);
         return taskGroup;
     }
 

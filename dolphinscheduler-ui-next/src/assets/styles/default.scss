@@ -19,7 +19,23 @@
   outline: 0;
 }
 
-html, body, p, dl, dd, dt {
+html,
+body {
+  width: 100%;
+  height: 100%;
+  //scrollbar-width: none;
+  //-ms-overflow-style: none;
+  //::-webkit-scrollbar {
+  //  display: none;
+  //}
+}
+
+html,
+body,
+p,
+dl,
+dd,
+dt {
   margin: 0;
   padding: 0;
 }

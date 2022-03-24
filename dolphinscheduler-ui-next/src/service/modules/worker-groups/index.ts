@@ -22,7 +22,7 @@ export function queryAllWorkerGroupsPaging(params: ListReq): any {
   return axios({
     url: '/worker-groups',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -30,27 +30,28 @@ export function saveWorkerGroup(data: WorkerGroupReq): any {
   return axios({
     url: '/worker-groups',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryAllWorkerGroups(): any {
   return axios({
     url: '/worker-groups/all',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function queryWorkerAddressList(): any {
   return axios({
     url: '/worker-groups/worker-address-list',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function deleteById(id: IdReq): any {
   return axios({
-    url: `/worker-groups/${id}`,
+    url: `/worker-groups/${id.id}`,
     method: 'delete',
+    params: id
   })
 }

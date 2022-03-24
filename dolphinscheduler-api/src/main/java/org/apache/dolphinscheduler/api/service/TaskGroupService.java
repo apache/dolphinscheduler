@@ -35,7 +35,7 @@ public interface TaskGroupService {
      * @param groupSize   task group total size
      * @return the result code and msg
      */
-    Map<String, Object> createTaskGroup(User loginUser, String name,
+    Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name,
                                         String description, int groupSize);
 
     /**
@@ -66,7 +66,7 @@ public interface TaskGroupService {
      * @param pageSize  page size
      * @return the result code and msg
      */
-    Map<String, Object> queryAllTaskGroup(User loginUser, int pageNo, int pageSize);
+    Map<String, Object> queryAllTaskGroup(User loginUser, String name,Integer status, int pageNo, int pageSize);
 
     /**
      * query all task group by status
@@ -85,10 +85,10 @@ public interface TaskGroupService {
      * @param loginUser login user
      * @param pageNo    page no
      * @param pageSize  page size
-     * @param name      name
+     * @param projectCode  project code
      * @return the result code and msg
      */
-    Map<String, Object> queryTaskGroupByName(User loginUser, int pageNo, int pageSize, String name);
+    Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode);
 
     /**
      * query all task group by id
@@ -110,7 +110,7 @@ public interface TaskGroupService {
      * @param status    status
      * @return the result code and msg
      */
-    Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, int status);
+    Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, Integer status);
 
     /**
      * close a task group
@@ -136,5 +136,7 @@ public interface TaskGroupService {
      * @param taskId task id
      * @return result
      */
-    Map<String, Object> wakeTaskcompulsively(User loginUser, int taskId);
+    Map<String, Object> forceStartTask(User loginUser, int taskId);
+
+    Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority);
 }

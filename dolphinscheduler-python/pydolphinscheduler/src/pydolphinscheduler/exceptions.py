@@ -21,26 +21,22 @@
 class PyDSBaseException(Exception):
     """Base exception for pydolphinscheduler."""
 
-    pass
-
 
 class PyDSParamException(PyDSBaseException):
     """Exception for pydolphinscheduler parameter verify error."""
-
-    pass
 
 
 class PyDSTaskNoFoundException(PyDSBaseException):
     """Exception for pydolphinscheduler workflow task no found error."""
 
-    pass
-
 
 class PyDSJavaGatewayException(PyDSBaseException):
     """Exception for pydolphinscheduler Java gateway error."""
 
-    pass
-
 
 class PyDSProcessDefinitionNotAssignException(PyDSBaseException):
     """Exception for pydolphinscheduler process definition not assign error."""
+
+
+class PyDSConfException(PyDSBaseException):
+    """Exception for pydolphinscheduler configuration error."""

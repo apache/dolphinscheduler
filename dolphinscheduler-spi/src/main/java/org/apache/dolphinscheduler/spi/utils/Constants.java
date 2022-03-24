@@ -41,6 +41,8 @@ public class Constants {
     public static final String STRING_PLUGIN_PARAM_VALIDATE = "validate";
     /** alert plugin param options string **/
     public static final String STRING_PLUGIN_PARAM_OPTIONS = "options";
+    /**plugin param emit string **/
+    public static final String STRING_PLUGIN_PARAM_EMIT = "emit";
 
 
     /** string true */
@@ -71,6 +73,30 @@ public class Constants {
      * date format of yyyyMMddHHmmssSSS
      */
     public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_LEFT = "{{";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_RIGHT = "}}";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_LEFT_SPACE = "{ {";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_RIGHT_SPACE = "} }";
+
+    public static final String SMALL = "small";
+
+    public static final String CHANGE = "change";
 
     public static final String SPRING_DATASOURCE_MIN_IDLE = "spring.datasource.minIdle";
 
@@ -119,6 +145,11 @@ public class Constants {
     public static final String KERBEROS = "kerberos";
 
     /**
+     *  support hive datasource in one session
+     */
+    public static final String SUPPORT_HIVE_ONE_SESSION = "support.hive.oneSession";
+
+    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
@@ -130,6 +161,7 @@ public class Constants {
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+    public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
 
 
     /**
@@ -143,6 +175,7 @@ public class Constants {
     public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
     public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
     public static final String PRESTO_VALIDATION_QUERY = "select 1";
+    public static final String REDHIFT_VALIDATION_QUERY = "select 1";
 
     /**
      * jdbc url
@@ -156,7 +189,7 @@ public class Constants {
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
     public static final String JDBC_PRESTO = "jdbc:presto://";
-
+    public static final String JDBC_REDSHIFT = "jdbc:redshift://";
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
@@ -174,6 +207,11 @@ public class Constants {
     public static final String DOUBLE_SLASH = "//";
 
     /**
+     * SLASH /
+     */
+    public static final String SLASH = "/";
+
+    /**
      * comma ,
      */
     public static final String COMMA = ",";
@@ -183,10 +221,22 @@ public class Constants {
      */
     public static final String COLON = ":";
 
+
     /**
-     * AT SIGN
+     * AT SIGN @
      */
     public static final String AT_SIGN = "@";
+
+    /**
+     * SEMICOLON ;
+     */
+    public static final String SEMICOLON = ";";
+
+
+    /**
+     * EQUAL_SIGN =
+     */
+    public static final String EQUAL_SIGN = "=";
 
     /**
      * datasource encryption salt
@@ -194,4 +244,5 @@ public class Constants {
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
+
 }

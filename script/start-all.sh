@@ -45,7 +45,6 @@ do
   echo "$worker worker server is starting"
 
   ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start worker-server;"
-  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start logger-server;"
 done
 
 ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start alert-server;"
@@ -53,8 +52,15 @@ ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-  echo "$apiServer worker server is starting"
+  echo "$apiServer api server is starting"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
+done
+
+pythonGatewayHost=(${pythonGatewayServers//,/ })
+for pythonGatewayServer in "${pythonGatewayHost[@]}"
+do
+  echo "$pythonGatewayServer python gateway server is starting"
+  ssh -p $sshPort $pythonGatewayServer "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start python-gateway-server;"
 done
 
 # query server status

@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.Date;
 
@@ -49,13 +47,11 @@ public class TaskResponseEvent {
     /**
      * start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
      * end time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date endTime;
 
     /**

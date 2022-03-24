@@ -15,32 +15,23 @@
  * limitations under the License.
  */
 
-import { toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import RouteState from './types'
-import { RouteRecordRaw } from 'vue-router'
 
-export const useAsyncRouteStore = defineStore({
+export const useRouteStore = defineStore({
   id: 'route',
   state: (): RouteState => ({
-    menus: [],
-    routers: [],
-    addRouters: [],
+    lastRoute: 'home'
   }),
+  persist: true,
   getters: {
-    getMenus(): RouteRecordRaw[] {
-      return this.menus
-    },
-    getRouters(): RouteRecordRaw[] {
-      return toRaw(this.addRouters)
-    },
+    getLastRoute(): string {
+      return this.lastRoute
+    }
   },
   actions: {
-    setMenus(menus) {
-      this.menus = menus
-    },
-    async generateRouters(routes) {
-      console.log(routes)
-    },
-  },
+    setLastRoute(lastRoute: string): void {
+      this.lastRoute = lastRoute
+    }
+  }
 })

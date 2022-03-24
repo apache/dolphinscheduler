@@ -22,6 +22,7 @@
           <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputFileName"
                     type="input"
                     v-model="fileName"
                     maxlength="60"
@@ -66,8 +67,8 @@
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <div class="submit">
-              <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Create')}} </el-button>
-              <el-button type="text" size="small" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </el-button>
+              <el-button id="btnSubmit" type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Create')}} </el-button>
+              <el-button id="btnCancel" type="text" size="small" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </el-button>
             </div>
           </template>
         </m-list-box-f>
@@ -154,7 +155,10 @@
         this.keypress = () => {
           if (!editor.getOption('readOnly')) {
             editor.showHint({
-              completeSingle: false
+              completeSingle: false,
+              extraKeys: {
+                Enter: ''
+              }
             })
           }
         }

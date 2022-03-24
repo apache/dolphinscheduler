@@ -15,21 +15,54 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, PropType, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
-import Language from '../language'
+import Locales from '../locales'
+import Timezone from '../timezone'
 import User from '../user'
-import { useDataList } from './use-dataList'
-import { useMenuClick } from './use-menuClick'
+import Theme from '../theme'
 
-const navbar = defineComponent({
-  name: 'navbar',
+const Navbar = defineComponent({
+  name: 'Navbar',
+  props: {
+    headerMenuOptions: {
+      type: Array as PropType<any>,
+      default: []
+    },
+    localesOptions: {
+      type: Array as PropType<any>,
+      default: []
+    },
+    timezoneOptions: {
+      type: Array as PropType<any>,
+      default: []
+    },
+    userDropdownOptions: {
+      type: Array as PropType<any>,
+      default: []
+    }
+  },
   setup() {
-    const { state } = useDataList()
-    const { handleMenuClick } = useMenuClick()
-    return { ...toRefs(state), handleMenuClick }
+    const route = useRoute()
+    const router = useRouter()
+
+    const menuKey = ref(route.meta.activeMenu as string)
+
+    const handleMenuClick = (key: string) => {
+      router.push({ path: `/${key}` })
+    }
+
+    watch(
+      () => route.path,
+      () => {
+        menuKey.value = route.meta.activeMenu as string
+      }
+    )
+
+    return { handleMenuClick, menuKey }
   },
   render() {
     return (
@@ -37,19 +70,21 @@ const navbar = defineComponent({
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            v-model={[this.activeKey, 'value']}
+            value={this.menuKey}
             mode='horizontal'
-            options={this.menuOptions}
+            options={this.headerMenuOptions}
             onUpdateValue={this.handleMenuClick}
           />
         </div>
         <div class={styles.settings}>
-          <Language />
-          <User />
+          <Theme />
+          <Locales localesOptions={this.localesOptions} />
+          <Timezone timezoneOptions={this.timezoneOptions} />
+          <User userDropdownOptions={this.userDropdownOptions} />
         </div>
       </div>
     )
-  },
+  }
 })
 
-export default navbar
+export default Navbar

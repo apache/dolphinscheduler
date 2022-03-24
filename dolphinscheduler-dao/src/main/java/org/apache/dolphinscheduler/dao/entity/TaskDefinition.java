@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,7 +38,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -180,13 +179,11 @@ public class TaskDefinition {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     /**
@@ -199,6 +196,10 @@ public class TaskDefinition {
      * task group id
      */
     private int taskGroupId;
+    /**
+     * task group id
+     */
+    private int taskGroupPriority;
 
     public TaskDefinition() {
     }
@@ -455,20 +456,24 @@ public class TaskDefinition {
         }
         TaskDefinition that = (TaskDefinition) o;
         return failRetryTimes == that.failRetryTimes
-                && failRetryInterval == that.failRetryInterval
-                && timeout == that.timeout
-                && delayTime == that.delayTime
-                && Objects.equals(name, that.name)
-                && Objects.equals(description, that.description)
-                && Objects.equals(taskType, that.taskType)
-                && Objects.equals(taskParams, that.taskParams)
-                && flag == that.flag
-                && taskPriority == that.taskPriority
-                && Objects.equals(workerGroup, that.workerGroup)
-                && timeoutFlag == that.timeoutFlag
-                && timeoutNotifyStrategy == that.timeoutNotifyStrategy
-                && Objects.equals(resourceIds, that.resourceIds)
-                && environmentCode == that.environmentCode;
+            && failRetryInterval == that.failRetryInterval
+            && timeout == that.timeout
+            && delayTime == that.delayTime
+            && Objects.equals(name, that.name)
+            && Objects.equals(description, that.description)
+            && Objects.equals(taskType, that.taskType)
+            && Objects.equals(taskParams, that.taskParams)
+            && flag == that.flag
+            && taskPriority == that.taskPriority
+            && Objects.equals(workerGroup, that.workerGroup)
+            && timeoutFlag == that.timeoutFlag
+            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+            && (Objects.equals(resourceIds, that.resourceIds)
+            || (StringUtils.EMPTY.equals(resourceIds) && that.resourceIds == null)
+            || (StringUtils.EMPTY.equals(that.resourceIds) && resourceIds == null))
+            && environmentCode == that.environmentCode
+            && taskGroupId == that.taskGroupId
+            && taskGroupPriority == that.taskGroupPriority;
     }
 
     @Override
@@ -492,6 +497,8 @@ public class TaskDefinition {
                 + ", workerGroup='" + workerGroup + '\''
                 + ", failRetryTimes=" + failRetryTimes
                 + ", environmentCode='" + environmentCode + '\''
+                + ", taskGroupId='" + taskGroupId + '\''
+                + ", taskGroupPriority='" + taskGroupPriority + '\''
                 + ", failRetryInterval=" + failRetryInterval
                 + ", timeoutFlag=" + timeoutFlag
                 + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
@@ -501,5 +508,13 @@ public class TaskDefinition {
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

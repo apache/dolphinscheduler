@@ -56,21 +56,21 @@ public class MasterRegistryDataListener implements SubscribeListener {
         }
     }
 
-    public void handleMasterEvent(Event event) {
+    private void handleMasterEvent(Event event) {
         final String path = event.path();
         switch (event.type()) {
             case ADD:
                 logger.info("master node added : {}", path);
                 break;
             case REMOVE:
-                masterRegistryClient.removeNodePath(path, NodeType.MASTER, true);
+                masterRegistryClient.removeMasterNodePath(path, NodeType.MASTER, true);
                 break;
             default:
                 break;
         }
     }
 
-    public void handleWorkerEvent(Event event) {
+    private void handleWorkerEvent(Event event) {
         final String path = event.path();
         switch (event.type()) {
             case ADD:
@@ -78,7 +78,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
                 break;
             case REMOVE:
                 logger.info("worker node deleted : {}", path);
-                masterRegistryClient.removeNodePath(path, NodeType.WORKER, true);
+                masterRegistryClient.removeWorkerNodePath(path, NodeType.WORKER, true);
                 break;
             default:
                 break;

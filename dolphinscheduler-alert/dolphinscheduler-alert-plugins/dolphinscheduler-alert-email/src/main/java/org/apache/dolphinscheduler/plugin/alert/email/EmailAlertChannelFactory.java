@@ -111,7 +111,7 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                                         .addParamsOptions(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false))
                                         .addParamsOptions(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false))
                                         .addParamsOptions(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false))
-                                        .addParamsOptions(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false))
+                                        .addParamsOptions(new ParamsOptions(ShowType.TABLE_ATTACHMENT.getDescp(), ShowType.TABLE_ATTACHMENT.getDescp(), false))
                                         .setValue(ShowType.TABLE.getDescp())
                                         .addValidate(Validate.newBuilder().setRequired(true).build())
                                         .build();

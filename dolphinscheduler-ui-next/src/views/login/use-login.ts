@@ -16,24 +16,41 @@
  */
 
 import { useRouter } from 'vue-router'
+import { login } from '@/service/modules/login'
+import { getUserInfo } from '@/service/modules/users'
+import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
-import { queryLog } from '@/service/modules/login'
+import type { SessionIdRes } from '@/service/modules/login/types'
+import type { UserInfoRes } from '@/service/modules/users/types'
+import { useRouteStore } from '@/store/route/route'
+import { useTimezoneStore } from '@/store/timezone/timezone'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
+  const userStore = useUserStore()
+  const routeStore = useRouteStore()
+  const timezoneStore = useTimezoneStore()
+
   const handleLogin = () => {
-    state.loginFormRef.validate((valid: any) => {
+    state.loginFormRef.validate(async (valid: any) => {
       if (!valid) {
-        queryLog({ ...state.loginForm }).then((res: Response) => {
-          console.log('res', res)
-          router.push({ path: 'home' })
-        })
-      } else {
-        console.log('Invalid')
+        const loginRes: SessionIdRes = await login({ ...state.loginForm })
+        await userStore.setSessionId(loginRes.sessionId)
+
+        const userInfoRes: UserInfoRes = await getUserInfo()
+        await userStore.setUserInfo(userInfoRes)
+
+        const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
+        await timezoneStore.setTimezone(timezone)
+
+        const path = routeStore.lastRoute
+
+        router.push({ path: path || 'home' })
       }
     })
   }
+
   return {
-    handleLogin,
+    handleLogin
   }
 }

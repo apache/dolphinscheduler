@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
@@ -26,16 +25,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
  */
 public interface ITaskProcessor {
 
-    void run();
+    void init(TaskInstance taskInstance, ProcessInstance processInstance);
 
     boolean action(TaskAction taskAction);
 
     String getType();
 
-    boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger);
-
-    ExecutionStatus taskState();
-
-    void dispatch(TaskInstance taskInstance, ProcessInstance processInstance);
+    TaskInstance taskInstance();
 
 }

@@ -18,15 +18,14 @@
 import { axios } from '@/service/service'
 import {
   PageReq,
-  ListReq,
   ProjectCodeReq,
   TaskDefinitionListReq,
   TaskDefinitionJsonReq,
-  GenNumReq,
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
   VersionReq,
+  ISingleSaveReq
 } from './types'
 
 export function queryTaskDefinitionListPaging(
@@ -34,9 +33,9 @@ export function queryTaskDefinitionListPaging(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition`,
+    url: `/projects/${projectCode.projectCode}/task-definition`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -47,28 +46,27 @@ export function save(
   return axios({
     url: `/projects/${projectCode}/task-definition`,
     method: 'post',
-    data,
+    data
   })
 }
 
-export function genTaskCodeList(
-  params: GenNumReq,
-  projectCode: ProjectCodeReq
-): any {
-  return axios({
+export function genTaskCodeList(num: number, projectCode: number) {
+  return axios.request<unknown, number[]>({
     url: `/projects/${projectCode}/task-definition/gen-task-codes`,
     method: 'get',
-    params,
+    params: {
+      genNum: num
+    }
   })
 }
 
 export function queryTaskDefinitionByCode(
-  code: CodeReq,
-  projectCode: ProjectCodeReq
+  code: number,
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -80,19 +78,17 @@ export function update(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function deleteTaskDefinition(
-  data: TaskDefinitionJsonObjReq,
   code: CodeReq,
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}`,
-    method: 'put',
-    data,
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}`,
+    method: 'delete'
   })
 }
 
@@ -104,19 +100,19 @@ export function releaseTaskDefinition(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/release`,
     method: 'post',
-    data,
+    data
   })
 }
 
-export function queryVersions(
+export function queryTaskVersions(
   params: PageReq,
   code: CodeReq,
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/versions`,
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -126,8 +122,8 @@ export function switchVersion(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/versions/${version}`,
-    method: 'get',
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions/${version.version}`,
+    method: 'get'
   })
 }
 
@@ -137,7 +133,27 @@ export function deleteVersion(
   projectCode: ProjectCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/versions/${version}`,
-    method: 'delete',
+    url: `/projects/${projectCode.projectCode}/task-definition/${code.code}/versions/${version.version}`,
+    method: 'delete'
+  })
+}
+
+export function saveSingle(projectCode: number, data: ISingleSaveReq) {
+  return axios({
+    url: `/projects/${projectCode}/task-definition/save-single`,
+    method: 'post',
+    data
+  })
+}
+
+export function updateWithUpstream(
+  projectCode: number,
+  code: number,
+  data: ISingleSaveReq
+) {
+  return axios({
+    url: `/projects/${projectCode}/task-definition/${code}/with-upstream`,
+    method: 'put',
+    data
   })
 }

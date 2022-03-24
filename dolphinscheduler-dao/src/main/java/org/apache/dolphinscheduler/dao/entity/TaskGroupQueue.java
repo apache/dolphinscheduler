@@ -23,9 +23,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * Task Group Queue
@@ -45,6 +45,21 @@ public class TaskGroupQueue implements Serializable {
      * TaskInstance name
      */
     private String taskName;
+    /**
+     * project name
+     */
+    @TableField(exist = false)
+    private String projectName;
+    /**
+     * project code
+     */
+    @TableField(exist = false)
+    private String projectCode;
+    /**
+     * process instance name
+     */
+    @TableField(exist = false)
+    private String processInstanceName;
     /**
      * taskGroup id
      */
@@ -74,12 +89,10 @@ public class TaskGroupQueue implements Serializable {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public TaskGroupQueue() {
@@ -162,16 +175,16 @@ public class TaskGroupQueue implements Serializable {
     @Override
     public String toString() {
         return "TaskGroupQueue{"
-                + "id=" + id
-                + ", taskId=" + taskId
-                + ", taskName='" + taskName + '\''
-                + ", groupId=" + groupId
-                + ", processId=" + processId
-                + ", priority=" + priority
-                + ", status=" + status
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", taskId=" + taskId
+            + ", taskName='" + taskName + '\''
+            + ", groupId=" + groupId
+            + ", processId=" + processId
+            + ", priority=" + priority
+            + ", status=" + status
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 
     public TaskGroupQueueStatus getStatus() {
@@ -196,5 +209,29 @@ public class TaskGroupQueue implements Serializable {
 
     public void setInQueue(int inQueue) {
         this.inQueue = inQueue;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProcessInstanceName() {
+        return processInstanceName;
+    }
+
+    public void setProcessInstanceName(String processInstanceName) {
+        this.processInstanceName = processInstanceName;
+    }
+
+    public String getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(String projectCode) {
+        this.projectCode = projectCode;
     }
 }

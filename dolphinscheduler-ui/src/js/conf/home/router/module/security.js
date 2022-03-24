@@ -94,6 +94,14 @@ const security = [
         meta: {
           title: `${i18n.$t('Token manage')}`
         }
+      },
+      {
+        path: '/security/namespace',
+        name: 'namespace',
+        component: resolve => require(['../../pages/security/pages/namespace'], resolve),
+        meta: {
+          title: `${i18n.$t('K8s Namespace')}`
+        }
       }
     ]
   }

@@ -16,13 +16,19 @@
 # under the License.
 
 """Test Task class function."""
-
+import logging
+import re
 from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
 from tests.testing.task import Task as testTask
+from tests.testing.task import TaskWithCode
+
+TEST_TASK_RELATION_SET = set()
+TEST_TASK_RELATION_SIZE = 0
 
 
 @pytest.mark.parametrize(
@@ -66,6 +72,45 @@ def test_property_task_params(attr, expect):
     assert expect == task.task_params
 
 
+@pytest.mark.parametrize(
+    "pre_code, post_code, expect",
+    [
+        (123, 456, hash("123 -> 456")),
+        (12345678, 987654321, hash("12345678 -> 987654321")),
+    ],
+)
+def test_task_relation_hash_func(pre_code, post_code, expect):
+    """Test TaskRelation magic function :func:`__hash__`."""
+    task_param = TaskRelation(pre_task_code=pre_code, post_task_code=post_code)
+    assert hash(task_param) == expect
+
+
+@pytest.mark.parametrize(
+    "pre_code, post_code, size_add",
+    [
+        (123, 456, 1),
+        (123, 456, 0),
+        (456, 456, 1),
+        (123, 123, 1),
+        (456, 123, 1),
+        (0, 456, 1),
+        (123, 0, 1),
+    ],
+)
+def test_task_relation_add_to_set(pre_code, post_code, size_add):
+    """Test TaskRelation with different pre_code and post_code add to set behavior.
+
+    Here we use global variable to keep set of :class:`TaskRelation` instance and the number we expect
+    of the size when we add a new task relation to exists set.
+    """
+    task_relation = TaskRelation(pre_task_code=pre_code, post_task_code=post_code)
+    TEST_TASK_RELATION_SET.add(task_relation)
+    # hint python interpreter use global variable instead of local's
+    global TEST_TASK_RELATION_SIZE
+    TEST_TASK_RELATION_SIZE += size_add
+    assert len(TEST_TASK_RELATION_SET) == TEST_TASK_RELATION_SIZE
+
+
 def test_task_relation_to_dict():
     """Test TaskRelation object function to_dict."""
     pre_task_code = 123
@@ -79,10 +124,10 @@ def test_task_relation_to_dict():
         "conditionType": 0,
         "conditionParams": {},
     }
-    task_param = TaskRelation(
+    task_relation = TaskRelation(
         pre_task_code=pre_task_code, post_task_code=post_task_code
     )
-    assert task_param.get_define() == expect
+    assert task_relation.get_define() == expect
 
 
 def test_task_get_define():
@@ -180,3 +225,19 @@ def test_tasks_list_shift(dep_expr: str, flag: str):
 
     assert all([1 == len(getattr(t, reverse_direction_attr)) for t in tasks])
     assert all([task.code in getattr(t, reverse_direction_attr) for t in tasks])
+
+
+def test_add_duplicate(caplog):
+    """Test add task which code already in process definition."""
+    with ProcessDefinition("test_add_duplicate_workflow") as _:
+        TaskWithCode(name="test_task_1", task_type="test", code=123, version=1)
+        with caplog.at_level(logging.WARNING):
+            TaskWithCode(
+                name="test_task_duplicate_code", task_type="test", code=123, version=2
+            )
+        assert all(
+            [
+                caplog.text.startswith("WARNING  pydolphinscheduler"),
+                re.findall("already in process definition", caplog.text),
+            ]
+        )

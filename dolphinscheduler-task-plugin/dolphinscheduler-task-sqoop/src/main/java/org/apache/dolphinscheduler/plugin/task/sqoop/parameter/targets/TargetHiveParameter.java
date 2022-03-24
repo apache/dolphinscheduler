@@ -54,6 +54,10 @@ public class TargetHiveParameter {
      * hive partition value
      */
     private String hivePartitionValue;
+    /**
+     * hive target dir
+     */
+    private String hiveTargetDir;
 
     public String getHiveDatabase() {
         return hiveDatabase;
@@ -117,5 +121,13 @@ public class TargetHiveParameter {
 
     public void setHivePartitionValue(String hivePartitionValue) {
         this.hivePartitionValue = hivePartitionValue;
+    }
+
+    public String getHiveTargetDir() {
+        return hiveTargetDir;
+    }
+
+    public void setHiveTargetDir(String hiveTargetDir) {
+        this.hiveTargetDir = hiveTargetDir;
     }
 }

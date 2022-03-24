@@ -17,17 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.KERBEROS;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.LOGIN_USER_KEY_TAB_PATH;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.LOGIN_USER_KEY_TAB_USERNAME;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATA_QUALITY_JAR_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.KERBEROS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOGIN_USER_KEY_TAB_PATH;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOGIN_USER_KEY_TAB_USERNAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESOURCE_UPLOAD_PATH;
 
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -106,6 +107,16 @@ public class CommonUtils {
         return false;
     }
 
+    public static String getDataQualityJarName() {
+        String dqsJarName = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
+
+        if (org.apache.commons.lang.StringUtils.isEmpty(dqsJarName)) {
+            return "dolphinscheduler-data-quality.jar";
+        }
+
+        return dqsJarName;
+    }
+
     /**
      * hdfs udf dir
      *
@@ -130,7 +141,7 @@ public class CommonUtils {
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
-        String resourceUploadPath = PropertyUtils.getString(TaskConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+        String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
         if ("/".equals(resourceUploadPath)) {
             // if basepath is configured to /,  the generated url may be  //default/resources (with extra leading /)
             return "";
@@ -138,5 +149,4 @@ public class CommonUtils {
             return resourceUploadPath;
         }
     }
-
 }

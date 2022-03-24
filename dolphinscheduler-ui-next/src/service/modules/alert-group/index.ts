@@ -22,7 +22,7 @@ export function queryAlertGroupListPaging(params: ListReq): any {
   return axios({
     url: '/alert-groups',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -30,14 +30,14 @@ export function createAlertGroup(data: GroupReq): any {
   return axios({
     url: '/alert-groups',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function listAlertGroupById(): any {
   return axios({
     url: '/alert-groups/list',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -45,7 +45,7 @@ export function queryAlertGroupById(data: IdReq): any {
   return axios({
     url: '/alert-groups/query',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -53,21 +53,22 @@ export function verifyGroupName(params: GroupNameReq): any {
   return axios({
     url: '/alert-groups/verify-name',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function updateAlertGroup(data: GroupReq, id: IdReq): any {
   return axios({
-    url: `/alert-groups/${id}`,
+    url: `/alert-groups/${id.id}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function delAlertGroupById(id: IdReq): any {
   return axios({
-    url: `/alert-groups/${id}`,
+    url: `/alert-groups/${id.id}`,
     method: 'delete',
+    params: id
   })
 }

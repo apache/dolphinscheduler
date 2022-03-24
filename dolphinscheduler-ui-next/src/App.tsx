@@ -15,40 +15,67 @@
  * limitations under the License.
  */
 
-import { defineComponent, computed } from 'vue'
-import { NConfigProvider, darkTheme, GlobalThemeOverrides } from 'naive-ui'
-import { useAsyncRouteStore } from '@/store/route/route'
+import { defineComponent, computed, ref, nextTick, provide } from 'vue'
+import {
+  zhCN,
+  enUS,
+  dateZhCN,
+  dateEnUS,
+  NConfigProvider,
+  darkTheme,
+  GlobalThemeOverrides,
+  NMessageProvider
+} from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
+import { useLocalesStore } from '@/store/locales/locales'
 import themeList from '@/themes'
 
 const App = defineComponent({
   name: 'App',
   setup() {
-    const asyncRouteStore = useAsyncRouteStore()
+    const isRouterAlive = ref(true)
     const themeStore = useThemeStore()
     const currentTheme = computed(() =>
       themeStore.darkTheme ? darkTheme : undefined
     )
+    const localesStore = useLocalesStore()
+    /*refresh page when router params change*/
+    const reload = () => {
+      isRouterAlive.value = false
+      nextTick(() => {
+        isRouterAlive.value = true
+      })
+    }
+
+    provide('reload', reload)
+
     return {
+      reload,
+      isRouterAlive,
       currentTheme,
+      localesStore
     }
   },
   render() {
     const themeOverrides: GlobalThemeOverrides =
       themeList[this.currentTheme ? 'dark' : 'light']
 
-    console.log(themeOverrides)
-
     return (
       <NConfigProvider
         theme={this.currentTheme}
-        themeOverrides={themeOverrides}
-        style={{ width: '100%', height: '100vh', overflow: 'hidden' }}
+        theme-overrides={themeOverrides}
+        style={{ width: '100%', height: '100vh' }}
+        date-locale={
+          String(this.localesStore.getLocales) === 'zh_CN' ? dateZhCN : dateEnUS
+        }
+        locale={String(this.localesStore.getLocales) === 'zh_CN' ? zhCN : enUS}
       >
-        <router-view />
+        <NMessageProvider>
+          {this.isRouterAlive ? <router-view /> : ''}
+        </NMessageProvider>
       </NConfigProvider>
     )
-  },
+  }
 })
 
 export default App
