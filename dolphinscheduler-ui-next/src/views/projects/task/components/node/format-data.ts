@@ -227,7 +227,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DATAX') {
-    taskParams.customConfig = data.customConfig
+    taskParams.customConfig = data.customConfig ? 1 : 0
     if (taskParams.customConfig === 0) {
       taskParams.dsType = data.dsType
       taskParams.dataSource = data.dataSource
@@ -489,6 +489,9 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.udfs) {
     params.udfs = data.taskParams.udfs?.split(',')
+  }
+  if (data.taskParams?.customConfig !== void 0) {
+    params.customConfig = data.taskParams.customConfig === 1 ? true : false
   }
   return params
 }
