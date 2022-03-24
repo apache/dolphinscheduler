@@ -302,7 +302,7 @@ public class ProcessService {
         return processInstance;
     }
 
-    private void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
+    protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         processInstance.setState(ExecutionStatus.SERIAL_WAIT);
         saveProcessInstance(processInstance);
         //serial wait
@@ -852,7 +852,7 @@ public class ProcessService {
      * @param host host
      * @return process instance
      */
-    private ProcessInstance constructProcessInstance(Command command, String host) {
+    protected ProcessInstance constructProcessInstance(Command command, String host) {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
@@ -2908,7 +2908,7 @@ public class ProcessService {
         return this.processInstanceMapper.loadNextProcess4Serial(code, state);
     }
 
-    private void deleteCommandWithCheck(int commandId) {
+    protected void deleteCommandWithCheck(int commandId) {
         int delete = this.commandMapper.deleteById(commandId);
         if (delete != 1) {
             throw new ServiceException("delete command fail, id:" + commandId);
