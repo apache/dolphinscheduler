@@ -76,7 +76,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const destinationDatasourceOptions = ref([] as any)
   const jobSpeedByteOptions: any[] = [
     {
-      label: '不限制',
+      label: `0(${t('project.node.unlimited')})`,
       value: 0
     },
     {
@@ -102,7 +102,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   ]
   const jobSpeedRecordOptions: any[] = [
     {
-      label: '不限制',
+      label: `0(${t('project.node.unlimited')})`,
       value: 0
     },
     {
