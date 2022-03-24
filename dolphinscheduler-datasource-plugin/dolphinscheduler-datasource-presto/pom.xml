@@ -25,48 +25,35 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dolphinscheduler-datasource-all</artifactId>
+    <artifactId>dolphinscheduler-datasource-presto</artifactId>
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
 
     <dependencies>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-clickhouse</artifactId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-db2</artifactId>
+            <artifactId>dolphinscheduler-datasource-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-hive</artifactId>
+            <groupId>com.facebook.presto</groupId>
+            <artifactId>presto-jdbc</artifactId>
+            <version>${presto.jdbc.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-mysql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-oracle</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-sqlserver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-redshift</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-spark</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-presto</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <type>jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
