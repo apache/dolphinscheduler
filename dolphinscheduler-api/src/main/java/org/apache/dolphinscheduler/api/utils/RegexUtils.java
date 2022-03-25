@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 /**
@@ -41,7 +43,7 @@ public class RegexUtils {
 
     public static String escapeNRT(String str) {
         // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-        if (str != null && !str.isEmpty()) {
+        if (!StringUtils.isEmpty(str)) {
             return str.replaceAll("[\n|\r|\t]", "_");
         }
         return null;

@@ -60,10 +60,6 @@
     <dependencySets>
         <dependencySet>
             <outputDirectory>libs</outputDirectory>
-            <excludes>
-                <exclude>com.amazonaws:aws-java-sdk-emr</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-core</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>

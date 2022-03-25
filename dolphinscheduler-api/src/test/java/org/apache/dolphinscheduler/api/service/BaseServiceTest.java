@@ -24,21 +24,19 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * base service test
@@ -66,12 +64,10 @@ public class BaseServiceTest {
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         //ADMIN_USER
-        boolean isAdmin = baseService.isAdmin(user);
-        Assert.assertTrue(isAdmin);
+        Assert.assertTrue(baseService.isAdmin(user));
         //GENERAL_USER
         user.setUserType(UserType.GENERAL_USER);
-        isAdmin = baseService.isAdmin(user);
-        Assert.assertFalse(isAdmin);
+        Assert.assertFalse(baseService.isAdmin(user));
 
     }
 
@@ -96,21 +92,21 @@ public class BaseServiceTest {
         baseService.putMsg(result,Status.PROJECT_NOT_FOUND,"test");
     }
 
-    @Test
-    public void testCreateTenantDirIfNotExists() {
-
-        PowerMockito.mockStatic(HadoopUtils.class);
-        PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
-
-        try {
-            baseService.createTenantDirIfNotExists("test");
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-            logger.error("CreateTenantDirIfNotExists error ",e);
-            e.printStackTrace();
-        }
-
-    }
+//    @Test
+//    public void testCreateTenantDirIfNotExists() {
+//
+//        PowerMockito.mockStatic(HadoopUtils.class);
+//        PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
+//
+//        try {
+//            baseService.createTenantDirIfNotExists("test");
+//        } catch (Exception e) {
+//            Assert.fail();
+//            logger.error("CreateTenantDirIfNotExists error ",e);
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     @Test
     public void testHasPerm() {
@@ -118,14 +114,12 @@ public class BaseServiceTest {
         User user = new User();
         user.setId(1);
         //create user
-        boolean hasPerm = baseService.hasPerm(user,1);
-        Assert.assertTrue(hasPerm);
+        Assert.assertTrue(baseService.canOperator(user,1));
 
         //admin
         user.setId(2);
         user.setUserType(UserType.ADMIN_USER);
-        hasPerm = baseService.hasPerm(user,1);
-        Assert.assertTrue(hasPerm);
+        Assert.assertTrue(baseService.canOperator(user,1));
 
     }
 

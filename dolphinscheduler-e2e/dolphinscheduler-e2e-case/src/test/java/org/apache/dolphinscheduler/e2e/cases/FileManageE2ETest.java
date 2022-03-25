@@ -170,22 +170,25 @@ public class FileManageE2ETest {
 //            .anyMatch(it -> it.contains(testSubDirectoryName)));
 //    }
 
-    @Test
-    @Order(22)
-    void testRenameDirectory() {
-        final FileManagePage page = new FileManagePage(browser);
-
-        page.rename(testDirectoryName, testRenameDirectoryName);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(page.fileList())
-                .as("File list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameDirectoryName));
-        });
-    }
+/*
+* when the storage is s3,the directory cannot be renamed
+* */
+//    @Test
+//    @Order(22)
+//    void testRenameDirectory() {
+//        final FileManagePage page = new FileManagePage(browser);
+//
+//        page.rename(testDirectoryName, testRenameDirectoryName);
+//
+//        await().untilAsserted(() -> {
+//            browser.navigate().refresh();
+//
+//            assertThat(page.fileList())
+//                .as("File list should contain newly-created file")
+//                .extracting(WebElement::getText)
+//                .anyMatch(it -> it.contains(testRenameDirectoryName));
+//        });
+//    }
 
     @Test
     @Order(30)
@@ -194,7 +197,7 @@ public class FileManageE2ETest {
 
         page.goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class)
-            .delete(testRenameDirectoryName);
+            .delete(testDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -202,7 +205,7 @@ public class FileManageE2ETest {
             assertThat(
                     page.fileList()
             ).noneMatch(
-                    it -> it.getText().contains(testRenameDirectoryName)
+                    it -> it.getText().contains(testDirectoryName)
             );
         });
     }

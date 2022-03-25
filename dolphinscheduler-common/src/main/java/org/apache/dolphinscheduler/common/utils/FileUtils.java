@@ -17,23 +17,14 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.Constants.UTF_8;
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
-
 import org.apache.commons.io.IOUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * file utils
@@ -106,8 +97,8 @@ public class FileUtils {
     /**
      * @return get suffixes for resource files that support online viewing
      */
-    public static String getResourceViewSuffixs() {
-        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS, RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE);
+    public static String getResourceViewSuffixes() {
+        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXES, RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE);
     }
 
     /**

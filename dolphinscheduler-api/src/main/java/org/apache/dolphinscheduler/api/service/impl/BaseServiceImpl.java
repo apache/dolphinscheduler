@@ -17,16 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -127,23 +125,23 @@ public class BaseServiceImpl implements BaseService {
      * @param tenantCode tenant code
      * @throws IOException if hdfs operation exception
      */
-    @Override
-    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-        // init resource path and udf path
-        HadoopUtils.getInstance().mkdir(resourcePath);
-        HadoopUtils.getInstance().mkdir(udfsPath);
-    }
+//    @Override
+//    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
+//        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
+//        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
+//        // init resource path and udf path
+//        HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
+//        HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
+//    }
 
     /**
-     * has perm
+     * Verify that the operator has permissions
      *
      * @param operateUser operate user
      * @param createUserId create user id
      */
     @Override
-    public boolean hasPerm(User operateUser, int createUserId) {
+    public boolean canOperator(User operateUser, int createUserId) {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
 
