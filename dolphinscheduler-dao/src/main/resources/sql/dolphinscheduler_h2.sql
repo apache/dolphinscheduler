@@ -760,7 +760,7 @@ CREATE TABLE t_ds_resources
     create_time  datetime     DEFAULT NULL,
     update_time  datetime     DEFAULT NULL,
     pid          int(11) DEFAULT NULL,
-    full_name    varchar(64)  DEFAULT NULL,
+    full_name    varchar(128)  DEFAULT NULL,
     is_directory tinyint(4) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_resources_un (full_name, type)
