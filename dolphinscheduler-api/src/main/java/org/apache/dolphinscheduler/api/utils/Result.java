@@ -96,8 +96,8 @@ public class Result<T> {
      * @param status status
      * @return result
      */
-    public static Result error(Status status) {
-        return new Result(status);
+    public static <T> Result<T> error(Status status) {
+        return new Result<>(status);
     }
 
     /**
@@ -107,8 +107,8 @@ public class Result<T> {
      * @param args args
      * @return result
      */
-    public static Result errorWithArgs(Status status, Object... args) {
-        return new Result(status.getCode(), MessageFormat.format(status.getMsg(), args));
+    public static <T> Result<T> errorWithArgs(Status status, Object... args) {
+        return new Result<>(status.getCode(), MessageFormat.format(status.getMsg(), args));
     }
 
     public Integer getCode() {
