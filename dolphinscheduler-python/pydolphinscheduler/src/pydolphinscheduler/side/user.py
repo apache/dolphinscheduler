@@ -19,8 +19,10 @@
 
 from typing import Optional
 
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base_side import BaseSide
 from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.side.tenant import Tenant
 
 
 class User(BaseSide):
@@ -39,12 +41,12 @@ class User(BaseSide):
     def __init__(
         self,
         name: str,
-        password: str,
-        email: str,
-        phone: str,
-        tenant: str,
-        queue: Optional[str] = None,
-        status: Optional[int] = 1,
+        password: Optional[str] = configuration.USER_PASSWORD,
+        email: Optional[str] = configuration.USER_EMAIL,
+        phone: Optional[str] = configuration.USER_PHONE,
+        tenant: Optional[str] = configuration.WORKFLOW_TENANT,
+        queue: Optional[str] = configuration.WORKFLOW_QUEUE,
+        status: Optional[int] = configuration.USER_STATE,
     ):
         super().__init__(name)
         self.password = password
@@ -54,8 +56,15 @@ class User(BaseSide):
         self.queue = queue
         self.status = status
 
+    def create_tenant_if_not_exists(self) -> None:
+        """Create tenant object."""
+        tenant = Tenant(name=self.tenant, queue=self.queue)
+        tenant.create_if_not_exists(self.queue)
+
     def create_if_not_exists(self, **kwargs):
         """Create User if not exists."""
+        # Should make sure queue already exists.
+        self.create_tenant_if_not_exists()
         gateway = launch_gateway()
         gateway.entry_point.createUser(
             self.name,

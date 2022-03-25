@@ -299,6 +299,7 @@ interface INodeData
       | 'sparkParameters'
       | 'conditionResult'
       | 'udfs'
+      | 'customConfig'
     >,
     ISqoopTargetData,
     ISqoopSourceData,
@@ -336,6 +337,7 @@ interface INodeData
   successBranch?: number
   failedBranch?: number
   udfs?: string[]
+  customConfig?: boolean
 }
 
 interface ITaskData

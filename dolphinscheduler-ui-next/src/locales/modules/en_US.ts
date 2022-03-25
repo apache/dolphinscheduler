@@ -517,8 +517,10 @@ const project = {
     related_items: 'Related items',
     project_name: 'Project Name',
     project_tips: 'Please select project name',
-    workflow_relation_no_data_result_title: 'Can not find any relations of workflows.',
-    workflow_relation_no_data_result_desc: 'There is not any workflows. Please create a workflow, and then visit this page again.',
+    workflow_relation_no_data_result_title:
+      'Can not find any relations of workflows.',
+    workflow_relation_no_data_result_desc:
+      'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
     online: 'Online',
@@ -816,9 +818,9 @@ const project = {
     switch_branch_flow: 'Branch Flow',
     and: 'and',
     or: 'or',
-    datax_custom_template: 'Custom Template Switch',
+    datax_custom_template: 'Custom Template',
     datax_json_template: 'JSON',
-    datax_target_datasource_type: 'Target Datasource Type',
+    datax_target_datasource_type: 'Target Datasource Types',
     datax_target_database: 'Target Database',
     datax_target_table: 'Target Table',
     datax_target_table_tips: 'Please enter the name of the target table',
@@ -919,7 +921,8 @@ const project = {
     integer_tips: 'Please enter a positive integer',
     sql_parameter: 'SQL Parameter',
     format_tips: 'Please enter format',
-    udf_function: 'UDF Function'
+    udf_function: 'UDF Function',
+    unlimited: 'unlimited'
   }
 }
 

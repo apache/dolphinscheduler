@@ -76,7 +76,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const destinationDatasourceOptions = ref([] as any)
   const jobSpeedByteOptions: any[] = [
     {
-      label: '不限制',
+      label: `0(${t('project.node.unlimited')})`,
       value: 0
     },
     {
@@ -102,7 +102,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   ]
   const jobSpeedRecordOptions: any[] = [
     {
-      label: '不限制',
+      label: `0(${t('project.node.unlimited')})`,
       value: 0
     },
     {
@@ -205,8 +205,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const customParameterSpan = ref(0)
 
   const initConstants = () => {
-    if (model.customConfigSwitch) {
-      model.customConfig = 1
+    if (model.customConfig) {
       sqlEditorSpan.value = 0
       jsonEditorSpan.value = 24
       datasourceSpan.value = 0
@@ -215,7 +214,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       jobSpeedSpan.value = 0
       customParameterSpan.value = 24
     } else {
-      model.customConfig = 0
       sqlEditorSpan.value = 24
       jsonEditorSpan.value = 0
       datasourceSpan.value = 12
@@ -244,7 +242,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   }
 
   watch(
-    () => model.customConfigSwitch,
+    () => model.customConfig,
     () => {
       initConstants()
     }
@@ -253,7 +251,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'switch',
-      field: 'customConfigSwitch',
+      field: 'customConfig',
       name: t('project.node.datax_custom_template')
     },
     {

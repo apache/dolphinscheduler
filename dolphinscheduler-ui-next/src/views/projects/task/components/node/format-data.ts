@@ -181,7 +181,7 @@ export function formatParams(data: INodeData): {
     taskParams.postStatements = data.postStatements
     taskParams.sendEmail = data.sendEmail
     taskParams.displayRows = data.displayRows
-    if (data.sendEmail) {
+    if (data.sqlType === '0' && data.sendEmail) {
       taskParams.title = data.title
       taskParams.groupId = data.groupId
     }
@@ -227,7 +227,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DATAX') {
-    taskParams.customConfig = data.customConfig
+    taskParams.customConfig = data.customConfig ? 1 : 0
     if (taskParams.customConfig === 0) {
       taskParams.dsType = data.dsType
       taskParams.dataSource = data.dataSource
@@ -368,12 +368,6 @@ export function formatModel(data: ITaskData) {
       (item: { id: number }) => item.id
     )
   }
-  if (
-    data.taskParams?.connectTimeout !== 60000 ||
-    data.taskParams?.socketTimeout !== 60000
-  ) {
-    params.timeoutSetting = true
-  }
   if (data.taskParams?.mainJar) {
     params.mainJar = data.taskParams?.mainJar.id
   }
@@ -489,6 +483,9 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.udfs) {
     params.udfs = data.taskParams.udfs?.split(',')
+  }
+  if (data.taskParams?.customConfig !== void 0) {
+    params.customConfig = data.taskParams.customConfig === 1 ? true : false
   }
   return params
 }
