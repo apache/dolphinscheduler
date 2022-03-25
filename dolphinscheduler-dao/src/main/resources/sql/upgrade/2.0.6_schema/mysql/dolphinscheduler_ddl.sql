@@ -13,25 +13,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../types'
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
-export function useTargetTaskName(): IJsonItem {
-  const { t } = useI18n()
-  return {
-    type: 'input',
-    field: 'targetJobName',
-    name: t('project.node.target_task_name'),
-    props: {
-      placeholder: t('project.node.target_task_name_tips'),
-      maxLength: 100
-    },
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.target_task_name_tips')
-    }
-  }
-}
+-- uc_dolphin_T_t_ds_resources_R_full_name
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_resources_R_full_name;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name()
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_NAME='t_ds_resources'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME ='full_name')
+    THEN
+ALTER TABLE t_ds_resources MODIFY COLUMN `full_name` varchar(128);
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_resources_R_full_name;
+DROP PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name;

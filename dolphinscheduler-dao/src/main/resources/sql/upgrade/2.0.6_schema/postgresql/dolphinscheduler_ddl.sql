@@ -13,25 +13,32 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../types'
+delimiter d//
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+    )
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
 
-export function useTargetTaskName(): IJsonItem {
-  const { t } = useI18n()
-  return {
-    type: 'input',
-    field: 'targetJobName',
-    name: t('project.node.target_task_name'),
-    props: {
-      placeholder: t('project.node.target_task_name_tips'),
-      maxLength: 100
-    },
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.target_task_name_tips')
-    }
-  }
-}
+    --- alter column
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
+
+    return 'Success!';
+    exception when others then
+        ---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+
+select dolphin_update_metadata();
+
+d//

@@ -286,6 +286,7 @@ interface ITaskParams {
   }
   udfs?: string
   connParams?: string
+  targetJobName?: string
 }
 
 interface INodeData
