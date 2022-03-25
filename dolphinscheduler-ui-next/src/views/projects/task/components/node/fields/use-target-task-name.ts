@@ -27,6 +27,11 @@ export function useTargetTaskName(): IJsonItem {
     props: {
       placeholder: t('project.node.target_task_name_tips'),
       maxLength: 100
+    },
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      message: t('project.node.target_task_name_tips')
     }
   }
 }
