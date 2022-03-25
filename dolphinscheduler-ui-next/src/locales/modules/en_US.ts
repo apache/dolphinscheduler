@@ -733,7 +733,7 @@ const project = {
     body_not_contains: 'Content does not contain',
     http_parameters_position: 'Http Parameters Position',
     target_task_name: 'Target Task Name',
-    target_task_name_tips: 'Please enter the Pigeon task name',
+    target_task_name_tips: 'Please enter the Pigeon task name(required)',
     datasource_type: 'Datasource types',
     datasource_instances: 'Datasource instances',
     sql_type: 'SQL Type',

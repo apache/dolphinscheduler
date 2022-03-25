@@ -33,6 +33,6 @@ export function useShell(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useResources(),
-    ...useCustomParams({ model, field: 'localParams', isSimple: true })
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
 }
