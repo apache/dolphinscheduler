@@ -300,6 +300,9 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
   }
+  if (data.taskType === 'PIGEON') {
+    taskParams.targetJobName = data.targetJobName
+  }
 
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
