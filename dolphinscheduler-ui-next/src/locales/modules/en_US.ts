@@ -162,7 +162,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    worker_no_data_result_title: 'No Worker Nodes Exist',
+    worker_no_data_result_desc:
+      'Currently, there are no worker nodes exist, please create a worker node and refresh this page'
   },
   db: {
     health_state: 'Health State',

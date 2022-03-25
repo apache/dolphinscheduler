@@ -161,7 +161,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    worker_no_data_result_title: 'Worker节点不存在',
+    worker_no_data_result_desc:
+      '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'
   },
   db: {
     health_state: '健康状态',

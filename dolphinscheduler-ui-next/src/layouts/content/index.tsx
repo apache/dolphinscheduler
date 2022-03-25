@@ -119,7 +119,11 @@ const Content = defineComponent({
               sideKey={this.sideKeyRef}
             />
           )}
-          <NLayoutContent native-scrollbar={false} style='padding: 16px 22px' contentStyle={'height: 100%'}>
+          <NLayoutContent
+            native-scrollbar={false}
+            style='padding: 16px 22px'
+            contentStyle={'height: 100%'}
+          >
             <router-view key={this.$route.fullPath} />
           </NLayoutContent>
         </NLayout>

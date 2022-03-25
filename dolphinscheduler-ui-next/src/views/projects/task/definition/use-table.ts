@@ -106,11 +106,7 @@ export function useTable(onEdit: Function) {
         key: 'upstreamTaskMap',
         render: (row: TaskDefinitionItem) =>
           row.upstreamTaskMap.map((item: string, index: number) => {
-            return h(
-              'p',
-              null,
-              { default: () => `[${index + 1}] ${item}` }
-            )
+            return h('p', null, { default: () => `[${index + 1}] ${item}` })
           }),
         ...COLUMN_WIDTH_CONFIG['name']
       },
