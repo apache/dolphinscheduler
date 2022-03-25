@@ -24,12 +24,22 @@ import type { IJsonItem, IOption, SourceType } from '../types'
 export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
-  const hiveSpan = computed(() => (model.targetType === 'HIVE' ? 24 : 0))
-  const hdfsSpan = computed(() => (model.targetType === 'HDFS' ? 24 : 0))
-  const mysqlSpan = computed(() => (model.targetType === 'MYSQL' ? 24 : 0))
-  const dataSourceSpan = computed(() => (model.targetType === 'MYSQL' ? 12 : 0))
+  const hiveSpan = computed(() =>
+    !model.isCustomTask && model.targetType === 'HIVE' ? 24 : 0
+  )
+  const hdfsSpan = computed(() =>
+    !model.isCustomTask && model.targetType === 'HDFS' ? 24 : 0
+  )
+  const mysqlSpan = computed(() =>
+    !model.isCustomTask && model.targetType === 'MYSQL' ? 24 : 0
+  )
+  const dataSourceSpan = computed(() =>
+    !model.isCustomTask && model.targetType === 'MYSQL' ? 12 : 0
+  )
   const updateSpan = computed(() =>
-    model.targetType === 'MYSQL' && model.isUpdate ? 24 : 0
+    !model.isCustomTask && model.targetType === 'MYSQL' && model.isUpdate
+      ? 24
+      : 0
   )
 
   const targetTypes = ref([
@@ -100,7 +110,7 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'custom',
-      field: 'custom-title',
+      field: 'custom-title-target',
       span: unCustomSpan,
       widget: h(
         'div',
