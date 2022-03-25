@@ -86,7 +86,7 @@ export function useDataQuality({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useRules(model, (items: IJsonItem[], len: number) => {
-        jsonRef.value.splice(17, len, ...items)
+        jsonRef.value.splice(15, len, ...items)
       }),
       Fields.useDeployMode(),
       Fields.useDriverCores(),
