@@ -1619,7 +1619,9 @@ public class WorkflowExecuteThread {
             stateEvent.setExecutionStatus(processInstance.getState());
             stateEvent.setProcessInstanceId(this.processInstance.getId());
             stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
-            this.processStateChangeHandler(stateEvent);
+//            this.processStateChangeHandler(stateEvent);
+            // replace with `stateEvents`, make sure `WorkflowExecuteThread` can be deleted to avoid memory leaks
+            this.stateEvents.add(stateEvent);
         }
     }
 
@@ -1782,6 +1784,11 @@ public class WorkflowExecuteThread {
                     TaskInstance taskInstance = submitTaskExec(task);
                     if (taskInstance == null) {
                         this.taskFailedSubmit = true;
+                        // Remove and add to complete map and error map
+                        removeTaskFromStandbyList(task);
+                        completeTaskMap.put(task.getTaskCode(), task.getId());
+                        errorTaskMap.put(task.getTaskCode(), task.getId());
+                        logger.info("process {}, task {}, id:{} submit task failed.", task.getProcessInstanceId(), task.getName(), task.getId());
                     } else {
                         removeTaskFromStandbyList(task);
                     }
