@@ -147,7 +147,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
 
-        if (!hasPerm(loginUser, dataSource.getUserId())) {
+        if (!canOperator(loginUser, dataSource.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -378,7 +378,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            if (!hasPerm(loginUser, dataSource.getUserId())) {
+            if (!canOperator(loginUser, dataSource.getUserId())) {
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
