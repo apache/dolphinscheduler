@@ -390,15 +390,25 @@ export function formatModel(data: ITaskData) {
     params.targetHiveTable = targetParams.hiveTable
     params.targetHiveCreateTable = targetParams.createHiveTable
     params.targetHiveDropDelimiter = targetParams.dropDelimiter
-    params.targetHiveOverWrite = targetParams.hiveOverWrite
+    params.targetHiveOverWrite =
+      targetParams.hiveOverWrite === void 0 ? true : targetParams.hiveOverWrite
     params.targetHiveTargetDir = targetParams.hiveTargetDir
     params.targetHiveReplaceDelimiter = targetParams.replaceDelimiter
     params.targetHivePartitionKey = targetParams.hivePartitionKey
     params.targetHivePartitionValue = targetParams.hivePartitionValue
     params.targetHdfsTargetPath = targetParams.targetPath
-    params.targetHdfsDeleteTargetDir = targetParams.deleteTargetDir
-    params.targetHdfsCompressionCodec = targetParams.compressionCodec
-    params.targetHdfsFileType = targetParams.fileType
+    params.targetHdfsDeleteTargetDir =
+      targetParams.deleteTargetDir === void 0
+        ? true
+        : targetParams.deleteTargetDir
+    params.targetHdfsCompressionCodec =
+      targetParams.compressionCodec === void 0
+        ? 'snappy'
+        : targetParams.compressionCodec
+    params.targetHdfsFileType =
+      targetParams.fileType === void 0
+        ? '--as-avrodatafile'
+        : targetParams.fileType
     params.targetHdfsFieldsTerminated = targetParams.fieldsTerminated
     params.targetHdfsLinesTerminated = targetParams.linesTerminated
     params.targetMysqlType = targetParams.targetType
@@ -409,7 +419,10 @@ export function formatModel(data: ITaskData) {
     params.targetMysqlLinesTerminated = targetParams.linesTerminated
     params.targetMysqlIsUpdate = targetParams.isUpdate
     params.targetMysqlTargetUpdateKey = targetParams.targetUpdateKey
-    params.targetMysqlUpdateMode = targetParams.targetUpdateMode
+    params.targetMysqlUpdateMode =
+      targetParams.targetUpdateMode === void 0
+        ? 'allowinsert'
+        : targetParams.targetUpdateMode
   }
   if (data.taskParams?.sourceParams) {
     const sourceParams: ISqoopSourceParams = JSON.parse(
@@ -422,8 +435,8 @@ export function formatModel(data: ITaskData) {
     params.srcQueryType = sourceParams.srcQueryType
     params.sourceMysqlType = sourceParams.srcType
     params.sourceMysqlDatasource = sourceParams.srcDatasource
-    params.mapColumnHive = sourceParams.mapColumnHive
-    params.mapColumnJava = sourceParams.mapColumnJava
+    params.mapColumnHive = sourceParams.mapColumnHive || []
+    params.mapColumnJava = sourceParams.mapColumnJava || []
     params.sourceHdfsExportDir = sourceParams.exportDir
     params.sourceHiveDatabase = sourceParams.hiveDatabase
     params.sourceHiveTable = sourceParams.hiveTable
@@ -492,6 +505,9 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.customConfig !== void 0) {
     params.customConfig = data.taskParams.customConfig === 1 ? true : false
+  }
+  if (data.taskParams?.jobType) {
+    params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
   return params
 }

@@ -15,50 +15,36 @@
  * limitations under the License.
  */
 
-import { ref, h, watch, computed, unref } from 'vue'
+import { ref, h, watch, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDatasource } from './use-sqoop-datasource'
 import { useCustomParams } from '.'
 import styles from '../index.module.scss'
 import type { IJsonItem, IOption, ModelType } from '../types'
 
-export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
+export function useSourceType(
+  model: { [field: string]: any },
+  unCustomSpan: Ref<number>
+): IJsonItem[] {
   const { t } = useI18n()
-  const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
-  const tableSpan = computed(() =>
-    !model.isCustomTask &&
-    model.sourceType === 'MYSQL' &&
-    model.srcQueryType === '0'
-      ? 24
-      : 0
-  )
-  const editorSpan = computed(() =>
-    !model.isCustomTask &&
-    model.sourceType === 'MYSQL' &&
-    model.srcQueryType === '1'
-      ? 24
-      : 0
-  )
-  const columnSpan = computed(() =>
-    !model.isCustomTask &&
-    model.sourceType === 'MYSQL' &&
-    model.srcColumnType === '1'
-      ? 24
-      : 0
-  )
-  const mysqlSpan = computed(() =>
-    !model.isCustomTask && model.sourceType === 'MYSQL' ? 24 : 0
-  )
-  const hiveSpan = computed(() =>
-    !model.isCustomTask && model.sourceType === 'HIVE' ? 24 : 0
-  )
-  const hdfsSpan = computed(() =>
-    !model.isCustomTask && model.sourceType === 'HDFS' ? 24 : 0
-  )
-  const datasourceSpan = computed(() =>
-    !model.isCustomTask && model.sourceType === 'MYSQL' ? 12 : 0
-  )
-
+  const mysqlSpan = ref(24)
+  const tableSpan = ref(0)
+  const editorSpan = ref(24)
+  const columnSpan = ref(0)
+  const hiveSpan = ref(0)
+  const hdfsSpan = ref(0)
+  const datasourceSpan = ref(0)
+  const resetSpan = () => {
+    mysqlSpan.value =
+      unCustomSpan.value && model.sourceType === 'MYSQL' ? 24 : 0
+    tableSpan.value = mysqlSpan.value && model.srcQueryType === '0' ? 24 : 0
+    editorSpan.value = mysqlSpan.value && model.srcQueryType === '1' ? 24 : 0
+    columnSpan.value = tableSpan.value && model.srcColumnType === '1' ? 24 : 0
+    hiveSpan.value = unCustomSpan.value && model.sourceType === 'HIVE' ? 24 : 0
+    hdfsSpan.value = unCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0
+    datasourceSpan.value =
+      unCustomSpan.value && model.sourceType === 'MYSQL' ? 12 : 0
+  }
   const sourceTypes = ref([
     {
       label: 'MYSQL',
@@ -108,7 +94,20 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
     () => model.modelType,
     (modelType: ModelType) => {
       sourceTypes.value = getSourceTypesByModelType(modelType)
-      model.sourceType = sourceTypes.value[0].value
+      if (!sourceTypes.value.find((type) => model.sourceType === type.value)) {
+        model.sourceType = sourceTypes.value[0].value
+      }
+    }
+  )
+  watch(
+    () => [
+      unCustomSpan.value,
+      model.sourceType,
+      model.srcQueryType,
+      model.srcColumnType
+    ],
+    () => {
+      resetSpan()
     }
   )
 
@@ -162,9 +161,9 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: !!unref(tableSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(tableSpan) && !value) {
+          if (tableSpan.value && !value) {
             return new Error(t('project.node.table_tips'))
           }
         }
@@ -190,9 +189,9 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: !!unref(columnSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(columnSpan) && !value) {
+          if (!!columnSpan.value && !value) {
             return new Error(t('project.node.column_tips'))
           }
         }
@@ -208,9 +207,9 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(hiveSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(hiveSpan) && !value) {
+          if (hiveSpan.value && !value) {
             return new Error(t('project.node.database_tips'))
           }
         }
@@ -226,9 +225,9 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(hiveSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(hiveSpan) && !value) {
+          if (hiveSpan.value && !value) {
             return new Error(t('project.node.hive_table_tips'))
           }
         }
@@ -262,9 +261,9 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(hdfsSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(hdfsSpan) && !value) {
+          if (hdfsSpan.value && !value) {
             return new Error(t('project.node.export_dir_tips'))
           }
         }
@@ -277,9 +276,9 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       span: editorSpan,
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(editorSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(editorSpan) && !value) {
+          if (editorSpan.value && !value) {
             return new Error(t('project.node.sql_statement_tips'))
           }
         }
@@ -290,14 +289,14 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
       field: 'mapColumnHive',
       name: 'map_column_hive',
       isSimple: true,
-      span: editorSpan
+      span: mysqlSpan
     }),
     ...useCustomParams({
       model,
       field: 'mapColumnJava',
       name: 'map_column_java',
       isSimple: true,
-      span: editorSpan
+      span: mysqlSpan
     })
   ]
 }
