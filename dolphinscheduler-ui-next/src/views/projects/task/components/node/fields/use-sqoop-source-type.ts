@@ -26,18 +26,38 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
   const tableSpan = computed(() =>
-    model.sourceType === 'MYSQL' && model.srcQueryType === '0' ? 24 : 0
+    !model.isCustomTask &&
+    model.sourceType === 'MYSQL' &&
+    model.srcQueryType === '0'
+      ? 24
+      : 0
   )
   const editorSpan = computed(() =>
-    model.sourceType === 'MYSQL' && model.srcQueryType === '1' ? 24 : 0
+    !model.isCustomTask &&
+    model.sourceType === 'MYSQL' &&
+    model.srcQueryType === '1'
+      ? 24
+      : 0
   )
   const columnSpan = computed(() =>
-    model.sourceType === 'MYSQL' && model.srcColumnType === '1' ? 24 : 0
+    !model.isCustomTask &&
+    model.sourceType === 'MYSQL' &&
+    model.srcColumnType === '1'
+      ? 24
+      : 0
   )
-  const mysqlSpan = computed(() => (model.sourceType === 'MYSQL' ? 24 : 0))
-  const hiveSpan = computed(() => (model.sourceType === 'HIVE' ? 24 : 0))
-  const hdfsSpan = computed(() => (model.sourceType === 'HDFS' ? 24 : 0))
-  const datasourceSpan = computed(() => (model.sourceType === 'MYSQL' ? 12 : 0))
+  const mysqlSpan = computed(() =>
+    !model.isCustomTask && model.sourceType === 'MYSQL' ? 24 : 0
+  )
+  const hiveSpan = computed(() =>
+    !model.isCustomTask && model.sourceType === 'HIVE' ? 24 : 0
+  )
+  const hdfsSpan = computed(() =>
+    !model.isCustomTask && model.sourceType === 'HDFS' ? 24 : 0
+  )
+  const datasourceSpan = computed(() =>
+    !model.isCustomTask && model.sourceType === 'MYSQL' ? 12 : 0
+  )
 
   const sourceTypes = ref([
     {
@@ -95,7 +115,7 @@ export function useSourceType(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'custom',
-      field: 'custom-title',
+      field: 'custom-title-source',
       span: unCustomSpan,
       widget: h(
         'div',
