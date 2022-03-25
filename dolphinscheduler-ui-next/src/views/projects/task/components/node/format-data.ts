@@ -318,7 +318,10 @@ export function formatParams(data: INodeData): {
       taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
       taskParams: {
-        localParams: data.localParams,
+        localParams: data.localParams?.map((item: any) => {
+          item.value = item.value || ''
+          return item
+        }),
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
           ? data.resourceList.map((id: number) => ({ id }))
