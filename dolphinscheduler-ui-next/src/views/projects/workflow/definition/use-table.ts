@@ -82,17 +82,18 @@ export function useTable() {
         key: 'name',
         className: 'workflow-name',
         ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row) => h(
-          ButtonLink,
-          {
-            onClick: () =>
-              void router.push({
-                name: 'workflow-definition-detail',
-                params: { code: row.code }
-              })
-          },
-          { default: () => row.name }
-        )
+        render: (row) =>
+          h(
+            ButtonLink,
+            {
+              onClick: () =>
+                void router.push({
+                  name: 'workflow-definition-detail',
+                  params: { code: row.code }
+                })
+            },
+            { default: () => row.name }
+          )
       },
       {
         title: t('project.workflow.status'),
