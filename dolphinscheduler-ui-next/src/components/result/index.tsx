@@ -33,11 +33,13 @@ const props = {
     type: String as PropType<string>
   },
   size: {
-    type: String as PropType<"small" | "medium" | "large" | "huge">,
+    type: String as PropType<'small' | 'medium' | 'large' | 'huge'>,
     default: 'medium'
   },
   status: {
-    type: String as PropType<"500" | "error" | "info" | "success" | "warning" | "404" | "403" | "418">
+    type: String as PropType<
+      '500' | 'error' | 'info' | 'success' | 'warning' | '404' | '403' | '418'
+    >
   },
   contentStyle: {
     type: String as PropType<string | CSSProperties>,
