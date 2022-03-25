@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -136,7 +137,11 @@ public final class TelegramSender {
         HttpPost httpPost = buildHttpPost(url, buildMsgJsonStr(content));
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
-            httpClient = getProxyClient(proxy, port, user, password);
+            if (StringUtils.isNotEmpty(user) && StringUtils.isNotEmpty(password)) {
+                httpClient = getProxyClient(proxy, port, user, password);
+            }else {
+                httpClient = getDefaultClient();
+            }
             RequestConfig rcf = getProxyConfig(proxy, port);
             httpPost.setConfig(rcf);
         } else {
