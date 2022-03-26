@@ -21,8 +21,7 @@ import {
   NGi,
   NCard,
   NNumberAnimation,
-  NSpace,
-  NDataTable
+  NSpace
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useMaster } from './use-master'
