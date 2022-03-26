@@ -162,7 +162,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    worker_no_data_result_title: 'No Worker Nodes Exist',
+    worker_no_data_result_desc:
+      'Currently, there are no worker nodes exist, please create a worker node and refresh this page'
   },
   db: {
     health_state: 'Health State',
@@ -285,7 +288,9 @@ const resource = {
       'Please select UDF resources directory',
     enter_instructions_tips: 'Please enter a instructions',
     enter_name_tips: 'Please enter name',
-    enter_description_tips: 'Please enter description'
+    enter_description_tips: 'Please enter description',
+    upload: 'Upload',
+    upload_udf_resources: 'Upload UDF Resources'
   },
   task_group_option: {
     manage: 'Task group manage',
@@ -514,7 +519,11 @@ const project = {
     project_name_required: 'Project name is required',
     related_items: 'Related items',
     project_name: 'Project Name',
-    project_tips: 'Please select project name'
+    project_tips: 'Please select project name',
+    workflow_relation_no_data_result_title:
+      'Can not find any relations of workflows.',
+    workflow_relation_no_data_result_desc:
+      'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
     online: 'Online',
@@ -727,7 +736,7 @@ const project = {
     body_not_contains: 'Content does not contain',
     http_parameters_position: 'Http Parameters Position',
     target_task_name: 'Target Task Name',
-    target_task_name_tips: 'Please enter the Pigeon task name',
+    target_task_name_tips: 'Please enter the Pigeon task name(required)',
     datasource_type: 'Datasource types',
     datasource_instances: 'Datasource instances',
     sql_type: 'SQL Type',
@@ -812,9 +821,9 @@ const project = {
     switch_branch_flow: 'Branch Flow',
     and: 'and',
     or: 'or',
-    datax_custom_template: 'Custom Template Switch',
+    datax_custom_template: 'Custom Template',
     datax_json_template: 'JSON',
-    datax_target_datasource_type: 'Target Datasource Type',
+    datax_target_datasource_type: 'Target Datasource Types',
     datax_target_database: 'Target Database',
     datax_target_table: 'Target Table',
     datax_target_table_tips: 'Please enter the name of the target table',
@@ -904,7 +913,19 @@ const project = {
     fix_value: 'FixValue',
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    send_email: 'Send Email',
+    log_display: 'Log display',
+    rows_of_result: 'rows of result',
+    title: 'Title',
+    title_tips: 'Please enter the title of email',
+    alarm_group: 'Alarm group',
+    alarm_group_tips: 'Alarm group required',
+    integer_tips: 'Please enter a positive integer',
+    sql_parameter: 'SQL Parameter',
+    format_tips: 'Please enter format',
+    udf_function: 'UDF Function',
+    unlimited: 'unlimited'
   }
 }
 
@@ -1125,7 +1146,12 @@ const security = {
     ToPersonId: 'To Person Id',
     ToPersonEmail: 'To Person Email',
     AtSomeoneInRoom: 'At Someone In Room',
-    Destination: 'Destination'
+    Destination: 'Destination',
+    AtMobiles: 'At User Mobiles',
+    AtUserIds: 'At User Ids',
+    MsgType: 'Msg Type',
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}All"
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',

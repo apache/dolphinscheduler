@@ -26,7 +26,8 @@ spring:
     username: sa
     password: ""
   jackson:
-    time-zone: GMT+8
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
   servlet:
     multipart:
       max-file-size: 1024MB

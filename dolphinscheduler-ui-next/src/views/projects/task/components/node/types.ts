@@ -30,8 +30,8 @@ export type {
   IWorkflowTaskInstance,
   WorkflowInstance
 } from '@/views/projects/workflow/components/dag/types'
+export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
 
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
 type RelationType = 'AND' | 'OR'
@@ -237,6 +237,10 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
+  sendEmail?: boolean
+  displayRows?: number
+  title?: string
+  groupId?: string
   preStatements?: string[]
   postStatements?: string[]
   method?: string
@@ -280,6 +284,9 @@ interface ITaskParams {
     successNode?: number[]
     failedNode?: number[]
   }
+  udfs?: string
+  connParams?: string
+  targetJobName?: string
 }
 
 interface INodeData
@@ -292,6 +299,8 @@ interface INodeData
       | 'dependence'
       | 'sparkParameters'
       | 'conditionResult'
+      | 'udfs'
+      | 'customConfig'
     >,
     ISqoopTargetData,
     ISqoopSourceData,
@@ -328,6 +337,8 @@ interface INodeData
   definition?: object
   successBranch?: number
   failedBranch?: number
+  udfs?: string[]
+  customConfig?: boolean
 }
 
 interface ITaskData
@@ -352,7 +363,6 @@ export {
   ITaskParams,
   IOption,
   IDataBase,
-  ProgramType,
   ModelType,
   SourceType,
   ISqoopSourceParams,

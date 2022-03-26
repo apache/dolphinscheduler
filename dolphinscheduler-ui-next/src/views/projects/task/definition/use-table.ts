@@ -31,6 +31,11 @@ import {
   deleteTaskDefinition
 } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 import type {
   TaskDefinitionItem,
   TaskDefinitionRes
@@ -47,7 +52,8 @@ export function useTable(onEdit: Function) {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('project.task.task_name'),
@@ -59,73 +65,65 @@ export function useTable(onEdit: Function) {
               onClick: () => void onEdit(row, true)
             },
             { default: () => row.taskName }
-          )
+          ),
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.workflow_name'),
-        key: 'processDefinitionName'
+        key: 'processDefinitionName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.workflow_state'),
         key: 'processReleaseState',
         render: (row: any) => {
           if (row.processReleaseState === 'OFFLINE') {
-            return h(
-              NTag,
-              { type: 'error', size: 'small' },
+            return h(NTag, { type: 'error', size: 'small' }, () =>
               t('project.task.offline')
             )
           } else if (row.processReleaseState === 'ONLINE') {
-            return h(
-              NTag,
-              { type: 'info', size: 'small' },
+            return h(NTag, { type: 'info', size: 'small' }, () =>
               t('project.task.online')
             )
           }
-        }
+        },
+        width: 130
       },
       {
         title: t('project.task.task_type'),
-        key: 'taskType'
+        key: 'taskType',
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('project.task.version'),
         key: 'taskVersion',
         render: (row: TaskDefinitionItem) =>
-          h('span', null, 'v' + row.taskVersion)
+          h('span', null, 'v' + row.taskVersion),
+        ...COLUMN_WIDTH_CONFIG['version']
       },
       {
         title: t('project.task.upstream_tasks'),
         key: 'upstreamTaskMap',
         render: (row: TaskDefinitionItem) =>
-          h(
-            'span',
-            null,
-            row.upstreamTaskMap.length < 1
-              ? '-'
-              : h(NSpace, null, {
-                  default: () =>
-                    row.upstreamTaskMap.map((item: string) => {
-                      return h(
-                        NTag,
-                        { type: 'info', size: 'small' },
-                        { default: () => item }
-                      )
-                    })
-                })
-          )
+          row.upstreamTaskMap.map((item: string, index: number) => {
+            return h('p', null, { default: () => `[${index + 1}] ${item}` })
+          }),
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.task.create_time'),
-        key: 'taskCreateTime'
+        key: 'taskCreateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.task.update_time'),
-        key: 'taskUpdateTime'
+        key: 'taskUpdateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.task.operation'),
         key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -251,10 +249,14 @@ export function useTable(onEdit: Function) {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [],
     page: ref(1),
     pageSize: ref(10),

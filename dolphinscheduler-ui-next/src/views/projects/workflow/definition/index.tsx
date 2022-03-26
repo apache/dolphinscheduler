@@ -154,10 +154,10 @@ export default defineComponent({
             columns={this.columns}
             data={this.tableData}
             striped
-            size={'small'}
             class={styles.table}
             v-model:checked-row-keys={this.checkedRowKeys}
             row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination
@@ -176,19 +176,21 @@ export default defineComponent({
               {{
                 default: () => t('project.workflow.delete'),
                 trigger: () => (
-                  <NButton
-                    tag='div'
-                    type='primary'
-                    disabled={this.checkedRowKeys.length <= 0}
-                    class='btn-delete-all'
-                  >
-                    <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
-                      {{
-                        default: () => t('project.workflow.delete_confirm'),
-                        trigger: () => t('project.workflow.delete')
-                      }}
-                    </NPopconfirm>
-                  </NButton>
+                  <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => (
+                        <NButton
+                          tag='div'
+                          type='primary'
+                          disabled={this.checkedRowKeys.length <= 0}
+                          class='btn-delete-all'
+                        >
+                          {t('project.workflow.delete')}
+                        </NButton>
+                      )
+                    }}
+                  </NPopconfirm>
                 )
               }}
             </NTooltip>

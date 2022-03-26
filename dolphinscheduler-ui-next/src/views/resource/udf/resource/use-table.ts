@@ -32,7 +32,12 @@ import {
   queryResourceById
 } from '@/service/modules/resources'
 import ButtonLink from '@/components/button-link'
-import { IUdfResourceParam } from './types'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { IUdfResourceParam } from './types'
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
@@ -51,6 +56,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     breadList: [],
@@ -68,12 +74,13 @@ export function useTable() {
       {
         title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (_row, index) => index + 1
       },
       {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
+        width: 220,
         render: (row) => {
           return !row.directory
             ? row.alias
@@ -89,33 +96,40 @@ export function useTable() {
       {
         title: t('resource.udf.whether_directory'),
         key: 'whether_directory',
+        ...COLUMN_WIDTH_CONFIG['yesOrNo'],
         render: (row) =>
           row.directory ? t('resource.file.yes') : t('resource.file.no')
       },
       {
         title: t('resource.udf.file_name'),
+        ...COLUMN_WIDTH_CONFIG['name'],
         key: 'fileName'
       },
       {
         title: t('resource.udf.file_size'),
         key: 'size',
+        ...COLUMN_WIDTH_CONFIG['size'],
         render: (row) => bytesToSize(row.size)
       },
       {
         title: t('resource.udf.description'),
-        key: 'description'
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('resource.udf.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.udf.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('resource.udf.operation'),
         key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render: (row) => {
           return h(NSpace, null, {
             default: () => [
@@ -204,6 +218,9 @@ export function useTable() {
         }
       }
     ] as TableColumns<any>
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const getTableData = (params: IUdfResourceParam) => {

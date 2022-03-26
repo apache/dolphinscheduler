@@ -41,7 +41,7 @@ const taskGroupOption = defineComponent({
 
     const searchParamRef = ref()
 
-    let updateItemData = reactive({
+    const updateItemData = reactive({
       id: 0,
       name: '',
       projectCode: 0,
@@ -180,6 +180,7 @@ const taskGroupOption = defineComponent({
               size={'small'}
               data={this.tableData}
               striped
+              scrollX={this.tableWidth}
             />
             <div class={styles.pagination}>
               <NPagination

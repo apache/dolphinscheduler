@@ -31,10 +31,15 @@ import {
   release
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
-import { IDefinitionParam } from './types'
 import styles from './index.module.scss'
-import { NEllipsis, NTag } from 'naive-ui'
+import { NTag } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { IDefinitionParam } from './types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -42,6 +47,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     checkedRowKeys: [] as Array<RowKey>,
     row: {},
     tableData: [],
@@ -62,43 +68,37 @@ export function useTable() {
       {
         type: 'selection',
         disabled: (row) => row.releaseState === 'ONLINE',
-        className: 'btn-selected'
+        className: 'btn-selected',
+        ...COLUMN_WIDTH_CONFIG['selection']
       },
       {
         title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (row, index) => index + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
-        width: 200,
         className: 'workflow-name',
+        ...COLUMN_WIDTH_CONFIG['name'],
         render: (row) =>
           h(
-            NEllipsis,
-            { style: 'max-width: 200px; color: #2080f0' },
+            ButtonLink,
             {
-              default: () =>
-                h(
-                  ButtonLink,
-                  {
-                    onClick: () =>
-                      void router.push({
-                        name: 'workflow-definition-detail',
-                        params: { code: row.code }
-                      })
-                  },
-                  { default: () => row.name }
-                ),
-              tooltip: () => row.name
-            }
+              onClick: () =>
+                void router.push({
+                  name: 'workflow-definition-detail',
+                  params: { code: row.code }
+                })
+            },
+            { default: () => row.name }
           )
       },
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) =>
           row.releaseState === 'ONLINE'
             ? t('project.workflow.up_line')
@@ -107,28 +107,32 @@ export function useTable() {
       {
         title: t('project.workflow.create_time'),
         key: 'createTime',
-        width: 150
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
         key: 'updateTime',
-        width: 150
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.description'),
-        key: 'description'
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('project.workflow.create_user'),
-        key: 'userName'
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.modify_user'),
-        key: 'modifyBy'
+        key: 'modifyBy',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.schedule_publish_status'),
         key: 'scheduleReleaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) => {
           if (row.scheduleReleaseState === 'ONLINE') {
             return h(
@@ -154,8 +158,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 360,
-        fixed: 'right',
+        ...COLUMN_WIDTH_CONFIG['operation'](8.5),
         className: styles.operation,
         render: (row) =>
           h(TableAction, {
@@ -173,6 +176,9 @@ export function useTable() {
           })
       }
     ] as TableColumns<any>
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const editWorkflow = (row: any) => {

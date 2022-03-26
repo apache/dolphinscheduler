@@ -21,14 +21,15 @@ import { useI18n } from 'vue-i18n'
 import { useWorker } from './use-worker'
 import styles from './index.module.scss'
 import Card from '@/components/card'
+import Result from '@/components/result'
 import Gauge from '@/components/chart/modules/Gauge'
 import WorkerModal from './worker-modal'
 import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { WorkerNode } from '@/service/modules/monitor/types'
 
-const master = defineComponent({
-  name: 'master',
+const worker = defineComponent({
+  name: 'worker',
   setup() {
     const showModalRef = ref(false)
     const { t } = useI18n()
@@ -65,7 +66,14 @@ const master = defineComponent({
     const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
       this
 
-    return (
+    return this.data.length < 1 ? (
+      <Result
+        title={t('monitor.worker.worker_no_data_result_title')}
+        description={t('monitor.worker.worker_no_data_result_desc')}
+        status={'info'}
+        size={'medium'}
+      />
+    ) : (
       <>
         <NSpace vertical size={25}>
           {this.data.map((item: WorkerNode) => {
@@ -149,4 +157,4 @@ const master = defineComponent({
   }
 })
 
-export default master
+export default worker

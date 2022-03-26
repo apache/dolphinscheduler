@@ -66,7 +66,7 @@ export default defineComponent({
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
     const renameShowRef = ref(false)
-    const serachRef = ref()
+    const searchRef = ref()
 
     const renameInfo = reactive({
       id: -1,
@@ -85,7 +85,7 @@ export default defineComponent({
       paginationReactive.page = page
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value,
+        searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
       )
@@ -96,7 +96,7 @@ export default defineComponent({
       paginationReactive.pageSize = pageSize
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value,
+        searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
       )
@@ -115,7 +115,7 @@ export default defineComponent({
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value
+        searchRef.value
       )
     }
 
@@ -147,7 +147,7 @@ export default defineComponent({
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value
+        searchRef.value
       )
     }
     const fileStore = useFileStore()
@@ -196,7 +196,7 @@ export default defineComponent({
         const newDir = dirs.slice(0, index + 1).join('/')
         if (newDir) {
           const id = 0
-          let resource = await queryResourceById(
+          const resource = await queryResourceById(
             {
               id,
               type: 'FILE',
@@ -228,7 +228,7 @@ export default defineComponent({
 
     return {
       fileId,
-      serachRef,
+      searchRef,
       folderShowRef,
       uploadShowRef,
       renameShowRef,
@@ -249,7 +249,10 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-    const { columnsRef } = useTable(this.handleRenameFile, this.updateList)
+    const { columnsRef, tableWidth } = useTable(
+      this.handleRenameFile,
+      this.updateList
+    )
     const {
       handleConditions,
       handleCreateFolder,
@@ -289,7 +292,7 @@ export default defineComponent({
                 <div class={styles.list}>
                   <NInput
                     placeholder={t('resource.file.enter_keyword_tips')}
-                    v-model={[this.serachRef, 'value']}
+                    v-model={[this.searchRef, 'value']}
                   />
                 </div>
               </div>
@@ -322,6 +325,7 @@ export default defineComponent({
                   size={'small'}
                   class={styles['table-box']}
                   row-class-name='items'
+                  scrollX={tableWidth}
                 />
                 <div class={styles.pagination}>
                   <NPagination

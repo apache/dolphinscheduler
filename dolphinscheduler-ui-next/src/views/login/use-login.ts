@@ -40,9 +40,7 @@ export function useLogin(state: any) {
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
 
-        const timezone = userInfoRes.timeZone
-          ? userInfoRes.timeZone
-          : Intl.DateTimeFormat().resolvedOptions().timeZone
+        const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
         await timezoneStore.setTimezone(timezone)
 
         const path = routeStore.lastRoute
