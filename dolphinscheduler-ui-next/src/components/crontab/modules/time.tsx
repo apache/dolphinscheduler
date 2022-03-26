@@ -233,8 +233,8 @@ export default defineComponent({
                 defaultValue={0}
                 min={0}
                 max={59}
-                v-model:value={this.intervalStartRef}
-                onUpdateValue={this.onIntervalStart}
+                v-model:value={this.intervalPerformRef}
+                onUpdateValue={this.onIntervalPerform}
               />
             </div>
             <div class={styles['item-text']}>
@@ -245,8 +245,8 @@ export default defineComponent({
                 defaultValue={0}
                 min={0}
                 max={59}
-                v-model:value={this.intervalPerformRef}
-                onUpdateValue={this.onIntervalPerform}
+                v-model:value={this.intervalStartRef}
+                onUpdateValue={this.onIntervalStart}
               />
             </div>
             <div class={styles['item-text']}>{t(this.timeI18n!.timeStart)}</div>

@@ -261,7 +261,8 @@ export function useModal(
         const schedule = JSON.stringify({
           startTime: start,
           endTime: end,
-          crontab: state.timingForm.crontab
+          crontab: state.timingForm.crontab,
+          timezoneId: state.timingForm.timezoneId
         })
         previewSchedule({ schedule }, projectCode).then((res: any) => {
           variables.schedulePreviewList = res
