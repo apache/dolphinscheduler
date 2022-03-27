@@ -256,16 +256,25 @@ public class DataxParameters extends AbstractParameters {
     @Override
     public ResourceParametersHelper getResources() {
         ResourceParametersHelper resources = super.getResources();
+
+        if (customConfig == Flag.YES.ordinal()) {
+            return resources;
+        }
         resources.put(ResourceType.DATASOURCE, dataSource);
         resources.put(ResourceType.DATASOURCE, dataTarget);
         return resources;
     }
 
     public DataxTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
-        DataSourceParameters dbSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataSource);
-        DataSourceParameters dbTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataTarget);
 
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+
+        if (customConfig == Flag.YES.ordinal()) {
+            return dataxTaskExecutionContext;
+        }
+
+        DataSourceParameters dbSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataSource);
+        DataSourceParameters dbTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataTarget);
 
         if (Objects.nonNull(dbSource)) {
             dataxTaskExecutionContext.setDataSourceId(dataSource);
