@@ -118,10 +118,13 @@ export function useTable(
     page: ref(1),
     pageSize: ref(10),
     name: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     Promise.all([queryTaskGroupListPaging(params), queryAllProjectList()]).then(
       (values: any[]) => {
         variables.totalPage = values[0].totalPage
@@ -149,6 +152,7 @@ export function useTable(
             }
           }
         )
+        variables.loadingRef = false
       }
     )
   }

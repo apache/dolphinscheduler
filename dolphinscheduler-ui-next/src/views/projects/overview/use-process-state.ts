@@ -23,12 +23,18 @@ import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
+import { reactive, ref } from 'vue'
 
 export function useProcessState() {
   const route = useRoute()
   const { t } = useI18n()
+  const processVariables = reactive({
+    processLoadingRef: ref(false)
+  })
 
   const getProcessState = (date: Array<number>) => {
+    if (processVariables.processLoadingRef) return
+    processVariables.processLoadingRef = true
     const { state } = useAsyncState(
       countProcessInstanceState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
@@ -48,6 +54,7 @@ export function useProcessState() {
             name: t('home.' + toLower(item.taskStateType))
           }
         })
+        processVariables.processLoadingRef = false
 
         return { table, chart }
       }),
@@ -57,5 +64,5 @@ export function useProcessState() {
     return state
   }
 
-  return { getProcessState }
+  return { getProcessState, processVariables }
 }
