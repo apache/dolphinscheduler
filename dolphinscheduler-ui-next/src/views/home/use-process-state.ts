@@ -22,7 +22,7 @@ import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
-import { reactive, ref, Ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 export function useProcessState() {
   const { t } = useI18n()

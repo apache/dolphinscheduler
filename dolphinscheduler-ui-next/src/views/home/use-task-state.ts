@@ -22,7 +22,7 @@ import { useI18n } from 'vue-i18n'
 import { countTaskState } from '@/service/modules/projects-analysis'
 import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
-import { reactive, Ref, ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 export function useTaskState() {
   const { t } = useI18n()

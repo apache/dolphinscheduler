@@ -19,7 +19,6 @@ import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NDataTable } from 'naive-ui'
 import Modal from '@/components/modal'
-import styles from '../index.module.scss'
 import { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 const props = {
@@ -90,7 +89,6 @@ export default defineComponent({
         onConfirm={this.onConfirm}
       >
         <NDataTable
-          loading={loadingRef}
           columns={this.columns}
           data={this.ruleInputEntryList}
           striped
