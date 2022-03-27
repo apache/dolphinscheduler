@@ -58,7 +58,8 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
-    showRef: ref(false)
+    showRef: ref(false),
+    loadingRef: ref(false)
   })
 
   const renderTime = (time: string) => {
@@ -242,6 +243,8 @@ export function useTable() {
   }
 
   const getTableData = (params: ISearchParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const definitionCode = Number(
       router.currentRoute.value.params.definitionCode
     )
@@ -253,6 +256,7 @@ export function useTable() {
       variables.tableData = res.totalList.map((item: any) => {
         return { ...item }
       })
+      variables.loadingRef = false
     })
   }
 

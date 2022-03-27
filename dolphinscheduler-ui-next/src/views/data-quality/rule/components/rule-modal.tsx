@@ -90,11 +90,11 @@ export default defineComponent({
         onConfirm={this.onConfirm}
       >
         <NDataTable
+          loading={loadingRef}
           columns={this.columns}
           data={this.ruleInputEntryList}
           striped
           size={'small'}
-          class={styles.table}
         />
       </Modal>
     )

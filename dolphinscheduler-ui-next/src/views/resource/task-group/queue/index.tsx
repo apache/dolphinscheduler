@@ -150,7 +150,8 @@ const taskGroupQueue = defineComponent({
       onSearch,
       showModalRef,
       updateItemData,
-      taskGroupOptions
+      taskGroupOptions,
+      loadingRef
     } = this
 
     const { columns } = useTable(updatePriority, resetTableData)
@@ -192,6 +193,7 @@ const taskGroupQueue = defineComponent({
         >
           <div>
             <NDataTable
+              loading={loadingRef}
               columns={columns}
               size={'small'}
               data={this.tableData}
