@@ -317,6 +317,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         map.forEach((code, parameters) -> {
             DataSource datasource = processService.findDataSourceById(code);
+            if (Objects.isNull(datasource)) {
+                return;
+            }
             DataSourceParameters dataSourceParameters = new DataSourceParameters();
             dataSourceParameters.setType(datasource.getType());
             dataSourceParameters.setConnectionParams(datasource.getConnectionParams());
