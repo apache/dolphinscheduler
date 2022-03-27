@@ -35,7 +35,8 @@ export function useTable() {
     operationType: ref(null),
     userName: ref(null),
     datePickerRange: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -69,6 +70,8 @@ export function useTable() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -90,6 +93,7 @@ export function useTable() {
             ...item
           }
         }) as any
+        variables.loadingRef = false
       }),
       {}
     )

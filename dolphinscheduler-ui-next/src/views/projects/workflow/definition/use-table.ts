@@ -60,7 +60,8 @@ export function useTable() {
     startShowRef: ref(false),
     timingShowRef: ref(false),
     versionShowRef: ref(false),
-    copyShowRef: ref(false)
+    copyShowRef: ref(false),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -337,12 +338,15 @@ export function useTable() {
   }
 
   const getTableData = (params: IDefinitionParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }),
       { total: 0, table: [] }
     )

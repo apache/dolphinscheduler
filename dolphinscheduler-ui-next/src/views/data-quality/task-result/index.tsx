@@ -77,7 +77,7 @@ const TaskResult = defineComponent({
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch } = this
+    const { t, requestTableData, onUpdatePageSize, onSearch, loadingRef } = this
 
     return (
       <>
@@ -156,6 +156,7 @@ const TaskResult = defineComponent({
         </NCard>
         <Card class={styles['table-card']}>
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             scrollX={this.tableWidth}

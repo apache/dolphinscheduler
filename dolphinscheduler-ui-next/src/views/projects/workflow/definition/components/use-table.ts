@@ -152,10 +152,13 @@ export function useTable(
     page: ref(1),
     totalPage: ref(1),
     pageSize: ref(10),
-    projectCode: ref(Number(router.currentRoute.value.params.projectCode))
+    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
+    loadingRef: ref(false)
   })
 
   const getTableData = (row: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     variables.row = row
     queryVersions(
       {
@@ -168,6 +171,7 @@ export function useTable(
       variables.tableData = res.totalList.map((item: any) => ({ ...item }))
 
       variables.totalPage = res.totalPage
+      variables.loadingRef = false
     })
   }
 

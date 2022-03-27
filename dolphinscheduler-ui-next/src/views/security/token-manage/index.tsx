@@ -97,7 +97,8 @@ const tokenManage = defineComponent({
       onCancelModal,
       onConfirmModal,
       handleModalChange,
-      onSearch
+      onSearch,
+      loadingRef
     } = this
 
     return (
@@ -135,6 +136,7 @@ const tokenManage = defineComponent({
         </NCard>
         <Card class={styles['table-card']}>
           <NDataTable
+            loading={loadingRef}
             row-class-name='items'
             columns={this.columns}
             data={this.tableData}

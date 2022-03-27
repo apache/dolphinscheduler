@@ -62,7 +62,8 @@ export function useTable() {
     processInstanceName: ref(null),
     totalPage: ref(1),
     showModalRef: ref(false),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -268,6 +269,8 @@ export function useTable() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -306,6 +309,7 @@ export function useTable() {
             }
           }) as any
           variables.totalPage = res.totalPage
+          variables.loadingRef = false
         }
       ),
       {}

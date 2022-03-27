@@ -181,7 +181,8 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const handleDelete = (row: any) => {
@@ -198,6 +199,8 @@ export function useTable() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryEnvironmentListPaging({ ...params }).then((res: EnvironmentRes) => {
         variables.tableData = res.totalList.map((item, unused) => {
@@ -214,6 +217,7 @@ export function useTable() {
           }
         }) as any
         variables.totalPage = res.totalPage
+        variables.loadingRef = false
       }),
       {}
     )

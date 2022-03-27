@@ -61,7 +61,8 @@ export function useTable() {
     stateType: ref(),
     startDate: ref(),
     endDate: ref(),
-    projectCode: ref(Number(router.currentRoute.value.params.projectCode))
+    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -236,6 +237,8 @@ export function useTable() {
   }
 
   const getTableData = () => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const params = {
       pageNo: variables.page,
       pageSize: variables.pageSize,
@@ -252,6 +255,7 @@ export function useTable() {
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }
     )
   }

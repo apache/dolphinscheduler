@@ -136,7 +136,8 @@ const taskGroupOption = defineComponent({
       resetTableData,
       onUpdatePageSize,
       updateItem,
-      onSearch
+      onSearch,
+      loadingRef
     } = this
 
     const { columns } = useTable(updateItem, resetTableData)
@@ -176,6 +177,7 @@ const taskGroupOption = defineComponent({
         >
           <div>
             <NDataTable
+              loading={loadingRef}
               columns={columns}
               size={'small'}
               data={this.tableData}

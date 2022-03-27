@@ -88,6 +88,7 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
@@ -123,6 +124,7 @@ export default defineComponent({
         </Card>
         <Card title={t('resource.function.udf_function')}>
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             striped
