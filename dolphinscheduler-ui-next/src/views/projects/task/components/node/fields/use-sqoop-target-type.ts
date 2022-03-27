@@ -26,8 +26,8 @@ export function useTargetType(
   unCustomSpan: Ref<number>
 ): IJsonItem[] {
   const { t } = useI18n()
-  const hiveSpan = ref(24)
-  const hdfsSpan = ref(0)
+  const hiveSpan = ref(0)
+  const hdfsSpan = ref(24)
   const mysqlSpan = ref(0)
   const dataSourceSpan = ref(0)
   const updateSpan = ref(0)
@@ -103,7 +103,7 @@ export function useTargetType(
     () => [model.sourceType, model.srcQueryType],
     ([sourceType, srcQueryType]) => {
       targetTypes.value = getTargetTypesBySourceType(sourceType, srcQueryType)
-      if (!targetTypes.value.find((type) => model.targetType === type.value)) {
+      if (!model.targetType) {
         model.targetType = targetTypes.value[0].value
       }
     }
