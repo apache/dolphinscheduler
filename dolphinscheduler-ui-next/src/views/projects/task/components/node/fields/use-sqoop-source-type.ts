@@ -33,7 +33,7 @@ export function useSourceType(
   const columnSpan = ref(0)
   const hiveSpan = ref(0)
   const hdfsSpan = ref(0)
-  const datasourceSpan = ref(0)
+  const datasourceSpan = ref(12)
   const resetSpan = () => {
     mysqlSpan.value =
       unCustomSpan.value && model.sourceType === 'MYSQL' ? 24 : 0
@@ -94,7 +94,7 @@ export function useSourceType(
     () => model.modelType,
     (modelType: ModelType) => {
       sourceTypes.value = getSourceTypesByModelType(modelType)
-      if (!sourceTypes.value.find((type) => model.sourceType === type.value)) {
+      if (!model.sourceType) {
         model.sourceType = sourceTypes.value[0].value
       }
     }
@@ -149,7 +149,12 @@ export function useSourceType(
           label: 'SQL',
           value: '1'
         }
-      ]
+      ],
+      props: {
+        'on-update:value': (value: '0' | '1') => {
+          model.targetType = value === '0' ? 'HIVE' : 'HDFS'
+        }
+      }
     },
     {
       type: 'input',
