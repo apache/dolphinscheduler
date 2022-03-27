@@ -224,7 +224,9 @@ export default defineComponent({
             label={t('project.workflow.workflow_name')}
             path='workflow_name'
           >
-            {this.row.name}
+            <div class={styles.formItem} title={this.row.name}>
+              {this.row.name}
+            </div> 
           </NFormItem>
           <NFormItem
             label={t('project.workflow.failure_strategy')}

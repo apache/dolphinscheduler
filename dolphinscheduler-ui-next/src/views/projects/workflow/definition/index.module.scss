@@ -95,3 +95,10 @@
     margin-right: 5px;
   }
 }
+
+.formItem {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+}
