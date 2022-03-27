@@ -91,7 +91,7 @@ const list = defineComponent({
     }
   },
   render() {
-    const { t } = this
+    const { t, loadingRef } = this
     return (
       <div>
         <NCard>
@@ -124,6 +124,7 @@ const list = defineComponent({
           class={styles['table-card']}
         >
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             scrollX={this.tableWidth}

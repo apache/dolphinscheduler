@@ -172,10 +172,13 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryTenantListPaging({ ...params }).then((res: any) => {
         variables.tableData = res.totalList.map((item: any, unused: number) => {
@@ -184,9 +187,10 @@ export function useTable() {
           }
         })
         variables.totalPage = res.totalPage
+        variables.loadingRef = false
       }),
       {}
-    )
+      )
 
     return state
   }

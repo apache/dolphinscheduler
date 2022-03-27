@@ -98,7 +98,8 @@ const yarnQueueManage = defineComponent({
       onCancelModal,
       onConfirmModal,
       handleModalChange,
-      onSearch
+      onSearch,
+      loadingRef
     } = this
 
     return (
@@ -136,6 +137,7 @@ const yarnQueueManage = defineComponent({
         </NCard>
         <Card class={styles['table-card']}>
           <NDataTable
+            loading={loadingRef}
             row-class-name='items'
             columns={this.columns}
             data={this.tableData}
