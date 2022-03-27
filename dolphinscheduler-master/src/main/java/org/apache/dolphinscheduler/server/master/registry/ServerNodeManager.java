@@ -300,6 +300,7 @@ public class ServerNodeManager implements InitializingBean {
 
     private void updateMasterNodes() {
         MASTER_SLOT = 0;
+        MASTER_SIZE = 0;
         this.masterNodes.clear();
         String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
         try {

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -184,14 +185,15 @@ public class MasterSchedulerService extends Thread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
-
         List<ProcessInstance> processInstances = Collections.synchronizedList(new ArrayList<>(commands.size()));
         CountDownLatch latch = new CountDownLatch(commands.size());
         for (final Command command : commands) {
             masterPrepareExecService.execute(() -> {
                 try {
                     // slot check again
-                    if (!slotCheck(command)) {
+                    SlotCheckState slotCheckState = slotCheck(command);
+                    if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
+                        logger.info("handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
                         return;
                     }
                     ProcessInstance processInstance = processService.handleCommand(logger,
@@ -225,16 +227,18 @@ public class MasterSchedulerService extends Thread {
         int pageSize = masterConfig.getFetchCommandNum();
         List<Command> result = new ArrayList<>();
         while (Stopper.isRunning()) {
-            if (ServerNodeManager.getMasterSize() == 0) {
-                return result;
-            }
             // todo: Can we use the slot to scan database?
             List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
             if (commandList.size() == 0) {
                 return result;
             }
             for (Command command : commandList) {
-                if (slotCheck(command)) {
+                SlotCheckState slotCheckState = slotCheck(command);
+                if (slotCheckState.equals(SlotCheckState.CHANGE)) {
+                    // return and wait next scan, don't reset param, waste resources of cpu
+                    return new ArrayList<>();
+                }
+                if (slotCheckState.equals(SlotCheckState.PASS)) {
                     result.add(command);
                 }
             }
@@ -247,10 +251,18 @@ public class MasterSchedulerService extends Thread {
         return result;
     }
 
-    private boolean slotCheck(Command command) {
+    private SlotCheckState slotCheck(Command command) {
         int slot = ServerNodeManager.getSlot();
         int masterSize = ServerNodeManager.getMasterSize();
-        return masterSize != 0 && command.getId() % masterSize == slot;
+        SlotCheckState state;
+        if (masterSize <= 0) {
+            state = SlotCheckState.CHANGE;
+        } else if (command.getId() % masterSize == slot) {
+            state = SlotCheckState.PASS;
+        } else {
+            state = SlotCheckState.INJECT;
+        }
+        return state;
     }
 
     private String getLocalAddress() {
