@@ -44,14 +44,12 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -124,9 +122,6 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private LoggerRequestProcessor loggerRequestProcessor;
 
-    @Value("${spring.jackson.time-zone:UTC}")
-    private String timezone;
-
     /**
      * worker server startup, not use web service
      *
@@ -142,8 +137,6 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run() {
-        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
-
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
