@@ -844,6 +844,16 @@ public class ProcessServiceTest {
         Assert.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
     }
 
+    @Test
+    public void testFindCommandPageBySlot() {
+        int pageSize = 1;
+        int pageNumber = 0;
+        int masterCount = 0;
+        int thisMasterSlot = 2;
+        List<Command> commandList = processService.findCommandPageBySlot(pageSize,pageNumber,masterCount,thisMasterSlot);
+        Assert.assertEquals(0,commandList.size());
+    }
+
     private TaskGroupQueue getTaskGroupQueue() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task name");
