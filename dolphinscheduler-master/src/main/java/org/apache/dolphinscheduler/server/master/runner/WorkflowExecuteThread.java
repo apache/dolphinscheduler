@@ -384,13 +384,15 @@ public class WorkflowExecuteThread {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.TIMEOUT);
         } else {
-            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, taskInstance.getTaskDefine());
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
         }
         return true;
     }
 
     private boolean processTimeout() {
-        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, this.processDefinition);
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, projectUser);
         return true;
     }
 

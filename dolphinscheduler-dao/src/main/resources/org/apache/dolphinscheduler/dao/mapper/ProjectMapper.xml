@@ -150,6 +150,7 @@
     <select id="queryProjectWithUserByProcessInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
         select
             dp.id project_id,
+            dp.code project_code,
             dp.name project_name,
             u.user_name user_name
         from t_ds_process_instance di
