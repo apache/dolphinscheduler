@@ -19,6 +19,11 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
+import java.util.Objects;
+
+/**
+ * alert result
+ */
 public class AlertResult {
     private String status;
     private String message;
@@ -53,6 +58,7 @@ public class AlertResult {
         return this;
     }
 
+    @Override
     public boolean equals(final Object o) {
         if (o == this) {
             return true;
@@ -61,36 +67,35 @@ public class AlertResult {
             return false;
         }
         final AlertResult other = (AlertResult) o;
-        if (!other.canEqual((Object) this)) {
+        if (!other.canEqual(this)) {
             return false;
         }
-        final Object this$status = this.getStatus();
-        final Object other$status = other.getStatus();
-        if (this$status == null ? other$status != null : !this$status.equals(other$status)) {
+        final Object thisStatus = this.getStatus();
+        final Object otherStatus = other.getStatus();
+        if (!Objects.equals(thisStatus, otherStatus)) {
             return false;
         }
-        final Object this$message = this.getMessage();
-        final Object other$message = other.getMessage();
-        if (this$message == null ? other$message != null : !this$message.equals(other$message)) {
-            return false;
-        }
-        return true;
+        final Object thisMessage = this.getMessage();
+        final Object otherMessage = other.getMessage();
+        return Objects.equals(thisMessage, otherMessage);
     }
 
     protected boolean canEqual(final Object other) {
         return other instanceof AlertResult;
     }
 
+    @Override
     public int hashCode() {
-        final int PRIME = 59;
+        final int prime = 59;
         int result = 1;
-        final Object $status = this.getStatus();
-        result = result * PRIME + ($status == null ? 43 : $status.hashCode());
-        final Object $message = this.getMessage();
-        result = result * PRIME + ($message == null ? 43 : $message.hashCode());
+        final Object s = this.getStatus();
+        result = result * prime + (s == null ? 43 : s.hashCode());
+        final Object message = this.getMessage();
+        result = result * prime + (message == null ? 43 : message.hashCode());
         return result;
     }
 
+    @Override
     public String toString() {
         return "AlertResult(status=" + this.getStatus() + ", message=" + this.getMessage() + ")";
     }
@@ -116,6 +121,7 @@ public class AlertResult {
             return new AlertResult(status, message);
         }
 
+        @Override
         public String toString() {
             return "AlertResult.AlertResultBuilder(status=" + this.status + ", message=" + this.message + ")";
         }
