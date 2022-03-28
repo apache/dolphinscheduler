@@ -87,6 +87,7 @@ export default defineComponent({
       name: '',
       description: '',
       tenantCode: 'default',
+      executionType: 'PARALLEL',
       timeoutFlag: false,
       timeout: 0,
       globalParams: [],
@@ -94,6 +95,12 @@ export default defineComponent({
       sync: false
     })
     const formRef = ref()
+    const executeTypeOptions = [
+      { value: 'PARALLEL', label: 'parallel' },
+      { value: 'SERIAL_WAIT', label: 'Serial wait' },
+      { value: 'SERIAL_DISCARD', label: 'Serial discard' },
+      { value: 'SERIAL_PRIORITY', label: 'Serial priority' }
+    ]
     const rule = {
       name: {
         required: true,
@@ -155,6 +162,7 @@ export default defineComponent({
         formValue.value.name = process.name
         formValue.value.description = process.description
         formValue.value.tenantCode = process.tenantCode || 'default'
+        formValue.value.executionType = process.executionType || 'PARALLEL'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true
           formValue.value.timeout = process.timeout
@@ -211,6 +219,17 @@ export default defineComponent({
                 v-slots={{
                   suffix: () => t('project.dag.minute')
                 }}
+              />
+            </NFormItem>
+          )}
+          {!props.instance && (
+            <NFormItem
+              label={t('project.dag.process_execute_type')}
+              path='executionType'
+            >
+              <NSelect
+                options={executeTypeOptions}
+                v-model:value={formValue.value.executionType}
               />
             </NFormItem>
           )}

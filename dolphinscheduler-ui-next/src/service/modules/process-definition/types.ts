@@ -59,6 +59,7 @@ interface ProcessDefinitionReq {
   taskDefinitionJson: string
   taskRelationJson: string
   tenantCode: string
+  executionType: string
   description?: string
   globalParams?: string
   timeout?: number

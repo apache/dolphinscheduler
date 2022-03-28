@@ -333,7 +333,6 @@ export function renderStateCell(state: ITaskState, t: Function) {
     NIcon,
     {
       color: stateOption.color,
-      size: 18,
       class: stateOption.classNames,
       style: {
         display: 'flex'
@@ -344,7 +343,7 @@ export function renderStateCell(state: ITaskState, t: Function) {
   return h(NTooltip, null, {
     trigger: () => {
       if (!stateOption.isSpin) return Icon
-      return h(NSpin, { size: 'small' }, { icon: () => Icon })
+      return h(NSpin, { size: 18 }, { icon: () => Icon })
     },
     default: () => stateOption.desc
   })
