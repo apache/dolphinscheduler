@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -36,11 +37,8 @@ import io.netty.channel.Channel;
 public final class AlertRequestProcessor implements NettyRequestProcessor {
     private static final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
 
-    private final AlertSender alertSender;
-
-    public AlertRequestProcessor(AlertSender alertSender) {
-        this.alertSender = alertSender;
-    }
+    @Autowired
+    private AlertSenderService alertSenderService;
 
     @Override
     public void process(Channel channel, Command command) {
@@ -51,7 +49,7 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
 
         logger.info("Received command : {}", alertSendRequestCommand);
 
-        AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(
+        AlertSendResponseCommand alertSendResponseCommand = alertSenderService.syncHandler(
             alertSendRequestCommand.getGroupId(),
             alertSendRequestCommand.getTitle(),
             alertSendRequestCommand.getContent(),

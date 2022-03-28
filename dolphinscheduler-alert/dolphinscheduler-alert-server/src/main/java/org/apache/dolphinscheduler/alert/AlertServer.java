@@ -17,73 +17,102 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-
-import java.io.Closeable;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.event.EventListener;
+
+import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
-public class AlertServer implements Closeable {
+public class AlertServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
-    private final PluginDao pluginDao;
-    private final AlertDao alertDao;
-    private final AlertPluginManager alertPluginManager;
-    private final AlertSender alertSender;
-    private final AlertRequestProcessor alertRequestProcessor;
-
-    private NettyRemotingServer server;
+    @Autowired
+    private PluginDao pluginDao;
 
     @Autowired
-    private AlertConfig config;
+    private AlertSenderService alertSenderService;
 
-    public AlertServer(PluginDao pluginDao, AlertDao alertDao, AlertPluginManager alertPluginManager, AlertSender alertSender, AlertRequestProcessor alertRequestProcessor) {
-        this.pluginDao = pluginDao;
-        this.alertDao = alertDao;
-        this.alertPluginManager = alertPluginManager;
-        this.alertSender = alertSender;
-        this.alertRequestProcessor = alertRequestProcessor;
-    }
+    @Autowired
+    private AlertRequestProcessor alertRequestProcessor;
 
+    @Autowired
+    private AlertConfig alertConfig;
+
+    private NettyRemotingServer nettyRemotingServer;
+
+    /**
+     * alert server startup, not use web service
+     *
+     * @param args arguments
+     */
     public static void main(String[] args) {
-        SpringApplication.run(AlertServer.class, args);
+        Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
+        new SpringApplicationBuilder(AlertServer.class).web(WebApplicationType.NONE).run(args);
     }
 
-    @EventListener
-    public void start(ApplicationReadyEvent readyEvent) {
-        logger.info("Starting Alert server");
+    @PostConstruct
+    public void run() {
+        logger.info("alert server starting...");
 
         checkTable();
         startServer();
+        alertSenderService.start();
 
-        Executors.newScheduledThreadPool(1)
-                .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
+                close("shutdownHook");
+            }
+        }));
+    }
+
+    /**
+     * gracefully close
+     *
+     * @param cause close cause
+     */
+    public void close(String cause) {
+
+        try {
+            // execute only once
+            if (Stopper.isStopped()) {
+                return;
+            }
+
+            logger.info("alert server is stopping ..., cause : {}", cause);
+
+            // set stop signal is true
+            Stopper.stop();
+
+            try {
+                // thread sleep 3 seconds for thread quietly stop
+                Thread.sleep(3000L);
+            } catch (Exception e) {
+                logger.warn("thread sleep exception ", e);
+            }
+            // close
+            this.nettyRemotingServer.close();
+
+        } catch (Exception e) {
+            logger.error("alert server stop exception ", e);
+        }
     }
 
     @Override
-    @PreDestroy
-    public void close() {
-        server.close();
+    public void stop(String cause) {
+        close(cause);
     }
 
     private void checkTable() {
@@ -95,26 +124,11 @@ public class AlertServer implements Closeable {
 
     private void startServer() {
         NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(config.getPort());
+        serverConfig.setListenPort(alertConfig.getPort());
 
-        server = new NettyRemotingServer(serverConfig);
-        server.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
-        server.start();
+        nettyRemotingServer = new NettyRemotingServer(serverConfig);
+        nettyRemotingServer.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
+        nettyRemotingServer.start();
     }
 
-    final class Sender implements Runnable {
-        @Override
-        public void run() {
-            if (!Stopper.isRunning()) {
-                return;
-            }
-
-            try {
-                final List<Alert> alerts = alertDao.listPendingAlerts();
-                alertSender.send(alerts);
-            } catch (Exception e) {
-                logger.error("Failed to send alert", e);
-            }
-        }
-    }
 }

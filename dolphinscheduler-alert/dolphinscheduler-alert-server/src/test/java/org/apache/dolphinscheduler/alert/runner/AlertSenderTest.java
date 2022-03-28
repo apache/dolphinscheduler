@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.alert.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.AlertSender;
+import org.apache.dolphinscheduler.alert.AlertSenderService;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -39,24 +39,32 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AlertSenderTest {
     private static final Logger logger = LoggerFactory.getLogger(AlertSenderTest.class);
 
+    @Mock
     private AlertDao alertDao;
+    @Mock
     private PluginDao pluginDao;
+    @Mock
     private AlertPluginManager alertPluginManager;
 
-    private AlertSender alertSender;
+    @InjectMocks
+    private AlertSenderService alertSenderService;
 
     @Before
     public void before() {
-        alertDao = mock(AlertDao.class);
-        pluginDao = mock(PluginDao.class);
-        alertPluginManager = mock(AlertPluginManager.class);
+//        alertDao = mock(AlertDao.class);
+//        pluginDao = mock(PluginDao.class);
+//        alertPluginManager = mock(AlertPluginManager.class);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -65,12 +73,11 @@ public class AlertSenderTest {
         int alertGroupId = 1;
         String title = "alert mail test title";
         String content = "alert mail test content";
-        alertSender = new AlertSender(alertDao, alertPluginManager);
 
         //1.alert instance does not exist
         when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(null);
 
-        AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+        AlertSendResponseCommand alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
             logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
@@ -89,7 +96,7 @@ public class AlertSenderTest {
         PluginDefine pluginDefine = new PluginDefine(pluginName, "1", null);
         when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
 
-        alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+        alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
             logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
@@ -99,7 +106,7 @@ public class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(null);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+        alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
             logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
@@ -111,7 +118,7 @@ public class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+        alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
             logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
@@ -123,7 +130,7 @@ public class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+        alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertTrue(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
             logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
@@ -143,7 +150,7 @@ public class AlertSenderTest {
         alert.setWarningType(WarningType.FAILURE);
         alertList.add(alert);
 
-        alertSender = new AlertSender(alertDao, alertPluginManager);
+//        alertSenderService = new AlertSenderService();
 
         int pluginDefineId = 1;
         String pluginInstanceParams = "alert-instance-mail-params";
@@ -165,6 +172,7 @@ public class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
         Assert.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
-        alertSender.send(alertList);
+        when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
+        alertSenderService.send(alertList);
     }
 }
