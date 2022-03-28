@@ -25,13 +25,15 @@ export function useDataQuality({
   from = 0,
   readonly,
   data,
-  jsonRef
+  jsonRef,
+  updateElements
 }: {
   projectCode: number
   from?: number
   readonly?: boolean
   data?: ITaskData
   jsonRef: Ref<IJsonItem[]>
+  updateElements: () => void
 }) {
   const { t } = useI18n()
   const model = reactive({
@@ -87,6 +89,7 @@ export function useDataQuality({
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useRules(model, (items: IJsonItem[], len: number) => {
         jsonRef.value.splice(15, len, ...items)
+        updateElements()
       }),
       Fields.useDeployMode(),
       Fields.useDriverCores(),
