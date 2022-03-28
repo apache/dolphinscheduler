@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
@@ -27,6 +26,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;

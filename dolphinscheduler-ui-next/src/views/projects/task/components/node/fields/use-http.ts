@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 
 export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-  const timeoutSpan = computed(() => (model.timeoutSetting ? 12 : 0))
 
-  const HTTP_CHECK_CONDITIONs = [
+  const HTTP_CHECK_CONDITIONS = [
     {
       label: t('project.node.status_code_default'),
       value: 'STATUS_CODE_DEFAULT'
@@ -129,7 +127,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'httpCheckCondition',
       name: t('project.node.http_check_condition'),
-      options: HTTP_CHECK_CONDITIONs
+      options: HTTP_CHECK_CONDITIONS
     },
     {
       type: 'input',
@@ -141,15 +139,10 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
-      type: 'switch',
-      field: 'timeoutSetting',
-      name: t('project.node.timeout_settings')
-    },
-    {
       type: 'input-number',
       field: 'connectTimeout',
       name: t('project.node.connect_timeout'),
-      span: timeoutSpan,
+      span: 12,
       props: {
         max: Math.pow(7, 10) - 1
       },
@@ -172,7 +165,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       type: 'input-number',
       field: 'socketTimeout',
       name: t('project.node.socket_timeout'),
-      span: timeoutSpan,
+      span: 12,
       props: {
         max: Math.pow(7, 10) - 1
       },

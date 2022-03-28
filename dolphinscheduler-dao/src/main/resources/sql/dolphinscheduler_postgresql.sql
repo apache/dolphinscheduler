@@ -210,12 +210,15 @@ CREATE TABLE t_ds_alert (
   title varchar(64) DEFAULT NULL ,
   content text ,
   alert_status int DEFAULT '0' ,
+  warning_type int DEFAULT '2' ,
   log text ,
   alertgroup_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
+create index idx_status on t_ds_alert (alert_status);
 
 --
 -- Table structure for table t_ds_alertgroup
@@ -666,7 +669,7 @@ CREATE TABLE t_ds_resources (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   pid int,
-  full_name varchar(64),
+  full_name varchar(128),
   is_directory boolean DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)

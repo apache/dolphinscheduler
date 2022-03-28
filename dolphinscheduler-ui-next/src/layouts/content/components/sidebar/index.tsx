@@ -18,7 +18,6 @@
 import { defineComponent, ref, PropType } from 'vue'
 import { NLayoutSider, NMenu } from 'naive-ui'
 import { useMenuClick } from './use-menuClick'
-import { useMenuStore } from '@/store/menu/menu'
 
 const Sidebar = defineComponent({
   name: 'Sidebar',
@@ -33,7 +32,6 @@ const Sidebar = defineComponent({
     }
   },
   setup() {
-    const menuStore = useMenuStore()
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
       'workflow',
@@ -46,7 +44,7 @@ const Sidebar = defineComponent({
 
     const { handleMenuClick } = useMenuClick()
 
-    return { collapsedRef, defaultExpandedKeys, handleMenuClick, menuStore }
+    return { collapsedRef, defaultExpandedKeys, handleMenuClick }
   },
   render() {
     return (
@@ -60,6 +58,7 @@ const Sidebar = defineComponent({
         onExpand={() => (this.collapsedRef = false)}
       >
         <NMenu
+          class='tab-vertical'
           value={this.sideKey}
           options={this.sideMenuOptions}
           defaultExpandedKeys={this.defaultExpandedKeys}

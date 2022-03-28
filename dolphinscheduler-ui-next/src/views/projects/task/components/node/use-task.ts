@@ -14,169 +14,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { useFlink } from './tasks/use-flink'
-import { useShell } from './tasks/use-shell'
-import { useSubProcess } from './tasks/use-sub-process'
-import { usePigeon } from './tasks/use-pigeon'
-import { usePython } from './tasks/use-python'
-import { useSpark } from './tasks/use-spark'
-import { useMr } from './tasks/use-mr'
-import { useHttp } from './tasks/use-http'
-import { useSql } from './tasks/use-sql'
-import { useProcedure } from './tasks/use-procedure'
-import { useSqoop } from './tasks/use-sqoop'
-import { useSeaTunnel } from './tasks/use-sea-tunnel'
-import { useSwitch } from './tasks/use-switch'
-import { useConditions } from './tasks/use-conditions'
-import { useDataX } from './tasks/use-datax'
-import { useDependent } from './tasks/use-dependent'
-import { IJsonItem, INodeData, ITaskData } from './types'
+import { ref, Ref, unref } from 'vue'
+import nodes from './tasks'
+import getElementByJson from '@/components/form/get-elements-by-json'
+import { useTaskNodeStore } from '@/store/project/task-node'
+import type {
+  IFormItem,
+  IJsonItem,
+  INodeData,
+  ITaskData,
+  FormRules,
+  EditWorkflowDefinition
+} from './types'
 
 export function useTask({
   data,
   projectCode,
   from,
-  readonly
+  readonly,
+  definition
 }: {
   data: ITaskData
   projectCode: number
   from?: number
   readonly?: boolean
-}): { json: IJsonItem[]; model: INodeData } {
-  const { taskType = 'SHELL' } = data
-  let node = {} as { json: IJsonItem[]; model: INodeData }
-  if (taskType === 'SHELL') {
-    node = useShell({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'SUB_PROCESS') {
-    node = useSubProcess({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'PYTHON') {
-    node = usePython({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'SPARK') {
-    node = useSpark({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'MR') {
-    node = useMr({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'FLINK') {
-    node = useFlink({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'HTTP') {
-    node = useHttp({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'PIGEON') {
-    node = usePigeon({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'SQL') {
-    node = useSql({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'PROCEDURE') {
-    node = useProcedure({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'SQOOP') {
-    node = useSqoop({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'SEATUNNEL') {
-    node = useSeaTunnel({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
+  definition?: EditWorkflowDefinition
+}): {
+  elementsRef: Ref<IFormItem[]>
+  rulesRef: Ref<FormRules>
+  model: INodeData
+} {
+  const taskStore = useTaskNodeStore()
+  taskStore.updateDefinition(unref(definition), data?.code)
+
+  const jsonRef = ref([]) as Ref<IJsonItem[]>
+  const elementsRef = ref([]) as Ref<IFormItem[]>
+  const rulesRef = ref({})
+
+  const params = {
+    projectCode,
+    from,
+    readonly,
+    data,
+    jsonRef,
+    updateElements: () => {
+      getElements()
+    }
   }
 
-  if (taskType === 'SWITCH') {
-    node = useSwitch({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
+  const { model, json } = nodes[data.taskType || 'SHELL'](params)
+  jsonRef.value = json
+  model.preTasks = taskStore.getPreTasks
+
+  const getElements = () => {
+    const { rules, elements } = getElementByJson(jsonRef.value, model)
+    elementsRef.value = elements
+    rulesRef.value = rules
   }
 
-  if (taskType === 'CONDITIONS') {
-    node = useConditions({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
+  getElements()
 
-  if (taskType === 'DATAX') {
-    node = useDataX({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-  if (taskType === 'DEPENDENT') {
-    node = useDependent({
-      projectCode,
-      from,
-      readonly,
-      data
-    })
-  }
-
-  return node
+  return { elementsRef, rulesRef, model }
 }

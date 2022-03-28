@@ -17,6 +17,7 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
+import { useRouter } from 'vue-router'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
 export function useSubProcess({
@@ -30,7 +31,10 @@ export function useSubProcess({
   readonly?: boolean
   data?: ITaskData
 }) {
+  const router = useRouter()
+  const workflowCode = router.currentRoute.value.params.code
   const model = reactive({
+    taskType: 'SUB_PROCESS',
     name: '',
     flag: 'YES',
     description: '',
@@ -42,7 +46,7 @@ export function useSubProcess({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    processDefinitionCode: ''
+    processDefinitionCode: 0
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -54,8 +58,7 @@ export function useSubProcess({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -76,9 +79,9 @@ export function useSubProcess({
         projectCode,
         from,
         processName: data?.processName,
-        code: data?.code
+        code: from === 1 ? 0 : Number(workflowCode)
       }),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

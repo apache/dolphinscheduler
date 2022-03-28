@@ -31,6 +31,7 @@ export function usePigeon({
   data?: ITaskData
 }) {
   const model = reactive({
+    taskType: 'PIGEON',
     name: '',
     flag: 'YES',
     description: '',
@@ -53,8 +54,7 @@ export function usePigeon({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -73,7 +73,7 @@ export function usePigeon({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       Fields.useTargetTaskName(),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

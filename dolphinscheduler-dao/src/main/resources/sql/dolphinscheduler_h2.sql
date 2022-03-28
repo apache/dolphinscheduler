@@ -274,6 +274,7 @@ CREATE TABLE t_ds_alert
     title         varchar(64) DEFAULT NULL,
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
+    warning_type  tinyint(4) DEFAULT '2',
     log           text,
     alertgroup_id int(11) DEFAULT NULL,
     create_time   datetime    DEFAULT NULL,
@@ -759,7 +760,7 @@ CREATE TABLE t_ds_resources
     create_time  datetime     DEFAULT NULL,
     update_time  datetime     DEFAULT NULL,
     pid          int(11) DEFAULT NULL,
-    full_name    varchar(64)  DEFAULT NULL,
+    full_name    varchar(128)  DEFAULT NULL,
     is_directory tinyint(4) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_resources_un (full_name, type)
@@ -869,7 +870,7 @@ CREATE TABLE t_ds_tenant
     id          int(11) NOT NULL AUTO_INCREMENT,
     tenant_code varchar(64)  DEFAULT NULL,
     description varchar(255) DEFAULT NULL,
-    queue_id    int(11) DEFAULT NULL,
+    queue_id    int(11)      DEFAULT NULL,
     create_time datetime     DEFAULT NULL,
     update_time datetime     DEFAULT NULL,
     PRIMARY KEY (id)
@@ -885,15 +886,15 @@ CREATE TABLE t_ds_tenant
 DROP TABLE IF EXISTS t_ds_udfs CASCADE;
 CREATE TABLE t_ds_udfs
 (
-    id            int(11) NOT NULL AUTO_INCREMENT,
-    user_id       int(11) NOT NULL,
+    id            int(11)      NOT NULL AUTO_INCREMENT,
+    user_id       int(11)      NOT NULL,
     func_name     varchar(100) NOT NULL,
     class_name    varchar(255) NOT NULL,
-    type          tinyint(4) NOT NULL,
+    type          tinyint(4)   NOT NULL,
     arg_types     varchar(255) DEFAULT NULL,
     database      varchar(255) DEFAULT NULL,
     description   varchar(255) DEFAULT NULL,
-    resource_id   int(11) NOT NULL,
+    resource_id   int(11)      NOT NULL,
     resource_name varchar(255) NOT NULL,
     create_time   datetime     NOT NULL,
     update_time   datetime     NOT NULL,

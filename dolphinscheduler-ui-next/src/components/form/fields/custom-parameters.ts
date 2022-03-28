@@ -46,6 +46,7 @@ const CustomParameters = defineComponent({
               circle: true,
               size: 'small',
               type: 'info',
+              class: 'btn-create-custom-parameter',
               disabled,
               onClick: onAdd
             },
@@ -134,6 +135,7 @@ export function renderCustomParameters(
                 type: 'error',
                 size: 'small',
                 disabled,
+                class: 'btn-delete-custom-parameter',
                 onClick: () => {
                   fields[field].splice(i, 1)
                   rules.splice(i, 1)

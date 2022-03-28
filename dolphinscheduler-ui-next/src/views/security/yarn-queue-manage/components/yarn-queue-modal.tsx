@@ -95,6 +95,7 @@ const YarnQueueModal = defineComponent({
           confirmDisabled={!this.model.queueName || !this.model.queue}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

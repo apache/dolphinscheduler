@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api;
 
-import java.util.TimeZone;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -32,15 +27,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("org.apache.dolphinscheduler")
 public class ApiApplicationServer {
 
-    @Value("${spring.jackson.time-zone:UTC}")
-    private String timezone;
-
     public static void main(String[] args) {
         SpringApplication.run(ApiApplicationServer.class);
     }
 
-    @PostConstruct
-    public void run() {
-        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
-    }
 }

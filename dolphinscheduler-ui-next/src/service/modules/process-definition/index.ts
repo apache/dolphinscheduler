@@ -65,7 +65,7 @@ export function batchCopyByCodes(
   })
 }
 
-export function batchDeleteByCodes(data: CodesReq, code: CodeReq): any {
+export function batchDeleteByCodes(data: CodesReq, code: number): any {
   return axios({
     url: `/projects/${code}/process-definition/batch-delete`,
     method: 'post',

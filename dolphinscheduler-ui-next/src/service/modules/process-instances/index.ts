@@ -23,7 +23,6 @@ import {
   SubIdReq,
   TaskReq,
   LongestReq,
-  IdReq,
   ProcessInstanceReq
 } from './types'
 
@@ -94,8 +93,8 @@ export function queryProcessInstanceById(
 
 export function updateProcessInstance(
   data: ProcessInstanceReq,
-  id: IdReq,
-  code: CodeReq
+  id: number,
+  code: number
 ): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}`,
@@ -118,7 +117,7 @@ export function queryTaskListByProcessId(id: number, code: number): any {
   })
 }
 
-export function vieGanttTree(id: IdReq, code: CodeReq): any {
+export function viewGanttTree(id: number, code: number): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-gantt`,
     method: 'get'

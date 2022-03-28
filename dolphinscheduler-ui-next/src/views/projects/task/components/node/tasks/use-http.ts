@@ -48,7 +48,6 @@ export function useHttp({
     httpParams: [],
     url: '',
     condition: '',
-    timeoutSetting: false,
     connectTimeout: 60000,
     socketTimeout: 60000
   } as INodeData)
@@ -62,8 +61,7 @@ export function useHttp({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -82,7 +80,7 @@ export function useHttp({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useHttp(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

@@ -38,9 +38,7 @@ type IType =
   | 'custom'
   | 'multi-condition'
 
-interface IOption extends SelectOption, TreeSelectOption {
-  label: string
-}
+type IOption = SelectOption | TreeSelectOption
 
 interface IFormItem {
   showLabel?: boolean
@@ -85,5 +83,6 @@ export {
   FormItemRule,
   FormRules,
   IFormItem,
-  GridProps
+  GridProps,
+  IJsonItemParams
 }

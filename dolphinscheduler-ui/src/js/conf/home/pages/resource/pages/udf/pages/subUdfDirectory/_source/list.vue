@@ -53,6 +53,9 @@
         </el-table-column>
         <el-table-column :label="$t('Operation')" min-width="120">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('ReUpload File')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-upload" @click="_reUpload(scope.row,scope.$index)" :disabled="scope.row.directory" circle></el-button></span>
+            </el-tooltip>
             <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
             </el-tooltip>
@@ -88,7 +91,7 @@
   import { downloadFile } from '@/module/download'
   import { bytesToSize } from '@/module/util/util'
   import localStore from '@/module/util/localStorage'
-
+  import { findComponentDownward } from '@/module/util'
   export default {
     name: 'udf-manage-list',
     data () {
@@ -130,6 +133,9 @@
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
+      },
+      _reUpload (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload('UDF', item, this.$route.params.id)
       },
       _rename (item, i) {
         this.item = item

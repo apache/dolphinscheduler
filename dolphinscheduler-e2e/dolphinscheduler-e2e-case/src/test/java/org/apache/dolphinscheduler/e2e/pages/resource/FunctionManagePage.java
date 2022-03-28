@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -37,21 +39,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
-    @FindBy(id = "btnCreateUdfFunction")
+    @FindBy(className = "btn-create-udf-function")
     private WebElement buttonCreateUdfFunction;
 
-    @FindBy(className = "udf-function-items")
+    @FindBy(className = "items")
     private List<WebElement> functionList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
-    private final CreateUdfFunctionBox createUdfFunctionBox;
+    private CreateUdfFunctionBox createUdfFunctionBox;
 
-    private final RenameUdfFunctionBox renameUdfFunctionBox;
+    private RenameUdfFunctionBox renameUdfFunctionBox;
 
     public FunctionManagePage(RemoteWebDriver driver) {
         super(driver);
@@ -64,6 +66,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
         buttonCreateUdfFunction().click();
 
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createUdfFunctionBox().radioFunctionType());
+
         createUdfFunctionBox().inputFunctionName().sendKeys(udfFunctionName);
 
         createUdfFunctionBox().inputClassName().sendKeys(className);
@@ -74,7 +78,7 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
         createUdfFunctionBox().selectUdfResource()
             .stream()
-            .filter(it -> it.getText().contains(udfResourceName))
+            .filter(it -> it.getAttribute("innerHTML").contains(udfResourceName))
             .findFirst()
             .orElseThrow(() -> new RuntimeException(String.format("No %s in udf resource list", udfResourceName)))
             .click();
@@ -88,16 +92,14 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         functionList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.id("btnRename")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No rename button in function manage list"))
             .click();
 
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("createUdfDialog")));
-
-        renameUdfFunctionBox().inputFunctionName().clear();
-
+        renameUdfFunctionBox().inputFunctionName().sendKeys(Keys.CONTROL + "a");
+        renameUdfFunctionBox().inputFunctionName().sendKeys(Keys.BACK_SPACE);
         renameUdfFunctionBox().inputFunctionName().sendKeys(afterName);
 
         renameUdfFunctionBox.buttonSubmit().click();
@@ -109,18 +111,13 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         functionList()
             .stream()
             .filter(it -> it.getText().contains(udfFunctionName))
-            .flatMap(it -> it.findElements(By.id("btnDelete")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in udf resource list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting in udf resource page"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -131,25 +128,43 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputFunctionName")
+        @FindBys({
+                @FindBy(className = "radio-function-type"),
+                @FindBy(tagName = "input"),
+        })
+        private WebElement radioFunctionType;
+
+        @FindBys({
+                @FindBy(className = "input-function-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputFunctionName;
 
-        @FindBy(id = "inputClassName")
+        @FindBys({
+                @FindBy(className = "input-class-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputClassName;
 
-        @FindBy(id = "btnUdfResourceDropDown")
+        @FindBys({
+                @FindBy(className = "btn-udf-resource-dropdown"),
+                @FindBy(className = "n-base-selection"),
+        })
         private WebElement buttonUdfResourceDropDown;
 
-        @FindBy(className = "vue-treeselect__menu")
+        @FindBy(className = "n-tree-node-content__text")
         private List<WebElement> selectUdfResource;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "textarea"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 
@@ -159,19 +174,28 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputFunctionName")
+        @FindBys({
+                @FindBy(className = "input-function-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputFunctionName;
 
-        @FindBy(id = "inputClassName")
+        @FindBys({
+                @FindBy(className = "input-class-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputClassName;
 
-        @FindBy(id = "inputDescription")
+        @FindBys({
+                @FindBy(className = "input-description"),
+                @FindBy(tagName = "textarea"),
+        })
         private WebElement inputDescription;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }

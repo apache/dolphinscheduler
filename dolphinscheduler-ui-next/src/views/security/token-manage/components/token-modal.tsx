@@ -67,12 +67,22 @@ const TokenModal = defineComponent({
             : ''
         variables.model.expireTime = Date.now()
         variables.model.token = ''
+      } else {
+        variables.model.userId = props.row.userId
+        variables.model.expireTime = new Date(props.row.expireTime).getTime()
+        variables.model.token = props.row.token
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
 
     const confirmModal = () => {
       handleValidate(props.statusRef)
+    }
+
+    const changeUser = () => {
+      if (props.statusRef !== 0) {
+        variables.model.token = ''
+      }
     }
 
     watch(
@@ -119,11 +129,12 @@ const TokenModal = defineComponent({
       cancelModal,
       confirmModal,
       getToken,
+      changeUser,
       userStore
     }
   },
   render() {
-    const { t, getToken, userStore } = this
+    const { t, getToken, changeUser, userStore } = this
 
     return (
       <div>
@@ -141,6 +152,7 @@ const TokenModal = defineComponent({
           }
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (
@@ -170,6 +182,7 @@ const TokenModal = defineComponent({
                       placeholder={t('security.token.user_tips')}
                       options={this.model.generalOptions}
                       v-model={[this.model.userId, 'value']}
+                      onUpdateValue={changeUser}
                     />
                   </NFormItem>
                 )}

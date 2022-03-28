@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.regex.Pattern;
 
@@ -49,27 +48,28 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+    public static final String FORMAT_SS ="%s%s";
+    public static final String FORMAT_S_S ="%s/%s";
+    public static final String AWS_ACCESS_KEY_ID="aws.access.key.id";
+    public static final String AWS_SECRET_ACCESS_KEY="aws.secret.access.key";
+    public static final String AWS_REGION="aws.region";
+    public static final String FOLDER_SEPARATOR ="/";
+
+    public static final String RESOURCE_TYPE_FILE = "resources";
+
+    public static final String RESOURCE_TYPE_UDF="udfs";
+
+    public static final String STORAGE_S3="S3";
+
+    public static final String STORAGE_HDFS="HDFS";
+
+    public static final String BUCKET_NAME = "dolphinscheduler-test";
 
     /**
      * fs.defaultFS
      */
-    public static final String FS_DEFAULTFS = "fs.defaultFS";
+    public static final String FS_DEFAULT_FS = "fs.defaultFS";
 
-
-    /**
-     * fs s3a endpoint
-     */
-    public static final String FS_S3A_ENDPOINT = "fs.s3a.endpoint";
-
-    /**
-     * fs s3a access key
-     */
-    public static final String FS_S3A_ACCESS_KEY = "fs.s3a.access.key";
-
-    /**
-     * fs s3a secret key
-     */
-    public static final String FS_S3A_SECRET_KEY = "fs.s3a.secret.key";
 
 
     /**
@@ -125,9 +125,9 @@ public final class Constants {
     /**
      * resource.view.suffixs
      */
-    public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
+    public static final String RESOURCE_VIEW_SUFFIXES = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
+    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -149,6 +149,7 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
+    public static final String AWS_END_POINT = "aws.endpoint";
     /**
      * comma ,
      */
@@ -494,11 +495,11 @@ public final class Constants {
     /**
      * quartz job prifix
      */
-    public static final String QUARTZ_JOB_PRIFIX = "job";
+    public static final String QUARTZ_JOB_PREFIX = "job";
     /**
      * quartz job group prifix
      */
-    public static final String QUARTZ_JOB_GROUP_PRIFIX = "jobgroup";
+    public static final String QUARTZ_JOB_GROUP_PREFIX = "jobgroup";
     /**
      * projectId
      */
@@ -567,6 +568,8 @@ public final class Constants {
     public static final String QUEUE_NAME = "queueName";
     public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
     public static final int LOG_QUERY_LIMIT = 4096;
+    public static final String BLOCKING_CONDITION = "blockingCondition";
+    public static final String ALERT_WHEN_BLOCKING = "alertWhenBlocking";
 
     /**
      * master/worker server use for zk

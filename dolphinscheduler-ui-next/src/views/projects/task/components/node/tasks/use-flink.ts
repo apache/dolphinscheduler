@@ -31,6 +31,7 @@ export function useFlink({
   data?: ITaskData
 }) {
   const model = reactive<INodeData>({
+    taskType: 'FLINK',
     name: '',
     flag: 'YES',
     description: '',
@@ -61,8 +62,7 @@ export function useFlink({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -81,7 +81,7 @@ export function useFlink({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useFlink(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

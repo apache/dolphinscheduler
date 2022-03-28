@@ -32,6 +32,7 @@ jobs:
   build:
     name: E2E-Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
         with:
@@ -66,6 +67,7 @@ jobs:
     name: ${{ matrix.case.name }}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       matrix:
         case:
@@ -85,8 +87,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
           - name: Workflow
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
-          - name: WorkflowForSwitch
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
+#          - name: WorkflowForSwitch
+#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
           - name: FileManage
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
           - name: UdfManage
@@ -139,7 +141,14 @@ jobs:
   result:
     name: E2E
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [ e2e ]
+    if: always()
     steps:
       - name: Status
-        run: echo "Passed!"
+        run: |
+          if [[ ${{ needs.e2e.result }} == 'success' ]]; then
+            echo "Passed!"
+          else
+            exit -1
+          fi

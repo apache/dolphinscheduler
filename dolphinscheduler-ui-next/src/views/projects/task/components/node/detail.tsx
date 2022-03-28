@@ -15,92 +15,60 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref, watch } from 'vue'
+import { defineComponent, ref, watch, inject, Ref, unref } from 'vue'
 import Form from '@/components/form'
 import { useTask } from './use-task'
-import getElementByJson from '@/components/form/get-elements-by-json'
-import type { ITaskData } from './types'
-import { useI18n } from 'vue-i18n'
+import type { ITaskData, EditWorkflowDefinition } from './types'
 
-const props = {
-  projectCode: {
-    type: Number as PropType<number>,
-    default: 0
-  },
-  data: {
-    type: Object as PropType<ITaskData>,
-    default: { taskType: 'SHELL' }
-  },
-  readonly: {
-    type: Boolean as PropType<boolean>,
-    default: false
-  },
-  loading: {
-    type: Boolean as PropType<boolean>,
-    default: false
-  },
-  from: {
-    type: Number as PropType<number>,
-    default: 0
-  }
+interface IDetailPanel {
+  projectCode: number
+  data: ITaskData
+  readonly: false
+  from: number
+  detailRef?: Ref
+  definition?: EditWorkflowDefinition
 }
 
 const NodeDetail = defineComponent({
   name: 'NodeDetail',
-  props,
-  emits: ['linkEventText'],
+  emits: ['taskTypeChange'],
   setup(props, { expose, emit }) {
-    const { data, projectCode, from, readonly } = props
-    const { t } = useI18n()
+    const formRef = ref()
+    const detailData: IDetailPanel = inject('data') || {
+      projectCode: 0,
+      data: {
+        taskType: 'SHELL'
+      },
+      readonly: false,
+      from: 0
+    }
+    const { data, projectCode, from, readonly, definition } = unref(detailData)
 
-    const { json, model } = useTask({
+    const { elementsRef, rulesRef, model } = useTask({
       data,
       projectCode,
       from,
-      readonly
+      readonly,
+      definition
     })
-
-    const jsonRef = ref(json)
-    const formRef = ref()
-
-    const { rules, elements } = getElementByJson(jsonRef.value, model)
-
-    expose({
-      form: formRef
-    })
-
     watch(
       () => model.taskType,
-      (taskType) => {
-        // TODO: Change task type
-        if (taskType === 'SUB_PROCESS') {
-          // TODO: add linkUrl
-          emit(
-            'linkEventText',
-            true,
-            `${t('project.node.enter_child_node')}`,
-            ''
-          )
-        } else {
-          emit('linkEventText', false, '', '')
-        }
+      async (taskType) => {
+        emit('taskTypeChange', taskType)
       }
     )
 
-    return { rules, elements, model, formRef }
-  },
-  render(props: { readonly: boolean; loading: boolean }) {
-    const { rules, elements, model } = this
-    return (
+    expose(formRef)
+
+    return () => (
       <Form
-        ref='formRef'
+        ref={formRef}
         meta={{
           model,
-          rules,
-          elements,
-          disabled: props.readonly
+          rules: rulesRef.value,
+          elements: elementsRef.value,
+          disabled: unref(readonly)
         }}
-        loading={props.loading}
         layout={{
           xGap: 10
         }}

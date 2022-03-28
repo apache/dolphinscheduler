@@ -86,6 +86,8 @@ public class FileManageE2ETest {
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
                 .login(user, password)
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class)
                 .create(tenant);
 
         await().untilAsserted(() -> assertThat(tenantPage.tenantList())
@@ -93,9 +95,13 @@ public class FileManageE2ETest {
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(tenant)));
 
-        tenantPage.goToNav(SecurityPage.class)
-            .goToTab(UserPage.class)
-            .update(user, user, password, email, phone)
+        UserPage userPage = tenantPage.goToNav(SecurityPage.class)
+            .goToTab(UserPage.class);
+
+        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
+
+        userPage.update(user, user, password, email, phone, tenant)
             .goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class);
     }
@@ -137,49 +143,52 @@ public class FileManageE2ETest {
             .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
-    @Test
-    @Order(20)
-    void testCreateDuplicateDirectory() {
-        final FileManagePage page = new FileManagePage(browser);
+//    @Test
+//    @Order(20)
+//    void testCreateDuplicateDirectory() {
+//        final FileManagePage page = new FileManagePage(browser);
+//
+//        page.createDirectory(testDirectoryName, "test_desc");
+//
+//        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+//                .contains("resource already exists")
+//        );
+//
+//        page.createDirectoryBox().buttonCancel().click();
+//    }
 
-        page.createDirectory(testDirectoryName, "test_desc");
+//    @Test
+//    @Order(21)
+//    void testCreateSubDirectory() {
+//        final FileManagePage page = new FileManagePage(browser);
+//
+//        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
+//
+//        await().untilAsserted(() -> assertThat(page.fileList())
+//            .as("File list should contain newly-created file")
+//            .extracting(WebElement::getText)
+//            .anyMatch(it -> it.contains(testSubDirectoryName)));
+//    }
 
-        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("resource already exists")
-        );
-
-        page.createDirectoryBox().buttonCancel().click();
-    }
-
-    @Test
-    @Order(21)
-    void testCreateSubDirectory() {
-        final FileManagePage page = new FileManagePage(browser);
-
-        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
-
-        await().untilAsserted(() -> assertThat(page.fileList())
-            .as("File list should contain newly-created file")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(testSubDirectoryName)));
-    }
-
-    @Test
-    @Order(22)
-    void testRenameDirectory() {
-        final FileManagePage page = new FileManagePage(browser);
-
-        page.rename(testSubDirectoryName, testRenameDirectoryName);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(page.fileList())
-                .as("File list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameDirectoryName));
-        });
-    }
+/*
+* when the storage is s3,the directory cannot be renamed
+* */
+//    @Test
+//    @Order(22)
+//    void testRenameDirectory() {
+//        final FileManagePage page = new FileManagePage(browser);
+//
+//        page.rename(testDirectoryName, testRenameDirectoryName);
+//
+//        await().untilAsserted(() -> {
+//            browser.navigate().refresh();
+//
+//            assertThat(page.fileList())
+//                .as("File list should contain newly-created file")
+//                .extracting(WebElement::getText)
+//                .anyMatch(it -> it.contains(testRenameDirectoryName));
+//        });
+//    }
 
     @Test
     @Order(30)
@@ -265,25 +274,9 @@ public class FileManageE2ETest {
     }
 
     @Test
-    @Order(60)
-    void testUploadOver1GBFile() throws IOException {
-        final FileManagePage page = new FileManagePage(browser);
-
-        RandomAccessFile file = new RandomAccessFile(testOver1GBFilePath.toFile(), "rw");
-        file.setLength((long) (1.5 * 1024 * 1024 * 1024));
-
-        page.uploadFile(testOver1GBFilePath.toFile().getAbsolutePath());
-
-        await().untilAsserted(() ->
-            assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("Upload File size cannot exceed 1g")
-        );
-    }
-
-    @Test
     @Order(65)
     void testUploadUnder1GBFile() throws IOException {
-        final FileManagePage page = new FileManagePage(browser);
+        FileManagePage page = new FileManagePage(browser);
 
         browser.navigate().refresh();
 

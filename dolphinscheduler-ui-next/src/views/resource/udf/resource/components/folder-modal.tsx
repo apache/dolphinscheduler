@@ -79,17 +79,16 @@ export default defineComponent({
         title={t('resource.udf.create_folder')}
         onCancel={this.hideModal}
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='folderFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='folderFormRef'>
           <NFormItem label={t('resource.udf.folder_name')} path='name'>
             <NInput
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
+              class='input-directory-name'
             />
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
@@ -97,6 +96,7 @@ export default defineComponent({
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}
+              class='input-description'
             />
           </NFormItem>
         </NForm>

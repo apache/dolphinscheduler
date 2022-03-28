@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { watch, computed, unref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useSourceType, useTargetType } from '.'
 import type { IJsonItem, ModelType } from '../types'
@@ -23,11 +23,6 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const customSpan = computed(() => (model.isCustomTask ? 24 : 0))
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
-
-  watch(
-    () => model.srcQueryType,
-    () => {}
-  )
 
   return [
     {
@@ -45,7 +40,7 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: !model.isCustomTask,
+        required: true,
         validator(validate, value) {
           if (!model.isCustomTask && !value) {
             return new Error(t('project.node.sqoop_job_name_tips'))
@@ -74,8 +69,8 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
       isSimple: true,
       span: unCustomSpan
     }),
-    ...useSourceType(model),
-    ...useTargetType(model),
+    ...useSourceType(model, unCustomSpan),
+    ...useTargetType(model, unCustomSpan),
     {
       type: 'input-number',
       field: 'concurrency',
@@ -92,9 +87,9 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
       span: customSpan,
       validate: {
         trigger: ['input', 'trigger'],
-        required: !!unref(customSpan),
+        required: true,
         validator(rule, value) {
-          if (!!unref(customSpan) && !value) {
+          if (customSpan.value && !value) {
             return new Error(t('project.node.custom_script'))
           }
         }

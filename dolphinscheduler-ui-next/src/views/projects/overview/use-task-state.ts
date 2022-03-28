@@ -23,12 +23,18 @@ import { useI18n } from 'vue-i18n'
 import { countTaskState } from '@/service/modules/projects-analysis'
 import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
+import { reactive, ref } from 'vue'
 
 export function useTaskState() {
   const route = useRoute()
   const { t } = useI18n()
+  const taskVariables = reactive({
+    taskLoadingRef: ref(false)
+  })
 
   const getTaskState = (date: Array<number>) => {
+    if (taskVariables.taskLoadingRef) return
+    taskVariables.taskLoadingRef = true
     const { state } = useAsyncState(
       countTaskState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
@@ -48,6 +54,7 @@ export function useTaskState() {
             name: t('home.' + toLower(item.taskStateType))
           }
         })
+        taskVariables.taskLoadingRef = false
 
         return { table, chart }
       }),
@@ -57,5 +64,5 @@ export function useTaskState() {
     return state
   }
 
-  return { getTaskState }
+  return { getTaskState, taskVariables }
 }

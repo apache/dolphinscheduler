@@ -15,84 +15,110 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted } from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
-import { useForm } from '../use-form'
+import { useForm } from './use-form'
 import Modal from '@/components/modal'
-import { createProject, updateProject } from '@/service/modules/projects'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
-  show: {
+  showModalRef: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  data: {
-    type: Object as PropType<any>
-  },
-  status: {
+  statusRef: {
     type: Number as PropType<number>,
     default: 0
+  },
+  row: {
+    type: Object as PropType<any>,
+    default: {}
   }
 }
 
 const ProjectModal = defineComponent({
   name: 'ProjectModal',
   props,
-  emits: ['confirm', 'cancel'],
-  setup(props, { emit }) {
-    const { state, t } = useForm()
+  emits: ['cancelModal', 'confirmModal'],
+  setup(props, ctx) {
+    const { variables, t, handleValidate } = useForm(props, ctx)
 
-    onMounted(() => {
-      if (props.status === 1) {
-        state.projectForm.projectName = props.data.projectName
-        state.projectForm.description = props.data.description
+    const userStore = useUserStore()
+
+    const cancelModal = () => {
+      if (props.statusRef === 0) {
+        variables.model.projectName = ''
+        variables.model.description = ''
+      } else {
+        variables.model.userName = props.row.userName
+        variables.model.projectName = props.row.name
+        variables.model.description = props.row.description
       }
-    })
-
-    const onConfirm = () => {
-      ;(props.status === 1
-        ? updateProject(state.projectForm, props.data.code)
-        : createProject(state.projectForm)
-      ).then(() => {
-        emit('confirm')
-      })
+      ctx.emit('cancelModal', props.showModalRef)
     }
 
-    const onCancel = () => {
-      state.projectForm.projectName = ''
-      state.projectForm.description = ''
-      state.projectForm.userName = ''
-      emit('cancel')
+    const confirmModal = () => {
+      handleValidate(props.statusRef)
     }
 
-    return { ...toRefs(state), t, onConfirm, onCancel }
+    watch(
+      () => props.statusRef,
+      () => {
+        if (props.statusRef === 0) {
+          variables.model.projectName = ''
+          variables.model.userName = (
+            userStore.getUserInfo as UserInfoRes
+          ).userName
+          variables.model.description = ''
+        } else {
+          variables.model.projectName = props.row.name
+          variables.model.userName = props.row.userName
+          variables.model.description = props.row.description
+        }
+      }
+    )
+
+    watch(
+      () => props.row,
+      () => {
+        variables.model.projectName = props.row.name
+        variables.model.userName = props.row.userName
+        variables.model.description = props.row.description
+      }
+    )
+
+    return { ...toRefs(variables), t, cancelModal, confirmModal }
   },
   render() {
-    const { t, onConfirm, onCancel, show, status } = this
+    const { t } = this
     return (
       <Modal
         title={
-          status === 0
+          this.statusRef === 0
             ? t('project.list.create_project')
             : t('project.list.edit_project')
         }
-        show={show}
-        onConfirm={onConfirm}
-        onCancel={onCancel}
-        confirmDisabled={
-          !this.projectForm.projectName || !this.projectForm.userName
-        }
+        show={this.showModalRef}
+        onConfirm={this.confirmModal}
+        onCancel={this.cancelModal}
+        confirmDisabled={!this.model.projectName || !this.model.userName}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='projectFormRef'>
           <NFormItem label={t('project.list.project_name')} path='projectName'>
             <NInput
-              v-model={[this.projectForm.projectName, 'value']}
+              v-model={[this.model.projectName, 'value']}
               placeholder={t('project.list.project_tips')}
+              class='input-project-name'
             />
           </NFormItem>
           <NFormItem label={t('project.list.owned_users')} path='userName'>
             <NInput
-              v-model={[this.projectForm.userName, 'value']}
+              disabled={this.statusRef === 0}
+              v-model={[this.model.userName, 'value']}
               placeholder={t('project.list.username_tips')}
             />
           </NFormItem>
@@ -101,7 +127,7 @@ const ProjectModal = defineComponent({
             path='description'
           >
             <NInput
-              v-model={[this.projectForm.description, 'value']}
+              v-model={[this.model.description, 'value']}
               type='textarea'
               placeholder={t('project.list.description_tips')}
             />

@@ -14,42 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryResourceByProgramType } from '@/service/modules/resources'
-import { removeUselessChildren } from './use-shell'
-import { useCustomParams } from '.'
-import type { IJsonItem, ProgramType } from '../types'
+import {
+  useCustomParams,
+  useDeployMode,
+  useDriverCores,
+  useDriverMemory,
+  useExecutorNumber,
+  useExecutorMemory,
+  useExecutorCores,
+  useMainJar,
+  useResources
+} from '.'
+import type { IJsonItem } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' ? 0 : 24
   )
-
-  const mainJarOptions = ref([])
-  const resources: { [field: string]: any } = {}
-
-  const getResourceList = async (programType: ProgramType) => {
-    if (resources[programType] !== void 0) {
-      mainJarOptions.value = resources[programType]
-      return
-    }
-    try {
-      const res = await queryResourceByProgramType({
-        type: 'FILE',
-        programType
-      })
-      removeUselessChildren(res)
-      mainJarOptions.value = res || []
-      resources[programType] = res
-    } catch (err) {}
-  }
-
-  onMounted(() => {
-    getResourceList(model.programType)
-  })
 
   return [
     {
@@ -59,21 +43,18 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.program_type'),
       options: PROGRAM_TYPES,
       props: {
-        'on-update:value': (value: ProgramType) => {
+        'on-update:value': () => {
           model.mainJar = null
           model.mainClass = ''
-          getResourceList(value)
         }
-      },
-      value: model.programType
+      }
     },
     {
       type: 'select',
       field: 'sparkVersion',
       span: 12,
       name: t('project.node.spark_version'),
-      options: SPARK_VERSIONS,
-      value: model.sparkVersion
+      options: SPARK_VERSIONS
     },
     {
       type: 'input',
@@ -93,35 +74,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    {
-      type: 'tree-select',
-      field: 'mainJar',
-      name: t('project.node.main_package'),
-      props: {
-        cascade: true,
-        showPath: true,
-        checkStrategy: 'child',
-        placeholder: t('project.node.main_package_tips'),
-        keyField: 'id',
-        labelField: 'fullName'
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: model.programType !== 'PYTHON',
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.main_package_tips'))
-          }
-        }
-      },
-      options: mainJarOptions
-    },
-    {
-      type: 'radio',
-      field: 'deployMode',
-      name: t('project.node.deploy_mode'),
-      options: DeployModes
-    },
+    useMainJar(model),
+    useDeployMode(),
     {
       type: 'input',
       field: 'appName',
@@ -130,115 +84,11 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.app_name_tips')
       }
     },
-    {
-      type: 'input-number',
-      field: 'driverCores',
-      name: t('project.node.driver_cores'),
-      span: 12,
-      props: {
-        placeholder: t('project.node.driver_cores_tips'),
-        min: 1
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.driver_cores_tips'))
-          }
-        }
-      }
-    },
-    {
-      type: 'input',
-      field: 'driverMemory',
-      name: t('project.node.driver_memory'),
-      span: 12,
-      props: {
-        placeholder: t('project.node.driver_memory_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.driver_memory_tips'))
-          }
-          if (!Number.isInteger(parseInt(value))) {
-            return new Error(
-              t('project.node.driver_memory') +
-                t('project.node.positive_integer_tips')
-            )
-          }
-        }
-      },
-      value: model.driverMemory
-    },
-    {
-      type: 'input-number',
-      field: 'numExecutors',
-      name: t('project.node.executor_number'),
-      span: 12,
-      props: {
-        placeholder: t('project.node.executor_number_tips'),
-        min: 1
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.executor_number_tips'))
-          }
-        }
-      },
-      value: model.numExecutors
-    },
-    {
-      type: 'input',
-      field: 'executorMemory',
-      name: t('project.node.executor_memory'),
-      span: 12,
-      props: {
-        placeholder: t('project.node.executor_memory_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.executor_memory_tips'))
-          }
-          if (!Number.isInteger(parseInt(value))) {
-            return new Error(
-              t('project.node.executor_memory_tips') +
-                t('project.node.positive_integer_tips')
-            )
-          }
-        }
-      },
-      value: model.executorMemory
-    },
-    {
-      type: 'input-number',
-      field: 'executorCores',
-      name: t('project.node.executor_cores'),
-      span: 12,
-      props: {
-        placeholder: t('project.node.executor_cores_tips'),
-        min: 1
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.executor_cores_tips'))
-          }
-        }
-      },
-      value: model.executorCores
-    },
+    useDriverCores(),
+    useDriverMemory(),
+    useExecutorNumber(),
+    useExecutorMemory(),
+    useExecutorCores(),
     {
       type: 'input',
       field: 'mainArgs',
@@ -257,22 +107,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.option_parameters_tips')
       }
     },
-    {
-      type: 'tree-select',
-      field: 'resourceList',
-      name: t('project.node.resources'),
-      options: mainJarOptions,
-      props: {
-        multiple: true,
-        checkable: true,
-        cascade: true,
-        showPath: true,
-        checkStrategy: 'child',
-        placeholder: t('project.node.resources_tips'),
-        keyField: 'id',
-        labelField: 'name'
-      }
-    },
+    useResources(),
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
@@ -300,20 +135,5 @@ export const SPARK_VERSIONS = [
   {
     label: 'SPARK1',
     value: 'SPARK1'
-  }
-]
-
-export const DeployModes = [
-  {
-    label: 'cluster',
-    value: 'cluster'
-  },
-  {
-    label: 'client',
-    value: 'client'
-  },
-  {
-    label: 'local',
-    value: 'local'
   }
 ]

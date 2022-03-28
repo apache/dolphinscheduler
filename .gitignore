@@ -45,6 +45,7 @@ dolphinscheduler-alert/src/main/resources/logback.xml
 dolphinscheduler-server/src/main/resources/logback.xml
 dolphinscheduler-ui/dist
 dolphinscheduler-ui/node
+dolphinscheduler-ui-next/node
 dolphinscheduler-common/sql
 dolphinscheduler-common/test
 dolphinscheduler-worker/logs
@@ -54,6 +55,7 @@ dolphinscheduler-worker/logs
 # ------------------
 # Cache
 __pycache__/
+.tox/
 
 # Build
 build/

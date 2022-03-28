@@ -17,16 +17,26 @@
 
 import { defineComponent, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
-import { NInput, NButton, NSwitch, NForm, NFormItem } from 'naive-ui'
+import {
+  NInput,
+  NButton,
+  NSwitch,
+  NForm,
+  NFormItem,
+  useMessage
+} from 'naive-ui'
 import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
+import cookies from 'js-cookie'
 
 const login = defineComponent({
   name: 'login',
   setup() {
+    window.$message = useMessage()
+
     const { state, t, locale } = useForm()
     const { handleChange } = useTranslate(locale)
     const { handleLogin } = useLogin(state)
@@ -36,6 +46,8 @@ const login = defineComponent({
     if (themeStore.getTheme) {
       themeStore.setDarkTheme()
     }
+
+    cookies.set('language', localesStore.getLocales, { path: '/' })
 
     return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },

@@ -25,6 +25,11 @@ import {
 } from '@/service/modules/task-group'
 import TableAction from './components/table-action'
 import _ from 'lodash'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 import { parseTime } from '@/utils/common'
 
 export function useTable(
@@ -34,30 +39,66 @@ export function useTable(
   const { t } = useI18n()
 
   const columns: TableColumns<any> = [
-    { title: '#', key: 'index', render: (row, index) => index + 1 },
-    { title: t('resource.task_group_queue.project_name'), key: 'projectName' },
-    { title: t('resource.task_group_queue.task_name'), key: 'taskName' },
+    {
+      title: '#',
+      key: 'index',
+      render: (row, index) => index + 1,
+      ...COLUMN_WIDTH_CONFIG['index']
+    },
+    {
+      title: t('resource.task_group_queue.project_name'),
+      key: 'projectName',
+      ...COLUMN_WIDTH_CONFIG['name']
+    },
+    {
+      title: t('resource.task_group_queue.task_name'),
+      key: 'taskName',
+      ...COLUMN_WIDTH_CONFIG['name']
+    },
     {
       title: t('resource.task_group_queue.process_instance_name'),
-      key: 'processInstanceName'
+      key: 'processInstanceName',
+      ...COLUMN_WIDTH_CONFIG['name']
     },
     {
       title: t('resource.task_group_queue.task_group_name'),
-      key: 'taskGroupName'
+      key: 'taskGroupName',
+      ...COLUMN_WIDTH_CONFIG['name']
     },
-    { title: t('resource.task_group_queue.priority'), key: 'priority' },
+    {
+      title: t('resource.task_group_queue.priority'),
+      key: 'priority',
+      width: 120
+    },
     {
       title: t('resource.task_group_queue.force_starting_status'),
-      key: 'forceStart'
+      key: 'forceStart',
+      ...COLUMN_WIDTH_CONFIG['state']
     },
-    { title: t('resource.task_group_queue.in_queue'), key: 'inQueue' },
-    { title: t('resource.task_group_queue.task_status'), key: 'status' },
-    { title: t('resource.task_group_queue.create_time'), key: 'createTime' },
-    { title: t('resource.task_group_queue.update_time'), key: 'updateTime' },
+    {
+      title: t('resource.task_group_queue.in_queue'),
+      key: 'inQueue',
+      width: 120
+    },
+    {
+      title: t('resource.task_group_queue.task_status'),
+      key: 'status',
+      ...COLUMN_WIDTH_CONFIG['state']
+    },
+    {
+      title: t('resource.task_group_queue.create_time'),
+      key: 'createTime',
+      ...COLUMN_WIDTH_CONFIG['time']
+    },
+    {
+      title: t('resource.task_group_queue.update_time'),
+      key: 'updateTime',
+      ...COLUMN_WIDTH_CONFIG['time']
+    },
     {
       title: t('resource.task_group_queue.actions'),
       key: 'actions',
-      width: 150,
+      ...COLUMN_WIDTH_CONFIG['operation'](2),
       render: (row: any) =>
         h(TableAction, {
           row,
@@ -76,13 +117,17 @@ export function useTable(
 
   const variables = reactive({
     tableData: [],
+    tableWidth: calculateTableWidth(columns) || DefaultTableWidth,
     page: ref(1),
     pageSize: ref(10),
     groupId: ref(3),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const taskGroupSearchParams = {
       pageNo: 1,
       pageSize: 2147483647
@@ -117,6 +162,7 @@ export function useTable(
           }
         }
       )
+      variables.loadingRef = false
     })
   }
 

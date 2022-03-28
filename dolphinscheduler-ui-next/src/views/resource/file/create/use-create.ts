@@ -31,18 +31,14 @@ export function useCreate(state: any) {
     const currentDir = fileStore.getCurrentDir || '/'
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
-        try {
-          await onlineCreateResource({
-            ...state.fileForm,
-            ...{ pid, currentDir }
-          })
+        await onlineCreateResource({
+          ...state.fileForm,
+          ...{ pid, currentDir }
+        })
 
-          window.$message.success(t('resource.file.success'))
-          const name = pid ? 'resource-file-subdirectory' : 'file'
-          router.push({ name, params: { id: pid } })
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        window.$message.success(t('resource.file.success'))
+        const name = pid ? 'resource-file-subdirectory' : 'file'
+        router.push({ name, params: { id: pid } })
       }
     })
   }

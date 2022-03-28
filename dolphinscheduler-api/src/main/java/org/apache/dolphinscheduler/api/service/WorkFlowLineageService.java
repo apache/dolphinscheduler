@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * work flow lineage service

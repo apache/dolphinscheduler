@@ -29,9 +29,7 @@ export function useCustomCellBuilder() {
   function parseLocationStr(locationStr: string) {
     let locations = null
     if (!locationStr) return locations
-    try {
-      locations = JSON.parse(locationStr)
-    } catch (error) {}
+    locations = JSON.parse(locationStr)
     return Array.isArray(locations) ? locations : null
   }
 
@@ -85,7 +83,9 @@ export function useCustomCellBuilder() {
       attrs: {
         image: {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
-          'xlink:href': `/src/assets/images/task-icons/${type.toLocaleLowerCase()}.png`
+          'xlink:href': `${
+            import.meta.env.BASE_URL
+          }images/task-icons/${type.toLocaleLowerCase()}.png`
         },
         title: {
           text: truncation

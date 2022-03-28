@@ -24,9 +24,9 @@ body:
     attributes:
       value: |
         Please make sure what you are reporting is indeed a bug with reproducible steps, if you want to ask questions
-        or share ideas, please [subscribe to our mailing list](mailto:dev-subscribe@dolphinscheduler.apache.org) and sent
-        emails to [our mailing list](mailto:dev@dolphinscheduler.apache.org), you can also head to our
-        [Discussion](https://github.com/apache/dolphinscheduler/discussions) tab.
+        or share ideas, you can head to our
+        [Discussions](https://github.com/apache/dolphinscheduler/discussions) tab, you can also [subscribe to our mailing list](mailto:dev-subscribe@dolphinscheduler.apache.org) and send 
+        emails to [our mailing list](mailto:dev@dolphinscheduler.apache.org)
 
         For better global communication, Please write in English.
 
@@ -98,7 +98,8 @@ body:
         Which version of Apache DolphinScheduler are you running? We only accept bugs report from the LTS projects.
       options:
         - dev
-        - 2.0.4
+        - 3.0.0-alpha
+        - 2.0.5
         - 2.0.3
         - 2.0.2
         - 2.0.1

@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +62,10 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 public class JSONUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
+
+    static {
+        logger.info("init timezone: {}",TimeZone.getDefault());
+    }
 
     /**
      * can use static singleton, inject: just make sure to reuse!

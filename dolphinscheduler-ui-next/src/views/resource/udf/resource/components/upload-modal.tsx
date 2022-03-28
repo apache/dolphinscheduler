@@ -39,6 +39,9 @@ export default defineComponent({
     const { handleUploadFile } = useModal(state, ctx)
 
     const hideModal = () => {
+      state.uploadForm.name = ''
+      state.uploadForm.description = ''
+      state.uploadForm.file = ''
       ctx.emit('update:show')
     }
 
@@ -66,17 +69,16 @@ export default defineComponent({
         title={t('resource.udf.file_upload')}
         onCancel={this.hideModal}
         onConfirm={this.handleFolder}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='uploadFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='uploadFormRef'>
           <NFormItem label={t('resource.udf.file_name')} path='name'>
             <NInput
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
+              class='input-file-name'
             />
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
@@ -84,12 +86,14 @@ export default defineComponent({
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}
+              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('resource.udf.upload_files')} path='file'>
             <NUpload
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
+              class='btn-upload'
             >
               <NButton>
                 {t('resource.udf.upload')}

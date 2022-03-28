@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTa
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.openqa.selenium.By;
@@ -44,14 +45,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 @SuppressWarnings("UnstableApiUsage")
 @Getter
 public final class WorkflowForm {
-    private final WebDriver driver;
+    private WebDriver driver;
     private final WorkflowSaveDialog saveForm;
     private final WorkflowFormatDialog formatDialog;
 
     @FindBy(className = "graph-format")
     private WebElement formatBtn;
 
-    @FindBy(id = "btnSave")
+    @FindBy(className = "btn-save")
     private WebElement buttonSave;
 
     public WorkflowForm(WebDriver driver) {

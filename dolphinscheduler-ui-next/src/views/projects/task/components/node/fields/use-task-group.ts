@@ -33,20 +33,16 @@ export function useTaskGroup(
   const getTaskGroupList = async () => {
     if (loading.value) return
     loading.value = true
-    try {
-      const { totalList = [] } = await queryTaskGroupListPagingByProjectCode({
-        pageNo: 1,
-        pageSize: 2147483647,
-        projectCode
-      })
-      options.value = totalList.map((item: { id: string; name: string }) => ({
-        label: item.name,
-        value: item.id
-      }))
-      loading.value = false
-    } catch (err) {
-      loading.value = false
-    }
+    const { totalList = [] } = await queryTaskGroupListPagingByProjectCode({
+      pageNo: 1,
+      pageSize: 2147483647,
+      projectCode
+    })
+    options.value = totalList.map((item: { id: string; name: string }) => ({
+      label: item.name,
+      value: item.id
+    }))
+    loading.value = false
   }
 
   onMounted(() => {
@@ -56,7 +52,10 @@ export function useTaskGroup(
   watch(
     () => model.taskGroupId,
     (taskGroupId) => {
-      if (!taskGroupId) model.taskGroupPriority = 0
+      if (!taskGroupId) {
+        model.taskGroupId = null
+        model.taskGroupPriority = null
+      }
     }
   )
 
@@ -79,8 +78,7 @@ export function useTaskGroup(
         max: Math.pow(10, 60) - 1,
         disabled: priorityDisabled
       },
-      span: 12,
-      value: 0
+      span: 12
     }
   ]
 }

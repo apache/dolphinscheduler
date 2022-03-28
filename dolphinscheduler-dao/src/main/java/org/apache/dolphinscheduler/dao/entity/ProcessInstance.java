@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -248,6 +248,12 @@ public class ProcessInstance {
      * re-start time
      */
     private Date restartTime;
+
+    /**
+     * workflow block flag
+     */
+    @TableField(exist = false)
+    private boolean isBlocked;
 
     public ProcessInstance() {
 
@@ -623,6 +629,14 @@ public class ProcessInstance {
         this.processDefinitionVersion = processDefinitionVersion;
     }
 
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{"
@@ -701,6 +715,8 @@ public class ProcessInstance {
             + ", restartTime='"
             + restartTime
             + '\''
+            + ", isBlocked="
+            + isBlocked
             + '}';
     }
 

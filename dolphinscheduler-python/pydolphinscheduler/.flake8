@@ -26,7 +26,9 @@ exclude =
     old,
     build,
     dist,
-    htmlcov
+    htmlcov,
+    .tox,
+    dist,
 ignore = 
     # It's clear and not need to add docstring
     D107,  # D107: Don't require docstrings on __init__
@@ -34,5 +36,5 @@ ignore =
     # Conflict to Black
     W503   # W503: Line breaks before binary operators
 per-file-ignores =
-    src/pydolphinscheduler/side/__init__.py:F401
-    src/pydolphinscheduler/tasks/__init__.py:F401
+    */pydolphinscheduler/side/__init__.py:F401
+    */pydolphinscheduler/tasks/__init__.py:F401

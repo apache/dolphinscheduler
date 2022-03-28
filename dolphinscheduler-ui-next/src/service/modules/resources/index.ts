@@ -55,6 +55,13 @@ export function queryResourceById(
   })
 }
 
+export function queryCurrentResourceById(id: number): any {
+  return axios({
+    url: `/resources/${id}/query`,
+    method: 'get'
+  })
+}
+
 export function createResource(
   data: CreateReq & FileNameReq & NameReq & ResourceTypeReq
 ): any {
@@ -65,7 +72,7 @@ export function createResource(
   })
 }
 
-export function authorizedFile(params: UserIdReq) {
+export function authorizedFile(params: UserIdReq): any {
   return axios({
     url: '/resources/authed-file',
     method: 'get',
@@ -73,7 +80,7 @@ export function authorizedFile(params: UserIdReq) {
   })
 }
 
-export function authorizeResourceTree(params: UserIdReq) {
+export function authorizeResourceTree(params: UserIdReq): any {
   return axios({
     url: '/resources/authed-resource-tree',
     method: 'get',
@@ -81,7 +88,7 @@ export function authorizeResourceTree(params: UserIdReq) {
   })
 }
 
-export function authUDFFunc(params: UserIdReq) {
+export function authUDFFunc(params: UserIdReq): any {
   return axios({
     url: '/resources/authed-udf-func',
     method: 'get',
@@ -135,7 +142,7 @@ export function queryUdfFuncListPaging(params: ListReq): any {
   })
 }
 
-export function queryUdfFuncList(params: IdReq & ListReq): any {
+export function queryUdfFuncList(params: { type: 'HIVE' | 'SPARK' }): any {
   return axios({
     url: '/resources/udf-func/list',
     method: 'get',
@@ -158,7 +165,7 @@ export function deleteUdfFunc(id: number): any {
   })
 }
 
-export function unAuthUDFFunc(params: UserIdReq) {
+export function unAuthUDFFunc(params: UserIdReq): any {
   return axios({
     url: '/resources/unauth-udf-func',
     method: 'get',

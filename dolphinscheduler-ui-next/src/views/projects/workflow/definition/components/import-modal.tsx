@@ -67,13 +67,9 @@ export default defineComponent({
         title={t('project.workflow.upload')}
         onCancel={this.hideModal}
         onConfirm={this.handleImport}
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.importRules}
-          ref='importFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.importRules} ref='importFormRef'>
           <NFormItem label={t('project.workflow.upload_file')} path='file'>
             <NButton>
               <NUpload
@@ -82,7 +78,7 @@ export default defineComponent({
                 showFileList={false}
               >
                 <NButton text>
-                  上传
+                  {t('project.workflow.upload')}
                   <NIcon>
                     <CloudUploadOutlined />
                   </NIcon>

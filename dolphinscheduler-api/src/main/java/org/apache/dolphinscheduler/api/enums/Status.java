@@ -215,6 +215,7 @@ public enum Status {
     REVOKE_PROJECT_ERROR(10182, "revoke project error", "撤销项目授权错误"),
     QUERY_AUTHORIZED_USER(10183, "query authorized user error", "查询拥有项目权限的用户错误"),
     PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
+    TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -226,7 +227,7 @@ public enum Status {
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar", "UDF资源文件后缀名只支持[jar]"),
     HDFS_COPY_FAIL(20010, "hdfs copy {0} -> {1} fail", "hdfs复制失败：[{0}] -> [{1}]"),
     RESOURCE_FILE_EXIST(20011, "resource file {0} already exists in hdfs,please delete it or change name!", "资源文件[{0}]在hdfs中已存在，请删除或修改资源名"),
-    RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists in hdfs!", "资源文件[{0}]在hdfs中不存在"),
+    RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists !", "资源文件[{0}]不存在"),
     UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}", "udf函数绑定了资源文件[{0}]"),
     RESOURCE_IS_USED(20014, "resource file is used by process definition", "资源文件被上线的流程定义使用了"),
     PARENT_RESOURCE_NOT_EXIST(20015, "parent resource not exist", "父资源文件不存在"),
@@ -297,7 +298,8 @@ public enum Status {
     NOT_SUPPORT_UPDATE_TASK_DEFINITION(50056, "task state does not support modification", "当前任务不支持修改"),
     NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
-
+    STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
+    S3_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
     /**
      * for monitor
      */
@@ -337,12 +339,12 @@ public enum Status {
     LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012, "failed to delete the alert instance, there is an alarm group associated with this alert instance",
             "删除告警实例失败，存在与此告警实例关联的警报组"),
-    PROCESS_DEFINITION_VERSION_IS_USED(110013,"this process definition version is used","此工作流定义版本被使用"),
+    PROCESS_DEFINITION_VERSION_IS_USED(110013, "this process definition version is used", "此工作流定义版本被使用"),
 
     CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
-    ENVIRONMENT_NAME_EXISTS(120002,"this environment name [{0}] already exists","环境名称[{0}]已经存在"),
-    ENVIRONMENT_NAME_IS_NULL(120003,"this environment name shouldn't be empty.","环境名称不能为空"),
-    ENVIRONMENT_CONFIG_IS_NULL(120004,"this environment config shouldn't be empty.","环境配置信息不能为空"),
+    ENVIRONMENT_NAME_EXISTS(120002, "this environment name [{0}] already exists", "环境名称[{0}]已经存在"),
+    ENVIRONMENT_NAME_IS_NULL(120003, "this environment name shouldn't be empty.", "环境名称不能为空"),
+    ENVIRONMENT_CONFIG_IS_NULL(120004, "this environment config shouldn't be empty.", "环境配置信息不能为空"),
     UPDATE_ENVIRONMENT_ERROR(120005, "update environment [{0}] info error", "更新环境[{0}]信息失败"),
     DELETE_ENVIRONMENT_ERROR(120006, "delete environment error", "删除环境信息失败"),
     DELETE_ENVIRONMENT_RELATED_TASK_EXISTS(120007, "this environment has been used in tasks,so you can't delete it.", "该环境已经被任务使用，所以不能删除该环境信息"),
@@ -358,26 +360,26 @@ public enum Status {
     GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
     GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
     GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
-    TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
-    TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
-    TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组已经被关闭"),
-    TASK_GROUP_FULL(130004,"task group is full","任务组已经满了"),
-    TASK_GROUP_USED_SIZE_ERROR(130005,"the used size number of task group is dirty","任务组使用的容量发生了变化"),
-    TASK_GROUP_QUEUE_RELEASE_ERROR(130006,"failed to release task group queue","任务组资源释放时出现了错误"),
-    TASK_GROUP_QUEUE_AWAKE_ERROR(130007,"awake waiting task failed","任务组使唤醒等待任务时发生了错误"),
-    CREATE_TASK_GROUP_ERROR(130008,"create task group error","创建任务组错误"),
-    UPDATE_TASK_GROUP_ERROR(130009,"update task group list error","更新任务组错误"),
-    QUERY_TASK_GROUP_LIST_ERROR(130010,"query task group list error","查询任务组列表错误"),
-    CLOSE_TASK_GROUP_ERROR(130011,"close task group error","关闭任务组错误"),
-    START_TASK_GROUP_ERROR(130012,"start task group error","启动任务组错误"),
-    QUERY_TASK_GROUP_QUEUE_LIST_ERROR(130013,"query task group queue list error","查询任务组队列列表错误"),
-    TASK_GROUP_CACHE_START_FAILED(130014,"cache start failed","任务组相关的缓存启动失败"),
+    TASK_GROUP_NAME_EXSIT(130001, "this task group name is repeated in a project", "该任务组名称在一个项目中已经使用"),
+    TASK_GROUP_SIZE_ERROR(130002, "task group size error", "任务组大小应该为大于1的整数"),
+    TASK_GROUP_STATUS_ERROR(130003, "task group status error", "任务组已经被关闭"),
+    TASK_GROUP_FULL(130004, "task group is full", "任务组已经满了"),
+    TASK_GROUP_USED_SIZE_ERROR(130005, "the used size number of task group is dirty", "任务组使用的容量发生了变化"),
+    TASK_GROUP_QUEUE_RELEASE_ERROR(130006, "failed to release task group queue", "任务组资源释放时出现了错误"),
+    TASK_GROUP_QUEUE_AWAKE_ERROR(130007, "awake waiting task failed", "任务组使唤醒等待任务时发生了错误"),
+    CREATE_TASK_GROUP_ERROR(130008, "create task group error", "创建任务组错误"),
+    UPDATE_TASK_GROUP_ERROR(130009, "update task group list error", "更新任务组错误"),
+    QUERY_TASK_GROUP_LIST_ERROR(130010, "query task group list error", "查询任务组列表错误"),
+    CLOSE_TASK_GROUP_ERROR(130011, "close task group error", "关闭任务组错误"),
+    START_TASK_GROUP_ERROR(130012, "start task group error", "启动任务组错误"),
+    QUERY_TASK_GROUP_QUEUE_LIST_ERROR(130013, "query task group queue list error", "查询任务组队列列表错误"),
+    TASK_GROUP_CACHE_START_FAILED(130014, "cache start failed", "任务组相关的缓存启动失败"),
     ENVIRONMENT_WORKER_GROUPS_IS_INVALID(130015, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
-    UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
+    UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016, "You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
             "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
     TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源"),
-    TASK_GROUP_STATUS_CLOSED(130018,"The task group has been closed.","任务组已经被关闭"),
-    TASK_GROUP_STATUS_OPENED(130019,"The task group has been opened.","任务组已经被开启"),
+    TASK_GROUP_STATUS_CLOSED(130018, "The task group has been closed.", "任务组已经被关闭"),
+    TASK_GROUP_STATUS_OPENED(130019, "The task group has been opened.", "任务组已经被开启"),
     NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT(130020, "Not allow to disable your own account", "不能停用自己的账号"),
     NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP(130030, "Not allow to delete the default alarm group ", "不能删除默认告警组"),
     TIME_ZONE_ILLEGAL(130031, "time zone [{0}] is illegal", "时区参数 [{0}] 不合法"),
@@ -390,7 +392,8 @@ public enum Status {
     K8S_CLIENT_OPS_ERROR(1300006, "k8s error with exception {0}", "k8s操作报错[{0}]"),
     VERIFY_K8S_NAMESPACE_ERROR(1300007, "verify k8s and namespace error", "验证k8s命名空间信息错误"),
     DELETE_K8S_NAMESPACE_BY_ID_ERROR(1300008, "delete k8s namespace by id error", "删除命名空间错误"),
-    ;
+    VERIFY_PARAMETER_NAME_FAILED(1300009, "The file name verify  failed", "文件命名校验失败"),
+    STORE_OPERATE_CREATE_ERROR(1300010, "create the resource failed", "存储操作失败");
 
     private final int code;
     private final String enMsg;
@@ -416,8 +419,6 @@ public enum Status {
 
     /**
      * Retrieve Status enum entity by status code.
-     * @param code
-     * @return
      */
     public static Optional<Status> findStatusBy(int code) {
         for (Status status : Status.values()) {

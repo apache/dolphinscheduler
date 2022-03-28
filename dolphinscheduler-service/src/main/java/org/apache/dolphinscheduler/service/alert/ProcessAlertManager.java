@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -193,6 +193,7 @@ public class ProcessAlertManager {
             alert.setTitle("worker fault tolerance");
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
+            alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alertDao.addAlert(alert);
@@ -223,6 +224,7 @@ public class ProcessAlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
+        alert.setWarningType(processInstance.getState().typeIsSuccess() ? WarningType.SUCCESS : WarningType.FAILURE);
         String content = getContentProcessInstance(processInstance, taskInstances,projectUser);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
@@ -359,5 +361,40 @@ public class ProcessAlertManager {
 
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
         alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
+    }
+
+    /**
+     *
+     * check node type and process blocking flag, then insert a block record into db
+     *
+     * @param processInstance process instance
+     * @param projectUser the project owner
+     */
+    public void sendProcessBlockingAlert(ProcessInstance processInstance,
+                                         ProjectUser projectUser) {
+        Alert alert = new Alert();
+        String cmdName = getCommandCnName(processInstance.getCommandType());
+        List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
+        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .projectId(projectUser.getProjectId())
+                .projectName(projectUser.getProjectName())
+                .owner(projectUser.getUserName())
+                .processId(processInstance.getId())
+                .processName(processInstance.getName())
+                .processType(processInstance.getCommandType())
+                .processState(processInstance.getState())
+                .runTimes(processInstance.getRunTimes())
+                .processStartTime(processInstance.getStartTime())
+                .processEndTime(processInstance.getEndTime())
+                .processHost(processInstance.getHost())
+                .build();
+        blockingNodeList.add(processAlertContent);
+        String content = JSONUtils.toJsonString(blockingNodeList);
+        alert.setTitle(cmdName + " Blocked");
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alertDao.addAlert(alert);
+        logger.info("add alert to db, alert: {}",alert);
     }
 }

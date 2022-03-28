@@ -22,10 +22,51 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import lombok.Getter;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 @Getter
 public final class SubWorkflowTaskForm extends TaskNodeForm {
+    @FindBys({
+            @FindBy(className = "select-child-node"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement btnSelectChildNodeDropdown;
+
+    @FindBy(className = "n-base-select-option__content")
+    private List<WebElement> selectChildNode;
+
+    private WebDriver driver;
+
+
     public SubWorkflowTaskForm(WorkflowForm parent) {
         super(parent);
+
+        this.driver = parent.driver();
+    }
+
+    public SubWorkflowTaskForm childNode(String node) {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
+        
+        btnSelectChildNodeDropdown().click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.className(
+                "n-base-select-option__content")));
+
+        selectChildNode()
+                .stream()
+                .filter(it -> it.getText().contains(node))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in child node dropdown list", node)))
+                .click();
+
+        return this;
     }
 }

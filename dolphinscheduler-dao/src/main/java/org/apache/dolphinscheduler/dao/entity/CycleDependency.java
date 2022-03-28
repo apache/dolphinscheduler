@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
@@ -40,7 +41,6 @@ public class CycleDependency {
      * cycle enum
      */
     private CycleEnum cycleEnum;
-
 
     public CycleDependency(int processDefineId, Date lastScheduleTime, Date expirationTime, CycleEnum cycleEnum) {
         this.processDefineId = processDefineId;
@@ -83,11 +83,11 @@ public class CycleDependency {
 
     @Override
     public String toString() {
-        return "CycleDependency{" +
-                "processDefineId=" + processDefineId +
-                ", lastScheduleTime=" + lastScheduleTime +
-                ", expirationTime=" + expirationTime +
-                ", cycleEnum=" + cycleEnum +
-                '}';
+        return "CycleDependency{"
+                + "processDefineId=" + processDefineId
+                + ", lastScheduleTime=" + lastScheduleTime
+                + ", expirationTime=" + expirationTime
+                + ", cycleEnum=" + cycleEnum
+                + '}';
     }
 }
