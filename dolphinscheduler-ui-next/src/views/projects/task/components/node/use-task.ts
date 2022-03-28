@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, Ref, unref, watch } from 'vue'
+import { ref, Ref, unref } from 'vue'
 import nodes from './tasks'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import { useTaskNodeStore } from '@/store/project/task-node'
