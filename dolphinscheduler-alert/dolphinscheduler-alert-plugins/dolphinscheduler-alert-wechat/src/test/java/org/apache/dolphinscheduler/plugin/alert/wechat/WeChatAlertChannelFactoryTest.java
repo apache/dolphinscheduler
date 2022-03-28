@@ -36,7 +36,7 @@ public class WeChatAlertChannelFactoryTest {
         WeChatAlertChannelFactory weChatAlertChannelFactory = new WeChatAlertChannelFactory();
         List<PluginParams> params = weChatAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assert.assertEquals(7, params.size());
+        Assert.assertEquals(6, params.size());
     }
 
     @Test
