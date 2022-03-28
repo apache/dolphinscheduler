@@ -61,10 +61,6 @@ public class WeChatSenderTest {
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, "100000");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, "NAME_ENTERPRISE_WE_CHAT_CORP_ID");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, "NAME_ENTERPRISE_WE_CHAT_SECRET");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, "{\"touser\":\"{toUser}\",\"agentid\":{agentId}"
-            +
-            ",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}"
-        );
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, "Kris");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG, "msg");
         weChatConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE.getDescp());

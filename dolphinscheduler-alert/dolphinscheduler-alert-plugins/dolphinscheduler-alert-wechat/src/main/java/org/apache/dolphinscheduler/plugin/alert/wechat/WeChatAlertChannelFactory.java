@@ -62,13 +62,6 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                                                                .build())
                                           .build();
 
-        InputParam userSendMsgParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USER_SEND_MSG)
-                                                .setPlaceholder("please input corp id ")
-                                                .addValidate(Validate.newBuilder()
-                                                                     .setRequired(true)
-                                                                     .build())
-                                                .build();
-
         InputParam agentIdParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_AGENT_ID)
                                             .setPlaceholder("please input agent id ")
                                             .addValidate(Validate.newBuilder()
@@ -90,7 +83,7 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                                         .addValidate(Validate.newBuilder().setRequired(true).build())
                                         .build();
 
-        return Arrays.asList(corpIdParam, secretParam, usersParam, userSendMsgParam, agentIdParam, sendType, showType);
+        return Arrays.asList(corpIdParam, secretParam, usersParam, agentIdParam, sendType, showType);
     }
 
     @Override

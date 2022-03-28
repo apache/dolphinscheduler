@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.*;
 
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
@@ -35,8 +36,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -59,8 +58,8 @@ public final class WeChatSender {
     private static final String SECRET_REGEX = "{secret}";
     private static final String TOKEN_REGEX = "{token}";
     private final String weChatAgentId;
+    private final String weChatChatId;
     private final String weChatUsers;
-    private final String weChatUserSendMsg;
     private final String weChatTokenUrlReplace;
     private final String weChatToken;
     private final String sendType;
@@ -68,11 +67,11 @@ public final class WeChatSender {
 
     WeChatSender(Map<String, String> config) {
         weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
+        weChatChatId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CHAT_ID);
         weChatUsers = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS);
         String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
-        weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
         sendType = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SEND_TYPE);
         showType = config.get(AlertConstants.NAME_SHOW_TYPE);
         requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);
@@ -96,7 +95,7 @@ public final class WeChatSender {
                 response.close();
             }
             logger.info("Enterprise WeChat send [{}], param:{}, resp:{}",
-                url, data, resp);
+                    url, data, resp);
             return resp;
         }
     }
@@ -229,30 +228,13 @@ public final class WeChatSender {
     }
 
     /**
-     * make user multi user message
-     *
-     * @param toUser the toUser
-     * @param agentId the agentId
-     * @param msg the msg
-     * @return Enterprise WeChat send message
-     */
-    private String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
-        String listUser = mkString(toUser);
-        return weChatUserSendMsg.replace(USER_REG_EXP, listUser)
-                                .replace(AGENT_ID_REG_EXP, agentId)
-                                .replace(MSG_REG_EXP, msg);
-    }
-
-    /**
      * send Enterprise WeChat
      *
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      */
     public AlertResult sendEnterpriseWeChat(String title, String content) {
         AlertResult alertResult;
-        List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
-        String msg = makeUserSendMsg(userList, weChatAgentId, data);
         if (null == weChatToken) {
             alertResult = new AlertResult();
             alertResult.setMessage("send we chat alert fail,get weChat token error");
@@ -260,14 +242,21 @@ public final class WeChatSender {
             return alertResult;
         }
         String enterpriseWeChatPushUrlReplace = "";
+        Map<String,String> contentMap=new HashMap<>();
+        contentMap.put(WeChatAlertConstants.WE_CHAT_CONTENT_KEY,data);
+        String msgJson="";
         if (sendType.equals(WeChatType.APP.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+            WechatAppMessage wechatAppMessage=new WechatAppMessage(weChatUsers, WE_CHAT_MESSAGE_TYPE_TEXT, Integer.valueOf(weChatAgentId),contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY, WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
+            msgJson=JSONUtils.toJsonString(wechatAppMessage);
         } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+            WechatAppChatMessage wechatAppChatMessage=new WechatAppChatMessage(weChatChatId, WE_CHAT_MESSAGE_TYPE_TEXT, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
+            msgJson=JSONUtils.toJsonString(wechatAppChatMessage);
         }
 
         try {
-            return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));
+            return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msgJson));
         } catch (Exception e) {
             logger.info("send we chat alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();

@@ -24,10 +24,9 @@ public final class WeChatAlertParamsConstants {
     static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "secret";
     static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "$t('teamSendMsg')";
     static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "teamSendMsg";
-    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "$t('userSendMsg')";
-    static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "userSendMsg";
     static final String ENTERPRISE_WE_CHAT_AGENT_ID = "$t('agentId')";
     static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "agentId";
+    static final String NAME_ENTERPRISE_WE_CHAT_CHAT_ID = "chatId";
     static final String ENTERPRISE_WE_CHAT_USERS = "$t('users')";
     static final String NAME_ENTERPRISE_WE_CHAT_USERS = "users";
 
