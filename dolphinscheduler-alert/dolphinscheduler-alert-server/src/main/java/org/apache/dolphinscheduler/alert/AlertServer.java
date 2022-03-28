@@ -18,11 +18,15 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.PluginDao;
+import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +36,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -44,21 +49,26 @@ import org.springframework.context.event.EventListener;
 public class AlertServer implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
+    private final PluginDao pluginDao;
+    private final AlertDao alertDao;
     private final AlertPluginManager alertPluginManager;
     private final AlertSender alertSender;
     private final AlertRequestProcessor alertRequestProcessor;
-    private final AlertConfig config;
-    @Value("${spring.jackson.time-zone:UTC}")
-    private String timezone;
 
     private NettyRemotingServer server;
 
+    @Autowired
+    private AlertConfig config;
 
-    public AlertServer(AlertPluginManager alertPluginManager, AlertSender alertSender, AlertRequestProcessor alertRequestProcessor, AlertConfig config) {
+    @Value("${spring.jackson.time-zone:UTC}")
+    private String timezone;
+
+    public AlertServer(PluginDao pluginDao, AlertDao alertDao, AlertPluginManager alertPluginManager, AlertSender alertSender, AlertRequestProcessor alertRequestProcessor) {
+        this.pluginDao = pluginDao;
+        this.alertDao = alertDao;
         this.alertPluginManager = alertPluginManager;
         this.alertSender = alertSender;
         this.alertRequestProcessor = alertRequestProcessor;
-        this.config = config;
     }
 
     public static void main(String[] args) {
@@ -78,7 +88,7 @@ public class AlertServer implements Closeable {
         startServer();
 
         Executors.newScheduledThreadPool(1)
-                 .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
+            .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
     }
 
     @Override
@@ -88,7 +98,7 @@ public class AlertServer implements Closeable {
     }
 
     private void checkTable() {
-        if (!alertPluginManager.checkPluginDefineTableExist()) {
+        if (!pluginDao.checkPluginDefineTableExist()) {
             logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
             System.exit(1);
         }
@@ -111,7 +121,8 @@ public class AlertServer implements Closeable {
             }
 
             try {
-                alertSender.sendPendingAlerts();
+                final List<Alert> alerts = alertDao.listPendingAlerts();
+                alertSender.send(alerts);
             } catch (Exception e) {
                 logger.error("Failed to send alert", e);
             }

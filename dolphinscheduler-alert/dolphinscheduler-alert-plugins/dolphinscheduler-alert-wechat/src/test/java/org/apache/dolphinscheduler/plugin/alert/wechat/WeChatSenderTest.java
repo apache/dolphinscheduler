@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.alert.api.ShowType;
 
 import java.util.HashMap;
 import java.util.Map;
