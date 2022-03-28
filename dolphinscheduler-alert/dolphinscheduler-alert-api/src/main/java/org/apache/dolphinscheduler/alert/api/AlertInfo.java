@@ -45,16 +45,18 @@ public class AlertInfo {
         return this.alertParams;
     }
 
-    public void setAlertParams(Map<String, String> alertParams) {
+    public AlertInfo setAlertParams(Map<String, String> alertParams) {
         this.alertParams = alertParams;
+        return this;
     }
 
     public AlertData getAlertData() {
         return this.alertData;
     }
 
-    public void setAlertData(AlertData alertData) {
+    public AlertInfo setAlertData(AlertData alertData) {
         this.alertData = alertData;
+        return this;
     }
 
     @Override
