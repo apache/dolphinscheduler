@@ -303,7 +303,15 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
-
+  let timeoutNotifyStrategy = ''
+  if (data.timeoutNotifyStrategy) {
+    if (data.timeoutNotifyStrategy.length === 1) {
+      timeoutNotifyStrategy = data.timeoutNotifyStrategy[0]
+    }
+    if (data.timeoutNotifyStrategy.length === 2) {
+      timeoutNotifyStrategy = 'WARNFAILED'
+    }
+  }
   const params = {
     processDefinitionCode: data.processName ? String(data.processName) : '',
     upstreamCodes: data?.preTasks?.join(','),
@@ -333,9 +341,9 @@ export function formatParams(data: INodeData): {
       },
       taskPriority: data.taskPriority,
       taskType: data.taskType,
-      timeout: data.timeout,
+      timeout: data.timeoutFlag ? data.timeout : 0,
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
-      timeoutNotifyStrategy: data.timeoutNotifyStrategy?.join(''),
+      timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
       workerGroup: data.workerGroup
     }
   } as {
@@ -362,7 +370,9 @@ export function formatModel(data: ITaskData) {
     ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
-    timeoutNotifyStrategy: [data.timeoutNotifyStrategy] || [],
+    timeoutNotifyStrategy: data.timeoutNotifyStrategy
+      ? [data.timeoutNotifyStrategy]
+      : [],
     localParams: data.taskParams?.localParams || []
   } as INodeData
 
