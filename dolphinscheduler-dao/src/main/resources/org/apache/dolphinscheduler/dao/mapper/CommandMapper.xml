@@ -39,4 +39,12 @@
         order by process_instance_priority, id asc
         limit #{limit} offset #{offset}
     </select>
+
+    <select id="queryCommandPageBySlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select *
+        from t_ds_command
+        where id % #{masterCount} = #{thisMasterSlot}
+        order by process_instance_priority, id asc
+            limit #{limit} offset #{offset}
+    </select>
 </mapper>
