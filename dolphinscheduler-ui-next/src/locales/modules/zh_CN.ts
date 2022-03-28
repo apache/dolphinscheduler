@@ -151,7 +151,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    master_no_data_result_title: 'Master节点不存在',
+    master_no_data_result_desc:
+      '目前没有任何Master节点，请先创建Master节点，再访问该页面'
   },
   worker: {
     cpu_usage: '处理器使用量',

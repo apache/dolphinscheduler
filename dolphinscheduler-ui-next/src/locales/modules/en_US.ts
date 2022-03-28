@@ -152,7 +152,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    master_no_data_result_title: 'No Master Nodes Exist',
+    master_no_data_result_desc:
+      'Currently, there are no master nodes exist, please create a master node and refresh this page'
   },
   worker: {
     cpu_usage: 'CPU Usage',

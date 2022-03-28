@@ -27,6 +27,7 @@ import { useI18n } from 'vue-i18n'
 import { useMaster } from './use-master'
 import styles from './index.module.scss'
 import Card from '@/components/card'
+import Result from "@/components/result";
 import Gauge from '@/components/chart/modules/Gauge'
 import MasterModal from './master-modal'
 import type { Ref } from 'vue'
@@ -67,7 +68,14 @@ const master = defineComponent({
     const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
       this
 
-    return (
+    return this.data.length < 1 ? (
+      <Result
+        title={t('monitor.master.master_no_data_result_title')}
+        description={t('monitor.master.master_no_data_result_desc')}
+        status={'info'}
+        size={'medium'}
+      />
+    ) : (
       <>
         <NSpace vertical size={25}>
           {this.data.map((item: MasterNode) => {
