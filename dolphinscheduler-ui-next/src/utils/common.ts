@@ -24,7 +24,7 @@ import {
   EditOutlined,
   MinusCircleOutlined,
   CheckCircleFilled,
-  LoadingOutlined,
+  Loading3QuartersOutlined,
   PauseCircleFilled,
   ClockCircleOutlined,
   StopFilled,
@@ -319,8 +319,8 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     id: 14,
     desc: `${t('project.workflow.serial_wait')}`,
     color: '#5102ce',
-    icon: LoadingOutlined,
-    isSpin: false,
+    icon: Loading3QuartersOutlined,
+    isSpin: true,
     classNames: 'serial_wait'
   }
 })

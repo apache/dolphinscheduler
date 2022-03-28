@@ -40,6 +40,7 @@ export interface ProcessDefinition {
   timeout: number
   tenantId: number
   tenantCode: string
+  executionType: string
   modifyBy?: any
   warningGroupId: number
 }
@@ -142,6 +143,7 @@ export interface SaveForm {
   name: string
   description: string
   tenantCode: string
+  executionType: string
   timeoutFlag: boolean
   timeout: number
   globalParams: GlobalParam[]
