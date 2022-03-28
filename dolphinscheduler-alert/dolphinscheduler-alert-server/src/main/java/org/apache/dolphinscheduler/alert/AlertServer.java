@@ -88,7 +88,7 @@ public class AlertServer implements Closeable {
         startServer();
 
         Executors.newScheduledThreadPool(1)
-            .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
+                 .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
     }
 
     @Override
