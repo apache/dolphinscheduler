@@ -53,7 +53,7 @@
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
-          <td width="50"><x-checkbox v-model="item.isCheck" :disabled="item.releaseState === 'ONLINE'" @on-change="_arrDelChange"></x-checkbox></td>
+          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
@@ -122,24 +122,54 @@
         </tr>
       </table>
     </div>
-    <x-poptip
-            v-show="strSelectIds !== ''"
-            ref="poptipDeleteAll"
-            placement="bottom-start"
-            width="90">
-      <p>{{$t('Delete?')}}</p>
-      <div style="text-align: right; margin: 0;padding-top: 4px;">
-        <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
-        <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
-      </div>
-      <template slot="reference">
-        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
-      </template>
-    </x-poptip>
-    <template v-if="strSelectIds !== ''">
-      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
-    </template>
-
+    <div v-if="strSelectIds !== ''" style="position: absolute; bottom: -48px; left: 16px;">
+      <span>
+        {{$t('Selected')}}
+        <span style="padding: 0 4px">{{ strSelectIds.split(',').length }}</span>{{ strSelectIds.split(',').length > 1 ? $t('Items') : $t('Item') }}
+      </span>
+      <x-button
+        size="xsmall"
+        class="definition-list-footer-btn"
+        @click="_batchExport(item)"
+      >{{$t('Export')}}</x-button>
+      <x-button
+        size="xsmall"
+        @click="_batchStart()"
+        class="definition-list-footer-btn"
+        :disabled="selectedOnlineState"
+      >{{$t('Start')}}</x-button>
+      <x-button
+        size="xsmall"
+        type="ghost"
+        icon="ans-icon-warn-empty"
+        v-tooltip.large.top.end="$t('BatchStartTips')"></x-button>
+      <x-button
+        size="xsmall"
+        @click="_batchOnline()"
+        class="definition-list-footer-btn"
+        :disabled="selectedOfflineState"
+      >{{$t('online')}}</x-button>
+      <x-button
+        size="xsmall"
+        @click="_batchOffline()"
+        class="definition-list-footer-btn"
+        :disabled="selectedOnlineState"
+      >{{$t('offline')}}</x-button>
+      <x-poptip
+        v-show="strSelectIds !== ''"
+        ref="poptipDeleteAll"
+        placement="bottom-start"
+        width="90">
+        <p>{{$t('Delete?')}}</p>
+        <div style="text-align: right; margin: 0;padding-top: 4px;">
+          <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
+          <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
+        </div>
+        <template slot="reference">
+          <x-button type="error" :disabled="selectedOfflineState" class="definition-list-footer-btn" size="xsmall">{{$t('Delete')}}</x-button>
+        </template>
+      </x-poptip>
+    </div>
   </div>
 </template>
 <script>
@@ -166,7 +196,7 @@
     },
     mixins: [switchProject],
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition','copyProcess']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition','copyProcess', 'batchOnlineProcess', 'batchOfflineProcess', 'batchExecuteProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
@@ -347,13 +377,51 @@
           processDefinitionIds: this.strSelectIds,
           fileName: "process_"+new Date().getTime()
         }).then(res => {
+          this.$message.success(res.msg)
           this._onUpdate()
-          this.checkAll = false
-          this.strSelectIds = ''
+          this._resetSelected()
         }).catch(e => {
-          this.strSelectIds = ''
-          this.checkAll = false
           this.$message.error(e.msg)
+          this._resetSelected()
+        })
+      },
+      // 批量启动
+      _batchStart() {
+        this.batcExecuteProcess({
+          processDefinitionIds: this.strSelectIds,
+        }).then(res => {
+          this.$message.success(res.msg)
+          this._onUpdate()
+          this._resetSelected()
+        }).catch(e => {
+          this.$message.error(e.msg)
+          this._resetSelected()
+        })
+      },
+      // 批量上线
+      _batchOnline() {
+        this.batchOnlineProcess({
+          processDefinitionIds: this.strSelectIds,
+        }).then(res => {
+          this.$message.success(res.msg)
+          this._onUpdate()
+          this._resetSelected()
+        }).catch(e => {
+          this.$message.error(e.msg)
+          this._resetSelected()
+        })
+      },
+      // 批量下线
+      _batchOffline() {
+        this.batchOfflineProcess({
+          processDefinitionIds: this.strSelectIds,
+        }).then(res => {
+          this.$message.success(res.msg)
+          this._onUpdate()
+          this._resetSelected()
+        }).catch(e => {
+          this.$message.error(e.msg)
+          this._resetSelected()
         })
       },
 
@@ -376,7 +444,7 @@
        * click the select-all checkbox
        */
       _topCheckBoxClick (is) {
-        _.map(this.list , v => v.isCheck = v.releaseState === 'ONLINE' ? false : is)
+        _.map(this.list , v => v.isCheck = is)
         this._arrDelChange()
       },
       /**
@@ -403,14 +471,20 @@
           processDefinitionIds: this.strSelectIds
         }).then(res => {
           this._onUpdate()
-          this.checkAll = false
-          this.strSelectIds = ''
+          this._resetSelected()
           this.$message.success(res.msg)
         }).catch(e => {
-          this.strSelectIds = ''
-          this.checkAll = false
+          this._resetSelected()
           this.$message.error(e.msg || '')
         })
+      },
+      /**
+       * reset table selected
+       */
+      _resetSelected() {
+        this.strSelectIds = ''
+        this.checkAll = false
+        this._topCheckBoxClick(false)
       }
     },
     watch: {
@@ -429,6 +503,20 @@
         this.strSelectIds = ''
       }
     },
+    computed: {
+      // 勾选项全部为上线状态
+      selectedOnlineState() {
+        if (this.strSelectIds === '') return true;
+        const selectedIds = this.strSelectIds.split(',').map(item => +item);
+        return !(this.list.filter(item => selectedIds.includes(item.id)).every(item => item.releaseState === "ONLINE"));
+      },
+      // 勾选项全部为下线状态
+      selectedOfflineState() {
+        if (this.strSelectIds === '') return true;
+        const selectedIds = this.strSelectIds.split(',').map(item => +item);
+        return !(this.list.filter(item => selectedIds.includes(item.id)).every(item => item.releaseState === "OFFLINE"));
+      },
+    },
     created () {
     },
     mounted () {
@@ -436,3 +524,8 @@
     components: { }
   }
 </script>
+<style>
+.definition-list-footer-btn {
+  margin-left: 12px;
+}
+</style>

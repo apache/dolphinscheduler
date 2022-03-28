@@ -75,6 +75,18 @@ public class ProcessDefinitionControllerTest {
     }
 
     @Test
+    public void batchReleaseProcessDefinition() {
+        String projectName = "test";
+        String processIds = "93,94,95,96";
+        int releaseState = 0;
+
+        Result result = new Result();
+        Mockito.when(processDefinitionController.batchReleaseProcessDefinition(user, projectName, processIds, releaseState)).thenReturn(result);
+        Result response = processDefinitionController.batchReleaseProcessDefinition(user, projectName, processIds, releaseState);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+
+    @Test
     public void testCreateProcessDefinition() throws Exception {
         String json = "{\"globalParams\":[],"
                 + "\"tasks\":["

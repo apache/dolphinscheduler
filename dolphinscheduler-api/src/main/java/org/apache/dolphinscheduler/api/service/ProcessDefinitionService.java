@@ -17,7 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_DEFINE_NOT_EXIST;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID;
+import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
+import static org.apache.dolphinscheduler.common.enums.FailureStrategy.CONTINUE;
+import static org.apache.dolphinscheduler.common.enums.RunMode.RUN_MODE_SERIAL;
+import static org.apache.dolphinscheduler.common.enums.TaskDependType.TASK_POST;
 
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -131,6 +136,9 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private ExecutorService execService;
 
     /**
      * create process definition
@@ -1463,5 +1471,115 @@ public class ProcessDefinitionService extends BaseDAGService {
         return recursionProcessDefinitionName(projectId,processDefinitionName,num + 1);
     }
 
+    public ProcessDefinition getProcessDefinitionById(int id) {
+        return processDefineMapper.queryByDefineId(id);
+    }
+
+    public Map<String, Object> batchExecuteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> execFailedIdList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(processDefinitionIds)) {
+            String[] processDefinitionIdArray = processDefinitionIds.split(",");
+
+            for (String strProcessDefinitionId : processDefinitionIdArray) {
+                int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+                try {
+                    ProcessDefinition processDefinition = getProcessDefinitionById(processDefinitionId);
+                    if (null != processDefinition) {
+                        String workGroup = JSONObject.parseObject(processDefinition.getProcessDefinitionJson()).getJSONArray("tasks").getJSONObject(0).getString("workerGroup");
+
+                        Map<String, Object> execResult = execService.execProcessInstance(loginUser, projectName, processDefinitionId, "", START_PROCESS, CONTINUE,
+                                "", TASK_POST, WarningType.NONE,
+                                0, "", "", RUN_MODE_SERIAL, Priority.MEDIUM, workGroup, Constants.MAX_TASK_TIMEOUT);
+
+                        if (!Status.SUCCESS.equals(execResult.get(Constants.STATUS))) {
+                            execFailedIdList.add(strProcessDefinitionId);
+                            logger.error((String) execResult.get(Constants.MSG));
+                        }
+                    } else {
+                        logger.error("processDefinitionId:{} process definition is null", processDefinitionId);
+                        putMsg(result, PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+                    }
+
+
+                } catch (Exception e) {
+                    logger.error("processDefinitionId:{} process execution is failed", processDefinitionId);
+                    execFailedIdList.add(strProcessDefinitionId);
+                }
+            }
+        }
+
+        if (!execFailedIdList.isEmpty()) {
+            putMsg(result, Status.BATCH_EXEC_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", execFailedIdList));
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+
+    public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
+        Map<String, Object> result = new HashMap<>(5);
+        List<String> deleteFailedIdList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(processDefinitionIds)) {
+            String[] processDefinitionIdArray = processDefinitionIds.split(",");
+
+            for (String strProcessDefinitionId : processDefinitionIdArray) {
+                int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+                try {
+                    Map<String, Object> deleteResult = deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
+                        deleteFailedIdList.add(strProcessDefinitionId);
+                        logger.error((String) deleteResult.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    deleteFailedIdList.add(strProcessDefinitionId);
+                }
+            }
+        }
+
+        if (!deleteFailedIdList.isEmpty()) {
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+
+    public Map<String, Object> batchReleaseProcessDefinition(User loginUser, String projectName, String processDefinitionIds, int releaseState) {
+        Map<String, Object> result = new HashMap<>(5);
+        List<String> batchFailedIdList = new ArrayList<>();
+        List<String> batchSucceedIdList = new ArrayList<>();
+
+        if (StringUtils.isNotEmpty(processDefinitionIds)) {
+            String[] processDefinitionIdArray = processDefinitionIds.split(",");
+
+            for (String strProcessDefinitionId : processDefinitionIdArray) {
+                int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+                try {
+                    Map<String, Object> batchResult = releaseProcessDefinition(loginUser, projectName, processDefinitionId, releaseState);
+
+                    if (!Status.SUCCESS.equals(batchResult.get(Constants.STATUS))) {
+                        batchFailedIdList.add(strProcessDefinitionId);
+                        logger.error((String) batchResult.get(Constants.MSG));
+                        // return returnDataList(batchResult);
+                    } else {
+                        batchSucceedIdList.add(strProcessDefinitionId);
+                    }
+                } catch (Exception e) {
+                    batchFailedIdList.add(strProcessDefinitionId);
+                }
+            }
+        }
+        if (!batchFailedIdList.isEmpty()) {
+            logger.error("Batch Operate Process Definitions，Failed ids:{} ", String.join(",", batchFailedIdList));
+            putMsg(result, Status.BATCH_OPERATION_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", batchFailedIdList));
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
+        if (!batchSucceedIdList.isEmpty()) {
+            logger.info("Batch Operate Process Definitions，Successes ids:{} ", String.join(",", batchSucceedIdList));
+        }
+        return result;
+    }
 }
 

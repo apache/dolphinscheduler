@@ -27,7 +27,7 @@
       </template>
       <template slot="content">
         <template v-if="processListP.length || total>0">
-          <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+          <m-list ref="mList" :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
           <div class="page-box">
             <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
           </div>
@@ -85,9 +85,11 @@
        * page
        */
       _page (val) {
+        this.$refs.mList._resetSelected()
         this.searchParams.pageNo = val
       },
       _pageSize (val) {
+        this.$refs.mList._resetSelected()
         this.searchParams.pageSize = val
       },
       /**

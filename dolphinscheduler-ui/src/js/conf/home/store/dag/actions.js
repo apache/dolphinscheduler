@@ -80,6 +80,62 @@ export default {
     })
   },
   /**
+   * Batch online process definition
+   */
+  batchOnlineProcess({state}, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/batch-online`, {
+        processDefinitionIds: payload.processDefinitionIds,
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Batch offline process definition
+   */
+  batchOfflineProcess({state}, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/batch-offline`, {
+        processDefinitionIds: payload.processDefinitionIds,
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Batch execute process definition
+   */
+  batchExecuteProcess({state}, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/batch-execute`, {
+        processDefinitionIds: payload.processDefinitionIds,
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Batch execute process definition
+   */
+  batchStopTaskInstance({state}, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/task-instance/batch-stop-flink`, {
+        taskInstanceIds: payload.taskInstanceIds,
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Update process instance status
    */
   editExecutorsState ({ state }, payload) {

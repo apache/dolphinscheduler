@@ -16,14 +16,20 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -40,6 +46,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
+import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
+import static org.apache.dolphinscheduler.common.enums.FailureStrategy.CONTINUE;
+import static org.apache.dolphinscheduler.common.enums.RunMode.RUN_MODE_SERIAL;
+import static org.apache.dolphinscheduler.common.enums.TaskDependType.TASK_POST;
 
 
 /**
@@ -419,32 +429,7 @@ public class ProcessDefinitionController extends BaseController {
     ) {
         logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
                 loginUser.getUserName(), projectName, processDefinitionIds);
-
-        Map<String, Object> result = new HashMap<>(5);
-        List<String> deleteFailedIdList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(processDefinitionIds)) {
-            String[] processDefinitionIdArray = processDefinitionIds.split(",");
-
-            for (String strProcessDefinitionId : processDefinitionIdArray) {
-                int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
-                try {
-                    Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
-                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedIdList.add(strProcessDefinitionId);
-                        logger.error((String) deleteResult.get(Constants.MSG));
-                    }
-                } catch (Exception e) {
-                    deleteFailedIdList.add(strProcessDefinitionId);
-                }
-            }
-        }
-
-        if (!deleteFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
-
+        Map<String, Object> result = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, projectName, processDefinitionIds);
         return returnDataList(result);
     }
 
@@ -495,4 +480,63 @@ public class ProcessDefinitionController extends BaseController {
         return returnDataList(result);
     }
 
+    public Result batchReleaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                @RequestParam(value = "processIds", required = true) String processDefinitionIds,
+                                                @RequestParam(value = "releaseState", required = true) int releaseState) {
+
+        logger.info("login user {}, batch release process definition, project name: {}, processDefinitionIds: {}, release state: {}",
+                loginUser.getUserName(), projectName, processDefinitionIds, releaseState);
+        Map<String, Object> result = processDefinitionService.batchReleaseProcessDefinition(loginUser, projectName, processDefinitionIds, releaseState);
+        return returnDataList(result);
+    }
+
+    @ApiOperation(value = "batch online ProcessDefinition", notes = "BATCH_ONLINE_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID_LIST", required = true, dataType = "String", example = "1,2,3,4")
+    })
+    @GetMapping(value = "/batch-online")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
+    public Result batchOnlineProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                    @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds) {
+        return batchReleaseProcessDefinition(loginUser, projectName, processDefinitionIds, ReleaseState.ONLINE.getCode());
+    }
+
+
+    @ApiOperation(value = "batch offline ProcessDefinition", notes = "BATCH_OFFLINE_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID_LIST", required = true, dataType = "String", example = "1,2,3,4")
+    })
+    @GetMapping(value = "/batch-offline")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
+    public Result batchOfflineProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                     @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds) {
+        return batchReleaseProcessDefinition(loginUser, projectName, processDefinitionIds, ReleaseState.OFFLINE.getCode());
+    }
+
+    /*batch-execute*/
+    @ApiOperation(value = "batch execute ProcessDefinition", notes = "BATCH_EXECUTION_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID_LIST", required = true, dataType = "String", example = "1,2,3,4")
+    })
+    @GetMapping(value = "/batch-execute")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
+    public Result batchExecuteProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                     @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds) {
+
+        logger.info("login user {}, batch execute process definition, project name: {}, processDefinitionIds: {}",
+                loginUser.getUserName(), projectName, processDefinitionIds);
+
+        Map<String, Object> result = processDefinitionService.batchExecuteProcessDefinitionByIds(loginUser, projectName, processDefinitionIds);
+        return returnDataList(result);
+    }
 }
