@@ -102,7 +102,7 @@ public class FunctionManageE2ETest {
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
-        UdfManagePage udfManagePage = userPage.update(user, user, password, email, phone, tenant)
+        UdfManagePage udfManagePage = userPage.update(user, user, email, phone, tenant)
                 .goToNav(ResourcePage.class)
                 .goToTab(UdfManagePage.class)
                 .uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());

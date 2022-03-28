@@ -97,7 +97,7 @@ public class UdfManageE2ETest {
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
-        userPage.update(user, user, password, email, phone, tenant)
+        userPage.update(user, user, email, phone, tenant)
             .goToNav(ResourcePage.class)
             .goToTab(UdfManagePage.class);
     }

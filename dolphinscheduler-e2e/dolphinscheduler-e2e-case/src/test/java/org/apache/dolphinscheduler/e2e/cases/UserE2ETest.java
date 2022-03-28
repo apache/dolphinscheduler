@@ -122,7 +122,7 @@ class UserE2ETest {
 
         browser.navigate().refresh();
 
-        page.update(user, editUser, editPassword, editEmail, editPhone, tenant);
+        page.update(user, editUser, editEmail, editPhone, tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
