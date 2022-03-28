@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.alert.email.template;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
+import org.apache.dolphinscheduler.plugin.alert.email.ShowType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 

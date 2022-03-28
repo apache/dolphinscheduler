@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email.template;
 
-import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.plugin.alert.email.ShowType;
 
 public interface AlertTemplate {
 

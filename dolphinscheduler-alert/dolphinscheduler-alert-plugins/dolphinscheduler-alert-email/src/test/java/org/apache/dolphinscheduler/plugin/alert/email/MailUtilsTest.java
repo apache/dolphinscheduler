@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
-import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
