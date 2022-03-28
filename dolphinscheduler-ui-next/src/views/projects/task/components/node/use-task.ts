@@ -56,7 +56,10 @@ export function useTask({
     from,
     readonly,
     data,
-    jsonRef
+    jsonRef,
+    updateElements: () => {
+      getElements()
+    }
   }
 
   const { model, json } = nodes[data.taskType || 'SHELL'](params)
@@ -70,13 +73,6 @@ export function useTask({
   }
 
   getElements()
-
-  watch(
-    () => jsonRef.value.length,
-    () => {
-      getElements()
-    }
-  )
 
   return { elementsRef, rulesRef, model }
 }
