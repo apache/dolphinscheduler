@@ -32,6 +32,7 @@ import MasterModal from './master-modal'
 import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { MasterNode } from '@/service/modules/monitor/types'
+import Result from "@/components/result";
 
 const master = defineComponent({
   name: 'master',
@@ -67,7 +68,14 @@ const master = defineComponent({
     const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
       this
 
-    return (
+    return this.data.length < 1 ? (
+      <Result
+        title={t('monitor.master.master_no_data_result_title')}
+        description={t('monitor.master.master_no_data_result_desc')}
+        status={'info'}
+        size={'medium'}
+      />
+    ) : (
       <>
         <NSpace vertical size={25}>
           {this.data.map((item: MasterNode) => {
