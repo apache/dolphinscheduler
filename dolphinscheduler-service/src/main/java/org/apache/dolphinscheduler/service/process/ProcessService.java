@@ -408,6 +408,16 @@ public class ProcessService {
     }
 
     /**
+     * get command page
+     */
+    public List<Command> findCommandPageBySlot(int pageSize, int pageNumber, int masterCount, int thisMasterSlot) {
+        if (masterCount <= 0) {
+            return Lists.newArrayList();
+        }
+        return commandMapper.queryCommandPageBySlot(pageSize, pageNumber * pageSize, masterCount, thisMasterSlot);
+    }
+
+    /**
      * check the input command exists in queue list
      *
      * @param command command

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -165,6 +166,38 @@ public class CommandMapperTest extends BaseDaoTest {
 
         assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
     }
+
+    /**
+     * test query command page by slot
+     */
+    @Test
+    public void testQueryCommandPageBySlot() {
+        int masterCount = 4;
+        int thisMasterSlot = 2;
+        // for hit or miss
+        toTestQueryCommandPageBySlot(masterCount,thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount,thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount,thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount,thisMasterSlot);
+    }
+
+    private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
+        Command command = createCommand();
+        int id = command.getId();
+        boolean hit = id % masterCount == thisMasterSlot;
+        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, 0, masterCount, thisMasterSlot);
+        if (hit) {
+            assertEquals(id,commandList.get(0).getId());
+        } else {
+            commandList.forEach(o -> {
+                assertNotEquals(id, o.getId());
+                assertEquals(thisMasterSlot, o.getId() % masterCount);
+            });
+        }
+        return hit;
+    }
+
+
 
     /**
      * create command map

@@ -226,27 +226,12 @@ public class MasterSchedulerService extends Thread {
         int pageNumber = 0;
         int pageSize = masterConfig.getFetchCommandNum();
         List<Command> result = new ArrayList<>();
-        while (Stopper.isRunning()) {
-            // todo: Can we use the slot to scan database?
-            List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
-            if (commandList.size() == 0) {
-                return result;
+        if (Stopper.isRunning()) {
+            int thisMasterSlot = ServerNodeManager.getSlot();
+            int masterCount = ServerNodeManager.getMasterSize();
+            if (masterCount > 0) {
+                result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             }
-            for (Command command : commandList) {
-                SlotCheckState slotCheckState = slotCheck(command);
-                if (slotCheckState.equals(SlotCheckState.CHANGE)) {
-                    // return and wait next scan, don't reset param, waste resources of cpu
-                    return new ArrayList<>();
-                }
-                if (slotCheckState.equals(SlotCheckState.PASS)) {
-                    result.add(command);
-                }
-            }
-            if (CollectionUtils.isNotEmpty(result)) {
-                logger.info("find {} commands, slot:{}", result.size(), ServerNodeManager.getSlot());
-                break;
-            }
-            pageNumber += 1;
         }
         return result;
     }
