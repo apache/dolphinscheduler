@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, Ref, unref, watch } from 'vue'
+import { ref, Ref, unref } from 'vue'
 import nodes from './tasks'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import { useTaskNodeStore } from '@/store/project/task-node'
@@ -56,7 +56,10 @@ export function useTask({
     from,
     readonly,
     data,
-    jsonRef
+    jsonRef,
+    updateElements: () => {
+      getElements()
+    }
   }
 
   const { model, json } = nodes[data.taskType || 'SHELL'](params)
@@ -70,13 +73,6 @@ export function useTask({
   }
 
   getElements()
-
-  watch(
-    () => jsonRef.value.length,
-    () => {
-      getElements()
-    }
-  )
 
   return { elementsRef, rulesRef, model }
 }
