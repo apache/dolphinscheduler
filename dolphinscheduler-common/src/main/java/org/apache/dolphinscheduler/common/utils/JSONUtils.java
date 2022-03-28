@@ -63,6 +63,10 @@ public class JSONUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
 
+    static {
+        logger.info("init timezone: {}",TimeZone.getDefault());
+    }
+
     /**
      * can use static singleton, inject: just make sure to reuse!
      */
