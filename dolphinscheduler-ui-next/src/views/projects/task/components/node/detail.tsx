@@ -18,6 +18,7 @@
 import { defineComponent, ref, watch, inject, Ref, unref } from 'vue'
 import Form from '@/components/form'
 import { useTask } from './use-task'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import type { ITaskData, EditWorkflowDefinition } from './types'
 
 interface IDetailPanel {
@@ -33,6 +34,9 @@ const NodeDetail = defineComponent({
   name: 'NodeDetail',
   emits: ['taskTypeChange'],
   setup(props, { expose, emit }) {
+    const taskStore = useTaskNodeStore()
+    taskStore.init()
+
     const formRef = ref()
     const detailData: IDetailPanel = inject('data') || {
       projectCode: 0,
