@@ -20,22 +20,19 @@ package org.apache.dolphinscheduler.server.master.dispatch.exceptions;
 /**
  *  execute exception
  */
-public class ExecuteException extends Exception{
+public class ExecuteException extends Exception {
 
     public ExecuteException() {
         super();
     }
 
-
     public ExecuteException(String message) {
         super(message);
     }
 
-
     public ExecuteException(String message, Throwable cause) {
         super(message, cause);
     }
-
 
     public ExecuteException(Throwable cause) {
         super(cause);

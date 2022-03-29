@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, watch } from 'vue'
+import { defineComponent, toRefs } from 'vue'
 import {
   NButton,
   NInput,
@@ -90,9 +90,10 @@ const UsersManage = defineComponent({
             <NSpace vertical>
               <NDataTable
                 row-class-name='items'
-                columns={this.columnsRef}
+                columns={this.columnsRef.columns}
                 data={this.list}
                 loading={this.loading}
+                scrollX={this.columnsRef.tableWidth}
               />
               <NSpace justify='center'>
                 <NPagination

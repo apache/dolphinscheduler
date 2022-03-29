@@ -21,10 +21,10 @@ import static org.apache.dolphinscheduler.common.utils.placeholder.TimePlacehold
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.text.ParseException;
 import java.util.ArrayList;

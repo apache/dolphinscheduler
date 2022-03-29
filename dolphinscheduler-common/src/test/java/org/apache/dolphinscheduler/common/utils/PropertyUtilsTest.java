@@ -26,6 +26,6 @@ public class PropertyUtilsTest {
 
     @Test
     public void getString() {
-        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULTFS));
+        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
     }
 }

@@ -67,8 +67,8 @@ integration service run by GitHub Action to test whether the patch is good or no
 section [With GitHub Action](#with-github-action) see more detail.
 
 And to make more convenience to local tests, we also have the way to run your [test automated with tox](#automated-testing-with-tox)
-locally. It is helpful when your try to find out the detail when continuous integration in GitHub Action failed,
-or you have a great patch and want to test local first.
+locally(*run all tests except integrate test with need docker environment*). It is helpful when your try to find out the
+detail when continuous integration in GitHub Action failed, or you have a great patch and want to test local first.
 
 Besides [automated testing with tox](#automated-testing-with-tox) locally, we also have a [manual way](#manually)
 run tests. And it is scattered commands to reproduce each step of the integration test we told about.
@@ -76,14 +76,14 @@ run tests. And it is scattered commands to reproduce each step of the integratio
 * Remote
   * [With GitHub Action](#with-github-action)
 * Local
-  * [Automated Testing With tox](#automated-testing-with-tox)
-  * [Manually](#manually)
+  * [Automated Testing With tox](#automated-testing-with-tox)(including all but integrate test)
+  * [Manually](#manually)(with integrate test)
 
 ### With GitHub Action
 
 GitHub Action test in various environment for pydolphinscheduler, including different python version in
 `3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`. It will trigger and run automatically when you
-submit pull requests to `apache/dolphinscheduler`. 
+submit pull requests to `apache/dolphinscheduler`.
 
 ### Automated Testing With tox
 
@@ -104,6 +104,10 @@ tox -e local-ci
 It will take a while when you run it the first time, because it has to install dependencies and make some prepare,
 and the next time you run it will be faster.
 
+If you failed section `lint` when you run command `tox -e local-ci`, you could try to run command `tox -e auto-lint`
+which we provider fix as many lints as possible. When I finish, you could run command `tox -e local-ci` to see
+whether the linter pass or not, you have to fix it by yourself if linter still fail. 
+
 ### Manually
 
 #### Code Style
@@ -114,6 +118,17 @@ maybe you could follow [Black-integration][black-editor] to configure them in yo
 
 Our Python API CI would automatically run code style checker and unittest when you submit pull request in
 GitHub, you could also run static check locally.
+
+We recommend [pre-commit](https://pre-commit.com/) to do the checker mentioned above before you develop locally. 
+You should install `pre-commit` by running
+
+```shell
+python -m pip install pre-commit 
+```
+
+in your development environment and then run `pre-commit install` to set up the git hooks scripts. After finish
+above steps, each time you run `git commit` or `git push` would run pre-commit check to make basic check before
+you create pull requests in GitHub.
 
 ```shell
 # We recommend you run isort and Black before Flake8, because Black could auto fix some code style issue
@@ -130,6 +145,29 @@ python -m flake8
 ```
 
 #### Testing
+
+## Build Docs
+
+We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in 
+GitHub. You may locally ensure docs could be built suceessfully in case the failure blocks CI.
+
+To build docs locally, install sphinx and related python modules first via:
+
+```shell
+pip install '.[doc]'
+``` 
+
+Then 
+
+```shell
+cd pydolphinscheduler/docs/
+make clean && make html
+```
+
+## Testing
+
+pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
+pull request or commit to dev branch, with python version `3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`.
 
 pydolphinscheduler using [pytest][pytest] to run all tests in directory `tests`. You could run tests by the commands
 
@@ -149,6 +187,28 @@ python -m coverage run && python -m  coverage report
 It would not only run unit test but also show each file coverage which cover rate less than 100%, and `TOTAL`
 line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
 this command output.
+
+#### Integrate Test
+
+Integrate Test can not run when you execute command `tox -e local-ci` because it needs external environment
+including [Docker](https://docs.docker.com/get-docker/) and specific image build by [maven](https://maven.apache.org/install.html).
+Here we would show you the step to run integrate test in directory `dolphinscheduler-python/pydolphinscheduler/tests/integration`.
+
+```shell
+# Go to project root directory and build Docker image
+cd ../../
+
+# Build Docker image
+./mvnw -B clean install \
+    -Dmaven.test.skip \
+    -Dmaven.javadoc.skip \
+    -Dmaven.checkstyle.skip \
+    -Pdocker,release -Ddocker.tag=ci \
+    -pl dolphinscheduler-standalone-server -am
+
+# Go to pydolphinscheduler root directory and run integrate tests
+tox -e integrate-test
+```
 
 ## Add LICENSE When New Dependencies Adding
 
@@ -172,3 +232,4 @@ users who may use it in other way.
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 [coverage]: https://coverage.readthedocs.io/en/stable/
 [isort]: https://pycqa.github.io/isort/index.html
+[sphinx]: https://www.sphinx-doc.org/en/master/

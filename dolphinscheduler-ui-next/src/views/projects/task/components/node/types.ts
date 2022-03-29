@@ -17,7 +17,6 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-
 import type { TaskType } from '@/views/projects/task/constants/task-type'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
@@ -26,8 +25,13 @@ import type {
   FormRules,
   IJsonItemParams
 } from '@/components/form/types'
+export type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
+export type {
+  IWorkflowTaskInstance,
+  WorkflowInstance
+} from '@/views/projects/workflow/components/dag/types'
+export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
 
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
 type RelationType = 'AND' | 'OR'
@@ -233,6 +237,10 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
+  sendEmail?: boolean
+  displayRows?: number
+  title?: string
+  groupId?: string
   preStatements?: string[]
   postStatements?: string[]
   method?: string
@@ -271,6 +279,14 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  processDefinitionCode?: number
+  conditionResult?: {
+    successNode?: number[]
+    failedNode?: number[]
+  }
+  udfs?: string
+  connParams?: string
+  targetJobName?: string
 }
 
 interface INodeData
@@ -282,6 +298,9 @@ interface INodeData
       | 'sourceParams'
       | 'dependence'
       | 'sparkParameters'
+      | 'conditionResult'
+      | 'udfs'
+      | 'customConfig'
     >,
     ISqoopTargetData,
     ISqoopSourceData,
@@ -315,6 +334,11 @@ interface INodeData
   masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
+  definition?: object
+  successBranch?: number
+  failedBranch?: number
+  udfs?: string[]
+  customConfig?: boolean
 }
 
 interface ITaskData
@@ -339,7 +363,6 @@ export {
   ITaskParams,
   IOption,
   IDataBase,
-  ProgramType,
   ModelType,
   SourceType,
   ISqoopSourceParams,

@@ -15,22 +15,32 @@
  * limitations under the License.
  */
 
-import { ref, h, watch, computed, unref } from 'vue'
+import { ref, h, watch, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDatasource } from './use-sqoop-datasource'
 import styles from '../index.module.scss'
 import type { IJsonItem, IOption, SourceType } from '../types'
 
-export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
+export function useTargetType(
+  model: { [field: string]: any },
+  unCustomSpan: Ref<number>
+): IJsonItem[] {
   const { t } = useI18n()
-  const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
-  const hiveSpan = computed(() => (model.targetType === 'HIVE' ? 24 : 0))
-  const hdfsSpan = computed(() => (model.targetType === 'HDFS' ? 24 : 0))
-  const mysqlSpan = computed(() => (model.targetType === 'MYSQL' ? 24 : 0))
-  const dataSourceSpan = computed(() => (model.targetType === 'MYSQL' ? 12 : 0))
-  const updateSpan = computed(() =>
-    model.targetType === 'MYSQL' && model.isUpdate ? 24 : 0
-  )
+  const hiveSpan = ref(0)
+  const hdfsSpan = ref(24)
+  const mysqlSpan = ref(0)
+  const dataSourceSpan = ref(0)
+  const updateSpan = ref(0)
+
+  const resetSpan = () => {
+    hiveSpan.value = unCustomSpan.value && model.targetType === 'HIVE' ? 24 : 0
+    hdfsSpan.value = unCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0
+    mysqlSpan.value =
+      unCustomSpan.value && model.targetType === 'MYSQL' ? 24 : 0
+    dataSourceSpan.value =
+      unCustomSpan.value && model.targetType === 'MYSQL' ? 12 : 0
+    updateSpan.value = mysqlSpan.value && model.targetMysqlIsUpdate ? 24 : 0
+  }
 
   const targetTypes = ref([
     {
@@ -59,12 +69,12 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
         }
         return [
           {
-            label: 'HDFS',
-            value: 'HDFS'
-          },
-          {
             label: 'HIVE',
             value: 'HIVE'
+          },
+          {
+            label: 'HDFS',
+            value: 'HDFS'
           }
         ]
       case 'HDFS':
@@ -78,12 +88,12 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
       default:
         return [
           {
-            label: 'HDFS',
-            value: 'HDFS'
-          },
-          {
             label: 'HIVE',
             value: 'HIVE'
+          },
+          {
+            label: 'HDFS',
+            value: 'HDFS'
           }
         ]
     }
@@ -92,14 +102,24 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => [model.sourceType, model.srcQueryType],
     ([sourceType, srcQueryType]) => {
-      getTargetTypesBySourceType(sourceType, srcQueryType)
+      targetTypes.value = getTargetTypesBySourceType(sourceType, srcQueryType)
+      if (!model.targetType) {
+        model.targetType = targetTypes.value[0].value
+      }
+    }
+  )
+
+  watch(
+    () => [unCustomSpan.value, model.targetType, model.targetMysqlIsUpdate],
+    () => {
+      resetSpan()
     }
   )
 
   return [
     {
       type: 'custom',
-      field: 'custom-title',
+      field: 'custom-title-target',
       span: unCustomSpan,
       widget: h(
         'div',
@@ -124,9 +144,9 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(hiveSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(hiveSpan) && !value) {
+          if (hiveSpan.value && !value) {
             return new Error(t('project.node.database_tips'))
           }
         }
@@ -135,16 +155,16 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'targetHiveTable',
-      name: t('project.node.database'),
+      name: t('project.node.table'),
       span: hiveSpan,
       props: {
         placeholder: t('project.node.table')
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(hiveSpan),
+        required: true,
         validator(rule, value) {
-          if (!!unref(hiveSpan) && !value) {
+          if (hiveSpan.value && !value) {
             return new Error(t('project.node.hive_table_tips'))
           }
         }
@@ -214,9 +234,9 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(hdfsSpan),
+        required: true,
         validator(rule, value) {
-          if (!!unref(hdfsSpan) && !value) {
+          if (hdfsSpan.value && !value) {
             return new Error(t('project.node.target_dir_tips'))
           }
         }
@@ -276,9 +296,9 @@ export function useTargetType(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['blur', 'input'],
-        required: !!unref(mysqlSpan),
+        required: true,
         validator(validate, value) {
-          if (!!unref(mysqlSpan) && !value) {
+          if (mysqlSpan.value && !value) {
             return new Error(t('project.node.table_tips'))
           }
         }

@@ -141,9 +141,7 @@ const DetailModal = defineComponent({
                 rules={rules}
                 ref='detailFormRef'
                 require-mark-placement='left'
-                label-placement='left'
-                label-width={180}
-                label-align='right'
+                label-align='left'
               >
                 <NFormItem
                   label={t('datasource.datasource')}

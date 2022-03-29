@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage.NavBarItem;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -37,17 +38,17 @@ import lombok.Getter;
 
 @Getter
 public final class ProjectPage extends NavBarPage implements NavBarItem {
-    @FindBy(id = "btnCreateProject")
+    @FindBy(className = "btn-create-project")
     private WebElement buttonCreateProject;
 
-    @FindBy(className = "items-project")
+    @FindBy(className = "items")
     private List<WebElement> projectList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final CreateProjectForm createProjectForm;
 
@@ -64,9 +65,6 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         createProjectForm().inputProjectName().sendKeys(project);
         createProjectForm().buttonSubmit().click();
 
-        new WebDriverWait(driver(), 10)
-            .until(ExpectedConditions.textToBePresentInElementLocated(By.className("project-name"), project));
-
         return this;
     }
 
@@ -78,12 +76,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
             .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
             .findElement(By.className("delete")).click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button is displayed"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -91,7 +84,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     public ProjectDetailPage goTo(String project) {
         projectList().stream()
                      .filter(it -> it.getText().contains(project))
-                     .map(it -> it.findElement(By.className("project-name")))
+                     .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
                      .findFirst()
                      .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
                      .click();
@@ -105,10 +98,13 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputProjectName")
+        @FindBys({
+                @FindBy(className = "input-project-name"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputProjectName;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
     }
 }

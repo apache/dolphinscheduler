@@ -58,6 +58,7 @@ test = [
     "freezegun>=1.1",
     "coverage>=6.1",
     "pytest-cov>=3.0",
+    "docker>=5.0.3",
 ]
 
 style = [
@@ -65,6 +66,7 @@ style = [
     "flake8-docstrings>=1.6",
     "flake8-black>=0.2",
     "isort>=5.10",
+    "autoflake>=1.4",
 ]
 
 dev = style + test + doc + build
@@ -95,11 +97,9 @@ class CleanCommand(Command):
 
     def initialize_options(self) -> None:
         """Set default values for options."""
-        pass
 
     def finalize_options(self) -> None:
         """Set final values for options."""
-        pass
 
     def run(self) -> None:
         """Run and remove temporary files."""

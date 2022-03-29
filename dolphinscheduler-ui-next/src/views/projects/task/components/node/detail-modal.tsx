@@ -19,26 +19,32 @@ import {
   defineComponent,
   PropType,
   ref,
-  reactive,
   watch,
   nextTick,
   provide,
   computed,
-  h
+  h,
+  Ref
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import Detail from './detail'
 import { formatModel } from './format-data'
-import type { ITaskData, ITaskType } from './types'
 import {
   HistoryOutlined,
   ProfileOutlined,
   QuestionCircleTwotone
 } from '@vicons/antd'
 import { NIcon } from 'naive-ui'
+import { TASK_TYPES_MAP } from '../../constants/task-type'
 import { Router, useRouter } from 'vue-router'
-import { IWorkflowTaskInstance } from '@/views/projects/workflow/components/dag/types'
+import type {
+  ITaskData,
+  ITaskType,
+  EditWorkflowDefinition,
+  IWorkflowTaskInstance,
+  WorkflowInstance
+} from './types'
 
 const props = {
   show: {
@@ -61,11 +67,18 @@ const props = {
     type: Number as PropType<number>,
     default: 0
   },
+  definition: {
+    type: Object as PropType<Ref<EditWorkflowDefinition>>
+  },
   processInstance: {
-    type: Object as PropType<any>
+    type: Object as PropType<WorkflowInstance>
   },
   taskInstance: {
     type: Object as PropType<IWorkflowTaskInstance>
+  },
+  saving: {
+    type: Boolean,
+    default: false
   }
 }
 
@@ -97,20 +110,20 @@ const NodeDetailModal = defineComponent({
       }
     }
 
-    const initHeaderLinks = (
-      processInstance: any,
-      taskType: ITaskType | undefined
-    ) => {
+    const initHeaderLinks = (processInstance: any, taskType?: ITaskType) => {
       headerLinks.value = [
         {
           text: t('project.node.instructions'),
-          show: taskType ? true : false,
+          show:
+            taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable
+              ? true
+              : false,
           action: () => {
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
               locale.value.toLowerCase().replace('_', '-') +
               '/docs/latest/user_doc/guide/task/' +
-              taskType?.toLowerCase() +
+              taskType?.toLowerCase().replace('_', '-') +
               '.html'
             window.open(helpUrl)
           },
@@ -139,7 +152,9 @@ const NodeDetailModal = defineComponent({
     }
 
     const onTaskTypeChange = (taskType: ITaskType) => {
+      // eslint-disable-next-line vue/no-mutating-props
       props.data.taskType = taskType
+      initHeaderLinks(props.processInstance, props.data.taskType)
     }
 
     provide(
@@ -148,7 +163,8 @@ const NodeDetailModal = defineComponent({
         projectCode: props.projectCode,
         data: props.data,
         from: props.from,
-        readonly: props.readonly
+        readonly: props.readonly,
+        definition: props.definition
       }))
     )
 
@@ -156,7 +172,6 @@ const NodeDetailModal = defineComponent({
       () => [props.show, props.data],
       async () => {
         if (!props.show) return
-
         initHeaderLinks(props.processInstance, props.data.taskType)
         await nextTick()
         detailRef.value.value.setValues(formatModel(props.data))
@@ -168,7 +183,7 @@ const NodeDetailModal = defineComponent({
         show={props.show}
         title={`${t('project.node.current_node_settings')}`}
         onConfirm={onConfirm}
-        confirmLoading={false}
+        confirmLoading={props.saving}
         confirmDisabled={props.readonly}
         onCancel={onCancel}
         headerLinks={headerLinks}

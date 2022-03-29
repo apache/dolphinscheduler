@@ -20,8 +20,6 @@ import { format } from 'date-fns'
 import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import { NTooltip, NIcon, NSpin } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
 import {
@@ -31,21 +29,27 @@ import {
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
-import { runningType, tasksState } from '@/utils/common'
-import { IWorkflowInstance } from '@/service/modules/process-instances/types'
-import { ICountDownParam } from './types'
-import { ExecuteReq } from '@/service/modules/executors/types'
+import { runningType } from '@/utils/common'
 import { parseTime } from '@/utils/common'
 import styles from './index.module.scss'
+import { renderStateCell } from '../../task/instance/use-table'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { Router } from 'vue-router'
+import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
+import type { ICountDownParam } from './types'
+import type { ExecuteReq } from '@/service/modules/executors/types'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const taskStateIcon = tasksState(t)
-
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     checkedRowKeys: [] as Array<RowKey>,
     tableData: [] as Array<IWorkflowInstance>,
     page: ref(1),
@@ -57,24 +61,28 @@ export function useTable() {
     stateType: ref(),
     startDate: ref(),
     endDate: ref(),
-    projectCode: ref(Number(router.currentRoute.value.params.projectCode))
+    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        type: 'selection'
+        type: 'selection',
+        className: 'btn-selected',
+        ...COLUMN_WIDTH_CONFIG['selection']
       },
       {
         title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['name'],
+        className: 'workflow-name',
         render: (row: IWorkflowInstance) =>
           h(
             ButtonLink,
@@ -92,48 +100,15 @@ export function useTable() {
       {
         title: t('project.workflow.status'),
         key: 'state',
-        render: (_row: IWorkflowInstance) => {
-          const stateIcon = taskStateIcon[_row.state]
-          const iconElement = h(
-            NIcon,
-            {
-              size: '18px',
-              style: 'position: relative; top: 7.5px; left: 7.5px'
-            },
-            {
-              default: () =>
-                h(stateIcon.icon, {
-                  color: stateIcon.color
-                })
-            }
-          )
-          return h(
-            NTooltip,
-            {},
-            {
-              trigger: () => {
-                if (stateIcon.isSpin) {
-                  return h(
-                    NSpin,
-                    {
-                      small: 'small'
-                    },
-                    {
-                      icon: () => iconElement
-                    }
-                  )
-                } else {
-                  return iconElement
-                }
-              },
-              default: () => stateIcon!.desc
-            }
-          )
-        }
+        ...COLUMN_WIDTH_CONFIG['state'],
+        className: 'workflow-status',
+        render: (_row: IWorkflowInstance) => renderStateCell(_row.state, t)
       },
       {
         title: t('project.workflow.run_type'),
         key: 'commandType',
+        width: 160,
+        className: 'workflow-run-type',
         render: (_row: IWorkflowInstance) =>
           (
             _.filter(runningType(t), (v) => v.code === _row.commandType)[0] ||
@@ -143,6 +118,7 @@ export function useTable() {
       {
         title: t('project.workflow.scheduling_time'),
         key: 'scheduleTime',
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (_row: IWorkflowInstance) =>
           _row.scheduleTime
             ? format(parseTime(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
@@ -151,6 +127,7 @@ export function useTable() {
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (_row: IWorkflowInstance) =>
           _row.startTime
             ? format(parseTime(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
@@ -159,6 +136,7 @@ export function useTable() {
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
+        ...COLUMN_WIDTH_CONFIG['time'],
         render: (_row: IWorkflowInstance) =>
           _row.endTime
             ? format(parseTime(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
@@ -167,34 +145,40 @@ export function useTable() {
       {
         title: t('project.workflow.duration'),
         key: 'duration',
+        ...COLUMN_WIDTH_CONFIG['duration'],
         render: (_row: IWorkflowInstance) => _row.duration || '-'
       },
       {
         title: t('project.workflow.run_times'),
-        key: 'runTimes'
+        key: 'runTimes',
+        ...COLUMN_WIDTH_CONFIG['times'],
+        className: 'workflow-run-times'
       },
       {
         title: t('project.workflow.fault_tolerant_sign'),
-        key: 'recovery'
+        key: 'recovery',
+        width: 100
       },
       {
         title: t('project.workflow.dry_run_flag'),
         key: 'dryRun',
+        ...COLUMN_WIDTH_CONFIG['dryRun'],
         render: (_row: IWorkflowInstance) => (_row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.workflow.executor'),
-        key: 'executorName'
+        key: 'executorName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.host'),
-        key: 'host'
+        key: 'host',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 250,
-        fixed: 'right',
+        ...COLUMN_WIDTH_CONFIG['operation'](6),
         className: styles.operation,
         render: (_row: IWorkflowInstance, index: number) =>
           h(TableAction, {
@@ -247,9 +231,14 @@ export function useTable() {
           })
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const getTableData = () => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const params = {
       pageNo: variables.page,
       pageSize: variables.pageSize,
@@ -266,6 +255,7 @@ export function useTable() {
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }
     )
   }

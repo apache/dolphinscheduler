@@ -103,7 +103,9 @@ const home = {
   waiting_depend: 'WAITING_DEPEND',
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
-  serial_wait: 'SERIAL_WAIT'
+  serial_wait: 'SERIAL_WAIT',
+  ready_block: 'READY_BLOCK',
+  block: 'BLOCK'
 }
 
 const password = {
@@ -137,7 +139,8 @@ const profile = {
   state_tips: 'Please choose your state',
   enable: 'Enable',
   disable: 'Disable',
-  timezone_success: 'Time zone updated successful'
+  timezone_success: 'Time zone updated successful',
+  please_select_timezone: 'Choose timeZone'
 }
 
 const monitor = {
@@ -149,7 +152,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    master_no_data_result_title: 'No Master Nodes Exist',
+    master_no_data_result_desc:
+      'Currently, there are no master nodes exist, please create a master node and refresh this page'
   },
   worker: {
     cpu_usage: 'CPU Usage',
@@ -159,7 +165,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    worker_no_data_result_title: 'No Worker Nodes Exist',
+    worker_no_data_result_desc:
+      'Currently, there are no worker nodes exist, please create a worker node and refresh this page'
   },
   db: {
     health_state: 'Health State',
@@ -282,7 +291,9 @@ const resource = {
       'Please select UDF resources directory',
     enter_instructions_tips: 'Please enter a instructions',
     enter_name_tips: 'Please enter name',
-    enter_description_tips: 'Please enter description'
+    enter_description_tips: 'Please enter description',
+    upload: 'Upload',
+    upload_udf_resources: 'Upload UDF Resources'
   },
   task_group_option: {
     manage: 'Task group manage',
@@ -403,6 +414,7 @@ const project = {
     tree_view: 'Tree View',
     tree_limit: 'Limit Size',
     export: 'Export',
+    batch_copy: 'Batch Copy',
     version_info: 'Version Info',
     version: 'Version',
     file_upload: 'File Upload',
@@ -506,9 +518,19 @@ const project = {
     cancel_full_screen: 'Cancel full screen',
     task_state: 'Task status',
     mode_of_dependent: 'Mode of dependent',
-    open: 'Open'
+    open: 'Open',
+    project_name_required: 'Project name is required',
+    related_items: 'Related items',
+    project_name: 'Project Name',
+    project_tips: 'Please select project name',
+    workflow_relation_no_data_result_title:
+      'Can not find any relations of workflows.',
+    workflow_relation_no_data_result_desc:
+      'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    online: 'Online',
+    offline: 'Offline',
     task_name: 'Task Name',
     task_type: 'Task Type',
     create_task: 'Create Task',
@@ -554,7 +576,9 @@ const project = {
     delay_execution: 'Delay Execution',
     forced_success: 'Forced Success',
     view_log: 'View Log',
-    download_log: 'Download Log'
+    download_log: 'Download Log',
+    refresh: 'Refresh',
+    serial_wait: 'Serial Wait'
   },
   dag: {
     create: 'Create Workflow',
@@ -576,6 +600,12 @@ const project = {
     description: 'Description',
     tenant: 'Tenant',
     timeout_alert: 'Timeout Alert',
+    process_execute_type: 'Process execute type',
+    parallel: 'parallel',
+    serial_wait: 'Serial wait',
+    serial_discard: 'Serial discard',
+    serial_priority: 'Serial priority',
+    recover_serial_wait: 'Recover serial wait',
     global_variables: 'Global Variables',
     basic_info: 'Basic Information',
     minute: 'Minute',
@@ -584,6 +614,7 @@ const project = {
     success: 'Success',
     delete_cell: 'Delete selected edges and nodes',
     online_directly: 'Whether to go online the process definition',
+    update_directly: 'Whether to update the process definition',
     dag_name_empty: 'DAG graph name cannot be empty',
     positive_integer: 'Please enter a positive integer greater than 0',
     prop_empty: 'prop is empty',
@@ -714,7 +745,7 @@ const project = {
     body_not_contains: 'Content does not contain',
     http_parameters_position: 'Http Parameters Position',
     target_task_name: 'Target Task Name',
-    target_task_name_tips: 'Please enter the Pigeon task name',
+    target_task_name_tips: 'Please enter the Pigeon task name(required)',
     datasource_type: 'Datasource types',
     datasource_instances: 'Datasource instances',
     sql_type: 'SQL Type',
@@ -799,9 +830,9 @@ const project = {
     switch_branch_flow: 'Branch Flow',
     and: 'and',
     or: 'or',
-    datax_custom_template: 'Custom Template Switch',
+    datax_custom_template: 'Custom Template',
     datax_json_template: 'JSON',
-    datax_target_datasource_type: 'Target Datasource Type',
+    datax_target_datasource_type: 'Target Datasource Types',
     datax_target_database: 'Target Database',
     datax_target_table: 'Target Table',
     datax_target_table_tips: 'Please enter the name of the target table',
@@ -836,6 +867,7 @@ const project = {
     last_saturday: 'LastSaturday',
     last_sunday: 'LastSunday',
     this_month: 'ThisMonth',
+    this_month_begin: 'ThisMonthBegin',
     last_month: 'LastMonth',
     last_month_begin: 'LastMonthBegin',
     last_month_end: 'LastMonthEnd',
@@ -890,7 +922,19 @@ const project = {
     fix_value: 'FixValue',
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: 'Please enter the definition of the job flow.'
+    emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    send_email: 'Send Email',
+    log_display: 'Log display',
+    rows_of_result: 'rows of result',
+    title: 'Title',
+    title_tips: 'Please enter the title of email',
+    alarm_group: 'Alarm group',
+    alarm_group_tips: 'Alarm group required',
+    integer_tips: 'Please enter a positive integer',
+    sql_parameter: 'SQL Parameter',
+    format_tips: 'Please enter format',
+    udf_function: 'UDF Function',
+    unlimited: 'unlimited'
   }
 }
 
@@ -1050,24 +1094,26 @@ const security = {
   alarm_instance: {
     search_input_tips: 'Please input the keywords',
     alarm_instance_manage: 'Alarm instance manage',
-    alarm_instance: 'Alarm Instance',
     alarm_instance_name: 'Alarm instance name',
     alarm_instance_name_tips: 'Please enter alarm plugin instance name',
     alarm_plugin_name: 'Alarm plugin name',
     create_time: 'Create Time',
     update_time: 'Update Time',
     operation: 'Operation',
-    edit: 'Edit',
+    edit_alarm_instance: 'Edit Alarm Instance',
     delete: 'Delete',
+    edit: 'Edit',
+    delete_confirm: 'Delete?',
     confirm: 'Confirm',
     cancel: 'Cancel',
     submit: 'Submit',
-    create: 'Create',
+    create_alarm_instance: 'Create Alarm Instance',
     select_plugin: 'Select plugin',
     select_plugin_tips: 'Select Alarm plugin',
     instance_parameter_exception: 'Instance parameter exception',
     WebHook: 'WebHook',
     webHook: 'WebHook',
+    WarningType: 'Warning Type',
     IsEnableProxy: 'Enable Proxy',
     Proxy: 'Proxy',
     Port: 'Port',
@@ -1102,7 +1148,19 @@ const security = {
     username: 'Username',
     botToken: 'Bot Token',
     chatId: 'Channel Chat Id',
-    parseMode: 'Parse Mode'
+    parseMode: 'Parse Mode',
+    IntegrationKey: 'Integration Key',
+    BotAccessToken: 'Bot Access Token',
+    RoomId: 'Room Id',
+    ToPersonId: 'To Person Id',
+    ToPersonEmail: 'To Person Email',
+    AtSomeoneInRoom: 'At Someone In Room',
+    Destination: 'Destination',
+    AtMobiles: 'At User Mobiles',
+    AtUserIds: 'At User Ids',
+    MsgType: 'Msg Type',
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}All"
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
@@ -1146,6 +1204,7 @@ const datasource = {
   click_to_view: 'Click to view',
   delete: 'Delete',
   confirm: 'Confirm',
+  delete_confirm: 'Delete?',
   cancel: 'Cancel',
   create: 'Create',
   edit: 'Edit',
@@ -1261,7 +1320,7 @@ const data_quality = {
     timeliness_check: 'TimelinessCheck',
     enumeration_check: 'EnumerationCheck',
     table_count_check: 'TableCountCheck',
-    All: 'All',
+    all: 'All',
     FixValue: 'FixValue',
     DailyAvg: 'DailyAvg',
     WeeklyAvg: 'WeeklyAvg',

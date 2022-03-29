@@ -17,14 +17,16 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function useDeployMode(span = 24): IJsonItem {
+export function useDeployMode(span = 24, showClient = true): IJsonItem {
   const { t } = useI18n()
 
   return {
     type: 'radio',
     field: 'deployMode',
     name: t('project.node.deploy_mode'),
-    options: DEPLOY_MODES,
+    options: DEPLOY_MODES.filter((option) =>
+      option.value === 'client' ? showClient : true
+    ),
     span
   }
 }

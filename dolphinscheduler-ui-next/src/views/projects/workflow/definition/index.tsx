@@ -23,7 +23,9 @@ import {
   NIcon,
   NInput,
   NPagination,
-  NSpace
+  NSpace,
+  NTooltip,
+  NPopconfirm
 } from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -32,6 +34,7 @@ import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
 import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
+import CopyModal from './components/copy-modal'
 import { useRouter, useRoute } from 'vue-router'
 import type { Router } from 'vue-router'
 import styles from './index.module.scss'
@@ -43,7 +46,14 @@ export default defineComponent({
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
 
-    const { variables, createColumns, getTableData } = useTable()
+    const {
+      variables,
+      createColumns,
+      getTableData,
+      batchDeleteWorkflow,
+      batchExportWorkflow,
+      batchCopyWorkflow
+    } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -54,6 +64,11 @@ export default defineComponent({
     }
 
     const handleUpdateList = () => {
+      requestData()
+    }
+
+    const handleCopyUpdateList = () => {
+      variables.checkedRowKeys = []
       requestData()
     }
 
@@ -88,18 +103,27 @@ export default defineComponent({
       handleUpdateList,
       createDefinition,
       handleChangePageSize,
+      batchDeleteWorkflow,
+      batchExportWorkflow,
+      batchCopyWorkflow,
+      handleCopyUpdateList,
       ...toRefs(variables)
     }
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.createDefinition}>
+              <NButton
+                type='primary'
+                onClick={this.createDefinition}
+                class='btn-create-process'
+              >
                 {t('project.workflow.create_workflow')}
               </NButton>
               <NButton strong secondary onClick={() => (this.showRef = true)}>
@@ -127,11 +151,15 @@ export default defineComponent({
         </Card>
         <Card title={t('project.workflow.workflow_definition')}>
           <NDataTable
+            loading={loadingRef}
+            rowKey={(row) => row.code}
             columns={this.columns}
             data={this.tableData}
             striped
-            size={'small'}
             class={styles.table}
+            v-model:checked-row-keys={this.checkedRowKeys}
+            row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination
@@ -144,6 +172,62 @@ export default defineComponent({
               onUpdatePage={this.requestData}
               onUpdatePageSize={this.handleChangePageSize}
             />
+          </div>
+          <div class={styles['batch-button']}>
+            <NTooltip>
+              {{
+                default: () => t('project.workflow.delete'),
+                trigger: () => (
+                  <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => (
+                        <NButton
+                          tag='div'
+                          type='primary'
+                          disabled={this.checkedRowKeys.length <= 0}
+                          class='btn-delete-all'
+                        >
+                          {t('project.workflow.delete')}
+                        </NButton>
+                      )
+                    }}
+                  </NPopconfirm>
+                )
+              }}
+            </NTooltip>
+            <NTooltip>
+              {{
+                default: () => t('project.workflow.export'),
+                trigger: () => (
+                  <NButton
+                    tag='div'
+                    type='primary'
+                    disabled={this.checkedRowKeys.length <= 0}
+                    onClick={this.batchExportWorkflow}
+                    class='btn-delete-all'
+                  >
+                    {t('project.workflow.export')}
+                  </NButton>
+                )
+              }}
+            </NTooltip>
+            <NTooltip>
+              {{
+                default: () => t('project.workflow.batch_copy'),
+                trigger: () => (
+                  <NButton
+                    tag='div'
+                    type='primary'
+                    disabled={this.checkedRowKeys.length <= 0}
+                    onClick={() => (this.copyShowRef = true)}
+                    class='btn-delete-all'
+                  >
+                    {t('project.workflow.batch_copy')}
+                  </NButton>
+                )
+              }}
+            </NTooltip>
           </div>
         </Card>
         <ImportModal
@@ -164,6 +248,11 @@ export default defineComponent({
           v-model:row={this.row}
           v-model:show={this.versionShowRef}
           onUpdateList={this.handleUpdateList}
+        />
+        <CopyModal
+          v-model:codes={this.checkedRowKeys}
+          v-model:show={this.copyShowRef}
+          onUpdateList={this.handleCopyUpdateList}
         />
       </div>
     )

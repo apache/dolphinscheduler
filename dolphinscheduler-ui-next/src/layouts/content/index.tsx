@@ -20,8 +20,8 @@ import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
-import { useMenuStore } from '@/store/menu/menu'
 import { useLocalesStore } from '@/store/locales/locales'
+import { useRouteStore } from '@/store/route/route'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
@@ -31,9 +31,9 @@ const Content = defineComponent({
     window.$message = useMessage()
 
     const route = useRoute()
-    const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
+    const routeStore = useRouteStore()
     const {
       state,
       changeMenuOption,
@@ -51,16 +51,11 @@ const Content = defineComponent({
     })
 
     const getSideMenu = (state: any) => {
-      const key = menuStore.getMenuKey
+      const key = route.meta.activeMenu
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
           ?.children || state.menuOptions
-      state.isShowSide = menuStore.getShowSideStatus
-    }
-
-    const getSideMenuOptions = (item: any) => {
-      menuStore.setMenuKey(item.key)
-      getSideMenu(state)
+      state.isShowSide = route.meta.showSide
     }
 
     watch(useI18n().locale, () => {
@@ -74,17 +69,26 @@ const Content = defineComponent({
       () => route.path,
       () => {
         if (route.path !== '/login') {
-          state.isShowSide = menuStore.getShowSideStatus
+          routeStore.setLastRoute(route.path)
+
+          state.isShowSide = route.meta.showSide as boolean
           if (route.matched[1].path === '/projects/:projectCode') {
             changeMenuOption(state)
-            getSideMenu(state)
           }
-          sideKeyRef.value = route.matched[1].path.includes(':projectCode')
-            ? route.matched[1].path.replace(
+
+          getSideMenu(state)
+
+          const currentSide = (
+            route.meta.activeSide
+              ? route.meta.activeSide
+              : route.matched[1].path
+          ) as string
+          sideKeyRef.value = currentSide.includes(':projectCode')
+            ? currentSide.replace(
                 ':projectCode',
-                menuStore.getProjectCode
+                route.params.projectCode as string
               )
-            : route.matched[1].path
+            : currentSide
         }
       },
       { immediate: true }
@@ -92,9 +96,7 @@ const Content = defineComponent({
 
     return {
       ...toRefs(state),
-      menuStore,
       changeMenuOption,
-      getSideMenuOptions,
       sideKeyRef
     }
   },
@@ -103,8 +105,7 @@ const Content = defineComponent({
       <NLayout style='height: 100%'>
         <NLayoutHeader style='height: 65px'>
           <NavBar
-            class="tab-horizontal"
-            onHandleMenuClick={this.getSideMenuOptions}
+            class='tab-horizontal'
             headerMenuOptions={this.headerMenuOptions}
             localesOptions={this.localesOptions}
             timezoneOptions={this.timezoneOptions}
@@ -118,7 +119,11 @@ const Content = defineComponent({
               sideKey={this.sideKeyRef}
             />
           )}
-          <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
+          <NLayoutContent
+            native-scrollbar={false}
+            style='padding: 16px 22px'
+            contentStyle={'height: 100%'}
+          >
             <router-view key={this.$route.fullPath} />
           </NLayoutContent>
         </NLayout>

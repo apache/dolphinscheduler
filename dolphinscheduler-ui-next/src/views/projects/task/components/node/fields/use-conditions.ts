@@ -15,47 +15,22 @@
  * limitations under the License.
  */
 
-import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import { useRelationCustomParams, useTimeoutAlarm } from '.'
 import type { IJsonItem } from '../types'
 
 export function useConditions(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
+  const taskStore = useTaskNodeStore()
 
-  const taskCodeOptions = ref([] as { label: string; value: number }[])
-  const postTasksOptions = ref([] as { label: string; value: number }[])
+  const preTaskOptions = taskStore.preTaskOptions.filter((option) =>
+    taskStore.preTasks.includes(Number(option.value))
+  )
   const stateOptions = [
     { label: t('project.node.success'), value: 'success' },
     { label: t('project.node.failed'), value: 'failed' }
   ]
-
-  watch(
-    () => model.preTasks,
-    () => {
-      taskCodeOptions.value =
-        model.preTaskOptions
-          ?.filter((task: { code: number }) =>
-            model.preTasks?.includes(task.code)
-          )
-          .map((task: { code: number; name: string }) => ({
-            value: task.code,
-            label: task.name
-          })) || []
-    }
-  )
-
-  watch(
-    () => model.postTaskOptions,
-    () => {
-      postTasksOptions.value = model.postTasksOptions.map(
-        (task: { code: number; name: string }) => ({
-          value: task.code,
-          label: task.name
-        })
-      )
-    }
-  )
 
   return [
     {
@@ -76,7 +51,15 @@ export function useConditions(model: { [field: string]: any }): IJsonItem[] {
       props: {
         clearable: true
       },
-      options: postTasksOptions
+      validate: {
+        trigger: ['input', 'blur'],
+        validator: (unuse, value) => {
+          if (value && value === model.failedBranch) {
+            return new Error(t('project.node.branch_tips'))
+          }
+        }
+      },
+      options: taskStore.getPostTaskOptions
     },
     {
       type: 'select',
@@ -96,7 +79,15 @@ export function useConditions(model: { [field: string]: any }): IJsonItem[] {
       props: {
         clearable: true
       },
-      options: postTasksOptions
+      validate: {
+        trigger: ['input', 'blur'],
+        validator: (unuse, value) => {
+          if (value && value === model.successBranch) {
+            return new Error(t('project.node.branch_tips'))
+          }
+        }
+      },
+      options: taskStore.getPostTaskOptions
     },
     ...useTimeoutAlarm(model),
     ...useRelationCustomParams({
@@ -110,7 +101,7 @@ export function useConditions(model: { [field: string]: any }): IJsonItem[] {
             type: 'select',
             field: 'depTaskCode',
             span: 10,
-            options: taskCodeOptions
+            options: preTaskOptions
           },
           {
             type: 'select',

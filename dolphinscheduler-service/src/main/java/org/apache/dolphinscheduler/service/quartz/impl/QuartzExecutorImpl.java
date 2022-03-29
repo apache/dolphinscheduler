@@ -17,31 +17,12 @@
 
 package org.apache.dolphinscheduler.service.quartz.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.PROJECT_ID;
-import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_GROUP_PRIFIX;
-import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_PRIFIX;
-import static org.apache.dolphinscheduler.common.Constants.SCHEDULE;
-import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_ID;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -52,6 +33,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static org.apache.dolphinscheduler.common.Constants.PROJECT_ID;
+import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_GROUP_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.SCHEDULE;
+import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_ID;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 @Service
 public class QuartzExecutorImpl implements QuartzExecutor {
@@ -69,6 +66,7 @@ public class QuartzExecutorImpl implements QuartzExecutor {
      * @param projectId projectId
      * @param schedule schedule
      */
+    @Override
     public void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule) {
         String jobName = this.buildJobName(schedule.getId());
         String jobGroupName = this.buildJobGroupName(projectId);
@@ -142,14 +140,19 @@ public class QuartzExecutorImpl implements QuartzExecutor {
         }
     }
 
-    public String buildJobName(int scheduleId) {
-        return QUARTZ_JOB_PRIFIX + UNDERLINE + scheduleId;
+
+    @Override
+    public String buildJobName(int processId) {
+        return QUARTZ_JOB_PREFIX + UNDERLINE + processId;
     }
 
+
+    @Override
     public String buildJobGroupName(int projectId) {
-        return QUARTZ_JOB_GROUP_PRIFIX + UNDERLINE + projectId;
+        return QUARTZ_JOB_GROUP_PREFIX + UNDERLINE + projectId;
     }
 
+    @Override
     public Map<String, Object> buildDataMap(int projectId, Schedule schedule) {
         Map<String, Object> dataMap = new HashMap<>(8);
         dataMap.put(PROJECT_ID, projectId);

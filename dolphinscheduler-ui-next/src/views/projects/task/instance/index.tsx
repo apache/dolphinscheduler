@@ -86,13 +86,13 @@ const TaskInstance = defineComponent({
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch, onConfirmModal } =
+    const { t, requestTableData, onUpdatePageSize, onSearch, onConfirmModal, loadingRef } =
       this
 
     return (
       <>
         <NCard>
-          <NSpace justify='end'>
+          <NSpace justify='end' wrap={false}>
             <NInput
               v-model={[this.searchVal, 'value']}
               size='small'
@@ -182,7 +182,12 @@ const TaskInstance = defineComponent({
           </NSpace>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
+            scrollX={this.tableWidth}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

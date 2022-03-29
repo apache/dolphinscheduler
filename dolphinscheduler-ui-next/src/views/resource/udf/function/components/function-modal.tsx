@@ -126,13 +126,9 @@ export default defineComponent({
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='functionFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='functionFormRef'>
           <NFormItem label={t('resource.function.type')} path='type'>
             <NRadioGroup
               v-model={[this.functionForm.type, 'value']}
@@ -190,12 +186,7 @@ export default defineComponent({
             </NInputGroup>
           </NFormItem>
           {this.uploadShow && (
-            <NForm
-              rules={this.uploadRules}
-              ref='uploadFormRef'
-              label-placement='left'
-              label-width='160'
-            >
+            <NForm rules={this.uploadRules} ref='uploadFormRef'>
               <NFormItem
                 label={t('resource.function.udf_resources_directory')}
                 path='pid'
@@ -224,20 +215,19 @@ export default defineComponent({
                     v-model={[this.uploadForm.name, 'value']}
                     placeholder={t('resource.function.enter_name_tips')}
                   />
-                  <NButton>
-                    <NUpload
-                      v-model={[this.uploadForm.file, 'value']}
-                      customRequest={this.customRequest}
-                      showFileList={false}
-                    >
-                      <NButton text>
-                        上传
-                        <NIcon>
-                          <CloudUploadOutlined />
-                        </NIcon>
-                      </NButton>
-                    </NUpload>
-                  </NButton>
+                  <NUpload
+                    v-model={[this.uploadForm.file, 'value']}
+                    customRequest={this.customRequest}
+                    showFileList={false}
+                    style={{ width: 'auto' }}
+                  >
+                    <NButton>
+                      {t('resource.function.upload')}
+                      <NIcon>
+                        <CloudUploadOutlined />
+                      </NIcon>
+                    </NButton>
+                  </NUpload>
                 </NInputGroup>
               </NFormItem>
               <NFormItem
@@ -254,7 +244,9 @@ export default defineComponent({
                 />
               </NFormItem>
               <NFormItem label=' '>
-                <NButton onClick={this.handleUpload}>上传UDF资源</NButton>
+                <NButton onClick={this.handleUpload}>
+                  {t('resource.function.upload_udf_resources')}
+                </NButton>
               </NFormItem>
             </NForm>
           )}

@@ -83,7 +83,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone,
+    public UserPage update(String user, String editUser, String editEmail, String editPhone,
                            String tenant) {
         userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
@@ -96,8 +96,6 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         editUserForm().inputUserName().sendKeys(Keys.CONTROL+"a");
         editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputUserName().sendKeys(editUser);
-
-        editUserForm().inputUserPassword().sendKeys(editPassword);
 
         createUserForm().btnSelectTenantDropdown().click();
 

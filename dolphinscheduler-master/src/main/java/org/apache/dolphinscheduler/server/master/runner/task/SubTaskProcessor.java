@@ -20,13 +20,12 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.auto.service.AutoService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
@@ -40,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 /**
  * subtask processor
@@ -123,6 +123,10 @@ public class SubTaskProcessor extends BaseTaskProcessor {
             processService.saveTaskInstance(taskInstance);
         }
     }
+
+    /**
+     * get the params from subProcessInstance to this subProcessTask
+     */
     private void dealFinish() {
         String thisTaskInstanceVarPool = taskInstance.getVarPool();
         if (StringUtils.isNotEmpty(thisTaskInstanceVarPool)) {
@@ -212,10 +216,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public String getType() {
-        return TaskType.SUB_PROCESS.getDesc();
+        return TASK_TYPE_SUB_PROCESS;
     }
 
-    public ProcessInstance getSubProcessInstance() {
-        return subProcessInstance;
-    }
 }

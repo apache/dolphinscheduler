@@ -43,12 +43,18 @@ const FormModal = defineComponent({
       state.formData.priority = props.data.priority
     })
 
-    const onConfirm = () => {
-      const value = state.formData.priority + ''
-      if (value) {
-        modifyTaskGroupQueuePriority(state.formData).then(() => {
+    const onConfirm = async () => {
+      if (state.saving) return
+      state.saving = true
+      try {
+        const value = state.formData.priority + ''
+        if (value) {
+          await modifyTaskGroupQueuePriority(state.formData)
           emit('confirm')
-        })
+        }
+        state.saving = false
+      } catch (err) {
+        state.saving = false
       }
     }
 
@@ -67,6 +73,7 @@ const FormModal = defineComponent({
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
           <NFormItem

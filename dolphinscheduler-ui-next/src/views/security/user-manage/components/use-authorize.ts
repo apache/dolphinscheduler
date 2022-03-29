@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import { reactive } from 'vue'
-import { useI18n } from 'vue-i18n'
 import {
   queryAuthorizedProject,
   queryUnauthorizedProject
@@ -40,8 +39,6 @@ import { removeUselessChildren } from '@/utils/tree-format'
 import type { TAuthType, IResourceOption, IOption } from '../types'
 
 export function useAuthorize() {
-  const { t } = useI18n()
-
   const state = reactive({
     saving: false,
     loading: false,
@@ -105,11 +102,11 @@ export function useAuthorize() {
     ])
     state.loading = false
     state.authorizedUdfs = udfs[0].map(
-      (item: { name: string; id: number }) => item.id
+      (item: { funcName: string; id: number }) => item.id
     )
     state.unauthorizedUdfs = [...udfs[0], ...udfs[1]].map(
-      (item: { name: string; id: number }) => ({
-        label: item.name,
+      (item: { funcName: string; id: number }) => ({
+        label: item.funcName,
         value: item.id
       })
     )
@@ -124,13 +121,13 @@ export function useAuthorize() {
     ])
     state.loading = false
     removeUselessChildren(resources[0])
-    let udfResources = [] as IResourceOption[]
-    let fileResources = [] as IResourceOption[]
+    const udfResources = [] as IResourceOption[]
+    const fileResources = [] as IResourceOption[]
     resources[0].forEach((item: IResourceOption) => {
       item.type === 'FILE' ? fileResources.push(item) : udfResources.push(item)
     })
-    let udfTargets = [] as number[]
-    let fileTargets = [] as number[]
+    const udfTargets = [] as number[]
+    const fileTargets = [] as number[]
     resources[1].forEach((item: { type: string; id: number }) => {
       item.type === 'FILE'
         ? fileTargets.push(item.id)
@@ -138,9 +135,8 @@ export function useAuthorize() {
     })
     state.fileResources = fileResources
     state.udfResources = udfResources
-    console.log(fileResources)
     state.authorizedFileResources = fileTargets
-    state.authorizedUdfResources = fileTargets
+    state.authorizedUdfResources = udfTargets
   }
 
   const onInit = (type: TAuthType, userId: number) => {
@@ -156,6 +152,36 @@ export function useAuthorize() {
     if (type === 'authorize_resource') {
       getResources(userId)
     }
+  }
+
+  /*
+    getParent
+  */
+  const getParent = (data2: Array<number>, nodeId2: number) => {
+    let arrRes: Array<any> = []
+    if (data2.length === 0) {
+      if (nodeId2) {
+        arrRes.unshift(data2)
+      }
+      return arrRes
+    }
+    const rev = (data: Array<any>, nodeId: number) => {
+      for (let i = 0, length = data.length; i < length; i++) {
+        const node = data[i]
+        if (node.id === nodeId) {
+          arrRes.unshift(node)
+          rev(data2, node.pid)
+          break
+        } else {
+          if (node.children) {
+            rev(node.children, nodeId)
+          }
+        }
+      }
+      return arrRes
+    }
+    arrRes = rev(data2, nodeId2)
+    return arrRes
   }
 
   const onSave = async (type: TAuthType, userId: number) => {
@@ -176,16 +202,44 @@ export function useAuthorize() {
     if (type === 'authorize_udf') {
       await grantUDFFunc({
         userId,
-        udfIds: state.authorizedUdfResources.join(',')
+        udfIds: state.authorizedUdfs.join(',')
       })
     }
     if (type === 'authorize_resource') {
+      let fullPathFileId = []
+      const pathFileId: Array<string> = []
+      state.authorizedFileResources.forEach((v: number) => {
+        state.fileResources.forEach((v1: any) => {
+          const arr = []
+          arr[0] = v1
+          if (getParent(arr, v).length > 0) {
+            fullPathFileId = getParent(arr, v).map((v2: any) => {
+              return v2.id
+            })
+            pathFileId.push(fullPathFileId.join('-'))
+          }
+        })
+      })
+
+      let fullPathUdfId = []
+      const pathUdfId: Array<string> = []
+      state.authorizedUdfResources.forEach((v: number) => {
+        state.udfResources.forEach((v1: any) => {
+          const arr = []
+          arr[0] = v1
+          if (getParent(arr, v).length > 0) {
+            fullPathUdfId = getParent(arr, v).map((v2: any) => {
+              return v2.id
+            })
+            pathUdfId.push(fullPathUdfId.join('-'))
+          }
+        })
+      })
+
+      const allPathId = pathFileId.concat(pathUdfId)
       await grantResource({
         userId,
-        resourceIds:
-          state.resourceType === 'file'
-            ? state.authorizedFileResources.join(',')
-            : state.authorizedUdfResources.join(',')
+        resourceIds: allPathId.join(',')
       })
     }
     state.saving = false

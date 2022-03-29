@@ -22,11 +22,16 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DependResult;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -34,20 +39,16 @@ import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -59,6 +60,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -387,13 +393,15 @@ public class WorkflowExecuteThread {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.TIMEOUT);
         } else {
-            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, taskInstance.getTaskDefine());
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
         }
         return true;
     }
 
     private boolean processTimeout() {
-        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, this.processDefinition);
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, projectUser);
         return true;
     }
 
@@ -472,9 +480,6 @@ public class WorkflowExecuteThread {
             completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
         }
 
-        if(taskInstance.isSubProcess()) {
-
-        }
         this.updateProcessInstanceState();
     }
 
@@ -688,8 +693,8 @@ public class WorkflowExecuteThread {
                 logger.error("task {} is not a blocking task", task.getTaskCode());
                 return false;
             }
-            BlockingParameters parameters = (BlockingParameters) TaskParametersUtils.getParameters(TaskType.BLOCKING.getDesc(),
-                task.getTaskParams());
+
+            BlockingParameters parameters = JSONUtils.parseObject(task.getTaskParams(), BlockingParameters.class);
             if (parameters.isAlertWhenBlocking()) {
                 ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
                 processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
@@ -1520,7 +1525,7 @@ public class WorkflowExecuteThread {
     private ExecutionStatus processReadyBlock() {
         if (activeTaskProcessorMaps.size() > 0) {
             for (ITaskProcessor taskProcessor : activeTaskProcessorMaps.values()) {
-                if (!TaskType.BLOCKING.getDesc().equals(taskProcessor.getType())) {
+                if (!TASK_TYPE_BLOCKING.equals(taskProcessor.getType())) {
                     taskProcessor.action(TaskAction.PAUSE);
                 }
             }

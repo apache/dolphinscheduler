@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.enums;
 
 /**
  * execute type
  */
 public enum ExecuteType {
-
 
     /**
      * operation type
@@ -32,10 +32,9 @@ public enum ExecuteType {
      */
     NONE, REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE;
 
-
-    public static ExecuteType getEnum(int value){
+    public static ExecuteType getEnum(int value) {
         for (ExecuteType e: ExecuteType.values()) {
-            if(e.ordinal() == value) {
+            if (e.ordinal() == value) {
                 return e;
             }
         }

@@ -44,26 +44,11 @@ export function useDataX({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    customConfig: data?.taskParams?.customConfig
-      ? data?.taskParams?.customConfig
-      : 0,
-    customConfigSwitch: data?.taskParams?.customConfig !== 0,
-    dsType: data?.taskParams?.dsType ? data?.taskParams?.dsType : 'MYSQL',
-    dataSource: data?.taskParams?.dataSource,
-    dtType: data?.taskParams?.dtType ? data?.taskParams?.dtType : 'MYSQL',
-    dataTarget: data?.taskParams?.dataTarget,
-    sql: data?.taskParams?.sql,
-    targetTable: data?.taskParams?.targetTable,
-    preStatements: data?.taskParams?.preStatements
-      ? data?.taskParams?.preStatements
-      : [],
-    postStatements: data?.taskParams?.postStatements
-      ? data?.taskParams?.postStatements
-      : [],
-    jobSpeedByte: data?.taskParams?.jobSpeedByte,
-    jobSpeedRecord: data?.taskParams?.jobSpeedRecord,
-    xms: data?.taskParams?.xms,
-    xmx: data?.taskParams?.xmx
+    customConfig: false,
+    dsType: 'MYSQL',
+    dtType: 'MYSQL',
+    preStatements: [],
+    postStatements: []
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -75,8 +60,7 @@ export function useDataX({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -95,7 +79,7 @@ export function useDataX({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useDataX(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

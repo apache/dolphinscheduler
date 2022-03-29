@@ -113,7 +113,7 @@ export function useUserDetail() {
     const result = await queryList()
     state.queues = result.map((queue: { queueName: string; id: string }) => ({
       label: queue.queueName,
-      value: queue.id
+      value: queue.queueName
     }))
     if (state.queues.length) {
       initialValues.queue = state.queues[0].value
@@ -137,19 +137,24 @@ export function useUserDetail() {
     state.formData = { ...initialValues }
   }
   const onSave = async (id?: number): Promise<boolean> => {
-    await state.formRef.validate()
-    if (state.saving) return false
-    state.saving = true
-    if (PREV_NAME !== state.formData.userName) {
-      await verifyUserName({ userName: state.formData.userName })
+    try {
+      await state.formRef.validate()
+      if (state.saving) return false
+      state.saving = true
+      if (PREV_NAME !== state.formData.userName) {
+        await verifyUserName({ userName: state.formData.userName })
+      }
+
+      id
+        ? await updateUser({ id, ...state.formData })
+        : await createUser(state.formData)
+
+      state.saving = false
+      return true
+    } catch (err) {
+      state.saving = false
+      return false
     }
-
-    id
-      ? await updateUser({ id, ...state.formData })
-      : await createUser(state.formData)
-
-    state.saving = false
-    return true
   }
   const onSetValues = (record: IRecord) => {
     state.formData = {

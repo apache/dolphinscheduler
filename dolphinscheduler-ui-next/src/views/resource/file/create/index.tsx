@@ -68,8 +68,6 @@ export default defineComponent({
         <NForm
           rules={this.rules}
           ref='fileFormRef'
-          label-placement='left'
-          label-width='160'
           class={styles['form-content']}
         >
           <NFormItem label={t('resource.file.file_name')} path='fileName'>
@@ -109,7 +107,13 @@ export default defineComponent({
           </NFormItem>
           <div class={styles['file-edit-content']}>
             <div class={styles.submit}>
-              <NButton type='info' size='small' round onClick={this.handleFile} class='btn-submit'>
+              <NButton
+                type='info'
+                size='small'
+                round
+                onClick={this.handleFile}
+                class='btn-submit'
+              >
                 {t('resource.file.save')}
               </NButton>
               <NButton

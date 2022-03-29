@@ -20,6 +20,11 @@ import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryExecuteResultListPaging } from '@/service/modules/data-quality'
 import { format } from 'date-fns'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 import type {
   ResultItem,
   ResultListRes
@@ -31,6 +36,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
@@ -38,7 +44,8 @@ export function useTable() {
     state: ref(null),
     searchVal: ref(null),
     datePickerRange: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -46,15 +53,18 @@ export function useTable() {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('data_quality.task_result.task_name'),
-        key: 'userName'
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.workflow_instance'),
-        key: 'processInstanceName'
+        key: 'processInstanceName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('data_quality.task_result.rule_type'),
@@ -69,11 +79,13 @@ export function useTable() {
           } else if (row.ruleType === 3) {
             return t('data_quality.task_result.multi_table_comparison')
           }
-        }
+        },
+        ...COLUMN_WIDTH_CONFIG['ruleType']
       },
       {
         title: t('data_quality.task_result.rule_name'),
-        key: 'ruleName'
+        key: 'ruleName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('data_quality.task_result.state'),
@@ -86,15 +98,18 @@ export function useTable() {
           } else if (row.state === 2) {
             return t('data_quality.task_result.failure')
           }
-        }
+        },
+        ...COLUMN_WIDTH_CONFIG['state']
       },
       {
         title: t('data_quality.task_result.actual_value'),
-        key: 'statisticsValue'
+        key: 'statisticsValue',
+        width: 140
       },
       {
         title: t('data_quality.task_result.excepted_value'),
-        key: 'comparisonValue'
+        key: 'comparisonValue',
+        width: 140
       },
       {
         title: t('data_quality.task_result.check_type'),
@@ -109,7 +124,8 @@ export function useTable() {
           } else if (row.checkType === 3) {
             return t('data_quality.task_result.expected_and_actual_or_expected')
           }
-        }
+        },
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
         title: t('data_quality.task_result.operator'),
@@ -128,43 +144,56 @@ export function useTable() {
           } else if (row.operator === 5) {
             return '!='
           }
-        }
+        },
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.threshold'),
-        key: 'threshold'
+        key: 'threshold',
+        width: 120
       },
       {
         title: t('data_quality.task_result.failure_strategy'),
-        key: 'failureStrategy'
+        key: 'failureStrategy',
+        width: 150
       },
       {
         title: t('data_quality.task_result.excepted_value_type'),
-        key: 'comparisonTypeName'
+        key: 'comparisonTypeName',
+        width: 200
       },
       {
         title: t('data_quality.task_result.error_output_path'),
         key: 'errorOutputPath',
         render: (row: ResultItem) => {
           return row.errorOutputPath ? row : '-'
-        }
+        },
+        width: 200
       },
       {
         title: t('data_quality.task_result.username'),
-        key: 'userName'
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('data_quality.task_result.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -186,6 +215,8 @@ export function useTable() {
             ...item
           }
         }) as any
+
+        variables.loadingRef = false
       }),
       {}
     )

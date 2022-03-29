@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
@@ -30,6 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +44,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * access token service impl
@@ -118,7 +124,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!hasPerm(loginUser,userId)) {
+        if (!canOperator(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -163,7 +169,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!hasPerm(loginUser,userId)) {
+        if (!canOperator(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -191,7 +197,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
-        if (!hasPerm(loginUser,accessToken.getUserId())) {
+        if (!canOperator(loginUser,accessToken.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -215,7 +221,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!hasPerm(loginUser,userId)) {
+        if (!canOperator(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

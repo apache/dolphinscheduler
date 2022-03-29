@@ -25,13 +25,15 @@ export function useDataQuality({
   from = 0,
   readonly,
   data,
-  jsonRef
+  jsonRef,
+  updateElements
 }: {
   projectCode: number
   from?: number
   readonly?: boolean
   data?: ITaskData
   jsonRef: Ref<IJsonItem[]>
+  updateElements: () => void
 }) {
   const { t } = useI18n()
   const model = reactive({
@@ -67,8 +69,7 @@ export function useDataQuality({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -87,7 +88,8 @@ export function useDataQuality({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useRules(model, (items: IJsonItem[], len: number) => {
-        jsonRef.value.splice(17, len, ...items)
+        jsonRef.value.splice(15, len, ...items)
+        updateElements()
       }),
       Fields.useDeployMode(),
       Fields.useDriverCores(),
@@ -109,7 +111,7 @@ export function useDataQuality({
         field: 'localParams',
         isSimple: true
       }),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
@@ -33,19 +33,21 @@ export function useTimeoutAlarm(model: { [field: string]: any }): IJsonItem[] {
       value: 'FAILED'
     }
   ]
-  watch(
-    () => model.timeoutFlag,
-    (timeoutFlag) => {
-      model.timeoutNotifyStrategy = timeoutFlag ? ['WARN'] : []
-      model.timeout = timeoutFlag ? 30 : null
-    }
-  )
 
   return [
     {
       type: 'switch',
       field: 'timeoutFlag',
-      name: t('project.node.timeout_alarm')
+      name: t('project.node.timeout_alarm'),
+      props: {
+        'on-update:value': (value: boolean) => {
+          if (value) {
+            if (!model.timeoutNotifyStrategy.length)
+              model.timeoutNotifyStrategy = ['WARN']
+            if (!model.timeout) model.timeout = 30
+          }
+        }
+      }
     },
     {
       type: 'checkbox',

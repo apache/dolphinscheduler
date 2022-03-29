@@ -18,17 +18,17 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
-
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Retry Report Task Status Thread
@@ -46,7 +46,7 @@ public class RetryReportTaskStatusThread implements Runnable {
     @Autowired
     private TaskCallbackService taskCallbackService;
 
-    public void start(){
+    public void start() {
         Thread thread = new Thread(this,"RetryReportTaskStatusThread");
         thread.setDaemon(true);
         thread.start();
@@ -59,30 +59,30 @@ public class RetryReportTaskStatusThread implements Runnable {
     public void run() {
         ResponseCache instance = ResponseCache.get();
 
-        while (Stopper.isRunning()){
+        while (Stopper.isRunning()) {
 
             // sleep 5 minutes
             ThreadUtils.sleep(RETRY_REPORT_TASK_STATUS_INTERVAL);
 
             try {
-                if (!instance.getAckCache().isEmpty()){
+                if (!instance.getAckCache().isEmpty()) {
                     Map<Integer,Command> ackCache =  instance.getAckCache();
-                    for (Map.Entry<Integer, Command> entry : ackCache.entrySet()){
+                    for (Map.Entry<Integer, Command> entry : ackCache.entrySet()) {
                         Integer taskInstanceId = entry.getKey();
                         Command ackCommand = entry.getValue();
                         taskCallbackService.sendAck(taskInstanceId,ackCommand);
                     }
                 }
 
-                if (!instance.getResponseCache().isEmpty()){
+                if (!instance.getResponseCache().isEmpty()) {
                     Map<Integer,Command> responseCache =  instance.getResponseCache();
-                    for (Map.Entry<Integer, Command> entry : responseCache.entrySet()){
+                    for (Map.Entry<Integer, Command> entry : responseCache.entrySet()) {
                         Integer taskInstanceId = entry.getKey();
                         Command responseCommand = entry.getValue();
                         taskCallbackService.sendResult(taskInstanceId,responseCommand);
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("retry report task status error", e);
             }
         }
