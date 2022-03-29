@@ -16,7 +16,7 @@
  */
 
 import { reactive, h } from 'vue'
-import { NIcon } from 'naive-ui'
+import { NEllipsis, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   HomeOutlined,
@@ -90,12 +90,12 @@ export function useDataList() {
     const projectCode = route.params.projectCode || ''
     state.menuOptions = [
       {
-        label: t('menu.home'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.home') }),
         key: 'home',
         icon: renderIcon(HomeOutlined)
       },
       {
-        label: t('menu.project'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.project') }),
         key: 'projects',
         icon: renderIcon(ProfileOutlined),
         children: [
@@ -141,7 +141,7 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.resources'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.resources') }),
         key: 'resource',
         icon: renderIcon(FolderOutlined),
         children: [
@@ -183,7 +183,8 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.data_quality'),
+        label: () =>
+          h(NEllipsis, null, { default: () => t('menu.data_quality') }),
         key: 'data-quality',
         icon: renderIcon(ContainerOutlined),
         children: [
@@ -200,13 +201,14 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.datasource'),
+        label: () =>
+          h(NEllipsis, null, { default: () => t('menu.datasource') }),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
         children: []
       },
       {
-        label: t('menu.monitor'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.monitor') }),
         key: 'monitor',
         icon: renderIcon(DesktopOutlined),
         children: [
@@ -247,7 +249,7 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.security'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.security') }),
         key: 'security',
         icon: renderIcon(SafetyCertificateOutlined),
         children:

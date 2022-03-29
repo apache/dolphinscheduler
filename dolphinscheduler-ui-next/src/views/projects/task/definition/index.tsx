@@ -114,8 +114,15 @@ const TaskDefinition = defineComponent({
     }
   },
   render() {
-    const { t, onSearch, requestData, onUpdatePageSize, onRefresh, onCreate, loadingRef } =
-      this
+    const {
+      t,
+      onSearch,
+      requestData,
+      onUpdatePageSize,
+      onRefresh,
+      onCreate,
+      loadingRef
+    } = this
 
     return (
       <>

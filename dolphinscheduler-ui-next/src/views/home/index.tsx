@@ -64,11 +64,18 @@ export default defineComponent({
       taskStateRef,
       processStateRef,
       ...toRefs(taskVariables),
-      ...toRefs(processVariables),
+      ...toRefs(processVariables)
     }
   },
   render() {
-    const { t, dateRef, handleTaskDate, handleProcessDate, taskLoadingRef, processLoadingRef } = this
+    const {
+      t,
+      dateRef,
+      handleTaskDate,
+      handleProcessDate,
+      taskLoadingRef,
+      processLoadingRef
+    } = this
 
     return (
       <div>

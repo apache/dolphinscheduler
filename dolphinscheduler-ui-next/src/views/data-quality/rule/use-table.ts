@@ -132,7 +132,6 @@ export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
             'yyyy-MM-dd HH:mm:ss'
           )
 
-          
           return {
             ...item,
             ruleName: ruleNameLocale,

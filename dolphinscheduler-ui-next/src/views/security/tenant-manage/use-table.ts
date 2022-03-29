@@ -190,7 +190,7 @@ export function useTable() {
         variables.loadingRef = false
       }),
       {}
-      )
+    )
 
     return state
   }

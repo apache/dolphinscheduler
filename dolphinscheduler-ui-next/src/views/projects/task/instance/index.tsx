@@ -86,8 +86,14 @@ const TaskInstance = defineComponent({
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch, onConfirmModal, loadingRef } =
-      this
+    const {
+      t,
+      requestTableData,
+      onUpdatePageSize,
+      onSearch,
+      onConfirmModal,
+      loadingRef
+    } = this
 
     return (
       <>
