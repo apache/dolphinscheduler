@@ -18,14 +18,12 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +43,7 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningProcessor.class);
 
     @Autowired
-    private TaskResponseService taskResponseService;
+    private TaskEventService taskEventService;
 
     /**
      * task ack process
@@ -59,21 +57,8 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
         TaskExecuteRunningCommand taskExecuteRunningCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
         logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningCommand);
 
-        String workerAddress = ChannelUtils.toAddress(channel).getAddress();
-
-        ExecutionStatus ackStatus = ExecutionStatus.of(taskExecuteRunningCommand.getStatus());
-
-        // TaskResponseEvent
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newRunningAck(ackStatus,
-                taskExecuteRunningCommand.getStartTime(),
-                workerAddress,
-                taskExecuteRunningCommand.getExecutePath(),
-                taskExecuteRunningCommand.getLogPath(),
-                taskExecuteRunningCommand.getTaskInstanceId(),
-                channel,
-                taskExecuteRunningCommand.getProcessInstanceId());
-
-        taskResponseService.addResponse(taskResponseEvent);
+        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningCommand, channel);
+        taskEventService.addEvent(taskEvent);
     }
 
 }

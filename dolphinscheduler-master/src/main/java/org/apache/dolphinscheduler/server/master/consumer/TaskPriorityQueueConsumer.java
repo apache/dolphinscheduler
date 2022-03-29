@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -31,7 +30,8 @@ import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
@@ -93,6 +93,12 @@ public class TaskPriorityQueueConsumer extends Thread {
      */
     @Autowired
     private MasterConfig masterConfig;
+
+    /**
+     * task response service
+     */
+    @Autowired
+    private TaskEventService taskEventService;
 
     /**
      * consumer thread pool
@@ -178,7 +184,7 @@ public class TaskPriorityQueueConsumer extends Thread {
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
-                changeTaskStateToDispatch(context, executionContext);
+                addDispatchEvent(context, executionContext);
             }
         } catch (RuntimeException | ExecuteException e) {
             logger.error("dispatch error: {}", e.getMessage(), e);
@@ -187,16 +193,11 @@ public class TaskPriorityQueueConsumer extends Thread {
     }
 
     /**
-     * change task state to dispatch
+     * add dispatch event
      */
-    private void changeTaskStateToDispatch(TaskExecutionContext context, ExecutionContext executionContext) {
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(context.getProcessInstanceId());
-        if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(context.getTaskInstanceId())) {
-            TaskInstance taskInstance = workflowExecuteThread.getTaskInstance(context.getTaskInstanceId());
-            taskInstance.setState(ExecutionStatus.DISPATCH);
-            taskInstance.setHost(executionContext.getHost().getAddress());
-            processService.saveTaskInstance(taskInstance);
-        }
+    private void addDispatchEvent(TaskExecutionContext context, ExecutionContext executionContext) {
+        TaskEvent taskEvent = TaskEvent.newDispatchEvent(context.getProcessInstanceId(), context.getTaskInstanceId(), executionContext.getHost().getAddress());
+        taskEventService.addEvent(taskEvent);
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {

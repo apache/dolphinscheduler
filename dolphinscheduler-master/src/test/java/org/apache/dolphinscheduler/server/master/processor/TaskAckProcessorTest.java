@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -38,22 +38,22 @@ import io.netty.channel.Channel;
  * task ack processor test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SpringApplicationContext.class, TaskResponseEvent.class})
+@PrepareForTest({SpringApplicationContext.class, TaskEvent.class})
 public class TaskAckProcessorTest {
 
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-    private TaskResponseService taskResponseService;
+    private TaskEventService taskEventService;
     private ProcessService processService;
     private TaskExecuteRunningCommand taskExecuteRunningCommand;
-    private TaskResponseEvent taskResponseEvent;
+    private TaskEvent taskResponseEvent;
     private Channel channel;
 
     @Before
     public void before() {
         PowerMockito.mockStatic(SpringApplicationContext.class);
 
-        taskResponseService = PowerMockito.mock(TaskResponseService.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskResponseService.class)).thenReturn(taskResponseService);
+        taskEventService = PowerMockito.mock(TaskEventService.class);
+        PowerMockito.when(SpringApplicationContext.getBean(TaskEventService.class)).thenReturn(taskEventService);
 
         processService = PowerMockito.mock(ProcessService.class);
         PowerMockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
@@ -61,7 +61,7 @@ public class TaskAckProcessorTest {
         taskExecuteRunningProcessor = new TaskExecuteRunningProcessor();
 
         channel = PowerMockito.mock(Channel.class);
-        taskResponseEvent = PowerMockito.mock(TaskResponseEvent.class);
+        taskResponseEvent = PowerMockito.mock(TaskEvent.class);
 
         taskExecuteRunningCommand = new TaskExecuteRunningCommand();
         taskExecuteRunningCommand.setStatus(1);
