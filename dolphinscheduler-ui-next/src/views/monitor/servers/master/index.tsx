@@ -16,18 +16,12 @@
  */
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import {
-  NGrid,
-  NGi,
-  NCard,
-  NNumberAnimation,
-  NSpace
-} from 'naive-ui'
+import { NGrid, NGi, NCard, NNumberAnimation, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useMaster } from './use-master'
 import styles from './index.module.scss'
 import Card from '@/components/card'
-import Result from "@/components/result";
+import Result from '@/components/result'
 import Gauge from '@/components/chart/modules/Gauge'
 import MasterModal from './master-modal'
 import type { Ref } from 'vue'
