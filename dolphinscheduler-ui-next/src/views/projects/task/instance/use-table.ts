@@ -336,14 +336,15 @@ export function renderStateCell(state: ITaskState, t: Function) {
       class: stateOption.classNames,
       style: {
         display: 'flex'
-      }
+      },
+      size: 20
     },
     () => h(stateOption.icon)
   )
   return h(NTooltip, null, {
     trigger: () => {
       if (!stateOption.isSpin) return Icon
-      return h(NSpin, { size: 18 }, { icon: () => Icon })
+      return h(NSpin, { size: 20 }, { icon: () => Icon })
     },
     default: () => stateOption.desc
   })

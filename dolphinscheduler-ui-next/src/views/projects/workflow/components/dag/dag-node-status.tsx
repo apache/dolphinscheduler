@@ -41,7 +41,7 @@ export default defineComponent({
     const iconElement = h(
       NIcon,
       {
-        size: '20px'
+        size: 20
       },
       {
         default: () =>
@@ -63,7 +63,7 @@ export default defineComponent({
               return h(
                 NSpin,
                 {
-                  small: 'small'
+                  size: 20
                 },
                 {
                   icon: () => this.iconElement
