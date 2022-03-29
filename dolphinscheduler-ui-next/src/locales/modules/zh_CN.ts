@@ -618,7 +618,8 @@ const project = {
     node_not_created: '未创建节点保存失败',
     copy_name: '复制名称',
     view_variables: '查看变量',
-    startup_parameter: '启动参数'
+    startup_parameter: '启动参数',
+    online: '已上线'
   },
   node: {
     current_node_settings: '当前节点设置',

@@ -622,7 +622,8 @@ const project = {
     node_not_created: 'Failed to save node not created',
     copy_name: 'Copy Name',
     view_variables: 'View Variables',
-    startup_parameter: 'Startup Parameter'
+    startup_parameter: 'Startup Parameter',
+    online: 'Online'
   },
   node: {
     current_node_settings: 'Current node settings',
