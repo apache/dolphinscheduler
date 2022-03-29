@@ -74,8 +74,5 @@ public class AlertServerTest extends TestCase {
         
         Assert.assertEquals(50053, nettyServerConfig.getListenPort());
 
-        alertServer.close("close");
-
-
     }
 }
