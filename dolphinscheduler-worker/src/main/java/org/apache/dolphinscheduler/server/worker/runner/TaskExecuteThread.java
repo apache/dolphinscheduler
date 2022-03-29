@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
@@ -125,10 +124,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     @Override
     public void run() {
-        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getProcessInstanceId());
         if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
-            responseCommand.setStatus(ExecutionStatus.SUCCESS.getCode());
-            responseCommand.setEndTime(new Date());
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUCCESS);
+            taskExecutionContext.setStartTime(new Date());
+            taskExecutionContext.setEndTime(new Date());
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             return;
@@ -182,11 +181,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
             // task handle
             this.task.handle();
 
-            responseCommand.setStatus(this.task.getExitStatus().getCode());
-
             // task result process
             if (this.task.getNeedAlert()) {
-                sendAlert(this.task.getTaskAlertInfo(), responseCommand.getStatus());
+                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus().getCode());
             }
 
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(this.task.getExitStatus().getCode()));
