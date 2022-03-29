@@ -96,7 +96,7 @@ export function useForm() {
   }
 
   const resetForm = () => {
-    state.detailFormRef.setValues({ ...initialValues })
+    state.detailFormRef.resetValues({ ...initialValues })
     state.json = []
   }
 
