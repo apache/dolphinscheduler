@@ -363,6 +363,7 @@ export default defineComponent({
                     type='datetimerange'
                     clearable
                     v-model:value={this.startForm.startEndTime}
+                    placement='top'
                   />
                 </NFormItem>
               </NSpace>
