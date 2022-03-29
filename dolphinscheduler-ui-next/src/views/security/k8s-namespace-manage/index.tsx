@@ -98,7 +98,8 @@ const k8sNamespaceManage = defineComponent({
       onCancelModal,
       onConfirmModal,
       handleModalChange,
-      onSearch
+      onSearch,
+      loadingRef
     } = this
 
     return (
@@ -131,6 +132,7 @@ const k8sNamespaceManage = defineComponent({
         </NCard>
         <Card class={styles['table-card']}>
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             scrollX={this.tableWidth}
