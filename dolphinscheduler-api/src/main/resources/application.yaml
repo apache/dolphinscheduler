@@ -30,8 +30,8 @@ server:
 spring:
   application:
     name: api-server
-  main:
-    banner-mode: off
+  banner:
+    charset: UTF-8
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
