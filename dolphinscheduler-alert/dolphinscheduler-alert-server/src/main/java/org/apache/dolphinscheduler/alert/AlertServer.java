@@ -40,6 +40,9 @@ public class AlertServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
     @Autowired
+    private AlertPluginManager alertPluginManager;
+
+    @Autowired
     private PluginDao pluginDao;
 
     @Autowired
@@ -67,6 +70,7 @@ public class AlertServer implements IStoppable {
     public void run() {
         logger.info("alert server starting...");
 
+        alertPluginManager.installPlugin();
         checkTable();
         startServer();
         alertSenderService.start();

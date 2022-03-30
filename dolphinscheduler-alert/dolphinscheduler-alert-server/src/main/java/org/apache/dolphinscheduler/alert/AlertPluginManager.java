@@ -41,41 +41,34 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class AlertPluginManager {
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
-    private final PluginDao pluginDao;
+    @Autowired
+    private PluginDao pluginDao;
 
     private final Map<Integer, AlertChannel> channelKeyedById = new HashMap<>();
 
     private final PluginParams warningTypeParams = getWarningTypeParams();
 
-    public AlertPluginManager(PluginDao pluginDao) {
-        this.pluginDao = pluginDao;
-    }
-
     public PluginParams getWarningTypeParams() {
         return
-            RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                .setValue(WarningType.ALL.getDescp())
-                .addValidate(Validate.newBuilder().setRequired(true).build())
-                .build();
+                RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                        .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                        .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                        .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                        .setValue(WarningType.ALL.getDescp())
+                        .addValidate(Validate.newBuilder().setRequired(true).build())
+                        .build();
     }
 
-    @EventListener
-    public void installPlugin(ApplicationReadyEvent readyEvent) {
+    public void installPlugin() {
         final Set<String> names = new HashSet<>();
 
         ServiceLoader.load(AlertChannelFactory.class).forEach(factory -> {

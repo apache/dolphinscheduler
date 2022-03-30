@@ -41,7 +41,7 @@ public class AlertPluginManagerTest extends TestCase {
     public void testAlertPluginManager() {
         Mockito.when(pluginDao.addOrUpdatePluginDefine(Mockito.any(PluginDefine.class))).thenReturn(0);
         
-        alertPluginManager.installPlugin(null);
+        alertPluginManager.installPlugin();
         
         Assert.assertEquals(1, alertPluginManager.size());
         
