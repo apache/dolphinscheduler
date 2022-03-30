@@ -50,9 +50,6 @@ public class AlertServerTest extends TestCase {
     private AlertConfig alertConfig;
 
     @Mock
-    private AlertDao alertDao;
-
-    @Mock
     private AlertSenderService alertSenderService;
     
     @Test
@@ -61,8 +58,6 @@ public class AlertServerTest extends TestCase {
         Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
         
         Mockito.when(alertConfig.getPort()).thenReturn(50053);
-
-        Mockito.when(alertDao.listPendingAlerts()).thenReturn(new ArrayList<>());
 
         Mockito.doNothing().when(alertSenderService).start();
 
