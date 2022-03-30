@@ -105,7 +105,7 @@ export function useTable() {
                       })
                   },
                   {
-                    default: () => h(NEllipsis, null, row.name)
+                    default: () => h(NEllipsis, null, () => row.name)
                   }
                 ),
                 h(
