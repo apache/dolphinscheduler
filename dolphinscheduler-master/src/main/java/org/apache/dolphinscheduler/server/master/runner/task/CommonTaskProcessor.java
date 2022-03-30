@@ -54,7 +54,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-        this.setTaskExecutionLogger();
+
         int taskGroupId = taskInstance.getTaskGroupId();
         if (taskGroupId > 0) {
             boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),

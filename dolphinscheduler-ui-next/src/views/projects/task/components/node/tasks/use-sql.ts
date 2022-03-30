@@ -80,8 +80,7 @@ export function useSql({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useDatasourceType(model),
-      Fields.useDatasource(model),
+      ...Fields.useDatasource(model),
       ...Fields.useSqlType(model),
       ...Fields.useSql(model),
       Fields.usePreTasks()
