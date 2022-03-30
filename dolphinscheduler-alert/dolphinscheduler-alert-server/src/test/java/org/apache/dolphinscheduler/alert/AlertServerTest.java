@@ -51,9 +51,14 @@ public class AlertServerTest extends TestCase {
 
     @Mock
     private AlertSenderService alertSenderService;
+
+    @Mock
+    private AlertPluginManager alertPluginManager;
     
     @Test
     public void testStart() {
+
+        Mockito.doNothing().when(alertPluginManager).installPlugin();
 
         Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
         
