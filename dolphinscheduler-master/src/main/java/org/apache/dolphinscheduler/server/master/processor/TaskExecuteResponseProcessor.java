@@ -18,13 +18,12 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +35,15 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- * task response processor
+ * task execute response processor
  */
 @Component
-public class TaskResponseProcessor implements NettyRequestProcessor {
+public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskResponseProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteResponseProcessor.class);
 
     @Autowired
-    private TaskResponseService taskResponseService;
+    private TaskEventService taskEventService;
 
     /**
      * task final result response
@@ -57,19 +56,10 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteResponseCommand.class);
-        logger.info("received command : {}", responseCommand);
+        TaskExecuteResponseCommand taskExecuteResponseCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteResponseCommand.class);
+        logger.info("received command : {}", taskExecuteResponseCommand);
 
-        // TaskResponseEvent
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(ExecutionStatus.of(responseCommand.getStatus()),
-                responseCommand.getEndTime(),
-                responseCommand.getProcessId(),
-                responseCommand.getAppIds(),
-                responseCommand.getTaskInstanceId(),
-                responseCommand.getVarPool(),
-                channel,
-                responseCommand.getProcessInstanceId()
-        );
-        taskResponseService.addResponse(taskResponseEvent);
+        TaskEvent taskResponseEvent = TaskEvent.newResultEvent(taskExecuteResponseCommand, channel);
+        taskEventService.addEvent(taskResponseEvent);
     }
 }
