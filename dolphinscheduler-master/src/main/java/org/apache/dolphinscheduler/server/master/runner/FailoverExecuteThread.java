@@ -64,8 +64,8 @@ public class FailoverExecuteThread extends Thread {
 
     @Override
     public void run() {
+        logger.info("failover execute thread started");
         while (Stopper.isRunning()) {
-            logger.info("failover execute started");
             try {
                 List<String> hosts = getNeedFailoverMasterServers();
                 if (CollectionUtils.isEmpty(hosts)) {
