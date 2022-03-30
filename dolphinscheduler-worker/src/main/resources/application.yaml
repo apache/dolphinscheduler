@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 spring:
-  main:
-    banner-mode: off
+  banner:
+    charset: UTF-8
   application:
     name: worker-server
   jackson:
