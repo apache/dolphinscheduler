@@ -125,10 +125,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
         if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
-            // local execute path
-            String execLocalPath = getExecLocalPath(taskExecutionContext);
-            logger.info("task instance local execute path : {}", execLocalPath);
-            taskExecutionContext.setExecutePath(execLocalPath);
+            if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
+                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+            }
 
             // check if the OS user exists
             if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
@@ -141,11 +140,13 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 return;
             }
 
+            // local execute path
+            String execLocalPath = getExecLocalPath(taskExecutionContext);
+            logger.info("task instance local execute path : {}", execLocalPath);
+            taskExecutionContext.setExecutePath(execLocalPath);
+
             try {
                 FileUtils.createWorkDirIfAbsent(execLocalPath);
-                if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
-                    OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
-                }
             } catch (Throwable ex) {
                 logger.error("create execLocalPath fail, path: {}, taskInstanceId: {}", execLocalPath, taskExecutionContext.getTaskInstanceId());
                 logger.error("create executeLocalPath fail", ex);
