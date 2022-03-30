@@ -175,8 +175,7 @@ export function useCanvasInit(options: Options) {
           ],
           x: 0,
           y: 0,
-          offset: { x: 0, y: fo ? -28 : -10 },
-          zIndex: -1
+          offset: { x: 0, y: fo ? -28 : -10 }
         }
       })
     })
