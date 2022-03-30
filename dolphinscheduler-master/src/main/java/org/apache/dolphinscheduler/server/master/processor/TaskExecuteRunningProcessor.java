@@ -18,14 +18,12 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +35,15 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- * task ack processor
+ * task execute running processor
  */
 @Component
-public class TaskAckProcessor implements NettyRequestProcessor {
+public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskAckProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningProcessor.class);
 
     @Autowired
-    private TaskResponseService taskResponseService;
+    private TaskEventService taskEventService;
 
     /**
      * task ack process
@@ -55,25 +53,12 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteAckCommand taskAckCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteAckCommand.class);
-        logger.info("taskAckCommand : {}", taskAckCommand);
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING == command.getType(), String.format("invalid command type : %s", command.getType()));
+        TaskExecuteRunningCommand taskExecuteRunningCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
+        logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningCommand);
 
-        String workerAddress = ChannelUtils.toAddress(channel).getAddress();
-
-        ExecutionStatus ackStatus = ExecutionStatus.of(taskAckCommand.getStatus());
-
-        // TaskResponseEvent
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ackStatus,
-                taskAckCommand.getStartTime(),
-                workerAddress,
-                taskAckCommand.getExecutePath(),
-                taskAckCommand.getLogPath(),
-                taskAckCommand.getTaskInstanceId(),
-                channel,
-                taskAckCommand.getProcessInstanceId());
-
-        taskResponseService.addResponse(taskResponseEvent);
+        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningCommand, channel);
+        taskEventService.addEvent(taskEvent);
     }
 
 }
