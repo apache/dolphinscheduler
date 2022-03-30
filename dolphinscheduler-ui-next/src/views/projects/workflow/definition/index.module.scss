@@ -102,3 +102,16 @@
   overflow: hidden;
   word-break: break-all;
 }
+
+.workflow-name {
+  :global {
+    div:first-child {
+      width: calc(100% - 32px);
+
+      .n-button,
+      .n-button__content {
+        width: 100%;
+      }
+    }
+  }
+}
