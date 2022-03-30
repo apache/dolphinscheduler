@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 
@@ -34,31 +34,31 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- *  db task response processor
+ * task execute running ack, from master to worker
  */
 @Component
-public class DBTaskResponseProcessor implements NettyRequestProcessor {
+public class TaskExecuteResponseAckProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(DBTaskResponseProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteResponseAckProcessor.class);
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.DB_TASK_RESPONSE == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESPONSE_ACK == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
 
-        DBTaskResponseCommand taskResponseCommand = JSONUtils.parseObject(
-                command.getBody(), DBTaskResponseCommand.class);
+        TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = JSONUtils.parseObject(
+                command.getBody(), TaskExecuteResponseAckCommand.class);
 
-        if (taskResponseCommand == null) {
-            logger.error("dBTask Response  command is null");
+        if (taskExecuteResponseAckCommand == null) {
+            logger.error("task execute response ack command is null");
             return;
         }
-        logger.info("dBTask Response command : {}", taskResponseCommand);
+        logger.info("task execute response ack command : {}", taskExecuteResponseAckCommand);
 
-        if (taskResponseCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-            ResponseCache.get().removeResponseCache(taskResponseCommand.getTaskInstanceId());
-            TaskCallbackService.remove(taskResponseCommand.getTaskInstanceId());
-            logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskResponseCommand.getTaskInstanceId());
+        if (taskExecuteResponseAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+            ResponseCache.get().removeResponseCache(taskExecuteResponseAckCommand.getTaskInstanceId());
+            TaskCallbackService.remove(taskExecuteResponseAckCommand.getTaskInstanceId());
+            logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteResponseAckCommand.getTaskInstanceId());
         }
     }
 

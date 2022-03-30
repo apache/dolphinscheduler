@@ -22,18 +22,19 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.io.Serializable;
 
 /**
- * db task final result response command
+ * task execute response ack command
+ * from master to worker
  */
-public class DBTaskResponseCommand implements Serializable {
+public class TaskExecuteResponseAckCommand implements Serializable {
 
     private int taskInstanceId;
     private int status;
 
-    public DBTaskResponseCommand() {
+    public TaskExecuteResponseAckCommand() {
         super();
     }
 
-    public DBTaskResponseCommand(int status, int taskInstanceId) {
+    public TaskExecuteResponseAckCommand(int status, int taskInstanceId) {
         this.status = status;
         this.taskInstanceId = taskInstanceId;
     }
@@ -61,7 +62,7 @@ public class DBTaskResponseCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.DB_TASK_RESPONSE);
+        command.setType(CommandType.TASK_EXECUTE_RESPONSE_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
@@ -69,7 +70,7 @@ public class DBTaskResponseCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "DBTaskResponseCommand{"
+        return "TaskExecuteResponseAckCommand{"
             + "taskInstanceId=" + taskInstanceId
             + ", status=" + status
             + '}';

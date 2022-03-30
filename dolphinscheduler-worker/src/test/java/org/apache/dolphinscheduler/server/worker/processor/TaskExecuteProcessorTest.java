@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -53,7 +53,7 @@ import org.slf4j.Logger;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class, TaskCallbackService.class, WorkerConfig.class, FileUtils.class,
-    JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
+        JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
 @Ignore
 public class TaskExecuteProcessorTest {
 
@@ -84,7 +84,7 @@ public class TaskExecuteProcessorTest {
         workerConfig.setListenPort(1234);
         command = new Command();
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
-        ackCommand = new TaskExecuteAckCommand().convert2Command();
+        ackCommand = new TaskExecuteRunningCommand().convert2Command();
         taskRequestCommand = new TaskExecuteRequestCommand();
         alertClientService = PowerMockito.mock(AlertClientService.class);
         workerExecService = PowerMockito.mock(ExecutorService.class);
@@ -95,7 +95,7 @@ public class TaskExecuteProcessorTest {
         PowerMockito.when(ChannelUtils.toAddress(null)).thenReturn(null);
 
         taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
-        PowerMockito.doNothing().when(taskCallbackService).sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
+        PowerMockito.doNothing().when(taskCallbackService).send(taskExecutionContext.getTaskInstanceId(), ackCommand);
 
         PowerMockito.mockStatic(SpringApplicationContext.class);
         PowerMockito.when(SpringApplicationContext.getBean(TaskCallbackService.class))
@@ -125,10 +125,10 @@ public class TaskExecuteProcessorTest {
 
         PowerMockito.mockStatic(FileUtils.class);
         PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId()))
+                        taskExecutionContext.getProcessDefineCode(),
+                        taskExecutionContext.getProcessDefineVersion(),
+                        taskExecutionContext.getProcessInstanceId(),
+                        taskExecutionContext.getTaskInstanceId()))
                 .thenReturn(taskExecutionContext.getExecutePath());
         PowerMockito.doNothing().when(FileUtils.class, "createWorkDirIfAbsent", taskExecutionContext.getExecutePath());
 

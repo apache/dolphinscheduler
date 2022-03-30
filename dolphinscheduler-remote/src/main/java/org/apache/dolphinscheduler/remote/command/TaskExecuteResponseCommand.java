@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *  execute task response command
+ * execute task response command
  */
 public class TaskExecuteResponseCommand implements Serializable {
 
@@ -36,23 +36,43 @@ public class TaskExecuteResponseCommand implements Serializable {
     }
 
     /**
-     *  task instance id
+     * task instance id
      */
     private int taskInstanceId;
 
     /**
      * process instance id
      */
-    private  int processInstanceId;
+    private int processInstanceId;
 
     /**
-     *  status
+     * status
      */
     private int status;
 
+    /**
+     * startTime
+     */
+    private Date startTime;
 
     /**
-     *  end time
+     * host
+     */
+    private String host;
+
+    /**
+     * logPath
+     */
+    private String logPath;
+
+    /**
+     * executePath
+     */
+    private String executePath;
+
+
+    /**
+     * end time
      */
     private Date endTime;
 
@@ -72,6 +92,38 @@ public class TaskExecuteResponseCommand implements Serializable {
      */
     private String varPool;
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public void setLogPath(String logPath) {
+        this.logPath = logPath;
+    }
+
+    public String getExecutePath() {
+        return executePath;
+    }
+
+    public void setExecutePath(String executePath) {
+        this.executePath = executePath;
+    }
+
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
@@ -79,7 +131,7 @@ public class TaskExecuteResponseCommand implements Serializable {
     public String getVarPool() {
         return varPool;
     }
-    
+
     public int getTaskInstanceId() {
         return taskInstanceId;
     }
@@ -122,6 +174,7 @@ public class TaskExecuteResponseCommand implements Serializable {
 
     /**
      * package response command
+     *
      * @return command
      */
     public Command convert2Command() {
@@ -136,10 +189,16 @@ public class TaskExecuteResponseCommand implements Serializable {
     public String toString() {
         return "TaskExecuteResponseCommand{"
                 + "taskInstanceId=" + taskInstanceId
+                + ", processInstanceId=" + processInstanceId
                 + ", status=" + status
+                + ", startTime=" + startTime
                 + ", endTime=" + endTime
+                + ", host=" + host
+                + ", logPath=" + logPath
+                + ", executePath=" + executePath
                 + ", processId=" + processId
                 + ", appIds='" + appIds + '\''
+                + ", varPool=" + varPool
                 + '}';
     }
 

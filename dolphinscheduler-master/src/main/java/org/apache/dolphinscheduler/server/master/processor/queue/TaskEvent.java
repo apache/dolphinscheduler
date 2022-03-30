@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
+import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 
 import java.util.Date;
 
@@ -27,7 +30,7 @@ import io.netty.channel.Channel;
 /**
  * task event
  */
-public class TaskResponseEvent {
+public class TaskEvent {
 
     /**
      * taskInstanceId
@@ -90,46 +93,45 @@ public class TaskResponseEvent {
     private Channel channel;
 
     private int processInstanceId;
-    
-    public static TaskResponseEvent newAck(ExecutionStatus state,
-                                           Date startTime,
-                                           String workerAddress,
-                                           String executePath,
-                                           String logPath,
-                                           int taskInstanceId,
-                                           Channel channel,
-                                           int processInstanceId) {
-        TaskResponseEvent event = new TaskResponseEvent();
-        event.setState(state);
-        event.setStartTime(startTime);
-        event.setWorkerAddress(workerAddress);
-        event.setExecutePath(executePath);
-        event.setLogPath(logPath);
-        event.setTaskInstanceId(taskInstanceId);
-        event.setEvent(Event.ACK);
-        event.setChannel(channel);
+
+    public static TaskEvent newDispatchEvent(int processInstanceId, int taskInstanceId, String workerAddress) {
+        TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(processInstanceId);
+        event.setTaskInstanceId(taskInstanceId);
+        event.setWorkerAddress(workerAddress);
+        event.setEvent(Event.DISPATCH);
         return event;
     }
 
-    public static TaskResponseEvent newResult(ExecutionStatus state,
-                                              Date endTime,
-                                              int processId,
-                                              String appIds,
-                                              int taskInstanceId,
-                                              String varPool,
-                                              Channel channel,
-                                              int processInstanceId) {
-        TaskResponseEvent event = new TaskResponseEvent();
-        event.setState(state);
-        event.setEndTime(endTime);
-        event.setProcessId(processId);
-        event.setAppIds(appIds);
-        event.setTaskInstanceId(taskInstanceId);
-        event.setEvent(Event.RESULT);
-        event.setVarPool(varPool);
+    public static TaskEvent newRunningEvent(TaskExecuteRunningCommand command, Channel channel) {
+        TaskEvent event = new TaskEvent();
+        event.setProcessInstanceId(command.getProcessInstanceId());
+        event.setTaskInstanceId(command.getTaskInstanceId());
+        event.setState(ExecutionStatus.of(command.getStatus()));
+        event.setStartTime(command.getStartTime());
+        event.setExecutePath(command.getExecutePath());
+        event.setLogPath(command.getLogPath());
         event.setChannel(channel);
-        event.setProcessInstanceId(processInstanceId);
+        event.setWorkerAddress(ChannelUtils.toAddress(channel).getAddress());
+        event.setEvent(Event.RUNNING);
+        return event;
+    }
+
+    public static TaskEvent newResultEvent(TaskExecuteResponseCommand command, Channel channel) {
+        TaskEvent event = new TaskEvent();
+        event.setProcessInstanceId(command.getProcessInstanceId());
+        event.setTaskInstanceId(command.getTaskInstanceId());
+        event.setState(ExecutionStatus.of(command.getStatus()));
+        event.setStartTime(command.getStartTime());
+        event.setExecutePath(command.getExecutePath());
+        event.setLogPath(command.getLogPath());
+        event.setEndTime(command.getEndTime());
+        event.setProcessId(command.getProcessId());
+        event.setAppIds(command.getAppIds());
+        event.setVarPool(command.getVarPool());
+        event.setChannel(channel);
+        event.setWorkerAddress(ChannelUtils.toAddress(channel).getAddress());
+        event.setEvent(Event.RESULT);
         return event;
     }
 
@@ -140,7 +142,7 @@ public class TaskResponseEvent {
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
-    
+
     public int getTaskInstanceId() {
         return taskInstanceId;
     }
