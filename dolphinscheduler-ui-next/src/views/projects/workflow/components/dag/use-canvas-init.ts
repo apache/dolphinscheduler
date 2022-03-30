@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { Node } from '@antv/x6'
+import type { Markup, Node } from '@antv/x6'
 import { ref, onMounted, Ref } from 'vue'
 import { Graph } from '@antv/x6'
 import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
@@ -156,6 +156,9 @@ export function useCanvasInit(options: Options) {
     // Add a node tool when the mouse entering
     graph.value.on('node:mouseenter', ({ node }) => {
       const nodeName = node.getData().taskName
+      const markup = node.getMarkup() as Markup.JSONMarkup[]
+      const fo = markup.filter((m) => m.tagName === 'foreignObject')[0]
+
       node.addTools({
         name: 'button',
         args: {
@@ -172,7 +175,7 @@ export function useCanvasInit(options: Options) {
           ],
           x: 0,
           y: 0,
-          offset: { x: 0, y: -10 }
+          offset: { x: 0, y: fo ? -28 : -10 }
         }
       })
     })

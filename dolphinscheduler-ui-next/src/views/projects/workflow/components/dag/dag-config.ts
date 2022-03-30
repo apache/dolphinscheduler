@@ -187,9 +187,7 @@ export const NODE = {
     },
     fo: {
       refX: '46%',
-      refY: -25,
-      width: 18,
-      height: 18
+      refY: -25
     }
   },
   ports: {
