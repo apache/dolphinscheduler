@@ -110,8 +110,8 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         ListenableFuture future = this.submitListenable(() -> {
-            taskExecuteThread.run();
             multiThreadFilterMap.put(taskExecuteThread.getKey(), taskExecuteThread);
+            taskExecuteThread.run();
         });
         future.addCallback(new ListenableFutureCallback() {
             @Override
