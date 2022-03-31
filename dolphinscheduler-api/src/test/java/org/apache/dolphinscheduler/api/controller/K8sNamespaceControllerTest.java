@@ -100,7 +100,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.K8S_CLIENT_OPS_ERROR.getCode(), result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
