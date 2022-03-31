@@ -32,6 +32,7 @@ import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import LogModal from './components/log-modal'
+import { stateType } from '@/utils/common'
 import styles from './index.module.scss'
 
 const TaskInstance = defineComponent({
@@ -126,44 +127,7 @@ const TaskInstance = defineComponent({
             <NSelect
               v-model={[this.stateType, 'value']}
               size='small'
-              options={[
-                {
-                  label: t('project.task.submitted_success'),
-                  value: 'SUBMITTED_SUCCESS'
-                },
-                {
-                  label: t('project.task.running_execution'),
-                  value: 'RUNNING_EXECUTION'
-                },
-                { label: t('project.task.ready_pause'), value: 'READY_PAUSE' },
-                { label: t('project.task.pause'), value: 'PAUSE' },
-                { label: t('project.task.ready_stop'), value: 'READY_STOP' },
-                { label: t('project.task.stop'), value: 'STOP' },
-                { label: t('project.task.failure'), value: 'FAILURE' },
-                { label: t('project.task.success'), value: 'SUCCESS' },
-                {
-                  label: t('project.task.need_fault_tolerance'),
-                  value: 'NEED_FAULT_TOLERANCE'
-                },
-                { label: t('project.task.kill'), value: 'KILL' },
-                {
-                  label: t('project.task.waiting_thread'),
-                  value: 'WAITING_THREAD'
-                },
-                {
-                  label: t('project.task.waiting_depend'),
-                  value: 'WAITING_DEPEND'
-                },
-                {
-                  label: t('project.task.delay_execution'),
-                  value: 'DELAY_EXECUTION'
-                },
-                {
-                  label: t('project.task.forced_success'),
-                  value: 'FORCED_SUCCESS'
-                },
-                { label: t('project.task.serial_wait'), value: 'SERIAL_WAIT' }
-              ]}
+              options={stateType(t).slice(1)}
               placeholder={t('project.task.state')}
               style={{ width: '180px' }}
               clearable
