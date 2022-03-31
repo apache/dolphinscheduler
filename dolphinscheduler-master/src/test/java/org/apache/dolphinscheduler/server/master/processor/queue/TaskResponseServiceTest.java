@@ -67,6 +67,9 @@ public class TaskResponseServiceTest {
     @Mock
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
+    @Mock
+    private TaskExecuteThreadPool taskExecuteThreadPool;
+
     @Before
     public void before() {
         taskEventService.start();
@@ -101,8 +104,6 @@ public class TaskResponseServiceTest {
 
     @Test
     public void testAddResponse() {
-        Mockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-        Mockito.when(channel.writeAndFlush(Mockito.any())).thenReturn(null);
         taskEventService.addEvent(ackEvent);
         taskEventService.addEvent(resultEvent);
     }
