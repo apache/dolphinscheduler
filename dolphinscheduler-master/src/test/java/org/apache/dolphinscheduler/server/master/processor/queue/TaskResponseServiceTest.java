@@ -67,6 +67,9 @@ public class TaskResponseServiceTest {
     @Mock
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
+    @Mock
+    private TaskExecuteThreadPool taskExecuteThreadPool;
+
     @Before
     public void before() {
         taskEventService.start();
