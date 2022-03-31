@@ -62,7 +62,9 @@ public enum ExecutionStatus {
     FORCED_SUCCESS(13, "forced success"),
     SERIAL_WAIT(14, "serial wait"),
     READY_BLOCK(15, "ready block"),
-    BLOCK(16, "block");
+    BLOCK(16, "block"),
+    DISPATCH(17, "dispatch"),
+    ;
 
     ExecutionStatus(int code, String descp) {
         this.code = code;

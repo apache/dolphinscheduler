@@ -54,6 +54,7 @@ public enum TaskStateType {
                 };
             case RUNNING:
                 return new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+                        ExecutionStatus.DISPATCH.ordinal(),
                         ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                         ExecutionStatus.DELAY_EXECUTION.ordinal(),
                         ExecutionStatus.READY_PAUSE.ordinal(),
