@@ -109,8 +109,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         }
         int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
         ListenableFuture future = this.submitListenable(() -> {
-            workflowExecuteThread.handleEvents();
             multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
+            workflowExecuteThread.handleEvents();
         });
         future.addCallback(new ListenableFutureCallback() {
             @Override
