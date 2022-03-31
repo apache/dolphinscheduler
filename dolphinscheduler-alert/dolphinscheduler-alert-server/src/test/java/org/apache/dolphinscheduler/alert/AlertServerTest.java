@@ -51,14 +51,9 @@ public class AlertServerTest extends TestCase {
 
     @Mock
     private AlertSenderService alertSenderService;
-
-    @Mock
-    private AlertPluginManager alertPluginManager;
     
     @Test
     public void testStart() {
-
-        Mockito.doNothing().when(alertPluginManager).installPlugin();
 
         Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
         
@@ -66,7 +61,7 @@ public class AlertServerTest extends TestCase {
 
         Mockito.doNothing().when(alertSenderService).start();
 
-        alertServer.run();
+        alertServer.run(null);
     
         NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "nettyRemotingServer");
     

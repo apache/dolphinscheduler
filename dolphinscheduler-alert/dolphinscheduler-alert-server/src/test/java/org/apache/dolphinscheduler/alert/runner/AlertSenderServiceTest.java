@@ -46,8 +46,8 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AlertSenderTest {
-    private static final Logger logger = LoggerFactory.getLogger(AlertSenderTest.class);
+public class AlertSenderServiceTest {
+    private static final Logger logger = LoggerFactory.getLogger(AlertSenderServiceTest.class);
 
     @Mock
     private AlertDao alertDao;
@@ -61,9 +61,6 @@ public class AlertSenderTest {
 
     @Before
     public void before() {
-//        alertDao = mock(AlertDao.class);
-//        pluginDao = mock(PluginDao.class);
-//        alertPluginManager = mock(AlertPluginManager.class);
         MockitoAnnotations.initMocks(this);
     }
 

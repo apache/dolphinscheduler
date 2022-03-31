@@ -30,7 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.event.EventListener;
 
 import javax.annotation.PostConstruct;
 
@@ -38,9 +40,6 @@ import javax.annotation.PostConstruct;
 @ComponentScan("org.apache.dolphinscheduler")
 public class AlertServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
-
-    @Autowired
-    private AlertPluginManager alertPluginManager;
 
     @Autowired
     private PluginDao pluginDao;
@@ -66,11 +65,10 @@ public class AlertServer implements IStoppable {
         new SpringApplicationBuilder(AlertServer.class).web(WebApplicationType.NONE).run(args);
     }
 
-    @PostConstruct
-    public void run() {
+    @EventListener
+    public void run(ApplicationReadyEvent readyEvent) {
         logger.info("alert server starting...");
 
-        alertPluginManager.installPlugin();
         checkTable();
         startServer();
         alertSenderService.start();
