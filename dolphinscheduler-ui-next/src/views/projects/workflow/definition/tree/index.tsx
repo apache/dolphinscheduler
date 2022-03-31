@@ -27,7 +27,8 @@ import { Router, useRouter } from 'vue-router'
 import { viewTree } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { find } from 'lodash'
-import { ITaskTypeNodeOption } from './types'
+import { tasksState } from '@/utils/common'
+import type { ITaskTypeNodeOption } from './types'
 
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
@@ -136,67 +137,11 @@ export default defineComponent({
     ])
 
     const initTaskStateMap = () => {
-      taskStateMap.value = [
-        {
-          state: 'SUBMITTED_SUCCESS',
-          value: t('project.task.submitted_success'),
-          color: '#A9A9A9'
-        },
-        {
-          state: 'RUNNING_EXECUTION',
-          value: t('project.task.running_execution'),
-          color: '#4295DA'
-        },
-        {
-          state: 'READY_PAUSE',
-          value: t('project.task.ready_pause'),
-          color: '#50AEA3'
-        },
-        { state: 'PAUSE', value: t('project.task.pause'), color: '#367A72' },
-        {
-          state: 'READY_STOP',
-          value: t('project.task.ready_stop'),
-          color: '#E93424'
-        },
-        { state: 'STOP', value: t('project.task.stop'), color: '#D62E20' },
-        { state: 'FAILURE', value: t('project.task.failed'), color: '#000000' },
-        {
-          state: 'SUCCESS',
-          value: t('project.task.success'),
-          color: '#67C93B'
-        },
-        {
-          state: 'NEED_FAULT_TOLERANCE',
-          value: t('project.task.need_fault_tolerance'),
-          color: '#F09235'
-        },
-        { state: 'KILL', value: t('project.task.kill'), color: '#991F14' },
-        {
-          state: 'WAITING_THREAD',
-          value: t('project.task.waiting_thread'),
-          color: '#8635E4'
-        },
-        {
-          state: 'WAITING_DEPEND',
-          value: t('project.task.waiting_depend'),
-          color: '#4A0AB6'
-        },
-        {
-          state: 'DELAY_EXECUTION',
-          value: t('project.task.delay_execution'),
-          color: '#c5b4ec'
-        },
-        {
-          state: 'FORCED_SUCCESS',
-          value: t('project.task.forced_success'),
-          color: '#453463'
-        },
-        {
-          state: 'SERIAL_WAIT',
-          value: t('project.task.serial_wait'),
-          color: '#1b0446'
-        }
-      ]
+      taskStateMap.value = Object.entries(tasksState(t)).map(([key, item]) => ({
+        state: key,
+        value: item.desc,
+        color: item.color
+      }))
     }
 
     const initChartData = (node: any, newNode: any) => {

@@ -104,6 +104,7 @@ const home = {
   delay_execution: '延时执行',
   forced_success: '强制成功',
   serial_wait: '串行等待',
+  dispatch: '派发',
   ready_block: '准备阻断',
   block: '阻断'
 }
@@ -493,6 +494,7 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
+    dispatch: '派发',
     executing: '正在执行',
     startup_type: '启动类型',
     complement_range: '补数范围',
@@ -557,24 +559,9 @@ const project = {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?',
-    submitted_success: '提交成功',
-    running_execution: '正在运行',
-    ready_pause: '准备暂停',
-    pause: '暂停',
-    ready_stop: '准备停止',
-    stop: '停止',
-    failure: '失败',
-    success: '成功',
-    need_fault_tolerance: '需要容错',
-    kill: 'KILL',
-    waiting_thread: '等待线程',
-    waiting_depend: '等待依赖完成',
-    delay_execution: '延时执行',
-    forced_success: '强制成功',
     view_log: '查看日志',
     download_log: '下载日志',
-    refresh: '刷新',
-    serial_wait: '串行等待'
+    refresh: '刷新'
   },
   dag: {
     create: '创建工作流',
