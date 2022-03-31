@@ -22,22 +22,6 @@ spring:
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
-    username: root
-    password: root
-    hikari:
-      connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
-      pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
 
 registry:
   type: zookeeper

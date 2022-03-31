@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.registry;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
@@ -28,8 +29,6 @@ import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHED
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
