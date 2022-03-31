@@ -1,70 +1,71 @@
-# 历史版本：
-#### 以下是Apache DolphinScheduler每个稳定版本的设置说明。
+# Older Versions：
 
-### 版本：2.0.5
+#### Setup instructions,  are available for each stable version of Apache DolphinScheduler below:
 
-#### 地址：[2.0.5 文档](../2.0.5/user_doc/guide/quick-start.md)
+### Versions: 2.0.5
 
-### 版本：2.0.3
+#### Links： [2.0.5 Document](../2.0.5/user_doc/guide/quick-start.md)
 
-#### 地址：[2.0.3 文档](../2.0.3/user_doc/guide/quick-start.md)
+### Versions: 2.0.3
 
-### 版本：2.0.2
+#### Links： [2.0.3 Document](../2.0.3/user_doc/guide/quick-start.md)
 
-#### 地址：[2.0.2 文档](../2.0.2/user_doc/guide/quick-start.md)
+### Versions: 2.0.2
 
-### 版本：2.0.1
+#### Links：[2.0.2 Document](../2.0.2/user_doc/guide/quick-start.md)
 
-#### 地址：[2.0.1 文档](../2.0.1/user_doc/guide/quick-start.md)
+### Versions: 2.0.1
 
-### 版本：2.0.0
+#### Links：[2.0.1 Document](../2.0.1/user_doc/guide/quick-start.md)
 
-#### 地址：[2.0.0 文档](../2.0.0/user_doc/guide/quick-start.md)
+### Versions: 2.0.0
 
-### 版本：1.3.9
+#### Links：[2.0.0 Document](../2.0.0/user_doc/guide/quick-start.md)
 
-#### 地址：[1.3.9 文档](../1.3.9/user_doc/quick-start.md)
+### Versions：1.3.9
 
-### 版本：1.3.8
+#### Links：[1.3.9 Document](../1.3.9/user_doc/quick-start.md)
 
-#### 地址：[1.3.8 文档](../1.3.8/user_doc/quick-start.md)
+### Versions：1.3.8
 
-### 版本：1.3.6
+#### Links：[1.3.8 Document](../1.3.8/user_doc/quick-start.md)
 
-#### 地址：[1.3.6 文档](../1.3.6/user_doc/quick-start.md)
+### Versions：1.3.6
 
-### 版本：1.3.5
+#### Links：[1.3.6 Document](../1.3.6/user_doc/quick-start.md)
 
-#### 地址：[1.3.5 文档](../1.3.5/user_doc/quick-start.md)
+### Versions：1.3.5
 
-### 版本：1.3.4
+#### Links：[1.3.5 Document](../1.3.5/user_doc/quick-start.md)
 
-##### 地址：[1.3.4 文档](../1.3.4/user_doc/quick-start.md)
+### Versions：1.3.4
 
-### 版本：1.3.3
+##### Links：[1.3.4 Document](../1.3.4/user_doc/quick-start.md)
 
-#### 地址：[1.3.3 文档](../1.3.4/user_doc/quick-start.md)
+### Versions：1.3.3
 
-### 版本：1.3.2
+#### Links：[1.3.3 Document](../1.3.4/user_doc/quick-start.md)
 
-#### 地址：[1.3.2 文档](../1.3.2/user_doc/quick-start.md)
+### Versions：1.3.2
 
-### 版本：1.3.1
+#### Links：[1.3.2 Document](../1.3.2/user_doc/quick-start.md)
 
-#### 地址：[1.3.1 文档](../1.3.1/user_doc/quick-start.md)
+### Versions：1.3.1
 
-### 版本：1.2.1
+#### Links：[1.3.1 Document](../1.3.1/user_doc/quick-start.md)
 
-#### 地址：[1.2.1 文档](../1.2.1/user_doc/quick-start.md)
+### Versions：1.2.1
 
-### 版本：1.2.0
+#### Links：[1.2.1 Document](../1.2.1/user_doc/quick-start.md)
 
-#### 地址：[1.2.0 文档](../1.2.0/user_doc/quick-start.md)
+### Versions：1.2.0
 
-### 版本：1.1.0
+#### Links：[1.2.0 Document](../1.2.0/user_doc/quick-start.md)
 
-#### 地址：[1.1.0 文档](../1.2.0/user_doc/quick-start.md)
+### Versions：1.1.0
 
-### 版本：Dev
+#### Links：[1.1.0 Document](../1.2.0/user_doc/quick-start.md)
 
-#### 地址：[Dev 文档](../dev/user_doc/about/introduction.md)
+### Versions：Dev
+
+#### Links：[Dev Document](../dev/user_doc/about/introduction.md)

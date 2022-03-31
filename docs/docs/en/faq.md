@@ -1,131 +1,139 @@
 <!-- markdown-link-check-disable -->
-## Q：项目的名称是？
+## Q: What's the name of this project?
 
-A：DolphinScheduler
+A: DolphinScheduler
 
 ---
 
-## Q：DolphinScheduler 服务介绍及建议运行内存
+## Q: DolphinScheduler service introduction and recommended running memory
 
-A：DolphinScheduler 由 5 个服务组成，MasterServer、WorkerServer、ApiServer、AlertServer、LoggerServer 和 UI。
+A: DolphinScheduler consists of 5 services, MasterServer, WorkerServer, ApiServer, AlertServer, LoggerServer and UI.
 
-| 服务                      | 说明                                                         |
+| Service                   | Description                                                  |
 | ------------------------- | ------------------------------------------------------------ |
-| MasterServer              | 主要负责 **DAG** 的切分和任务状态的监控                      |
-| WorkerServer/LoggerServer | 主要负责任务的提交、执行和任务状态的更新。LoggerServer 用于 Rest Api 通过 **RPC** 查看日志 |
-| ApiServer                 | 提供 Rest Api 服务，供 UI 进行调用                            |
-| AlertServer               | 提供告警服务                                                 |
-| UI                        | 前端页面展示                                                 |
+| MasterServer              | Mainly responsible for DAG segmentation and task status monitoring |
+| WorkerServer/LoggerServer | Mainly responsible for the submission, execution and update of task status. LoggerServer is used for Rest Api to view logs through RPC |
+| ApiServer                 | Provides the Rest Api service for the UI to call             |
+| AlertServer               | Provide alarm service                                        |
+| UI                        | Front page display                                           |
 
-注意：**由于服务比较多，建议单机部署最好是 4 核 16G 以上**
-
----
-
-
-## Q：系统支持哪些邮箱？
-
-A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在 alert.properties 中选择性配置
+Note：**Due to the large number of services, it is recommended that the single-machine deployment is preferably 4 cores and 16G or more.**
 
 ---
 
-## Q：常用的系统变量时间参数有哪些，如何使用？
+## Q: Which mailboxes does the system support?
 
-A：请参考[使用手册](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/parameter/built-in.html) 第8小节
-
----
-
-## Q：pip install kazoo 这个安装报错。是必须安装的吗？
-
-A： 这个是 python 连接 Zookeeper 需要使用到的，用于删除Zookeeper中的master/worker临时节点信息。所以如果是第一次安装，就可以忽略错误。在1.3.0之后，kazoo不再需要了，我们用程序来代替kazoo所做的
+A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supported. Support TLS and SSL protocols, optionally configured in alert.properties
 
 ---
 
-## Q：怎么指定机器运行任务
+## Q: What are the common system variable time parameters and how do I use them?
 
-A：使用 **管理员** 创建 Worker 分组，在 **流程定义启动** 的时候可**指定Worker分组**或者在**任务节点上指定Worker分组**。如果不指定，则使用 Default，**Default默认是使用的集群里所有的Worker中随机选取一台来进行任务提交、执行**
-
----
-
-## Q：任务的优先级
-
-A：我们同时 **支持流程和任务的优先级**。优先级我们有 **HIGHEST、HIGH、MEDIUM、LOW 和 LOWEST** 五种级别。**可以设置不同流程实例之间的优先级，也可以设置同一个流程实例中不同任务实例的优先级**。详细内容请参考任务优先级设计 https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.html#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1
-
-----
-
-## Q：dolphinscheduler-grpc 报错
-
-A：在 1.2 及以前版本中，在根目录下执行：mvn -U clean package assembly:assembly -Dmaven.test.skip=true,然后刷新下整个项目就好，1.3版本中不再使用 GRPC 进行通信了
-
-----
-
-## Q：DolphinScheduler 支持 windows 上运行么
-
-A： 理论上只有 **Worker 是需要在 Linux 上运行的**，其它的服务都是可以在 windows 上正常运行的。但是还是建议最好能在 linux 上部署使用
-
------
-
-## Q：UI 在 linux 编译 node-sass 提示：Error：EACCESS:permission denied，mkdir xxxx
-
-A：单独安装 **npm install node-sass --unsafe-perm**，之后再 **npm install**
+A: Please refer to 'System parameter' in the system-manual 
 
 ---
 
-## Q：UI 不能正常登陆访问
+## Q: pip install kazoo This installation gives an error. Is it necessary to install?
 
-A：     1，如果是 node 启动的查看 dolphinscheduler-ui 下的 .env 文件里的 API_BASE 配置是否是 Api Server 服务地址
-
-​       2，如果是 nginx 启动的并且是通过 **install-dolphinscheduler-ui.sh** 安装的，查看             
-
-​              **/etc/nginx/conf.d/dolphinscheduler.conf** 中的 proxy_pass 配置是否是 Api Server 服务地址
-
-​       3，如果以上配置都是正确的，那么请查看 Api Server 服务是否是正常的，
-
-​			curl http://localhost:12345/dolphinscheduler/users/get-user-info 查看 Api Server 日志，
-
-​			如果提示 cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null，则证明 Api Server 服务是正常的
-
-​       4，如果以上都没有问题，需要查看一下 **application.properties** 中的 **server.context-path 和 server.port 配置**是否正确
-注意：1.3 版本直接使用 Jetty 进行前端代码的解析，无需再安装配置 nginx 了
+A: This is the python connection Zookeeper needs to use, it is used to delete the master/worker temporary node info in the Zookeeper. so you can ignore error if it's your first install. after version 1.3.0, kazoo is not been needed, we use program to replace what kazoo done 
 
 ---
 
-## Q：流程定义手动启动或调度启动之后，没有流程实例生成
+## Q: How to specify the machine running task
 
-A： 	  1，首先通过 **jps 查看MasterServer服务是否存在**，或者从服务监控直接查看 zk 中是否存在 master 服务
-
-​	   2，如果存在 master 服务，查看 **命令状态统计** 或者 **t_ds_error_command** 中是否增加的新记录，如果增加了，**请查看 message 字段定位启动异常原因**
-
----
-
-## Q：任务状态一直处于提交成功状态
-
-A：        1，首先通过 **jps 查看 WorkerServer 服务是否存在**，或者从服务监控直接查看 zk 中是否存在 worker 服务
-
-​          2，如果 **WorkerServer** 服务正常，需要 **查看 MasterServer 是否把 task 任务放到 zk 队列中** ，**需要查看 MasterServer 日志及 zk 队列中是否有任务阻塞**
-
-​	   3，如果以上都没有问题，需要定位是否指定了 Worker 分组，但是 **Worker 分组的机器不是在线状态**
+A: version 1.2 and berfore, Use **the administrator** to create a Worker group, **specify the Worker group** when the **process definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
+version 1.3, you can set worker group for the worker
 
 ---
 
-## Q：install.sh 中需要注意问题
+## Q: Priority of the task
 
-A：  	   1，如果替换变量中包含特殊字符，**请用 \ 转移符进行转移**
-
-​	    2，installPath="/data1_1T/dolphinscheduler"，**这个目录不能和当前要一键安装的 install.sh 目录是一样的**
-
-​	    3，deployUser="dolphinscheduler"，**部署用户必须具有 sudo 权限**，因为 worker 是通过 sudo -u 租户 sh xxx.command 进行执行的
-
-​	    4，monitorServerState="false"，服务监控脚本是否启动，默认是不启动服务监控脚本的。**如果启动服务监控脚本，则每 5 分钟定时来监控 master 和 worker 的服务是否 down 机，如果 down 机则会自动重启**
-
-​	    5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到conf根目录下
-
-​	注意：**1.0.x 版本是不会自动创建 hdfs 根目录的，需要自行创建，并且需要部署用户有hdfs的操作权限**
+A: We also support **the priority of processes and tasks**. Priority We have five levels of **HIGHEST, HIGH, MEDIUM, LOW and LOWEST**. **You can set the priority between different process instances, or you can set the priority of different task instances in the same process instance.** For details, please refer to the task priority design in the architecture-design.
 
 ---
 
-## Q：流程定义和流程实例下线异常
+## Q: dolphinscheduler-grpc gives an error
 
-A ： 对于 **1.0.4 以前的版本中**，修改 dolphinscheduler-api cn.dolphinscheduler.api.quartz 包下的代码即可
+A: Execute in the root directory: mvn -U clean package assembly:assembly -Dmaven.test.skip=true , then refresh the entire project.
+version 1.3 not use grpc, we use netty directly
+
+---
+
+## Q: Does DolphinScheduler support running on windows?
+
+A: In theory, **only the Worker needs to run on Linux**. Other services can run normally on Windows. But it is still recommended to deploy on Linux.
+
+---
+
+## Q: UI compiles node-sass prompt in linux: Error: EACCESS: permission denied, mkdir xxxx
+
+A: Install **npm install node-sass --unsafe-perm** separately, then **npm install**
+
+---
+
+## Q: UI cannot log in normally.
+
+A:   1, if it is node startup, check whether the .env API_BASE configuration under dolphinscheduler-ui is the Api Server service address.
+
+​       2, If it is nginx booted and installed via **install-dolphinscheduler-ui.sh**, check if the proxy_pass      			configuration in **/etc/nginx/conf.d/dolphinscheduler.conf** is the Api Server service address
+
+​       3, if the above configuration is correct, then please check if the Api Server service is normal, 
+
+​		   curl http://localhost:12345/dolphinscheduler/users/get-user-info, check the Api Server log,
+
+​          if  Prompt cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null,   		  which proves that the Api Server service is normal.
+
+​	4, if there is no problem above, you need to check if **server.context-path and server.port configuration** in **application.properties** is correct
+
+---
+
+## Q: After the process definition is manually started or scheduled, no process instance is generated.
+
+A:   1, first **check whether the MasterServer service exists through jps**, or directly check whether there is a master service in zk from the service monitoring.
+
+​       2,If there is a master service, check **the command status statistics** or whether new records are added in **t_ds_error_command**. If it is added, **please check the message field.**
+
+---
+
+## Q : The task status is always in the successful submission status.
+
+A:   1, **first check whether the WorkerServer service exists through jps**, or directly check whether there is a worker service in zk from the service monitoring.
+
+​       2,If the **WorkerServer** service is normal, you need to **check whether the MasterServer puts the task task in the zk queue. You need to check whether the task is blocked in the MasterServer log and the zk queue.**
+
+​       3, if there is no problem above, you need to locate whether the Worker group is specified, but **the machine grouped by the worker is not online**.
+
+---
+
+## Q: Is there a Docker image and a Dockerfile?
+
+A: Provide Docker image and Dockerfile.
+
+Docker image address: https://hub.docker.com/r/escheduler/escheduler_images
+
+Dockerfile address: https://github.com/qiaozhanwei/escheduler_dockerfile/tree/master/docker_escheduler
+
+---
+
+## Q : Need to pay attention to the problem in install.sh
+
+A:   1, if the replacement variable contains special characters, **use the \ transfer character to transfer**
+
+​       2, installPath="/data1_1T/dolphinscheduler", **this directory can not be the same as the install.sh directory currently installed with one click.**
+
+​       3, deployUser = "dolphinscheduler", **the deployment user must have sudo privileges**, because the worker is executed by sudo -u tenant sh xxx.command
+
+​       4, monitorServerState = "false", whether the service monitoring script is started, the default is not to start the service monitoring script. **If the service monitoring script is started, the master and worker services are monitored every 5 minutes, and if the machine is down, it will automatically restart.**
+
+​       5, hdfsStartupSate="false", whether to enable HDFS resource upload function. The default is not enabled. **If it is not enabled, the resource center cannot be used.** If enabled, you need to configure the configuration of fs.defaultFS and yarn in conf/common/hadoop/hadoop.properties. If you use namenode HA, you need to copy core-site.xml and hdfs-site.xml to the conf root directory.
+
+​    Note: **The 1.0.x version does not automatically create the hdfs root directory, you need to create it yourself, and you need to deploy the user with hdfs operation permission.**
+
+---
+
+## Q : Process definition and process instance offline exception
+
+A : For **versions prior to 1.0.4**, modify the code under the escheduler-api cn.escheduler.api.quartz package.
 
 ```
 public boolean deleteJob(String jobName, String jobGroupName) {
@@ -150,117 +158,126 @@ public boolean deleteJob(String jobName, String jobGroupName) {
 
 ---
 
-## Q：HDFS 启动之前创建的租户，能正常使用资源中心吗
+## Q: Can the tenant created before the HDFS startup use the resource center normally?
 
-A： 不能。因为在未启动 HDFS 创建的租户，不会在 HDFS 中注册租户目录。所以上次资源会报错
-
-## Q：多 Master 和多 Worker 状态下，服务掉了，怎么容错
-
-A：  **注意：Master 监控 Master 及 Worker 服务。**
-
-​	1，如果 Master 服务掉了，其它的 Master 会接管挂掉的 Master 的流程，继续监控 Worker task 状态
-
-​	2，如果 Worker 服务掉了，Master 会监控到 Worker 服务掉了，如果存在 Yarn 任务，Kill Yarn 任务之后走重试
-
-具体请看容错设计：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.html#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1
+A: No. Because the tenant created by HDFS is not started, the tenant directory will not be registered in HDFS. So the last resource will report an error.
 
 ---
 
-## Q：对于 Master 和 Worker 一台机器伪分布式下的容错
+## Q: In the multi-master and multi-worker state, the service is lost, how to be fault-tolerant
 
-A ： 1.0.3 版本只实现了 Master 启动流程容错，不走 Worker 容错。也就是说如果 Worker 挂掉的时候，没有 Master 存在。这流程将会出现问题。我们会在 **1.1.0** 版本中增加 Master 和 Worker 启动自容错，修复这个问题。如果想手动修改这个问题，需要针对 **跨重启正在运行流程** **并且已经掉的正在运行的 Worker 任务，需要修改为失败**，**同时跨重启正在运行流程设置为失败状态**。然后从失败节点进行流程恢复即可
+A: **Note:** **Master monitors Master and Worker services.**
+
+​    1，If the Master service is lost, other Masters will take over the process of the hanged Master and continue to monitor the Worker task status.
+
+​    2，If the Worker service is lost, the Master will monitor that the Worker service is gone. If there is a Yarn task, the Kill Yarn task will be retried.
+
+Please see the fault-tolerant design in the architecture for details.
 
 ---
 
-## Q：定时容易设置成每秒执行
+## Q : Fault tolerance for a machine distributed by Master and Worker
 
-A ： 设置定时的时候需要注意，如果第一位（* * * * * ? *）设置成 \* ，则表示每秒执行。**我们将会在 1.1.0 版本中加入显示最近调度的时间列表** ，使用 http://cron.qqe2.com/  可以在线看近 5 次运行时间
+A: The 1.0.3 version only implements the fault tolerance of the Master startup process, and does not take the Worker Fault Tolerance. That is to say, if the Worker hangs, no Master exists. There will be problems with this process. We will add Master and Worker startup fault tolerance in version **1.1.0** to fix this problem. If you want to manually modify this problem, you need to **modify the running task for the running worker task that is running the process across the restart and has been dropped. The running process is set to the failed state across the restart**. Then resume the process from the failed node.
 
+---
 
+## Q : Timing is easy to set to execute every second
 
-## Q：定时有有效时间范围吗
+A : Note when setting the timing. If the first digit (* * * * * ? *) is set to *, it means execution every second. **We will add a list of recently scheduled times in version 1.1.0.** You can see the last 5 running times online at http://cron.qqe2.com/
 
-A：有的，**如果定时的起止时间是同一个时间，那么此定时将是无效的定时**。**如果起止时间的结束时间比当前的时间小，很有可能定时会被自动删除**
+---
 
+## Q: Is there a valid time range for timing?
 
+A: Yes, **if the timing start and end time is the same time, then this timing will be invalid timing. If the end time of the start and end time is smaller than the current time, it is very likely that the timing will be automatically deleted.**
 
-## Q：任务依赖有几种实现
+---
 
-A：  1，**DAG** 之间的任务依赖关系，是从 **入度为零** 进行 DAG 切分的
+## Q : There are several implementations of task dependencies
 
-​	 2，有 **任务依赖节点** ，可以实现跨流程的任务或者流程依赖，具体请参考 依赖(DEPENDENT)节点：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.html#%E4%BB%BB%E5%8A%A1%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE
+A:	1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
 
+​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual. 
 
-## Q：流程定义有几种启动方式
+​	Note: **Cross-project processes or task dependencies are not supported**
 
-A： 1，在 **流程定义列表**，点击 **启动** 按钮
+---
 
-​		2，**流程定义列表添加定时器**，调度启动流程定义
+## Q: There are several ways to start the process definition.
 
-​		3，流程定义 **查看或编辑** DAG 页面，任意 **任务节点右击** 启动流程定义
+A:   1, in **the process definition list**, click the **Start** button.
 
-​		4，可以对流程定义 DAG 编辑，设置某些任务的运行标志位 **禁止运行**，则在启动流程定义的时候，将该节点的连线将从 DAG 中去掉
+​       2, **the process definition list adds a timer**, scheduling start process definition.
 
-## Q：Python 任务设置 Python 版本
+​       3, process definition **view or edit** the DAG page, any **task node right click** Start process definition.
 
-A：  只需要修改 conf/env/dolphinscheduler_env.sh 中的 PYTHON_HOME
+​       4, you can define DAG editing for the process, set the running flag of some tasks to **prohibit running**, when the process definition is started, the connection of the node will be removed from the DAG.
+
+---
+
+## Q : Python task setting Python version
+
+A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in conf/env/.dolphinscheduler_env.sh
 
 ```
 export PYTHON_HOME=/bin/python
 ```
 
-注意：这了 **PYTHON_HOME** ，是 python 命令的绝对路径，而不是单纯的 PYTHON_HOME，还需要注意的是 export PATH 的时候，需要直接
+Note: This is **PYTHON_HOME** , which is the absolute path of the python command, not the simple PYTHON_HOME. Also note that when exporting the PATH, you need to directly
 
 ```
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
 ```
 
+​		2，For versions prior to 1.0.3, the Python task only supports the Python version of the system. It does not support specifying the Python version.
 
-## Q：Worker Task 通过 sudo -u 租户 sh xxx.command 会产生子进程，在 kill 的时候，是否会杀掉
+---
 
-A： 我们会在 1.0.4 中增加 kill 任务同时，kill 掉任务产生的各种所有子进程
+## Q：Worker Task will generate a child process through sudo -u tenant sh xxx.command, will kill when kill
 
+A：  We will add the kill task in 1.0.4 and kill all the various child processes generated by the task.
 
+---
 
-## Q：DolphinScheduler 中的队列怎么用，用户队列和租户队列是什么意思
+## Q ： How to use the queue in DolphinScheduler, what does the user queue and tenant queue mean?
 
-A ： DolphinScheduler 中的队列可以在用户或者租户上指定队列，**用户指定的队列优先级是高于租户队列的优先级的。**，例如：对 MR 任务指定队列，是通过 mapreduce.job.queuename 来指定队列的。
+A ： The queue in the DolphinScheduler can be configured on the user or the tenant. **The priority of the queue specified by the user is higher than the priority of the tenant queue.** For example, to specify a queue for an MR task, the queue is specified by mapreduce.job.queuename.
 
-注意：MR 在用以上方法指定队列的时候，传递参数请使用如下方式：
+Note: When using the above method to specify the queue, the MR uses the following methods:
 
 ```
-	Configuration conf = new Configuration();
+	      Configuration conf = new Configuration();
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         String[] remainingArgs = optionParser.getRemainingArgs();
 ```
 
 
-如果是 Spark 任务 --queue 方式指定队列
 
+If it is a Spark task --queue mode specifies the queue
 
+---
 
-## Q：Master 或者 Worker 报如下告警
-
-<p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/master_worker_lack_res.png" width="60%" />
- </p>
-
-
-A ： 修改 conf 下的 master.properties **master.reserved.memory** 的值为更小的值，比如说 0.1 或者
-
-worker.properties **worker.reserved.memory** 的值为更小的值，比如说 0.1
-
-
-
-## Q：hive 版本是 1.1.0+cdh5.15.0，SQL hive 任务连接报错
+## Q : Master or Worker reports the following alarm
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/cdh_hive_error.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/master_worker_lack_res.png" width="60%" />
  </p>
 
 
 
-A： 将 hive pom
+A ： Change the value of master.properties **master.reserved.memory** under conf to a smaller value, say 0.1 or the value of worker.properties **worker.reserved.memory** is a smaller value, say 0.1
+
+---
+
+## Q: The hive version is 1.1.0+cdh5.15.0, and the SQL hive task connection is reported incorrectly.
+
+<p align="center">
+   <img src="https://analysys.github.io/easyscheduler_docs/images/cdh_hive_error.png" width="60%" />
+ </p>
+
+
+A ： Will hive pom
 
 ```
 <dependency>
@@ -270,7 +287,7 @@ A： 将 hive pom
 </dependency>
 ```
 
-修改为
+change into
 
 ```
 <dependency>
@@ -282,83 +299,82 @@ A： 将 hive pom
 
 ---
 
-## Q：如何增加一台工作服务器
-A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/laster/user_doc/installation/cluster.html) 1.3 小节，创建部署用户和 hosts 映射
+## Q : how to add a worker server
+A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
 
-​	2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/laster/user_doc/installation/cluster.html) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
-​          1.4 小节的最后一步是在当前新增机器上执行的，即需要给部署目录部署用户的权限
+​		2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
 
-​	3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
+​		3, Copy the deployment directory from worker server that has already deployed
 
-​	4，到 bin 下，启动 worker server 和 logger server
-```
+​		4, Go to bin dir, then start worker server and logger server
+
+        ```
         ./dolphinscheduler-daemon.sh start worker-server
         ./dolphinscheduler-daemon.sh start logger-server
-```
+        ```
 
 ---
 
-## Q：DolphinScheduler 什么时候发布新版本，同时新旧版本区别，以及如何升级，版本号规范 
-A：1，Apache 项目的发版流程是通过邮件列表完成的。 你可以订阅 DolphinScheduler 的邮件列表，订阅之后如果有发版，你就可以收到邮件。请参照这篇[指引](https://github.com/apache/dolphinscheduler#get-help)来订阅 DolphinScheduler 的邮件列表。
+## Q : When DolphinScheduler release a new version, and the change between current version and latest, and how to upgrade, and version number specification
+A: 1, The release process of Apache Project happens in the mailing list. You can subscribe DolphinScheduler's mailing list and then when the release is in process, you'll receive release emails. Please follow this [introduction](https://github.com/apache/dolphinscheduler#get-help) to subscribe DolphinScheduler's mailing list.
+    
+2, When new version published, there would be release note which describe the change log, and there also have upgrade document for the previous version to new's.
 
-   2，当项目发版的时候，会有发版说明告知具体的变更内容，同时也会有从旧版本升级到新版本的升级文档。
-
-   3，版本号为 x.y.z, 当 x 增加时代表全新架构的版本。当 y 增加时代表与 y 版本之前的不兼容需要升级脚本或其他人工处理才能升级。当 z 增加代表是 bug 修复，升级完全兼容。无需额外处理。之前有个问题 1.0.2 的升级不兼容 1.0.1 需要升级脚本。
-
----
-
-## Q：后续任务在前置任务失败情况下仍旧可以执行
-A：在启动工作流的时候，你可以设置失败策略：继续还是失败。
-![设置任务失败策略](https://user-images.githubusercontent.com/15833811/80368215-ee378080-88be-11ea-9074-01a33d012b23.png)
+3, Version number is x.y.z, when x is increased, it represents the version of the new architecture. When y is increased, it means that it is incompatible with the y version before it needs to be upgraded by script or other manual processing. When the z increase represents a bug fix, the upgrade is fully compatible. No additional processing is required. Remaining problem, the 1.0.2 upgrade is not compatible with 1.0.1 and requires an upgrade script. 
 
 ---
 
-## Q：工作流模板 DAG、工作流实例、工作任务及实例之间是什么关系 工作流模板 DAG、工作流实例、工作任务及实例之间是什么关系，一个 dag 支持最大并发 100，是指产生 100 个工作流实例并发运行吗？一个 dag 中的任务节点，也有并发数的配置，是指任务也可以并发多个线程运行吗？最大数 100 吗？
-A：
+## Q : Subsequent tasks can execute even front task failed
+A: When start the workflow, you can set the task failure strategy: continue or failure.
+![set task failure strategy](https://user-images.githubusercontent.com/15833811/80368215-ee378080-88be-11ea-9074-01a33d012b23.png)
+
+---
+
+## Q : Workflow template DAG, workflow instance, work task and what is the relationship among them? A DAG supports a maximum concurrency of 100, does it mean that 100 workflow instances are generated and run concurrently? A task node in a DAG also has a concurrent number configuration. Does it mean that tasks can run concurrently with multiple threads? Is the maximum number 100?
+A: 
 
 1.2.1 version
 ```
-   master.properties
-   设置 master 节点并发执行的最大工作流数
-   master.exec.threads=100
-   
-   Control the number of parallel tasks in each workflow
-   设置每个工作流可以并发执行的最大任务数
-   master.exec.task.number=20
-   
-   worker.properties
-   设置 worker 节点并发执行的最大任务数
-   worker.exec.threads=100
+master.properties
+Control the max parallel number of master node workflows
+master.exec.threads=100
+
+Control the max number of parallel tasks in each workflow
+master.exec.task.number=20
+
+worker.properties
+Control the max parallel number of worker node tasks
+worker.exec.threads=100
 ```
 
 ---
 
-## Q：工作组管理页面没有展示按钮
+## Q : Worker group manage page no buttons displayed
 <p align="center">
    <img src="https://user-images.githubusercontent.com/39816903/81903776-d8cb9180-95f4-11ea-98cb-94ca1e6a1db5.png" width="60%" />
 </p>
-A：1.3.0 版本，为了支持 k8s，worker ip 一直变动，因此我们不能在 UI 界面上配置，工作组可以配置在 worker.properties 上配置名称。
+A: For version 1.3.0, we want to support k8s, while the ip always will be changed, so can't config on the UI, worker can config group name in the worker.properties.
 
 ---
 
-## Q：为什么不把 mysql 的 jdbc 连接包添加到 docker 镜像里面
-A：Mysql jdbc 连接包的许可证和 apache v2 的许可证不兼容，因此它不能被加入到 docker 镜像里面。
+## Q : Why not add mysql jdbc connector to docker image
+A: The license of mysql jdbc connector is not compatible with apache v2 license, so it can't be included by docker image.
 
 ---
 
-## Q：当一个任务提交多个 yarn 程序的时候经常失败
+## Q : Allways fail when a task instance submit multiple yarn application
 <p align="center">
    <img src="https://user-images.githubusercontent.com/16174111/81312485-476e9380-90b9-11ea-9aad-ed009db899b1.png" width="60%" />
-</p>
-A：这个 Bug 在 dev 分支已修复，并加入到需求/待做列表。
+ </p>
+A： This bug have fix in dev and in Requirement/TODO list.
 
 ---
 
-## Q：Master 服务和 Worker 服务在运行几天之后停止了
+## Q : Master server and worker server stop abnormally after run for a few days
 <p align="center">
    <img src="https://user-images.githubusercontent.com/18378986/81293969-c3101680-90a0-11ea-87e5-ac9f0dd53f5e.png" width="60%" />
-</p>
-A：会话超时时间太短了，只有 0.3 秒，修改 zookeeper.properties 的配置项：
+ </p>
+A: Session timeout is too short, only 0.3 seconds. Change the config item in zookeeper.properties:
 
 ```
    zookeeper.session.timeout=60000
@@ -367,81 +383,84 @@ A：会话超时时间太短了，只有 0.3 秒，修改 zookeeper.properties �
 
 ---
 
-## Q：使用 docker-compose 默认配置启动，显示 zookeeper 错误
+## Q : Started using the docker-compose default configuration and display zookeeper errors
 <p align="center">
    <img src="https://user-images.githubusercontent.com/42579056/80374318-13c98780-88c9-11ea-8d5f-53448b957f02.png" width="60%" />
  </p>
-A：这个问题在 dev-1.3.0 版本解决了。这个 [pr](https://github.com/apache/dolphinscheduler/pull/2595) 已经解决了这个 bug，主要的改动点：
+A: This problem is solved in dev-1.3.0. This [pr](https://github.com/apache/dolphinscheduler/pull/2595) has solved this bug, brief change log:
 
 ```
-    在docker-compose.yml文件中增加zookeeper的环境变量ZOO_4LW_COMMANDS_WHITELIST。
-    把minLatency,avgLatency and maxLatency的类型从int改成float。
+    1. add zookeeper environment variable ZOO_4LW_COMMANDS_WHITELIST in docker-compose.yml file.
+    2. change the data type of minLatency, avgLatency and maxLatency from int to float.
 ```
 
 ---
 
-## Q：界面上显示任务一直运行，结束不了，从日志上看任务实例为空
+## Q : Interface show some task would be running all the time when db delayed and log show task instance is null
 <p align="center">
    <img src="https://user-images.githubusercontent.com/51871547/80302626-b1478d00-87dd-11ea-97d4-08aa2244a6d0.jpg" width="60%" />
  </p>
 <p align="center">
    <img src="https://user-images.githubusercontent.com/51871547/80302626-b1478d00-87dd-11ea-97d4-08aa2244a6d0.jpg" width="60%" />
  </p>
-A：这个 [bug](https://github.com/apache/dolphinscheduler/issues/1477)  描述了问题的详情。这个问题在 1.2.1 版本已经被修复了。
-对于 1.2.1 以下的版本，这种情况的一些提示：
+
+A: This [bug](https://github.com/apache/dolphinscheduler/issues/1477) describe the problem detail and it has been been solved in version 1.2.1.
+
+For version under 1.2.1, some tips for this situation:
 
 ```
-1，清空 zk 下这个路径的任务：/dolphinscheduler/task_queue
-2，修改任务状态为失败（int 值 6）
-3，运行工作流来从失败中恢复
+1. clear the task queue in zk for path: /dolphinscheduler/task_queue
+2. change the state of the task to failed( integer value: 6).
+3. run the work flow by recover from failed
 ```
 
 ---
 
-## Q：zk 中注册的 master 信息 ip 地址是 127.0.0.1，而不是配置的域名所对应或者解析的 ip 地址，可能导致不能查看任务日志
-A：修复 bug：
-```
-   1、confirm hostname
-   $hostname
-   hadoop1
-   2、hostname -i
-   127.0.0.1 10.3.57.15
-   3、edit /etc/hosts,delete hadoop1 from 127.0.0.1 record
-   $cat /etc/hosts
-   127.0.0.1 localhost
-   10.3.57.15 ds1 hadoop1
-   4、hostname -i
-   10.3.57.15
-```
-   hostname 命令返回服务器主机名，hostname -i 返回的是服务器主机名在 /etc/hosts 中所有匹配的ip地址。所以我把 /etc/hosts 中 127.0.0.1 中的主机名删掉，只保留内网 ip 的解析就可以了，没必要把 127.0.0.1 整条注释掉, 只要 hostname 命令返回值在 /etc/hosts 中对应的内网 ip 正确就可以，ds 程序取了第一个值，我理解上 ds 程序不应该用 hostname -i 取值这样有点问题，因为好多公司服务器的主机名都是运维配置的，感觉还是直接取配置文件的域名解析的返回 ip 更准确，或者 znode 中存域名信息而不是 /etc/hosts。
+## Q : Zookeeper masters znode list ip address is 127.0.0.1, instead of wanted ip eth0 or eth1, and may can't see task log
+A: bug fix:
+   ```
+      1, confirm hostname
+      $hostname
+      hadoop1
+      2, hostname -i
+      127.0.0.1 10.3.57.15
+      3, edit /etc/hosts,delete hadoop1 from 127.0.0.1 record
+      $cat /etc/hosts
+      127.0.0.1 localhost
+      10.3.57.15 ds1 hadoop1
+      4, hostname -i
+      10.3.57.15
+   ```
+
+   Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
 
 ---
 
-## Q：调度系统设置了一个秒级的任务，导致系统挂掉
-A：调度系统不支持秒级任务。
+## Q : The scheduling system set a second frequency task, causing the system to crash
+A: The scheduling system not support second frequency task.
 
 ---
 
-## Q：编译前后端代码 (dolphinscheduler-ui) 报错不能下载"https://github.com/sass/node-sass/releases/download/v4.13.1/darwin-x64-72_binding.node"
-A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录 
+## Q : Compile front-end code(dolphinscheduler-ui) show error cannot download "https://github.com/sass/node-sass/releases/download/v4.13.1/darwin-x64-72_binding.node"
+A: 1, cd dolphinscheduler-ui and delete node_modules directory 
 ```
 sudo rm -rf node_modules
 ```
-   ​	2，通过 npm.taobao.org 下载 node-sass
+   ​	2, install node-sass through npm.taobao.org
  ```
  sudo npm uninstall node-sass
  sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
  ```
-   3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+   3, if the 2nd step failure, please, [referer url](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
 ```
  sudo npm rebuild node-sass
 ```
-当问题解决之后，如果你不想每次编译都下载这个 node，你可以设置系统环境变量：SASS_BINARY_PATH= /xxx/xxx/xxx/xxx.node。
+When solved this problem, if you don't want to download this node every time, you can set system environment variable: SASS_BINARY_PATH= /xxx/xxx/xxx/xxx.node.
 
 ---
 
-## Q：当使用 mysql 作为 ds 数据库需要如何配置
-A：1，修改项目根目录 maven 配置文件，移除 scope 的 test 属性，这样 mysql 的包就可以在其它阶段被加载
+## Q : How to config when use mysql as database instead of postgres
+A: 1, Edit project root dir maven config file, remove scope test property so that mysql driver can be loaded.
 ```
 <dependency>
 	<groupId>mysql</groupId>
@@ -450,71 +469,73 @@ A：1，修改项目根目录 maven 配置文件，移除 scope 的 test 属性�
 	<scope>test<scope>
 </dependency>
 ```
-   ​	2，修改 application-dao.properties 和 quzrtz.properties 来使用 mysql 驱动
-   默认驱动是 postgres 主要由于许可证原因。
+   ​	2, Edit application-dao.properties and quzrtz.properties config file to use mysql driver.
+   Default is postgresSql driver because of license problem.
 
 ---
 
-## Q：shell 任务是如何运行的
-A：1，被执行的服务器在哪里配置，以及实际执行的服务器是哪台? 要指定在某个 worker 上去执行，可以在 worker 分组中配置，固定 IP，这样就可以把路径写死。如果配置的 worker 分组有多个 worker，实际执行的服务器由调度决定的，具有随机性。
+## Q : How does a shell task run
+A: 1, Where is the executed server? Specify one worker to run the task, you can create worker group in Security Center, then the task can be send to the particular worker. If a worker group have multiple servers, which server actually execute is determined by scheduling and has randomness.
 
-   ​	2，如果是服务器上某个路径的一个 shell 文件，怎么指向这个路径？服务器上某个路径下的 shell 文件，涉及到权限问题，不建议这么做。建议你可以使用资源中心的存储功能，然后在 shell 编辑器里面使用资源引用就可以，系统会帮助你把脚本下载到执行目录下。如果以 hdfs 作为资源中心，在执行的时候，调度器会把依赖的 jar 包，文件等资源拉到 worker 的执行目录上，我这边是 /tmp/escheduler/exec/process，该配置可以在 install.sh 中进行指定。
+   ​	2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installtion dolphinscheduler.
 
-   3，以哪个用户来执行任务？执行任务的时候，调度器会采用 sudo -u 租户的方式去执行，租户是一个 linux 用户。
-
----
-
-## Q：生产环境部署方式有推荐的最佳实践吗
-A：1，如果没有很多任务要运行，出于稳定性考虑我们建议使用 3 个节点，并且最好把 Master/Worder 服务部署在不同的节点。如果你只有一个节点，当然只能把所有的服务部署在同一个节点！通常来说，需要多少节点取决于你的业务，海豚调度系统本身不需要很多的资源。充分测试之后，你们将找到使用较少节点的合适的部署方式。
+   3, Which user execute the task? Task is run by the tenant through "sudo -u ${tenant}", tenant is a linux user.
 
 ---
 
-## Q：DEPENDENT 节点
-A：1，DEPENDENT 节点实际是没有执行体的，是专门用来配置数据周期依赖逻辑，然后再把执行节点挂载后面，来实现任务间的周期依赖。
+## Q : What’s the best deploy mode you suggest in production env
+A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines. 
 
 ---
 
-## Q：如何改变 Master 服务的启动端口
+## Q : DEPENDENT Task Node
+A: 1, DEPENDENT task node actually does not have script, it used for config data cycle dependent logic, and then add task node after that to realize task cycle dependent.
+
+---
+
+## Q : How to change the boot port of the master
 <p align="center">
    <img src="https://user-images.githubusercontent.com/8263441/62352160-0f3e9100-b53a-11e9-95ba-3ae3dde49c72.png" width="60%" />
  </p>
-A：1，修改 application_master.properties 配置文件，例如：server.port=12345。
+A: 1, modify application_master.properties, for example: server.port=12345.
 
 ---
 
-## Q：调度任务不能上线
-A：1，我们可以成功创建调度任务，并且表 t_scheduler_schedules 中也成功加入了一条记录，但当我点击上线后，前端页面无反应且会把 t_scheduler_schedules 这张表锁定，我测试过将 t_scheduler_schedules 中的 RELEASE_state 字段手动更新为 1 这样前端会显示为上线状态。DS 版本 1.2+ 表名是 t_ds_schedules，其它版本表名是 t_scheduler_schedules。
+## Q : Scheduled tasks cannot be online
+A: 1, We can successly create scheduled task and add one record into t_scheduler_schedules table, but when I click online, front page no reaction and will lock table t_scheduler_schedules, and tested set field release_state value to 1 in table t_scheduler_schedules, and task display online state. For DS version above 1.2 table name is t_ds_schedules, other version table name is t_scheduler_schedules.
 
 ---
 
-## Q：请问 swagger ui 的地址是什么
-A：1，1.2+ 版本地址是：http://apiServerIp:apiServerPort/dolphinscheduler/doc.html?language=zh_CN&lang=cn，其它版本是 http://apiServerIp:apiServerPort/escheduler/doc.html?language=zh_CN&lang=cn。
+## Q : What is the address of swagger ui
+A: 1, For version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
 
 ---
 
-## Q：前端安装包缺少文件
+## Q : Front-end installation package is missing files
 <p align="center">
    <img src="https://user-images.githubusercontent.com/41460919/61437083-d960b080-a96e-11e9-87f1-297ba3aca5e3.png" width="60%" />
  </p>
  <p align="center">
     <img src="https://user-images.githubusercontent.com/41460919/61437218-1b89f200-a96f-11e9-8e48-3fac47eb2389.png" width="60%" />
   </p>
-A： 1，用户修改了 api server 配置文件中的![apiServerContextPath](https://user-images.githubusercontent.com/41460919/61678323-1b09a680-ad35-11e9-9707-3ba68bbc70d6.png)配置项，导致了这个问题，恢复成默认配置之后问题解决。
+
+A: 1, User changed the config api server config file and item
+ ![apiServerContextPath](https://user-images.githubusercontent.com/41460919/61678323-1b09a680-ad35-11e9-9707-3ba68bbc70d6.png), thus lead to the problem. After resume to the default value and problem solved.
 
 ---
 
-## Q：上传比较大的文件卡住
+## Q : Upload a relatively large file blocked
 <p align="center">
    <img src="https://user-images.githubusercontent.com/21357069/58231400-805b0e80-7d69-11e9-8107-7f37b06a95df.png" width="60%" />
  </p>
-A：1，编辑 ngnix 配置文件 vi /etc/nginx/nginx.conf，更改上传大小 client_max_body_size 1024m。
+A: 1, Edit ngnix config file, edit upload max size client_max_body_size 1024m.
      
-   ​	2，更新 google chrome 版本到最新版本。
+   ​	2, the version of Google Chrome is old, and the latest version of the browser has been updated.
 
 ---
 
-## Q：创建 spark 数据源，点击“测试连接”，系统回退回到登入页面
-A：1，edit /etc/nginx/conf.d/escheduler.conf
+## Q : Create a spark data source, click "Test Connection", the system will fall back to the login page
+A: 1, edit nginx config file /etc/nginx/conf.d/escheduler.conf
 ```
      proxy_connect_timeout 300s;
      proxy_read_timeout 300s;
@@ -523,62 +544,60 @@ A：1，edit /etc/nginx/conf.d/escheduler.conf
 
 ---
 
-## Q：欢迎订阅 DolphinScheduler 开发邮件列表
-A：在使用 DolphinScheduler 的过程中，如果您有任何问题或者想法、建议，都可以通过 Apache 邮件列表参与到 DolphinScheduler 的社区建设中来。
-   发送订阅邮件也非常简单，步骤如下:
+## Q : Welcome to subscribe the DolphinScheduler development mailing list
+A: In the process of using DolphinScheduler, if you have any questions or ideas, suggestions, you can participate in the DolphinScheduler community building through the Apache mailing list. Sending a subscription email is also very simple, the steps are as follows: 
 
-   1，用自己的邮箱向 dev-subscribe@dolphinscheduler.apache.org 发送一封邮件，主题和内容任意。
+1, Send an email to dev-subscribe@dolphinscheduler.apache.org with your own email address, subject and content.
 
-   2， 接收确认邮件并回复。 完成步骤1后，您将收到一封来自 dev-help@dolphinscheduler.apache.org 的确认邮件（如未收到，请确认邮件是否被自动归入垃圾邮件、推广邮件、订阅邮件等文件夹）。然后直接回复该邮件，或点击邮件里的链接快捷回复即可，主题和内容任意。
+2, Receive confirmation email and reply. After completing step 1, you will receive a confirmation email from dev-help@dolphinscheduler.apache.org (if not received, please confirm whether the email is automatically classified as spam, promotion email, subscription email, etc.) . Then reply directly to the email, or click on the link in the email to reply quickly, the subject and content are arbitrary.
 
-   3， 接收欢迎邮件。 完成以上步骤后，您会收到一封主题为 WELCOME to dev@dolphinscheduler.apache.org 的欢迎邮件，至此您已成功订阅 Apache DolphinScheduler的邮件列表。
-
----
-
-## Q：工作流依赖
-A：1，目前是按照自然天来判断，上月末：判断时间是工作流 A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'。上月：是判断上个月从 1 号到月末每天都要有完成的A实例。上周： 上周 7 天都要有完成的 A 实例。前两天： 判断昨天和前天，两天都要有完成的 A 实例。
+3, Receive a welcome email. After completing the above steps, you will receive a welcome email with the subject WELCOME to dev@dolphinscheduler.apache.org, and you have successfully subscribed to the Apache DolphinScheduler mailing list.
 
 ---
 
-## Q：DS 后端接口文档
-A：1，http://106.75.43.194:8888/dolphinscheduler/doc.html?language=zh_CN&lang=zh。
+## Q : Workflow Dependency
+A: 1, It is currently judged according to natural days, at the end of last month: the judgment time is the workflow A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'. Last month: It is judged that there is an A instance completed every day from the 1st to the end of the month. Last week: There are completed A instances 7 days last week. The first two days: Judging yesterday and the day before yesterday, there must be a completed A instance for two days.
 
+---
 
-## dolphinscheduler 在运行过程中，ip 地址获取错误的问题
+## Q : DS Backend Inteface Document
+A: 1, http://106.75.43.194:8888/dolphinscheduler/doc.html?language=en.
 
-master 服务、worker 服务在 zookeeper 注册时，会以 ip:port 的形式创建相关信息
+## During the operation of dolphinscheduler, the ip address is obtained incorrectly
 
-如果 ip 地址获取错误，请检查网络信息，如 Linux 系统通过 `ifconfig` 命令查看网络信息，以下图为例：
+When the master service and worker service are registered with zookeeper, relevant information will be created in the form of ip:port
+
+If the ip address is obtained incorrectly, please check the network information. For example, in the Linux system, use the `ifconfig` command to view the network information. The following figure is an example:
 
 <p align="center">
   <img src="/img/network/network_config.png" width="60%" />
 </p>
 
-可以使用 dolphinscheduler 提供的三种策略，获取可用 ip：
+You can use the three strategies provided by dolphinscheduler to get the available ip:
 
-* default: 优先获取内网网卡获取 ip 地址，其次获取外网网卡获取 ip 地址，在前两项失效情况下，使用第一块可用网卡的地址
-* inner: 使用内网网卡获取 ip地址，如果获取失败抛出异常信息
-* outer: 使用外网网卡获取 ip地址，如果获取失败抛出异常信息
+* default: First using internal network card to obtain the IP address, and then using external network card. If all above fail, use the address of the first available network card
+* inner: Use the internal network card to obtain the ip address, if fails thrown an exception.
+* outer: Use the external network card to obtain the ip address, if fails thrown an exception.
 
-配置方式是在 `common.properties` 中修改相关配置：
+Modify the configuration in `common.properties`:
 
 ```shell
 # network IP gets priority, default: inner outer
 # dolphin.scheduler.network.priority.strategy=default
 ```
 
-以上配置修改后重启服务生效
+After configuration is modified, restart the service to activation
 
-如果 ip 地址获取依然错误，请下载 [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) 到相应机器，执行以下命令以进一步排障，并反馈给社区开发人员：
+If the ip address is still wrong, please download [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) to the machine, execute the following commands and feedback the output to the community developers:
 
 ```shell
 java -jar target/dolphinscheduler-netutils.jar
 ```
 
-## 配置 sudo 免密，用于解决默认配置 sudo 权限过大或不能申请 root 权限的使用问题
+## Configure sudo to be secret free, which is used to solve the problem of using the default configuration sudo authority to be too large or unable to apply for root authority
 
-配置 dolphinscheduler OS 账号的 sudo 权限为部分普通用户范围内的一个普通用户管理者，限制指定用户在指定主机上运行某些命令，详细配置请看 sudo 权限管理
-例如 sudo 权限管理配置 dolphinscheduler OS 账号只能操作用户 userA,userB,userC 的权限（其中用户 userA,userB,userC 用于多租户向大数据集群提交作业）
+Configure the sudo permission of the dolphinscheduler account to be an ordinary user manager within the scope of some ordinary users, and restrict specified users to run certain commands on the specified host. For detailed configuration, please see sudo rights management
+For example, sudo permission management configuration dolphinscheduler OS account can only operate the permissions of users userA, userB, userC (users userA, userB, and userC are used for multi-tenant submitting jobs to the big data cluster)
 
 ```shell
 echo 'dolphinscheduler  ALL=(userA,userB,userC)  NOPASSWD: NOPASSWD: ALL' >> /etc/sudoers
@@ -587,20 +606,20 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 ---
 
-## Q：Yarn多集群支持
-A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EMR）：
+## Q：Deploy for multiple YARN clusters
+A：By deploying different worker in different yarn clusters，the steps are as follows(eg: AWS EMR):
 
-   1. 将 Worker 节点部署至 EMR 集群的 Master 节点
+   1. Deploying the worker server on the master node of the EMR cluster
    
-   2. 将 `conf/common.properties` 中的 `yarn.application.status.address` 修改为当前集群的 Yarn 的信息
+   2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
    
-   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 和 `bin/dolphinscheduler-daemon.sh start logger-server` 分别启动 worker-server 和 logger-server
+   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` and `bin/dolphinscheduler-daemon.sh start logger-server` to start worker-server and logger-server
 
 ---
 
 ## Q：Update process definition error: Duplicate key TaskDefinition
 
-A：在DS 2.0.4之前（2.0.0-alpha之后），可能存在版本切换的重复键问题，导致更新工作流失败；可参考如下SQL进行重复数据的删除，以MySQL为例：（注意：操作前请务必备份原数据，SQL来源于pr [#8408](https://github.com/apache/dolphinscheduler/pull/8408)）
+A：Before DS 2.0.4 (after 2.0.0-alpha), there may be a problem of duplicate keys TaskDefinition due to version switching, which may cause the update workflow to fail; you can refer to the following SQL to delete duplicate data, taking MySQL as an example: (Note: Before operating, be sure to back up the original data, the SQL from pr[#8408](https://github.com/apache/dolphinscheduler/pull/8408))
 
 ```SQL
 DELETE FROM t_ds_process_task_relation_log WHERE id IN
@@ -686,4 +705,4 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
 
 ---
 
-我们会持续收集更多的 FAQ。
+## We will collect more FAQ later
