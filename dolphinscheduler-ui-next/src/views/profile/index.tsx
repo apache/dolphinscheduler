@@ -24,8 +24,8 @@ import Card from '@/components/card'
 import Modal from '@/components/modal'
 import Info from './components/info'
 import utils from '@/utils'
-import {useUserStore} from "@/store/user/user";
-import type {UserInfoRes} from "@/service/modules/users/types";
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const profile = defineComponent({
   name: 'profile',
