@@ -104,8 +104,6 @@ public class TaskResponseServiceTest {
 
     @Test
     public void testAddResponse() {
-        Mockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-        Mockito.when(channel.writeAndFlush(Mockito.any())).thenReturn(null);
         taskEventService.addEvent(ackEvent);
         taskEventService.addEvent(resultEvent);
     }
