@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.service.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
@@ -11,13 +28,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperRegistry;
-import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryProperties;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.test.TestingServer;
-import org.apache.http.util.Asserts;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +54,7 @@ public class RegistryClientTest {
 
     @Before
     public void before() throws Exception {
-        workerGroups = Lists.newArrayList("flink","hadoop");
+        workerGroups = Lists.newArrayList("flink", "hadoop");
         TestingServer server = new TestingServer(true);
         RegistryProperties p = new RegistryProperties();
         p.getZookeeper().setConnectString(server.getConnectString());
@@ -51,7 +66,7 @@ public class RegistryClientTest {
 
     @Test
     public void testPersistEphemeralAndGet() {
-        Server master = createServer(NodeType.MASTER,"192.168.1.1");
+        Server master = createServer(NodeType.MASTER, "192.168.1.1");
         String workerPath = this.getMasterPath(master);
         String heartBeatInfo = "heartBeatInfo";
         registryClient.persistEphemeral(workerPath, heartBeatInfo);
@@ -70,35 +85,35 @@ public class RegistryClientTest {
         List<Server> workers = createWorks();
         persistWorkers(workers);
         List<Server> reaultWorders = registryClient.getServerList(NodeType.WORKER);
-        Assert.assertEquals(workers.size()*workerGroups.size(), reaultWorders.size());
+        Assert.assertEquals(workers.size() * workerGroups.size(), reaultWorders.size());
     }
 
     @Test
     public void testGetServerMaps() {
         List<Server> masters = createMasters();
         persistMasters(masters);
-        Map<String,String> masterMaps = registryClient.getServerMaps(NodeType.MASTER,true);
+        Map<String, String> masterMaps = registryClient.getServerMaps(NodeType.MASTER, true);
         masters.forEach(master -> {
-            Assert.assertTrue(masterMaps.containsKey(master.getHost()+":"+master.getPort()));
+            Assert.assertTrue(masterMaps.containsKey(master.getHost() + ":" + master.getPort()));
         });
-        Map<String,String> masterMaps2 = registryClient.getServerMaps(NodeType.MASTER,false);
+        Map<String, String> masterMaps2 = registryClient.getServerMaps(NodeType.MASTER, false);
         masters.forEach(master -> {
-            Assert.assertTrue(masterMaps2.containsKey(master.getHost()+":"+master.getPort()));
+            Assert.assertTrue(masterMaps2.containsKey(master.getHost() + ":" + master.getPort()));
         });
 
 
         List<Server> workers = createWorks();
         persistWorkers(workers);
-        Map<String,String> workerMaps = registryClient.getServerMaps(NodeType.WORKER,true);
+        Map<String, String> workerMaps = registryClient.getServerMaps(NodeType.WORKER, true);
         workers.forEach(worker -> {
-            Assert.assertTrue(workerMaps.containsKey(worker.getHost()+":"+worker.getPort()));
+            Assert.assertTrue(workerMaps.containsKey(worker.getHost() + ":" + worker.getPort()));
         });
 
-        Map<String,String> workerMaps2 = registryClient.getServerMaps(NodeType.WORKER,false);
+        Map<String, String> workerMaps2 = registryClient.getServerMaps(NodeType.WORKER, false);
         workers.forEach(worker -> {
-            Assert.assertFalse(workerMaps2.containsKey(worker.getHost()+":"+worker.getPort()));
+            Assert.assertFalse(workerMaps2.containsKey(worker.getHost() + ":" + worker.getPort()));
             workerGroups.forEach(g -> {
-                Assert.assertTrue(workerMaps2.containsKey(g+"/"+worker.getHost()+":"+worker.getPort()));
+                Assert.assertTrue(workerMaps2.containsKey(g + "/" + worker.getHost() + ":" + worker.getPort()));
             });
         });
     }
@@ -108,11 +123,11 @@ public class RegistryClientTest {
         List<Server> masters = createMasters();
         persistMasters(masters);
         Server checkMaster = masters.get(0);
-        boolean exists = registryClient.checkNodeExists(checkMaster.getHost()+":"+checkMaster.getPort(),NodeType.MASTER);
+        boolean exists = registryClient.checkNodeExists(checkMaster.getHost() + ":" + checkMaster.getPort(), NodeType.MASTER);
         Assert.assertTrue(exists);
-        exists = registryClient.checkNodeExists("192.168.2.1:"+checkMaster.getPort(),NodeType.MASTER);
+        exists = registryClient.checkNodeExists("192.168.2.1:" + checkMaster.getPort(), NodeType.MASTER);
         Assert.assertFalse(exists);
-        exists = registryClient.checkNodeExists(checkMaster.getHost()+":"+checkMaster.getPort(),NodeType.WORKER);
+        exists = registryClient.checkNodeExists(checkMaster.getHost() + ":" + checkMaster.getPort(), NodeType.WORKER);
         Assert.assertFalse(exists);
     }
 
@@ -123,12 +138,12 @@ public class RegistryClientTest {
         Server deadMaster = masters.get(0);
         String path = getMasterPath(deadMaster);
 
-        registryClient.handleDeadServer(Lists.newArrayList(path),NodeType.MASTER,ADD_OP);
-        boolean result = registryClient.checkIsDeadServer(path,"master");
+        registryClient.handleDeadServer(Lists.newArrayList(path), NodeType.MASTER, ADD_OP);
+        boolean result = registryClient.checkIsDeadServer(path, "master");
         Assert.assertTrue(result);
 
-        registryClient.handleDeadServer(Lists.newArrayList(path),NodeType.MASTER,DELETE_OP);
-        result = registryClient.checkIsDeadServer(path,"master");
+        registryClient.handleDeadServer(Lists.newArrayList(path), NodeType.MASTER, DELETE_OP);
+        result = registryClient.checkIsDeadServer(path, "master");
         Assert.assertFalse(result);
     }
 
@@ -166,15 +181,15 @@ public class RegistryClientTest {
     }
 
     private List<Server> createMasters() {
-        Server s1 = createServer(NodeType.MASTER,"192.168.1.1");
-        Server s2 = createServer(NodeType.MASTER,"192.168.1.2");
-        return Lists.newArrayList(s1,s2);
+        Server s1 = createServer(NodeType.MASTER, "192.168.1.1");
+        Server s2 = createServer(NodeType.MASTER, "192.168.1.2");
+        return Lists.newArrayList(s1, s2);
     }
 
     private List<Server> createWorks() {
-        Server s1 = createServer(NodeType.WORKER,"192.168.1.3");
-        Server s2 = createServer(NodeType.WORKER,"192.168.1.4");
-        return Lists.newArrayList(s1,s2);
+        Server s1 = createServer(NodeType.WORKER, "192.168.1.3");
+        Server s2 = createServer(NodeType.WORKER, "192.168.1.4");
+        return Lists.newArrayList(s1, s2);
     }
 
     private Server createServer(NodeType nodeType, String host) {
@@ -197,13 +212,13 @@ public class RegistryClientTest {
     }
 
     private String getMasterPath(Server server) {
-        String address = server.getHost()+":"+server.getPort();
+        String address = server.getHost() + ":" + server.getPort();
         return REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + address;
     }
 
     private Set<String> getWorkerPaths(Server server) {
         Set<String> workerPaths = Sets.newHashSet();
-        String address = server.getHost()+":"+server.getPort();
+        String address = server.getHost() + ":" + server.getPort();
         for (String workGroup : workerGroups) {
             StringJoiner workerPathJoiner = new StringJoiner(SINGLE_SLASH);
             workerPathJoiner.add(REGISTRY_DOLPHINSCHEDULER_WORKERS);
