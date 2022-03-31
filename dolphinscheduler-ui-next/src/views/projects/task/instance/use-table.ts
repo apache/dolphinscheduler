@@ -327,6 +327,8 @@ export function useTable() {
 }
 
 export function renderStateCell(state: ITaskState, t: Function) {
+  if (!state) return ''
+
   const stateOption = tasksState(t)[state]
 
   const Icon = h(

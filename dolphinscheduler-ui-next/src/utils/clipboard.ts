@@ -15,22 +15,17 @@
  * limitations under the License.
  */
 
-import { copy } from '@/utils/clipboard'
-import { useMessage } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
-
-/**
- * Text copy with success message
- */
-export function useTextCopy() {
-  const { t } = useI18n()
-  const message = useMessage()
-  const copyText = (text: string) => {
-    if (copy(text)) {
-      message.success(t('project.dag.copy_success'))
-    }
-  }
-  return {
-    copy: copyText
-  }
+export const copy = (text: string): boolean => {
+  const range = document.createRange()
+  const node = document.createTextNode(text)
+  document.body.append(node)
+  range.selectNode(node)
+  window.getSelection()?.addRange(range)
+  let result = false
+  try {
+    result = document.execCommand('copy')
+  } catch (err) {}
+  window.getSelection()?.removeAllRanges()
+  document.body.removeChild(node)
+  return result
 }
