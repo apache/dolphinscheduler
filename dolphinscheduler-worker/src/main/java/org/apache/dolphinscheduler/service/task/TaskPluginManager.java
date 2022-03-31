@@ -21,13 +21,10 @@ import static java.lang.String.format;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,34 +41,12 @@ public class TaskPluginManager {
 
     private final Map<String, TaskChannel> taskChannelMap = new ConcurrentHashMap<>();
 
-    private void loadTaskChannel(TaskChannelFactory taskChannelFactory) {
-        TaskChannel taskChannel = taskChannelFactory.create();
-        taskChannelMap.put(taskChannelFactory.getName(), taskChannel);
-    }
-
     public Map<String, TaskChannel> getTaskChannelMap() {
         return Collections.unmodifiableMap(taskChannelMap);
     }
 
     public TaskChannel getTaskChannel(String type) {
         return this.getTaskChannelMap().get(type);
-    }
-
-    public boolean checkTaskParameters(ParametersNode parametersNode) {
-        AbstractParameters abstractParameters = this.getParameters(parametersNode);
-        return abstractParameters != null && abstractParameters.checkParameters();
-    }
-
-    public AbstractParameters getParameters(ParametersNode parametersNode) {
-        String taskType = parametersNode.getTaskType();
-        if (Objects.isNull(taskType)) {
-            return null;
-        }
-        TaskChannel taskChannel = this.getTaskChannelMap().get(taskType);
-        if (Objects.isNull(taskChannel)) {
-            return null;
-        }
-        return taskChannel.parseParameters(parametersNode);
     }
 
     @EventListener
@@ -91,5 +66,10 @@ public class TaskPluginManager {
 
             logger.info("Registered task plugin: {}", name);
         });
+    }
+
+    private void loadTaskChannel(TaskChannelFactory taskChannelFactory) {
+        TaskChannel taskChannel = taskChannelFactory.create();
+        taskChannelMap.put(taskChannelFactory.getName(), taskChannel);
     }
 }
