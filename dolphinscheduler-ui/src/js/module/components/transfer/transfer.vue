@@ -71,10 +71,8 @@
     methods: {
       _ok () {
         this.$refs.popup.spinnerLoading = true
-        console.log(1111)
         setTimeout(() => {
           this.$refs.popup.spinnerLoading = false
-          console.log(2222)
           if (this.transferData.type.name === `${i18n.$t('Managing Users')}`) {
             this.$emit('onUpdate', _.map(this.targetList, v => v.id).join(','))
           } else if (this.transferData.type.name === `${i18n.$t('Project')}`) {
