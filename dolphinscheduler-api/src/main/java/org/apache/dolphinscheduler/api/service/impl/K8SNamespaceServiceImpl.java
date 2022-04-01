@@ -155,7 +155,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         k8sNamespaceObj.setCreateTime(now);
         k8sNamespaceObj.setUpdateTime(now);
 
-        if (!Constants.K8S.equals(k8sNamespaceObj.getK8s())) {
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER.equals(k8sNamespaceObj.getK8s())) {
             try {
                 String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
                 k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
@@ -209,7 +209,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         k8sNamespaceObj.setLimitsMemory(limitsMemory);
         k8sNamespaceObj.setUpdateTime(now);
 
-        if (!Constants.K8S.equals(k8sNamespaceObj.getK8s())) {
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER.equals(k8sNamespaceObj.getK8s())) {
             try {
                 String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
                 k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
