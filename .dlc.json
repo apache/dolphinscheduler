@@ -1,0 +1,32 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^http://localhost"
+    },
+    {
+      "pattern": "^https://hive.apache.org"
+    },
+    {
+      "pattern": "^http://192"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "{{BASEURL}}/"
+    },
+    {
+      "pattern": "^/img",
+      "replacement": "{{BASEURL}}/docs/img"
+    }
+  ],
+  "timeout": "10s",
+  "retryOn429": true,
+  "retryCount": 10,
+  "fallbackRetryDelay": "1000s",
+  "aliveStatusCodes": [
+    200,
+    401,
+    0
+  ]
+}
