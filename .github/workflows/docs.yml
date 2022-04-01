@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Run Image Check
-        run: python img_utils.py
+        run: python img_utils.py -v check
   dead-link:
     name: Dead Link
     runs-on: ubuntu-latest

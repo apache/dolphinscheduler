@@ -12,8 +12,12 @@
   ],
   "replacementPatterns": [
     {
-      "pattern": "^/",
-      "replacement": "{{BASEURL}}/"
+      "pattern": "^/en-us/download/download.html$",
+      "replacement": "https://dolphinscheduler.apache.org/en-us/download/download.html"
+    },
+    {
+      "pattern": "^/zh-cn/download/download.html$",
+      "replacement": "https://dolphinscheduler.apache.org/zh-cn/download/download.html"
     },
     {
       "pattern": "^/img",

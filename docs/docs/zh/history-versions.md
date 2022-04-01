@@ -1,3 +1,5 @@
+<!-- markdown-link-check-disable -->
+
 # 历史版本：
 #### 以下是Apache DolphinScheduler每个稳定版本的设置说明。
 

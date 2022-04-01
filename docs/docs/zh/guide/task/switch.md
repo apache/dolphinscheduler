@@ -30,7 +30,7 @@ Switch是一个条件判断节点，依据[全局变量](../parameter/global.md)
 
 最终switch任务的配置如下
 
-![task-switch-configure](../../../../../../img/switch_configure.jpg)
+![task-switch-configure](/img/switch_configure.jpg)
 
 ## 相关任务
 

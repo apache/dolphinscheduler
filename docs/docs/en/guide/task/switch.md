@@ -31,7 +31,7 @@ Here we have three tasks, the dependencies are `A -> B -> [C, D]`, and `task_a` 
 
 The following shows the switch task configuration:
 
-![task-switch-configure](../../../../../../img/switch_configure.jpg)
+![task-switch-configure](/img/switch_configure.jpg)
 
 ## Related Task
 

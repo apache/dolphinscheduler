@@ -1,3 +1,5 @@
+<!-- markdown-link-check-disable -->
+
 # Older Versions：
 
 #### Setup instructions,  are available for each stable version of Apache DolphinScheduler below:
