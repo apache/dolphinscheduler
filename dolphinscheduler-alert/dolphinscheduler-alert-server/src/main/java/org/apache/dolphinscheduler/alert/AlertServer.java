@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.alert;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -98,12 +99,9 @@ public class AlertServer implements IStoppable {
             // set stop signal is true
             Stopper.stop();
 
-            try {
-                // thread sleep 3 seconds for thread quietly stop
-                Thread.sleep(3000L);
-            } catch (Exception e) {
-                logger.warn("thread sleep exception ", e);
-            }
+            // thread sleep 3 seconds for thread quietly stop
+            ThreadUtils.sleep(3000L);
+
             // close
             this.nettyRemotingServer.close();
 

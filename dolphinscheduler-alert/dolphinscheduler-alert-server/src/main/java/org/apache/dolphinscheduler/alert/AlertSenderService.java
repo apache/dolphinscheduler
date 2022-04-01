@@ -18,11 +18,16 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.alert.api.*;
+import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertConstants;
+import org.apache.dolphinscheduler.alert.api.AlertData;
+import org.apache.dolphinscheduler.alert.api.AlertInfo;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -63,7 +68,7 @@ public final class AlertSenderService extends Thread {
             try {
                 List<Alert> alerts = alertDao.listPendingAlerts();
                 this.send(alerts);
-                TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             } catch (Exception e) {
                 logger.error("alert sender thread error", e);
             }
