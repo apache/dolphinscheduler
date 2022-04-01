@@ -40,7 +40,6 @@ public class CommonDataSourceClient implements DataSourceClient {
     private static final Logger logger = LoggerFactory.getLogger(CommonDataSourceClient.class);
 
     public static final String COMMON_USER = "root";
-    public static final String COMMON_PASSWORD = "123456";
     public static final String COMMON_VALIDATION_QUERY = "select 1";
 
     protected final BaseConnectionParam baseConnectionParam;
@@ -73,17 +72,10 @@ public class CommonDataSourceClient implements DataSourceClient {
         if (StringUtils.isBlank(baseConnectionParam.getUser())) {
             setDefaultUsername(baseConnectionParam);
         }
-        if (StringUtils.isBlank(baseConnectionParam.getPassword())) {
-            setDefaultPassword(baseConnectionParam);
-        }
     }
 
     protected void setDefaultUsername(BaseConnectionParam baseConnectionParam) {
         baseConnectionParam.setUser(COMMON_USER);
-    }
-
-    protected void setDefaultPassword(BaseConnectionParam baseConnectionParam) {
-        baseConnectionParam.setPassword(COMMON_PASSWORD);
     }
 
     protected void checkValidationQuery(BaseConnectionParam baseConnectionParam) {

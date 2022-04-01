@@ -60,7 +60,7 @@ const Form = defineComponent({
                   {...formItemProps}
                   span={unref(span) === void 0 ? 24 : unref(span)}
                   path={path}
-                  key={path}
+                  key={path || String(Date.now() + Math.random())}
                 >
                   {h(widget)}
                 </NFormItemGi>

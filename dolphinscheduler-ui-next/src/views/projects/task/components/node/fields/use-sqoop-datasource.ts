@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { onMounted, ref, unref, Ref } from 'vue'
+import { onMounted, ref, Ref } from 'vue'
 import { queryDataSourceList } from '@/service/modules/data-source'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem, IDataBase } from '../types'
@@ -52,7 +52,7 @@ export function useDatasource(
       span: span,
       options: [{ label: 'MYSQL', value: 'MYSQL' }],
       validate: {
-        required: unref(span) !== 0
+        required: true
       }
     },
     {

@@ -106,11 +106,7 @@ export function useTable(onEdit: Function) {
         key: 'upstreamTaskMap',
         render: (row: TaskDefinitionItem) =>
           row.upstreamTaskMap.map((item: string, index: number) => {
-            return h(
-              'p',
-              null,
-              { default: () => `[${index + 1}] ${item}` }
-            )
+            return h('p', null, { default: () => `[${index + 1}] ${item}` })
           }),
         ...COLUMN_WIDTH_CONFIG['name']
       },
@@ -270,7 +266,8 @@ export function useTable(onEdit: Function) {
     taskType: ref(null),
     showVersionModalRef: ref(false),
     showMoveModalRef: ref(false),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const handleDelete = (row: any) => {
@@ -289,6 +286,8 @@ export function useTable(onEdit: Function) {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryTaskDefinitionListPaging({ ...params }, { projectCode }).then(
         (res: TaskDefinitionRes) => {
@@ -306,6 +305,7 @@ export function useTable(onEdit: Function) {
             }
           }) as any
           variables.totalPage = res.totalPage
+          variables.loadingRef = false
         }
       ),
       {}

@@ -47,7 +47,7 @@ public class RetryReportTaskStatusThread implements Runnable {
     private TaskCallbackService taskCallbackService;
 
     public void start() {
-        Thread thread = new Thread(this,"RetryReportTaskStatusThread");
+        Thread thread = new Thread(this, "RetryReportTaskStatusThread");
         thread.setDaemon(true);
         thread.start();
     }
@@ -65,21 +65,21 @@ public class RetryReportTaskStatusThread implements Runnable {
             ThreadUtils.sleep(RETRY_REPORT_TASK_STATUS_INTERVAL);
 
             try {
-                if (!instance.getAckCache().isEmpty()) {
-                    Map<Integer,Command> ackCache =  instance.getAckCache();
-                    for (Map.Entry<Integer, Command> entry : ackCache.entrySet()) {
+                if (!instance.getRunningCache().isEmpty()) {
+                    Map<Integer, Command> runningCache = instance.getRunningCache();
+                    for (Map.Entry<Integer, Command> entry : runningCache.entrySet()) {
                         Integer taskInstanceId = entry.getKey();
-                        Command ackCommand = entry.getValue();
-                        taskCallbackService.sendAck(taskInstanceId,ackCommand);
+                        Command runningCommand = entry.getValue();
+                        taskCallbackService.send(taskInstanceId, runningCommand);
                     }
                 }
 
                 if (!instance.getResponseCache().isEmpty()) {
-                    Map<Integer,Command> responseCache =  instance.getResponseCache();
+                    Map<Integer, Command> responseCache = instance.getResponseCache();
                     for (Map.Entry<Integer, Command> entry : responseCache.entrySet()) {
                         Integer taskInstanceId = entry.getKey();
                         Command responseCommand = entry.getValue();
-                        taskCallbackService.sendResult(taskInstanceId,responseCommand);
+                        taskCallbackService.send(taskInstanceId, responseCommand);
                     }
                 }
             } catch (Exception e) {

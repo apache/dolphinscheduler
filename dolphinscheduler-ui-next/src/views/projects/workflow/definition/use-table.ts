@@ -19,9 +19,8 @@ import _ from 'lodash'
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
 import { useAsyncState } from '@vueuse/core'
+import { useTextCopy } from '../components/dag/use-text-copy'
 import {
   batchCopyByCodes,
   batchDeleteByCodes,
@@ -32,7 +31,8 @@ import {
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
-import { NTag } from 'naive-ui'
+import { NTag, NSpace, NIcon, NButton, NEllipsis } from 'naive-ui'
+import { CopyOutlined } from '@vicons/antd'
 import ButtonLink from '@/components/button-link'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -40,11 +40,13 @@ import {
   DefaultTableWidth
 } from '@/utils/column-width-config'
 import type { IDefinitionParam } from './types'
+import type { Router } from 'vue-router'
+import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-
+  const { copy } = useTextCopy()
   const variables = reactive({
     columns: [],
     tableWidth: DefaultTableWidth,
@@ -60,7 +62,8 @@ export function useTable() {
     startShowRef: ref(false),
     timingShowRef: ref(false),
     versionShowRef: ref(false),
-    copyShowRef: ref(false)
+    copyShowRef: ref(false),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -81,18 +84,44 @@ export function useTable() {
         title: t('project.workflow.workflow_name'),
         key: 'name',
         className: 'workflow-name',
-        ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row) => h(
-          ButtonLink,
-          {
-            onClick: () =>
-              void router.push({
-                name: 'workflow-definition-detail',
-                params: { code: row.code }
-              })
-          },
-          { default: () => row.name }
-        )
+        width: 200,
+        render: (row) =>
+          h(
+            NSpace,
+            {
+              justify: 'space-between',
+              wrap: false,
+              class: styles['workflow-name']
+            },
+            {
+              default: () => [
+                h(
+                  ButtonLink,
+                  {
+                    onClick: () =>
+                      void router.push({
+                        name: 'workflow-definition-detail',
+                        params: { code: row.code }
+                      })
+                  },
+                  {
+                    default: () => h(NEllipsis, null, () => row.name)
+                  }
+                ),
+                h(
+                  NButton,
+                  {
+                    quaternary: true,
+                    circle: true,
+                    type: 'info',
+                    size: 'tiny',
+                    onClick: () => void copy(row.name)
+                  },
+                  { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
+                )
+              ]
+            }
+          )
       },
       {
         title: t('project.workflow.status'),
@@ -336,12 +365,15 @@ export function useTable() {
   }
 
   const getTableData = (params: IDefinitionParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }),
       { total: 0, table: [] }
     )

@@ -114,8 +114,15 @@ const TaskDefinition = defineComponent({
     }
   },
   render() {
-    const { t, onSearch, requestData, onUpdatePageSize, onRefresh, onCreate } =
-      this
+    const {
+      t,
+      onSearch,
+      requestData,
+      onUpdatePageSize,
+      onRefresh,
+      onCreate,
+      loadingRef
+    } = this
 
     return (
       <>
@@ -163,6 +170,7 @@ const TaskDefinition = defineComponent({
         </NCard>
         <Card class={styles['table-card']}>
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             scrollX={this.tableWidth}

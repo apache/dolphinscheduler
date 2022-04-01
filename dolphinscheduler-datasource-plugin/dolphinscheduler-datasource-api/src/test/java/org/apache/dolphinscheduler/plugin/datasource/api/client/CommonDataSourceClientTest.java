@@ -70,11 +70,6 @@ public class CommonDataSourceClientTest {
         PowerMockito.doNothing().when(commonDataSourceClient).setDefaultUsername(Mockito.any(BaseConnectionParam.class));
         commonDataSourceClient.setDefaultUsername(baseConnectionParam);
         Mockito.verify(commonDataSourceClient).setDefaultUsername(Mockito.any(BaseConnectionParam.class));
-
-        PowerMockito.doNothing().when(commonDataSourceClient).setDefaultPassword(Mockito.any(BaseConnectionParam.class));
-        commonDataSourceClient.setDefaultPassword(baseConnectionParam);
-        Mockito.verify(commonDataSourceClient).setDefaultPassword(Mockito.any(BaseConnectionParam.class));
-
     }
 
     @Test

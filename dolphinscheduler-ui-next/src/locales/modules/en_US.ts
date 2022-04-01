@@ -104,6 +104,7 @@ const home = {
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
   serial_wait: 'SERIAL_WAIT',
+  dispatch: 'DISPATCH',
   ready_block: 'READY_BLOCK',
   block: 'BLOCK'
 }
@@ -152,7 +153,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    master_no_data_result_title: 'No Master Nodes Exist',
+    master_no_data_result_desc:
+      'Currently, there are no master nodes exist, please create a master node and refresh this page'
   },
   worker: {
     cpu_usage: 'CPU Usage',
@@ -162,7 +166,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    worker_no_data_result_title: 'No Worker Nodes Exist',
+    worker_no_data_result_desc:
+      'Currently, there are no worker nodes exist, please create a worker node and refresh this page'
   },
   db: {
     health_state: 'Health State',
@@ -490,6 +497,7 @@ const project = {
     delay_execution: 'Delay execution',
     forced_success: 'Forced success',
     serial_wait: 'Serial wait',
+    dispatch: 'Dispatch',
     executing: 'Executing',
     startup_type: 'Startup Type',
     complement_range: 'Complement Range',
@@ -555,24 +563,9 @@ const project = {
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?',
-    submitted_success: 'Submitted Success',
-    running_execution: 'Running Execution',
-    ready_pause: 'Ready Pause',
-    pause: 'Pause',
-    ready_stop: 'Ready Stop',
-    stop: 'Stop',
-    failure: 'Failure',
-    success: 'Success',
-    need_fault_tolerance: 'Need Fault Tolerance',
-    kill: 'Kill',
-    waiting_thread: 'Waiting Thread',
-    waiting_depend: 'Waiting Depend',
-    delay_execution: 'Delay Execution',
-    forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
-    refresh: 'Refresh',
-    serial_wait: 'Serial Wait'
+    refresh: 'Refresh'
   },
   dag: {
     create: 'Create Workflow',
@@ -594,6 +587,12 @@ const project = {
     description: 'Description',
     tenant: 'Tenant',
     timeout_alert: 'Timeout Alert',
+    process_execute_type: 'Process execute type',
+    parallel: 'parallel',
+    serial_wait: 'Serial wait',
+    serial_discard: 'Serial discard',
+    serial_priority: 'Serial priority',
+    recover_serial_wait: 'Recover serial wait',
     global_variables: 'Global Variables',
     basic_info: 'Basic Information',
     minute: 'Minute',
@@ -610,7 +609,8 @@ const project = {
     node_not_created: 'Failed to save node not created',
     copy_name: 'Copy Name',
     view_variables: 'View Variables',
-    startup_parameter: 'Startup Parameter'
+    startup_parameter: 'Startup Parameter',
+    online: 'Online'
   },
   node: {
     current_node_settings: 'Current node settings',

@@ -62,7 +62,8 @@ export function useTable() {
     processInstanceName: ref(null),
     totalPage: ref(1),
     showModalRef: ref(false),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -268,6 +269,8 @@ export function useTable() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -306,6 +309,7 @@ export function useTable() {
             }
           }) as any
           variables.totalPage = res.totalPage
+          variables.loadingRef = false
         }
       ),
       {}
@@ -323,24 +327,26 @@ export function useTable() {
 }
 
 export function renderStateCell(state: ITaskState, t: Function) {
+  if (!state) return ''
+
   const stateOption = tasksState(t)[state]
 
   const Icon = h(
     NIcon,
     {
       color: stateOption.color,
-      size: 18,
       class: stateOption.classNames,
       style: {
         display: 'flex'
-      }
+      },
+      size: 20
     },
     () => h(stateOption.icon)
   )
   return h(NTooltip, null, {
     trigger: () => {
       if (!stateOption.isSpin) return Icon
-      return h(NSpin, { size: 'small' }, { icon: () => Icon })
+      return h(NSpin, { size: 20 }, { icon: () => Icon })
     },
     default: () => stateOption.desc
   })

@@ -259,11 +259,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            processService.changeTaskState(taskInstance, ExecutionStatus.FAILURE,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    null,
-                    null);
+            taskInstance.setState(ExecutionStatus.FAILURE);
+            processService.saveTaskInstance(taskInstance);
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
@@ -317,6 +314,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         map.forEach((code, parameters) -> {
             DataSource datasource = processService.findDataSourceById(code);
+            if (Objects.isNull(datasource)) {
+                return;
+            }
             DataSourceParameters dataSourceParameters = new DataSourceParameters();
             dataSourceParameters.setType(datasource.getType());
             dataSourceParameters.setConnectionParams(datasource.getConnectionParams());

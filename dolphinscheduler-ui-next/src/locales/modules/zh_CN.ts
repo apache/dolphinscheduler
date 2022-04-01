@@ -104,6 +104,7 @@ const home = {
   delay_execution: '延时执行',
   forced_success: '强制成功',
   serial_wait: '串行等待',
+  dispatch: '派发',
   ready_block: '准备阻断',
   block: '阻断'
 }
@@ -151,7 +152,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    master_no_data_result_title: 'Master节点不存在',
+    master_no_data_result_desc:
+      '目前没有任何Master节点，请先创建Master节点，再访问该页面'
   },
   worker: {
     cpu_usage: '处理器使用量',
@@ -161,7 +165,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    worker_no_data_result_title: 'Worker节点不存在',
+    worker_no_data_result_desc:
+      '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'
   },
   db: {
     health_state: '健康状态',
@@ -487,6 +494,7 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
+    dispatch: '派发',
     executing: '正在执行',
     startup_type: '启动类型',
     complement_range: '补数范围',
@@ -551,24 +559,9 @@ const project = {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?',
-    submitted_success: '提交成功',
-    running_execution: '正在运行',
-    ready_pause: '准备暂停',
-    pause: '暂停',
-    ready_stop: '准备停止',
-    stop: '停止',
-    failure: '失败',
-    success: '成功',
-    need_fault_tolerance: '需要容错',
-    kill: 'KILL',
-    waiting_thread: '等待线程',
-    waiting_depend: '等待依赖完成',
-    delay_execution: '延时执行',
-    forced_success: '强制成功',
     view_log: '查看日志',
     download_log: '下载日志',
-    refresh: '刷新',
-    serial_wait: '串行等待'
+    refresh: '刷新'
   },
   dag: {
     create: '创建工作流',
@@ -590,6 +583,12 @@ const project = {
     description: '描述',
     tenant: '租户',
     timeout_alert: '超时告警',
+    process_execute_type: '执行策略',
+    parallel: '并行',
+    serial_wait: '串行等待',
+    serial_discard: '串行抛弃',
+    serial_priority: '串行优先',
+    recover_serial_wait: '串行恢复',
     global_variables: '全局变量',
     basic_info: '基本信息',
     minute: '分',
@@ -606,7 +605,8 @@ const project = {
     node_not_created: '未创建节点保存失败',
     copy_name: '复制名称',
     view_variables: '查看变量',
-    startup_parameter: '启动参数'
+    startup_parameter: '启动参数',
+    online: '已上线'
   },
   node: {
     current_node_settings: '当前节点设置',

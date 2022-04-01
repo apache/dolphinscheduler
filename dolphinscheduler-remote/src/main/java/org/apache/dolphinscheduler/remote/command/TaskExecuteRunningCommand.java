@@ -23,9 +23,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * execute task request command
+ * task execute running command
+ * from worker to master
  */
-public class TaskExecuteAckCommand implements Serializable {
+public class TaskExecuteRunningCommand implements Serializable {
 
     /**
      * taskInstanceId
@@ -62,6 +63,16 @@ public class TaskExecuteAckCommand implements Serializable {
      */
     private String executePath;
 
+    /**
+     * processId
+     */
+    private int processId;
+
+    /**
+     * appIds
+     */
+    private String appIds;
+
     public Date getStartTime() {
         return startTime;
     }
@@ -94,6 +105,14 @@ public class TaskExecuteAckCommand implements Serializable {
         this.taskInstanceId = taskInstanceId;
     }
 
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
     public String getLogPath() {
         return logPath;
     }
@@ -110,6 +129,22 @@ public class TaskExecuteAckCommand implements Serializable {
         this.executePath = executePath;
     }
 
+    public int getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(int processId) {
+        this.processId = processId;
+    }
+
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
+    }
+
     /**
      * package request command
      *
@@ -117,7 +152,7 @@ public class TaskExecuteAckCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_ACK);
+        command.setType(CommandType.TASK_EXECUTE_RUNNING);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
@@ -125,22 +160,16 @@ public class TaskExecuteAckCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskExecuteAckCommand{"
+        return "TaskExecuteRunningCommand{"
                 + "taskInstanceId=" + taskInstanceId
+                + ", processInstanceId='" + processInstanceId + '\''
                 + ", startTime=" + startTime
                 + ", host='" + host + '\''
                 + ", status=" + status
                 + ", logPath='" + logPath + '\''
                 + ", executePath='" + executePath + '\''
-                + ", processInstanceId='" + processInstanceId + '\''
+                + ", processId=" + processId + '\''
+                + ", appIds='" + appIds + '\''
                 + '}';
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
     }
 }

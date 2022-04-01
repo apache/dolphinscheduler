@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -123,6 +124,12 @@ public class ServerNodeManager implements InitializingBean {
      */
     @Autowired
     private AlertDao alertDao;
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
 
     private static volatile int MASTER_SLOT = 0;
 
@@ -300,6 +307,7 @@ public class ServerNodeManager implements InitializingBean {
 
     private void updateMasterNodes() {
         MASTER_SLOT = 0;
+        MASTER_SIZE = 0;
         this.masterNodes.clear();
         String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
         try {
@@ -337,18 +345,18 @@ public class ServerNodeManager implements InitializingBean {
     private void syncMasterNodes(Collection<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
-            String host = NetUtils.getHost();
+            String addr = NetUtils.getAddr(NetUtils.getHost(), masterConfig.getListenPort());
             this.masterNodes.addAll(nodes);
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
-            int index = masterPriorityQueue.getIndex(host);
+            int index = masterPriorityQueue.getIndex(addr);
             if (index >= 0) {
                 MASTER_SIZE = nodes.size();
                 MASTER_SLOT = index;
             } else {
-                logger.warn("current host:{} is not in active master list", host);
+                logger.warn("current addr:{} is not in active master list", addr);
             }
-            logger.info("update master nodes, master size: {}, slot: {}", MASTER_SIZE, MASTER_SLOT);
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, addr);
         } finally {
             masterLock.unlock();
         }

@@ -26,6 +26,17 @@ export function useForm() {
     await state.formRef.validate(...args)
   }
 
+  const resetValues = (initialValues: { [field: string]: any }) => {
+    const modelKeys = Object.keys(state.formRef.model)
+    for (const key of modelKeys) {
+      if (!Object.keys(initialValues).includes(key)) {
+        delete state.formRef.model[key]
+      }
+    }
+
+    setValues(initialValues)
+  }
+
   const setValues = (initialValues: { [field: string]: any }) => {
     for (const [key, value] of Object.entries(initialValues)) {
       state.formRef.model[key] = value
@@ -45,6 +56,7 @@ export function useForm() {
     validate,
     setValues,
     getValues,
+    resetValues,
     restoreValidation
   }
 }

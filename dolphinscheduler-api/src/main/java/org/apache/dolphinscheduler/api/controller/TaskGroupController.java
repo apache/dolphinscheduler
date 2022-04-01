@@ -71,7 +71,7 @@ public class TaskGroupController extends BaseController {
      * @param name        project id
      * @return result and msg code
      */
-    @ApiOperation(value = "create", notes = "CREATE_TAKS_GROUP_NOTE")
+    @ApiOperation(value = "create", notes = "CREATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", type = "Long"),
@@ -102,7 +102,7 @@ public class TaskGroupController extends BaseController {
      * @param name        project id
      * @return result and msg code
      */
-    @ApiOperation(value = "update", notes = "UPDATE_TAKS_GROUP_NOTE")
+    @ApiOperation(value = "update", notes = "UPDATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "id", dataType = "Int"),
         @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
@@ -159,7 +159,7 @@ public class TaskGroupController extends BaseController {
      * @param pageSize  page size
      * @return queue list
      */
-    @ApiOperation(value = "queryTaskGroupByStatus", notes = "QUERY_TASK_GROUP_LIST_BY_STSATUS_NOTES")
+    @ApiOperation(value = "queryTaskGroupByStatus", notes = "QUERY_TASK_GROUP_LIST_BY_STATUS_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),

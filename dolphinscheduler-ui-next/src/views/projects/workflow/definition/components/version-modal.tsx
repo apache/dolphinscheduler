@@ -80,7 +80,7 @@ export default defineComponent({
 
   render() {
     const { t } = useI18n()
-    const { requestData } = this
+    const { requestData, loadingRef } = this
 
     return (
       <Modal
@@ -90,6 +90,7 @@ export default defineComponent({
         onConfirm={this.hideModal}
       >
         <NDataTable
+          loading={loadingRef}
           columns={this.columns}
           data={this.tableData}
           striped

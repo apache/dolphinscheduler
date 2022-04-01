@@ -84,7 +84,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     public void submitStateEvent(StateEvent stateEvent) {
         WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.error("workflowExecuteThread is null, processInstanceId:{}", stateEvent.getProcessInstanceId());
+            logger.warn("workflowExecuteThread is null, stateEvent:{}", stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
@@ -109,8 +109,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         }
         int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
         ListenableFuture future = this.submitListenable(() -> {
-            workflowExecuteThread.handleEvents();
             multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
+            workflowExecuteThread.handleEvents();
         });
         future.addCallback(new ListenableFutureCallback() {
             @Override
