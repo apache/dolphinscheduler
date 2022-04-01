@@ -51,20 +51,3 @@ pnpm run prettier
 ```
 
 ---
-
-### E2E
-
-In order to ensure the stability of the project, we have added a lot of `E2E` tests, you can learn about it through the following list, and when you make code changes, please make sure that the `DOM` of `E2E` has not changed, if there are changes, please Correspondingly modify the backend code or explain it in `PR`.
-
-- [Login](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/login.md)
-- [Data Source](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/data-source.md)
-- [Navbar](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/navbar.md)
-- [Project](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/project.md)
-- [Resource](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/resource.md)
-- [Security](https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-ui-next/docs/e2e/security.md)
-
-### Known Issues
-
-Since this system is newly developed, there are some known issues, but this does not affect your use. We will deal with it in subsequent versions. If you are an open source enthusiast, your contributions are very welcome.
-
-Check out all known issues [Know Issues](https://github.com/apache/dolphinscheduler/issues/8565).
