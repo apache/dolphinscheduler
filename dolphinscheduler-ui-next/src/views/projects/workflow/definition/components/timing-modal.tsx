@@ -102,25 +102,6 @@ export default defineComponent({
       }
     }
 
-    const warningTypeOptions = [
-      {
-        value: 'NONE',
-        label: t('project.workflow.none_send')
-      },
-      {
-        value: 'SUCCESS',
-        label: t('project.workflow.success_send')
-      },
-      {
-        value: 'FAILURE',
-        label: t('project.workflow.failure_send')
-      },
-      {
-        value: 'ALL',
-        label: t('project.workflow.all_send')
-      }
-    ]
-
     const priorityOptions = [
       {
         value: 'HIGHEST',
@@ -235,7 +216,6 @@ export default defineComponent({
       crontabRef,
       parallelismRef,
       priorityOptions,
-      warningTypeOptions,
       environmentOptions,
       hideModal,
       handleTiming,
@@ -342,7 +322,24 @@ export default defineComponent({
             path='warningType'
           >
             <NSelect
-              options={this.warningTypeOptions}
+              options={[
+                {
+                  value: 'NONE',
+                  label: t('project.workflow.none_send')
+                },
+                {
+                  value: 'SUCCESS',
+                  label: t('project.workflow.success_send')
+                },
+                {
+                  value: 'FAILURE',
+                  label: t('project.workflow.failure_send')
+                },
+                {
+                  value: 'ALL',
+                  label: t('project.workflow.all_send')
+                }
+              ]}
               v-model:value={this.timingForm.warningType}
             />
           </NFormItem>
