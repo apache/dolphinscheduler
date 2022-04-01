@@ -55,7 +55,12 @@ def get_files_recurse(path: Path) -> Set:
 
 def get_paths_uniq_suffix(paths: Set[Path]) -> Set:
     """Get file suffix without dot in given :param:`paths`."""
-    return {path.suffix[1:] for path in paths}
+    res = set()
+    for path in paths:
+        if path.suffix == "":
+            log.warning("There is a path %s without suffix.", path)
+        res.add(path.suffix[1:])
+    return res
 
 
 def get_paths_rel_path(paths: Set[Path], rel: Path) -> Set:
@@ -178,9 +183,9 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
-    args = arg_parser.parse_args()
+    # args = arg_parser.parse_args()
 
-    # args = arg_parser.parse_args(["prune"])
+    args = arg_parser.parse_args(["check"])
     log.setLevel(args.log_level)
     if args.log_level <= logging.DEBUG:
         print("All args is:", args)
