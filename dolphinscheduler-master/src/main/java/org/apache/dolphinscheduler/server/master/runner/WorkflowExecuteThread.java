@@ -1788,7 +1788,7 @@ public class WorkflowExecuteThread {
                         removeTaskFromStandbyList(task);
                         completeTaskMap.put(task.getTaskCode(), task.getId());
                         errorTaskMap.put(task.getTaskCode(), task.getId());
-                        logger.info("process {}, task {}, id:{} submit task failed.", task.getProcessInstanceId(), task.getName(), task.getId());
+                        logger.error("process {}, task {}, code:{} submit task failed.", task.getProcessInstanceId(), task.getName(), task.getCode());
                     } else {
                         removeTaskFromStandbyList(task);
                     }
