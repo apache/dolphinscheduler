@@ -108,7 +108,7 @@
 - Select the project and authorize the project.
 
 <p align="center">
-   <img src="/img/authproject-en.png" width="80%" />
+   <img src="/img/auth-project-en.png" width="80%" />
  </p>
 
 - Resources, data sources, and UDF function authorization are the same as project authorization.
