@@ -80,8 +80,7 @@ jobs:
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
-    needs: [build, paths-filter]
-    if: ${{ needs.paths-filter.outputs.path }} == 'true'
+    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -163,7 +162,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.path }} == 'false' ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.path == 'false' }} ]]; then
             echo "Passed!"
           else
             exit -1
