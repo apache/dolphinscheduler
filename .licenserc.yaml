@@ -33,6 +33,7 @@ header:
     - .gitattributes
     - '**/licenses/**/LICENSE-*'
     - '**/*.md'
+    - '**/*.svg'
     - '**/*.json'
     - '**/*.iml'
     - '**/*.ini'
