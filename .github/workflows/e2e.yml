@@ -33,18 +33,18 @@ jobs:
     name: E2E-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      path: ${{ steps.filter.outputs.path }}
+      ignore: ${{ steps.filter.outputs.ignore }}
     steps:
       - uses: getsentry/paths-filter@v2
         id: filter
         with:
           filters: |
-            ignore-path:
-              - 'docs/**'
+            ignore:
+              - '(.github/**)'
   build:
     name: E2E-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.ignore-path == 'false' }}
+    if: ${{ needs.paths-filter.outputs.ignore == 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -160,7 +160,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore-path == 'true' }} ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
             echo "Passed!"
           else
             exit -1
