@@ -32,6 +32,8 @@ on:
       - 'dolphinscheduler-rpc/**'
       - 'dolphinscheduler-server/**'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
 
 concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}

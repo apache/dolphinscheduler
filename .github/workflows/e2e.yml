@@ -17,9 +17,13 @@
 
 on:
   pull_request:
+    paths-ignore:
+      - 'docs/**'
   push:
     branches:
       - dev
+    paths-ignore:
+      - 'docs/**'
 
 name: E2E
 
