@@ -50,7 +50,7 @@ jobs:
           filters: |
             path:
               - '!(docs/**)**'
-              - '!(.github/**)**'
+              - '!.github/**'
   build:
     name: Backend-Build
     needs: paths-filter
