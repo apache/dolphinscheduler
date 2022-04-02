@@ -18,7 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm, NEllipsis } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
