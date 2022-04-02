@@ -686,4 +686,13 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
 
 ---
 
+## Q：使用Postgresql数据库从2.0.1升级至2.0.5更新失败
+
+A：在数据库中执行以下SQL即可完成修复:
+```SQL
+update t_ds_version set version='2.0.1';
+```
+
+---
+
 我们会持续收集更多的 FAQ。
