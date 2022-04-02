@@ -79,9 +79,8 @@ jobs:
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
-    needs: paths-filter
+    needs: [build, paths-filter]
     if: ${{ needs.paths-filter.outputs.path }} == 'true'
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
