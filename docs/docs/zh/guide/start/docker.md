@@ -2,8 +2,8 @@
 
 ## 先决条件
 
- - [Docker](https://docs.docker.com/engine/install/) 1.13.1+
- - [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+- [Docker](https://docs.docker.com/engine/install/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
 
 ## 如何使用 Docker 镜像
 
@@ -21,12 +21,12 @@
 
 对于 Windows Docker Toolbox 用户，有两项需要配置：
 
- - **内存**：打开 Oracle VirtualBox Manager，如果你双击 Docker Quickstart Terminal 并成功运行 Docker Toolbox，你将会看到一个名为 `default` 的虚拟机. 点击 `设置 -> 系统 -> 主板 -> 内存大小`
- - **端口转发**：点击 `设置 -> 网络 -> 高级 -> 端口转发 -> 添加`. `名称`，`主机端口` 和 `子系统端口` 都填写 `12345`，不填 `主机IP` 和 `子系统IP`
+- **内存**：打开 Oracle VirtualBox Manager，如果你双击 Docker Quickstart Terminal 并成功运行 Docker Toolbox，你将会看到一个名为 `default` 的虚拟机. 点击 `设置 -> 系统 -> 主板 -> 内存大小`
+- **端口转发**：点击 `设置 -> 网络 -> 高级 -> 端口转发 -> 添加`. `名称`，`主机端口` 和 `子系统端口` 都填写 `12345`，不填 `主机IP` 和 `子系统IP`
 
 对于 Windows Docker Desktop 用户
- - **Hyper-V 模式**：点击 `Docker Desktop -> Settings -> Resources -> Memory`
- - **WSL 2 模式**：参考 [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig)
+- **Hyper-V 模式**：点击 `Docker Desktop -> Settings -> Resources -> Memory`
+- **WSL 2 模式**：参考 [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig)
 
 #### 1、下载源码包
 
@@ -66,9 +66,9 @@ $ docker-compose up -d
 
 #### 1、基础软件安装 (请自行安装)
 
- - [PostgreSQL](https://www.postgresql.org/download/) (8.2.15+)
- - [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)
- - [Docker](https://docs.docker.com/engine/install/) (1.13.1+)
+- [PostgreSQL](https://www.postgresql.org/download/) (8.2.15+)
+- [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)
+- [Docker](https://docs.docker.com/engine/install/) (1.13.1+)
 
 #### 2、请登录 PostgreSQL 数据库，创建名为 `dolphinscheduler` 数据库
 
@@ -104,15 +104,13 @@ apache/dolphinscheduler:1.3.8 all
 在容器启动时，会自动启动以下服务：
 
 ```
-    MasterServer         ----- master服务
-    WorkerServer         ----- worker服务
-    ApiApplicationServer ----- api服务
-    AlertServer          ----- alert服务
+    MasterServer         ----- master 服务
+    WorkerServer         ----- worker 服务
+    ApiApplicationServer ----- api 服务
+    AlertServer          ----- alert 服务
 ```
 
-如果你只是想运行 dolphinscheduler 中的部分服务
-
-你可以够通执行以下命令来运行dolphinscheduler中的部分服务
+如果你只是想运行 dolphinscheduler 中的部分服务,你可以够通执行以下命令来运行 dolphinscheduler 中的部分服务
 
 * 启动一个 **master server**, 如下:
 
@@ -154,7 +152,7 @@ $ docker run -d --name dolphinscheduler-alert \
 apache/dolphinscheduler:1.3.8 alert-server
 ```
 
-**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM`。
+**注意**: 当你运行 dolphinscheduler 中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM`。
 
 ## 环境变量
 
@@ -349,11 +347,12 @@ export SECURITY_AUTHENTICATION_TYPE=PASSWORD
 ```
 
 当添加以上环境变量后，你应该在相应的模板文件`application-api.properties.tpl`中添加这个环境变量配置:
+
 ```
 security.authentication.type=${SECURITY_AUTHENTICATION_TYPE}
 ```
 
-`/root/start-init-conf.sh`将根据模板文件动态的生成配置文件：
+`/root/start-init-conf.sh` 将根据模板文件动态的生成配置文件：
 
 ```sh
 echo "generate dolphinscheduler config"
@@ -577,7 +576,7 @@ $SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_H
 文件 `spark-examples_2.11-2.4.7.jar` 需要先被上传到资源中心，然后创建一个 Spark 任务并设置:
 
 - Spark版本: `SPARK2`
-- 主函数的Class: `org.apache.spark.examples.SparkPi`
+- 主函数的 Class: `org.apache.spark.examples.SparkPi`
 - 主程序包: `spark-examples_2.11-2.4.7.jar`
 - 部署方式: `local`
 
