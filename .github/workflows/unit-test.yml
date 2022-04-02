@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-name: Unit Test
+name: Test
 
 on:
   pull_request:
@@ -111,7 +111,7 @@ jobs:
           name: unit-test-logs
           path: ${LOG_DIR}
   result:
-    name: Unit-Test-Result
+    name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [ unit-test ]

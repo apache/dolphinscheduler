@@ -152,7 +152,7 @@ jobs:
           path: ${{ env.RECORDING_PATH }}
           retention-days: 1
   result:
-    name: E2E-Result
+    name: E2E
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [ e2e ]
