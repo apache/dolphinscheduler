@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-name: Test
+name: Unit Test
 
 on:
   pull_request:
