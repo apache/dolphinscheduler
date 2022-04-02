@@ -42,7 +42,7 @@ github:
     dev:
       required_status_checks:
         contexts:
-          - Backend
+          - Build
           - Unit Test
           - E2E
       required_pull_request_reviews:

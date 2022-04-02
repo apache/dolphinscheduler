@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-name: Backend
+name: Build
 
 on:
   push:
