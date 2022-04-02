@@ -42,18 +42,18 @@ jobs:
     name: Backend-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      path: ${{ steps.filter.outputs.ignore }}
+      path: ${{ steps.filter.outputs.include }}
     steps:
       - uses: getsentry/paths-filter@v2
         id: filter
         with:
           filters: |
-            ignore:
-              - '(docs/**|dolphinscheduler-ui/**|dolphinscheduler-ui-next/**|.github/**)'
+            include:
+              - '!(docs/**|dolphinscheduler-ui/**|dolphinscheduler-ui-next/**|.github/**)'
   build:
     name: Backend-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.ignore == 'false' }}
+    if: ${{ needs.paths-filter.outputs.include == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -86,7 +86,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
+          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'false' }} ]]; then
             echo "Passed!"
           else
             exit -1
