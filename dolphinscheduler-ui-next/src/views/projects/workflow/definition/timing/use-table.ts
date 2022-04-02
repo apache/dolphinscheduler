@@ -89,13 +89,13 @@ export function useTable() {
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
-        ...COLUMN_WIDTH_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
         render: (row: any) => renderTime(row.startTime, row.timezoneId)
       },
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
-        ...COLUMN_WIDTH_CONFIG['time'],
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
         render: (row: any) => renderTime(row.endTime, row.timezoneId)
       },
       {
