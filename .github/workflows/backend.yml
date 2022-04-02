@@ -48,13 +48,13 @@ jobs:
         id: filter
         with:
           filters: |
-            path:
-              - '!(docs/**)**'
-              - '!.github/**'
+            ignore-path:
+              - 'docs/**'
+              - '.github/**'
   build:
     name: Backend-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.path == 'true' }}
+    if: ${{ needs.paths-filter.outputs.ignore-path == 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -87,7 +87,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.path == 'false' }} ]]; then
+          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore-path == 'true' }} ]]; then
             echo "Passed!"
           else
             exit -1
