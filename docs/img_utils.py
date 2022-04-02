@@ -183,9 +183,9 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
-    # args = arg_parser.parse_args()
+    args = arg_parser.parse_args()
 
-    args = arg_parser.parse_args(["check"])
+    # args = arg_parser.parse_args(["check"])
     log.setLevel(args.log_level)
     if args.log_level <= logging.DEBUG:
         print("All args is:", args)
