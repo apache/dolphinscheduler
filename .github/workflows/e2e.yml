@@ -17,13 +17,9 @@
 
 on:
   pull_request:
-    paths-ignore:
-      - 'docs/**'
   push:
     branches:
       - dev
-    paths-ignore:
-      - 'docs/**'
 
 name: E2E
 
@@ -33,8 +29,22 @@ concurrency:
 
 
 jobs:
+  paths-filter:
+    name: E2E-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.path }}
+    steps:
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            path:
+              - '!(docs/**)**'
   build:
     name: E2E-Build
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.path }} == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -69,6 +79,8 @@ jobs:
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.path }} == 'true'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -151,7 +163,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.path }} == 'false' ]]; then
             echo "Passed!"
           else
             exit -1
