@@ -33,7 +33,7 @@ jobs:
     name: E2E-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      backend: ${{ steps.filter.outputs.path }}
+      path: ${{ steps.filter.outputs.path }}
     steps:
       - uses: dorny/paths-filter@v2
         id: filter
