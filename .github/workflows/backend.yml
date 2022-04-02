@@ -86,7 +86,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'false' }} ]]; then
+          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.include == 'false' }} ]]; then
             echo "Passed!"
           else
             exit -1
