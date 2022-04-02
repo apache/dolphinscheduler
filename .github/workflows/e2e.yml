@@ -45,7 +45,7 @@ jobs:
   build:
     name: E2E-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.path }} == 'true'
+    if: ${{ needs.paths-filter.outputs.path == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
