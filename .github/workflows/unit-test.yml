@@ -47,9 +47,9 @@ jobs:
         with:
           filters: |
             path:
-              - '!(.github/**)**'
+              - '!(docs/**)**'
   unit-test:
-    name: Unit Test
+    name: Unit-Test
     needs: paths-filter
     if: ${{ needs.paths-filter.outputs.path == 'true' }}
     runs-on: ubuntu-latest

@@ -40,8 +40,7 @@ jobs:
         with:
           filters: |
             path:
-              - '!(.github/**)**'
-#              - '!(docs/**)**'
+              - '!(docs/**)**'
   build:
     name: E2E-Build
     needs: paths-filter
@@ -152,9 +151,8 @@ jobs:
           name: recording-${{ matrix.case.name }}
           path: ${{ env.RECORDING_PATH }}
           retention-days: 1
-
   result:
-    name: E2E
+    name: E2E-Result
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [ e2e ]
