@@ -42,7 +42,7 @@ jobs:
     name: Backend-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      path: ${{ steps.filter.outputs.path }}
+      path: ${{ steps.filter.outputs.ignore }}
     steps:
       - uses: getsentry/paths-filter@v2
         id: filter
