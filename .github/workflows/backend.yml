@@ -50,7 +50,8 @@ jobs:
           filters: |
             ignore-path:
               - 'docs/**'
-              - '.github/**'
+              - 'dolphinscheduler-ui/**'
+              - 'dolphinscheduler-ui-next/**'
   build:
     name: Backend-Build
     needs: paths-filter

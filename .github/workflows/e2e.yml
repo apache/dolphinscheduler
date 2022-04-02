@@ -39,12 +39,12 @@ jobs:
         id: filter
         with:
           filters: |
-            path:
-              - '!(docs/**)**'
+            ignore-path:
+              - 'docs/**'
   build:
     name: E2E-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.path == 'true' }}
+    if: ${{ needs.paths-filter.outputs.ignore-path == 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -160,7 +160,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.path == 'false' }} ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore-path == 'true' }} ]]; then
             echo "Passed!"
           else
             exit -1
