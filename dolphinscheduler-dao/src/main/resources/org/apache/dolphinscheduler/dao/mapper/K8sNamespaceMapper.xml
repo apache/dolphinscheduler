@@ -71,17 +71,9 @@
         <include refid="baseSqlV2">
             <property name="alias" value="b"/>
         </include>
-
-        <choose>
-            <when test="userId !=null and userId != ''">
-                from ( select namespace_id  from t_ds_relation_namespace_user where user_id= #{userId} ) a
-                left join  t_ds_k8s_namespace b
-                on b.id = a.namespace_id
-                where b.id is not null
-            </when>
-            <otherwise>
-                from t_ds_k8s_namespace b
-            </otherwise>
-        </choose>
+        from ( select namespace_id  from t_ds_relation_namespace_user where user_id= #{userId} ) a
+        left join  t_ds_k8s_namespace b
+        on b.id = a.namespace_id
+        where b.id is not null
     </select>
 </mapper>

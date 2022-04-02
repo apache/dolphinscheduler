@@ -341,8 +341,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
-        // query all namespace list except specified userId
-        List<K8sNamespace> namespaceList = k8sNamespaceMapper.queryNamespaceExceptUserId(userId);
+        // query all namespace list,this auth does not like project
+        List<K8sNamespace> namespaceList = k8sNamespaceMapper.selectList(null);
         List<K8sNamespace> resultList = new ArrayList<>();
         Set<K8sNamespace> namespaceSet;
         if (namespaceList != null && !namespaceList.isEmpty()) {
@@ -386,7 +386,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
         if (isAdmin(loginUser)) {
-            return k8sNamespaceMapper.queryNamespaceAvailable(null);
+            return k8sNamespaceMapper.selectList(null);
         } else {
             return k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
         }
