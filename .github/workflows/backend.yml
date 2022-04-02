@@ -38,8 +38,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paths-filter:
+    name: Backend-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      path: ${{ steps.filter.outputs.path }}
+    steps:
+      - uses: getsentry/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            path:
+              - '!(.github/**)**'
   build:
     name: Build
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.path == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -63,3 +77,17 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
+  result:
+    name: Build-Result
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ build ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.path == 'false' }} ]]; then
+            echo "Passed!"
+          else
+            exit -1
+          fi
