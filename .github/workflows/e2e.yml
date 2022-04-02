@@ -35,6 +35,7 @@ jobs:
     outputs:
       path: ${{ steps.filter.outputs.path }}
     steps:
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2.10.2
         id: filter
         with:
