@@ -46,6 +46,9 @@ export const COLUMN_WIDTH_CONFIG = {
   time: {
     width: 180
   },
+  timeZone: {
+    width: 220
+  },
   operation: (number: number): CommonColumnInfo => ({
     fixed: 'right',
     width: Math.max(30 * number + 12 * (number - 1) + 24, 100)
