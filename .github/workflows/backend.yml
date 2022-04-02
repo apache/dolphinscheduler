@@ -51,7 +51,7 @@ jobs:
             path:
               - '!(docs/**)**'
   build:
-    name: Build
+    name: Backend-Build
     needs: paths-filter
     if: ${{ needs.paths-filter.outputs.path == 'true' }}
     runs-on: ubuntu-latest
