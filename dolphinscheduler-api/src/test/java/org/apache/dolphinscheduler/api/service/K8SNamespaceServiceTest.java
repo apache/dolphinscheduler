@@ -189,8 +189,8 @@ public class K8SNamespaceServiceTest {
 
     @Test
     public void testQueryUnAuthorizedNamespace() {
-        Mockito.when(k8sNamespaceMapper.queryNamespaceExceptUserId(2)).thenReturn(getNamespaceList());
         Mockito.when(k8sNamespaceMapper.queryAuthedNamespaceListByUserId(2)).thenReturn(new ArrayList<>());
+        Mockito.when(k8sNamespaceMapper.selectList(Mockito.any())).thenReturn(getNamespaceList());
 
         // test admin user
         User loginUser = new User();
