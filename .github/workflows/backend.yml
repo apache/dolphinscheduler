@@ -49,7 +49,7 @@ jobs:
         with:
           filters: |
             ignore:
-              - '(docs/**|dolphinscheduler-ui/**|dolphinscheduler-ui-next/**)'
+              - '(docs/**|dolphinscheduler-ui/**|dolphinscheduler-ui-next/**|.github/**)'
   build:
     name: Backend-Build
     needs: paths-filter
