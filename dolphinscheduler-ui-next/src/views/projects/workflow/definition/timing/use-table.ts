@@ -84,15 +84,7 @@ export function useTable() {
       {
         title: t('project.workflow.workflow_name'),
         key: 'processDefinitionName',
-        ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row: any) =>
-          h(
-            NEllipsis,
-            { style: 'max-width: 200px' },
-            {
-              default: () => row.processDefinitionName
-            }
-          )
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.start_time'),
