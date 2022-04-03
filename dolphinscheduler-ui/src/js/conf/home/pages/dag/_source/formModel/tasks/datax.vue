@@ -59,7 +59,7 @@
           <m-datasource
             ref="refDt"
             @on-dsData="_onDtData"
-            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
+            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER', 'CLICKHOUSE']"
             :data="{ type:dtType,datasource:datatarget }">
           </m-datasource>
         </div>
