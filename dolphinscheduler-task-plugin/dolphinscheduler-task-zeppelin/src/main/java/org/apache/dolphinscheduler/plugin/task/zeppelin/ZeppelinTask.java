@@ -67,7 +67,7 @@ public class ZeppelinTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws InterruptedException {
+    public void handle() throws Exception {
         try {
             String noteId = this.zeppelinParameters.getNoteId();
             String paragraphId = this.zeppelinParameters.getParagraphId();
@@ -77,13 +77,12 @@ public class ZeppelinTask extends AbstractTaskExecutor {
             String resultContent = paragraphResult.getResultInText();
             Status status = paragraphResult.getStatus();
             final int exitStatusCode = mapStatusToExitCode(status);
-            logger.info("zeppelin task finished with results: {}", resultContent);
             // Use noteId-paragraph-Id as app id
             setAppIds(String.format("%s-%s", noteId, paragraphId));
-            // TODO: map exit code
             setExitStatusCode(exitStatusCode);
+            logger.info("zeppelin task finished with results: {}", resultContent);
         } catch (Exception e) {
-            // TODO: handle exception
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             logger.error("zeppelin task submit failed with error", e);
         }
     }

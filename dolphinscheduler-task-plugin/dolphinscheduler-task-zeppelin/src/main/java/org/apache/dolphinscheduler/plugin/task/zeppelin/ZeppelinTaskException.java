@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
 /**
- * Custom EmrTaskException
+ * Custom ZeppelinTaskException
  */
 public class ZeppelinTaskException extends RuntimeException {
 
