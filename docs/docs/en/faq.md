@@ -705,4 +705,13 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
 
 ---
 
+## Q：Upgrade from 2.0.1 to 2.0.5 using PostgreSQL database failed
+
+A：The repair can be completed by executing the following SQL in the database:
+```SQL
+update t_ds_version set version='2.0.1';
+```
+
+---
+
 ## We will collect more FAQ later
