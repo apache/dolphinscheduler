@@ -28,6 +28,10 @@ export default {
   defaultSearch: 'google', // default search engine
   defaultLanguage: 'en-us',
   'en-us': {
+    banner: {
+      text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw'
+    },
     pageMenu: [
       {
         key: 'home',
@@ -210,6 +214,10 @@ export default {
     copyright: 'Copyright © 2019-2021 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
   },
   'zh-cn': {
+    banner: {
+      text: '🤔 有关于 Apache DolphinScheduler 的疑问，加入 Slack 频道来讨论他们 ',
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw'
+    },
     pageMenu: [
       {
         key: 'home',
