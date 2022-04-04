@@ -44,7 +44,7 @@ jobs:
     outputs:
       ignore: ${{ steps.filter.outputs.ignore }}
     steps:
-      - uses: getsentry/paths-filter@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
           filters: |
