@@ -144,6 +144,9 @@ public class Constants {
      */
     public static final String KERBEROS = "kerberos";
 
+    /**
+     * renew_lifetime in kerberos configuration
+     */
     public static final String KERBEROS_RENEW_LIFETIME_HOURS = "kerberos.renew.lifetime.hours";
 
     /**
