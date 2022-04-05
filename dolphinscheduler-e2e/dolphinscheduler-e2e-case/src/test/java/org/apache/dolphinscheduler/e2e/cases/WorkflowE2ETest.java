@@ -74,7 +74,7 @@ class WorkflowE2ETest {
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
-        userPage.update(user, user, password, email, phone, tenant)
+        userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
                 .create(project)
         ;

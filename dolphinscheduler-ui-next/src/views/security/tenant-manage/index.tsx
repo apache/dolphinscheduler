@@ -91,7 +91,7 @@ const tenementManage = defineComponent({
     }
   },
   render() {
-    const { t } = this
+    const { t, loadingRef } = this
     return (
       <div class={styles.container}>
         <NCard>
@@ -124,6 +124,7 @@ const tenementManage = defineComponent({
           class={styles['table-card']}
         >
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             row-class-name='items'

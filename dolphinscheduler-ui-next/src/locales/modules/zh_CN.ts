@@ -151,7 +151,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    master_no_data_result_title: 'Master节点不存在',
+    master_no_data_result_desc:
+      '目前没有任何Master节点，请先创建Master节点，再访问该页面'
   },
   worker: {
     cpu_usage: '处理器使用量',
@@ -593,6 +596,12 @@ const project = {
     description: '描述',
     tenant: '租户',
     timeout_alert: '超时告警',
+    process_execute_type: '执行策略',
+    parallel: '并行',
+    serial_wait: '串行等待',
+    serial_discard: '串行抛弃',
+    serial_priority: '串行优先',
+    recover_serial_wait: '串行恢复',
     global_variables: '全局变量',
     basic_info: '基本信息',
     minute: '分',
@@ -609,7 +618,8 @@ const project = {
     node_not_created: '未创建节点保存失败',
     copy_name: '复制名称',
     view_variables: '查看变量',
-    startup_parameter: '启动参数'
+    startup_parameter: '启动参数',
+    online: '已上线'
   },
   node: {
     current_node_settings: '当前节点设置',
