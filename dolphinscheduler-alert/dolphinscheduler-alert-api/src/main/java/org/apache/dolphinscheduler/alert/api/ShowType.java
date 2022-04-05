@@ -26,7 +26,7 @@ public enum ShowType {
      * 2 attachment;
      * 3 TABLE+attachment;
      */
-    TABLE(0, "table"),
+    MARKDOWN(0, "markdown"),
     TEXT(1, "text"),
     ATTACHMENT(2, "attachment"),
     TABLE_ATTACHMENT(3, "table attachment");
