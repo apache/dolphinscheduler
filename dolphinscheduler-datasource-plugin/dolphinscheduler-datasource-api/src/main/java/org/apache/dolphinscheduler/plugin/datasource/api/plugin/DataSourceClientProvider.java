@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -27,14 +29,22 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.dolphinscheduler.spi.utils.Constants;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DataSourceClientProvider {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
-    private static final Map<String, DataSourceClient> uniqueId2dataSourceClientMap = new ConcurrentHashMap<>();
+    private final static long duration = PropertyUtils.getLong(Constants.KERBEROS_RENEW_LIFETIME_HOURS, 24);
+    private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(duration, TimeUnit.HOURS)
+            .maximumSize(100)
+            .build();
 
     private DataSourcePluginManager dataSourcePluginManager;
 
@@ -55,14 +65,20 @@ public class DataSourceClientProvider {
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
 
-        DataSourceClient dataSourceClient = uniqueId2dataSourceClientMap.computeIfAbsent(datasourceUniqueId, $ -> {
-            Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
-            if (null == dataSourceChannel) {
-                throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
-            }
-            return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
-        });
+        DataSourceClient dataSourceClient;
+        try {
+            dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
+                Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
+                DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+                if (null == dataSourceChannel) {
+                    throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+                }
+                return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
+            });
+        } catch (ExecutionException e) {
+            logger.error("create {} datasource client error.", dbType.getDescp(), e);
+            return null;
+        }
         return dataSourceClient.getConnection();
     }
 

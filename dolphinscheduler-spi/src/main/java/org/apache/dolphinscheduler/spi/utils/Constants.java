@@ -144,6 +144,8 @@ public class Constants {
      */
     public static final String KERBEROS = "kerberos";
 
+    public static final String KERBEROS_RENEW_LIFETIME_HOURS = "kerberos.renew.lifetime.hours";
+
     /**
      *  support hive datasource in one session
      */
