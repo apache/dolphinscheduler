@@ -59,7 +59,7 @@
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
         <quartz.version>2.3.2</quartz.version>
-        <jackson.version>2.10.5</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>9.1.3</cron.utils.version>
