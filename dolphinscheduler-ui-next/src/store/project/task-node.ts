@@ -115,6 +115,13 @@ export const useTaskNodeStore = defineStore({
     },
     updateMainJar(type: ProgramType, mainJar: IMainJar[]) {
       this.mainJars[type] = mainJar
+    },
+    init() {
+      this.preTaskOptions = []
+      this.postTaskOptions = []
+      this.preTasks = []
+      this.resources = []
+      this.mainJars = {}
     }
   }
 })

@@ -52,12 +52,12 @@ export function useProcessState() {
             name: t('home.' + toLower(item.taskStateType))
           }
         })
-        
+
         processVariables.processLoadingRef = false
         return { table, chart }
       }),
       { table: [], chart: [] }
-      )
+    )
 
     return state
   }
