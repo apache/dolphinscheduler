@@ -32,7 +32,7 @@
     <properties>
         <scala.binary.version>2.11</scala.binary.version>
         <spark.version>2.4.0</spark.version>
-        <jackson.version>2.9.0</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <scope>provided</scope>
     </properties>
 
