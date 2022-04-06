@@ -40,18 +40,18 @@ jobs:
     name: Unit-Test-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      ignore: ${{ steps.filter.outputs.ignore }}
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
           filters: |
-            ignore:
-              - '(docs/**)'
+            not-ignore:
+              - '!(docs/**)'
   unit-test:
     name: Unit-Test
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.ignore == 'false' }}
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -114,13 +114,16 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ unit-test ]
+    needs: [ unit-test, paths-filter ]
     if: always()
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.unit-test.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
-            echo "Passed!"
-          else
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+            echo "Skip Unit Test!"
+            exit 0
+          fi
+          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+            echo "Unit Test Failed!"
             exit -1
           fi
