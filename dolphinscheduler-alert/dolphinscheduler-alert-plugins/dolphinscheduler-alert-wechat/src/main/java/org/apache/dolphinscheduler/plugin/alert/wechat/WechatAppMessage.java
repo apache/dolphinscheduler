@@ -99,7 +99,7 @@ public class WechatAppMessage {
     public WechatAppMessage() {
     }
 
-    public WechatAppMessage(String touser, String msgtype, Integer agentid, Map<String, String> contentMap, Integer safe, Integer enable_id_trans, Integer enable_duplicate_check) {
+    public WechatAppMessage(String touser, String msgtype, Integer agentid, Map<String, String> contentMap, Integer safe, Integer enableIdTrans, Integer enableDuplicateCheck) {
         this.touser = touser;
         this.msgtype = msgtype;
         this.agentid = agentid;
@@ -109,7 +109,7 @@ public class WechatAppMessage {
             this.text = contentMap;
         }
         this.safe = safe;
-        this.enable_id_trans = enable_id_trans;
-        this.enable_duplicate_check = enable_duplicate_check;
+        this.enable_id_trans = enableIdTrans;
+        this.enable_duplicate_check = enableDuplicateCheck;
     }
 }
