@@ -33,7 +33,7 @@ jobs:
     name: E2E-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      ignore: ${{ steps.filter.outputs.not-ignore }}
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
@@ -163,7 +163,7 @@ jobs:
           if [[ ${{ needs.e2e.result }} == 'success' ]]; then
             echo "Passed!"
           elif [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
-            echo "Skip E2E"
+            echo "Skip E2E!"
           else
             exit -1
           fi
