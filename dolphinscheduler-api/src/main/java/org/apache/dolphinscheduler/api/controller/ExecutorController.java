@@ -21,8 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINIT
 import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
