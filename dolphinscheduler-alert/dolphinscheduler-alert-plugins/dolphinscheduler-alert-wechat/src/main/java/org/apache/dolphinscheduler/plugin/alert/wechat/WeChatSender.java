@@ -17,15 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
-import static java.util.Objects.requireNonNull;
-import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.*;
-
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -34,18 +29,20 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.util.Objects.requireNonNull;
+import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.*;
 
 public final class WeChatSender {
     private static final Logger logger = LoggerFactory.getLogger(WeChatSender.class);
@@ -57,8 +54,7 @@ public final class WeChatSender {
     private static final String CORP_ID_REGEX = "{corpId}";
     private static final String SECRET_REGEX = "{secret}";
     private static final String TOKEN_REGEX = "{token}";
-    private final String weChatAgentId;
-    private final String weChatChatId;
+    private final String weChatAgentIdChatId;
     private final String weChatUsers;
     private final String weChatTokenUrlReplace;
     private final String weChatToken;
@@ -66,8 +62,7 @@ public final class WeChatSender {
     private final String showType;
 
     WeChatSender(Map<String, String> config) {
-        weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
-        weChatChatId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CHAT_ID);
+        weChatAgentIdChatId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
         weChatUsers = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS);
         String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
@@ -76,8 +71,8 @@ public final class WeChatSender {
         showType = config.get(AlertConstants.NAME_SHOW_TYPE);
         requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
-            .replace(CORP_ID_REGEX, weChatCorpId)
-            .replace(SECRET_REGEX, weChatSecret);
+                .replace(CORP_ID_REGEX, weChatCorpId)
+                .replace(SECRET_REGEX, weChatSecret);
         weChatToken = getToken();
     }
 
@@ -101,41 +96,9 @@ public final class WeChatSender {
     }
 
     /**
-     * convert table to markdown style
-     *
-     * @param title the title
-     * @param content the content
-     * @return markdown table content
-     */
-    private static String markdownTable(String title, String content) {
-        List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
-        if (null == mapItemsList || mapItemsList.isEmpty()) {
-            logger.error("itemsList is null");
-            throw new RuntimeException("itemsList is null");
-        }
-        StringBuilder contents = new StringBuilder(200);
-        for (LinkedHashMap mapItems : mapItemsList) {
-            Set<Entry<String, Object>> entries = mapItems.entrySet();
-            Iterator<Entry<String, Object>> iterator = entries.iterator();
-            StringBuilder t = new StringBuilder(String.format("`%s`%s", title, WeChatAlertConstants.MARKDOWN_ENTER));
-
-            while (iterator.hasNext()) {
-
-                Map.Entry<String, Object> entry = iterator.next();
-                t.append(WeChatAlertConstants.MARKDOWN_QUOTE);
-                t.append(entry.getKey()).append(":").append(entry.getValue());
-                t.append(WeChatAlertConstants.MARKDOWN_ENTER);
-            }
-            contents.append(t);
-        }
-
-        return contents.toString();
-    }
-
-    /**
      * convert text to markdown style
      *
-     * @param title the title
+     * @param title   the title
      * @param content the content
      * @return markdown text
      */
@@ -242,17 +205,17 @@ public final class WeChatSender {
             return alertResult;
         }
         String enterpriseWeChatPushUrlReplace = "";
-        Map<String,String> contentMap=new HashMap<>();
-        contentMap.put(WeChatAlertConstants.WE_CHAT_CONTENT_KEY,data);
-        String msgJson="";
+        Map<String, String> contentMap = new HashMap<>();
+        contentMap.put(WeChatAlertConstants.WE_CHAT_CONTENT_KEY, data);
+        String msgJson = "";
         if (sendType.equals(WeChatType.APP.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
-            WechatAppMessage wechatAppMessage=new WechatAppMessage(weChatUsers, WE_CHAT_MESSAGE_TYPE_TEXT, Integer.valueOf(weChatAgentId),contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY, WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
-            msgJson=JSONUtils.toJsonString(wechatAppMessage);
+            WechatAppMessage wechatAppMessage = new WechatAppMessage(weChatUsers, showType, Integer.valueOf(weChatAgentIdChatId), contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY, WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
+            msgJson = JSONUtils.toJsonString(wechatAppMessage);
         } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
-            WechatAppChatMessage wechatAppChatMessage=new WechatAppChatMessage(weChatChatId, WE_CHAT_MESSAGE_TYPE_TEXT, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
-            msgJson=JSONUtils.toJsonString(wechatAppChatMessage);
+            WechatAppChatMessage wechatAppChatMessage = new WechatAppChatMessage(weChatAgentIdChatId, showType, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
+            msgJson = JSONUtils.toJsonString(wechatAppChatMessage);
         }
 
         try {
@@ -272,14 +235,7 @@ public final class WeChatSender {
      * @return the markdown alert table/text
      */
     private String markdownByAlert(String title, String content) {
-        String result = "";
-        if (showType.equals(ShowType.TABLE.getDescp())) {
-            result = markdownTable(title, content);
-        } else if (showType.equals(ShowType.TEXT.getDescp())) {
-            result = markdownText(title, content);
-        }
-        return result;
-
+        return markdownText(title, content);
     }
 
     private String getToken() {
