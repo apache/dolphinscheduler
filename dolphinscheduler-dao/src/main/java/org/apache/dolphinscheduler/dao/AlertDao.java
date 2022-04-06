@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -227,7 +229,9 @@ public class AlertDao {
      * List alerts that are pending for execution
      */
     public List<Alert> listPendingAlerts() {
-        return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
+        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
+                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
+        return alertMapper.selectList(wrapper);
     }
 
     /**

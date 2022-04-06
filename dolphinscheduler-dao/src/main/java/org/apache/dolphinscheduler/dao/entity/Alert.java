@@ -21,13 +21,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.google.common.base.Objects;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @TableName("t_ds_alert")
 public class Alert {
@@ -35,7 +35,7 @@ public class Alert {
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * sign
      */
@@ -74,7 +74,7 @@ public class Alert {
      * alertgroup_id
      */
     @TableField("alertgroup_id")
-    private int alertGroupId;
+    private Integer alertGroupId;
 
     /**
      * create_time
@@ -92,11 +92,11 @@ public class Alert {
     public Alert() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -140,11 +140,11 @@ public class Alert {
         this.log = log;
     }
 
-    public int getAlertGroupId() {
+    public Integer getAlertGroupId() {
         return alertGroupId;
     }
 
-    public void setAlertGroupId(int alertGroupId) {
+    public void setAlertGroupId(Integer alertGroupId) {
         this.alertGroupId = alertGroupId;
     }
 
@@ -189,23 +189,23 @@ public class Alert {
             return false;
         }
         Alert alert = (Alert) o;
-        return id == alert.id
-                && alertGroupId == alert.alertGroupId
-                && Objects.equal(sign, alert.sign)
-                && Objects.equal(title, alert.title)
-                && Objects.equal(content, alert.content)
+        return Objects.equals(id, alert.id)
+                && Objects.equals(alertGroupId, alert.alertGroupId)
+                && Objects.equals(sign, alert.sign)
+                && Objects.equals(title, alert.title)
+                && Objects.equals(content, alert.content)
                 && alertStatus == alert.alertStatus
                 && warningType == alert.warningType
-                && Objects.equal(log, alert.log)
-                && Objects.equal(createTime, alert.createTime)
-                && Objects.equal(updateTime, alert.updateTime)
-                && Objects.equal(info, alert.info)
+                && Objects.equals(log, alert.log)
+                && Objects.equals(createTime, alert.createTime)
+                && Objects.equals(updateTime, alert.updateTime)
+                && Objects.equals(info, alert.info)
                 ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, sign, title, content, alertStatus, warningType, log, alertGroupId, createTime, updateTime, info);
+        return Objects.hash(id, sign, title, content, alertStatus, warningType, log, alertGroupId, createTime, updateTime, info);
     }
 
     @Override

@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.greaterThan;
@@ -95,26 +94,6 @@ public class AlertMapperTest extends BaseDaoTest {
         Alert actualAlert = alertMapper.selectById(expectedAlert.getId());
 
         assertNull(actualAlert);
-    }
-
-    /**
-     * test list alert by status
-     */
-    @Test
-    public void testListAlertByStatus() {
-        Integer count = 10;
-        AlertStatus waitExecution = AlertStatus.WAIT_EXECUTION;
-
-        Map<Integer, Alert> expectedAlertMap = createAlertMap(count, waitExecution);
-
-        List<Alert> actualAlerts = alertMapper.listAlertByStatus(waitExecution);
-
-        for (Alert actualAlert : actualAlerts) {
-            Alert expectedAlert = expectedAlertMap.get(actualAlert.getId());
-            if (expectedAlert != null) {
-                assertEquals(expectedAlert, actualAlert);
-            }
-        }
     }
 
     /**

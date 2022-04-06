@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.alert.api.AlertChannel;
-import org.apache.dolphinscheduler.alert.api.AlertConstants;
-import org.apache.dolphinscheduler.alert.api.AlertData;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
-import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.dolphinscheduler.alert.api.*;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -30,19 +27,14 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 public final class AlertSender {
@@ -59,15 +51,16 @@ public final class AlertSender {
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
             //get alert group from alert
-            int alertGroupId = alert.getAlertGroupId();
+            int alertId = Optional.ofNullable(alert.getId()).orElse(0);
+            int alertGroupId = Optional.ofNullable(alert.getAlertGroupId()).orElse(0);
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
                 logger.error("send alert msg fail,no bind plugin instance.");
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alert.getId());
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alertId);
                 continue;
             }
             AlertData alertData = new AlertData();
-            alertData.setId(alert.getId())
+            alertData.setId(alertId)
                      .setContent(alert.getContent())
                      .setLog(alert.getLog())
                      .setTitle(alert.getTitle())
@@ -79,7 +72,7 @@ public final class AlertSender {
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
                     AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alert.getId(),instance.getId());
+                    alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alertId,instance.getId());
                     if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
                         sendSuccessCount++;
                     }
@@ -91,7 +84,7 @@ public final class AlertSender {
             } else if (sendSuccessCount < alertInstanceList.size()) {
                 alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
             }
-            alertDao.updateAlert(alertStatus, "", alert.getId());
+            alertDao.updateAlert(alertStatus, "", alertId);
         }
 
     }
