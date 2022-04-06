@@ -88,8 +88,6 @@ public class MysqlDataSourceE2ETest {
             .as("DataSource list should contain newly-created database")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(dataSourceName)));
-
-        throw new RuntimeException("test");
     }
 
     @Test
