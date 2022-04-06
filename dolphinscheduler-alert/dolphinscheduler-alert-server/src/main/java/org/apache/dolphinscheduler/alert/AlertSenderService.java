@@ -39,9 +39,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public final class AlertSenderService extends Thread {
@@ -94,14 +96,24 @@ public final class AlertSenderService extends Thread {
                     .setTitle(alert.getTitle())
                     .setWarnType(alert.getWarningType().getCode());
 
+            int sendSuccessCount = 0;
             for (AlertPluginInstance instance : alertInstanceList) {
-
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
-                    AlertStatus alertStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.updateAlert(alertStatus, alertResult.getMessage(), alert.getId());
+                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
+                    alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alert.getId(),instance.getId());
+                    if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
+                        sendSuccessCount++;
+                    }
                 }
             }
+            AlertStatus alertStatus = AlertStatus.EXECUTION_SUCCESS;
+            if (sendSuccessCount == 0) {
+                alertStatus = AlertStatus.EXECUTION_FAILURE;
+            } else if (sendSuccessCount < alertInstanceList.size()) {
+                alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
+            }
+            alertDao.updateAlert(alertStatus, "", alert.getId());
         }
     }
 

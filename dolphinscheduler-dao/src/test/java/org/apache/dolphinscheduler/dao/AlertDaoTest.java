@@ -62,6 +62,12 @@ public class AlertDaoTest {
     }
 
     @Test
+    public void testAddAlertSendStatus() {
+        int insertCount = alertDao.addAlertSendStatus(AlertStatus.EXECUTION_SUCCESS,"success",1,1);
+        Assert.assertEquals(1, insertCount);
+    }
+
+    @Test
     public void testSendServerStopedAlert() {
         int alertGroupId = 1;
         String host = "127.0.0.998165432";
