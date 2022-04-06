@@ -273,3 +273,5 @@ aws-java-sdk-s3-1.12.160.jar
 aws-java-sdk-kms-1.12.160.jar
 aws-java-sdk-emr-1.12.160.jar
 aws-java-sdk-core-1.12.160.jar
+org.apache.zeppelin:zeppelin-client:0.10.1
+org.apache.zeppelin:zeppelin-common:0.10.1
