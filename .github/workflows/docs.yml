@@ -18,6 +18,8 @@ name: Docs
 
 on:
   pull_request:
+    paths:
+      - 'docs/**'
 
 concurrency:
   group: doc-${{ github.event.pull_request.number || github.ref }}
@@ -47,6 +49,6 @@ jobs:
       - uses: actions/checkout@v2
       - run: sudo npm install -g markdown-link-check@3.10.0
       - run: |
-          for file in $(find . -name "*.md"); do
+          for file in $(find ./docs -name "*.md"); do
             markdown-link-check -c .dlc.json -q "$file"
           done
