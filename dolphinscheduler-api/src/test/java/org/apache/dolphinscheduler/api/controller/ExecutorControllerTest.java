@@ -202,6 +202,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("warningType", String.valueOf(warningType));
+        paramsMap.add("scheduleTime", "");
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
 				eq(null), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
