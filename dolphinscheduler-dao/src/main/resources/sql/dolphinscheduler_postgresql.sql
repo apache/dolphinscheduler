@@ -217,7 +217,7 @@ CREATE TABLE t_ds_alert (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
-)
+);
 comment on column t_ds_alert.sign is 'sign=sha1(content)';
 
 create index idx_status on t_ds_alert (alert_status);

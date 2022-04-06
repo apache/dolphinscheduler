@@ -48,7 +48,6 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_alert_R_sign()
             AND COLUMN_NAME='sign')
     THEN
         ALTER TABLE `t_ds_alert` ADD COLUMN `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)' after `id`;
-        UPDATE `t_ds_alert` SET `sign`=sha1(content) WHERE `sign`='';
         ALTER TABLE `t_ds_alert` ADD INDEX `idx_sign` (`sign`) USING BTREE;
     END IF;
 END;
