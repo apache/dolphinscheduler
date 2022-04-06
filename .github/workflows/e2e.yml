@@ -29,8 +29,22 @@ concurrency:
 
 
 jobs:
+  paths-filter:
+    name: E2E-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      ignore: ${{ steps.filter.outputs.ignore }}
+    steps:
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            ignore:
+              - '(docs/**)'
   build:
     name: E2E-Build
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.ignore == 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -137,7 +151,6 @@ jobs:
           name: recording-${{ matrix.case.name }}
           path: ${{ env.RECORDING_PATH }}
           retention-days: 1
-
   result:
     name: E2E
     runs-on: ubuntu-latest
@@ -147,7 +160,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
             echo "Passed!"
           else
             exit -1

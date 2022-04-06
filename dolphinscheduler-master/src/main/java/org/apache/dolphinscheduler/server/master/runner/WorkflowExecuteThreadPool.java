@@ -107,11 +107,9 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
             return;
         }
+        multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
         int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
-        ListenableFuture future = this.submitListenable(() -> {
-            multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
-            workflowExecuteThread.handleEvents();
-        });
+        ListenableFuture future = this.submitListenable(workflowExecuteThread::handleEvents);
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
