@@ -57,8 +57,7 @@ public final class WeChatSender {
     private static final String CORP_ID_REGEX = "{corpId}";
     private static final String SECRET_REGEX = "{secret}";
     private static final String TOKEN_REGEX = "{token}";
-    private final String weChatAgentId;
-    private final String weChatChatId;
+    private final String weChatAgentIdChatId;
     private final String weChatUsers;
     private final String weChatTokenUrlReplace;
     private final String weChatToken;
@@ -66,8 +65,7 @@ public final class WeChatSender {
     private final String showType;
 
     WeChatSender(Map<String, String> config) {
-        weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
-        weChatChatId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CHAT_ID);
+        weChatAgentIdChatId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
         weChatUsers = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS);
         String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
@@ -247,11 +245,11 @@ public final class WeChatSender {
         String msgJson="";
         if (sendType.equals(WeChatType.APP.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
-            WechatAppMessage wechatAppMessage=new WechatAppMessage(weChatUsers, WE_CHAT_MESSAGE_TYPE_TEXT, Integer.valueOf(weChatAgentId),contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY, WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
+            WechatAppMessage wechatAppMessage=new WechatAppMessage(weChatUsers, showType, Integer.valueOf(weChatAgentIdChatId),contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY, WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
             msgJson=JSONUtils.toJsonString(wechatAppMessage);
         } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
-            WechatAppChatMessage wechatAppChatMessage=new WechatAppChatMessage(weChatChatId, WE_CHAT_MESSAGE_TYPE_TEXT, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
+            WechatAppChatMessage wechatAppChatMessage=new WechatAppChatMessage(weChatAgentIdChatId, showType, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
             msgJson=JSONUtils.toJsonString(wechatAppChatMessage);
         }
 
@@ -272,14 +270,7 @@ public final class WeChatSender {
      * @return the markdown alert table/text
      */
     private String markdownByAlert(String title, String content) {
-        String result = "";
-        if (showType.equals(ShowType.TABLE.getDescp())) {
-            result = markdownTable(title, content);
-        } else if (showType.equals(ShowType.TEXT.getDescp())) {
-            result = markdownText(title, content);
-        }
-        return result;
-
+        return markdownText(title, content);
     }
 
     private String getToken() {

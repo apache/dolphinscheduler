@@ -56,7 +56,7 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                                            .build();
 
         InputParam usersParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USERS)
-                                          .setPlaceholder("please input userId, use `|` to separate multiple userIds and use `@all` to everyone ")
+                                          .setPlaceholder("use `|` to separate userIds and `@all` to everyone ")
                                           .addValidate(Validate.newBuilder()
                                                                .setRequired(false)
                                                                .build())
