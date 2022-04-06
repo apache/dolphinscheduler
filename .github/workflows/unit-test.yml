@@ -36,8 +36,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paths-filter:
+    name: Unit-Test-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      ignore: ${{ steps.filter.outputs.ignore }}
+    steps:
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            ignore:
+              - '(docs/**)'
   unit-test:
-    name: Unit Test
+    name: Unit-Test
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.ignore == 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -96,3 +110,17 @@ jobs:
         with:
           name: unit-test-logs
           path: ${LOG_DIR}
+  result:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ unit-test ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.unit-test.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
+            echo "Passed!"
+          else
+            exit -1
+          fi
