@@ -43,7 +43,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -52,8 +51,11 @@ import org.springframework.stereotype.Component;
 public final class AlertPluginManager {
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
-    @Autowired
-    private PluginDao pluginDao;
+    private final PluginDao pluginDao;
+
+    public AlertPluginManager(PluginDao pluginDao) {
+        this.pluginDao = pluginDao;
+    }
 
     private final Map<Integer, AlertChannel> channelKeyedById = new HashMap<>();
 

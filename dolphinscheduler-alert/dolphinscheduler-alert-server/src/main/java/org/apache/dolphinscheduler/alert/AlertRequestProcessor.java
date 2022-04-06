@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -37,8 +36,11 @@ import io.netty.channel.Channel;
 public final class AlertRequestProcessor implements NettyRequestProcessor {
     private static final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
 
-    @Autowired
-    private AlertSenderService alertSenderService;
+    private final AlertSenderService alertSenderService;
+
+    public AlertRequestProcessor(AlertSenderService alertSenderService) {
+        this.alertSenderService = alertSenderService;
+    }
 
     @Override
     public void process(Channel channel, Command command) {

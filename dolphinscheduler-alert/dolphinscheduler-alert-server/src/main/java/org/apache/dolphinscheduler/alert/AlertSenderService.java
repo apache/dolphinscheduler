@@ -36,24 +36,24 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public final class AlertSenderService extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(AlertSenderService.class);
 
-    @Autowired
-    private AlertDao alertDao;
+    private final AlertDao alertDao;
+    private final AlertPluginManager alertPluginManager;
 
-    @Autowired
-    private AlertPluginManager alertPluginManager;
+    public AlertSenderService(AlertDao alertDao, AlertPluginManager alertPluginManager) {
+        this.alertDao = alertDao;
+        this.alertPluginManager = alertPluginManager;
+    }
 
     @Override
     public synchronized void start() {

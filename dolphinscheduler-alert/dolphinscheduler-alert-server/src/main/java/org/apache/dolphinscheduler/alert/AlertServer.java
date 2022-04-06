@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
@@ -27,7 +26,6 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -35,26 +33,26 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.Closeable;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
-public class AlertServer implements IStoppable {
+public class AlertServer implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
-    @Autowired
-    private PluginDao pluginDao;
-
-    @Autowired
-    private AlertSenderService alertSenderService;
-
-    @Autowired
-    private AlertRequestProcessor alertRequestProcessor;
-
-    @Autowired
-    private AlertConfig alertConfig;
-
+    private final PluginDao pluginDao;
+    private final AlertSenderService alertSenderService;
+    private final AlertRequestProcessor alertRequestProcessor;
+    private final AlertConfig alertConfig;
     private NettyRemotingServer nettyRemotingServer;
+
+    public AlertServer(PluginDao pluginDao, AlertSenderService alertSenderService, AlertRequestProcessor alertRequestProcessor, AlertConfig alertConfig) {
+        this.pluginDao = pluginDao;
+        this.alertSenderService = alertSenderService;
+        this.alertRequestProcessor = alertRequestProcessor;
+        this.alertConfig = alertConfig;
+    }
 
     /**
      * alert server startup, not use web service
@@ -73,20 +71,20 @@ public class AlertServer implements IStoppable {
         checkTable();
         startServer();
         alertSenderService.start();
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (Stopper.isRunning()) {
-                close("shutdownHook");
-            }
-        }));
+    @Override
+    @PreDestroy
+    public void close() {
+        destroy("alert server destroy");
     }
 
     /**
-     * gracefully close
+     * gracefully stop
      *
-     * @param cause close cause
+     * @param cause stop cause
      */
-    public void close(String cause) {
+    public void destroy(String cause) {
 
         try {
             // execute only once
@@ -108,11 +106,6 @@ public class AlertServer implements IStoppable {
         } catch (Exception e) {
             logger.error("alert server stop exception ", e);
         }
-    }
-
-    @Override
-    public void stop(String cause) {
-        close(cause);
     }
 
     private void checkTable() {
