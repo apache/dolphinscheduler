@@ -42,18 +42,18 @@ jobs:
     name: Backend-Path-Filter
     runs-on: ubuntu-latest
     outputs:
-      ignore: ${{ steps.filter.outputs.ignore }}
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
           filters: |
-            ignore:
-              - '(docs/**|dolphinscheduler-ui/**|dolphinscheduler-ui-next/**)'
+            not-ignore:
+              - '!(docs/**|dolphinscheduler-ui/**|dolphinscheduler-ui-next/**)'
   build:
     name: Backend-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.ignore == 'false' }}
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -81,13 +81,16 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ build ]
+    needs: [ build, paths-filter ]
     if: always()
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.build.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
-            echo "Passed!"
-          else
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+            echo "Skip Build!"
+            exit 0
+          fi
+          if [[ ${{ needs.build.result }} != 'success' ]]; then
+            echo "Build Failed!"
             exit -1
           fi
