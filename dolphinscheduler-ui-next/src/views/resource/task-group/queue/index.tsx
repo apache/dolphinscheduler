@@ -170,13 +170,13 @@ const taskGroupQueue = defineComponent({
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.processName, 'value']}
-                placeholder={t('resource.task_group_queue.process_name')}
+                placeholder={t('resource.task_group_queue.workflow_name')}
               ></NInput>
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.instanceName, 'value']}
                 placeholder={t(
-                  'resource.task_group_queue.process_instance_name'
+                  'resource.task_group_queue.workflow_instance_name'
                 )}
               ></NInput>
               <NButton size='small' type='primary' onClick={onSearch}>

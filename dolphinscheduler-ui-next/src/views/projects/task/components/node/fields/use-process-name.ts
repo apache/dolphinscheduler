@@ -72,7 +72,7 @@ export function useProcessName({
     type: 'select',
     field: 'processName',
     span: 24,
-    name: t('project.node.process_name'),
+    name: t('project.node.workflow_name'),
     props: {
       loading: loading,
       disabled: !isCreate,
@@ -83,7 +83,7 @@ export function useProcessName({
       required: true,
       validator(validate: any, value: string) {
         if (!value) {
-          return new Error(t('project.node.process_name_tips'))
+          return new Error(t('project.node.workflow_name_tips'))
         }
       }
     },
