@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import org.apache.zeppelin.client.*;
-
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.zeppelin.client.ClientConfig;
+import org.apache.zeppelin.client.ParagraphResult;
+import org.apache.zeppelin.client.Status;
+import org.apache.zeppelin.client.ZeppelinClient;
 
 
 public class ZeppelinTask extends AbstractTaskExecutor {
