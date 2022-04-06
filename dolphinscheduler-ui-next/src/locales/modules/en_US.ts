@@ -1111,7 +1111,7 @@ const security = {
     Secret: 'Secret',
     users: 'Users',
     userSendMsg: 'UserSendMsg',
-    agentId: 'AgentId',
+    'agentId/chatId': 'AgentId or ChatId',
     showType: 'Show Type',
     receivers: 'Receivers',
     receiverCcs: 'ReceiverCcs',
