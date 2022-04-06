@@ -95,12 +95,7 @@ export default defineComponent({
       sync: false
     })
     const formRef = ref()
-    const executeTypeOptions = [
-      { value: 'PARALLEL', label: 'parallel' },
-      { value: 'SERIAL_WAIT', label: 'Serial wait' },
-      { value: 'SERIAL_DISCARD', label: 'Serial discard' },
-      { value: 'SERIAL_PRIORITY', label: 'Serial priority' }
-    ]
+
     const rule = {
       name: {
         required: true,
@@ -228,7 +223,18 @@ export default defineComponent({
               path='executionType'
             >
               <NSelect
-                options={executeTypeOptions}
+                options={[
+                  { value: 'PARALLEL', label: t('project.dag.parallel') },
+                  { value: 'SERIAL_WAIT', label: t('project.dag.serial_wait') },
+                  {
+                    value: 'SERIAL_DISCARD',
+                    label: t('project.dag.serial_discard')
+                  },
+                  {
+                    value: 'SERIAL_PRIORITY',
+                    label: t('project.dag.serial_priority')
+                  }
+                ]}
                 v-model:value={formValue.value.executionType}
               />
             </NFormItem>
