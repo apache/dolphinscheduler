@@ -86,10 +86,11 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.build.result }} == 'success' ]]; then
-            echo "Passed!"
-          elif [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
             echo "Skip Build!"
-          else
+            exit 0
+          fi
+          if [[ ${{ needs.build.result }} != 'success' ]]; then
+            echo "Build Failed!"
             exit -1
           fi

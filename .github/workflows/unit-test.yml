@@ -119,10 +119,11 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.unit-test.result }} == 'success' ]]; then
-            echo "Passed!"
-          elif [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
             echo "Skip Unit Test!"
-          else
+            exit 0
+          fi
+          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+            echo "Unit Test Failed!"
             exit -1
           fi
