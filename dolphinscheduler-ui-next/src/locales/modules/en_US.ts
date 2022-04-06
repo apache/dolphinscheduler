@@ -531,6 +531,7 @@ const project = {
       'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    current_task_settings: 'Current task settings',
     online: 'Online',
     offline: 'Offline',
     task_name: 'Task Name',
@@ -618,7 +619,7 @@ const project = {
     view_history: 'View history',
     view_log: 'View log',
     enter_this_child_node: 'Enter this child node',
-    name: 'Node name',
+    name: 'Name',
     name_tips: 'Please enter name (required)',
     task_type: 'Task Type',
     task_type_tips: 'Please select a task type (required)',

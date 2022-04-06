@@ -181,7 +181,11 @@ const NodeDetailModal = defineComponent({
     return () => (
       <Modal
         show={props.show}
-        title={`${t('project.node.current_node_settings')}`}
+        title={
+          props.from === 1
+            ? `${t('project.task.current_task_settings')}`
+            : `${t('project.node.current_node_settings')}`
+        }
         onConfirm={onConfirm}
         confirmLoading={props.saving}
         confirmDisabled={props.readonly}
