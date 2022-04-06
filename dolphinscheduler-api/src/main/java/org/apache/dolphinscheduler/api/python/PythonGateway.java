@@ -544,8 +544,7 @@ public class PythonGateway {
     @PostConstruct
     public void init() {
         if (pythonGatewayConfiguration.getEnabled()) {
-            PythonGateway pythonGateway = new PythonGateway();
-            pythonGateway.start();
+            this.start();
         }
     }
 

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties("python-gateway")
+@ConfigurationProperties(value = "python-gateway", ignoreUnknownFields = false)
 public class PythonGatewayConfiguration {
     private boolean enabled;
     private String gatewayServerAddress;
