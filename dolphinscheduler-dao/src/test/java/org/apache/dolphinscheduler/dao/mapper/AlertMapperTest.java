@@ -17,23 +17,21 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.*;
 
 /**
  * alert mapper test
@@ -153,9 +151,11 @@ public class AlertMapperTest extends BaseDaoTest {
      * @return alert
      */
     private Alert createAlert(AlertStatus alertStatus) {
+        String content = "[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]";
         Alert alert = new Alert();
         alert.setTitle("test alert");
-        alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
+        alert.setContent(content);
+        alert.setSign(DigestUtils.sha1Hex(content));
         alert.setAlertStatus(alertStatus);
         alert.setWarningType(WarningType.FAILURE);
         alert.setLog("success");
