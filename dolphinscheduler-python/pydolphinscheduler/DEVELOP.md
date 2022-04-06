@@ -146,6 +146,29 @@ python -m flake8
 
 #### Testing
 
+## Build Docs
+
+We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in 
+GitHub. You may locally ensure docs could be built suceessfully in case the failure blocks CI.
+
+To build docs locally, install sphinx and related python modules first via:
+
+```shell
+pip install '.[doc]'
+``` 
+
+Then 
+
+```shell
+cd pydolphinscheduler/docs/
+make clean && make html
+```
+
+## Testing
+
+pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
+pull request or commit to dev branch, with python version `3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`.
+
 pydolphinscheduler using [pytest][pytest] to run all tests in directory `tests`. You could run tests by the commands
 
 ```shell
@@ -209,3 +232,4 @@ users who may use it in other way.
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 [coverage]: https://coverage.readthedocs.io/en/stable/
 [isort]: https://pycqa.github.io/isort/index.html
+[sphinx]: https://www.sphinx-doc.org/en/master/

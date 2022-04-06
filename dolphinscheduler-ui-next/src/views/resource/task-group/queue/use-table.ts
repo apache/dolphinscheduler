@@ -56,7 +56,7 @@ export function useTable(
       ...COLUMN_WIDTH_CONFIG['name']
     },
     {
-      title: t('resource.task_group_queue.process_instance_name'),
+      title: t('resource.task_group_queue.workflow_instance_name'),
       key: 'processInstanceName',
       ...COLUMN_WIDTH_CONFIG['name']
     },
@@ -121,10 +121,13 @@ export function useTable(
     page: ref(1),
     pageSize: ref(10),
     groupId: ref(3),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const taskGroupSearchParams = {
       pageNo: 1,
       pageSize: 2147483647
@@ -159,6 +162,7 @@ export function useTable(
           }
         }
       )
+      variables.loadingRef = false
     })
   }
 

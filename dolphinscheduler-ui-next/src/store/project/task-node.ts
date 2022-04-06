@@ -16,14 +16,23 @@
  */
 import { defineStore } from 'pinia'
 import { uniqBy } from 'lodash'
-import type { TaskNodeState, EditWorkflowDefinition, IOption } from './types'
+import type {
+  TaskNodeState,
+  EditWorkflowDefinition,
+  IOption,
+  IResource,
+  ProgramType,
+  IMainJar
+} from './types'
 
 export const useTaskNodeStore = defineStore({
   id: 'project-task',
   state: (): TaskNodeState => ({
     preTaskOptions: [],
     postTaskOptions: [],
-    preTasks: []
+    preTasks: [],
+    resources: [],
+    mainJars: {}
   }),
   persist: true,
   getters: {
@@ -35,6 +44,12 @@ export const useTaskNodeStore = defineStore({
     },
     getPreTasks(): number[] {
       return this.preTasks
+    },
+    getResources(): IResource[] {
+      return this.resources
+    },
+    getMainJar(state) {
+      return (type: ProgramType): IMainJar[] | undefined => state.mainJars[type]
     }
   },
   actions: {
@@ -94,6 +109,19 @@ export const useTaskNodeStore = defineStore({
       )
       this.preTasks = preTasks
       this.postTaskOptions = postTaskOptions
+    },
+    updateResource(resources: IResource[]) {
+      this.resources = resources
+    },
+    updateMainJar(type: ProgramType, mainJar: IMainJar[]) {
+      this.mainJars[type] = mainJar
+    },
+    init() {
+      this.preTaskOptions = []
+      this.postTaskOptions = []
+      this.preTasks = []
+      this.resources = []
+      this.mainJars = {}
     }
   }
 })

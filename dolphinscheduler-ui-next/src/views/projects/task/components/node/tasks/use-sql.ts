@@ -49,7 +49,8 @@ export function useSql({
     sql: '',
     sqlType: '0',
     preStatements: [],
-    postStatements: []
+    postStatements: [],
+    udfs: []
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -79,8 +80,7 @@ export function useSql({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useDatasourceType(model),
-      Fields.useDatasource(model),
+      ...Fields.useDatasource(model),
       ...Fields.useSqlType(model),
       ...Fields.useSql(model),
       Fields.usePreTasks()

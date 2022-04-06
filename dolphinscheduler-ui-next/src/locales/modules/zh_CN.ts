@@ -104,6 +104,7 @@ const home = {
   delay_execution: '延时执行',
   forced_success: '强制成功',
   serial_wait: '串行等待',
+  dispatch: '派发',
   ready_block: '准备阻断',
   block: '阻断'
 }
@@ -151,7 +152,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    master_no_data_result_title: 'Master节点不存在',
+    master_no_data_result_desc:
+      '目前没有任何Master节点，请先创建Master节点，再访问该页面'
   },
   worker: {
     cpu_usage: '处理器使用量',
@@ -161,7 +165,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    worker_no_data_result_title: 'Worker节点不存在',
+    worker_no_data_result_desc:
+      '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'
   },
   db: {
     health_state: '健康状态',
@@ -319,8 +326,8 @@ const resource = {
     task_name: '任务名称',
     task_group_name: '任务组名称',
     project_name: '项目名称',
-    process_name: '工作流名称',
-    process_instance_name: '工作流实例',
+    workflow_name: '工作流名称',
+    workflow_instance_name: '工作流实例',
     queue: '任务组队列',
     priority: '组内优先级',
     priority_be_a_number: '优先级必须是大于等于0的数值',
@@ -487,6 +494,7 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
+    dispatch: '派发',
     executing: '正在执行',
     startup_type: '启动类型',
     complement_range: '补数范围',
@@ -513,7 +521,10 @@ const project = {
     project_name_required: '项目名称必填',
     related_items: '关联项目',
     project_name: '项目名称',
-    project_tips: '请选择项目'
+    project_tips: '请选择项目',
+    workflow_relation_no_data_result_title: '工作流关系不存在',
+    workflow_relation_no_data_result_desc:
+      '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
     online: '已上线',
@@ -548,24 +559,9 @@ const project = {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?',
-    submitted_success: '提交成功',
-    running_execution: '正在运行',
-    ready_pause: '准备暂停',
-    pause: '暂停',
-    ready_stop: '准备停止',
-    stop: '停止',
-    failure: '失败',
-    success: '成功',
-    need_fault_tolerance: '需要容错',
-    kill: 'KILL',
-    waiting_thread: '等待线程',
-    waiting_depend: '等待依赖完成',
-    delay_execution: '延时执行',
-    forced_success: '强制成功',
     view_log: '查看日志',
     download_log: '下载日志',
-    refresh: '刷新',
-    serial_wait: '串行等待'
+    refresh: '刷新'
   },
   dag: {
     create: '创建工作流',
@@ -587,6 +583,12 @@ const project = {
     description: '描述',
     tenant: '租户',
     timeout_alert: '超时告警',
+    process_execute_type: '执行策略',
+    parallel: '并行',
+    serial_wait: '串行等待',
+    serial_discard: '串行抛弃',
+    serial_priority: '串行优先',
+    recover_serial_wait: '串行恢复',
     global_variables: '全局变量',
     basic_info: '基本信息',
     minute: '分',
@@ -603,7 +605,8 @@ const project = {
     node_not_created: '未创建节点保存失败',
     copy_name: '复制名称',
     view_variables: '查看变量',
-    startup_parameter: '启动参数'
+    startup_parameter: '启动参数',
+    online: '已上线'
   },
   node: {
     current_node_settings: '当前节点设置',
@@ -615,8 +618,8 @@ const project = {
     name_tips: '请输入名称(必填)',
     task_type: '任务类型',
     task_type_tips: '请选择任务类型(必选)',
-    process_name: '工作流名称',
-    process_name_tips: '请选择工作流(必选)',
+    workflow_name: '工作流名称',
+    workflow_name_tips: '请选择工作流(必选)',
     child_node: '子节点',
     enter_child_node: '进入该子节点',
     run_flag: '运行标志',
@@ -720,7 +723,7 @@ const project = {
     body_not_contains: '内容不包含',
     http_parameters_position: '参数位置',
     target_task_name: '目标任务名',
-    target_task_name_tips: '请输入Pigeon任务名',
+    target_task_name_tips: '请输入Pigeon任务名(必填)',
     datasource_type: '数据源类型',
     datasource_instances: '数据源实例',
     sql_type: 'SQL类型',
@@ -904,7 +907,11 @@ const project = {
     title_tips: '请输入邮件主题',
     alarm_group: '告警组',
     alarm_group_tips: '告警组必填',
-    integer_tips: '请输入一个正整数'
+    integer_tips: '请输入一个正整数',
+    sql_parameter: 'sql参数',
+    format_tips: '请输入格式为',
+    udf_function: 'UDF函数',
+    unlimited: '不限制'
   }
 }
 
@@ -1121,12 +1128,16 @@ const security = {
     RoomId: '房间',
     ToPersonId: '用户',
     ToPersonEmail: '用户邮箱',
-    AtSomeoneInRoom: '@房间中的成员',
+    // eslint-disable-next-line quotes
+    AtSomeoneInRoom: "{'@'}房间中的成员",
     Destination: '描述',
-    AtMobiles: '被@人的手机号',
-    AtUserIds: '被@人的用户ID',
+    // eslint-disable-next-line quotes
+    AtMobiles: "被{'@'}人的手机号",
+    // eslint-disable-next-line quotes
+    AtUserIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
-    IsAtAll: '@所有人'
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}所有人"
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',

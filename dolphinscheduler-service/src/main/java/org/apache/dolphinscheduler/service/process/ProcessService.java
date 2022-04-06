@@ -52,6 +52,8 @@ public interface ProcessService {
 
     List<Command> findCommandPage(int pageSize, int pageNumber);
 
+    List<Command> findCommandPageBySlot(int pageSize, int pageNumber, int masterCount, int thisMasterSlot);
+
     boolean verifyIsNeedCreateCommand(Command command);
 
     ProcessInstance findProcessInstanceDetailById(int processId);
@@ -138,20 +140,7 @@ public interface ProcessService {
 
     ProcessInstance findParentProcessInstance(Integer subProcessId);
 
-    void changeTaskState(TaskInstance taskInstance,
-                         ExecutionStatus state,
-                         Date startTime,
-                         String host,
-                         String executePath,
-                         String logPath);
-
     int updateProcessInstance(ProcessInstance processInstance);
-
-    void changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
-                         Date endTime,
-                         int processId,
-                         String appIds,
-                         String varPool);
 
     void changeOutParam(TaskInstance taskInstance);
 

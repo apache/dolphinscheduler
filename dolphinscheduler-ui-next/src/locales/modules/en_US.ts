@@ -104,6 +104,7 @@ const home = {
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
   serial_wait: 'SERIAL_WAIT',
+  dispatch: 'DISPATCH',
   ready_block: 'READY_BLOCK',
   block: 'BLOCK'
 }
@@ -152,7 +153,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    master_no_data_result_title: 'No Master Nodes Exist',
+    master_no_data_result_desc:
+      'Currently, there are no master nodes exist, please create a master node and refresh this page'
   },
   worker: {
     cpu_usage: 'CPU Usage',
@@ -162,7 +166,10 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory'
+    directory: 'Directory',
+    worker_no_data_result_title: 'No Worker Nodes Exist',
+    worker_no_data_result_desc:
+      'Currently, there are no worker nodes exist, please create a worker node and refresh this page'
   },
   db: {
     health_state: 'Health State',
@@ -323,8 +330,8 @@ const resource = {
     task_name: 'Task name',
     task_group_name: 'Task group name',
     project_name: 'Project name',
-    process_name: 'Process name',
-    process_instance_name: 'Process instance',
+    workflow_name: 'Workflow name',
+    workflow_instance_name: 'Workflow instance',
     queue: 'Task group queue',
     priority: 'Priority',
     priority_be_a_number:
@@ -490,6 +497,7 @@ const project = {
     delay_execution: 'Delay execution',
     forced_success: 'Forced success',
     serial_wait: 'Serial wait',
+    dispatch: 'Dispatch',
     executing: 'Executing',
     startup_type: 'Startup Type',
     complement_range: 'Complement Range',
@@ -516,9 +524,14 @@ const project = {
     project_name_required: 'Project name is required',
     related_items: 'Related items',
     project_name: 'Project Name',
-    project_tips: 'Please select project name'
+    project_tips: 'Please select project name',
+    workflow_relation_no_data_result_title:
+      'Can not find any relations of workflows.',
+    workflow_relation_no_data_result_desc:
+      'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    current_task_settings: 'Current task settings',
     online: 'Online',
     offline: 'Offline',
     task_name: 'Task Name',
@@ -551,24 +564,9 @@ const project = {
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?',
-    submitted_success: 'Submitted Success',
-    running_execution: 'Running Execution',
-    ready_pause: 'Ready Pause',
-    pause: 'Pause',
-    ready_stop: 'Ready Stop',
-    stop: 'Stop',
-    failure: 'Failure',
-    success: 'Success',
-    need_fault_tolerance: 'Need Fault Tolerance',
-    kill: 'Kill',
-    waiting_thread: 'Waiting Thread',
-    waiting_depend: 'Waiting Depend',
-    delay_execution: 'Delay Execution',
-    forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
-    refresh: 'Refresh',
-    serial_wait: 'Serial Wait'
+    refresh: 'Refresh'
   },
   dag: {
     create: 'Create Workflow',
@@ -590,6 +588,12 @@ const project = {
     description: 'Description',
     tenant: 'Tenant',
     timeout_alert: 'Timeout Alert',
+    process_execute_type: 'Process execute type',
+    parallel: 'parallel',
+    serial_wait: 'Serial wait',
+    serial_discard: 'Serial discard',
+    serial_priority: 'Serial priority',
+    recover_serial_wait: 'Recover serial wait',
     global_variables: 'Global Variables',
     basic_info: 'Basic Information',
     minute: 'Minute',
@@ -606,7 +610,8 @@ const project = {
     node_not_created: 'Failed to save node not created',
     copy_name: 'Copy Name',
     view_variables: 'View Variables',
-    startup_parameter: 'Startup Parameter'
+    startup_parameter: 'Startup Parameter',
+    online: 'Online'
   },
   node: {
     current_node_settings: 'Current node settings',
@@ -614,12 +619,12 @@ const project = {
     view_history: 'View history',
     view_log: 'View log',
     enter_this_child_node: 'Enter this child node',
-    name: 'Node name',
+    name: 'Name',
     name_tips: 'Please enter name (required)',
     task_type: 'Task Type',
     task_type_tips: 'Please select a task type (required)',
-    process_name: 'Process Name',
-    process_name_tips: 'Please select a process (required)',
+    workflow_name: 'Workflow Name',
+    workflow_name_tips: 'Please select a workflow (required)',
     child_node: 'Child Node',
     enter_child_node: 'Enter child node',
     run_flag: 'Run flag',
@@ -729,7 +734,7 @@ const project = {
     body_not_contains: 'Content does not contain',
     http_parameters_position: 'Http Parameters Position',
     target_task_name: 'Target Task Name',
-    target_task_name_tips: 'Please enter the Pigeon task name',
+    target_task_name_tips: 'Please enter the Pigeon task name(required)',
     datasource_type: 'Datasource types',
     datasource_instances: 'Datasource instances',
     sql_type: 'SQL Type',
@@ -814,9 +819,9 @@ const project = {
     switch_branch_flow: 'Branch Flow',
     and: 'and',
     or: 'or',
-    datax_custom_template: 'Custom Template Switch',
+    datax_custom_template: 'Custom Template',
     datax_json_template: 'JSON',
-    datax_target_datasource_type: 'Target Datasource Type',
+    datax_target_datasource_type: 'Target Datasource Types',
     datax_target_database: 'Target Database',
     datax_target_table: 'Target Table',
     datax_target_table_tips: 'Please enter the name of the target table',
@@ -914,7 +919,11 @@ const project = {
     title_tips: 'Please enter the title of email',
     alarm_group: 'Alarm group',
     alarm_group_tips: 'Alarm group required',
-    integer_tips: 'Please enter a positive integer'
+    integer_tips: 'Please enter a positive integer',
+    sql_parameter: 'SQL Parameter',
+    format_tips: 'Please enter format',
+    udf_function: 'UDF Function',
+    unlimited: 'unlimited'
   }
 }
 
@@ -1139,7 +1148,8 @@ const security = {
     AtMobiles: 'At User Mobiles',
     AtUserIds: 'At User Ids',
     MsgType: 'Msg Type',
-    IsAtAll: '@All'
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}All"
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',

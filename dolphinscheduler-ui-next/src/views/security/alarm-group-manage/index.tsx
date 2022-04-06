@@ -97,7 +97,8 @@ const alarmGroupManage = defineComponent({
       onCancelModal,
       onConfirmModal,
       handleModalChange,
-      onSearch
+      onSearch,
+      loadingRef
     } = this
 
     return (
@@ -129,7 +130,11 @@ const alarmGroupManage = defineComponent({
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

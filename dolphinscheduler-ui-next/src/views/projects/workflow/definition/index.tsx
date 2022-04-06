@@ -112,6 +112,7 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
@@ -150,6 +151,7 @@ export default defineComponent({
         </Card>
         <Card title={t('project.workflow.workflow_definition')}>
           <NDataTable
+            loading={loadingRef}
             rowKey={(row) => row.code}
             columns={this.columns}
             data={this.tableData}
@@ -176,19 +178,21 @@ export default defineComponent({
               {{
                 default: () => t('project.workflow.delete'),
                 trigger: () => (
-                  <NButton
-                    tag='div'
-                    type='primary'
-                    disabled={this.checkedRowKeys.length <= 0}
-                    class='btn-delete-all'
-                  >
-                    <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
-                      {{
-                        default: () => t('project.workflow.delete_confirm'),
-                        trigger: () => t('project.workflow.delete')
-                      }}
-                    </NPopconfirm>
-                  </NButton>
+                  <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
+                    {{
+                      default: () => t('project.workflow.delete_confirm'),
+                      trigger: () => (
+                        <NButton
+                          tag='div'
+                          type='primary'
+                          disabled={this.checkedRowKeys.length <= 0}
+                          class='btn-delete-all'
+                        >
+                          {t('project.workflow.delete')}
+                        </NButton>
+                      )
+                    }}
+                  </NPopconfirm>
                 )
               }}
             </NTooltip>

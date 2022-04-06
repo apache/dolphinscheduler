@@ -89,6 +89,7 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
@@ -99,6 +100,7 @@ export default defineComponent({
         </Card>
         <Card title={t('project.workflow.workflow_instance')}>
           <NDataTable
+            loading={loadingRef}
             rowKey={(row) => row.id}
             columns={this.columns}
             data={this.tableData}

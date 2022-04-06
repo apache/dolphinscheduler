@@ -17,22 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
-
+import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -74,8 +60,8 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,10 +73,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.zaxxer.hikari.HikariDataSource;
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -262,11 +259,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            processService.changeTaskState(taskInstance, ExecutionStatus.FAILURE,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    null,
-                    null);
+            taskInstance.setState(ExecutionStatus.FAILURE);
+            processService.saveTaskInstance(taskInstance);
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
@@ -320,6 +314,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         map.forEach((code, parameters) -> {
             DataSource datasource = processService.findDataSourceById(code);
+            if (Objects.isNull(datasource)) {
+                return;
+            }
             DataSourceParameters dataSourceParameters = new DataSourceParameters();
             dataSourceParameters.setType(datasource.getType());
             dataSourceParameters.setConnectionParams(datasource.getConnectionParams());
@@ -381,7 +378,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // set the path used to store data quality task check error data
         dataQualityTaskExecutionContext.setHdfsPath(
-                PropertyUtils.getString(Constants.FS_DEFAULTFS)
+                PropertyUtils.getString(Constants.FS_DEFAULT_FS)
                 + PropertyUtils.getString(
                         Constants.DATA_QUALITY_ERROR_OUTPUT_PATH,
                         "/user/" + tenantCode + "/data_quality_error_data"));

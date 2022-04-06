@@ -28,6 +28,7 @@ public class OracleDataSourceClient extends CommonDataSourceClient {
         super(baseConnectionParam, dbType);
     }
 
+    @Override
     protected void setDefaultValidationQuery(BaseConnectionParam baseConnectionParam) {
         baseConnectionParam.setValidationQuery(Constants.ORACLE_VALIDATION_QUERY);
     }

@@ -66,7 +66,8 @@ export function useTable() {
     searchVal: ref(),
     totalPage: ref(1),
     folderShowRef: ref(false),
-    uploadShowRef: ref(false)
+    uploadShowRef: ref(false),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -80,7 +81,7 @@ export function useTable() {
       {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
-        width: 60,
+        width: 220,
         render: (row) => {
           return !row.directory
             ? row.alias
@@ -224,6 +225,8 @@ export function useTable() {
   }
 
   const getTableData = (params: IUdfResourceParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
         const breadList =
@@ -237,6 +240,7 @@ export function useTable() {
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }),
       { total: 0, table: [] }
     )

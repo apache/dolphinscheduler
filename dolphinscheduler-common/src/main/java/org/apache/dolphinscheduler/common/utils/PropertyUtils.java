@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
 
 public class PropertyUtils {
 
@@ -52,7 +50,6 @@ public class PropertyUtils {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
                 properties.load(fis);
-
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 System.exit(1);
@@ -73,7 +70,7 @@ public class PropertyUtils {
     public static boolean getResUploadStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-        return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
+        return resUploadType != ResUploadType.NONE;
     }
 
     /**

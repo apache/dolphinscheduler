@@ -28,10 +28,10 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResponseAckProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
@@ -44,14 +44,12 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -113,19 +111,16 @@ public class WorkerServer implements IStoppable {
     private TaskKillProcessor taskKillProcessor;
 
     @Autowired
-    private DBTaskAckProcessor dbTaskAckProcessor;
+    private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
     @Autowired
-    private DBTaskResponseProcessor dbTaskResponseProcessor;
+    private TaskExecuteResponseAckProcessor taskExecuteResponseAckProcessor;
 
     @Autowired
     private HostUpdateProcessor hostUpdateProcessor;
 
     @Autowired
     private LoggerRequestProcessor loggerRequestProcessor;
-
-    @Value("${spring.jackson.time-zone:UTC}")
-    private String timezone;
 
     /**
      * worker server startup, not use web service
@@ -142,16 +137,14 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run() {
-        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
-
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, taskExecuteProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, dbTaskAckProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, dbTaskResponseProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK, taskExecuteRunningAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE_ACK, taskExecuteResponseAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
 
         // logger server

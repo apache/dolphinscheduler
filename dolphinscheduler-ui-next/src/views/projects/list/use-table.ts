@@ -218,10 +218,13 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryProjectListPaging(params).then((res: ProjectRes) => {
         variables.totalPage = res.totalPage
@@ -238,6 +241,7 @@ export function useTable() {
             ...item
           }
         }) as any
+        variables.loadingRef = false
       }),
       {}
     )

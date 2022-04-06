@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, watch } from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
@@ -31,8 +31,8 @@ const workflowMonitor = defineComponent({
     const dateRef = ref([getTime(startOfToday()), Date.now()])
     const taskStateRef = ref()
     const processStateRef = ref()
-    const { getTaskState } = useTaskState()
-    const { getProcessState } = useProcessState()
+    const { getTaskState, taskVariables } = useTaskState()
+    const { getProcessState, processVariables } = useProcessState()
 
     const handleTaskDate = (val: any) => {
       taskStateRef.value = getTaskState(val)
@@ -62,11 +62,20 @@ const workflowMonitor = defineComponent({
       handleTaskDate,
       handleProcessDate,
       taskStateRef,
-      processStateRef
+      processStateRef,
+      ...toRefs(taskVariables),
+      ...toRefs(processVariables)
     }
   },
   render() {
-    const { t, dateRef, handleTaskDate, handleProcessDate } = this
+    const {
+      t,
+      dateRef,
+      handleTaskDate,
+      handleProcessDate,
+      taskLoadingRef,
+      processLoadingRef
+    } = this
 
     return (
       <div>
@@ -78,6 +87,7 @@ const workflowMonitor = defineComponent({
               tableData={this.taskStateRef?.value.table}
               chartData={this.taskStateRef?.value.chart}
               onUpdateDatePickerValue={handleTaskDate}
+              loadingRef={taskLoadingRef}
             />
           </NGi>
           <NGi>
@@ -87,6 +97,7 @@ const workflowMonitor = defineComponent({
               tableData={this.processStateRef?.value.table}
               chartData={this.processStateRef?.value.chart}
               onUpdateDatePickerValue={handleProcessDate}
+              loadingRef={processLoadingRef}
             />
           </NGi>
         </NGrid>

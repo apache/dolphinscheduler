@@ -48,7 +48,8 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
-    showRef: ref(false)
+    showRef: ref(false),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -162,12 +163,15 @@ export function useTable() {
   }
 
   const getTableData = (params: IUdfFunctionParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryUdfFuncListPaging({ ...params }).then((res: any) => {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }),
       { total: 0, table: [] }
     )

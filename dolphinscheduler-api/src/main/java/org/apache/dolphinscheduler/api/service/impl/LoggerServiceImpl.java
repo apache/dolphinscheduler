@@ -101,8 +101,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
-        if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
+        if (taskInstance == null) {
             return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
+        }
+        if (StringUtils.isBlank(taskInstance.getHost())) {
+            return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
         Result<String> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
         String log = queryLog(taskInstance,skipLineNum,limit);

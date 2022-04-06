@@ -18,7 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm, NEllipsis } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -38,15 +38,12 @@ import {
 } from '@/utils/column-width-config'
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
-import { useTimezoneStore } from '@/store/timezone/timezone'
 import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-  const timezoneStore = useTimezoneStore()
-  const timeZone = timezoneStore.getTimezone
 
   const variables = reactive({
     columns: [],
@@ -58,10 +55,15 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
-    showRef: ref(false)
+    showRef: ref(false),
+    loadingRef: ref(false)
   })
 
-  const renderTime = (time: string) => {
+  const renderTime = (time: string, timeZone: string) => {
+    if (!timeZone) {
+      return time
+    }
+
     const utc = format(new Date(time), 'zzz', {
       timeZone
     }).replace('GMT', 'UTC')
@@ -82,27 +84,19 @@ export function useTable() {
       {
         title: t('project.workflow.workflow_name'),
         key: 'processDefinitionName',
-        ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row: any) =>
-          h(
-            NEllipsis,
-            { style: 'max-width: 200px' },
-            {
-              default: () => row.processDefinitionName
-            }
-          )
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
-        ...COLUMN_WIDTH_CONFIG['time'],
-        render: (row: any) => renderTime(row.startTime)
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.startTime, row.timezoneId)
       },
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
-        ...COLUMN_WIDTH_CONFIG['time'],
-        render: (row: any) => renderTime(row.endTime)
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.endTime, row.timezoneId)
       },
       {
         title: t('project.workflow.crontab'),
@@ -242,6 +236,8 @@ export function useTable() {
   }
 
   const getTableData = (params: ISearchParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const definitionCode = Number(
       router.currentRoute.value.params.definitionCode
     )
@@ -253,6 +249,7 @@ export function useTable() {
       variables.tableData = res.totalList.map((item: any) => {
         return { ...item }
       })
+      variables.loadingRef = false
     })
   }
 

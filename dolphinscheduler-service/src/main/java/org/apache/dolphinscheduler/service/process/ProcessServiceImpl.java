@@ -133,6 +133,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,6 +168,7 @@ public class ProcessServiceImpl implements ProcessService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.DISPATCH.ordinal(),
             ExecutionStatus.RUNNING_EXECUTION.ordinal(),
             ExecutionStatus.DELAY_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
@@ -274,6 +276,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param command found command
      * @return process instance
      */
+    @Override
     @Transactional
     public ProcessInstance handleCommand(Logger logger, String host, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
@@ -408,6 +411,17 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Command> findCommandPage(int pageSize, int pageNumber) {
         return commandMapper.queryCommandPage(pageSize, pageNumber * pageSize);
+    }
+
+    /**
+     * get command page
+     */
+    @Override
+    public List<Command> findCommandPageBySlot(int pageSize, int pageNumber, int masterCount, int thisMasterSlot) {
+        if (masterCount <= 0) {
+            return Lists.newArrayList();
+        }
+        return commandMapper.queryCommandPageBySlot(pageSize, pageNumber * pageSize, masterCount, thisMasterSlot);
     }
 
     /**
@@ -587,7 +601,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     /**
      * recursive delete all task instance by process instance id
-     * @param processInstanceId
      */
     @Override
     public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
@@ -1359,19 +1372,22 @@ public class ProcessServiceImpl implements ProcessService {
                                            ProcessInstanceMap instanceMap,
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
-        Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
+        Map<String, Object> subProcessParam = JSONUtils.toMap(task.getTaskParams(), String.class, Object.class);
         long childDefineCode = 0L;
         if (subProcessParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
-            childDefineCode = Long.parseLong(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE));
+            childDefineCode = NumberUtils.toLong(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
         }
         ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
-        Map<String, String> globalMap = this.getGlobalParamMap(parentProcessInstance.getGlobalParams());
+        Map<String, String> globalMap = this.getGlobalParamMap(task.getVarPool());
         Map<String, String> fatherParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(allParam)) {
             for (Property info : allParam) {
+                if (Direct.OUT == info.getDirect()) {
+                    continue;
+                }
                 fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
             }
         }
@@ -1491,6 +1507,7 @@ public class ProcessServiceImpl implements ProcessService {
                 state == ExecutionStatus.RUNNING_EXECUTION
                         || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
+                        || state == ExecutionStatus.DISPATCH
         ) {
             return state;
         }
@@ -1829,30 +1846,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * change task state
-     *
-     * @param state state
-     * @param startTime startTime
-     * @param host host
-     * @param executePath executePath
-     * @param logPath logPath
-     */
-    @Override
-    public void changeTaskState(TaskInstance taskInstance,
-                                ExecutionStatus state,
-                                Date startTime,
-                                String host,
-                                String executePath,
-                                String logPath) {
-        taskInstance.setState(state);
-        taskInstance.setStartTime(startTime);
-        taskInstance.setHost(host);
-        taskInstance.setExecutePath(executePath);
-        taskInstance.setLogPath(logPath);
-        saveTaskInstance(taskInstance);
-    }
-
-    /**
      * update process instance
      *
      * @param processInstance processInstance
@@ -1861,28 +1854,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public int updateProcessInstance(ProcessInstance processInstance) {
         return processInstanceMapper.updateById(processInstance);
-    }
-
-    /**
-     * change task state
-     *
-     * @param state state
-     * @param endTime endTime
-     * @param varPool varPool
-     */
-    @Override
-    public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
-                                Date endTime,
-                                int processId,
-                                String appIds,
-                                String varPool) {
-        taskInstance.setPid(processId);
-        taskInstance.setAppLink(appIds);
-        taskInstance.setState(state);
-        taskInstance.setEndTime(endTime);
-        taskInstance.setVarPool(varPool);
-        changeOutParam(taskInstance);
-        saveTaskInstance(taskInstance);
     }
 
     /**
@@ -2650,7 +2621,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
             }
         }
-        taskCodeVersionMap.forEach((code,version) -> {
+        taskCodeVersionMap.forEach((code, version) -> {
             taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
         });
         return taskDefinitionLogs;
@@ -2768,7 +2739,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public int updateDqExecuteResultUserId(int taskInstanceId) {
         DqExecuteResult dqExecuteResult =
-                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq(TASK_INSTANCE_ID,taskInstanceId));
+                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq(TASK_INSTANCE_ID, taskInstanceId));
         if (dqExecuteResult == null) {
             return -1;
         }
@@ -2798,14 +2769,14 @@ public class ProcessServiceImpl implements ProcessService {
     public int deleteDqExecuteResultByTaskInstanceId(int taskInstanceId) {
         return dqExecuteResultMapper.delete(
                 new QueryWrapper<DqExecuteResult>()
-                        .eq(TASK_INSTANCE_ID,taskInstanceId));
+                        .eq(TASK_INSTANCE_ID, taskInstanceId));
     }
 
     @Override
     public int deleteTaskStatisticsValueByTaskInstanceId(int taskInstanceId) {
         return dqTaskStatisticsValueMapper.delete(
                 new QueryWrapper<DqTaskStatisticsValue>()
-                        .eq(TASK_INSTANCE_ID,taskInstanceId));
+                        .eq(TASK_INSTANCE_ID, taskInstanceId));
     }
 
     @Override
@@ -2830,12 +2801,8 @@ public class ProcessServiceImpl implements ProcessService {
 
     /**
      * the first time (when submit the task ) get the resource of the task group
-     * @param taskId    task id
-     * @param taskName
-     * @param groupId
-     * @param processId
-     * @param priority
-     * @return
+     *
+     * @param taskId task id
      */
     @Override
     public boolean acquireTaskGroup(int taskId,
@@ -2876,14 +2843,12 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     *  try to get the task group resource(when other task release the resource)
-     * @param taskGroupQueue
-     * @return
+     * try to get the task group resource(when other task release the resource)
      */
     @Override
     public boolean robTaskGroupResouce(TaskGroupQueue taskGroupQueue) {
         TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupQueue.getGroupId());
-        int affectedCount = taskGroupMapper.updateTaskGroupResource(taskGroup.getId(),taskGroupQueue.getId(),
+        int affectedCount = taskGroupMapper.updateTaskGroupResource(taskGroup.getId(), taskGroupQueue.getId(),
                 TaskGroupQueueStatus.WAIT_QUEUE.getCode());
         if (affectedCount > 0) {
             taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
@@ -2933,9 +2898,9 @@ public class ProcessServiceImpl implements ProcessService {
                 taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
             }
         } catch (Exception e) {
-            logger.error("release the task group error",e);
+            logger.error("release the task group error", e);
         }
-        logger.info("updateTask:{}",taskInstance.getName());
+        logger.info("updateTask:{}", taskInstance.getName());
         changeTaskGroupQueueStatus(taskInstance.getId(), TaskGroupQueueStatus.RELEASE);
         TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryTheHighestPriorityTasks(taskGroup.getId(),
                 TaskGroupQueueStatus.WAIT_QUEUE.getCode(), Flag.NO.getCode(), Flag.NO.getCode());
@@ -2970,11 +2935,11 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * insert into task group queue
      *
-     * @param taskId    task id
-     * @param taskName  task name
-     * @param groupId   group id
+     * @param taskId task id
+     * @param taskName task name
+     * @param groupId group id
      * @param processId process id
-     * @param priority  priority
+     * @param priority priority
      * @return result and msg code
      */
     @Override

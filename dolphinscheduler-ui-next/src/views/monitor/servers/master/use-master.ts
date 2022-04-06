@@ -15,14 +15,24 @@
  * limitations under the License.
  */
 
+import { reactive } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { listMaster } from '@/service/modules/monitor'
+import type { MasterNode } from '@/service/modules/monitor/types'
 
 export function useMaster() {
-  const getMaster = () => {
-    const { state } = useAsyncState(listMaster(), [])
+  const variables = reactive({
+    data: []
+  })
+  const getTableMaster = () => {
+    const { state } = useAsyncState(
+      listMaster().then((res: Array<MasterNode>) => {
+        variables.data = res as any
+      }),
+      []
+    )
+
     return state
   }
-
-  return { getMaster }
+  return { variables, getTableMaster }
 }

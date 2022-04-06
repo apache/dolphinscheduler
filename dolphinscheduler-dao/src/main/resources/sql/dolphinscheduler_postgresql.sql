@@ -669,7 +669,7 @@ CREATE TABLE t_ds_resources (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   pid int,
-  full_name varchar(64),
+  full_name varchar(128),
   is_directory boolean DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)
@@ -1893,4 +1893,19 @@ CREATE TABLE t_ds_k8s_namespace (
    update_time        timestamp DEFAULT NULL ,
    PRIMARY KEY (id) ,
    CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+    id                           serial NOT NULL,
+    alert_id                     int NOT NULL,
+    alert_plugin_instance_id     int NOT NULL,
+    send_status                  int DEFAULT '0',
+    log                          text,
+    create_time                  timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT alert_send_status_unique UNIQUE (alert_id,alert_plugin_instance_id)
 );

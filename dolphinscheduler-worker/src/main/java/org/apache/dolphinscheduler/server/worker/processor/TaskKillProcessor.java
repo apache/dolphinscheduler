@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -90,10 +91,17 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(killCommand, result);
-        taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskKillResponseCommand.getTaskInstanceId());
-        TaskCallbackService.remove(killCommand.getTaskInstanceId());
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
+        if (taskExecutionContext == null) {
+            logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
+            return;
+        }
+        taskExecutionContext.setCurrentExecutionStatus(result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
+        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
+
+        taskCallbackService.sendTaskKillResponseCommand(taskExecutionContext);
+        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+
         logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
     }
 

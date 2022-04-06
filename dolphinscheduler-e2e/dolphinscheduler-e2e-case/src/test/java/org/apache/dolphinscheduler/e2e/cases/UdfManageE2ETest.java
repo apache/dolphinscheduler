@@ -97,7 +97,7 @@ public class UdfManageE2ETest {
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
-        userPage.update(user, user, password, email, phone, tenant)
+        userPage.update(user, user, email, phone, tenant)
             .goToNav(ResourcePage.class)
             .goToTab(UdfManagePage.class);
     }
@@ -129,29 +129,30 @@ public class UdfManageE2ETest {
             .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
-    @Test
-    @Order(20)
-    void testRenameDirectory() {
-        final UdfManagePage page = new UdfManagePage(browser);
-
-        page.rename(testDirectoryName, testRenameDirectoryName);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-
-            assertThat(page.udfList())
-                .as("File list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameDirectoryName));
-        });
-    }
+//when s3  the directory cannot be renamed
+//    @Test
+//    @Order(20)
+//    void testRenameDirectory() {
+//        final UdfManagePage page = new UdfManagePage(browser);
+//
+//        page.rename(testDirectoryName, testRenameDirectoryName);
+//
+//        await().untilAsserted(() -> {
+//            browser.navigate().refresh();
+//
+//            assertThat(page.udfList())
+//                .as("File list should contain newly-created file")
+//                .extracting(WebElement::getText)
+//                .anyMatch(it -> it.contains(testRenameDirectoryName));
+//        });
+//    }
 
     @Test
     @Order(30)
     void testDeleteDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        page.delete(testRenameDirectoryName);
+        page.delete(testDirectoryName);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -159,7 +160,7 @@ public class UdfManageE2ETest {
             assertThat(
                 page.udfList()
             ).noneMatch(
-                it -> it.getText().contains(testRenameDirectoryName)
+                it -> it.getText().contains(testDirectoryName)
             );
         });
     }

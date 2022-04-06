@@ -36,11 +36,11 @@ const Timezone = defineComponent({
     const { t } = useI18n()
     const reload: any = inject('reload')
     const timezoneStore = useTimezoneStore()
-    const chooseVal = ref(
+    const currentTime =
       props.timezoneOptions.filter(
         (item: { value: string }) => item.value === timezoneStore.getTimezone
-      )[0].label
-    )
+      )[0] || {}
+    const chooseVal = ref(currentTime.label)
 
     const currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
     const options = [

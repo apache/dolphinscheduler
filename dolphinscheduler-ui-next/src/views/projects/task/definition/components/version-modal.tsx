@@ -77,7 +77,7 @@ const VersionModal = defineComponent({
     return { t, ...toRefs(variables), requestData, onConfirm }
   },
   render() {
-    const { t, requestData, onConfirm, show } = this
+    const { t, requestData, onConfirm, show, loadingRef } = this
 
     return (
       <Modal
@@ -86,7 +86,11 @@ const VersionModal = defineComponent({
         cancelShow={false}
         onConfirm={onConfirm}
       >
-        <NDataTable columns={this.columns} data={this.tableData} />
+        <NDataTable
+          loading={loadingRef}
+          columns={this.columns}
+          data={this.tableData}
+        />
         <div class={styles.pagination}>
           <NPagination
             v-model:page={this.page}

@@ -112,17 +112,19 @@ export const UserModal = defineComponent({
               placeholder={t('security.user.username_tips')}
             />
           </NFormItem>
-          <NFormItem
-            label={t('security.user.user_password')}
-            path='userPassword'
-          >
-            <NInput
-              class='input-password'
-              type='password'
-              v-model:value={this.formData.userPassword}
-              placeholder={t('security.user.user_password_tips')}
-            />
-          </NFormItem>
+          {!this.currentRecord?.id && (
+            <NFormItem
+              label={t('security.user.user_password')}
+              path='userPassword'
+            >
+              <NInput
+                class='input-password'
+                type='password'
+                v-model:value={this.formData.userPassword}
+                placeholder={t('security.user.user_password_tips')}
+              />
+            </NFormItem>
+          )}
           {this.IS_ADMIN && (
             <NFormItem label={t('security.user.tenant_code')} path='tenantId'>
               <NSelect
