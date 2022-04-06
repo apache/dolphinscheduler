@@ -32,6 +32,10 @@ BEGIN
     --- alter column
     EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
 
+    --- add column
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alert ADD COLUMN IF NOT EXISTS sign varchar(40) NOT NULL DEFAULT "" COMMENT "sign=sha1(content)"';
+    EXECUTE 'UPDATE ' || quote_ident(v_schema) ||'.t_ds_alert SET sign=digest(content, "sha1") WHERE sign=""';
+
     return 'Success!';
     exception when others then
         ---Raise EXCEPTION '(%)',SQLERRM;

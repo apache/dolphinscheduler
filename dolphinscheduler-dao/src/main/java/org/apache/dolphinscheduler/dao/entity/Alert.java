@@ -17,17 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.google.common.base.Objects;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("t_ds_alert")
 public class Alert {
@@ -36,6 +36,11 @@ public class Alert {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+    /**
+     * sign
+     */
+    @TableField(value = "sign")
+    private String sign;
     /**
      * title
      */
@@ -93,6 +98,14 @@ public class Alert {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
     }
 
     public String getTitle() {
@@ -175,78 +188,40 @@ public class Alert {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         Alert alert = (Alert) o;
-
-        if (id != alert.id) {
-            return false;
-        }
-        if (alertGroupId != alert.alertGroupId) {
-            return false;
-        }
-        if (!title.equals(alert.title)) {
-            return false;
-        }
-        if (!content.equals(alert.content)) {
-            return false;
-        }
-        if (alertStatus != alert.alertStatus) {
-            return false;
-        }
-        if (!log.equals(alert.log)) {
-            return false;
-        }
-        if (!createTime.equals(alert.createTime)) {
-            return false;
-        }
-        if (warningType != alert.warningType) {
-            return false;
-        }
-        return updateTime.equals(alert.updateTime) && info.equals(alert.info);
-
+        return id == alert.id
+                && alertGroupId == alert.alertGroupId
+                && Objects.equal(sign, alert.sign)
+                && Objects.equal(title, alert.title)
+                && Objects.equal(content, alert.content)
+                && alertStatus == alert.alertStatus
+                && warningType == alert.warningType
+                && Objects.equal(log, alert.log)
+                && Objects.equal(createTime, alert.createTime)
+                && Objects.equal(updateTime, alert.updateTime)
+                && Objects.equal(info, alert.info)
+                ;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + title.hashCode();
-        result = 31 * result + content.hashCode();
-        result = 31 * result + alertStatus.hashCode();
-        result = 31 * result + warningType.hashCode();
-        result = 31 * result + log.hashCode();
-        result = 31 * result + alertGroupId;
-        result = 31 * result + createTime.hashCode();
-        result = 31 * result + updateTime.hashCode();
-        result = 31 * result + info.hashCode();
-        return result;
+        return Objects.hashCode(id, sign, title, content, alertStatus, warningType, log, alertGroupId, createTime, updateTime, info);
     }
 
     @Override
     public String toString() {
-        return "Alert{"
-                + "id="
-                + id
-                + ", title='"
-                + title + '\''
-                + ", content='"
-                + content
-                + '\''
-                + ", alertStatus="
-                + alertStatus
-                + ", warningType="
-                + warningType
-                + ", log='"
-                + log
-                + '\''
-                + ", alertGroupId="
-                + alertGroupId
-                + '\''
-                + ", createTime="
-                + createTime
-                + ", updateTime="
-                + updateTime
-                + ", info="
-                + info
-                + '}';
+        return "Alert{" +
+                "id=" + id +
+                ", sign='" + sign + '\'' +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", alertStatus=" + alertStatus +
+                ", warningType=" + warningType +
+                ", log='" + log + '\'' +
+                ", alertGroupId=" + alertGroupId +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", info=" + info +
+                '}';
     }
 }

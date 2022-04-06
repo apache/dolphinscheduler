@@ -20,9 +20,6 @@ package org.apache.dolphinscheduler.dao;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +31,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @ActiveProfiles(ProfileType.H2)
 @RunWith(SpringRunner.class)
@@ -62,12 +61,12 @@ public class AlertDaoTest {
     }
 
     @Test
-    public void testSendServerStopedAlert() {
+    public void testSendServerStoppedAlert() {
         int alertGroupId = 1;
         String host = "127.0.0.998165432";
         String serverType = "Master";
-        alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
-        alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
+        alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
+        alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
         long count = alertDao.listPendingAlerts()
                              .stream()
                              .filter(alert -> alert.getContent().contains(host))

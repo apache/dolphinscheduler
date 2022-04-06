@@ -17,37 +17,32 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class AlertDao {
+
+    @Value("${alert.alarm-suppression.crash:60}")
+    private Integer crashAlarmSuppression;
+
     @Autowired
     private AlertMapper alertMapper;
 
@@ -64,6 +59,8 @@ public class AlertDao {
      * @return add alert result
      */
     public int addAlert(Alert alert) {
+        String sign = generateSign(alert);
+        alert.setSign(sign);
         return alertMapper.insert(alert);
     }
 
@@ -76,11 +73,25 @@ public class AlertDao {
      * @return update alert result
      */
     public int updateAlert(AlertStatus alertStatus, String log, int id) {
-        Alert alert = alertMapper.selectById(id);
+        Alert alert = new Alert();
+        alert.setId(id);
         alert.setAlertStatus(alertStatus);
         alert.setUpdateTime(new Date());
         alert.setLog(log);
         return alertMapper.updateById(alert);
+    }
+
+    /**
+     * 生成通知签名信息
+     * @param alert 通知实体
+     * @return 签名文本
+     */
+    private String generateSign (Alert alert) {
+        return Optional.of(alert)
+                .map(Alert::getContent)
+                .map(DigestUtils::sha1Hex)
+                .map(String::toLowerCase)
+                .orElse(StringUtils.EMPTY);
     }
 
     /**
@@ -90,7 +101,7 @@ public class AlertDao {
      * @param host host
      * @param serverType serverType
      */
-    public void sendServerStopedAlert(int alertGroupId, String host, String serverType) {
+    public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
                 type(serverType)
                 .host(host)
@@ -107,8 +118,11 @@ public class AlertDao {
         alert.setAlertGroupId(alertGroupId);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
+        alert.setSign(generateSign(alert));
         // we use this method to avoid insert duplicate alert(issue #5525)
-        alertMapper.insertAlertWhenServerCrash(alert);
+        // we modified this method to optimize performance(issue #9174)
+        Date crashAlarmSuppressionStartTime = DateTime.now().plusMinutes(-crashAlarmSuppression).toDate();
+        alertMapper.insertAlertWhenServerCrash(alert, crashAlarmSuppressionStartTime);
     }
 
     /**
@@ -148,6 +162,8 @@ public class AlertDao {
         alert.setContent(content);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
+        String sign = generateSign(alert);
+        alert.setSign(sign);
         alertMapper.insert(alert);
     }
 
@@ -230,5 +246,9 @@ public class AlertDao {
 
     public void setAlertGroupMapper(AlertGroupMapper alertGroupMapper) {
         this.alertGroupMapper = alertGroupMapper;
+    }
+
+    public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
+        this.crashAlarmSuppression = crashAlarmSuppression;
     }
 }

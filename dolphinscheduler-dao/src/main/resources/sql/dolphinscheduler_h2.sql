@@ -272,6 +272,7 @@ CREATE TABLE t_ds_alert
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
     title         varchar(64) DEFAULT NULL,
+    sign           char(40) NOT NULL DEFAULT '',
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
     warning_type  tinyint(4) DEFAULT '2',
@@ -279,7 +280,8 @@ CREATE TABLE t_ds_alert
     alertgroup_id int(11) DEFAULT NULL,
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    KEY            idx_sign (sign)
 );
 
 -- ----------------------------
