@@ -163,7 +163,7 @@ jobs:
           if [[ ${{ needs.e2e.result }} == 'success' ]]; then
             echo "Passed!"
           elif [[ ${{ needs.paths-filter.outputs.ignore }} == 'true' ]]; then
-            echo "Skip ${{ name }}"
+            echo "Skip ${{ result.name }}"
           else
             exit -1
           fi
