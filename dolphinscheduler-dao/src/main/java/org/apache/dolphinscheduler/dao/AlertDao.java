@@ -86,9 +86,10 @@ public class AlertDao {
     }
 
     /**
-     * 生成通知签名信息
-     * @param alert 通知实体
-     * @return 签名文本
+     * generate sign for alert
+     *
+     * @param alert alert
+     * @return sign's str
      */
     private String generateSign (Alert alert) {
         return Optional.of(alert)
