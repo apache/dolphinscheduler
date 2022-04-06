@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -58,6 +60,9 @@ public class AlertDao {
     @Autowired
     private AlertGroupMapper alertGroupMapper;
 
+    @Autowired
+    private AlertSendStatusMapper alertSendStatusMapper;
+
     /**
      * insert alert
      *
@@ -82,6 +87,25 @@ public class AlertDao {
         alert.setUpdateTime(new Date());
         alert.setLog(log);
         return alertMapper.updateById(alert);
+    }
+
+    /**
+     * add AlertSendStatus
+     *
+     * @param sendStatus alert send status
+     * @param log log
+     * @param alertId alert id
+     * @param alertPluginInstanceId alert plugin instance id
+     * @return insert count
+     */
+    public int addAlertSendStatus(AlertStatus sendStatus, String log, int alertId, int alertPluginInstanceId) {
+        AlertSendStatus alertSendStatus = new AlertSendStatus();
+        alertSendStatus.setAlertId(alertId);
+        alertSendStatus.setAlertPluginInstanceId(alertPluginInstanceId);
+        alertSendStatus.setSendStatus(sendStatus);
+        alertSendStatus.setLog(log);
+        alertSendStatus.setCreateTime(new Date());
+        return alertSendStatusMapper.insert(alertSendStatus);
     }
 
     /**
