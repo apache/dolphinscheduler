@@ -40,7 +40,7 @@ jobs:
         with:
           filters: |
             not-ignore:
-              - '!(docs/**|.github/**)'
+              - '!(docs/**)'
   build:
     name: E2E-Build
     needs: paths-filter
