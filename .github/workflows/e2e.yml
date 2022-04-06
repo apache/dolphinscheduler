@@ -155,12 +155,12 @@ jobs:
     name: E2E
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ e2e ]
+    needs: [ e2e, paths-filter ]
     if: always()
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result == 'success' || needs.paths-filter.outputs.ignore == 'true' }} ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore }} == 'true' ]]; then
             echo "Passed!"
           else
             exit -1
