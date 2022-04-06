@@ -160,7 +160,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore == 'true' }} ]]; then
+          if [[ ${{ needs.e2e.result == 'success' || needs.paths-filter.outputs.ignore == 'true' }} ]]; then
             echo "Passed!"
           else
             exit -1
