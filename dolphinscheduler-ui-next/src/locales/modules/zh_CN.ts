@@ -1097,7 +1097,7 @@ const security = {
     Secret: '密钥',
     users: '群员',
     userSendMsg: '群员信息',
-    agentId: '应用ID',
+    'agentId/chatId': '应用ID或群聊ID',
     showType: '内容展示类型',
     receivers: '收件人',
     receiverCcs: '抄送人',
