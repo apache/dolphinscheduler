@@ -40,7 +40,7 @@ jobs:
         with:
           filters: |
             ignore:
-              - '(docs/**)'
+              - '(docs/**|.github/**)'
   build:
     name: E2E-Build
     needs: paths-filter
@@ -160,8 +160,10 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.e2e.result }} == 'success' || ${{ needs.paths-filter.outputs.ignore }} == 'true' ]]; then
+          if [[ ${{ needs.e2e.result }} == 'success' ]]; then
             echo "Passed!"
+          elif [[ ${{ needs.paths-filter.outputs.ignore }} == 'true' ]]; then
+            echo "Skip ${ name }"
           else
             exit -1
           fi
