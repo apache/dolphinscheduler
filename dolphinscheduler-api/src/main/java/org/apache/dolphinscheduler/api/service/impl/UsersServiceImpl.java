@@ -552,6 +552,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
+        // reset user project relation
         projectUserMapper.deleteProjectRelation(0, userId);
 
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
