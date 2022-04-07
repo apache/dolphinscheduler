@@ -17,19 +17,13 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
-
-import static java.util.stream.Collectors.toSet;
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -130,10 +124,11 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,16 +143,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
 /**
  * process relative dao that some mappers in this.
@@ -271,8 +267,8 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
-     * @param logger logger
-     * @param host host
+     * @param logger  logger
+     * @param host    host
      * @param command found command
      * @return process instance
      */
@@ -375,7 +371,7 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * set process waiting thread
      *
-     * @param command command
+     * @param command         command
      * @param processInstance processInstance
      * @return process instance
      */
@@ -622,7 +618,7 @@ public class ProcessServiceImpl implements ProcessService {
      * recursive query sub process definition id by parent id.
      *
      * @param parentCode parentCode
-     * @param ids ids
+     * @param ids        ids
      */
     @Override
     public void recurseFindSubProcess(long parentCode, List<Long> ids) {
@@ -648,7 +644,7 @@ public class ProcessServiceImpl implements ProcessService {
      * create recovery waiting thread  command and delete origin command at the same time.
      * if the recovery command is exists, only update the field update_time
      *
-     * @param originCommand originCommand
+     * @param originCommand   originCommand
      * @param processInstance processInstance
      */
     @Override
@@ -705,7 +701,7 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * get schedule time from command
      *
-     * @param command command
+     * @param command  command
      * @param cmdParam cmdParam map
      * @return date
      */
@@ -734,8 +730,8 @@ public class ProcessServiceImpl implements ProcessService {
      * generate a new work process instance from command.
      *
      * @param processDefinition processDefinition
-     * @param command command
-     * @param cmdParam cmdParam map
+     * @param command           command
+     * @param cmdParam          cmdParam map
      * @return process instance
      */
     private ProcessInstance generateNewProcessInstance(ProcessDefinition processDefinition,
@@ -820,7 +816,7 @@ public class ProcessServiceImpl implements ProcessService {
      * use definition creator's tenant.
      *
      * @param tenantId tenantId
-     * @param userId userId
+     * @param userId   userId
      * @return tenant
      */
     @Override
@@ -860,7 +856,7 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * check command parameters is valid
      *
-     * @param command command
+     * @param command  command
      * @param cmdParam cmdParam map
      * @return whether command param is valid
      */
@@ -880,7 +876,7 @@ public class ProcessServiceImpl implements ProcessService {
      * construct process instance according to one command.
      *
      * @param command command
-     * @param host host
+     * @param host    host
      * @return process instance
      */
     protected ProcessInstance constructProcessInstance(Command command, String host) {
@@ -1059,7 +1055,7 @@ public class ProcessServiceImpl implements ProcessService {
      * return complement data if the process start with complement data
      *
      * @param processInstance processInstance
-     * @param command command
+     * @param command         command
      * @return command type
      */
     private CommandType getCommandTypeIfComplement(ProcessInstance processInstance, Command command) {
@@ -1074,8 +1070,8 @@ public class ProcessServiceImpl implements ProcessService {
      * initialize complement data parameters
      *
      * @param processDefinition processDefinition
-     * @param processInstance processInstance
-     * @param cmdParam cmdParam
+     * @param processInstance   processInstance
+     * @param cmdParam          cmdParam
      */
     private void initComplementDataParam(ProcessDefinition processDefinition,
                                          ProcessInstance processInstance,
@@ -1149,7 +1145,7 @@ public class ProcessServiceImpl implements ProcessService {
      * only the keys doesn't in sub process global would be joined.
      *
      * @param parentGlobalParams parentGlobalParams
-     * @param subGlobalParams subGlobalParams
+     * @param subGlobalParams    subGlobalParams
      * @return global params join
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams) {
@@ -1217,7 +1213,7 @@ public class ProcessServiceImpl implements ProcessService {
      * submit sub process to command
      *
      * @param processInstance processInstance
-     * @param taskInstance taskInstance
+     * @param taskInstance    taskInstance
      * @return task instance
      */
     @Override
@@ -1249,7 +1245,7 @@ public class ProcessServiceImpl implements ProcessService {
      * set map {parent instance id, task instance id, 0(child instance id)}
      *
      * @param parentInstance parentInstance
-     * @param parentTask parentTask
+     * @param parentTask     parentTask
      * @return process instance map
      */
     private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask) {
@@ -1278,7 +1274,7 @@ public class ProcessServiceImpl implements ProcessService {
      * find previous task work process map.
      *
      * @param parentProcessInstance parentProcessInstance
-     * @param parentTask parentTask
+     * @param parentTask            parentTask
      * @return process instance map
      */
     private ProcessInstanceMap findPreviousTaskProcessMap(ProcessInstance parentProcessInstance,
@@ -1304,7 +1300,7 @@ public class ProcessServiceImpl implements ProcessService {
      * create sub work process command
      *
      * @param parentProcessInstance parentProcessInstance
-     * @param task task
+     * @param task                  task
      */
     @Override
     public void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task) {
@@ -1441,7 +1437,7 @@ public class ProcessServiceImpl implements ProcessService {
      * update sub process definition
      *
      * @param parentProcessInstance parentProcessInstance
-     * @param childDefinitionCode childDefinitionId
+     * @param childDefinitionCode   childDefinitionId
      */
     private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, long childDefinitionCode) {
         ProcessDefinition fatherDefinition = this.findProcessDefinition(parentProcessInstance.getProcessDefinitionCode(),
@@ -1456,7 +1452,7 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * submit task to mysql
      *
-     * @param taskInstance taskInstance
+     * @param taskInstance    taskInstance
      * @param processInstance processInstance
      * @return task instance
      */
@@ -1493,7 +1489,7 @@ public class ProcessServiceImpl implements ProcessService {
      * return stop if work process state is ready stop
      * if all of above are not satisfied, return submit success
      *
-     * @param taskInstance taskInstance
+     * @param taskInstance    taskInstance
      * @param processInstance processInstance
      * @return process instance state
      */
@@ -1730,7 +1726,7 @@ public class ProcessServiceImpl implements ProcessService {
      * get id list by task state
      *
      * @param instanceId instanceId
-     * @param state state
+     * @param state      state
      * @return task instance states
      */
     @Override
@@ -1790,7 +1786,7 @@ public class ProcessServiceImpl implements ProcessService {
      * find work process map by parent process id and parent task id.
      *
      * @param parentWorkProcessId parentWorkProcessId
-     * @param parentTaskId parentTaskId
+     * @param parentTaskId        parentTaskId
      * @return process instance map
      */
     @Override
@@ -1814,7 +1810,7 @@ public class ProcessServiceImpl implements ProcessService {
      * find sub process instance
      *
      * @param parentProcessId parentProcessId
-     * @param parentTaskId parentTaskId
+     * @param parentTaskId    parentTaskId
      * @return process instance
      */
     @Override
@@ -2024,7 +2020,7 @@ public class ProcessServiceImpl implements ProcessService {
      * update process instance state by id
      *
      * @param processInstanceId processInstanceId
-     * @param executionStatus executionStatus
+     * @param executionStatus   executionStatus
      * @return update process result
      */
     @Override
@@ -2063,7 +2059,7 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * find tenant code by resource name
      *
-     * @param resName resource name
+     * @param resName      resource name
      * @param resourceType resource type
      * @return tenant code
      */
@@ -2103,7 +2099,7 @@ public class ProcessServiceImpl implements ProcessService {
      * find last scheduler process instance in the date interval
      *
      * @param definitionCode definitionCode
-     * @param dateInterval dateInterval
+     * @param dateInterval   dateInterval
      * @return process instance
      */
     @Override
@@ -2117,7 +2113,7 @@ public class ProcessServiceImpl implements ProcessService {
      * find last manual process instance interval
      *
      * @param definitionCode process definition code
-     * @param dateInterval dateInterval
+     * @param dateInterval   dateInterval
      * @return process instance
      */
     @Override
@@ -2131,8 +2127,8 @@ public class ProcessServiceImpl implements ProcessService {
      * find last running process instance
      *
      * @param definitionCode process definition code
-     * @param startTime start time
-     * @param endTime end time
+     * @param startTime      start time
+     * @param endTime        end time
      * @return process instance
      */
     @Override
@@ -2221,7 +2217,7 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * list unauthorized udf function
      *
-     * @param userId user id
+     * @param userId     user id
      * @param needChecks data source id array
      * @return unauthorized udf function list
      */
@@ -2648,7 +2644,7 @@ public class ProcessServiceImpl implements ProcessService {
      * add authorized resources
      *
      * @param ownResources own resources
-     * @param userId userId
+     * @param userId       userId
      */
     private void addAuthorizedResources(List<Resource> ownResources, int userId) {
         List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
@@ -2935,11 +2931,11 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * insert into task group queue
      *
-     * @param taskId task id
-     * @param taskName task name
-     * @param groupId group id
+     * @param taskId    task id
+     * @param taskName  task name
+     * @param groupId   group id
      * @param processId process id
-     * @param priority priority
+     * @param priority  priority
      * @return result and msg code
      */
     @Override
