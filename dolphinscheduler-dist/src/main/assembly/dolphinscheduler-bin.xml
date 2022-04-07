@@ -51,11 +51,6 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-python/target/python-gateway-server</directory>
-            <outputDirectory>python-gateway-server</outputDirectory>
-        </fileSet>
-
-        <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
             <outputDirectory>standalone-server</outputDirectory>
             <excludes>

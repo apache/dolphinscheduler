@@ -28,7 +28,8 @@ public enum AlertStatus {
      */
     WAIT_EXECUTION(0, "waiting executed"),
     EXECUTION_SUCCESS(1, "execute successfully"),
-    EXECUTION_FAILURE(2, "execute failed");
+    EXECUTION_FAILURE(2, "execute failed"),
+    EXECUTION_PARTIAL_SUCCESS(3, "execute partial successfully");
 
     AlertStatus(int code, String descp) {
         this.code = code;

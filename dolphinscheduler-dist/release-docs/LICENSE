@@ -607,7 +607,7 @@ MIT licenses
     date-fns 2.28.0: https://github.com/date-fns/date-fns MIT
     lodash 4.17.21: https://github.com/lodash/lodash MIT
     monaco-editor 0.31.1: https://github.com/microsoft/monaco-editor MIT
-    naive-ui 2.26.0: https://github.com/TuSimple/naive-ui MIT
+    naive-ui 2.27.0: https://github.com/TuSimple/naive-ui MIT
     nprogress 0.2.0: https://github.com/rstacruz/nprogress MIT
     pinia 2.0.11: https://github.com/vuejs/pinia MIT
     pinia-plugin-persistedstate 1.2.2: https://github.com/prazdevs/pinia-plugin-persistedstate MIT

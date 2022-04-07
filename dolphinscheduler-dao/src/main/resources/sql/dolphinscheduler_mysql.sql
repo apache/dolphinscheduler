@@ -1911,3 +1911,18 @@ CREATE TABLE `t_ds_relation_namespace_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+  `id`                            int(11) NOT NULL AUTO_INCREMENT,
+  `alert_id`                      int(11) NOT NULL,
+  `alert_plugin_instance_id`      int(11) NOT NULL,
+  `send_status`                   tinyint(4) DEFAULT '0',
+  `log`                           text,
+  `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

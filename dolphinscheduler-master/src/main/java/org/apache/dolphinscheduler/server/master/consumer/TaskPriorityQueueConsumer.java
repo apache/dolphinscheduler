@@ -186,8 +186,10 @@ public class TaskPriorityQueueConsumer extends Thread {
             if (result) {
                 addDispatchEvent(context, executionContext);
             }
-        } catch (RuntimeException | ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage(), e);
+        } catch (RuntimeException e) {
+            logger.error("dispatch error: ", e);
+        } catch (ExecuteException e) {
+            logger.error("dispatch error: {}", e.getMessage());
         }
         return result;
     }

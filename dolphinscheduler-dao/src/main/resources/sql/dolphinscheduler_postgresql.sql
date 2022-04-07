@@ -1909,3 +1909,18 @@ CREATE TABLE t_ds_relation_namespace_user (
     PRIMARY KEY (id) ,
     CONSTRAINT namespace_user_unique UNIQUE (user_id,namespace_id)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+    id                           serial NOT NULL,
+    alert_id                     int NOT NULL,
+    alert_plugin_instance_id     int NOT NULL,
+    send_status                  int DEFAULT '0',
+    log                          text,
+    create_time                  timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT alert_send_status_unique UNIQUE (alert_id,alert_plugin_instance_id)
+);

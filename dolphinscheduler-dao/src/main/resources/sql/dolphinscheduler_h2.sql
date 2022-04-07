@@ -1919,6 +1919,9 @@ INSERT INTO `t_ds_k8s_namespace`
 (`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
 VALUES (3, 200, 'auth_test', 68, 3,1,100,1, 10000, 'ds_null_k8s', '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
 
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
 DROP TABLE IF EXISTS t_ds_relation_namespace_user;
 CREATE TABLE t_ds_relation_namespace_user (
     id                int(11) NOT NULL AUTO_INCREMENT ,
@@ -1929,5 +1932,21 @@ CREATE TABLE t_ds_relation_namespace_user (
     update_time       datetime DEFAULT NULL ,
     PRIMARY KEY (id) ,
     UNIQUE KEY namespace_user_unique (user_id,namespace_id)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status CASCADE;
+CREATE TABLE t_ds_alert_send_status
+(
+    id                            int NOT NULL AUTO_INCREMENT,
+    alert_id                      int NOT NULL,
+    alert_plugin_instance_id      int NOT NULL,
+    send_status                   tinyint(4) DEFAULT '0',
+    log                           text,
+    create_time                   timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
 );
 
