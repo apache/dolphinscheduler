@@ -140,29 +140,6 @@ services:
     networks:
       - dolphinscheduler
 
-  dolphinscheduler-python-gateway:
-    image: ${HUB}/dolphinscheduler-python:${TAG}
-    ports:
-      - "54321:54321"
-      - "25333:25333"
-    env_file: .env
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:54321/actuator/health" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    depends_on:
-      dolphinscheduler-schema-initializer:
-        condition: service_completed_successfully
-      dolphinscheduler-zookeeper:
-        condition: service_healthy
-    volumes:
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-      - dolphinscheduler-shared-local:/opt/soft
-      - dolphinscheduler-resource-local:/dolphinscheduler
-    networks:
-      - dolphinscheduler
-
 networks:
   dolphinscheduler:
     driver: bridge
