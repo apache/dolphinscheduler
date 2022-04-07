@@ -114,8 +114,15 @@ const TaskDefinition = defineComponent({
     }
   },
   render() {
-    const { t, onSearch, requestData, onUpdatePageSize, onRefresh, onCreate } =
-      this
+    const {
+      t,
+      onSearch,
+      requestData,
+      onUpdatePageSize,
+      onRefresh,
+      onCreate,
+      loadingRef
+    } = this
 
     return (
       <>
@@ -162,7 +169,12 @@ const TaskDefinition = defineComponent({
           </div>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
+            scrollX={this.tableWidth}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}
@@ -196,6 +208,7 @@ const TaskDefinition = defineComponent({
           projectCode={this.projectCode}
           from={1}
           readonly={this.taskReadonly}
+          saving={this.taskSaving}
         />
       </>
     )

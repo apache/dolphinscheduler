@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,21 +78,35 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             case GET_LOG_BYTES_REQUEST:
                 GetLogBytesRequestCommand getLogRequest = JSONUtils.parseObject(
                         command.getBody(), GetLogBytesRequestCommand.class);
-                byte[] bytes = getFileContentBytes(getLogRequest.getPath());
+                String path = getLogRequest.getPath();
+                if (!checkPathSecurity(path)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+                byte[] bytes = getFileContentBytes(path);
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
                 break;
             case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
                         command.getBody(), ViewLogRequestCommand.class);
-                String msg = LoggerUtils.readWholeFileContent(viewLogRequest.getPath());
+                String viewLogPath = viewLogRequest.getPath();
+                if (!checkPathSecurity(viewLogPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+                String msg = LoggerUtils.readWholeFileContent(viewLogPath);
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
             case ROLL_VIEW_LOG_REQUEST:
                 RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(
                         command.getBody(), RollViewLogRequestCommand.class);
-                List<String> lines = readPartFileContent(rollViewLogRequest.getPath(),
+
+                String rollViewLogPath = rollViewLogRequest.getPath();
+                if (!checkPathSecurity(rollViewLogPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+
+                List<String> lines = readPartFileContent(rollViewLogPath,
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
@@ -104,7 +120,9 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), RemoveTaskLogRequestCommand.class);
 
                 String taskLogPath = removeTaskLogRequest.getPath();
-
+                if (!checkPathSecurity(taskLogPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
                 File taskLogFile = new File(taskLogPath);
                 boolean status = true;
                 try {
@@ -120,6 +138,24 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 break;
             default:
                 throw new IllegalArgumentException("unknown commandType");
+        }
+    }
+
+    /**
+     * LogServer only can read the logs dir.
+     * @param path
+     * @return
+     */
+    private boolean checkPathSecurity(String path) {
+        String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
+        if (StringUtils.isBlank(dsHome)) {
+            dsHome = System.getProperty("user.dir");
+        }
+        if (StringUtils.isBlank(path)) {
+            logger.warn("path is null");
+            return false;
+        } else {
+            return path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log");
         }
     }
 

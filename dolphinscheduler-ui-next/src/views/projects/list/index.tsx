@@ -26,7 +26,7 @@ import {
   NPagination,
   NSpace
 } from 'naive-ui'
-import { defineComponent, onMounted, ref, toRefs, reactive, watch } from 'vue'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProjectModal from './components/project-modal'
 import styles from './index.module.scss'
@@ -91,7 +91,7 @@ const list = defineComponent({
     }
   },
   render() {
-    const { t } = this
+    const { t, loadingRef } = this
     return (
       <div>
         <NCard>
@@ -100,7 +100,7 @@ const list = defineComponent({
               size='small'
               onClick={this.handleModalChange}
               type='primary'
-              class='btn-create-tenant'
+              class='btn-create-project'
             >
               {t('project.list.create_project')}
             </NButton>
@@ -124,8 +124,10 @@ const list = defineComponent({
           class={styles['table-card']}
         >
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
+            scrollX={this.tableWidth}
             row-class-name='items'
           />
           <div class={styles.pagination}>

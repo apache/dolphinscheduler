@@ -29,6 +29,7 @@ export function useForm() {
       queueId: 0,
       priority: 0
     } as TaskGroupQueuePriorityUpdateReq,
+    saving: false,
     rules: {
       priority: {
         required: true,

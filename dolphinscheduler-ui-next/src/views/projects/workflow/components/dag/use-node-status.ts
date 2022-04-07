@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue'
 import { render, h, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { Graph } from '@antv/x6'
 import { tasksState } from '@/utils/common'
 import { NODE, NODE_STATUS_MARKUP } from './dag-config'
 import { queryTaskListByProcessId } from '@/service/modules/process-instances'
 import NodeStatus from '@/views/projects/workflow/components/dag/dag-node-status'
-import { IWorkflowTaskInstance } from './types'
+import type { IWorkflowTaskInstance, ITaskState } from './types'
+import type { Graph } from '@antv/x6'
+import type { Ref } from 'vue'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -40,7 +40,11 @@ export function useNodeStatus(options: Options) {
 
   const { t } = useI18n()
 
-  const setNodeStatus = (code: string, state: string, taskInstance: any) => {
+  const setNodeStatus = (
+    code: string,
+    state: ITaskState,
+    taskInstance: any
+  ) => {
     const stateProps = tasksState(t)[state]
     const node = graph.value?.getCellById(code)
     if (node) {

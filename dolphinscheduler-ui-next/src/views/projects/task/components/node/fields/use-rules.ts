@@ -80,9 +80,10 @@ export function useRules(
       field: responseItem.field,
       options: responseItem.options,
       validate: responseItem.validate,
-      props: responseItem.props
+      props: responseItem.props,
+      value: responseItem.value
     }
-    let name = responseItem.name?.replace('$t(', '').replace(')', '')
+    const name = responseItem.name?.replace('$t(', '').replace(')', '')
     item.name = name ? t(`project.node.${name}`) : ''
 
     if (responseItem.type !== 'group') {

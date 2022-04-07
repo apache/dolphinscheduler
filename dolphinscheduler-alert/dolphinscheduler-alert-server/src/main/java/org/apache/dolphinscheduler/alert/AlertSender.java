@@ -18,10 +18,12 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -32,9 +34,11 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,14 +70,28 @@ public final class AlertSender {
             alertData.setId(alert.getId())
                      .setContent(alert.getContent())
                      .setLog(alert.getLog())
-                     .setTitle(alert.getTitle());
+                     .setTitle(alert.getTitle())
+                     .setTitle(alert.getTitle())
+                     .setWarnType(alert.getWarningType().getCode());
 
+            int sendSuccessCount = 0;
             for (AlertPluginInstance instance : alertInstanceList) {
-
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
-                AlertStatus alertStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                alertDao.updateAlert(alertStatus, alertResult.getMessage(), alert.getId());
+                if (alertResult != null) {
+                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
+                    alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alert.getId(),instance.getId());
+                    if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
+                        sendSuccessCount++;
+                    }
+                }
             }
+            AlertStatus alertStatus = AlertStatus.EXECUTION_SUCCESS;
+            if (sendSuccessCount == 0) {
+                alertStatus = AlertStatus.EXECUTION_FAILURE;
+            } else if (sendSuccessCount < alertInstanceList.size()) {
+                alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
+            }
+            alertDao.updateAlert(alertStatus, "", alert.getId());
         }
 
     }
@@ -86,11 +104,12 @@ public final class AlertSender {
      * @param content content
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content) {
+    public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content , int warnType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
         alertData.setContent(content)
-                 .setTitle(title);
+                 .setTitle(title)
+                 .setWarnType(warnType);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -107,10 +126,12 @@ public final class AlertSender {
 
         for (AlertPluginInstance instance : alertInstanceList) {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
-            AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
-            sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
-            sendResponseResults.add(alertSendResponseResult);
+            if (alertResult != null) {
+                AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
+                    Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
+                sendResponseResults.add(alertSendResponseResult);
+            }
         }
 
         return new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
@@ -135,9 +156,48 @@ public final class AlertSender {
             return alertResultExtend;
         }
 
+        Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
+        String instanceWarnType = WarningType.ALL.getDescp();
+
+        if(paramsMap != null){
+            instanceWarnType = paramsMap.getOrDefault(AlertConstants.NAME_WARNING_TYPE, WarningType.ALL.getDescp());
+        }
+
+        WarningType warningType = WarningType.of(instanceWarnType);
+
+        if (warningType == null) {
+            String message = String.format("Alert Plugin %s send error : plugin warnType is null", pluginInstanceName);
+            alertResultExtend.setStatus(String.valueOf(false));
+            alertResultExtend.setMessage(message);
+            logger.error("Alert Plugin {} send error : plugin warnType is null", pluginInstanceName);
+            return alertResultExtend;
+        }
+
+        boolean sendWarning = false;
+        switch (warningType) {
+            case ALL:
+                sendWarning = true;
+                break;
+            case SUCCESS:
+                if (alertData.getWarnType() == WarningType.SUCCESS.getCode()) {
+                    sendWarning = true;
+                }
+                break;
+            case FAILURE:
+                if (alertData.getWarnType() == WarningType.FAILURE.getCode()) {
+                    sendWarning = true;
+                }
+                break;
+            default:
+        }
+
+        if (!sendWarning) {
+            logger.info("Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}", pluginInstanceName, warningType.getCode(), alertData.getWarnType());
+            return null;
+        }
+
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult;
         try {

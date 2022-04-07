@@ -89,6 +89,7 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
@@ -99,14 +100,16 @@ export default defineComponent({
         </Card>
         <Card title={t('project.workflow.workflow_instance')}>
           <NDataTable
+            loading={loadingRef}
             rowKey={(row) => row.id}
             columns={this.columns}
             data={this.tableData}
             striped
             size={'small'}
             class={styles.table}
-            scrollX={1800}
+            scrollX={this.tableWidth}
             v-model:checked-row-keys={this.checkedRowKeys}
+            row-class-name='items-workflow-instances'
           />
           <div class={styles.pagination}>
             <NPagination
@@ -129,6 +132,7 @@ export default defineComponent({
                   type='primary'
                   disabled={this.checkedRowKeys.length <= 0}
                   style='position: absolute; bottom: 10px; left: 10px;'
+                  class='btn-delete-all'
                 >
                   <NPopconfirm onPositiveClick={this.handleBatchDelete}>
                     {{

@@ -18,7 +18,15 @@
 import { defineComponent, ref, inject, PropType, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
-import { NTooltip, NIcon, NButton, NSelect, NPopover, NText } from 'naive-ui'
+import {
+  NTooltip,
+  NIcon,
+  NButton,
+  NSelect,
+  NPopover,
+  NText,
+  NTag
+} from 'naive-ui'
 import {
   SearchOutlined,
   DownloadOutlined,
@@ -40,6 +48,7 @@ import { useThemeStore } from '@/store/theme/theme'
 import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
+import { WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
   layoutToggle: {
@@ -48,12 +57,12 @@ const props = {
   },
   // If this prop is passed, it means from definition detail
   instance: {
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowInstance>,
     default: null
   },
   definition: {
     // The same as the structure responsed by the queryProcessDefinitionByCode api
-    type: Object as PropType<any>,
+    type: Object as PropType<WorkflowDefinition>,
     default: null
   }
 }
@@ -194,6 +203,12 @@ export default defineComponent({
           ></NTooltip>
         )}
         <div class={Styles['toolbar-left-part']}>
+          {route.name !== 'workflow-instance-detail' &&
+            props.definition?.processDefinition?.releaseState === 'ONLINE' && (
+              <NTag round size='small' type='info'>
+                {t('project.dag.online')}
+              </NTag>
+            )}
           {route.name === 'workflow-instance-detail' && (
             <>
               <NTooltip
@@ -462,7 +477,7 @@ export default defineComponent({
           )}
           {/* Save workflow */}
           <NButton
-            class={Styles['toolbar-right-item']}
+            class={[Styles['toolbar-right-item'], 'btn-save']}
             type='info'
             secondary
             round
@@ -473,7 +488,7 @@ export default defineComponent({
             {t('project.dag.save')}
           </NButton>
           {/* Return to previous page */}
-          <NButton secondary round onClick={onClose}>
+          <NButton secondary round onClick={onClose} class='btn-close'>
             {t('project.dag.close')}
           </NButton>
         </div>

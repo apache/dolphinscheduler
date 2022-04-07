@@ -36,6 +36,10 @@ const props = {
   chartData: {
     type: Array as PropType<Array<StateChartData>>,
     default: () => []
+  },
+  loadingRef: {
+    type: Boolean as PropType<boolean>,
+    default: false
   }
 }
 
@@ -51,9 +55,15 @@ const StateCard = defineComponent({
     return { onUpdateDatePickerValue }
   },
   render() {
-    const { title, date, tableData, chartData, onUpdateDatePickerValue } = this
+    const {
+      title,
+      date,
+      tableData,
+      chartData,
+      onUpdateDatePickerValue,
+      loadingRef
+    } = this
     const { columnsRef } = useTable()
-
     return (
       <Card title={title}>
         {{
@@ -63,6 +73,7 @@ const StateCard = defineComponent({
               <NGi>
                 {tableData && (
                   <NDataTable
+                    loading={loadingRef}
                     columns={columnsRef}
                     data={tableData}
                     striped

@@ -58,8 +58,7 @@ export function useProcedure({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -77,10 +76,9 @@ export function useProcedure({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useDatasourceType(model),
-      Fields.useDatasource(model),
+      ...Fields.useDatasource(model),
       ...Fields.useProcedure(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

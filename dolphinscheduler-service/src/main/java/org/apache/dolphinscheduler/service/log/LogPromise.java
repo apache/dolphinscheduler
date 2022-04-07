@@ -53,7 +53,7 @@ public class LogPromise {
      */
     private Object result;
 
-    public LogPromise(long opaque, long timeout){
+    public LogPromise(long opaque, long timeout) {
         this.opaque = opaque;
         this.timeout = timeout;
         this.start = System.currentTimeMillis();
@@ -61,15 +61,14 @@ public class LogPromise {
         PROMISES.put(opaque, this);
     }
 
-
     /**
      *  notify client finish
      * @param opaque unique identification
      * @param result result
      */
-    public static void notify(long opaque, Object result){
+    public static void notify(long opaque, Object result) {
         LogPromise promise = PROMISES.remove(opaque);
-        if(promise != null){
+        if (promise != null) {
             promise.doCountDown(result);
         }
     }
@@ -79,7 +78,7 @@ public class LogPromise {
      *
      * @param result result
      */
-    private void doCountDown(Object result){
+    private void doCountDown(Object result) {
         this.result = result;
         this.latch.countDown();
     }
@@ -88,7 +87,7 @@ public class LogPromise {
      *  whether timeout
      * @return timeout
      */
-    public boolean isTimeout(){
+    public boolean isTimeout() {
         return System.currentTimeMillis() - start > timeout;
     }
 
@@ -96,7 +95,7 @@ public class LogPromise {
      *  get result
      * @return
      */
-    public Object getResult(){
+    public Object getResult() {
         try {
             latch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ignore) {
@@ -105,6 +104,5 @@ public class LogPromise {
         PROMISES.remove(opaque);
         return this.result;
     }
-
 
 }

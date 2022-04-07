@@ -40,8 +40,8 @@ const ButtonLink = defineComponent({
     return () => (
       <NButton {...props} onClick={onClick} text class={styles['button-link']}>
         {{
-          default: renderSlot(slots, 'default'),
-          icon: renderSlot(slots, 'icon')
+          default: () => renderSlot(slots, 'default'),
+          icon: () => renderSlot(slots, 'icon')
         }}
       </NButton>
     )

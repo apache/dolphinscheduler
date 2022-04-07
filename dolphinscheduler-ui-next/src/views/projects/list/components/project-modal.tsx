@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from './use-form'
 import Modal from '@/components/modal'
@@ -52,6 +52,8 @@ const ProjectModal = defineComponent({
         variables.model.description = ''
       } else {
         variables.model.userName = props.row.userName
+        variables.model.projectName = props.row.name
+        variables.model.description = props.row.description
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -65,7 +67,9 @@ const ProjectModal = defineComponent({
       () => {
         if (props.statusRef === 0) {
           variables.model.projectName = ''
-          variables.model.userName = (userStore.getUserInfo as UserInfoRes).userName
+          variables.model.userName = (
+            userStore.getUserInfo as UserInfoRes
+          ).userName
           variables.model.description = ''
         } else {
           variables.model.projectName = props.row.name
@@ -99,12 +103,16 @@ const ProjectModal = defineComponent({
         onConfirm={this.confirmModal}
         onCancel={this.cancelModal}
         confirmDisabled={!this.model.projectName || !this.model.userName}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='projectFormRef'>
           <NFormItem label={t('project.list.project_name')} path='projectName'>
             <NInput
               v-model={[this.model.projectName, 'value']}
               placeholder={t('project.list.project_tips')}
+              class='input-project-name'
             />
           </NFormItem>
           <NFormItem label={t('project.list.owned_users')} path='userName'>

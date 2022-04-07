@@ -17,40 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_NAME;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_DATASOURCE_ID;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
-
+import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.SqoopJobType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
-import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
-import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
-import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
@@ -61,43 +34,60 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
+import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractResourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ConnectorType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
-import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
-import org.apache.dolphinscheduler.spi.task.dq.utils.JdbcUrlParser;
-import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Enums;
-import com.google.common.base.Strings;
-import com.zaxxer.hikari.HikariDataSource;
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -120,6 +110,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+
+    protected TaskPluginManager taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
 
     protected String threadLoggerInfoName;
 
@@ -267,11 +259,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            processService.changeTaskState(taskInstance, ExecutionStatus.FAILURE,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    null,
-                    null);
+            taskInstance.setState(ExecutionStatus.FAILURE);
+            processService.saveTaskInstance(taskInstance);
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
@@ -280,32 +269,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setResources(getResourceFullNames(taskInstance));
 
-        SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
-        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
-        ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
-        SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
+        TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
+        ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
+        this.setTaskResourceInfo(resources);
+
+        // TODO to be optimized
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
-
-        // SQL task
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setSQLTaskRelation(sqlTaskExecutionContext, taskInstance);
-        }
-
-        // DATAX task
-        if (TaskType.DATAX.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setDataxTaskRelation(dataxTaskExecutionContext, taskInstance);
-        }
-
-        // procedure task
-        if (TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setProcedureTaskRelation(procedureTaskExecutionContext, taskInstance);
-        }
-
-        if (TaskType.SQOOP.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setSqoopTaskRelation(sqoopTaskExecutionContext, taskInstance);
-        }
-
-        if (TaskType.DATA_QUALITY.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
+        if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
             setDataQualityTaskRelation(dataQualityTaskExecutionContext,taskInstance,tenant.getTenantCode());
         }
 
@@ -314,81 +284,60 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
                 .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
-                .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
-                .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
-                .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
-                .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
-                .buildDataQualityTaskRelatedInfo(dataQualityTaskExecutionContext)
+                .buildResourceParametersInfo(resources)
+                .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
                 .create();
     }
 
-    /**
-     * set procedure task relation
-     *
-     * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskInstance taskInstance) {
-        ProcedureParameters procedureParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), ProcedureParameters.class);
-        int datasourceId = procedureParameters.getDatasource();
-        DataSource datasource = processService.findDataSourceById(datasourceId);
-        procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+    private void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
+        if (Objects.isNull(resourceParametersHelper)) {
+            return;
+        }
+        resourceParametersHelper.getResourceMap().forEach((type, map) -> {
+            switch (type) {
+                case DATASOURCE:
+                    this.setTaskDataSourceResourceInfo(map);
+                    break;
+                case UDF:
+                    this.setTaskUdfFuncResourceInfo(map);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
-    /**
-     * set datax task relation
-     *
-     * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskInstance taskInstance) {
-        DataxParameters dataxParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), DataxParameters.class);
-
-        DataSource dbSource = processService.findDataSourceById(dataxParameters.getDataSource());
-        DataSource dbTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
-
-        if (dbSource != null) {
-            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-            dataxTaskExecutionContext.setSourcetype(dbSource.getType().getCode());
-            dataxTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());
+    private void setTaskDataSourceResourceInfo(Map<Integer, AbstractResourceParameters> map) {
+        if (MapUtils.isEmpty(map)) {
+            return;
         }
 
-        if (dbTarget != null) {
-            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-            dataxTaskExecutionContext.setTargetType(dbTarget.getType().getCode());
-            dataxTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());
-        }
+        map.forEach((code, parameters) -> {
+            DataSource datasource = processService.findDataSourceById(code);
+            if (Objects.isNull(datasource)) {
+                return;
+            }
+            DataSourceParameters dataSourceParameters = new DataSourceParameters();
+            dataSourceParameters.setType(datasource.getType());
+            dataSourceParameters.setConnectionParams(datasource.getConnectionParams());
+            map.put(code, dataSourceParameters);
+        });
+
     }
 
-    /**
-     * set sqoop task relation
-     *
-     * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskInstance taskInstance) {
-        SqoopParameters sqoopParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqoopParameters.class);
-
-        // sqoop job type is template set task relation
-        if (sqoopParameters.getJobType().equals(SqoopJobType.TEMPLATE.getDescp())) {
-            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
-            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
-
-            DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
-            DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
-
-            if (dataSource != null) {
-                sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
-                sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-                sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
-            }
-
-            if (dataTarget != null) {
-                sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
-                sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-                sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
-            }
+    private void setTaskUdfFuncResourceInfo(Map<Integer, AbstractResourceParameters> map) {
+        if (MapUtils.isEmpty(map)) {
+            return;
         }
+        List<UdfFunc> udfFuncList = processService.queryUdfFunListByIds(map.keySet().toArray(new Integer[map.size()]));
+
+        udfFuncList.forEach(udfFunc -> {
+            UdfFuncParameters udfFuncParameters = JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
+            udfFuncParameters.setDefaultFS(HadoopUtils.getInstance().getDefaultFS());
+            String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
+            udfFuncParameters.setTenantCode(tenantCode);
+            map.put(udfFunc.getId(), udfFuncParameters);
+        });
     }
 
     /**
@@ -429,7 +378,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // set the path used to store data quality task check error data
         dataQualityTaskExecutionContext.setHdfsPath(
-                PropertyUtils.getString(Constants.FS_DEFAULTFS)
+                PropertyUtils.getString(Constants.FS_DEFAULT_FS)
                 + PropertyUtils.getString(
                         Constants.DATA_QUALITY_ERROR_OUTPUT_PATH,
                         "/user/" + tenantCode + "/data_quality_error_data"));
@@ -583,43 +532,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * set SQL task relation
-     *
-     * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
-        SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
-        int datasourceId = sqlParameters.getDatasource();
-        DataSource datasource = processService.findDataSourceById(datasourceId);
-        sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
-
-        sqlTaskExecutionContext.setDefaultFS(HadoopUtils.getInstance().getDefaultFS());
-
-        // whether udf type
-        boolean udfTypeFlag = Enums.getIfPresent(UdfType.class, Strings.nullToEmpty(sqlParameters.getType())).isPresent()
-                && !StringUtils.isEmpty(sqlParameters.getUdfs());
-
-        if (udfTypeFlag) {
-            String[] udfFunIds = sqlParameters.getUdfs().split(",");
-            int[] udfFunIdsArray = new int[udfFunIds.length];
-            for (int i = 0; i < udfFunIds.length; i++) {
-                udfFunIdsArray[i] = Integer.parseInt(udfFunIds[i]);
-            }
-
-            List<UdfFunc> udfFuncList = processService.queryUdfFunListByIds(udfFunIdsArray);
-            UdfFuncRequest udfFuncRequest;
-            Map<UdfFuncRequest, String> udfFuncRequestMap = new HashMap<>();
-            for (UdfFunc udfFunc : udfFuncList) {
-                udfFuncRequest = JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncRequest.class);
-                String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
-                udfFuncRequestMap.put(udfFuncRequest, tenantCode);
-            }
-            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncRequestMap);
-        }
-    }
-
-    /**
      * whehter tenant is null
      *
      * @param tenant tenant
@@ -641,8 +553,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
         Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
-
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {

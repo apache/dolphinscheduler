@@ -15,71 +15,145 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryDataSourceList } from '@/service/modules/data-source'
+import { indexOf, find } from 'lodash'
 import type { IJsonItem } from '../types'
-import { TypeReq } from '@/service/modules/data-source/types'
-import { find } from 'lodash'
+import type { TypeReq } from '@/service/modules/data-source/types'
 
 export function useDatasource(
   model: { [field: string]: any },
+  supportedDatasourceType?: string[],
   field?: string
-): IJsonItem {
+): IJsonItem[] {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
-  const loading = ref(false)
-  const defaultValue = ref(null)
+  const datasourceOptions = ref([] as { label: string; value: number }[])
 
-  const getDatasources = async () => {
-    if (loading.value) return
-    loading.value = true
-    await refreshOptions()
-    loading.value = false
+  const datasourceTypes = [
+    {
+      id: 0,
+      code: 'MYSQL',
+      disabled: false
+    },
+    {
+      id: 1,
+      code: 'POSTGRESQL',
+      disabled: false
+    },
+    {
+      id: 2,
+      code: 'HIVE',
+      disabled: false
+    },
+    {
+      id: 3,
+      code: 'SPARK',
+      disabled: false
+    },
+    {
+      id: 4,
+      code: 'CLICKHOUSE',
+      disabled: false
+    },
+    {
+      id: 5,
+      code: 'ORACLE',
+      disabled: false
+    },
+    {
+      id: 6,
+      code: 'SQLSERVER',
+      disabled: false
+    },
+    {
+      id: 7,
+      code: 'DB2',
+      disabled: false
+    },
+    {
+      id: 8,
+      code: 'PRESTO',
+      disabled: false
+    },
+    {
+      id: 9,
+      code: 'REDSHIFT',
+      disabled: false
+    }
+  ]
+
+  const getDatasourceTypes = async () => {
+    options.value = datasourceTypes
+      .filter((item) => {
+        if (item.disabled) {
+          return false
+        }
+        if (supportedDatasourceType) {
+          return indexOf(supportedDatasourceType, item.code) !== -1
+        }
+        return true
+      })
+      .map((item) => ({ label: item.code, value: item.code }))
   }
 
   const refreshOptions = async () => {
     const params = { type: model.type } as TypeReq
     const res = await queryDataSourceList(params)
-    defaultValue.value = null
-    options.value = []
-
-    res.map((item: any) => {
-      options.value.push({ label: item.name, value: String(item.id) })
-    })
-    if (options.value && model.datasource) {
-      const item = find(options.value, { value: String(model.datasource) })
+    datasourceOptions.value = res.map((item: any) => ({
+      label: item.name,
+      value: item.id
+    }))
+    if (!res.length && model.datasource) model.datasource = null
+    if (res.length && model.datasource) {
+      const item = find(res, { id: model.datasource })
       if (!item) {
         model.datasource = null
       }
     }
   }
 
-  watch(
-    () => model.type,
-    () => {
-      if (model.type) {
-        refreshOptions()
+  const onChange = () => {
+    refreshOptions()
+  }
+
+  onMounted(async () => {
+    getDatasourceTypes()
+    await nextTick()
+    refreshOptions()
+  })
+  return [
+    {
+      type: 'select',
+      field: field ? field : 'type',
+      span: 12,
+      name: t('project.node.datasource_type'),
+      props: {
+        'on-update:value': onChange
+      },
+      options: options,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true
+      }
+    },
+    {
+      type: 'select',
+      field: field || 'datasource',
+      span: 12,
+      name: t('project.node.datasource_instances'),
+      options: datasourceOptions,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(unuse: any, value) {
+          if (!value && value !== 0) {
+            return Error(t('project.node.datasource_instances'))
+          }
+        }
       }
     }
-  )
-
-  onMounted(() => {
-    getDatasources()
-  })
-  return {
-    type: 'select',
-    field: field ? field : 'datasource',
-    span: 12,
-    name: t('project.node.datasource_instances'),
-    props: {
-      loading: loading
-    },
-    options: options,
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true
-    }
-  }
+  ]
 }

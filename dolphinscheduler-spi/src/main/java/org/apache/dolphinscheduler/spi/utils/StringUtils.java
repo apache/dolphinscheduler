@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SINGLE_QUOTES;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -278,10 +276,6 @@ public class StringUtils {
 
     private static String hex(char ch) {
         return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
-    }
-
-    public static String wrapperSingleQuotes(String value) {
-        return SINGLE_QUOTES + value + SINGLE_QUOTES;
     }
 
     public static String replaceDoubleBrackets(String mainParameter) {

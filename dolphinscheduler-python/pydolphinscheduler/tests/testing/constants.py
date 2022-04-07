@@ -29,6 +29,15 @@ task_without_example = {
     "procedure",
 }
 
+# The examples ignore test to run it. Those examples could not be run directly cause it need other
+# support like resource files, data source and etc. But we should try to run them later for more coverage
+ignore_exec_examples = {
+    "task_datax_example",
+    "task_flink_example",
+    "task_map_reduce_example",
+    "task_spark_example",
+}
+
 # pydolphinscheduler environment home
 ENV_PYDS_HOME = "PYDOLPHINSCHEDULER_HOME"
 

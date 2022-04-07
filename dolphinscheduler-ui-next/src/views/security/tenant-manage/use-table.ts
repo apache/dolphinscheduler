@@ -24,6 +24,11 @@ import { reactive, h, ref } from 'vue'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 
 export function useTable() {
   const { t } = useI18n()
@@ -52,32 +57,39 @@ export function useTable() {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('security.tenant.tenant_code'),
         key: 'tenantCode',
-        className: 'tenant-code'
+        className: 'tenant-code',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('security.tenant.description'),
-        key: 'description'
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('security.tenant.queue_name'),
-        key: 'queueName'
+        key: 'queueName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('security.tenant.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.tenant.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('security.tenant.actions'),
         key: 'actions',
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -145,10 +157,14 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
@@ -156,10 +172,13 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryTenantListPaging({ ...params }).then((res: any) => {
         variables.tableData = res.totalList.map((item: any, unused: number) => {
@@ -168,6 +187,7 @@ export function useTable() {
           }
         })
         variables.totalPage = res.totalPage
+        variables.loadingRef = false
       }),
       {}
     )

@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -52,18 +53,21 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.server.config.PythonGatewayConfig;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -71,15 +75,12 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 
 import py4j.GatewayServer;
-
-import org.apache.commons.collections.CollectionUtils;
 
 @SpringBootApplication
 @ComponentScan(value = "org.apache.dolphinscheduler")
@@ -142,13 +143,8 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     @Autowired
     private PythonGatewayConfig pythonGatewayConfig;
 
-    @Value("${spring.jackson.time-zone:UTC}")
-    private String timezone;
-
-    @PostConstruct
-    public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
-    }
+    @Autowired
+    private ProjectUserMapper projectUserMapper;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -201,19 +197,19 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
      * If process definition do not exists in Project=`projectCode` would create a new one
      * If process definition already exists in Project=`projectCode` would update it
      *
-     * @param userName           user name who create or update process definition
-     * @param projectName        project name which process definition belongs to
-     * @param name               process definition name
-     * @param description        description
-     * @param globalParams       global params
-     * @param schedule           schedule for process definition, will not set schedule if null,
-     *                           and if would always fresh exists schedule if not null
-     * @param locations          locations json object about all tasks
-     * @param timeout            timeout for process definition working, if running time longer than timeout,
-     *                           task will mark as fail
-     * @param workerGroup        run task in which worker group
-     * @param tenantCode         tenantCode
-     * @param taskRelationJson   relation json for nodes
+     * @param userName user name who create or update process definition
+     * @param projectName project name which process definition belongs to
+     * @param name process definition name
+     * @param description description
+     * @param globalParams global params
+     * @param schedule schedule for process definition, will not set schedule if null,
+     * and if would always fresh exists schedule if not null
+     * @param locations locations json object about all tasks
+     * @param timeout timeout for process definition working, if running time longer than timeout,
+     * task will mark as fail
+     * @param workerGroup run task in which worker group
+     * @param tenantCode tenantCode
+     * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @return create result code
      */
@@ -231,8 +227,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType) {
         User user = usersService.queryUser(userName);
-        Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
+
         ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, name);
         long processDefinitionCode;
         // create or update process definition
@@ -241,10 +238,10 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
+                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
+                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
@@ -259,8 +256,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     /**
      * get process definition
-     * @param user                  user who create or update schedule
-     * @param projectCode           project which process definition belongs to
+     *
+     * @param user user who create or update schedule
+     * @param projectCode project which process definition belongs to
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
@@ -284,11 +282,11 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
      * It would always use latest schedule define in workflow-as-code, and set schedule online when
      * it's not null
      *
-     * @param user                  user who create or update schedule
-     * @param projectCode           project which process definition belongs to
+     * @param user user who create or update schedule
+     * @param projectCode project which process definition belongs to
      * @param processDefinitionCode process definition code
-     * @param schedule              schedule expression
-     * @param workerGroup           work group
+     * @param schedule schedule expression
+     * @param workerGroup work group
      */
     private void createOrUpdateSchedule(User user,
                                         long projectCode,
@@ -301,13 +299,13 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         if (scheduleObj == null) {
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, DEFAULT_WARNING_TYPE,
-                DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                    DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, DEFAULT_WARNING_TYPE,
-                DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                    DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
         schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
     }
@@ -327,31 +325,60 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(), ReleaseState.ONLINE);
 
         executorService.execProcessInstance(user,
-            project.getCode(),
-            processDefinition.getCode(),
-            cronTime,
-            null,
-            DEFAULT_FAILURE_STRATEGY,
-            null,
-            DEFAULT_TASK_DEPEND_TYPE,
-            DEFAULT_WARNING_TYPE,
-            DEFAULT_WARNING_GROUP_ID,
-            DEFAULT_RUN_MODE,
-            DEFAULT_PRIORITY,
-            workerGroup,
-            DEFAULT_ENVIRONMENT_CODE,
-            timeout,
-            null,
-            null,
-            DEFAULT_DRY_RUN,
-            COMPLEMENT_DEPENDENT_MODE
+                project.getCode(),
+                processDefinition.getCode(),
+                cronTime,
+                null,
+                DEFAULT_FAILURE_STRATEGY,
+                null,
+                DEFAULT_TASK_DEPEND_TYPE,
+                DEFAULT_WARNING_TYPE,
+                DEFAULT_WARNING_GROUP_ID,
+                DEFAULT_RUN_MODE,
+                DEFAULT_PRIORITY,
+                workerGroup,
+                DEFAULT_ENVIRONMENT_CODE,
+                timeout,
+                null,
+                null,
+                DEFAULT_DRY_RUN,
+                COMPLEMENT_DEPENDENT_MODE
         );
     }
 
     // side object
-    public Map<String, Object> createProject(String userName, String name, String desc) {
+    /*
+      Grant project's permission to user. Use when project's created user not current but
+      Python API use it to change process definition.
+     */
+    private Integer grantProjectToUser(Project project, User user) {
+        Date now = new Date();
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setUserId(user.getId());
+        projectUser.setProjectId(project.getId());
+        projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+        projectUser.setCreateTime(now);
+        projectUser.setUpdateTime(now);
+        return projectUserMapper.insert(projectUser);
+    }
+
+    /*
+      Grant or create project. Create a new project if project do not exists, and grant the project
+      permission to user if project exists but without permission to this user.
+     */
+    public void createOrGrantProject(String userName, String name, String desc) {
         User user = usersService.queryUser(userName);
-        return projectService.createProject(user, name, desc);
+
+        Project project;
+        project = projectMapper.queryByName(name);
+        if (project == null) {
+            projectService.createProject(user, name, desc);
+        } else if (project.getUserId() != user.getId()) {
+            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
+            if (projectUser == null) {
+                grantProjectToUser(project, user);
+            }
+        }
     }
 
     public Map<String, Object> createQueue(String name, String queueName) {
@@ -432,8 +459,8 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
      * Get processDefinition by given processDefinitionName name. It return map contain processDefinition id, name, code.
      * Useful in Python API create subProcess task which need processDefinition information.
      *
-     * @param userName              user who create or update schedule
-     * @param projectName           project name which process definition belongs to
+     * @param userName user who create or update schedule
+     * @param projectName project name which process definition belongs to
      * @param processDefinitionName process definition name
      */
     public Map<String, Object> getProcessDefinitionInfo(String userName, String projectName, String processDefinitionName) {
@@ -463,9 +490,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
      * Get project, process definition, task code.
      * Useful in Python API create dependent task which need processDefinition information.
      *
-     * @param projectName           project name which process definition belongs to
+     * @param projectName project name which process definition belongs to
      * @param processDefinitionName process definition name
-     * @param taskName              task name
+     * @param taskName task name
      */
     public Map<String, Object> getDependentInfo(String projectName, String processDefinitionName, String taskName) {
         Map<String, Object> result = new HashMap<>();
@@ -499,7 +526,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
      * Useful in Python API create flink or spark task which need processDefinition information.
      *
      * @param programType program type one of SCALA, JAVA and PYTHON
-     * @param fullName    full name of the resource
+     * @param fullName full name of the resource
      */
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
@@ -525,14 +552,14 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfig.getGatewayServerAddress());
             InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfig.getPythonAddress());
             server = new GatewayServer(
-                this,
-                pythonGatewayConfig.getGatewayServerPort(),
-                pythonGatewayConfig.getPythonPort(),
-                gatewayHost,
-                pythonHost,
-                pythonGatewayConfig.getConnectTimeout(),
-                pythonGatewayConfig.getReadTimeout(),
-                null
+                    this,
+                    pythonGatewayConfig.getGatewayServerPort(),
+                    pythonGatewayConfig.getPythonPort(),
+                    gatewayHost,
+                    pythonHost,
+                    pythonGatewayConfig.getConnectTimeout(),
+                    pythonGatewayConfig.getReadTimeout(),
+                    null
             );
             GatewayServer.turnLoggingOn();
             logger.info("PythonGatewayServer started on: " + gatewayHost.toString());

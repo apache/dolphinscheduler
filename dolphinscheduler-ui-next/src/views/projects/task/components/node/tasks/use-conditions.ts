@@ -58,8 +58,7 @@ export function useConditions({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -76,7 +75,7 @@ export function useConditions({
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       ...Fields.useConditions(model),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

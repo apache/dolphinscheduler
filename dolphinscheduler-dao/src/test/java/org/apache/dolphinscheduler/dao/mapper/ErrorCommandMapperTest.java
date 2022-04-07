@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
+package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -42,7 +42,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
      * insert
      * @return ErrorCommand
      */
-    private ErrorCommand insertOne(){
+    private ErrorCommand insertOne() {
         //insertOne
         ErrorCommand errorCommand = new ErrorCommand();
         errorCommand.setId(10101);
@@ -75,7 +75,6 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
 
         errorCommand.setProcessDefinitionCode(processDefinition.getCode());
         errorCommandMapper.updateById(errorCommand);
-
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
                 null,

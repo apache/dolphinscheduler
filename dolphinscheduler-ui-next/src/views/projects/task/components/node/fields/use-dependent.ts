@@ -142,6 +142,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         label: t('project.node.this_month')
       },
       {
+        value: 'thisMonthBegin',
+        label: t('project.node.this_month_begin')
+      },
+      {
         value: 'lastMonth',
         label: t('project.node.last_month')
       },
@@ -158,12 +162,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
 
   const getProjectList = async () => {
     const result = await queryProjectCreatedAndAuthorizedByUser()
-    projectList.value = result.map(
-      (item: { code: number; name: string }) => ({
-        value: item.code,
-        label: item.name
-      })
-    )
+    projectList.value = result.map((item: { code: number; name: string }) => ({
+      value: item.code,
+      label: item.name
+    }))
     return projectList
   }
   const getProcessList = async (code: number) => {

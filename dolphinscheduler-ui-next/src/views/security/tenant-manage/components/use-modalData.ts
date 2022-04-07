@@ -34,9 +34,10 @@ export function useModalData(
       id: ref<number>(-1),
       tenantCode: ref(''),
       description: ref(''),
-      queueId: ref<number>(-1),
+      queueId: ref<number | null>(null),
       generalOptions: []
     },
+    saving: false,
     rules: {
       tenantCode: {
         required: true
@@ -47,7 +48,7 @@ export function useModalData(
     }
   })
 
-  const getListData = () => {
+  const getListData = (status: number) => {
     const { state } = useAsyncState(
       queryList().then((res: any) => {
         variables.model.generalOptions = res.map((item: any) => {
@@ -56,7 +57,9 @@ export function useModalData(
             value: item.id
           }
         })
-        variables.model.queueId = res[0].id
+        if (status === 0) {
+          variables.model.queueId = res[0].id
+        }
       }),
       {}
     )
@@ -64,14 +67,18 @@ export function useModalData(
     return state
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.tenantFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitTenantModal() : updateTenantModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.tenantFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0 ? await submitTenantModal() : await updateTenantModal()
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitTenantModal = () => {
@@ -79,13 +86,14 @@ export function useModalData(
       (unused: any) => {
         const data = {
           tenantCode: variables.model.tenantCode,
-          queueId: variables.model.queueId,
+          queueId: variables.model.queueId as number,
           description: variables.model.description
         }
         createTenant(data).then(
           (unused: any) => {
             variables.model.tenantCode = ''
             variables.model.description = ''
+            variables.model.queueId = null
             ctx.emit('confirmModal', props.showModalRef)
           },
           (unused: any) => {

@@ -37,6 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class UserE2ETest {
@@ -115,7 +117,12 @@ class UserE2ETest {
     void testEditUser() {
         UserPage page = new UserPage(browser);
 
-        page.update(user, editUser, editPassword, editEmail, editPhone);
+        new WebDriverWait(browser, 20).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
+
+        browser.navigate().refresh();
+
+        page.update(user, editUser, editEmail, editPhone, tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -125,23 +132,22 @@ class UserE2ETest {
                 .anyMatch(it -> it.contains(editUser));
         });
     }
+    
+    @Test
+    @Order(40)
+    void testDeleteUser() {
+        final UserPage page = new UserPage(browser);
 
+        page.delete(editUser);
 
-//    @Test
-//    @Order(40)
-//    void testDeleteUser() {
-//        final UserPage page = new UserPage(browser);
-//
-//        page.delete(editUser);
-//
-//        await().untilAsserted(() -> {
-//            browser.navigate().refresh();
-//
-//            assertThat(
-//                page.userList()
-//            ).noneMatch(
-//                it -> it.getText().contains(user) || it.getText().contains(editUser)
-//            );
-//        });
-//    }
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                page.userList()
+            ).noneMatch(
+                it -> it.getText().contains(user) || it.getText().contains(editUser)
+            );
+        });
+    }
 }

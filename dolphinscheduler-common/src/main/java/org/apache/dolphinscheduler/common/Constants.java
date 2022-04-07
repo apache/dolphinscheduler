@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
@@ -49,27 +49,27 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+    public static final String FORMAT_SS = "%s%s";
+    public static final String FORMAT_S_S = "%s/%s";
+    public static final String AWS_ACCESS_KEY_ID = "aws.access.key.id";
+    public static final String AWS_SECRET_ACCESS_KEY = "aws.secret.access.key";
+    public static final String AWS_REGION = "aws.region";
+    public static final String FOLDER_SEPARATOR = "/";
+
+    public static final String RESOURCE_TYPE_FILE = "resources";
+
+    public static final String RESOURCE_TYPE_UDF = "udfs";
+
+    public static final String STORAGE_S3 = "S3";
+
+    public static final String STORAGE_HDFS = "HDFS";
+
+    public static final String BUCKET_NAME = "dolphinscheduler-test";
 
     /**
      * fs.defaultFS
      */
-    public static final String FS_DEFAULTFS = "fs.defaultFS";
-
-
-    /**
-     * fs s3a endpoint
-     */
-    public static final String FS_S3A_ENDPOINT = "fs.s3a.endpoint";
-
-    /**
-     * fs s3a access key
-     */
-    public static final String FS_S3A_ACCESS_KEY = "fs.s3a.access.key";
-
-    /**
-     * fs s3a secret key
-     */
-    public static final String FS_S3A_SECRET_KEY = "fs.s3a.secret.key";
+    public static final String FS_DEFAULT_FS = "fs.defaultFS";
 
 
     /**
@@ -125,9 +125,9 @@ public final class Constants {
     /**
      * resource.view.suffixs
      */
-    public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
+    public static final String RESOURCE_VIEW_SUFFIXES = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
+    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -149,6 +149,7 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
+    public static final String AWS_END_POINT = "aws.endpoint";
     /**
      * comma ,
      */
@@ -253,7 +254,7 @@ public final class Constants {
      * user name regex
      */
     public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
-    
+
     /**
      * read permission
      */
@@ -423,7 +424,7 @@ public final class Constants {
     /**
      * process or task definition first version
      */
-    public static final int VERSION_FIRST  = 1;
+    public static final int VERSION_FIRST = 1;
 
     /**
      * date format of yyyyMMdd
@@ -494,11 +495,11 @@ public final class Constants {
     /**
      * quartz job prifix
      */
-    public static final String QUARTZ_JOB_PRIFIX = "job";
+    public static final String QUARTZ_JOB_PREFIX = "job";
     /**
      * quartz job group prifix
      */
-    public static final String QUARTZ_JOB_GROUP_PRIFIX = "jobgroup";
+    public static final String QUARTZ_JOB_GROUP_PREFIX = "jobgroup";
     /**
      * projectId
      */
@@ -583,7 +584,6 @@ public final class Constants {
     public static final long DEPENDENT_ALL_TASK_CODE = 0;
 
 
-
     /**
      * preview schedule execute count
      */
@@ -639,20 +639,22 @@ public final class Constants {
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[] {
-        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal(),
-        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-        ExecutionStatus.WAITING_THREAD.ordinal(),
-        ExecutionStatus.WAITING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[]{
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.DISPATCH.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.DELAY_EXECUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal(),
+            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+            ExecutionStatus.WAITING_THREAD.ordinal(),
+            ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
-    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+    public static final int[] RUNNING_PROCESS_STATE = new int[]{
             ExecutionStatus.RUNNING_EXECUTION.ordinal(),
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.DISPATCH.ordinal(),
             ExecutionStatus.SERIAL_WAIT.ordinal()
     };
 

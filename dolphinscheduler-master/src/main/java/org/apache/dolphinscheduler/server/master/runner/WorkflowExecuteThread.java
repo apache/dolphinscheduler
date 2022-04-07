@@ -17,18 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DependResult;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -36,20 +30,15 @@ import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -61,6 +50,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -72,9 +67,8 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,11 +84,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 
 /**
  * master exec thread,split dag
@@ -385,13 +383,15 @@ public class WorkflowExecuteThread {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.TIMEOUT);
         } else {
-            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, taskInstance.getTaskDefine());
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
         }
         return true;
     }
 
     private boolean processTimeout() {
-        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, this.processDefinition);
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, projectUser);
         return true;
     }
 
@@ -447,7 +447,6 @@ public class WorkflowExecuteThread {
 
         if (taskInstance.getState().typeIsSuccess()) {
             completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-            processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
             if (!processInstance.isBlocked()) {
                 submitPostNode(Long.toString(taskInstance.getTaskCode()));
@@ -684,8 +683,8 @@ public class WorkflowExecuteThread {
                 logger.error("task {} is not a blocking task", task.getTaskCode());
                 return false;
             }
-            BlockingParameters parameters = (BlockingParameters) TaskParametersUtils.getParameters(TaskType.BLOCKING.getDesc(),
-                task.getTaskParams());
+
+            BlockingParameters parameters = JSONUtils.parseObject(task.getTaskParams(), BlockingParameters.class);
             if (parameters.isAlertWhenBlocking()) {
                 ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
                 processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
@@ -1279,6 +1278,24 @@ public class WorkflowExecuteThread {
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
             taskInstances.add(task);
         }
+        //the end node of the branch of the dag
+        if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)){
+            TaskInstance endTaskInstance = taskInstanceMap.get(completeTaskMap.get(NumberUtils.toLong(parentNodeCode)));
+            String taskInstanceVarPool = endTaskInstance.getVarPool();
+            if(StringUtils.isNotEmpty(taskInstanceVarPool)) {
+                Set<Property> taskProperties = JSONUtils.toList(taskInstanceVarPool, Property.class)
+                        .stream().collect(Collectors.toSet());
+                String processInstanceVarPool = processInstance.getVarPool();
+                if (StringUtils.isNotEmpty(processInstanceVarPool)) {
+                    Set<Property> properties = JSONUtils.toList(processInstanceVarPool, Property.class)
+                            .stream().collect(Collectors.toSet());
+                    properties.addAll(taskProperties);
+                    processInstance.setVarPool(JSONUtils.toJsonString(properties));
+                }else{
+                    processInstance.setVarPool(JSONUtils.toJsonString(taskProperties));
+                }
+            }
+        }
 
         // if previous node success , post node submit
         for (TaskInstance task : taskInstances) {
@@ -1498,7 +1515,7 @@ public class WorkflowExecuteThread {
     private ExecutionStatus processReadyBlock() {
         if (activeTaskProcessorMaps.size() > 0) {
             for (ITaskProcessor taskProcessor : activeTaskProcessorMaps.values()) {
-                if (!TaskType.BLOCKING.getDesc().equals(taskProcessor.getType())) {
+                if (!TASK_TYPE_BLOCKING.equals(taskProcessor.getType())) {
                     taskProcessor.action(TaskAction.PAUSE);
                 }
             }
@@ -1620,7 +1637,9 @@ public class WorkflowExecuteThread {
             stateEvent.setExecutionStatus(processInstance.getState());
             stateEvent.setProcessInstanceId(this.processInstance.getId());
             stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
-            this.processStateChangeHandler(stateEvent);
+//            this.processStateChangeHandler(stateEvent);
+            // replace with `stateEvents`, make sure `WorkflowExecuteThread` can be deleted to avoid memory leaks
+            this.stateEvents.add(stateEvent);
         }
     }
 
@@ -1783,6 +1802,11 @@ public class WorkflowExecuteThread {
                     TaskInstance taskInstance = submitTaskExec(task);
                     if (taskInstance == null) {
                         this.taskFailedSubmit = true;
+                        // Remove and add to complete map and error map
+                        removeTaskFromStandbyList(task);
+                        completeTaskMap.put(task.getTaskCode(), task.getId());
+                        errorTaskMap.put(task.getTaskCode(), task.getId());
+                        logger.error("process {}, task {}, code:{} submit task failed.", task.getProcessInstanceId(), task.getName(), task.getTaskCode());
                     } else {
                         removeTaskFromStandbyList(task);
                     }

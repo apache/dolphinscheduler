@@ -86,3 +86,32 @@
     width: 86%;
   }
 }
+
+.batch-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  > div {
+    margin-right: 5px;
+  }
+}
+
+.formItem {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.workflow-name {
+  :global {
+    div:first-child {
+      width: calc(100% - 32px);
+
+      .n-button,
+      .n-button__content {
+        width: 100%;
+      }
+    }
+  }
+}

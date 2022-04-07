@@ -39,12 +39,14 @@ export function useCustomParams({
         type: 'custom-parameters',
         field: field,
         name: t(`project.node.${name}`),
+        class: 'btn-custom-parameters',
         span,
         children: [
           {
             type: 'input',
             field: 'prop',
             span: 10,
+            class: 'input-param-key',
             props: {
               placeholder: t('project.node.prop_tips'),
               maxLength: 256
@@ -71,6 +73,7 @@ export function useCustomParams({
             type: 'input',
             field: 'value',
             span: 10,
+            class: 'input-param-value',
             props: {
               placeholder: t('project.node.value_tips'),
               maxLength: 256
@@ -85,12 +88,14 @@ export function useCustomParams({
         type: 'custom-parameters',
         field: field,
         name: t(`project.node.${name}`),
+        class: 'btn-custom-parameters',
         span,
         children: [
           {
             type: 'input',
             field: 'prop',
             span: 6,
+            class: 'input-param-key',
             props: {
               placeholder: t('project.node.prop_tips'),
               maxLength: 256
@@ -131,6 +136,7 @@ export function useCustomParams({
             type: 'input',
             field: 'value',
             span: 6,
+            class: 'input-param-value',
             props: {
               placeholder: t('project.node.value_tips'),
               maxLength: 256

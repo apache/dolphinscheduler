@@ -24,17 +24,18 @@ import {
   EditOutlined,
   MinusCircleOutlined,
   CheckCircleFilled,
-  LoadingOutlined,
+  Loading3QuartersOutlined,
   PauseCircleFilled,
   ClockCircleOutlined,
   StopFilled,
   StopOutlined,
   GlobalOutlined,
-  IssuesCloseOutlined
+  IssuesCloseOutlined,
+  SendOutlined
 } from '@vicons/antd'
 import { parseISO } from 'date-fns'
 import _ from 'lodash'
-import { ITaskState } from './types'
+import { ITaskStateConfig } from './types'
 
 /**
  * Intelligent display kb m
@@ -132,66 +133,10 @@ export const stateType = (t: any) => [
     value: '',
     label: `${t('project.workflow.all_status')}`
   },
-  {
-    value: 'SUBMITTED_SUCCESS',
-    label: `${t('project.workflow.submit_success')}`
-  },
-  {
-    value: 'RUNNING_EXECUTION',
-    label: `${t('project.workflow.running')}`
-  },
-  {
-    value: 'READY_PAUSE',
-    label: `${t('project.workflow.ready_to_pause')}`
-  },
-  {
-    value: 'PAUSE',
-    label: `${t('project.workflow.pause')}`
-  },
-  {
-    value: 'READY_STOP',
-    label: `${t('project.workflow.ready_to_stop')}`
-  },
-  {
-    value: 'STOP',
-    label: `${t('project.workflow.stop')}`
-  },
-  {
-    value: 'FAILURE',
-    label: `${t('project.workflow.failed')}`
-  },
-  {
-    value: 'SUCCESS',
-    label: `${t('project.workflow.success')}`
-  },
-  {
-    value: 'NEED_FAULT_TOLERANCE',
-    label: `${t('project.workflow.need_fault_tolerance')}`
-  },
-  {
-    value: 'KILL',
-    label: `${t('project.workflow.kill')}`
-  },
-  {
-    value: 'WAITING_THREAD',
-    label: `${t('project.workflow.waiting_for_thread')}`
-  },
-  {
-    value: 'WAITING_DEPEND',
-    label: `${t('project.workflow.waiting_for_dependency_to_complete')}`
-  },
-  {
-    value: 'DELAY_EXECUTION',
-    label: `${t('project.workflow.delay_execution')}`
-  },
-  {
-    value: 'FORCED_SUCCESS',
-    label: `${t('project.workflow.forced_success')}`
-  },
-  {
-    value: 'SERIAL_WAIT',
-    label: `${t('project.workflow.serial_wait')}`
-  }
+  ...Object.entries(tasksState(t)).map(([key, item]) => ({
+    value: key,
+    label: item.desc
+  }))
 ]
 
 /**
@@ -202,15 +147,14 @@ export const stateType = (t: any) => [
  * @icon icon
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
-// TODO: Looking for a more suitable icon
-export const tasksState = (t: any): ITaskState => ({
+export const tasksState = (t: any): ITaskStateConfig => ({
   SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${t('project.workflow.submit_success')}`,
     color: '#A9A9A9',
     icon: IssuesCloseOutlined,
     isSpin: false,
-    classNames: 'submitted'
+    classNames: 'submitted_success'
   },
   RUNNING_EXECUTION: {
     id: 1,
@@ -218,7 +162,7 @@ export const tasksState = (t: any): ITaskState => ({
     color: '#0097e0',
     icon: SettingFilled,
     isSpin: true,
-    classNames: 'executing'
+    classNames: 'running_execution'
   },
   READY_PAUSE: {
     id: 2,
@@ -226,7 +170,7 @@ export const tasksState = (t: any): ITaskState => ({
     color: '#07b1a3',
     icon: SettingOutlined,
     isSpin: false,
-    classNames: 'submitted'
+    classNames: 'ready_pause'
   },
   PAUSE: {
     id: 3,
@@ -241,14 +185,16 @@ export const tasksState = (t: any): ITaskState => ({
     desc: `${t('project.workflow.ready_to_stop')}`,
     color: '#FE0402',
     icon: StopFilled,
-    isSpin: false
+    isSpin: false,
+    classNames: 'ready_stop'
   },
   STOP: {
     id: 5,
     desc: `${t('project.workflow.stop')}`,
     color: '#e90101',
     icon: StopOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'stop'
   },
   FAILURE: {
     id: 6,
@@ -271,49 +217,64 @@ export const tasksState = (t: any): ITaskState => ({
     desc: `${t('project.workflow.need_fault_tolerance')}`,
     color: '#FF8C00',
     icon: EditOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'need_fault_tolerance'
   },
   KILL: {
     id: 9,
     desc: `${t('project.workflow.kill')}`,
     color: '#a70202',
     icon: MinusCircleOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'kill'
   },
   WAITING_THREAD: {
     id: 10,
     desc: `${t('project.workflow.waiting_for_thread')}`,
     color: '#912eed',
     icon: ClockCircleOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'waiting_thread'
   },
   WAITING_DEPEND: {
     id: 11,
     desc: `${t('project.workflow.waiting_for_dependence')}`,
     color: '#5101be',
     icon: GlobalOutlined,
-    isSpin: false
+    isSpin: false,
+    classNames: 'waiting_depend'
   },
   DELAY_EXECUTION: {
     id: 12,
     desc: `${t('project.workflow.delay_execution')}`,
     color: '#5102ce',
     icon: PauseCircleFilled,
-    isSpin: false
+    isSpin: false,
+    classNames: 'delay_execution'
   },
   FORCED_SUCCESS: {
     id: 13,
     desc: `${t('project.workflow.forced_success')}`,
     color: '#5102ce',
     icon: CheckCircleFilled,
-    isSpin: false
+    isSpin: false,
+    classNames: 'forced_success'
   },
   SERIAL_WAIT: {
     id: 14,
     desc: `${t('project.workflow.serial_wait')}`,
     color: '#5102ce',
-    icon: LoadingOutlined,
-    isSpin: false
+    icon: Loading3QuartersOutlined,
+    isSpin: true,
+    classNames: 'serial_wait'
+  },
+  DISPATCH: {
+    id: 15,
+    desc: `${t('project.workflow.dispatch')}`,
+    color: '#5101be',
+    icon: SendOutlined,
+    isSpin: false,
+    classNames: 'dispatch'
   }
 })
 

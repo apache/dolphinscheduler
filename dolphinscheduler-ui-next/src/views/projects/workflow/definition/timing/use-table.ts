@@ -18,14 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import {
-  NSpace,
-  NTooltip,
-  NButton,
-  NPopconfirm,
-  NEllipsis,
-  NIcon
-} from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -38,10 +31,15 @@ import {
   DeleteOutlined,
   EditOutlined
 } from '@vicons/antd'
-import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
 import styles from '../index.module.scss'
+import type { Router } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
@@ -49,6 +47,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
@@ -56,49 +55,63 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
-    showRef: ref(false)
+    showRef: ref(false),
+    loadingRef: ref(false)
   })
+
+  const renderTime = (time: string, timeZone: string) => {
+    if (!timeZone) {
+      return time
+    }
+
+    const utc = format(new Date(time), 'zzz', {
+      timeZone
+    }).replace('GMT', 'UTC')
+    return h('span', [
+      h('span', null, time),
+      h('span', { style: 'color: #1890ff; margin-left: 5px' }, `(${utc})`)
+    ])
+  }
 
   const createColumns = (variables: any) => {
     variables.columns = [
       {
         title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'processDefinitionName',
-        width: 200,
-        render: (row: any) =>
-          h(
-            NEllipsis,
-            { style: 'max-width: 200px' },
-            {
-              default: () => row.processDefinitionName
-            }
-          )
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('project.workflow.start_time'),
-        key: 'startTime'
+        key: 'startTime',
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.startTime, row.timezoneId)
       },
       {
         title: t('project.workflow.end_time'),
-        key: 'endTime'
+        key: 'endTime',
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.endTime, row.timezoneId)
       },
       {
         title: t('project.workflow.crontab'),
-        key: 'crontab'
+        key: 'crontab',
+        width: 140
       },
       {
         title: t('project.workflow.failure_strategy'),
-        key: 'failureStrategy'
+        key: 'failureStrategy',
+        width: 140
       },
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row: any) =>
           row.releaseState === 'ONLINE'
             ? t('project.workflow.up_line')
@@ -106,16 +119,18 @@ export function useTable() {
       },
       {
         title: t('project.workflow.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        fixed: 'right',
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         className: styles.operation,
         render: (row: any) => {
           return h(NSpace, null, {
@@ -210,6 +225,9 @@ export function useTable() {
         }
       }
     ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
 
   const handleEdit = (row: any) => {
@@ -218,6 +236,8 @@ export function useTable() {
   }
 
   const getTableData = (params: ISearchParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const definitionCode = Number(
       router.currentRoute.value.params.definitionCode
     )
@@ -229,6 +249,7 @@ export function useTable() {
       variables.tableData = res.totalList.map((item: any) => {
         return { ...item }
       })
+      variables.loadingRef = false
     })
   }
 
@@ -253,15 +274,14 @@ export function useTable() {
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
-    deleteScheduleById(id, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteScheduleById(id, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
+    })
   }
 
   return {

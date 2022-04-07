@@ -227,18 +227,8 @@ export default defineComponent({
         </NRadio>
         <NRadio class={styles['crontab-list']} value={'intervalTime'}>
           <div class={styles['crontab-list-item']}>
-            <div>{t(this.timeI18n!.every)}</div>
-            <div>
-              <NInputNumber
-                defaultValue={0}
-                min={0}
-                max={59}
-                v-model:value={this.intervalStartRef}
-                onUpdateValue={this.onIntervalStart}
-              />
-            </div>
-            <div>{t(this.timeI18n!.timeCarriedOut)}</div>
-            <div>
+            <div class={styles['item-text']}>{t(this.timeI18n!.every)}</div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}
@@ -247,15 +237,26 @@ export default defineComponent({
                 onUpdateValue={this.onIntervalPerform}
               />
             </div>
-            <div>{t(this.timeI18n!.timeStart)}</div>
+            <div class={styles['item-text']}>
+              {t(this.timeI18n!.timeCarriedOut)}
+            </div>
+            <div class={styles['number-input']}>
+              <NInputNumber
+                defaultValue={0}
+                min={0}
+                max={59}
+                v-model:value={this.intervalStartRef}
+                onUpdateValue={this.onIntervalStart}
+              />
+            </div>
+            <div class={styles['item-text']}>{t(this.timeI18n!.timeStart)}</div>
           </div>
         </NRadio>
         <NRadio class={styles['crontab-list']} value={'specificTime'}>
           <div class={styles['crontab-list-item']}>
             <div>{t(this.timeI18n!.specificTime)}</div>
-            <div>
+            <div class={styles['select-input']}>
               <NSelect
-                style={{ width: '300px' }}
                 multiple
                 options={this.options}
                 placeholder={t(this.timeI18n!.specificTimeTip)}
@@ -268,7 +269,7 @@ export default defineComponent({
         <NRadio class={styles['crontab-list']} value={'cycleTime'}>
           <div class={styles['crontab-list-item']}>
             <div>{t(this.timeI18n!.cycleFrom)}</div>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}
@@ -278,7 +279,7 @@ export default defineComponent({
               />
             </div>
             <div>{t(this.timeI18n!.to)}</div>
-            <div>
+            <div class={styles['number-input']}>
               <NInputNumber
                 defaultValue={0}
                 min={0}

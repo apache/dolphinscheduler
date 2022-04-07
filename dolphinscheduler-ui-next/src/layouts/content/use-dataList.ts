@@ -16,7 +16,7 @@
  */
 
 import { reactive, h } from 'vue'
-import { NIcon } from 'naive-ui'
+import { NEllipsis, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   HomeOutlined,
@@ -48,13 +48,14 @@ import {
   BarsOutlined,
   CloudServerOutlined
 } from '@vicons/antd'
-import { useMenuStore } from '@/store/menu/menu'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
+import { timezoneList } from '@/utils/timezone'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useDataList() {
   const { t } = useI18n()
-  const menuStore = useMenuStore()
+  const route = useRoute()
   const userStore = useUserStore()
 
   const renderIcon = (icon: any) => {
@@ -72,9 +73,13 @@ export function useDataList() {
     }
   ]
 
+  const timezoneOptions = () =>
+    timezoneList.map((item) => ({ label: item, value: item }))
+
   const state = reactive({
     isShowSide: false,
     localesOptions,
+    timezoneOptions: timezoneOptions(),
     userDropdownOptions: [],
     menuOptions: [],
     headerMenuOptions: [],
@@ -82,20 +87,21 @@ export function useDataList() {
   })
 
   const changeMenuOption = (state: any) => {
+    const projectCode = route.params.projectCode || ''
     state.menuOptions = [
       {
-        label: t('menu.home'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.home') }),
         key: 'home',
         icon: renderIcon(HomeOutlined)
       },
       {
-        label: t('menu.project'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.project') }),
         key: 'projects',
         icon: renderIcon(ProfileOutlined),
         children: [
           {
             label: t('menu.project_overview'),
-            key: `/projects/${menuStore.getProjectCode}`,
+            key: `/projects/${projectCode}`,
             icon: renderIcon(FundProjectionScreenOutlined)
           },
           {
@@ -105,15 +111,15 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.workflow_relation'),
-                key: `/projects/${menuStore.getProjectCode}/workflow/relation`
+                key: `/projects/${projectCode}/workflow/relation`
               },
               {
                 label: t('menu.workflow_definition'),
-                key: `/projects/${menuStore.getProjectCode}/workflow-definition`
+                key: `/projects/${projectCode}/workflow-definition`
               },
               {
                 label: t('menu.workflow_instance'),
-                key: `/projects/${menuStore.getProjectCode}/workflow/instances`
+                key: `/projects/${projectCode}/workflow/instances`
               }
             ]
           },
@@ -124,18 +130,18 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_definition'),
-                key: `/projects/${menuStore.getProjectCode}/task/definitions`
+                key: `/projects/${projectCode}/task/definitions`
               },
               {
                 label: t('menu.task_instance'),
-                key: `/projects/${menuStore.getProjectCode}/task/instances`
+                key: `/projects/${projectCode}/task/instances`
               }
             ]
           }
         ]
       },
       {
-        label: t('menu.resources'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.resources') }),
         key: 'resource',
         icon: renderIcon(FolderOutlined),
         children: [
@@ -177,7 +183,8 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.data_quality'),
+        label: () =>
+          h(NEllipsis, null, { default: () => t('menu.data_quality') }),
         key: 'data-quality',
         icon: renderIcon(ContainerOutlined),
         children: [
@@ -194,13 +201,14 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.datasource'),
+        label: () =>
+          h(NEllipsis, null, { default: () => t('menu.datasource') }),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
         children: []
       },
       {
-        label: t('menu.monitor'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.monitor') }),
         key: 'monitor',
         icon: renderIcon(DesktopOutlined),
         children: [
@@ -241,7 +249,7 @@ export function useDataList() {
         ]
       },
       {
-        label: t('menu.security'),
+        label: () => h(NEllipsis, null, { default: () => t('menu.security') }),
         key: 'security',
         icon: renderIcon(SafetyCertificateOutlined),
         children:

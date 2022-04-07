@@ -16,13 +16,18 @@
  */
 
 import { ref, onMounted, watch } from 'vue'
-import type { Ref } from 'vue'
-import type { Graph } from '@antv/x6'
-import type { Coordinate, NodeData } from './types'
+import { remove } from 'lodash'
 import { TaskType } from '@/views/projects/task/constants/task-type'
 import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
-import { WorkflowDefinition } from './types'
+import type { Ref } from 'vue'
+import type { Graph } from '@antv/x6'
+import type {
+  Coordinate,
+  NodeData,
+  WorkflowDefinition,
+  EditWorkflowDefinition
+} from './types'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -36,11 +41,24 @@ interface Options {
  */
 export function useTaskEdit(options: Options) {
   const { graph, definition } = options
-  const { addNode, setNodeName } = useCellUpdate({ graph })
+  const {
+    addNode,
+    removeNode,
+    getSources,
+    getTargets,
+    setNodeName,
+    setNodeEdge
+  } = useCellUpdate({
+    graph
+  })
+  const processDefinition = ref(
+    definition?.value || {
+      processDefinition: {},
+      processTaskRelationList: [],
+      taskDefinitionList: []
+    }
+  ) as Ref<EditWorkflowDefinition>
 
-  const taskDefinitions = ref<NodeData[]>(
-    definition.value?.taskDefinitionList || []
-  )
   const currTask = ref<NodeData>({
     taskType: 'SHELL',
     code: 0,
@@ -53,7 +71,7 @@ export function useTaskEdit(options: Options) {
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
     addNode(code + '', type, '', 'YES', coordinate)
-    taskDefinitions.value.push({
+    processDefinition.value.taskDefinitionList.push({
       code,
       taskType: type,
       name: ''
@@ -73,7 +91,9 @@ export function useTaskEdit(options: Options) {
     coordinate: Coordinate
   ) {
     addNode(code + '', type, name, flag, coordinate)
-    const definition = taskDefinitions.value.find((t) => t.code === targetCode)
+    const definition = processDefinition.value.taskDefinitionList.find(
+      (t) => t.code === targetCode
+    )
 
     const newDefinition = {
       ...definition,
@@ -81,7 +101,7 @@ export function useTaskEdit(options: Options) {
       name
     } as NodeData
 
-    taskDefinitions.value.push(newDefinition)
+    processDefinition.value.taskDefinitionList.push(newDefinition)
   }
 
   /**
@@ -89,9 +109,17 @@ export function useTaskEdit(options: Options) {
    * @param {number} code
    */
   function removeTasks(codes: number[]) {
-    taskDefinitions.value = taskDefinitions.value.filter(
-      (task) => !codes.includes(task.code)
-    )
+    processDefinition.value.taskDefinitionList =
+      processDefinition.value.taskDefinitionList.filter(
+        (task) => !codes.includes(task.code)
+      )
+    codes.forEach((code: number) => {
+      remove(
+        processDefinition.value.processTaskRelationList,
+        (process) =>
+          process.postTaskCode === code || process.preTaskCode === code
+      )
+    })
   }
 
   function openTaskModal(task: NodeData) {
@@ -104,10 +132,14 @@ export function useTaskEdit(options: Options) {
    * @param {number} code
    */
   function editTask(code: number) {
-    const definition = taskDefinitions.value.find((t) => t.code === code)
+    const definition = processDefinition.value.taskDefinitionList.find(
+      (t) => t.code === code
+    )
     if (definition) {
       currTask.value = definition
     }
+    updatePreTasks(getSources(String(code)), code)
+    updatePostTasks(code)
     taskModalVisible.value = true
   }
 
@@ -119,18 +151,22 @@ export function useTaskEdit(options: Options) {
   function taskConfirm({ data }: any) {
     const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
     // override target config
-    taskDefinitions.value = taskDefinitions.value.map((task) => {
-      if (task.code === currTask.value?.code) {
-        setNodeName(task.code + '', taskDef.name)
-        return {
-          ...taskDef,
-          version: task.version,
-          code: task.code,
-          taskType: currTask.value.taskType
+    processDefinition.value.taskDefinitionList =
+      processDefinition.value.taskDefinitionList.map((task) => {
+        if (task.code === currTask.value?.code) {
+          setNodeName(task.code + '', taskDef.name)
+
+          setNodeEdge(String(task.code), data.preTasks)
+          updatePreTasks(data.preTasks, task.code)
+          return {
+            ...taskDef,
+            version: task.version,
+            code: task.code,
+            taskType: currTask.value.taskType
+          }
         }
-      }
-      return task
-    })
+        return task
+      })
     taskModalVisible.value = false
   }
 
@@ -139,6 +175,56 @@ export function useTaskEdit(options: Options) {
    */
   function taskCancel() {
     taskModalVisible.value = false
+    if (!currTask.value.name) {
+      removeNode(String(currTask.value.code))
+      remove(
+        processDefinition.value.taskDefinitionList,
+        (task) => task.code === currTask.value.code
+      )
+    }
+  }
+
+  function updatePreTasks(preTasks: number[], code: number) {
+    if (processDefinition.value?.processTaskRelationList?.length) {
+      remove(
+        processDefinition.value.processTaskRelationList,
+        (process) => process.postTaskCode === code
+      )
+    }
+    if (!preTasks?.length) return
+    preTasks.forEach((task) => {
+      processDefinition.value?.processTaskRelationList.push({
+        postTaskCode: code,
+        preTaskCode: task,
+        name: '',
+        preTaskVersion: 1,
+        postTaskVersion: 1,
+        conditionType: 'NONE',
+        conditionParams: {}
+      })
+    })
+  }
+
+  function updatePostTasks(code: number) {
+    const targets = getTargets(String(code))
+    targets.forEach((target: number) => {
+      if (
+        !processDefinition.value?.processTaskRelationList.find(
+          (relation) =>
+            relation.postTaskCode === target && relation.preTaskCode === code
+        )
+      ) {
+        processDefinition.value?.processTaskRelationList.push({
+          postTaskCode: target,
+          preTaskCode: code,
+          name: '',
+          preTaskVersion: 1,
+          postTaskVersion: 1,
+          conditionType: 'NONE',
+          conditionParams: {}
+        })
+      }
+    })
   }
 
   onMounted(() => {
@@ -151,18 +237,18 @@ export function useTaskEdit(options: Options) {
   })
 
   watch(definition, () => {
-    taskDefinitions.value = definition.value?.taskDefinitionList || []
+    if (definition.value) processDefinition.value = definition.value
   })
 
   return {
     currTask,
     taskModalVisible,
+    processDefinition,
     taskConfirm,
     taskCancel,
     appendTask,
     editTask,
     copyTask,
-    taskDefinitions,
     removeTasks
   }
 }

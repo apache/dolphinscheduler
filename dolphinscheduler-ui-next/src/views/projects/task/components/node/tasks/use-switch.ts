@@ -58,8 +58,7 @@ export function useSwitch({
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName,
-        code: data?.code
+        processName: data?.processName
       })
     ]
   }
@@ -78,7 +77,7 @@ export function useSwitch({
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useSwitch(model, projectCode),
-      Fields.usePreTasks(model)
+      Fields.usePreTasks()
     ] as IJsonItem[],
     model
   }

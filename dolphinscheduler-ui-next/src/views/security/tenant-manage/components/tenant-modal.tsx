@@ -57,7 +57,7 @@ const TenantModal = defineComponent({
     watch(
       () => props.showModalRef,
       () => {
-        props.showModalRef && getListData()
+        props.showModalRef && getListData(props.statusRef)
       }
     )
 
@@ -67,6 +67,7 @@ const TenantModal = defineComponent({
         if (props.statusRef === 0) {
           variables.model.tenantCode = ''
           variables.model.description = ''
+          variables.model.queueId = null
         } else {
           variables.model.id = props.row.id
           variables.model.tenantCode = props.row.tenantCode
@@ -103,6 +104,7 @@ const TenantModal = defineComponent({
           onConfirm={this.confirmModal}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (
@@ -110,8 +112,6 @@ const TenantModal = defineComponent({
                 model={this.model}
                 rules={this.rules}
                 ref='tenantFormRef'
-                label-placement='left'
-                label-width={140}
                 require-mark-placement='left'
                 size='small'
                 style="{ maxWidth: '240px' }"

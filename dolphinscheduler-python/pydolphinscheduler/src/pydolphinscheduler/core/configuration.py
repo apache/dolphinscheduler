@@ -53,7 +53,7 @@ def init_config_file() -> None:
             "in %s, if you wan to overwrite the exists configure please remove the exists file manually.",
             str(config_path()),
         )
-    file.write(content=get_configs().to_string(), to_path=str(config_path()))
+    file.write(content=str(get_configs()), to_path=str(config_path()))
 
 
 def get_single_config(key: str) -> Any:
@@ -115,7 +115,7 @@ def set_single_config(key: str, value: Any) -> None:
             "Configuration path %s do not exists. Can not set configuration.", key
         )
     config[key] = value
-    file.write(content=config.to_string(), to_path=str(config_path()), overwrite=True)
+    file.write(content=str(config), to_path=str(config_path()), overwrite=True)
 
 
 # Start Common Configuration Settings
@@ -134,8 +134,8 @@ JAVA_GATEWAY_AUTO_CONVERT = configs.get_bool("java_gateway.auto_convert")
 USER_NAME = configs.get("default.user.name")
 USER_PASSWORD = configs.get("default.user.password")
 USER_EMAIL = configs.get("default.user.email")
-USER_PHONE = configs.get("default.user.phone")
-USER_STATE = configs.get("default.user.state")
+USER_PHONE = str(configs.get("default.user.phone"))
+USER_STATE = configs.get_int("default.user.state")
 
 # Workflow Settings
 WORKFLOW_PROJECT = configs.get("default.workflow.project")

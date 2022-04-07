@@ -35,7 +35,8 @@ export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
     pageSize: ref(10),
     state: ref(null),
     searchVal: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const columns: TableColumns<any> = [
@@ -97,6 +98,8 @@ export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
   ]
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -135,6 +138,8 @@ export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
             ruleTypeName: ruleTypeName
           }
         }) as any
+
+        variables.loadingRef = false
       }),
       {}
     )

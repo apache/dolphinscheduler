@@ -103,7 +103,10 @@ const home = {
   waiting_depend: '等待依赖完成',
   delay_execution: '延时执行',
   forced_success: '强制成功',
-  serial_wait: '串行等待'
+  serial_wait: '串行等待',
+  dispatch: '派发',
+  ready_block: '准备阻断',
+  block: '阻断'
 }
 
 const password = {
@@ -135,7 +138,9 @@ const profile = {
   phone_tips: '请输入手机号',
   state_tips: '请选择状态',
   enable: '启用',
-  disable: '禁用'
+  disable: '禁用',
+  timezone_success: '时区更新成功',
+  please_select_timezone: '请选择时区'
 }
 
 const monitor = {
@@ -147,7 +152,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    master_no_data_result_title: 'Master节点不存在',
+    master_no_data_result_desc:
+      '目前没有任何Master节点，请先创建Master节点，再访问该页面'
   },
   worker: {
     cpu_usage: '处理器使用量',
@@ -157,7 +165,10 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录'
+    directory: '注册目录',
+    worker_no_data_result_title: 'Worker节点不存在',
+    worker_no_data_result_desc:
+      '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'
   },
   db: {
     health_state: '健康状态',
@@ -279,7 +290,9 @@ const resource = {
     enter_select_udf_resources_directory_tips: '请选择UDF资源目录',
     enter_instructions_tips: '请输入使用说明',
     enter_name_tips: '请输入名称',
-    enter_description_tips: '请输入描述'
+    enter_description_tips: '请输入描述',
+    upload: '上传',
+    upload_udf_resources: '上传UDF资源'
   },
   task_group_option: {
     manage: '任务组管理',
@@ -313,8 +326,8 @@ const resource = {
     task_name: '任务名称',
     task_group_name: '任务组名称',
     project_name: '项目名称',
-    process_name: '工作流名称',
-    process_instance_name: '工作流实例',
+    workflow_name: '工作流名称',
+    workflow_instance_name: '工作流实例',
     queue: '任务组队列',
     priority: '组内优先级',
     priority_be_a_number: '优先级必须是大于等于0的数值',
@@ -399,6 +412,7 @@ const project = {
     tree_view: '工作流树形图',
     tree_limit: '限制大小',
     export: '导出',
+    batch_copy: '批量复制',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',
@@ -480,6 +494,7 @@ const project = {
     delay_execution: '延时执行',
     forced_success: '强制成功',
     serial_wait: '串行等待',
+    dispatch: '派发',
     executing: '正在执行',
     startup_type: '启动类型',
     complement_range: '补数范围',
@@ -502,9 +517,18 @@ const project = {
     cancel_full_screen: '取消全屏',
     task_state: '任务状态',
     mode_of_dependent: '依赖模式',
-    open: '打开'
+    open: '打开',
+    project_name_required: '项目名称必填',
+    related_items: '关联项目',
+    project_name: '项目名称',
+    project_tips: '请选择项目',
+    workflow_relation_no_data_result_title: '工作流关系不存在',
+    workflow_relation_no_data_result_desc:
+      '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    online: '已上线',
+    offline: '已下线',
     task_name: '任务名称',
     task_type: '任务类型',
     create_task: '创建任务',
@@ -535,22 +559,9 @@ const project = {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?',
-    submitted_success: '提交成功',
-    running_execution: '正在运行',
-    ready_pause: '准备暂停',
-    pause: '暂停',
-    ready_stop: '准备停止',
-    stop: '停止',
-    failure: '失败',
-    success: '成功',
-    need_fault_tolerance: '需要容错',
-    kill: 'KILL',
-    waiting_thread: '等待线程',
-    waiting_depend: '等待依赖完成',
-    delay_execution: '延时执行',
-    forced_success: '强制成功',
     view_log: '查看日志',
-    download_log: '下载日志'
+    download_log: '下载日志',
+    refresh: '刷新'
   },
   dag: {
     create: '创建工作流',
@@ -572,6 +583,12 @@ const project = {
     description: '描述',
     tenant: '租户',
     timeout_alert: '超时告警',
+    process_execute_type: '执行策略',
+    parallel: '并行',
+    serial_wait: '串行等待',
+    serial_discard: '串行抛弃',
+    serial_priority: '串行优先',
+    recover_serial_wait: '串行恢复',
     global_variables: '全局变量',
     basic_info: '基本信息',
     minute: '分',
@@ -580,6 +597,7 @@ const project = {
     success: '成功',
     delete_cell: '删除选中的线或节点',
     online_directly: '是否上线流程定义',
+    update_directly: '是否更新流程定义',
     dag_name_empty: 'DAG图名称不能为空',
     positive_integer: '请输入大于 0 的正整数',
     prop_empty: '自定义参数prop不能为空',
@@ -587,7 +605,8 @@ const project = {
     node_not_created: '未创建节点保存失败',
     copy_name: '复制名称',
     view_variables: '查看变量',
-    startup_parameter: '启动参数'
+    startup_parameter: '启动参数',
+    online: '已上线'
   },
   node: {
     current_node_settings: '当前节点设置',
@@ -599,8 +618,8 @@ const project = {
     name_tips: '请输入名称(必填)',
     task_type: '任务类型',
     task_type_tips: '请选择任务类型(必选)',
-    process_name: '工作流名称',
-    process_name_tips: '请选择工作流(必选)',
+    workflow_name: '工作流名称',
+    workflow_name_tips: '请选择工作流(必选)',
     child_node: '子节点',
     enter_child_node: '进入该子节点',
     run_flag: '运行标志',
@@ -704,7 +723,7 @@ const project = {
     body_not_contains: '内容不包含',
     http_parameters_position: '参数位置',
     target_task_name: '目标任务名',
-    target_task_name_tips: '请输入Pigeon任务名',
+    target_task_name_tips: '请输入Pigeon任务名(必填)',
     datasource_type: '数据源类型',
     datasource_instances: '数据源实例',
     sql_type: 'SQL类型',
@@ -825,6 +844,7 @@ const project = {
     last_saturday: '上周六',
     last_sunday: '上周日',
     this_month: '本月',
+    this_month_begin: '本月初',
     last_month: '上月',
     last_month_begin: '上月初',
     last_month_end: '上月末',
@@ -879,7 +899,19 @@ const project = {
     fix_value: '固定值',
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
-    emr_flow_define_json_tips: '请输入工作流定义'
+    emr_flow_define_json_tips: '请输入工作流定义',
+    send_email: '发送邮件',
+    log_display: '日志显示',
+    rows_of_result: '行查询结果',
+    title: '主题',
+    title_tips: '请输入邮件主题',
+    alarm_group: '告警组',
+    alarm_group_tips: '告警组必填',
+    integer_tips: '请输入一个正整数',
+    sql_parameter: 'sql参数',
+    format_tips: '请输入格式为',
+    udf_function: 'UDF函数',
+    unlimited: '不限制'
   }
 }
 
@@ -989,7 +1021,6 @@ const security = {
     update_user: '更新用户',
     delete_user: '删除用户',
     delete_confirm: '确定删除吗?',
-    delete_confirm_tip: '删除用户属于危险操作，请谨慎操作！',
     project: '项目',
     resource: '资源',
     file_resource: '文件资源',
@@ -1002,17 +1033,22 @@ const security = {
     authorize_udf: 'UDF函数授权',
     username: '用户名',
     username_exists: '用户名已存在',
-    username_rule_msg: '请输入用户名',
+    username_tips: '请输入用户名',
     user_password: '密码',
-    user_password_rule_msg: '请输入包含字母和数字，长度在6～20之间的密码',
+    user_password_tips: '请输入包含字母和数字，长度在6～20之间的密码',
     user_type: '用户类型',
+    ordinary_user: '普通用户',
+    administrator: '管理员',
     tenant_code: '租户',
-    tenant_id_rule_msg: '请选择租户',
+    tenant_id_tips: '请选择租户',
     queue: '队列',
+    queue_tips: '默认为租户关联队列',
     email: '邮件',
-    email_rule_msg: '请输入正确的邮箱',
+    email_empty_tips: '请输入邮箱',
+    emial_correct_tips: '请输入正确的邮箱格式',
     phone: '手机',
-    phone_rule_msg: '请输入正确的手机号',
+    phone_empty_tips: '请输入手机号码',
+    phone_correct_tips: '请输入正确的手机格式',
     state: '状态',
     state_enabled: '启用',
     state_disabled: '停用',
@@ -1025,29 +1061,33 @@ const security = {
     save_error_msg: '保存失败，请重试',
     delete_error_msg: '删除失败，请重试',
     auth_error_msg: '授权失败，请重试',
-    auth_success_msg: '授权成功'
+    auth_success_msg: '授权成功',
+    enable: '启用',
+    disable: '停用'
   },
   alarm_instance: {
     search_input_tips: '请输入关键字',
     alarm_instance_manage: '告警实例管理',
-    alarm_instance: '告警实例',
     alarm_instance_name: '告警实例名称',
     alarm_instance_name_tips: '请输入告警实例名称',
     alarm_plugin_name: '告警插件名称',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
-    edit: '编辑',
+    edit_alarm_instance: '编辑告警实例',
     delete: '删除',
+    edit: '编辑',
+    delete_confirm: '删除？',
     confirm: '确定',
     cancel: '取消',
     submit: '提交',
-    create: '创建',
+    create_alarm_instance: '创建告警实例',
     select_plugin: '选择插件',
     select_plugin_tips: '请选择告警插件',
     instance_parameter_exception: '实例参数异常',
     WebHook: 'Web钩子',
     webHook: 'Web钩子',
+    WarningType: '告警类型',
     IsEnableProxy: '启用代理',
     Proxy: '代理',
     Port: '端口',
@@ -1057,7 +1097,7 @@ const security = {
     Secret: '密钥',
     users: '群员',
     userSendMsg: '群员信息',
-    agentId: '应用ID',
+    'agentId/chatId': '应用ID或群聊ID',
     showType: '内容展示类型',
     receivers: '收件人',
     receiverCcs: '抄送人',
@@ -1082,7 +1122,22 @@ const security = {
     username: '用户名',
     botToken: '机器人Token',
     chatId: '频道ID',
-    parseMode: '解析类型'
+    parseMode: '解析类型',
+    IntegrationKey: '集成密钥',
+    BotAccessToken: '访问令牌',
+    RoomId: '房间',
+    ToPersonId: '用户',
+    ToPersonEmail: '用户邮箱',
+    // eslint-disable-next-line quotes
+    AtSomeoneInRoom: "{'@'}房间中的成员",
+    Destination: '描述',
+    // eslint-disable-next-line quotes
+    AtMobiles: "被{'@'}人的手机号",
+    // eslint-disable-next-line quotes
+    AtUserIds: "被{'@'}人的用户ID",
+    MsgType: '消息类型',
+    // eslint-disable-next-line quotes
+    IsAtAll: "{'@'}所有人"
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
@@ -1126,6 +1181,7 @@ const datasource = {
   click_to_view: '点击查看',
   delete: '删除',
   confirm: '确定',
+  delete_confirm: '删除？',
   cancel: '取消',
   create: '创建',
   edit: '编辑',

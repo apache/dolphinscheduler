@@ -29,6 +29,14 @@ export function useForm(
   const { t } = useI18n()
   const userStore = useUserStore()
 
+  const resetForm = () => {
+    variables.model = {
+      projectName: '',
+      description: '',
+      userName: (userStore.getUserInfo as UserInfoRes).userName
+    }
+  }
+
   const variables = reactive({
     projectFormRef: ref(),
     model: {
@@ -36,6 +44,7 @@ export function useForm(
       description: '',
       userName: (userStore.getUserInfo as UserInfoRes).userName
     },
+    saving: false,
     rules: {
       projectName: {
         required: true,
@@ -68,16 +77,30 @@ export function useForm(
     })
   }
 
-  const submitProjectModal = () => {
-    createProject(variables.model).then(() => {
+  const submitProjectModal = async () => {
+    if (variables.saving) return
+    variables.saving = true
+    try {
+      await createProject(variables.model)
+      variables.saving = false
+      resetForm()
       ctx.emit('confirmModal', props.showModalRef)
-    })
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
-  const updateProjectModal = () => {
-    updateProject(variables.model, props.row.code).then(() => {
+  const updateProjectModal = async () => {
+    if (variables.saving) return
+    variables.saving = true
+    try {
+      await updateProject(variables.model, props.row.code)
+      variables.saving = false
+      resetForm()
       ctx.emit('confirmModal', props.showModalRef)
-    })
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   return { variables, t, handleValidate }

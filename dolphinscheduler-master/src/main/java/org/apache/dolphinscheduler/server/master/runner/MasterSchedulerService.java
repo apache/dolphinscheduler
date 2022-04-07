@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -32,10 +33,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutor
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -98,6 +101,9 @@ public class MasterSchedulerService extends Thread {
 
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
+
+    @Autowired
+    private TaskPluginManager taskPluginManager;
 
     /**
      * constructor of MasterSchedulerService
@@ -179,13 +185,15 @@ public class MasterSchedulerService extends Thread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
-        List<ProcessInstance> processInstances = new ArrayList<>(commands.size());
+        List<ProcessInstance> processInstances = Collections.synchronizedList(new ArrayList<>(commands.size()));
         CountDownLatch latch = new CountDownLatch(commands.size());
         for (final Command command : commands) {
             masterPrepareExecService.execute(() -> {
                 try {
                     // slot check again
-                    if (!slotCheck(command)) {
+                    SlotCheckState slotCheckState = slotCheck(command);
+                    if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
+                        logger.info("handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
                         return;
                     }
                     ProcessInstance processInstance = processService.handleCommand(logger,
@@ -218,33 +226,28 @@ public class MasterSchedulerService extends Thread {
         int pageNumber = 0;
         int pageSize = masterConfig.getFetchCommandNum();
         List<Command> result = new ArrayList<>();
-        while (Stopper.isRunning()) {
-            if (ServerNodeManager.getMasterSize() == 0) {
-                return result;
+        if (Stopper.isRunning()) {
+            int thisMasterSlot = ServerNodeManager.getSlot();
+            int masterCount = ServerNodeManager.getMasterSize();
+            if (masterCount > 0) {
+                result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             }
-            // todo: Can we use the slot to scan database?
-            List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
-            if (commandList.size() == 0) {
-                return result;
-            }
-            for (Command command : commandList) {
-                if (slotCheck(command)) {
-                    result.add(command);
-                }
-            }
-            if (CollectionUtils.isNotEmpty(result)) {
-                logger.info("find {} commands, slot:{}", result.size(), ServerNodeManager.getSlot());
-                break;
-            }
-            pageNumber += 1;
         }
         return result;
     }
 
-    private boolean slotCheck(Command command) {
+    private SlotCheckState slotCheck(Command command) {
         int slot = ServerNodeManager.getSlot();
         int masterSize = ServerNodeManager.getMasterSize();
-        return masterSize != 0 && command.getId() % masterSize == slot;
+        SlotCheckState state;
+        if (masterSize <= 0) {
+            state = SlotCheckState.CHANGE;
+        } else if (command.getId() % masterSize == slot) {
+            state = SlotCheckState.PASS;
+        } else {
+            state = SlotCheckState.INJECT;
+        }
+        return state;
     }
 
     private String getLocalAddress() {
