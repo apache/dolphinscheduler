@@ -38,7 +38,7 @@ function initChart<Opt extends ECBasicOption>(
   const init = () => {
     chart = globalProperties?.echarts.init(
       domRef.value,
-      themeStore.darkTheme && 'dark-bold'
+      themeStore.darkTheme ? 'dark-bold' : 'macarons'
     )
     chart && chart.setOption(option)
   }
