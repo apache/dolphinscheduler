@@ -6,7 +6,7 @@
 
  `sh ./script/stop-all.sh`
 
-## Download the Newest Version Installation Package
+## Download the Latest Version Installation Package
 
 - [download](/en-us/download/download.html) the latest version of the installation packages.
 - The following upgrade operations need to be performed in the new version's directory.

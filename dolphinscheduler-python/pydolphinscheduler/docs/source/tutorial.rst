@@ -130,7 +130,7 @@ Now, we could run the Python code like other Python script, for the basic usage 
    :end-before: [end submit_or_run]
 
 If you not start your Apache DolphinScheduler server, you could find the way in
-:ref:`start:start Python gateway server` and it would have more detail about related server
+:ref:`start:start Python gateway service` and it would have more detail about related server
 start. Beside attribute `run`, we have attribute `submit` for object `ProcessDefinition`
 and it just submit workflow to the daemon but not setting the schedule information. For
 more detail you could see :ref:`concept:process definition`.

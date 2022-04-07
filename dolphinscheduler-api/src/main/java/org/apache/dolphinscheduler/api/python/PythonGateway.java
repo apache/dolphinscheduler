@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server;
+package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -56,7 +56,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.server.config.PythonGatewayConfig;
+import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -75,17 +75,13 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 import py4j.GatewayServer;
 
-@SpringBootApplication
-@ComponentScan(value = "org.apache.dolphinscheduler")
-public class PythonGatewayServer extends SpringBootServletInitializer {
-    private static final Logger logger = LoggerFactory.getLogger(PythonGatewayServer.class);
+@Component
+public class PythonGateway {
+    private static final Logger logger = LoggerFactory.getLogger(PythonGateway.class);
 
     private static final WarningType DEFAULT_WARNING_TYPE = WarningType.NONE;
     private static final int DEFAULT_WARNING_GROUP_ID = 0;
@@ -141,7 +137,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
-    private PythonGatewayConfig pythonGatewayConfig;
+    private PythonGatewayConfiguration pythonGatewayConfiguration;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -546,30 +542,32 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     }
 
     @PostConstruct
-    public void run() {
-        GatewayServer server;
-        try {
-            InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfig.getGatewayServerAddress());
-            InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfig.getPythonAddress());
-            server = new GatewayServer(
-                    this,
-                    pythonGatewayConfig.getGatewayServerPort(),
-                    pythonGatewayConfig.getPythonPort(),
-                    gatewayHost,
-                    pythonHost,
-                    pythonGatewayConfig.getConnectTimeout(),
-                    pythonGatewayConfig.getReadTimeout(),
-                    null
-            );
-            GatewayServer.turnLoggingOn();
-            logger.info("PythonGatewayServer started on: " + gatewayHost.toString());
-            server.start();
-        } catch (UnknownHostException e) {
-            logger.error("exception occurred while constructing PythonGatewayServer().", e);
+    public void init() {
+        if (pythonGatewayConfiguration.getEnabled()) {
+            this.start();
         }
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(PythonGatewayServer.class, args);
+    private void start() {
+        GatewayServer server;
+        try {
+            InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
+            InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfiguration.getPythonAddress());
+            server = new GatewayServer(
+                this,
+                pythonGatewayConfiguration.getGatewayServerPort(),
+                pythonGatewayConfiguration.getPythonPort(),
+                gatewayHost,
+                pythonHost,
+                pythonGatewayConfiguration.getConnectTimeout(),
+                pythonGatewayConfiguration.getReadTimeout(),
+                null
+            );
+            GatewayServer.turnLoggingOn();
+            logger.info("PythonGatewayService started on: " + gatewayHost.toString());
+            server.start();
+        } catch (UnknownHostException e) {
+            logger.error("exception occurred while constructing PythonGatewayService().", e);
+        }
     }
 }

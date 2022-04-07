@@ -140,6 +140,8 @@ alert:
   port: 50052
 
 python-gateway:
+  # Weather enable python gateway server or not. The default value is true.
+  enabled: true
   # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
   # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
   gateway-server-address: 0.0.0.0

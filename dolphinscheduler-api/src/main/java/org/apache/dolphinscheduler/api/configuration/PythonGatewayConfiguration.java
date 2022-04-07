@@ -15,23 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.config;
+package org.apache.dolphinscheduler.api.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties("python-gateway")
-public class PythonGatewayConfig {
+@ConfigurationProperties(value = "python-gateway", ignoreUnknownFields = false)
+public class PythonGatewayConfiguration {
+    private boolean enabled;
     private String gatewayServerAddress;
     private int gatewayServerPort;
     private String pythonAddress;
     private int pythonPort;
     private int connectTimeout;
     private int readTimeout;
+
+    public boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getGatewayServerAddress() {
         return gatewayServerAddress;

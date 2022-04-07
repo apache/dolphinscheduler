@@ -712,6 +712,12 @@ A：The repair can be completed by executing the following SQL in the database:
 update t_ds_version set version='2.0.1';
 ```
 
+## Can not find python-gateway-server in distribute package
+
+After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
+start API server. If you want disabled when Python gateway service you could change API server configuration in path
+`api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
+
 ---
 
 ## We will collect more FAQ later
