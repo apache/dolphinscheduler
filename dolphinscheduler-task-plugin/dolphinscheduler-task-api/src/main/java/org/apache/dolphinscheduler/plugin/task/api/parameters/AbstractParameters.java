@@ -75,15 +75,14 @@ public abstract class AbstractParameters implements IParameters {
      * @return parameters map
      */
     public Map<String, Property> getLocalParametersMap() {
+        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
-            Map<String, Property> localParametersMaps = new LinkedHashMap<>();
 
             for (Property property : localParams) {
                 localParametersMaps.put(property.getProp(),property);
             }
-            return localParametersMaps;
         }
-        return null;
+        return localParametersMaps;
     }
 
     /**
@@ -92,14 +91,13 @@ public abstract class AbstractParameters implements IParameters {
      * @return parameters map
      */
     public Map<String, Property> getVarPoolMap() {
+        Map<String, Property> varPoolMap = new LinkedHashMap<>();
         if (varPool != null) {
-            Map<String, Property> varPoolMap = new LinkedHashMap<>();
             for (Property property : varPool) {
                 varPoolMap.put(property.getProp(), property);
             }
-            return varPoolMap;
         }
-        return null;
+        return varPoolMap;
     }
 
     public List<Property> getVarPool() {
