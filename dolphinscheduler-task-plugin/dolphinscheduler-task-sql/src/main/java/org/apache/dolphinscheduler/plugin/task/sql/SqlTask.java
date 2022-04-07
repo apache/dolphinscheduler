@@ -243,7 +243,11 @@ public class SqlTask extends AbstractTaskExecutor {
             int rowCount = 0;
             int limit = sqlParameters.getLimit() == 0 ? QUERY_LIMIT : sqlParameters.getLimit();
 
-            while (rowCount < limit && resultSet.next()) {
+            while (resultSet.next()) {
+                if (rowCount == limit) {
+                    logger.info("sql result limit : {} exceeding results are filtered", limit);
+                    break;
+                }
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
                     mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
@@ -257,9 +261,6 @@ public class SqlTask extends AbstractTaskExecutor {
             for (int i = 0; i < displayRows; i++) {
                 String row = JSONUtils.toJsonString(resultJSONArray.get(i));
                 logger.info("row {} : {}", i + 1, row);
-            }
-            if (rowCount >= limit) {
-                logger.info("sql result limit : {} exceeding results are filtered", limit);
             }
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
