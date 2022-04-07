@@ -77,29 +77,35 @@ which we hold in GitHub
 After you installed *PyDolphinScheduler*, please remember `start Python Gateway Server`_
 which waiting for *PyDolphinScheduler*'s workflow definition require.
 
-Start Python Gateway Server
----------------------------
+Start Python Gateway Service
+----------------------------
 
 Since **PyDolphinScheduler** is Python API for `Apache DolphinScheduler`_, it
 could define workflow and tasks structure, but could not run it unless you
-`install Apache DolphinScheduler`_ and start Python gateway server. We only
-and some key steps here and you could go `install Apache DolphinScheduler`_
-for more detail
+`install Apache DolphinScheduler`_ and start its API server which including
+Python gateway service in it. We only and some key steps here and you could
+go `install Apache DolphinScheduler`_ for more detail
 
 .. code-block:: bash
 
-    # Start pythonGatewayServer
-    $ ./bin/dolphinscheduler-daemon.sh start pythonGatewayServer
+    # Start DolphinScheduler api-server which including python gateway service
+    $ ./bin/dolphinscheduler-daemon.sh start api-server
 
 To check whether the server is alive or not, you could run :code:`jps`. And
-the server is health if keyword `PythonGatewayServer` in the console. 
+the server is health if keyword `ApiApplicationServer` in the console.
 
 .. code-block:: bash
 
     $ jps
     ....
-    201472 PythonGatewayServer
+    201472 ApiApplicationServer
     ....
+
+.. note::
+
+   Please make sure you already enabled started Python gateway service along with `api-server`. The configuration is in
+   yaml config path `python-gateway.enabled : true` in api-server's configuration path in `api-server/conf/application.yaml`.
+   The default value is true and Python gateway service start when api server is been started.
 
 What's More
 -----------
