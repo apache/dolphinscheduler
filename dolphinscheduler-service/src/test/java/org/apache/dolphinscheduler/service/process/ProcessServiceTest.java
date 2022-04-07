@@ -113,7 +113,7 @@ public class ProcessServiceTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private ProcessService processService;
+    private ProcessServiceImpl processService;
     @Mock
     private CommandMapper commandMapper;
     @Mock
