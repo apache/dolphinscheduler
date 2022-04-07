@@ -55,7 +55,7 @@ After Python is already installed on your machine following section
     $ pip install apache-dolphinscheduler
 
 The latest version of *PyDolphinScheduler* would be installed after you run above
-command in your terminal. You could go and `start Python Gateway Server`_ to finish
+command in your terminal. You could go and `start Python Gateway Service`_ to finish
 the prepare, and then go to :doc:`tutorial` to make your hand dirty. But if you
 want to install the unreleased version of *PyDolphinScheduler*, you could go and see
 section `installing PyDolphinScheduler in dev`_ for more detail.
@@ -74,7 +74,7 @@ which we hold in GitHub
     # Install PyDolphinScheduler in develop mode
     $ cd dolphinscheduler-python/pydolphinscheduler && pip install -e .
 
-After you installed *PyDolphinScheduler*, please remember `start Python Gateway Server`_
+After you installed *PyDolphinScheduler*, please remember `start Python Gateway Service`_
 which waiting for *PyDolphinScheduler*'s workflow definition require.
 
 Start Python Gateway Service
