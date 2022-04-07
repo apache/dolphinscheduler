@@ -66,7 +66,7 @@ public class ParamUtils {
         //stream pass params
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams.size() == 0 && localParams.size() == 0) {
+        if (globalParams.size() == 0 && localParams.size() == 0 && varParams.size() == 0) {
             return null;
         }
         // if it is a complement,
@@ -86,15 +86,13 @@ public class ParamUtils {
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskExecutionContext.getTaskInstanceId()));
 
-        if (globalParams.size() != 0 && localParams.size() != 0) {
-            globalParams.putAll(localParams);
-        } else if (globalParams.size() == 0 && localParams.size() != 0) {
-            globalParams = localParams;
-        }
         if (varParams.size() != 0) {
-            varParams.putAll(globalParams);
-            globalParams = varParams;
+            globalParams.putAll(varParams);
         }
+        if (localParams.size() != 0) {
+            globalParams.putAll(localParams);
+        }
+
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
