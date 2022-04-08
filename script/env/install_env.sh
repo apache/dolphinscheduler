@@ -48,11 +48,6 @@ alertServer=${alertServer:-"ds3"}
 # Example for hostname: apiServers="ds1", Example for IP: apiServers="192.168.8.1"
 apiServers=${apiServers:-"ds1"}
 
-# A comma separated list of machine hostname or IP would be installed Python gateway server, it
-# must be a subset of configuration `ips`.
-# Example for hostname: pythonGatewayServers="ds1", Example for IP: pythonGatewayServers="192.168.8.1"
-pythonGatewayServers=${pythonGatewayServers:-"ds1"}
-
 # The directory to install DolphinScheduler for all machine we config above. It will automatically be created by `install.sh` script if not exists.
 # Do not set this configuration same as the current path (pwd)
 installPath=${installPath:-"/tmp/dolphinscheduler"}
