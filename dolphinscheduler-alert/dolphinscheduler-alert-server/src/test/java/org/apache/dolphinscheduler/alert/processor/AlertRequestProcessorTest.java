@@ -20,30 +20,35 @@ package org.apache.dolphinscheduler.alert.processor;
 import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.alert.AlertRequestProcessor;
-import org.apache.dolphinscheduler.alert.AlertSender;
+import org.apache.dolphinscheduler.alert.AlertSenderService;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import io.netty.channel.Channel;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AlertRequestProcessorTest {
+    @InjectMocks
     private AlertRequestProcessor alertRequestProcessor;
 
-    @Before
-    public void before() {
-        final AlertDao alertDao = mock(AlertDao.class);
-        alertRequestProcessor = new AlertRequestProcessor(new AlertSender(alertDao, null));
-    }
+    @Mock
+    private AlertSenderService alertSenderService;
+
 
     @Test
     public void testProcess() {
+        Mockito.when(alertSenderService.syncHandler(1, "title", "content", WarningType.FAILURE.getCode())).thenReturn(new AlertSendResponseCommand());
         Channel channel = mock(Channel.class);
         AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1, "title", "content", WarningType.FAILURE.getCode());
         Command reqCommand = alertSendRequestCommand.convert2Command();

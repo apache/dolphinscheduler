@@ -41,8 +41,6 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -55,23 +53,23 @@ public final class AlertPluginManager {
 
     private final PluginDao pluginDao;
 
-    private final Map<Integer, AlertChannel> channelKeyedById = new HashMap<>();
-
-    private final PluginParams warningTypeParams = getWarningTypeParams();
-
     public AlertPluginManager(PluginDao pluginDao) {
         this.pluginDao = pluginDao;
     }
 
+    private final Map<Integer, AlertChannel> channelKeyedById = new HashMap<>();
+
+    private final PluginParams warningTypeParams = getWarningTypeParams();
+
     public PluginParams getWarningTypeParams() {
         return
-            RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                .setValue(WarningType.ALL.getDescp())
-                .addValidate(Validate.newBuilder().setRequired(true).build())
-                .build();
+                RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                        .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                        .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                        .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                        .setValue(WarningType.ALL.getDescp())
+                        .addValidate(Validate.newBuilder().setRequired(true).build())
+                        .build();
     }
 
     @EventListener
