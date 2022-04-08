@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +50,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class RegistryClientTest {
+    AtomicInteger idGen = new AtomicInteger();
     List<String> workerGroups;
     private RegistryClient registryClient;
 
@@ -194,7 +196,7 @@ public class RegistryClientTest {
 
     private Server createServer(NodeType nodeType, String host) {
         Server server = new Server();
-        server.setId(Mockito.anyInt());
+        server.setId(idGen.incrementAndGet());
         server.setHost(host);
         server.setResInfo("");
         server.setZkDirectory("");
