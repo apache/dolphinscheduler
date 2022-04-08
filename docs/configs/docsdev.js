@@ -299,16 +299,6 @@ export default {
                 ],
             },
             {
-                title: 'Observability',
-                children: [
-
-                    {
-                        title: 'SkyWalking-Agent',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/skywalking-agent.html',
-                    },
-                ],
-            },
-            {
                 title: 'FAQ',
                 children: [
                     {
@@ -606,15 +596,6 @@ export default {
                     {
                         title: '缓存',
                         link: '/zh-cn/docs/dev/user_doc/architecture/cache.html',
-                    },
-                ],
-            },
-            {
-                title: '可观测性',
-                children: [
-                    {
-                        title: 'SkyWalking-Agent',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/skywalking-agent.html',
                     },
                 ],
             },
