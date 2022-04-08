@@ -209,19 +209,19 @@ public class Alert {
         this.processDefinitionCode = processDefinitionCode;
     }
 
-    public Integer getProcessInstanceId() {
+    public int getProcessInstanceId() {
         return processInstanceId;
     }
 
-    public void setProcessInstanceId(Integer processInstanceId) {
+    public void setProcessInstanceId(int processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
-    public Integer getAlertType() {
+    public int getAlertType() {
         return alertType;
     }
 
-    public void setAlertType(Integer alertType) {
+    public void setAlertType(int alertType) {
         this.alertType = alertType;
     }
 
