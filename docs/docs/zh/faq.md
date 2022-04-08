@@ -523,18 +523,6 @@ A：1，edit /etc/nginx/conf.d/escheduler.conf
 
 ---
 
-## Q：欢迎订阅 DolphinScheduler 开发邮件列表
-A：在使用 DolphinScheduler 的过程中，如果您有任何问题或者想法、建议，都可以通过 Apache 邮件列表参与到 DolphinScheduler 的社区建设中来。
-   发送订阅邮件也非常简单，步骤如下:
-
-   1，用自己的邮箱向 dev-subscribe@dolphinscheduler.apache.org 发送一封邮件，主题和内容任意。
-
-   2， 接收确认邮件并回复。 完成步骤1后，您将收到一封来自 dev-help@dolphinscheduler.apache.org 的确认邮件（如未收到，请确认邮件是否被自动归入垃圾邮件、推广邮件、订阅邮件等文件夹）。然后直接回复该邮件，或点击邮件里的链接快捷回复即可，主题和内容任意。
-
-   3， 接收欢迎邮件。 完成以上步骤后，您会收到一封主题为 WELCOME to dev@dolphinscheduler.apache.org 的欢迎邮件，至此您已成功订阅 Apache DolphinScheduler的邮件列表。
-
----
-
 ## Q：工作流依赖
 A：1，目前是按照自然天来判断，上月末：判断时间是工作流 A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'。上月：是判断上个月从 1 号到月末每天都要有完成的A实例。上周： 上周 7 天都要有完成的 A 实例。前两天： 判断昨天和前天，两天都要有完成的 A 实例。
 

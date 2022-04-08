@@ -22,11 +22,12 @@ labels: [ "bug", "Waiting for reply" ]
 body:
   - type: markdown
     attributes:
-      value: |
+      value: >
         Please make sure what you are reporting is indeed a bug with reproducible steps, if you want to ask questions
         or share ideas, you can head to our
-        [Discussions](https://github.com/apache/dolphinscheduler/discussions) tab, you can also [subscribe to our mailing list](mailto:dev-subscribe@dolphinscheduler.apache.org) and send 
-        emails to [our mailing list](mailto:dev@dolphinscheduler.apache.org)
+        [Discussions](https://github.com/apache/dolphinscheduler/discussions) tab, you can also
+        [join our slack](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)
+        and send your question to channel `#troubleshooting`
 
         For better global communication, Please write in English.
 

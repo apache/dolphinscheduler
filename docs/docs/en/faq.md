@@ -544,17 +544,6 @@ A: 1, edit nginx config file /etc/nginx/conf.d/escheduler.conf
 
 ---
 
-## Q : Welcome to subscribe the DolphinScheduler development mailing list
-A: In the process of using DolphinScheduler, if you have any questions or ideas, suggestions, you can participate in the DolphinScheduler community building through the Apache mailing list. Sending a subscription email is also very simple, the steps are as follows: 
-
-1, Send an email to dev-subscribe@dolphinscheduler.apache.org with your own email address, subject and content.
-
-2, Receive confirmation email and reply. After completing step 1, you will receive a confirmation email from dev-help@dolphinscheduler.apache.org (if not received, please confirm whether the email is automatically classified as spam, promotion email, subscription email, etc.) . Then reply directly to the email, or click on the link in the email to reply quickly, the subject and content are arbitrary.
-
-3, Receive a welcome email. After completing the above steps, you will receive a welcome email with the subject WELCOME to dev@dolphinscheduler.apache.org, and you have successfully subscribed to the Apache DolphinScheduler mailing list.
-
----
-
 ## Q : Workflow Dependency
 A: 1, It is currently judged according to natural days, at the end of last month: the judgment time is the workflow A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'. Last month: It is judged that there is an A instance completed every day from the 1st to the end of the month. Last week: There are completed A instances 7 days last week. The first two days: Judging yesterday and the day before yesterday, there must be a completed A instance for two days.
 
