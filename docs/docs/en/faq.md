@@ -29,13 +29,13 @@ A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supporte
 
 ## Q: What are the common system variable time parameters and how do I use them?
 
-A: Please refer to 'System parameter' in the system-manual 
+A: Please refer to 'System parameter' in the system-manual
 
 ---
 
 ## Q: pip install kazoo This installation gives an error. Is it necessary to install?
 
-A: This is the python connection Zookeeper needs to use, it is used to delete the master/worker temporary node info in the Zookeeper. so you can ignore error if it's your first install. after version 1.3.0, kazoo is not been needed, we use program to replace what kazoo done 
+A: This is the python connection Zookeeper needs to use, it is used to delete the master/worker temporary node info in the Zookeeper. so you can ignore error if it's your first install. after version 1.3.0, kazoo is not been needed, we use program to replace what kazoo done
 
 ---
 
@@ -77,7 +77,7 @@ A:   1, if it is node startup, check whether the .env API_BASE configuration und
 
 ​       2, If it is nginx booted and installed via **install-dolphinscheduler-ui.sh**, check if the proxy_pass      			configuration in **/etc/nginx/conf.d/dolphinscheduler.conf** is the Api Server service address
 
-​       3, if the above configuration is correct, then please check if the Api Server service is normal, 
+​       3, if the above configuration is correct, then please check if the Api Server service is normal,
 
 ​		   curl http://localhost:12345/dolphinscheduler/users/get-user-info, check the Api Server log,
 
@@ -198,7 +198,7 @@ A: Yes, **if the timing start and end time is the same time, then this timing wi
 
 A:	1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
 
-​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual. 
+​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual.
 
 ​	Note: **Cross-project processes or task dependencies are not supported**
 
@@ -317,10 +317,10 @@ A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluste
 
 ## Q : When DolphinScheduler release a new version, and the change between current version and latest, and how to upgrade, and version number specification
 A: 1, The release process of Apache Project happens in the mailing list. You can subscribe DolphinScheduler's mailing list and then when the release is in process, you'll receive release emails. Please follow this [introduction](https://github.com/apache/dolphinscheduler#get-help) to subscribe DolphinScheduler's mailing list.
-    
+
 2, When new version published, there would be release note which describe the change log, and there also have upgrade document for the previous version to new's.
 
-3, Version number is x.y.z, when x is increased, it represents the version of the new architecture. When y is increased, it means that it is incompatible with the y version before it needs to be upgraded by script or other manual processing. When the z increase represents a bug fix, the upgrade is fully compatible. No additional processing is required. Remaining problem, the 1.0.2 upgrade is not compatible with 1.0.1 and requires an upgrade script. 
+3, Version number is x.y.z, when x is increased, it represents the version of the new architecture. When y is increased, it means that it is incompatible with the y version before it needs to be upgraded by script or other manual processing. When the z increase represents a bug fix, the upgrade is fully compatible. No additional processing is required. Remaining problem, the 1.0.2 upgrade is not compatible with 1.0.1 and requires an upgrade script.
 
 ---
 
@@ -331,7 +331,7 @@ A: When start the workflow, you can set the task failure strategy: continue or f
 ---
 
 ## Q : Workflow template DAG, workflow instance, work task and what is the relationship among them? A DAG supports a maximum concurrency of 100, does it mean that 100 workflow instances are generated and run concurrently? A task node in a DAG also has a concurrent number configuration. Does it mean that tasks can run concurrently with multiple threads? Is the maximum number 100?
-A: 
+A:
 
 1.2.1 version
 ```
@@ -442,7 +442,7 @@ A: The scheduling system not support second frequency task.
 ---
 
 ## Q : Compile front-end code(dolphinscheduler-ui) show error cannot download "https://github.com/sass/node-sass/releases/download/v4.13.1/darwin-x64-72_binding.node"
-A: 1, cd dolphinscheduler-ui and delete node_modules directory 
+A: 1, cd dolphinscheduler-ui and delete node_modules directory
 ```
 sudo rm -rf node_modules
 ```
@@ -484,7 +484,7 @@ A: 1, Where is the executed server? Specify one worker to run the task, you can 
 ---
 
 ## Q : What’s the best deploy mode you suggest in production env
-A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines. 
+A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines.
 
 ---
 
@@ -529,7 +529,7 @@ A: 1, User changed the config api server config file and item
    <img src="https://user-images.githubusercontent.com/21357069/58231400-805b0e80-7d69-11e9-8107-7f37b06a95df.png" width="60%" />
  </p>
 A: 1, Edit ngnix config file, edit upload max size client_max_body_size 1024m.
-     
+
    ​	2, the version of Google Chrome is old, and the latest version of the browser has been updated.
 
 ---
@@ -545,7 +545,7 @@ A: 1, edit nginx config file /etc/nginx/conf.d/escheduler.conf
 ---
 
 ## Q : Welcome to subscribe the DolphinScheduler development mailing list
-A: In the process of using DolphinScheduler, if you have any questions or ideas, suggestions, you can participate in the DolphinScheduler community building through the Apache mailing list. Sending a subscription email is also very simple, the steps are as follows: 
+A: In the process of using DolphinScheduler, if you have any questions or ideas, suggestions, you can participate in the DolphinScheduler community building through the Apache mailing list. Sending a subscription email is also very simple, the steps are as follows:
 
 1, Send an email to dev-subscribe@dolphinscheduler.apache.org with your own email address, subject and content.
 
@@ -610,9 +610,9 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 A：By deploying different worker in different yarn clusters，the steps are as follows(eg: AWS EMR):
 
    1. Deploying the worker server on the master node of the EMR cluster
-   
+
    2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
-   
+
    3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` and `bin/dolphinscheduler-daemon.sh start logger-server` to start worker-server and logger-server
 
 ---
@@ -718,6 +718,430 @@ After version 3.0.0-alpha, Python gateway server integrate into API server, and 
 start API server. If you want disabled when Python gateway service you could change API server configuration in path
 `api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
 
+---
+
+## Q：How to View the Logs of a Pod Container?
+
+List all pods (aka `po`):
+
+```
+kubectl get po
+kubectl get po -n test # with test namespace
+```
+
+View the logs of a pod container named `dolphinscheduler-master-0`:
+
+```
+kubectl logs dolphinscheduler-master-0
+kubectl logs -f dolphinscheduler-master-0 # follow log output
+kubectl logs --tail 10 dolphinscheduler-master-0 -n test # show last 10 lines from the end of the logs
+```
+
+---
+
+## Q：How to Scale API, master and worker on Kubernetes?
+
+List all deployments (aka `deploy`):
+
+```
+kubectl get deploy
+kubectl get deploy -n test # with test namespace
+```
+
+Scale api to 3 replicas:
+
+```
+kubectl scale --replicas=3 deploy dolphinscheduler-api
+kubectl scale --replicas=3 deploy dolphinscheduler-api -n test # with test namespace
+```
+
+List all stateful sets (aka `sts`):
+
+```
+kubectl get sts
+kubectl get sts -n test # with test namespace
+```
+
+Scale master to 2 replicas:
+
+```
+kubectl scale --replicas=2 sts dolphinscheduler-master
+kubectl scale --replicas=2 sts dolphinscheduler-master -n test # with test namespace
+```
+
+Scale worker to 6 replicas:
+
+```
+kubectl scale --replicas=6 sts dolphinscheduler-worker
+kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test namespace
+```
+
+---
+
+## Q：How to Use MySQL as the DolphinScheduler's Database Instead of PostgreSQL?
+
+> Because of the commercial license, we cannot directly use the driver of MySQL.
+>
+> If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image follow the following instructions:
+
+1. Download the MySQL driver [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar).
+
+2. Create a new `Dockerfile` to add MySQL driver:
+
+```
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including MySQL driver:
+
+```
+docker build -t apache/dolphinscheduler:mysql-driver .
+```
+
+4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry.
+
+5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`.
+
+6. Modify postgresql `enabled` to `false` in `values.yaml`.
+
+7. Modify externalDatabase (especially modify `host`, `username` and `password`) in `values.yaml`:
+
+```yaml
+externalDatabase:
+  type: "mysql"
+  driver: "com.mysql.jdbc.Driver"
+  host: "localhost"
+  port: "3306"
+  username: "root"
+  password: "root"
+  database: "dolphinscheduler"
+  params: "useUnicode=true&characterEncoding=UTF-8"
+```
+
+8. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+---
+
+## Q：How to Support MySQL Datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of MySQL.
+>
+> If you want to add MySQL datasource, you can build a new image based on the `apache/dolphinscheduler` image follow the following instructions:
+
+1. Download the MySQL driver [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar).
+
+2. Create a new `Dockerfile` to add MySQL driver:
+
+```
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including MySQL driver:
+
+```
+docker build -t apache/dolphinscheduler:mysql-driver .
+```
+
+4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry.
+
+5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`.
+
+6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+7. Add a MySQL datasource in `Datasource manage`.
+
+---
+
+## Q：How to Support Oracle Datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of Oracle.
+>
+> If you want to add Oracle datasource, you can build a new image based on the `apache/dolphinscheduler` image follow the following instructions:
+
+1. Download the Oracle driver [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
+
+2. Create a new `Dockerfile` to add Oracle driver:
+
+```
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including Oracle driver:
+
+```
+docker build -t apache/dolphinscheduler:oracle-driver .
+```
+
+4. Push the docker image `apache/dolphinscheduler:oracle-driver` to a docker registry.
+
+5. Modify image `repository` and update `tag` to `oracle-driver` in `values.yaml`.
+
+6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+7. Add an Oracle datasource in `Datasource manage`.
+
+---
+
+## Q：How to Support Python 2 pip and Custom requirements.txt?
+
+1. Create a new `Dockerfile` to install pip:
+
+```
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+COPY requirements.txt /tmp
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python-pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+The command will install the default **pip 18.1**. If you upgrade the pip, just add the following command.
+
+```
+    pip install --no-cache-dir -U pip && \
+```
+
+2. Build a new docker image including pip:
+
+```
+docker build -t apache/dolphinscheduler:pip .
+```
+
+3. Push the docker image `apache/dolphinscheduler:pip` to a docker registry.
+
+4. Modify image `repository` and update `tag` to `pip` in `values.yaml`.
+
+5. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+6. Verify pip under a new Python task.
+
+---
+
+## Q：How to Support Python 3?
+
+1. Create a new `Dockerfile` to install Python 3:
+
+```
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+The command will install the default **Python 3.7.3**. If you also want to install **pip3**, just replace `python3` with `python3-pip` like:
+
+```
+    apt-get install -y --no-install-recommends python3-pip && \
+```
+
+2. Build a new docker image including Python 3:
+
+```
+docker build -t apache/dolphinscheduler:python3 .
+```
+
+3. Push the docker image `apache/dolphinscheduler:python3` to a docker registry.
+
+4. Modify image `repository` and update `tag` to `python3` in `values.yaml`.
+
+5. Modify `PYTHON_HOME` to `/usr/bin/python3` in `values.yaml`.
+
+6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+7. Verify Python 3 under a new Python task.
+
+---
+
+## Q：How to Support Hadoop, Spark, Flink, Hive or DataX?
+
+Take Spark 2.4.7 as an example:
+
+1. Download the Spark 2.4.7 release binary `spark-2.4.7-bin-hadoop2.7.tgz`.
+
+2. Ensure that `common.sharedStoragePersistence.enabled` is turned on.
+
+3. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+4. Copy the Spark 2.4.7 release binary into the Docker container.
+
+```bash
+kubectl cp spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
+kubectl cp -n test spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
+```
+
+Because the volume `sharedStoragePersistence` is mounted on `/opt/soft`, all files in `/opt/soft` will not be lost.
+
+5. Attach the container and ensure that `SPARK_HOME2` exists.
+
+```bash
+kubectl exec -it dolphinscheduler-worker-0 bash
+kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
+cd /opt/soft
+tar zxf spark-2.4.7-bin-hadoop2.7.tgz
+rm -f spark-2.4.7-bin-hadoop2.7.tgz
+ln -s spark-2.4.7-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+The last command will print the Spark version if everything goes well.
+
+6. Verify Spark under a Shell task.
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.11-2.4.7.jar
+```
+
+Check whether the task log contains the output like `Pi is roughly 3.146015`.
+
+7. Verify Spark under a Spark task.
+
+The file `spark-examples_2.11-2.4.7.jar` needs to be uploaded to the resources first, and then create a Spark task with:
+
+- Spark Version: `SPARK2`
+- Main Class: `org.apache.spark.examples.SparkPi`
+- Main Package: `spark-examples_2.11-2.4.7.jar`
+- Deploy Mode: `local`
+
+Similarly, check whether the task log contains the output like `Pi is roughly 3.146015`.
+
+8. Verify Spark on YARN.
+
+Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Similar to Spark support, the operation of supporting Hadoop is almost the same as the previous steps.
+
+Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists.
+
+---
+
+## Q：How to Support Spark 3?
+
+In fact, the way to submit applications with `spark-submit` is the same, regardless of Spark 1, 2 or 3. In other words, the semantics of `SPARK_HOME2` is the second `SPARK_HOME` instead of `SPARK2`'s `HOME`, so just set `SPARK_HOME2=/path/to/spark3`.
+
+Take Spark 3.1.1 as an example:
+
+1. Download the Spark 3.1.1 release binary `spark-3.1.1-bin-hadoop2.7.tgz`.
+
+2. Ensure that `common.sharedStoragePersistence.enabled` is turned on.
+
+3. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
+
+4. Copy the Spark 3.1.1 release binary into the Docker container.
+
+```bash
+kubectl cp spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
+kubectl cp -n test spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
+```
+
+5. Attach the container and ensure that `SPARK_HOME2` exists.
+
+```bash
+kubectl exec -it dolphinscheduler-worker-0 bash
+kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
+cd /opt/soft
+tar zxf spark-3.1.1-bin-hadoop2.7.tgz
+rm -f spark-3.1.1-bin-hadoop2.7.tgz
+ln -s spark-3.1.1-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+The last command will print the Spark version if everything goes well.
+
+6. Verify Spark under a Shell task.
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.12-3.1.1.jar
+```
+
+Check whether the task log contains the output like `Pi is roughly 3.146015`.
+
+---
+
+## Q：How to Support Shared Storage Between Master, Worker and Api Server?
+
+For example, Master, Worker and API server may use Hadoop at the same time.
+
+1. Modify the following configurations in `values.yaml`
+
+```yaml
+common:
+  sharedStoragePersistence:
+    enabled: false
+    mountPath: "/opt/soft"
+    accessModes:
+    - "ReadWriteMany"
+    storageClassName: "-"
+    storage: "20Gi"
+```
+
+Modify `storageClassName` and `storage` to actual environment values.
+
+> **Note**: `storageClassName` must support the access mode: `ReadWriteMany`.
+
+2. Copy the Hadoop into the directory `/opt/soft`.
+
+3. Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` are correct.
+
+---
+
+## Q：How to Support Local File Resource Storage Instead of HDFS and S3?
+
+Modify the following configurations in `values.yaml`:
+
+```yaml
+common:
+  configmap:
+    RESOURCE_STORAGE_TYPE: "HDFS"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "file:///"
+  fsFileResourcePersistence:
+    enabled: true
+    accessModes:
+    - "ReadWriteMany"
+    storageClassName: "-"
+    storage: "20Gi"
+```
+
+Modify `storageClassName` and `storage` to actual environment values.
+
+> **Note**: `storageClassName` must support the access mode: `ReadWriteMany`.
+
+---
+
+## Q：How to Support S3 Resource Storage Like MinIO?
+
+Take MinIO as an example: Modify the following configurations in `values.yaml`:
+
+```yaml
+common:
+  configmap:
+    RESOURCE_STORAGE_TYPE: "S3"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "s3a://BUCKET_NAME"
+    FS_S3A_ENDPOINT: "http://MINIO_IP:9000"
+    FS_S3A_ACCESS_KEY: "MINIO_ACCESS_KEY"
+    FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
+```
+
+Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY`  to actual environment values.
+
+> **Note**: `MINIO_IP` can only use IP instead of the domain name, because DolphinScheduler currently doesn't support S3 path style access.
+
+---
+
+## Q：How to Configure SkyWalking?
+
+Modify SkyWalking configurations in `values.yaml`:
+
+```yaml
+common:
+  configmap:
+    SKYWALKING_ENABLE: "true"
+    SW_AGENT_COLLECTOR_BACKEND_SERVICES: "127.0.0.1:11800"
+    SW_GRPC_LOG_SERVER_HOST: "127.0.0.1"
+    SW_GRPC_LOG_SERVER_PORT: "11800"
+```
 ---
 
 ## We will collect more FAQ later
