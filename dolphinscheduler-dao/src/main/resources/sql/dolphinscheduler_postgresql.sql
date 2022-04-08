@@ -215,8 +215,8 @@ CREATE TABLE t_ds_alert (
   alertgroup_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  project_code bigint NOT NULL,
-  process_definition_code bigint NOT NULL,
+  project_code bigint DEFAULT NULL,
+  process_definition_code bigint DEFAULT NULL,
   process_instance_id int DEFAULT NULL ,
   alert_type int DEFAULT NULL ,
   PRIMARY KEY (id)
