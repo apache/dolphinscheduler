@@ -619,7 +619,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode
      * @return
      */
-    private int createComplementCommandList(Date start, Date end, RunMode runMode, Command command,
+    protected int createComplementCommandList(Date start, Date end, RunMode runMode, Command command,
                                             Integer expectedParallelismNumber, ComplementDependentMode complementDependentMode) {
         int createCount = 0;
         int dependentProcessDefinitionCreateCount = 0;
@@ -713,7 +713,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * create complement dependent command
      */
-    private int createComplementDependentCommand(List<Schedule> schedules, Command command) {
+    protected int createComplementDependentCommand(List<Schedule> schedules, Command command) {
         int dependentProcessDefinitionCreateCount = 0;
         Command dependentCommand;
 

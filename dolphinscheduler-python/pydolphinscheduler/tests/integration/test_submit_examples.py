@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Test whether success submit examples DAG to PythonGatewayServer."""
+"""Test whether success submit examples DAG to PythonGatewayService."""
 
 from pathlib import Path
 
@@ -34,7 +34,7 @@ from tests.testing.path import path_example
     ],
 )
 def test_exec_white_list_example(example_path: Path):
-    """Test execute examples and submit DAG to PythonGatewayServer."""
+    """Test execute examples and submit DAG to PythonGatewayService."""
     try:
         exec(example_path.read_text())
     except Exception:
