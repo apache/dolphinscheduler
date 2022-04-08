@@ -61,9 +61,10 @@ def get_paths_rel_path(paths: Set[Path], rel: Path) -> Set:
 def get_docs_img_path(paths: Set[Path]) -> Set:
     """Get all img syntax from given :param:`paths` using the regexp from :param:`pattern`."""
     res = set()
+    pattern = re.compile(r"/img[\w./-]*")
     for path in paths:
         content = path.read_text()
-        find = re.findall(r"/img[\w./-]*", content)
+        find = pattern.findall(content)
         if find:
             res |= {item for item in find}
     return res
