@@ -18,7 +18,11 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.alert.api.*;
+import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertConstants;
+import org.apache.dolphinscheduler.alert.api.AlertData;
+import org.apache.dolphinscheduler.alert.api.AlertInfo;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
