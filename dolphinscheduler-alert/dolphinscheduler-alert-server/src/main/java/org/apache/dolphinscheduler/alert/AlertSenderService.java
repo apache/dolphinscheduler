@@ -17,42 +17,64 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-@Component
-public final class AlertSender {
-    private static final Logger logger = LoggerFactory.getLogger(AlertSender.class);
+@Service
+public final class AlertSenderService extends Thread {
+    private static final Logger logger = LoggerFactory.getLogger(AlertSenderService.class);
 
     private final AlertDao alertDao;
     private final AlertPluginManager alertPluginManager;
 
-    public AlertSender(AlertDao alertDao, AlertPluginManager alertPluginManager) {
+    public AlertSenderService(AlertDao alertDao, AlertPluginManager alertPluginManager) {
         this.alertDao = alertDao;
         this.alertPluginManager = alertPluginManager;
     }
+
+    @Override
+    public synchronized void start() {
+        super.setName("AlertSenderService");
+        super.start();
+    }
+
+    @Override
+    public void run() {
+        logger.info("alert sender started");
+        while (Stopper.isRunning()) {
+            try {
+                List<Alert> alerts = alertDao.listPendingAlerts();
+                this.send(alerts);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
+            } catch (Exception e) {
+                logger.error("alert sender thread error", e);
+            }
+        }
+    }
+
 
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
@@ -66,11 +88,11 @@ public final class AlertSender {
             }
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
-                     .setContent(alert.getContent())
-                     .setLog(alert.getLog())
-                     .setTitle(alert.getTitle())
-                     .setTitle(alert.getTitle())
-                     .setWarnType(alert.getWarningType().getCode());
+                    .setContent(alert.getContent())
+                    .setLog(alert.getLog())
+                    .setTitle(alert.getTitle())
+                    .setTitle(alert.getTitle())
+                    .setWarnType(alert.getWarningType().getCode());
 
             for (AlertPluginInstance instance : alertInstanceList) {
 
@@ -81,23 +103,22 @@ public final class AlertSender {
                 }
             }
         }
-
     }
 
     /**
      * sync send alert handler
      *
      * @param alertGroupId alertGroupId
-     * @param title title
-     * @param content content
+     * @param title        title
+     * @param content      content
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content , int warnType) {
+    public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content, int warnType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
         alertData.setContent(content)
-                 .setTitle(title)
-                 .setWarnType(warnType);
+                .setTitle(title)
+                .setWarnType(warnType);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -116,7 +137,7 @@ public final class AlertSender {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
             if (alertResult != null) {
                 AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                    Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                        Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
                 sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
                 sendResponseResults.add(alertSendResponseResult);
             }
@@ -128,7 +149,7 @@ public final class AlertSender {
     /**
      * alert result handler
      *
-     * @param instance instance
+     * @param instance  instance
      * @param alertData alertData
      * @return AlertResult
      */
@@ -147,7 +168,7 @@ public final class AlertSender {
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         String instanceWarnType = WarningType.ALL.getDescp();
 
-        if(paramsMap != null){
+        if (paramsMap != null) {
             instanceWarnType = paramsMap.getOrDefault(AlertConstants.NAME_WARNING_TYPE, WarningType.ALL.getDescp());
         }
 

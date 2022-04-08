@@ -36,10 +36,10 @@ import io.netty.channel.Channel;
 public final class AlertRequestProcessor implements NettyRequestProcessor {
     private static final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
 
-    private final AlertSender alertSender;
+    private final AlertSenderService alertSenderService;
 
-    public AlertRequestProcessor(AlertSender alertSender) {
-        this.alertSender = alertSender;
+    public AlertRequestProcessor(AlertSenderService alertSenderService) {
+        this.alertSenderService = alertSenderService;
     }
 
     @Override
@@ -51,7 +51,7 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
 
         logger.info("Received command : {}", alertSendRequestCommand);
 
-        AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(
+        AlertSendResponseCommand alertSendResponseCommand = alertSenderService.syncHandler(
             alertSendRequestCommand.getGroupId(),
             alertSendRequestCommand.getTitle(),
             alertSendRequestCommand.getContent(),
