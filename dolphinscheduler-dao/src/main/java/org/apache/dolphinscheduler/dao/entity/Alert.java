@@ -99,13 +99,13 @@ public class Alert {
      * process_instance_id
      */
     @TableField("process_instance_id")
-    private Integer processInstanceId;
+    private int processInstanceId;
 
     /**
      * alert_type
      */
     @TableField("alert_type")
-    private Integer alertType;
+    private int alertType;
 
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
