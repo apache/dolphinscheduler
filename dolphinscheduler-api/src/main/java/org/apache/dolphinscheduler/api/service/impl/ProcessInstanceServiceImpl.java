@@ -214,7 +214,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
-            processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
             processInstance.setLocations(processDefinition.getLocations());
             processInstance.setDagData(processService.genDagData(processDefinition));
             result.put(DATA_LIST, processInstance);
