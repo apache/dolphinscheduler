@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.common.enums;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * alert status
+ * alert sending(execution) status
  */
 public enum AlertStatus {
     /**

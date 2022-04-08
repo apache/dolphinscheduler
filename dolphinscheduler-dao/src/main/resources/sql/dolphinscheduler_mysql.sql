@@ -286,6 +286,10 @@ CREATE TABLE `t_ds_alert` (
   `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project_code',
+  `process_definition_code` bigint(20) DEFAULT NULL COMMENT 'process_definition_code',
+  `process_instance_id` int(11) DEFAULT NULL COMMENT 'process_instance_id',
+  `alert_type` int(11) DEFAULT NULL COMMENT 'alert_type',
   PRIMARY KEY (`id`),
   KEY `idx_status` (`alert_status`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
