@@ -564,6 +564,7 @@ const project = {
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?',
+    forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
     refresh: 'Refresh'
