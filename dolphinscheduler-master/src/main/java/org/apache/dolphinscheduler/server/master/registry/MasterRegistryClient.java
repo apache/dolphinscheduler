@@ -112,10 +112,7 @@ public class MasterRegistryClient {
     }
 
     public void start() {
-        String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
         try {
-            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
-            registryClient.getLock(nodeLock);
             // master registry
             registry();
 
@@ -123,8 +120,6 @@ public class MasterRegistryClient {
         } catch (Exception e) {
             logger.error("master start up exception", e);
             throw new RuntimeException("master start up error", e);
-        } finally {
-            registryClient.releaseLock(nodeLock);
         }
     }
 
