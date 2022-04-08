@@ -559,6 +559,7 @@ const project = {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?',
+    forced_success: '强制成功',
     view_log: '查看日志',
     download_log: '下载日志',
     refresh: '刷新'
