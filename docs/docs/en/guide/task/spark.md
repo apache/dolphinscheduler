@@ -65,4 +65,4 @@ Configure the required content according to the parameter descriptions above.
 
 ## Notice
 
-JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
+JAVA and Scala only used for identification, there is no difference. If you use Python to develop Spark application, there is no class of the main function and the rest is the same.
