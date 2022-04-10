@@ -75,7 +75,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", defaultTestAlertGroupName);
         paramsMap.add("groupType", "email");
-        paramsMap.add("description", "cxc junit 测试告警描述");
+        paramsMap.add("description", "cxc junit test alert description");
         paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
                 .header("sessionId", sessionId)
