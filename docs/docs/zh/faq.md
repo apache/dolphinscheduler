@@ -290,10 +290,9 @@ A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/do
 
 ​	3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
 
-​	4，到 bin 下，启动 worker server 和 logger server
+​	4，到 bin 下，启动 worker server
 ```
         ./dolphinscheduler-daemon.sh start worker-server
-        ./dolphinscheduler-daemon.sh start logger-server
 ```
 
 ---
@@ -594,7 +593,7 @@ A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EM
    
    2. 将 `conf/common.properties` 中的 `yarn.application.status.address` 修改为当前集群的 Yarn 的信息
    
-   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 和 `bin/dolphinscheduler-daemon.sh start logger-server` 分别启动 worker-server 和 logger-server
+   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 启动 worker-server
 
 ---
 

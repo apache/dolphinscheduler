@@ -306,11 +306,10 @@ A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluste
 
 ​		3, Copy the deployment directory from worker server that has already deployed
 
-​		4, Go to bin dir, then start worker server and logger server
+​		4, Go to bin dir, then start worker server
 
         ```
         ./dolphinscheduler-daemon.sh start worker-server
-        ./dolphinscheduler-daemon.sh start logger-server
         ```
 
 ---
@@ -613,7 +612,7 @@ A：By deploying different worker in different yarn clusters，the steps are as 
    
    2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
    
-   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` and `bin/dolphinscheduler-daemon.sh start logger-server` to start worker-server and logger-server
+   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` to start worker-server
 
 ---
 
