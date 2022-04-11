@@ -35,6 +35,7 @@
 
 ### Audit Log
 
-审计日志的记录提供了有关谁访问了系统，以及他或她在给定时间段内执行了哪些操作的信息，他对于维护安全都很有用。
+The audit log provides information about who accesses the system and the operations made to the system and record related
+time, which strengthen the security of the system and maintenance.
 
 ![audit-log](/img/new_ui/dev/monitor/audit-log.jpg)

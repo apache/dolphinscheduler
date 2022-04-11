@@ -1,9 +1,9 @@
 # Task Definition
 
-Task definition allow your operated the tasks in the task level. We already have workflow level task editor in
-[workflow definition](workflow-definition.md) which you can click the specific workflow and then edit its task definition.
-It is depressing when you want to edit the task definition but do not remember which workflow it belongs to. So we decide
-to add `Task Definition` view under `Task` menu.
+Task definition allows to modify or operate tasks at the task level rather than modifying them in the workflow definition.
+We already have workflow level task editor in [workflow definition](workflow-definition.md) which you can click the specific
+workflow and then edit its task definition. It is depressing when you want to edit the task definition but do not remember
+which workflow it belongs to. So we decide to add `Task Definition` view under `Task` menu.
 
 ![task-definition](/img/new_ui/dev/project/task-definition.jpg)
 
