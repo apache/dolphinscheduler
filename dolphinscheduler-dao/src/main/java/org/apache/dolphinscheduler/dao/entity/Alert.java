@@ -104,13 +104,13 @@ public class Alert {
      * process_instance_id
      */
     @TableField("process_instance_id")
-    private int processInstanceId;
+    private Integer processInstanceId;
 
     /**
      * alert_type
      */
     @TableField("alert_type")
-    private int alertType;
+    private Integer alertType;
 
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
@@ -222,19 +222,19 @@ public class Alert {
         this.processDefinitionCode = processDefinitionCode;
     }
 
-    public int getProcessInstanceId() {
+    public Integer getProcessInstanceId() {
         return processInstanceId;
     }
 
-    public void setProcessInstanceId(int processInstanceId) {
+    public void setProcessInstanceId(Integer processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
-    public int getAlertType() {
+    public Integer getAlertType() {
         return alertType;
     }
 
-    public void setAlertType(int alertType) {
+    public void setAlertType(Integer alertType) {
         this.alertType = alertType;
     }
 
