@@ -17,10 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -67,8 +71,10 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,13 +92,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 /**
  * master exec thread,split dag
@@ -447,6 +450,7 @@ public class WorkflowExecuteThread {
 
         if (taskInstance.getState().typeIsSuccess()) {
             completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+            processInstance.setVarPool(taskInstance.getVarPool());
             processService.saveProcessInstance(processInstance);
             if (!processInstance.isBlocked()) {
                 submitPostNode(Long.toString(taskInstance.getTaskCode()));
@@ -1210,6 +1214,10 @@ public class WorkflowExecuteThread {
             if (allProperty.size() > 0) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
+        } else {
+            if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
+                taskInstance.setVarPool(processInstance.getVarPool());
+            }
         }
     }
 
@@ -1279,19 +1287,19 @@ public class WorkflowExecuteThread {
             taskInstances.add(task);
         }
         //the end node of the branch of the dag
-        if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)){
+        if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)) {
             TaskInstance endTaskInstance = taskInstanceMap.get(completeTaskMap.get(NumberUtils.toLong(parentNodeCode)));
             String taskInstanceVarPool = endTaskInstance.getVarPool();
-            if(StringUtils.isNotEmpty(taskInstanceVarPool)) {
+            if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
                 Set<Property> taskProperties = JSONUtils.toList(taskInstanceVarPool, Property.class)
-                        .stream().collect(Collectors.toSet());
+                    .stream().collect(Collectors.toSet());
                 String processInstanceVarPool = processInstance.getVarPool();
                 if (StringUtils.isNotEmpty(processInstanceVarPool)) {
                     Set<Property> properties = JSONUtils.toList(processInstanceVarPool, Property.class)
-                            .stream().collect(Collectors.toSet());
+                        .stream().collect(Collectors.toSet());
                     properties.addAll(taskProperties);
                     processInstance.setVarPool(JSONUtils.toJsonString(properties));
-                }else{
+                } else {
                     processInstance.setVarPool(JSONUtils.toJsonString(taskProperties));
                 }
             }
@@ -1637,7 +1645,7 @@ public class WorkflowExecuteThread {
             stateEvent.setExecutionStatus(processInstance.getState());
             stateEvent.setProcessInstanceId(this.processInstance.getId());
             stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
-//            this.processStateChangeHandler(stateEvent);
+            // this.processStateChangeHandler(stateEvent);
             // replace with `stateEvents`, make sure `WorkflowExecuteThread` can be deleted to avoid memory leaks
             this.stateEvents.add(stateEvent);
         }
@@ -1650,10 +1658,10 @@ public class WorkflowExecuteThread {
         ExecutionStatus state = stateEvent.getExecutionStatus();
         if (processInstance.getState() != state) {
             logger.info(
-                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
-                    processInstance.getId(), processInstance.getName(),
-                    processInstance.getState(), state,
-                    processInstance.getCommandType());
+                "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
+                processInstance.getId(), processInstance.getName(),
+                processInstance.getState(), state,
+                processInstance.getCommandType());
 
             processInstance.setState(state);
             if (state.typeIsFinished()) {
