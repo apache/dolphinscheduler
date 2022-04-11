@@ -13,7 +13,7 @@
 应用指将告警结果通过企业微信的自定义应用进行通知，支持向特定用户发送消息和对所有人发送消息。目前还不支持部门和标签，欢迎提PR贡献代码。
 下图是应用告警配置的示例:
 
-![enterprise-wechat-app-msg](/img/alert/wechat-app-form-example-cn.png)
+![enterprise-wechat-app-msg](/img/alert/wechat-app-form-example.png)
 
 下图是应用告警消息的示例:
 
@@ -40,7 +40,7 @@
 群聊指将告警结果通过企业微信API创建的群聊进行通知，会向该群聊下的所有人发送消息，不支持向特定用户发送消息。
 下图是群聊告警配置的示例:
 
-![enterprise-wechat-group-msg](/img/alert/wechat-group-form-example-cn.png)
+![enterprise-wechat-group-msg](/img/alert/wechat-group-form-example.png)
 
 下图是群聊告警消息的示例:
 
