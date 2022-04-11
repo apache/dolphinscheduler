@@ -1171,7 +1171,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * join parent global params into sub process.
+     * join parent var pool params into sub process.
      * only the keys doesn't in sub process global would be joined.
      *
      * @param parentValPool
