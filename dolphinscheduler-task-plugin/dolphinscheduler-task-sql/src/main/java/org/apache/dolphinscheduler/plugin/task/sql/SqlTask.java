@@ -187,7 +187,8 @@ public class SqlTask extends AbstractTaskExecutor {
             }
 
             // pre sql
-            preSql(connection, preStatementsBinds);
+            executeUpdate(connection, preStatementsBinds, "pre");
+
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
 
             String result = null;
@@ -204,7 +205,7 @@ public class SqlTask extends AbstractTaskExecutor {
             }
             //deal out params
             sqlParameters.dealOutParam(result);
-            postSql(connection, postStatementsBinds);
+            executeUpdate(connection, postStatementsBinds, "post");
         } catch (Exception e) {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
@@ -288,35 +289,11 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    /**
-     * pre sql
-     *
-     * @param connection connection
-     * @param preStatementsBinds preStatementsBinds
-     */
-    private void preSql(Connection connection,
-                        List<SqlBinds> preStatementsBinds) throws Exception {
-        for (SqlBinds sqlBind : preStatementsBinds) {
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
-                int result = pstmt.executeUpdate();
-                logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
-
-            }
-        }
-    }
-
-    /**
-     * post sql
-     *
-     * @param connection connection
-     * @param postStatementsBinds postStatementsBinds
-     */
-    private void postSql(Connection connection,
-                         List<SqlBinds> postStatementsBinds) throws Exception {
+    private void executeUpdate(Connection connection, List<SqlBinds> postStatementsBinds, String handlerType) throws Exception {
         for (SqlBinds sqlBind : postStatementsBinds) {
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
-                int result = pstmt.executeUpdate();
-                logger.info("post statement execute result: {},for sql: {}", result, sqlBind.getSql());
+            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
+                int result = statement.executeUpdate();
+                logger.info("{} statement execute result: {},for sql: {}", handlerType, result, sqlBind.getSql());
             }
         }
     }
