@@ -17,19 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * udf function
@@ -39,13 +38,23 @@ public class UdfFunc {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
     /**
      * user id
      */
     private int userId;
 
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(String resourceType) {
+        this.resourceType = "UDF";
+    }
+
+    @TableField(exist = false)
+    private String resourceType = "UDF";
     /**
      * udf function name
      */
