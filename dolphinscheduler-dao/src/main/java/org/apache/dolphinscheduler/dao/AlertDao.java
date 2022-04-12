@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -73,7 +74,7 @@ public class AlertDao {
     }
 
     /**
-     * update alert
+     * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
      * @param log log
@@ -131,6 +132,7 @@ public class AlertDao {
         alert.setAlertGroupId(alertGroupId);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
+        alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
         // we use this method to avoid insert duplicate alert(issue #5525)
         alertMapper.insertAlertWhenServerCrash(alert);
     }
@@ -163,6 +165,10 @@ public class AlertDao {
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Process Timeout Warn");
+        alert.setProjectCode(projectUser.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.PROCESS_INSTANCE_TIMEOUT);
         saveTaskTimeoutAlert(alert, content, alertGroupId);
     }
 
@@ -203,6 +209,10 @@ public class AlertDao {
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
+        alert.setProjectCode(projectUser.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.TASK_TIMEOUT);
         saveTaskTimeoutAlert(alert, content, processInstance.getWarningGroupId());
     }
 
