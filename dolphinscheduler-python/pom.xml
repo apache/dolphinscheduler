@@ -30,6 +30,12 @@
 
     <profiles>
         <profile>
+            <id>release</id>
+            <properties>
+                <python.sign.skip>false</python.sign.skip>
+            </properties>
+        </profile>
+        <profile>
             <id>python</id>
             <build>
                 <plugins>
