@@ -47,11 +47,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -402,7 +398,18 @@ public class MasterRegistryClient {
         List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
 
         long startTime = System.currentTimeMillis();
-        List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
+        List<ProcessInstance> needFailoverProcessInstanceList = new ArrayList<>();
+
+        while (true) {
+            try {
+                needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
+                break;
+
+            } catch (Exception e) {
+                logger.error("Failed to connect to mysql. Try again 1 minute later......");
+                ThreadUtils.sleep(60 * 1000);
+            }
+        }
         logger.info("start master[{}] failover, process list size:{}", masterHost, needFailoverProcessInstanceList.size());
 
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
