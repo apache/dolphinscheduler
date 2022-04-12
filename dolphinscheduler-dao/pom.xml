@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>dev-SNAPSHOT</version>
+        <version>dev-20220412-1028</version>
     </parent>
     <artifactId>dolphinscheduler-dao</artifactId>
     <name>${project.artifactId}</name>
