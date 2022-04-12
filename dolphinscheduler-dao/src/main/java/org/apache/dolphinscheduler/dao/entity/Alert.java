@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
@@ -111,7 +112,7 @@ public class Alert {
      * alert_type
      */
     @TableField("alert_type")
-    private Integer alertType;
+    private AlertType alertType;
 
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
@@ -231,11 +232,11 @@ public class Alert {
         this.processInstanceId = processInstanceId;
     }
 
-    public Integer getAlertType() {
+    public AlertType getAlertType() {
         return alertType;
     }
 
-    public void setAlertType(Integer alertType) {
+    public void setAlertType(AlertType alertType) {
         this.alertType = alertType;
     }
 
