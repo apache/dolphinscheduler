@@ -20,14 +20,17 @@ package org.apache.dolphinscheduler.common.enums;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * warning message notification method
+ * describe the reason why alert generates
  */
 public enum AlertType {
     /**
-     * 0 email; 1 SMS
+     * 0 process instance failure; 1 process instance success, 2 fault tolerance warning, 3 task failure, 4 task success
      */
-    EMAIL(0, "email"),
-    SMS(1, "SMS");
+    PROCESS_INSTANCE_FAILURE(0, "process instance failure"),
+    PROCESS_INSTANCE_SUCCESS(1, "process instance success"),
+    FAULT_TOLERANCE_WARNING(2, "fault tolerance warning"),
+    TASK_FAILURE(3, "task failure"),
+    TASK_SUCCESS(4, "task success");
 
     AlertType(int code, String descp) {
         this.code = code;

@@ -22,13 +22,19 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-python</artifactId>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
     <profiles>
+        <profile>
+            <id>release</id>
+            <properties>
+                <python.sign.skip>false</python.sign.skip>
+            </properties>
+        </profile>
         <profile>
             <id>python</id>
             <build>
