@@ -86,6 +86,23 @@ public abstract class AbstractParameters implements IParameters {
     }
 
     /**
+     * get input local parameters map if the param direct is IN
+     * @return parameters map
+     */
+    public Map<String, Property> getInputLocalParametersMap() {
+        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
+        if (localParams != null) {
+
+            for (Property property : localParams) {
+                if (property.getDirect().equals(Direct.IN)) {
+                    localParametersMaps.put(property.getProp(), property);
+                }
+            }
+        }
+        return localParametersMaps;
+    }
+
+    /**
      * get varPool map
      *
      * @return parameters map
