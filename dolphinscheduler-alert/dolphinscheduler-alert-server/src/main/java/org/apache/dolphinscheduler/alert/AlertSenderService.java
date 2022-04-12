@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
@@ -34,14 +33,17 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public final class AlertSenderService extends Thread {
@@ -74,7 +76,6 @@ public final class AlertSenderService extends Thread {
             }
         }
     }
-
 
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
@@ -212,7 +213,8 @@ public final class AlertSenderService extends Thread {
         }
 
         if (!sendWarning) {
-            logger.info("Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}", pluginInstanceName, warningType.getCode(), alertData.getWarnType());
+            logger.info("Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}",
+                    pluginInstanceName, warningType.getCode(), alertData.getWarnType());
             return null;
         }
 
