@@ -87,11 +87,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ github.event_name }} == 'push' && ${{ needs.build.result }} != 'success' ]]; then
-            echo "Build Failed!"
-            exit -1
-          fi
-          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
             echo "Skip Build!"
             exit 0
           fi

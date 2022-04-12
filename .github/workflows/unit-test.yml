@@ -120,11 +120,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ github.event_name }} == 'push' && ${{ needs.unit-test.result }} != 'success' ]]; then
-          echo "Unit Test Failed!"
-          exit -1
-          fi
-          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
             echo "Skip Unit Test!"
             exit 0
           fi
