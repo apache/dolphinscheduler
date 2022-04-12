@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -194,6 +195,7 @@ public class ProcessAlertManager {
             alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
+            alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
             alertDao.addAlert(alert);
             logger.info("add alert to db , alert : {}", alert);
 
@@ -227,6 +229,10 @@ public class ProcessAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProjectCode(projectUser.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -285,6 +291,11 @@ public class ProcessAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProjectCode(result.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        //might need to change to data quality status
+        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -299,6 +310,9 @@ public class ProcessAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.TASK_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -392,6 +406,10 @@ public class ProcessAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProjectCode(projectUser.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.PROCESS_INSTANCE_BLOCKED);
         alertDao.addAlert(alert);
         logger.info("add alert to db, alert: {}",alert);
     }
