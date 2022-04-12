@@ -24,8 +24,9 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum AlertType {
     /**
-     * 0 process instance failure; 1 process instance success, 2 fault tolerance warning, 3 task failure, 4 task success
-     */
+     * 0 process instance failure, 1 process instance success, 2 process instance blocked, 3 process instance timeout, 4 fault tolerance warning,
+     * 5 task failure, 6 task success, 7 task timeout
+      */
     PROCESS_INSTANCE_FAILURE(0, "process instance failure"),
     PROCESS_INSTANCE_SUCCESS(1, "process instance success"),
     PROCESS_INSTANCE_BLOCKED(2, "process instance blocked"),
