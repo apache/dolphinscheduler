@@ -58,6 +58,7 @@ jobs:
           node-version: 16
       - name: Compile and Build
         run: |
-          npm install
-          npm run lint
-          npm run build:prod
+          npm install pnpm -g
+          pnpm install
+          pnpm run lint
+          pnpm run build:prod
