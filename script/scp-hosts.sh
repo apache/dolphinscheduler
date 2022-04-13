@@ -27,7 +27,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     txt="''"
 fi
 
-workersGroupMap=()
+declare -A workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
