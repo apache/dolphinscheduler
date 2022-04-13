@@ -115,7 +115,7 @@ export default defineComponent({
         validator() {
           const props = new Set()
 
-          const keys = formValue.value.globalParams.map(item => item.key)
+          const keys = formValue.value.globalParams.map((item) => item.key)
           const keysSet = new Set(keys)
           if (keysSet.size !== keys.length) {
             return new Error(t('project.dag.prop_repeat'))

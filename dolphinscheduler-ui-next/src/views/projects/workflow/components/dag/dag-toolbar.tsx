@@ -481,7 +481,9 @@ export default defineComponent({
             type='info'
             secondary
             round
-            disabled={props.definition?.processDefinition?.releaseState === 'ONLINE'}
+            disabled={
+              props.definition?.processDefinition?.releaseState === 'ONLINE'
+            }
             onClick={() => {
               context.emit('saveModelToggle', true)
             }}
