@@ -16,9 +16,13 @@ The following is the `APP` alert config example:
 
 ![enterprise-wechat-app-msg](/img/alert/wechat-app-form-example-en.png)
 
-The following is the `APP` alert message example:
+The following is the `APP` `MARKDOWN` alert message example:
 
-![enterprise-wechat-app-msg](/img/alert/enterprise-wechat-app-msg-en.png)
+![enterprise-wechat-app-msg-markdown](/img/alert/enterprise-wechat-app-msg-md.png)
+
+The following is the `APP` `TEXT` alert message example:
+
+![enterprise-wechat-app-msg-text](/img/alert/enterprise-wechat-app-msg-en.png)
 
 #### Prerequisites
 
@@ -44,9 +48,13 @@ The following is the `Group Chat` alert config example:
 
 ![enterprise-wechat-app-msg](/img/alert/wechat-group-form-example-en.png)
 
-The following is the `Group Chat` alert message example:
+The following is the `APP` `MARKDOWN` alert message example:
 
-![enterprise-wechat-group-msg](/img/alert/enterprise-wechat-group-msg-en.png)
+![enterprise-wechat-group-msg-markdown](/img/alert/enterprise-wechat-group-msg-md.png)
+
+The following is the `Group Chat` `TEXT` alert message example:
+
+![enterprise-wechat-group-msg-text](/img/alert/enterprise-wechat-group-msg-en.png)
 
 #### Prerequisites
 
