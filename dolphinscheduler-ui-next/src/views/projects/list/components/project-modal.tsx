@@ -117,7 +117,7 @@ const ProjectModal = defineComponent({
           </NFormItem>
           <NFormItem label={t('project.list.owned_users')} path='userName'>
             <NInput
-              disabled={this.statusRef === 0}
+              disabled={true}
               v-model={[this.model.userName, 'value']}
               placeholder={t('project.list.username_tips')}
             />
