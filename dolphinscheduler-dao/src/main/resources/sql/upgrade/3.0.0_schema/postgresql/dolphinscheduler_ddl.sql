@@ -17,6 +17,31 @@
 
 delimiter d//
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+    )
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
+
+    --- alter column
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
+
+    return 'Success!';
+    exception when others then
+        ---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+
+select dolphin_update_metadata();
+
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
     RETURNS character varying
     LANGUAGE 'plpgsql'
