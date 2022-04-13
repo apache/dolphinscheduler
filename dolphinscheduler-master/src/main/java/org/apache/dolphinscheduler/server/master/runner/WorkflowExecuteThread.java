@@ -267,10 +267,8 @@ public class WorkflowExecuteThread {
         }
         while (!this.stateEvents.isEmpty()) {
             try {
-                StateEvent stateEvent = this.stateEvents.peek();
-                if (stateEventHandler(stateEvent)) {
-                    this.stateEvents.remove(stateEvent);
-                }
+                StateEvent stateEvent = this.stateEvents.poll();
+                stateEventHandler(stateEvent);
             } catch (Exception e) {
                 logger.error("state handle error:", e);
             }
@@ -339,10 +337,6 @@ public class WorkflowExecuteThread {
                 break;
             default:
                 break;
-        }
-
-        if (result) {
-            this.stateEvents.remove(stateEvent);
         }
         return result;
     }
