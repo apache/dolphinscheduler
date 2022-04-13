@@ -37,7 +37,7 @@ firstColumn="node  server  state"
 echo $firstColumn
 echo -e '\n'
 
-workersGroupMap=()
+declare -A workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
