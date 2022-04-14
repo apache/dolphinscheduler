@@ -29,14 +29,15 @@
 
 .load-average {
   @include base;
-  color: dodgerblue;
+  color: var(--n-color-target);
 }
 
 .link-btn {
-  color: #579cd8;
+  color: var(--n-color-target);
   cursor: pointer;
 
   &:hover {
-    color: #80bef7;
+    color: var(--n-color-target);
+    opacity: 0.8;
   }
 }
