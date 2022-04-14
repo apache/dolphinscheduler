@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>dev-SNAPSHOT</version>
+        <version>dev-20220414-1341</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
