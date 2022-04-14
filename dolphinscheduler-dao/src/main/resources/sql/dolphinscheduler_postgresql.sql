@@ -208,6 +208,7 @@ DROP TABLE IF EXISTS t_ds_alert;
 CREATE TABLE t_ds_alert (
   id int NOT NULL  ,
   title varchar(64) DEFAULT NULL ,
+  sign varchar(40) NOT NULL DEFAULT '',
   content text ,
   alert_status int DEFAULT '0' ,
   warning_type int DEFAULT '2' ,
@@ -220,9 +221,11 @@ CREATE TABLE t_ds_alert (
   process_instance_id int DEFAULT NULL ,
   alert_type int DEFAULT NULL ,
   PRIMARY KEY (id)
-) ;
+);
+comment on column t_ds_alert.sign is 'sign=sha1(content)';
 
 create index idx_status on t_ds_alert (alert_status);
+create index idx_sign on t_ds_alert (sign);
 
 --
 -- Table structure for table t_ds_alertgroup
