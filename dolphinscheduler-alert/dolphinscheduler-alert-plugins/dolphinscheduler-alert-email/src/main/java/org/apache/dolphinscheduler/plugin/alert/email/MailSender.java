@@ -338,7 +338,7 @@ public final class MailSender {
         ExcelUtils.genExcelFile(content, randomFilename, xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(randomFilename + EmailConstants.EXCEL_SUFFIX_XLSX, EmailConstants.UTF_8, "B"));
+        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLSX, EmailConstants.UTF_8, "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
