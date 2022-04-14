@@ -32,7 +32,12 @@ import type { IJsonItem } from '../types'
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-    model.programType === 'PYTHON' ? 0 : 24
+    // model.programType === 'PYTHON' ? 0 : 24
+      (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+  )
+
+  const rawScriptSpan = computed(() =>
+      model.programType === 'SQL' ? 24 : 0
   )
 
   return [
@@ -75,6 +80,17 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useMainJar(model),
+    {
+      type: 'editor',
+      field: 'rawScript',
+      span: rawScriptSpan,
+      name: t('project.node.script'),
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: model.programType === 'SQL',
+        message: t('project.node.script_tips')
+      }
+    },
     useDeployMode(),
     {
       type: 'input',
@@ -124,6 +140,10 @@ export const PROGRAM_TYPES = [
   {
     label: 'PYTHON',
     value: 'PYTHON'
+  },
+  {
+    label: 'SQL',
+    value: 'SQL'
   }
 ]
 

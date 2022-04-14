@@ -91,7 +91,7 @@ public class SparkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
     private ProgramType programType;
 
@@ -99,6 +99,11 @@ public class SparkParameters extends AbstractParameters {
      * spark version
      */
     private String sparkVersion;
+
+    /**
+     * shell script
+     */
+    private String rawScript;
 
     /**
      * resource list
@@ -223,6 +228,14 @@ public class SparkParameters extends AbstractParameters {
 
     public void setSparkVersion(String sparkVersion) {
         this.sparkVersion = sparkVersion;
+    }
+
+    public String getRawScript() {
+        return rawScript;
+    }
+
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
     }
 
     @Override

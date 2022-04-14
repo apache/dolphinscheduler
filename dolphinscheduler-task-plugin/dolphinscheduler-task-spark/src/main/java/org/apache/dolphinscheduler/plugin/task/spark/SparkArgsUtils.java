@@ -17,23 +17,40 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 /**
  * spark args utils
  */
 public class SparkArgsUtils {
 
+    private final static Logger logger = LoggerFactory.getLogger(SparkArgsUtils.class);
+
     private static final String SPARK_CLUSTER = "cluster";
 
     private static final String SPARK_LOCAL = "local";
 
     private static final String SPARK_ON_YARN = "yarn";
+
+    private static TaskExecutionContext taskRequest;
 
     private SparkArgsUtils() {
         throw new IllegalStateException("Utility class");
@@ -45,7 +62,7 @@ public class SparkArgsUtils {
      * @param param param
      * @return argument list
      */
-    public static List<String> buildArgs(SparkParameters param) {
+    public static List<String> buildArgs(SparkParameters param) throws IOException {
         List<String> args = new ArrayList<>();
         args.add(SparkConstants.MASTER);
 
@@ -58,9 +75,46 @@ public class SparkArgsUtils {
 
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
-        if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
+        String rawScript = param.getRawScript();
+        if (programType != null && programType != ProgramType.PYTHON && programType != ProgramType.SQL && StringUtils.isNotEmpty(mainClass)) {
             args.add(SparkConstants.MAIN_CLASS);
             args.add(mainClass);
+        }
+        if (programType != null && programType == ProgramType.SQL && StringUtils.isNotEmpty(rawScript)){
+            args.add(SparkConstants.SQL_FILE);
+
+            StringBuffer sb = new StringBuffer();
+            sb.append("set");
+            sb.append(programType);
+            sb.append(";\n");
+
+            // generate scripts
+            String fileName = String.format("%s/%s_node.%s",
+                    taskRequest.getExecutePath(),
+                    taskRequest.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sql");
+
+            File file = new File(fileName);
+            Path path = file.toPath();
+
+            if (!Files.exists(path)) {
+                String script = param.getRawScript().replaceAll("\\r\\n", "\n");
+                param.setRawScript(script);
+                logger.info("raw script : {}", param.getRawScript());
+                logger.info("task execute path : {}", taskRequest.getExecutePath());
+
+                Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+                FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+                if (OSUtils.isWindows()) {
+                    Files.createFile(path);
+                } else {
+                    if (!file.getParentFile().exists()){
+                        file.getParentFile().mkdirs();
+                    }
+                    Files.createFile(path, attr);
+                }
+                Files.write(path, param.getRawScript().getBytes(), StandardOpenOption.APPEND);
+            }
+            args.add(fileName);
         }
 
         int driverCores = param.getDriverCores();
@@ -114,12 +168,14 @@ public class SparkArgsUtils {
         }
 
         ResourceInfo mainJar = param.getMainJar();
-        if (mainJar != null) {
+//        if (mainJar != null) {
+        if (programType != null && programType != ProgramType.SQL && mainJar != null) {
             args.add(mainJar.getRes());
         }
 
         String mainArgs = param.getMainArgs();
-        if (StringUtils.isNotEmpty(mainArgs)) {
+//        if (StringUtils.isNotEmpty(mainArgs)) {
+        if (programType != null && programType != ProgramType.SQL && StringUtils.isNotEmpty(mainArgs)) {
             args.add(mainArgs);
         }
 

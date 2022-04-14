@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +61,9 @@ public class SparkTask extends AbstractYarnTask {
             return;
         }
 
-        if (!sparkParameters.checkParameters()) {
+//        if (!sparkParameters.checkParameters()) {
+        ProgramType programType = sparkParameters.getProgramType();
+        if (programType != ProgramType.SQL && !sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
         sparkParameters.setQueue(taskExecutionContext.getQueue());
@@ -84,10 +86,18 @@ public class SparkTask extends AbstractYarnTask {
             sparkCommand = SparkVersion.SPARK1.getCommand();
         }
 
+        if (SparkVersion.SPARKSQL.name().equals(sparkParameters.getSparkVersion())){
+            sparkCommand = SparkVersion.SPARKSQL.getCommand();
+        }
+
         args.add(sparkCommand);
 
         // other parameters
-        args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
+        try {
+            args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
