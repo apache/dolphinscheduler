@@ -14,9 +14,17 @@ of to [language](#language) control button.
 
 ## Time Zone
 
-DolphinScheduler support time zone setting. The build-in time zone is based on the server you run DolphinScheduler. You could
+DolphinScheduler support time zone setting. 
+
+Server Time Zone
+
+Use `bin/dolphinshceduler_daemon.sh` to start server, the default time zone is UTC, you could update `SPRING_JACKSON_TIME_ZONE` in `bin/env/dolphinscheduler_env.sh`, such as `export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-Asia/Shanghai}`.<br>
+If you start server in idea, the default time zone is your local time zone, you could add the JVM parameter to update server time zone, such as `-Duser.timezone=UTC`.
+
+User Time zone
+
+The user's default time zone is based on the time zone in which you run the DolphinScheduler service.You could
 click the button on the right of the [language](#language) button and then click `Choose timeZone` to choose the time zone
 you want to switch. All time related components will adjust their time zone according to the time zone setting you select.
 
-DolphinScheduler uses UTC time for the internal communication, the time zone you choose only changes the display time format
-base on the UTC time. When you choose time zone `TIME ZONE`, we just convert the UTC time to the zone you prefer.
+

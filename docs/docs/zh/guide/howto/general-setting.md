@@ -12,8 +12,14 @@ DolphinScheduler 支持两种类型的内置主题，包括 `Dark` 和 `Light`�
 
 ## 时区
 
-DolphinScheduler 支持时区设置。默认时区基于您运行 DolphinScheduler 服务器的时区。如果你想要切换时区，可以点击 [语言](#语言) 按钮右侧的时区按钮，
-然后点击 `请选择时区` 进行时区选择。当切换完成后，所有与时间相关的组件都将更改。
+DolphinScheduler 支持时区设置。
 
-DolphinScheduler 内部通讯，以及任务主流程中使用 UTC 时间，在界面上显示的时间均是在 UTC 时间基础上进行时区格式化的，意味着当你切换了时区后，
-只是将格式化的时间从一个时区切换到另一个时区。
+服务时区
+
+使用脚本 `bin/dolphinshceduler_daemon.sh`启动服务， 服务的默认时区为UTC， 可以在`bin/env/dolphinscheduler_env.sh`中进行修改， 如`export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-Asia/Shanghai}`。<br>
+idea 启动服务默认时区为本地时区，可以加jvm参数如`-Duser.timezone=UTC`来修改时区。
+
+用户时区
+
+用户的默认时区基于您运行 DolphinScheduler 服务的时区。如果你想要切换时区，可以点击 [语言](#语言) 按钮右侧的时区按钮，
+然后点击 `请选择时区` 进行时区选择。当切换完成后，所有与时间相关的组件都将更改。
