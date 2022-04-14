@@ -36,7 +36,7 @@ def _get_func_str(func: types.FunctionType) -> str:
     src_strip = ""
     lead_space_num = None
     for line in lines:
-        if not lead_space_num:
+        if lead_space_num is None:
             lead_space_num = sum(1 for _ in itertools.takewhile(str.isspace, line))
         if line.strip() == "@task":
             continue
