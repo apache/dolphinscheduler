@@ -58,7 +58,7 @@ def version(part: str) -> None:
     "--init",
     "-i",
     is_flag=True,
-    help="Initialize and create configuration file to `PYDOLPHINSCHEDULER_HOME`.",
+    help="Initialize and create configuration file to `PYDS_HOME`.",
 )
 @click.option(
     "--set",

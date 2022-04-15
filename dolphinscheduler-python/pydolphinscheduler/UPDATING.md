@@ -24,6 +24,11 @@ It started after version 2.0.5 released
 
 ## dev
 
+* Change variable about where to keep pydolphinscheduler configuration from ``PYDOLPHINSCHEDULER_HOME`` to
+  ``PYDS_HOME`` which is same as other environment variable name.
+
+## 3.0.0a0
+
 * Integrate Python gateway server into Dolphinscheduler API server, and you could start Python gateway service by command
   `./bin/dolphinscheduler-daemon.sh start api-server` instead of independent command
   `./bin/dolphinscheduler-daemon.sh start python-gateway-server`.
