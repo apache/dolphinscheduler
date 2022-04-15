@@ -21,8 +21,6 @@ workDir=`cd ${workDir};pwd`
 
 source ${workDir}/env/install_env.sh
 
-declare -A workersGroupMap=()
-
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
@@ -58,4 +56,4 @@ done
 
 # query server status
 echo "query server status"
-cd $installPath/; sh bin/status-all.sh
+cd $installPath/; bash bin/status-all.sh
