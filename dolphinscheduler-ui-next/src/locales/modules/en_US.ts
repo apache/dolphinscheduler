@@ -615,6 +615,7 @@ const project = {
     online: 'Online'
   },
   node: {
+    return_back: 'Return',
     current_node_settings: 'Current node settings',
     instructions: 'Instructions',
     view_history: 'View history',
@@ -627,7 +628,6 @@ const project = {
     workflow_name: 'Workflow Name',
     workflow_name_tips: 'Please select a workflow (required)',
     child_node: 'Child Node',
-    enter_child_node: 'Enter child node',
     run_flag: 'Run flag',
     normal: 'Normal',
     prohibition_execution: 'Prohibition execution',

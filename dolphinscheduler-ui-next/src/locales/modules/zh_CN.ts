@@ -527,6 +527,7 @@ const project = {
       '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    current_task_settings: '当前任务设置',
     online: '已上线',
     offline: '已下线',
     task_name: '任务名称',
@@ -610,6 +611,7 @@ const project = {
     online: '已上线'
   },
   node: {
+    return_back: '返回上一节点',
     current_node_settings: '当前节点设置',
     instructions: '使用说明',
     view_history: '查看历史',
@@ -622,7 +624,6 @@ const project = {
     workflow_name: '工作流名称',
     workflow_name_tips: '请选择工作流(必选)',
     child_node: '子节点',
-    enter_child_node: '进入该子节点',
     run_flag: '运行标志',
     normal: '正常',
     prohibition_execution: '禁止执行',

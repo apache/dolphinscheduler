@@ -57,8 +57,8 @@ interface SubIdReq {
 }
 
 interface TaskReq {
-  taskCode: string
-  taskId: number
+  taskCode?: string
+  taskId?: number
 }
 
 interface LongestReq {
