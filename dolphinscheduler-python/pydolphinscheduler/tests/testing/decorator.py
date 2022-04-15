@@ -15,16 +15,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init pydolphinscheduler.core package."""
+"""Decorator module for testing module."""
 
-from pydolphinscheduler.core.database import Database
-from pydolphinscheduler.core.engine import Engine
-from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.task import Task
+import types
+from functools import wraps
 
-__all__ = [
-    "Engine",
-    "ProcessDefinition",
-    "Task",
-    "Database",
-]
+
+def foo(func: types.FunctionType):
+    """Decorate which do nothing for testing module."""
+
+    @wraps(func)
+    def wrapper():
+        print("foo decorator called.")
+        func()
+
+    return wrapper

@@ -26,11 +26,15 @@ from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.tasks.python import Python
 
 
+def foo():  # noqa: D103
+    print("hello world.")
+
+
 @pytest.mark.parametrize(
     "attr, expect",
     [
         (
-            {"code": "print(1)"},
+            {"definition": "print(1)"},
             {
                 "rawScript": "print(1)",
                 "localParams": [],
@@ -39,7 +43,29 @@ from pydolphinscheduler.tasks.python import Python
                 "waitStartTimeout": {},
                 "conditionResult": {"successNode": [""], "failedNode": [""]},
             },
-        )
+        ),
+        (
+            {"definition": "def foo():\n    print('I am foo')"},
+            {
+                "rawScript": "def foo():\n    print('I am foo')\nfoo()",
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        ),
+        (
+            {"definition": foo},
+            {
+                "rawScript": 'def foo():  # noqa: D103\n    print("hello world.")\nfoo()',
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        ),
     ],
 )
 @patch(
@@ -66,13 +92,11 @@ def test_property_task_params(mock_code_version, attr, expect):
 def test_python_task_not_support_code(mock_code, script_code):
     """Test python task parameters."""
     name = "not_support_code_type"
-    with pytest.raises(PyDSParamException, match="Parameter code do not support .*?"):
+    with pytest.raises(
+        PyDSParamException, match="Parameter definition do not support .*?"
+    ):
         task = Python(name, script_code)
         task.raw_script
-
-
-def foo():  # noqa: D103
-    print("hello world.")
 
 
 @pytest.mark.parametrize(
@@ -82,7 +106,7 @@ def foo():  # noqa: D103
         (
             "function_define",
             foo,
-            'def foo():  # noqa: D103\n    print("hello world.")\n',
+            'def foo():  # noqa: D103\n    print("hello world.")\nfoo()',
         ),
     ],
 )

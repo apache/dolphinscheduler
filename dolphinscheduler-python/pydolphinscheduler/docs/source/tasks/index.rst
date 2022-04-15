@@ -23,6 +23,7 @@ In this section
 .. toctree::
    :maxdepth: 1
    
+   func_wrap
    shell
    sql
    python

@@ -51,6 +51,7 @@ doc = [
     "sphinx>=4.3",
     "sphinx_rtd_theme>=1.0",
     "sphinx-click>=3.0",
+    "sphinx-inline-tabs",
 ]
 
 test = [

@@ -15,16 +15,19 @@
    specific language governing permissions and limitations
    under the License.
 
-HOWTOs
-======
+Python Function Wrapper
+=======================
 
-pydolphinscheduler HOWTOs are documents that cover a single, specific topic, and attempt to cover it fairly
-completely. This collection is an effort to foster documentation that is more detailed than the :doc:`../concept`
-and :doc:`../tutorial`.
+A decorator covert Python function into pydolphinscheduler's task.
 
-Currently, the HOWTOs are:
+Example
+-------
 
-.. toctree::
-   :maxdepth: 2
-   
-   remote-submit
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/tutorial_decorator.py
+   :start-after: [start tutorial]
+   :end-before: [end tutorial]
+
+Dive Into
+---------
+
+.. automodule:: pydolphinscheduler.tasks.func_wrap

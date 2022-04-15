@@ -44,7 +44,7 @@ def test_task_without_example():
     Avoiding add new type of tasks but without adding example describe how to use it.
     """
     # We use example/tutorial.py as shell task example
-    ignore_name = {"__init__.py", "shell.py"}
+    ignore_name = {"__init__.py", "shell.py", "func_wrap.py"}
     all_tasks = {task.stem for task in get_tasks(ignore_name=ignore_name)}
 
     have_example_tasks = set()
@@ -97,7 +97,7 @@ def test_example_basic():
         ), f"We expect all examples is python script, but get {ex.name}."
 
         # All except tutorial and __init__ is end with keyword "_example"
-        if ex.stem != "tutorial" and ex.stem != "__init__":
+        if ex.stem not in ("tutorial", "tutorial_decorator") and ex.stem != "__init__":
             assert ex.stem.endswith(
                 "_example"
             ), f"We expect all examples script end with keyword '_example', but get {ex.stem}."
