@@ -33,26 +33,25 @@ export function useEdit(state: any) {
       skipLineNum: 0,
       limit: 3000
     }
-    const { state } = useAsyncState(viewResource(params, id), {})
+    const { state } = useAsyncState(viewResource(params, id), {
+      alias: '',
+      content: ''
+    })
     return state
   }
 
   const handleUpdateContent = (id: number) => {
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
-        try {
-          await updateResourceContent(
-            {
-              ...state.fileForm
-            },
-            id
-          )
+        await updateResourceContent(
+          {
+            ...state.fileForm
+          },
+          id
+        )
 
-          window.$message.success(t('resource.file.success'))
-          router.go(-1)
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
+        window.$message.success(t('resource.file.success'))
+        router.go(-1)
       }
     })
   }

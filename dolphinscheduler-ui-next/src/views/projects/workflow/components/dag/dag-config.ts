@@ -187,9 +187,7 @@ export const NODE = {
     },
     fo: {
       refX: '46%',
-      refY: -25,
-      width: 18,
-      height: 18
+      refY: -25
     }
   },
   ports: {
@@ -200,7 +198,12 @@ export const NODE = {
         group: X6_PORT_OUT_NAME
       }
     ]
-  }
+  },
+  tools: [
+    {
+      name: 'contextmenu'
+    }
+  ]
 }
 
 export const NODE_HOVER = {

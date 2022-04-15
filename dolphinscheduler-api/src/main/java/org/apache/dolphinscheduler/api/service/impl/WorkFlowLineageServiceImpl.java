@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.DependentItem;
-import org.apache.dolphinscheduler.common.model.DependentTaskModel;
-import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -34,9 +33,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.curator.shaded.com.google.common.collect.Sets;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,19 +80,18 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     }
 
     @Override
-    public Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long workFlowCode) {
+    public Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long sourceWorkFlowCode) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
-        Map<Long, WorkFlowLineage> workFlowLineagesMap = new HashMap<>();
+        List<WorkFlowLineage> workFlowLineages = new ArrayList<>();
         Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
-        Set<Long> sourceWorkFlowCodes = Sets.newHashSet(workFlowCode);
-        recursiveWorkFlow(projectCode, workFlowLineagesMap, workFlowRelations, sourceWorkFlowCodes);
+        recursiveWorkFlow(projectCode, sourceWorkFlowCode, workFlowLineages, workFlowRelations);
         Map<String, Object> workFlowLists = new HashMap<>();
-        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineagesMap.values());
+        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineages);
         workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
         result.put(Constants.DATA_LIST, workFlowLists);
         putMsg(result, Status.SUCCESS);
@@ -100,30 +99,50 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     }
 
     private void recursiveWorkFlow(long projectCode,
-                                   Map<Long, WorkFlowLineage> workFlowLineagesMap,
-                                   Set<WorkFlowRelation> workFlowRelations,
-                                   Set<Long> sourceWorkFlowCodes) {
-        for (Long workFlowCode : sourceWorkFlowCodes) {
-            WorkFlowLineage workFlowLineage = workFlowLineageMapper.queryWorkFlowLineageByCode(projectCode, workFlowCode);
-            workFlowLineagesMap.put(workFlowCode, workFlowLineage);
-            List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineageByCode(projectCode, workFlowCode);
-            List<TaskDefinition> taskDefinitionList = new ArrayList<>();
-            for (ProcessLineage processLineage : processLineages) {
-                if (processLineage.getPreTaskCode() > 0) {
-                    taskDefinitionList.add(new TaskDefinition(processLineage.getPreTaskCode(), processLineage.getPreTaskVersion()));
+                                   long sourceWorkFlowCode,
+                                   List<WorkFlowLineage> workFlowLineages,
+                                   Set<WorkFlowRelation> workFlowRelations) {
+        workFlowLineages.add(workFlowLineageMapper.queryWorkFlowLineageByCode(projectCode,sourceWorkFlowCode));
+
+        List<WorkFlowLineage> downStreamWorkFlowLineages =
+                workFlowLineageMapper.queryDownstreamLineageByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
+        workFlowLineages.addAll(downStreamWorkFlowLineages);
+        downStreamWorkFlowLineages.forEach(workFlowLineage -> workFlowRelations.add(new WorkFlowRelation(sourceWorkFlowCode, workFlowLineage.getWorkFlowCode())));
+
+        List<WorkFlowLineage> upstreamWorkFlowLineages = new ArrayList<>();
+        getUpstreamLineages(sourceWorkFlowCode, upstreamWorkFlowLineages);
+        workFlowLineages.addAll(upstreamWorkFlowLineages);
+        upstreamWorkFlowLineages.forEach(workFlowLineage -> workFlowRelations.add(new WorkFlowRelation(workFlowLineage.getWorkFlowCode(), sourceWorkFlowCode)));
+    }
+
+    private void getUpstreamLineages(long sourceWorkFlowCode,
+                                     List<WorkFlowLineage> upstreamWorkFlowLineages) {
+        List<DependentProcessDefinition> workFlowDependentDefinitionList =
+                workFlowLineageMapper.queryUpstreamDependentParamsByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
+
+        List<Long> upstreamProcessDefinitionCodes = new ArrayList<>();
+
+        getProcessDefinitionCodeByDependentDefinitionList(workFlowDependentDefinitionList,
+                upstreamProcessDefinitionCodes);
+
+        if (!upstreamProcessDefinitionCodes.isEmpty()) {
+            upstreamWorkFlowLineages.addAll(
+                    workFlowLineageMapper.queryWorkFlowLineageByProcessDefinitionCodes(upstreamProcessDefinitionCodes));
+        }
+    }
+
+    /**
+     * get dependent process definition code by dependent process definition list
+     */
+    private void getProcessDefinitionCodeByDependentDefinitionList(List<DependentProcessDefinition> dependentDefinitionList,
+                                                                   List<Long> processDefinitionCodes) {
+        for (DependentProcessDefinition dependentProcessDefinition : dependentDefinitionList) {
+            for (DependentTaskModel dependentTaskModel : dependentProcessDefinition.getDependentParameters().getDependTaskList()) {
+                for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
+                    if (!processDefinitionCodes.contains(dependentItem.getDefinitionCode())) {
+                        processDefinitionCodes.add(dependentItem.getDefinitionCode());
+                    }
                 }
-                if (processLineage.getPostTaskCode() > 0) {
-                    taskDefinitionList.add(new TaskDefinition(processLineage.getPostTaskCode(), processLineage.getPostTaskVersion()));
-                }
-            }
-            sourceWorkFlowCodes = querySourceWorkFlowCodes(projectCode, workFlowCode, taskDefinitionList);
-            if (sourceWorkFlowCodes.isEmpty()) {
-                workFlowRelations.add(new WorkFlowRelation(0L, workFlowCode));
-                return;
-            } else {
-                workFlowLineagesMap.get(workFlowCode).setSourceWorkFlowCode(StringUtils.join(sourceWorkFlowCodes, Constants.COMMA));
-                sourceWorkFlowCodes.forEach(code -> workFlowRelations.add(new WorkFlowRelation(code, workFlowCode)));
-                recursiveWorkFlow(projectCode, workFlowLineagesMap, workFlowRelations, sourceWorkFlowCodes);
             }
         }
     }
@@ -183,7 +202,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList);
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (taskDefinitionLog.getProjectCode() == projectCode) {
-                if (taskDefinitionLog.getTaskType().equals(TaskType.DEPENDENT.getDesc())) {
+                if (taskDefinitionLog.getTaskType().equals(TASK_TYPE_DEPENDENT)) {
                     DependentParameters dependentParameters = JSONUtils.parseObject(taskDefinitionLog.getDependence(), DependentParameters.class);
                     if (dependentParameters != null) {
                         List<DependentTaskModel> dependTaskList = dependentParameters.getDependTaskList();

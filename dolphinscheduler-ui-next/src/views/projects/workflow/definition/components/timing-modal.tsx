@@ -15,7 +15,16 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, h, onMounted, ref } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  h,
+  onMounted,
+  ref,
+  watch,
+  computed
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
@@ -34,10 +43,12 @@ import {
   NInputGroup,
   NList,
   NListItem,
-  NThing
+  NThing,
+  NPopover
 } from 'naive-ui'
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { timezoneList } from '@/utils/timezone'
+import Crontab from '@/components/crontab'
 
 const props = {
   row: {
@@ -59,6 +70,7 @@ export default defineComponent({
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
+    const crontabRef = ref()
     const parallelismRef = ref(false)
     const { t } = useI18n()
     const { timingState } = useForm()
@@ -72,6 +84,12 @@ export default defineComponent({
       getPreviewSchedule
     } = useModal(timingState, ctx)
 
+    const environmentOptions = computed(() =>
+      variables.environmentList.filter((item: any) =>
+        item.workerGroups?.includes(timingState.timingForm.workerGroup)
+      )
+    )
+
     const hideModal = () => {
       ctx.emit('update:show')
     }
@@ -84,26 +102,7 @@ export default defineComponent({
       }
     }
 
-    const generalWarningTypeListOptions = () => [
-      {
-        value: 'NONE',
-        label: t('project.workflow.none_send')
-      },
-      {
-        value: 'SUCCESS',
-        label: t('project.workflow.success_send')
-      },
-      {
-        value: 'FAILURE',
-        label: t('project.workflow.failure_send')
-      },
-      {
-        value: 'ALL',
-        label: t('project.workflow.all_send')
-      }
-    ]
-
-    const generalPriorityList = () => [
+    const priorityOptions = [
       {
         value: 'HIGHEST',
         label: 'HIGHEST',
@@ -167,19 +166,59 @@ export default defineComponent({
       getPreviewSchedule()
     }
 
+    const initEnvironment = () => {
+      timingState.timingForm.environmentCode = null
+      variables.environmentList.forEach((item) => {
+        if (props.row.environmentCode === item.value) {
+          timingState.timingForm.environmentCode = item.value
+        }
+      })
+    }
+
+    const initWarningGroup = () => {
+      timingState.timingForm.warningGroupId = null
+      variables.alertGroups.forEach((item) => {
+        if (props.row.warningGroupId === item.value) {
+          timingState.timingForm.warningGroupId = item.value
+        }
+      })
+    }
+
     onMounted(() => {
       getWorkerGroups()
       getAlertGroups()
       getEnvironmentList()
     })
 
+    watch(
+      () => props.row,
+      () => {
+        if (!props.row.crontab) return
+
+        timingState.timingForm.startEndTime = [
+          new Date(props.row.startTime),
+          new Date(props.row.endTime)
+        ]
+        timingState.timingForm.crontab = props.row.crontab
+        timingState.timingForm.timezoneId = props.row.timezoneId
+        timingState.timingForm.failureStrategy = props.row.failureStrategy
+        timingState.timingForm.warningType = props.row.warningType
+        timingState.timingForm.processInstancePriority =
+          props.row.processInstancePriority
+        timingState.timingForm.workerGroup = props.row.workerGroup
+        initWarningGroup()
+        initEnvironment()
+      }
+    )
+
     return {
       t,
+      crontabRef,
       parallelismRef,
+      priorityOptions,
+      environmentOptions,
       hideModal,
       handleTiming,
-      generalWarningTypeListOptions,
-      generalPriorityList,
       timezoneOptions,
       renderLabel,
       updateWorkerGroup,
@@ -192,9 +231,6 @@ export default defineComponent({
 
   render() {
     const { t } = this
-    if (Number(this.timingForm.warningGroupId) === 0) {
-      this.timingForm.warningGroupId = ''
-    }
 
     return (
       <Modal
@@ -202,8 +238,9 @@ export default defineComponent({
         title={t('project.workflow.set_parameters_before_timing')}
         onCancel={this.hideModal}
         onConfirm={this.handleTiming}
+        confirmLoading={this.saving}
       >
-        <NForm ref='timingFormRef' label-placement='left' label-width='160'>
+        <NForm ref='timingFormRef'>
           <NFormItem
             label={t('project.workflow.start_and_stop_time')}
             path='startEndTime'
@@ -216,10 +253,25 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('project.workflow.timing')} path='crontab'>
             <NInputGroup>
-              <NInput
-                style={{ width: '80%' }}
-                v-model:value={this.timingForm.crontab}
-              ></NInput>
+              <NPopover
+                trigger='click'
+                showArrow={false}
+                placement='bottom'
+                style={{ width: '500px' }}
+              >
+                {{
+                  trigger: () => (
+                    <NInput
+                      style={{ width: '80%' }}
+                      readonly={true}
+                      v-model:value={this.timingForm.crontab}
+                    ></NInput>
+                  ),
+                  default: () => (
+                    <Crontab v-model:value={this.timingForm.crontab} />
+                  )
+                }}
+              </NPopover>
               <NButton type='primary' ghost onClick={this.handlePreview}>
                 {t('project.workflow.execute_time')}
               </NButton>
@@ -233,6 +285,7 @@ export default defineComponent({
             <NSelect
               v-model:value={this.timingForm.timezoneId}
               options={this.timezoneOptions()}
+              filterable
             />
           </NFormItem>
           <NFormItem label=' ' showFeedback={false}>
@@ -269,7 +322,24 @@ export default defineComponent({
             path='warningType'
           >
             <NSelect
-              options={this.generalWarningTypeListOptions()}
+              options={[
+                {
+                  value: 'NONE',
+                  label: t('project.workflow.none_send')
+                },
+                {
+                  value: 'SUCCESS',
+                  label: t('project.workflow.success_send')
+                },
+                {
+                  value: 'FAILURE',
+                  label: t('project.workflow.failure_send')
+                },
+                {
+                  value: 'ALL',
+                  label: t('project.workflow.all_send')
+                }
+              ]}
               v-model:value={this.timingForm.warningType}
             />
           </NFormItem>
@@ -278,7 +348,7 @@ export default defineComponent({
             path='processInstancePriority'
           >
             <NSelect
-              options={this.generalPriorityList()}
+              options={this.priorityOptions}
               renderLabel={this.renderLabel}
               v-model:value={this.timingForm.processInstancePriority}
             />
@@ -298,10 +368,9 @@ export default defineComponent({
             path='environmentCode'
           >
             <NSelect
-              options={this.environmentList.filter((item: any) =>
-                item.workerGroups?.includes(this.timingForm.workerGroup)
-              )}
+              options={this.environmentOptions}
               v-model:value={this.timingForm.environmentCode}
+              clearable
             />
           </NFormItem>
           <NFormItem
@@ -312,6 +381,7 @@ export default defineComponent({
               options={this.alertGroups}
               placeholder={t('project.workflow.please_choose')}
               v-model:value={this.timingForm.warningGroupId}
+              clearable
             />
           </NFormItem>
         </NForm>

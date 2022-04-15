@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -36,7 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -76,21 +74,21 @@ public class MasterTaskExecThreadTest {
 
     @Test
     public void testExistsValidWorkerGroup2() {
-        Set<String> workerGorups = new HashSet<>();
-        workerGorups.add("test1");
-        workerGorups.add("test2");
+        Set<String> workerGroups = new HashSet<>();
+        workerGroups.add("test1");
+        workerGroups.add("test2");
 
-        /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGorups);
+        /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGroups);
           boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
         Assert.assertFalse(b);*/
     }
 
     @Test
     public void testExistsValidWorkerGroup3() {
-        Set<String> workerGorups = new HashSet<>();
-        workerGorups.add("test1");
-        /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGorups);
-          Mockito.when(registryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGorups);
+        Set<String> workerGroups = new HashSet<>();
+        workerGroups.add("test1");
+        /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGroups);
+          Mockito.when(registryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGroups);
         boolean b = masterTaskExecThread.existsValidWorkerGroup("test1");
         Assert.assertTrue(b);*/
     }
@@ -122,7 +120,7 @@ public class MasterTaskExecThreadTest {
 
     private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType(TaskType.SHELL.getDesc());
+        taskInstance.setTaskType("SHELL");
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);

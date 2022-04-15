@@ -55,6 +55,10 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
     "sphinx_rtd_theme",
+    # Documenting command line interface
+    "sphinx_click.ext",
+    # Add inline tabbed content
+    "sphinx_inline_tabs",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

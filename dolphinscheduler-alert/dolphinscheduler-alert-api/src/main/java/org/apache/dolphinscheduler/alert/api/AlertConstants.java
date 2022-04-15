@@ -27,6 +27,10 @@ public final class AlertConstants {
 
     public static final String NAME_SHOW_TYPE = "showType";
 
+    public static final String WARNING_TYPE = "warningType";
+
+    public static final String NAME_WARNING_TYPE = "WarningType";
+
     private AlertConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }

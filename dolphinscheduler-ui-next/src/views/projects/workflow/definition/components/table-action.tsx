@@ -43,6 +43,7 @@ export default defineComponent({
   name: 'TableAction',
   props,
   emits: [
+    'editWorkflow',
     'updateList',
     'startWorkflow',
     'timingWorkflow',
@@ -51,9 +52,14 @@ export default defineComponent({
     'releaseWorkflow',
     'copyWorkflow',
     'exportWorkflow',
-    'gotoTimingManage'
+    'gotoTimingManage',
+    'gotoWorkflowTree'
   ],
   setup(props, ctx) {
+    const handleEditWorkflow = () => {
+      ctx.emit('editWorkflow')
+    }
+
     const handleStartWorkflow = () => {
       ctx.emit('startWorkflow')
     }
@@ -86,7 +92,12 @@ export default defineComponent({
       ctx.emit('gotoTimingManage')
     }
 
+    const handleGotoWorkflowTree = () => {
+      ctx.emit('gotoWorkflowTree')
+    }
+
     return {
+      handleEditWorkflow,
       handleStartWorkflow,
       handleTimingWorkflow,
       handleVersionWorkflow,
@@ -95,6 +106,7 @@ export default defineComponent({
       handleCopyWorkflow,
       handleExportWorkflow,
       handleGotoTimingManage,
+      handleGotoWorkflowTree,
       ...toRefs(props)
     }
   },
@@ -110,11 +122,13 @@ export default defineComponent({
             default: () => t('project.workflow.edit'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle
+                onClick={this.handleEditWorkflow}
                 disabled={releaseState === 'ONLINE'}
+                class='btn-edit'
                 /* TODO: Edit workflow */
               >
                 <NIcon>
@@ -129,12 +143,13 @@ export default defineComponent({
             default: () => t('project.workflow.start'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='primary'
                 tag='div'
                 circle
                 onClick={this.handleStartWorkflow}
                 disabled={releaseState === 'OFFLINE'}
+                class='btn-run'
               >
                 <NIcon>
                   <PlayCircleOutlined />
@@ -148,7 +163,7 @@ export default defineComponent({
             default: () => t('project.workflow.timing'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle
@@ -164,14 +179,18 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.workflow.up_line'),
+            default: () =>
+              releaseState === 'ONLINE'
+                ? t('project.workflow.down_line')
+                : t('project.workflow.up_line'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type={releaseState === 'ONLINE' ? 'warning' : 'error'}
                 tag='div'
                 circle
                 onClick={this.handleReleaseWorkflow}
+                class='btn-publish'
               >
                 <NIcon>
                   {releaseState === 'ONLINE' ? (
@@ -189,7 +208,7 @@ export default defineComponent({
             default: () => t('project.workflow.copy_workflow'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle
@@ -208,7 +227,7 @@ export default defineComponent({
             default: () => t('project.workflow.cron_manage'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle
@@ -227,13 +246,17 @@ export default defineComponent({
             default: () => t('project.workflow.delete'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='error'
                 tag='div'
                 circle
                 disabled={releaseState === 'ONLINE'}
+                class='btn-delete'
               >
-                <NPopconfirm onPositiveClick={this.handleDeleteWorkflow}>
+                <NPopconfirm
+                  disabled={releaseState === 'ONLINE'}
+                  onPositiveClick={this.handleDeleteWorkflow}
+                >
                   {{
                     default: () => t('project.workflow.delete_confirm'),
                     icon: () => (
@@ -257,11 +280,11 @@ export default defineComponent({
             default: () => t('project.workflow.tree_view'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle
-                /* TODO: Goto tree view*/
+                onClick={this.handleGotoWorkflowTree}
               >
                 <NIcon>
                   <ApartmentOutlined />
@@ -275,7 +298,7 @@ export default defineComponent({
             default: () => t('project.workflow.export'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle
@@ -293,7 +316,7 @@ export default defineComponent({
             default: () => t('project.workflow.version_info'),
             trigger: () => (
               <NButton
-                size='tiny'
+                size='small'
                 type='info'
                 tag='div'
                 circle

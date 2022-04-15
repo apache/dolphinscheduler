@@ -40,7 +40,8 @@ export function useVersion() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('project.task.version'),
@@ -157,7 +158,8 @@ export function useVersion() {
     taskVersion: ref(null),
     taskCode: ref(null),
     refreshTaskDefinition: ref(false),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const handleSwitchVersion = (row: TaskDefinitionVersionItem) => {
@@ -181,19 +183,21 @@ export function useVersion() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryTaskVersions(
         { ...params },
         { code: variables.taskCode },
         { projectCode }
       ).then((res: TaskDefinitionVersionRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any
         variables.totalPage = res.totalPage
+        variables.loadingRef = false
       }),
       {}
     )

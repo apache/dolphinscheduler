@@ -29,9 +29,7 @@ export function useCustomCellBuilder() {
   function parseLocationStr(locationStr: string) {
     let locations = null
     if (!locationStr) return locations
-    try {
-      locations = JSON.parse(locationStr)
-    } catch (error) {}
+    locations = JSON.parse(locationStr)
     return Array.isArray(locations) ? locations : null
   }
 
@@ -44,7 +42,7 @@ export function useCustomCellBuilder() {
   function buildEdge(
     sourceId: string,
     targetId: string,
-    label: string = ''
+    label = ''
   ): Edge.Metadata {
     return {
       shape: X6_EDGE_NAME,
@@ -68,6 +66,7 @@ export function useCustomCellBuilder() {
     id: string,
     type: string,
     taskName: string,
+    flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
   ): Node.Metadata {
     const truncation = taskName ? utils.truncateText(taskName, 18) : id
@@ -78,15 +77,21 @@ export function useCustomCellBuilder() {
       y: coordinate.y,
       data: {
         taskType: type,
-        taskName: taskName || id
+        taskName: taskName || id,
+        flag: flag
       },
       attrs: {
         image: {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
-          'xlink:href': `/src/assets/images/task-icons/${type.toLocaleLowerCase()}.png`
+          'xlink:href': `${
+            import.meta.env.BASE_URL
+          }images/task-icons/${type.toLocaleLowerCase()}.png`
         },
         title: {
           text: truncation
+        },
+        rect: {
+          fill: flag === 'NO' ? '#f3f3f5' : '#ffffff'
         }
       }
     }
@@ -108,17 +113,23 @@ export function useCustomCellBuilder() {
 
     tasks.forEach((task) => {
       const location = locations.find((l) => l.taskCode === task.code) || {}
-      const node = buildNode(task.code + '', task.taskType, task.name, {
-        x: location.x,
-        y: location.y
-      })
+      const node = buildNode(
+        task.code + '',
+        task.taskType,
+        task.name,
+        task.flag,
+        {
+          x: location.x,
+          y: location.y
+        }
+      )
       nodes.push(node)
     })
 
     connects
       .filter((r) => !!r.preTaskCode)
       .forEach((c) => {
-        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode, c.name)
+        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode + '', c.name)
         edges.push(edge)
       })
     return {

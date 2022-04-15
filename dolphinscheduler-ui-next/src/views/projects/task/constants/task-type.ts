@@ -14,6 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export type TaskType =
+  | 'SHELL'
+  | 'SUB_PROCESS'
+  | 'PROCEDURE'
+  | 'SQL'
+  | 'SPARK'
+  | 'FLINK'
+  | 'MR'
+  | 'PYTHON'
+  | 'DEPENDENT'
+  | 'HTTP'
+  | 'DATAX'
+  | 'PIGEON'
+  | 'SQOOP'
+  | 'CONDITIONS'
+  | 'DATA_QUALITY'
+  | 'SWITCH'
+  | 'SEATUNNEL'
+  | 'EMR'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -23,7 +42,8 @@ export const TASK_TYPES_MAP = {
     alias: 'SUB_PROCESS'
   },
   PROCEDURE: {
-    alias: 'PROCEDURE'
+    alias: 'PROCEDURE',
+    helperLinkDisable: true
   },
   SQL: {
     alias: 'SQL'
@@ -35,7 +55,8 @@ export const TASK_TYPES_MAP = {
     alias: 'FLINK'
   },
   MR: {
-    alias: 'MapReduce'
+    alias: 'MapReduce',
+    helperLinkDisable: true
   },
   PYTHON: {
     alias: 'PYTHON'
@@ -53,17 +74,25 @@ export const TASK_TYPES_MAP = {
     alias: 'PIGEON'
   },
   SQOOP: {
-    alias: 'SQOOP'
+    alias: 'SQOOP',
+    helperLinkDisable: true
   },
   CONDITIONS: {
     alias: 'CONDITIONS'
+  },
+  DATA_QUALITY: {
+    alias: 'DATA_QUALITY',
+    helperLinkDisable: true
   },
   SWITCH: {
     alias: 'SWITCH'
   },
   SEATUNNEL: {
-    alias: 'WATERDROP'
+    alias: 'WATERDROP',
+    helperLinkDisable: true
+  },
+  EMR: {
+    alias: 'AmazonEMR',
+    helperLinkDisable: true
   }
-}
-
-export type TaskType = keyof typeof TASK_TYPES_MAP
+} as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

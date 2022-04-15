@@ -37,7 +37,7 @@ firstColumn="node  server  state"
 echo $firstColumn
 echo -e '\n'
 
-workersGroupMap=()
+declare -A workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
@@ -73,12 +73,4 @@ for apiServer in ${apiServersHost[@]}
 do
   apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
-done
-
-# python gateway server check state
-pythonGatewayHost=(${pythonGatewayServers//,/ })
-for pythonGatewayServer in "${pythonGatewayHost[@]}"
-do
-  pythonGatewayState=`ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status python-gateway-server;"`
-  echo "$pythonGatewayServer  $pythonGatewayState"
 done

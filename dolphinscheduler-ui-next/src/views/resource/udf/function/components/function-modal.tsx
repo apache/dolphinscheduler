@@ -124,17 +124,16 @@ export default defineComponent({
         }
         onCancel={this.hideModal}
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='functionFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='functionFormRef'>
           <NFormItem label={t('resource.function.type')} path='type'>
             <NRadioGroup
               v-model={[this.functionForm.type, 'value']}
               name='type'
+              class='radio-function-type'
             >
               <NRadio value='HIVE'>HIVE UDF</NRadio>
             </NRadioGroup>
@@ -146,6 +145,7 @@ export default defineComponent({
             <NInput
               v-model={[this.functionForm.funcName, 'value']}
               placeholder={t('resource.function.enter_udf_unction_name_tips')}
+              class='input-function-name'
             />
           </NFormItem>
           <NFormItem
@@ -155,6 +155,7 @@ export default defineComponent({
             <NInput
               v-model={[this.functionForm.className, 'value']}
               placeholder={t('resource.function.enter_package_name_tips')}
+              class='input-class-name'
             />
           </NFormItem>
           <NFormItem
@@ -173,6 +174,7 @@ export default defineComponent({
                 defaultValue={this.functionForm.resourceId}
                 disabled={this.uploadShow}
                 showPath={false}
+                class='btn-udf-resource-dropdown'
               ></NTreeSelect>
               <NButton
                 type='primary'
@@ -184,12 +186,7 @@ export default defineComponent({
             </NInputGroup>
           </NFormItem>
           {this.uploadShow && (
-            <NForm
-              rules={this.uploadRules}
-              ref='uploadFormRef'
-              label-placement='left'
-              label-width='160'
-            >
+            <NForm rules={this.uploadRules} ref='uploadFormRef'>
               <NFormItem
                 label={t('resource.function.udf_resources_directory')}
                 path='pid'
@@ -218,20 +215,19 @@ export default defineComponent({
                     v-model={[this.uploadForm.name, 'value']}
                     placeholder={t('resource.function.enter_name_tips')}
                   />
-                  <NButton>
-                    <NUpload
-                      v-model={[this.uploadForm.file, 'value']}
-                      customRequest={this.customRequest}
-                      showFileList={false}
-                    >
-                      <NButton text>
-                        上传
-                        <NIcon>
-                          <CloudUploadOutlined />
-                        </NIcon>
-                      </NButton>
-                    </NUpload>
-                  </NButton>
+                  <NUpload
+                    v-model={[this.uploadForm.file, 'value']}
+                    customRequest={this.customRequest}
+                    showFileList={false}
+                    style={{ width: 'auto' }}
+                  >
+                    <NButton>
+                      {t('resource.function.upload')}
+                      <NIcon>
+                        <CloudUploadOutlined />
+                      </NIcon>
+                    </NButton>
+                  </NUpload>
                 </NInputGroup>
               </NFormItem>
               <NFormItem
@@ -244,10 +240,13 @@ export default defineComponent({
                   type='textarea'
                   v-model={[this.uploadForm.description, 'value']}
                   placeholder={t('resource.function.enter_description_tips')}
+                  class='input-description'
                 />
               </NFormItem>
               <NFormItem label=' '>
-                <NButton onClick={this.handleUpload}>上传UDF资源</NButton>
+                <NButton onClick={this.handleUpload}>
+                  {t('resource.function.upload_udf_resources')}
+                </NButton>
               </NFormItem>
             </NForm>
           )}
@@ -260,6 +259,7 @@ export default defineComponent({
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}
+              class='input-description'
             />
           </NFormItem>
         </NForm>

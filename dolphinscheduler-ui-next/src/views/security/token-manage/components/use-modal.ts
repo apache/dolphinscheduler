@@ -20,14 +20,12 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/user/user'
 import { useAsyncState } from '@vueuse/core'
 import { format } from 'date-fns'
-import { queryAlertPluginInstanceList } from '@/service/modules/alert-plugin'
 import { listAll } from '@/service/modules/users'
 import {
   generateToken,
   createToken,
   updateToken
 } from '@/service/modules/token'
-import type { AlertPluginItem } from '@/service/modules/alert-plugin/types'
 import type { UserListRes } from '@/service/modules/users/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
@@ -50,6 +48,7 @@ export function useModal(
       token: ref(''),
       generalOptions: []
     },
+    saving: false,
     rules: {
       userId: {
         required: true,
@@ -64,7 +63,6 @@ export function useModal(
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          console.log(variables.model.expireTime)
           if (!variables.model.expireTime) {
             return new Error(t('security.token.expiration_time_tips'))
           }
@@ -114,14 +112,18 @@ export function useModal(
     )
   }
 
-  const handleValidate = (statusRef: number) => {
-    variables.alertGroupFormRef.validate((errors: any) => {
-      if (!errors) {
-        statusRef === 0 ? submitTokenModal() : updateTokenModal()
-      } else {
-        return
-      }
-    })
+  const handleValidate = async (statusRef: number) => {
+    await variables.alertGroupFormRef.validate()
+
+    if (variables.saving) return
+    variables.saving = true
+
+    try {
+      statusRef === 0 ? await submitTokenModal() : await updateTokenModal()
+      variables.saving = false
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   const submitTokenModal = () => {

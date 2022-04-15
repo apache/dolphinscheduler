@@ -17,20 +17,29 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.auto.service.AutoService;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 /**
  * subtask processor
@@ -110,7 +119,37 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance != null && subProcessInstance.getState().typeIsFinished()) {
             taskInstance.setState(subProcessInstance.getState());
             taskInstance.setEndTime(new Date());
+            dealFinish();
             processService.saveTaskInstance(taskInstance);
+        }
+    }
+
+    /**
+     * get the params from subProcessInstance to this subProcessTask
+     */
+    private void dealFinish() {
+        String thisTaskInstanceVarPool = taskInstance.getVarPool();
+        if (StringUtils.isNotEmpty(thisTaskInstanceVarPool)) {
+            String subProcessInstanceVarPool = subProcessInstance.getVarPool();
+            if (StringUtils.isNotEmpty(subProcessInstanceVarPool)) {
+                List<Property> varPoolProperties = JSONUtils.toList(thisTaskInstanceVarPool, Property.class);
+                Map<String, Object> taskParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                });
+                Object localParams = taskParams.get(LOCAL_PARAMS);
+                if (localParams != null) {
+                    List<Property> properties = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+                    Map<String, String> subProcessParam = JSONUtils.toList(subProcessInstanceVarPool, Property.class).stream()
+                            .collect(Collectors.toMap(Property::getProp, Property::getValue));
+                    List<Property> outProperties = properties.stream().filter(r -> Direct.OUT == r.getDirect()).collect(Collectors.toList());
+                    for (Property info : outProperties) {
+                        info.setValue(subProcessParam.get(info.getProp()));
+                        varPoolProperties.add(info);
+                    }
+                    taskInstance.setVarPool(JSONUtils.toJsonString(varPoolProperties));
+                    //deal with localParam for show in the page
+                    processService.changeOutParam(taskInstance);
+                }
+            }
         }
     }
 
@@ -177,6 +216,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public String getType() {
-        return TaskType.SUB_PROCESS.getDesc();
+        return TASK_TYPE_SUB_PROCESS;
     }
+
 }

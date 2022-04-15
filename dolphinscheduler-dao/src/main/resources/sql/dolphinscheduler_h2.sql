@@ -272,13 +272,20 @@ CREATE TABLE t_ds_alert
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
     title         varchar(64) DEFAULT NULL,
+    sign           char(40) NOT NULL DEFAULT '',
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
+    warning_type  tinyint(4) DEFAULT '2',
     log           text,
     alertgroup_id int(11) DEFAULT NULL,
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
-    PRIMARY KEY (id)
+    project_code        bigint(20) DEFAULT NULL,
+    process_definition_code        bigint(20) DEFAULT NULL,
+    process_instance_id     int(11) DEFAULT NULL,
+    alert_type     int(11) DEFAULT NULL,
+    PRIMARY KEY (id),
+    KEY            idx_sign (sign)
 );
 
 -- ----------------------------
@@ -759,7 +766,7 @@ CREATE TABLE t_ds_resources
     create_time  datetime     DEFAULT NULL,
     update_time  datetime     DEFAULT NULL,
     pid          int(11) DEFAULT NULL,
-    full_name    varchar(64)  DEFAULT NULL,
+    full_name    varchar(128)  DEFAULT NULL,
     is_directory tinyint(4) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_resources_un (full_name, type)
@@ -869,7 +876,7 @@ CREATE TABLE t_ds_tenant
     id          int(11) NOT NULL AUTO_INCREMENT,
     tenant_code varchar(64)  DEFAULT NULL,
     description varchar(255) DEFAULT NULL,
-    queue_id    int(11) DEFAULT NULL,
+    queue_id    int(11)      DEFAULT NULL,
     create_time datetime     DEFAULT NULL,
     update_time datetime     DEFAULT NULL,
     PRIMARY KEY (id)
@@ -885,15 +892,15 @@ CREATE TABLE t_ds_tenant
 DROP TABLE IF EXISTS t_ds_udfs CASCADE;
 CREATE TABLE t_ds_udfs
 (
-    id            int(11) NOT NULL AUTO_INCREMENT,
-    user_id       int(11) NOT NULL,
+    id            int(11)      NOT NULL AUTO_INCREMENT,
+    user_id       int(11)      NOT NULL,
     func_name     varchar(100) NOT NULL,
     class_name    varchar(255) NOT NULL,
-    type          tinyint(4) NOT NULL,
+    type          tinyint(4)   NOT NULL,
     arg_types     varchar(255) DEFAULT NULL,
     database      varchar(255) DEFAULT NULL,
     description   varchar(255) DEFAULT NULL,
-    resource_id   int(11) NOT NULL,
+    resource_id   int(11)      NOT NULL,
     resource_name varchar(255) NOT NULL,
     create_time   datetime     NOT NULL,
     update_time   datetime     NOT NULL,
@@ -921,6 +928,7 @@ CREATE TABLE t_ds_user
     update_time   datetime    DEFAULT NULL,
     queue         varchar(64) DEFAULT NULL,
     state         int(1) DEFAULT 1,
+    time_zone     varchar(32) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY user_name_unique (user_name)
 );
@@ -979,7 +987,7 @@ VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', 
 -- ----------------------------
 INSERT INTO t_ds_user
 VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50',
-        '2018-10-24 17:40:22', null, 1);
+        '2018-10-24 17:40:22', null, 1, null);
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
@@ -1033,19 +1041,19 @@ INSERT INTO `t_ds_dq_comparison_type`
 VALUES(1, 'FixValue', NULL, NULL, NULL, '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', false);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(2, 'DailyFluctuation', 'select round(avg(statistics_value),2) as day_avg from t_ds_dq_task_statistics_value where data_time >=date_trunc(''DAY'', ${data_time}) and data_time < date_add(date_trunc(''day'', ${data_time}),1) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'day_range', 'day_range.day_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(2, 'DailyAvg', 'select round(avg(statistics_value),2) as day_avg from t_ds_dq_task_statistics_value where data_time >=date_trunc(''DAY'', ${data_time}) and data_time < date_add(date_trunc(''day'', ${data_time}),1) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'day_range', 'day_range.day_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(3, 'WeeklyFluctuation', 'select round(avg(statistics_value),2) as week_avg from t_ds_dq_task_statistics_value where  data_time >= date_trunc(''WEEK'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'week_range', 'week_range.week_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(3, 'WeeklyAvg', 'select round(avg(statistics_value),2) as week_avg from t_ds_dq_task_statistics_value where  data_time >= date_trunc(''WEEK'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'week_range', 'week_range.week_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(4, 'MonthlyFluctuation', 'select round(avg(statistics_value),2) as month_avg from t_ds_dq_task_statistics_value where  data_time >= date_trunc(''MONTH'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'month_range', 'month_range.month_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(4, 'MonthlyAvg', 'select round(avg(statistics_value),2) as month_avg from t_ds_dq_task_statistics_value where  data_time >= date_trunc(''MONTH'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'month_range', 'month_range.month_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(5, 'Last7DayFluctuation', 'select round(avg(statistics_value),2) as last_7_avg from t_ds_dq_task_statistics_value where  data_time >= date_add(date_trunc(''day'', ${data_time}),-7) and  data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_seven_days', 'last_seven_days.last_7_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(5, 'Last7DayAvg', 'select round(avg(statistics_value),2) as last_7_avg from t_ds_dq_task_statistics_value where  data_time >= date_add(date_trunc(''day'', ${data_time}),-7) and  data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_seven_days', 'last_seven_days.last_7_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(6, 'Last30DayFluctuation', 'select round(avg(statistics_value),2) as last_30_avg from t_ds_dq_task_statistics_value where  data_time >= date_add(date_trunc(''day'', ${data_time}),-30) and  data_time < date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_thirty_days', 'last_thirty_days.last_30_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(6, 'Last30DayAvg', 'select round(avg(statistics_value),2) as last_30_avg from t_ds_dq_task_statistics_value where  data_time >= date_add(date_trunc(''day'', ${data_time}),-30) and  data_time < date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_thirty_days', 'last_thirty_days.last_30_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
 VALUES(7, 'SrcTableTotalRows', 'SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})', 'total_count', 'total_count.total', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', false);
@@ -1908,3 +1916,20 @@ CREATE TABLE t_ds_k8s_namespace (
 -- ----------------------------
 INSERT INTO t_ds_k8s_namespace
 VALUES (1, 10000, 'default', 99, 'owner',1,NULL,1,'test',NULL,'default',null,null);
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status CASCADE;
+CREATE TABLE t_ds_alert_send_status
+(
+    id                            int NOT NULL AUTO_INCREMENT,
+    alert_id                      int NOT NULL,
+    alert_plugin_instance_id      int NOT NULL,
+    send_status                   tinyint(4) DEFAULT '0',
+    log                           text,
+    create_time                   timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
+);
+

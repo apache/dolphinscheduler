@@ -14,24 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
 /**
  * check utils
@@ -59,11 +57,17 @@ public class CheckUtils {
      * @return true if email regex valid, otherwise return false
      */
     public static boolean checkEmail(String email) {
-        if (StringUtils.isEmpty(email)) {
+        if (StringUtils.isBlank(email)) {
             return false;
         }
-
-        return email.length() > 5 && email.length() <= 40 && regexChecks(email, Constants.REGEX_MAIL_NAME);
+        EmailValidator emailValidator = new EmailValidator();
+        if (!emailValidator.isValid(email, null)) {
+            return false;
+        }
+        //Email is at least a second-level domain name
+        int indexDomain = email.lastIndexOf("@");
+        String domainString = email.substring(indexDomain);
+        return domainString.contains(".");
     }
 
     /**
@@ -115,46 +119,17 @@ public class CheckUtils {
     }
 
     /**
-     * check task node parameter
-     *
-     * @param taskNode TaskNode
-     * @return true if task node parameters are valid, otherwise return false
+     * check time zone parameter
+     * @param timeZone timeZone
+     * @return true if timeZone is valid, otherwise return false
      */
-    public static boolean checkTaskNodeParameters(TaskNode taskNode) {
-        AbstractParameters abstractParameters;
-        String taskType = taskNode.getType();
-        if (taskType == null) {
+    public static boolean checkTimeZone(String timeZone) {
+        try {
+            ZoneId.of(timeZone);
+            return true;
+        } catch (Exception e) {
             return false;
         }
-        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
-            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getDependence());
-        } else if (TaskType.SWITCH.getDesc().equalsIgnoreCase(taskType)) {
-            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getSwitchResult());
-        } else {
-            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getTaskParams());
-        }
-
-        if (abstractParameters != null) {
-            return abstractParameters.checkParameters();
-        }
-
-        return false;
-    }
-
-    public static boolean checkTaskDefinitionParameters(TaskDefinition taskDefinition) {
-        AbstractParameters abstractParameters;
-        String taskType = taskDefinition.getTaskType();
-        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
-            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskDefinition.getDependence());
-        } else {
-            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskDefinition.getTaskParams());
-        }
-
-        if (abstractParameters != null) {
-            return abstractParameters.checkParameters();
-        }
-
-        return false;
     }
 
     /**

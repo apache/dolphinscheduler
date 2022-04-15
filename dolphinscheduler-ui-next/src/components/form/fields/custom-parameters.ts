@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { defineComponent, h, renderSlot } from 'vue'
+import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
-import { NFormItemGi, NSpace, NButton, NIcon, NGrid } from 'naive-ui'
-import { PlusCircleOutlined, DeleteOutlined } from '@vicons/antd'
-import { omit } from 'lodash'
+import { NFormItemGi, NSpace, NButton, NGrid, NGridItem } from 'naive-ui'
+import { isFunction } from 'lodash'
+import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import getField from './get-field'
 import { formatValidate } from '../utils'
 import type { IJsonItem, FormItemRule } from '../types'
@@ -43,13 +43,16 @@ const CustomParameters = defineComponent({
           h(
             NButton,
             {
-              tertiary: true,
               circle: true,
+              size: 'small',
               type: 'info',
+              class: 'btn-create-custom-parameter',
               disabled,
               onClick: onAdd
             },
-            () => h(NIcon, { size: 24 }, () => h(PlusCircleOutlined))
+            {
+              icon: () => h(PlusOutlined)
+            }
           )
         ]
       }
@@ -57,53 +60,94 @@ const CustomParameters = defineComponent({
   }
 })
 
+const getDefaultValue = (children: IJsonItem[]) => {
+  const defaultValue: { [field: string]: any } = {}
+  const ruleItem: { [key: string]: FormItemRule[] | FormItemRule } = {}
+  const loop = (
+    children: IJsonItem[],
+    parent: { [field: string]: any },
+    ruleParent: { [key: string]: FormItemRule[] | FormItemRule }
+  ) => {
+    children.forEach((child) => {
+      const mergedChild = isFunction(child) ? child() : child
+      if (Array.isArray(mergedChild.children)) {
+        const childDefaultValue = {}
+        const childRuleItem = {}
+        loop(mergedChild.children, childDefaultValue, childRuleItem)
+        parent[mergedChild.field] = [childDefaultValue]
+        ruleParent[mergedChild.field] = {
+          type: 'array',
+          fields: childRuleItem
+        }
+        return
+      } else {
+        parent[mergedChild.field] = mergedChild.value || null
+        if (mergedChild.validate)
+          ruleParent[mergedChild.field] = formatValidate(mergedChild.validate)
+      }
+    })
+  }
+
+  loop(children, defaultValue, ruleItem)
+  return {
+    defaultValue,
+    ruleItem
+  }
+}
+
 export function renderCustomParameters(
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules: { [key: string]: FormItemRule }[]
+  rules: { [key: string]: FormItemRule | FormItemRule[] }[]
 ) {
-  const { field, children = [] } = item
-  let defaultValue: { [field: string]: any } = {}
-  let ruleItem: { [key: string]: FormItemRule } = {}
-
-  children.forEach((child) => {
-    defaultValue[child.field] = child.value || null
-    if (child.validate) ruleItem[child.field] = formatValidate(child.validate)
-  })
-  const getChild = (item: object, i: number) =>
+  const mergedItem = isFunction(item) ? item() : item
+  const { field, children = [] } = mergedItem
+  const { defaultValue, ruleItem } = getDefaultValue(children)
+  rules.push(ruleItem)
+  const getChild = (item: object, i: number, unused: boolean) =>
     children.map((child: IJsonItem) => {
+      const mergedChild = isFunction(child) ? child(i) : child
       return h(
         NFormItemGi,
         {
           showLabel: false,
-          ...omit(item, ['field', 'type', 'props', 'options']),
-          path: `${field}[${i}].${child.field}`,
-          span: 6
+          path: `${field}[${i}].${mergedChild.field}`,
+          span: unref(mergedChild.span),
+          class: mergedChild.class
         },
-        () => getField(child, item)
+        () => getField(mergedChild, item)
       )
     })
   const getChildren = ({ disabled }: { disabled: boolean }) =>
     fields[field].map((item: object, i: number) => {
       return h(NGrid, { xGap: 10 }, () => [
-        ...getChild(item, i),
+        ...getChild(item, i, disabled),
         h(
-          NButton,
+          NGridItem,
           {
-            tertiary: true,
-            circle: true,
-            type: 'error',
-            disabled,
-            onClick: () => {
-              fields[field].splice(i, 1)
-              rules.splice(i, 1)
-            }
+            span: 2
           },
-          () => h(NIcon, { size: 24 }, () => h(DeleteOutlined))
+          () =>
+            h(
+              NButton,
+              {
+                circle: true,
+                type: 'error',
+                size: 'small',
+                disabled,
+                class: 'btn-delete-custom-parameter',
+                onClick: () => {
+                  fields[field].splice(i, 1)
+                  rules.splice(i, 1)
+                }
+              },
+              {
+                icon: () => h(DeleteOutlined)
+              }
+            )
         )
       ])
     })
-
   return h(
     CustomParameters,
     {

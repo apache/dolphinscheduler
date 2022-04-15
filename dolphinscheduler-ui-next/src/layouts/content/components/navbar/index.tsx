@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
 import Locales from '../locales'
+import Timezone from '../timezone'
 import User from '../user'
 import Theme from '../theme'
-import { useMenuClick } from './use-menuClick'
-import { useMenuStore } from '@/store/menu/menu'
 
 const Navbar = defineComponent({
   name: 'Navbar',
@@ -36,16 +36,33 @@ const Navbar = defineComponent({
       type: Array as PropType<any>,
       default: []
     },
+    timezoneOptions: {
+      type: Array as PropType<any>,
+      default: []
+    },
     userDropdownOptions: {
       type: Array as PropType<any>,
       default: []
     }
   },
-  emits: ['handleMenuClick'],
-  setup(props, ctx) {
-    const { handleMenuClick } = useMenuClick(ctx)
-    const menuStore = useMenuStore()
-    return { handleMenuClick, menuStore }
+  setup() {
+    const route = useRoute()
+    const router = useRouter()
+
+    const menuKey = ref(route.meta.activeMenu as string)
+
+    const handleMenuClick = (key: string) => {
+      router.push({ path: `/${key}` })
+    }
+
+    watch(
+      () => route.path,
+      () => {
+        menuKey.value = route.meta.activeMenu as string
+      }
+    )
+
+    return { handleMenuClick, menuKey }
   },
   render() {
     return (
@@ -53,7 +70,7 @@ const Navbar = defineComponent({
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            value={this.menuStore.getMenuKey}
+            value={this.menuKey}
             mode='horizontal'
             options={this.headerMenuOptions}
             onUpdateValue={this.handleMenuClick}
@@ -62,6 +79,7 @@ const Navbar = defineComponent({
         <div class={styles.settings}>
           <Theme />
           <Locales localesOptions={this.localesOptions} />
+          <Timezone timezoneOptions={this.timezoneOptions} />
           <User userDropdownOptions={this.userDropdownOptions} />
         </div>
       </div>

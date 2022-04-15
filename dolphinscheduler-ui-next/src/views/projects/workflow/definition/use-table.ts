@@ -15,31 +15,42 @@
  * limitations under the License.
  */
 
+import _ from 'lodash'
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { useAsyncState } from '@vueuse/core'
+import { useTextCopy } from '../components/dag/use-text-copy'
 import {
   batchCopyByCodes,
+  batchDeleteByCodes,
   batchExportByCodes,
   deleteByCode,
   queryListPaging,
   release
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
-
-import { IDefinitionParam } from './types'
 import styles from './index.module.scss'
-import { NEllipsis, NTag } from 'naive-ui'
+import { NTag, NSpace, NIcon, NButton, NEllipsis } from 'naive-ui'
+import { CopyOutlined } from '@vicons/antd'
+import ButtonLink from '@/components/button-link'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
+import type { IDefinitionParam } from './types'
+import type { Router } from 'vue-router'
+import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
-
+  const { copy } = useTextCopy()
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
+    checkedRowKeys: [] as Array<RowKey>,
     row: {},
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
@@ -50,47 +61,72 @@ export function useTable() {
     showRef: ref(false),
     startShowRef: ref(false),
     timingShowRef: ref(false),
-    versionShowRef: ref(false)
+    versionShowRef: ref(false),
+    copyShowRef: ref(false),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
     variables.columns = [
       {
-        title: t('project.workflow.id'),
+        type: 'selection',
+        disabled: (row) => row.releaseState === 'ONLINE',
+        className: 'btn-selected',
+        ...COLUMN_WIDTH_CONFIG['selection']
+      },
+      {
+        title: '#',
         key: 'id',
-        width: 50,
+        ...COLUMN_WIDTH_CONFIG['index'],
         render: (row, index) => index + 1
       },
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
+        className: 'workflow-name',
         width: 200,
         render: (row) =>
           h(
-            NEllipsis,
-            { style: 'max-width: 200px; color: #2080f0' },
+            NSpace,
             {
-              default: () =>
+              justify: 'space-between',
+              wrap: false,
+              class: styles['workflow-name']
+            },
+            {
+              default: () => [
                 h(
-                  'a',
+                  ButtonLink,
                   {
-                    href: 'javascript:',
-                    class: styles.links,
                     onClick: () =>
-                      router.push({
+                      void router.push({
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })
                   },
-                  row.name
+                  {
+                    default: () => h(NEllipsis, null, () => row.name)
+                  }
                 ),
-              tooltip: () => row.name
+                h(
+                  NButton,
+                  {
+                    quaternary: true,
+                    circle: true,
+                    type: 'info',
+                    size: 'tiny',
+                    onClick: () => void copy(row.name)
+                  },
+                  { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
+                )
+              ]
             }
           )
       },
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) =>
           row.releaseState === 'ONLINE'
             ? t('project.workflow.up_line')
@@ -99,28 +135,32 @@ export function useTable() {
       {
         title: t('project.workflow.create_time'),
         key: 'createTime',
-        width: 150
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
         key: 'updateTime',
-        width: 150
+        ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.description'),
-        key: 'description'
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('project.workflow.create_user'),
-        key: 'userName'
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.modify_user'),
-        key: 'modifyBy'
+        key: 'modifyBy',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.schedule_publish_status'),
         key: 'scheduleReleaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) => {
           if (row.scheduleReleaseState === 'ONLINE') {
             return h(
@@ -146,12 +186,12 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        width: 300,
-        fixed: 'right',
+        ...COLUMN_WIDTH_CONFIG['operation'](8.5),
         className: styles.operation,
         render: (row) =>
           h(TableAction, {
             row,
+            onEditWorkflow: () => editWorkflow(row),
             onStartWorkflow: () => startWorkflow(row),
             onTimingWorkflow: () => timingWorkflow(row),
             onVersionWorkflow: () => versionWorkflow(row),
@@ -159,11 +199,24 @@ export function useTable() {
             onReleaseWorkflow: () => releaseWorkflow(row),
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
-            onGotoTimingManage: () => gotoTimingManage(row)
+            onGotoTimingManage: () => gotoTimingManage(row),
+            onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
     ] as TableColumns<any>
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
   }
+
+  const editWorkflow = (row: any) => {
+    variables.row = row
+    router.push({
+      name: 'workflow-definition-detail',
+      params: { code: row.code }
+    })
+  }
+
   const startWorkflow = (row: any) => {
     variables.startShowRef = true
     variables.row = row
@@ -180,19 +233,54 @@ export function useTable() {
   }
 
   const deleteWorkflow = (row: any) => {
-    deleteByCode(variables.projectCode, row.code)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    deleteByCode(variables.projectCode, row.code).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
+
+  const batchDeleteWorkflow = () => {
+    const data = {
+      codes: _.join(variables.checkedRowKeys, ',')
+    }
+
+    batchDeleteByCodes(data, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+
+      if (
+        variables.tableData.length === variables.checkedRowKeys.length &&
+        variables.page > 1
+      ) {
+        variables.page -= 1
+      }
+
+      variables.checkedRowKeys = []
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    })
+  }
+
+  const batchExportWorkflow = () => {
+    const fileName = 'workflow_' + new Date().getTime()
+    const data = {
+      codes: _.join(variables.checkedRowKeys, ',')
+    }
+
+    batchExportByCodes(data, variables.projectCode).then((res: any) => {
+      downloadBlob(res, fileName)
+      window.$message.success(t('project.workflow.success'))
+      variables.checkedRowKeys = []
+    })
+  }
+
+  const batchCopyWorkflow = () => {}
 
   const releaseWorkflow = (row: any) => {
     const data = {
@@ -201,18 +289,14 @@ export function useTable() {
         | 'OFFLINE'
         | 'ONLINE'
     }
-    release(data, variables.projectCode, row.code)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    release(data, variables.projectCode, row.code).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const copyWorkflow = (row: any) => {
@@ -220,18 +304,14 @@ export function useTable() {
       codes: String(row.code),
       targetProjectCode: variables.projectCode
     }
-    batchCopyByCodes(data, variables.projectCode)
-      .then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
+    batchCopyByCodes(data, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    })
   }
 
   const downloadBlob = (data: any, fileNameS = 'json') => {
@@ -265,13 +345,9 @@ export function useTable() {
     const data = {
       codes: String(row.code)
     }
-    batchExportByCodes(data, variables.projectCode)
-      .then((res: any) => {
-        downloadBlob(res, fileName)
-      })
-      .catch((error: any) => {
-        window.$message.error(error.message)
-      })
+    batchExportByCodes(data, variables.projectCode).then((res: any) => {
+      downloadBlob(res, fileName)
+    })
   }
 
   const gotoTimingManage = (row: any) => {
@@ -281,13 +357,23 @@ export function useTable() {
     })
   }
 
+  const gotoWorkflowTree = (row: any) => {
+    router.push({
+      name: 'workflow-definition-tree',
+      params: { projectCode: variables.projectCode, definitionCode: row.code }
+    })
+  }
+
   const getTableData = (params: IDefinitionParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }),
       { total: 0, table: [] }
     )
@@ -297,6 +383,9 @@ export function useTable() {
   return {
     variables,
     createColumns,
-    getTableData
+    getTableData,
+    batchDeleteWorkflow,
+    batchExportWorkflow,
+    batchCopyWorkflow
   }
 }

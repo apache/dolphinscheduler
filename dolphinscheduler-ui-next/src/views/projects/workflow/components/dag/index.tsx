@@ -15,8 +15,19 @@
  * limitations under the License.
  */
 
-import type { Graph } from '@antv/x6'
-import { defineComponent, ref, provide, PropType, toRef } from 'vue'
+import type { Cell, Graph } from '@antv/x6'
+import {
+  defineComponent,
+  ref,
+  provide,
+  PropType,
+  toRef,
+  watch,
+  onBeforeUnmount,
+  computed
+} from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import DagToolbar from './dag-toolbar'
 import DagCanvas from './dag-canvas'
 import DagSidebar from './dag-sidebar'
@@ -27,17 +38,26 @@ import {
   useGraphBackfill,
   useDagDragAndDrop,
   useTaskEdit,
-  useBusinessMapper
+  useBusinessMapper,
+  useNodeMenu,
+  useNodeStatus
 } from './dag-hooks'
 import { useThemeStore } from '@/store/theme/theme'
 import VersionModal from '../../definition/components/version-modal'
-import { WorkflowDefinition } from './types'
+import { WorkflowDefinition, WorkflowInstance } from './types'
 import DagSaveModal from './dag-save-modal'
-import TaskModal from '@/views/projects/node/detail-modal'
+import ContextMenuItem from './dag-context-menu'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
+import StartModal from '@/views/projects/workflow/definition/components/start-modal'
+import LogModal from '@/views/projects/workflow/instance/components/log-modal'
 import './x6-style.scss'
 
 const props = {
   // If this prop is passed, it means from definition detail
+  instance: {
+    type: Object as PropType<WorkflowInstance>,
+    default: undefined
+  },
   definition: {
     type: Object as PropType<WorkflowDefinition>,
     default: undefined
@@ -57,6 +77,8 @@ export default defineComponent({
   props,
   emits: ['refresh', 'save'],
   setup(props, context) {
+    const { t } = useI18n()
+    const route = useRoute()
     const theme = useThemeStore()
 
     // Whether the graph can be operated
@@ -82,8 +104,72 @@ export default defineComponent({
       currTask,
       taskCancel,
       appendTask,
-      taskDefinitions
-    } = useTaskEdit({ graph })
+      editTask,
+      copyTask,
+      processDefinition,
+      removeTasks
+    } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
+
+    // Right click cell
+    const { nodeVariables, menuHide, menuStart, viewLog, hideLog } =
+      useNodeMenu({
+        graph
+      })
+
+    // start button in the dag node menu
+    const startReadonly = computed(() => {
+      if (props.definition) {
+        return (
+          route.name === 'workflow-definition-detail' &&
+          props.definition!.processDefinition.releaseState === 'NOT_RELEASE'
+        )
+      } else {
+        return false
+      }
+    })
+
+    // other button in the dag node menu
+    const menuReadonly = computed(() => {
+      if (props.instance) {
+        return (
+          props.instance.state !== 'WAITING_THREAD' &&
+          props.instance.state !== 'SUCCESS' &&
+          props.instance.state !== 'PAUSE' &&
+          props.instance.state !== 'FAILURE' &&
+          props.instance.state !== 'STOP'
+        )
+      } else if (props.definition) {
+        return props.definition!.processDefinition.releaseState === 'ONLINE'
+      } else {
+        return false
+      }
+    })
+
+    const taskInstance = computed(() => {
+      if (nodeVariables.menuCell) {
+        const taskCode = Number(nodeVariables.menuCell!.id)
+        return taskList.value.find((task: any) => task.taskCode === taskCode)
+      } else {
+        return undefined
+      }
+    })
+
+    const currentTaskInstance = ref()
+
+    watch(
+      () => taskModalVisible.value,
+      () => {
+        if (props.instance && taskModalVisible.value) {
+          const taskCode = currTask.value.code
+          currentTaskInstance.value = taskList.value.find(
+            (task: any) => task.taskCode === taskCode
+          )
+        }
+      }
+    )
+
+    const statusTimerRef = ref()
+    const { taskList, refreshTaskStatus } = useNodeStatus({ graph })
 
     const { onDragStart, onDrop } = useDagDragAndDrop({
       graph,
@@ -121,16 +207,42 @@ export default defineComponent({
     const onSave = (saveForm: any) => {
       const edges = graph.value?.getEdges() || []
       const nodes = graph.value?.getNodes() || []
-      const connects = getConnects(nodes, edges, taskDefinitions.value as any)
+      if (!nodes.length) {
+        window.$message.error(t('project.dag.node_not_created'))
+        saveModelToggle(false)
+        return
+      }
+      const connects = getConnects(
+        nodes,
+        edges,
+        processDefinition.value.taskDefinitionList as any
+      )
       const locations = getLocations(nodes)
       context.emit('save', {
-        taskDefinitions: taskDefinitions.value,
+        taskDefinitions: processDefinition.value.taskDefinitionList,
         saveForm,
         connects,
         locations
       })
       saveModelToggle(false)
     }
+
+    const handleViewLog = (taskId: number, taskType: string) => {
+      taskModalVisible.value = false
+      viewLog(taskId, taskType)
+    }
+
+    watch(
+      () => props.definition,
+      () => {
+        if (props.instance) {
+          refreshTaskStatus()
+          statusTimerRef.value = setInterval(() => refreshTaskStatus(), 90000)
+        }
+      }
+    )
+
+    onBeforeUnmount(() => clearInterval(statusTimerRef.value))
 
     return () => (
       <div
@@ -141,9 +253,12 @@ export default defineComponent({
       >
         <DagToolbar
           layoutToggle={layoutToggle}
+          instance={props.instance}
           definition={props.definition}
           onVersionToggle={versionToggle}
           onSaveModelToggle={saveModelToggle}
+          onRemoveTasks={removeTasks}
+          onRefresh={refreshTaskStatus}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -163,14 +278,52 @@ export default defineComponent({
             onUpdateList={refreshDetail}
           />
         )}
-        <DagSaveModal v-model:show={saveModalShow.value} onSave={onSave} />
+        <DagSaveModal
+          v-model:show={saveModalShow.value}
+          onSave={onSave}
+          definition={props.definition}
+          instance={props.instance}
+        />
         <TaskModal
+          readonly={props.readonly}
           show={taskModalVisible.value}
           projectCode={props.projectCode}
-          taskDefinition={currTask.value}
+          processInstance={props.instance}
+          taskInstance={currentTaskInstance.value}
+          onViewLog={handleViewLog}
+          data={currTask.value as any}
+          definition={processDefinition}
           onSubmit={taskConfirm}
           onCancel={taskCancel}
         />
+        <ContextMenuItem
+          startReadonly={startReadonly.value}
+          menuReadonly={menuReadonly.value}
+          taskInstance={taskInstance.value}
+          cell={nodeVariables.menuCell as Cell}
+          visible={nodeVariables.menuVisible}
+          left={nodeVariables.pageX}
+          top={nodeVariables.pageY}
+          onHide={menuHide}
+          onStart={menuStart}
+          onEdit={editTask}
+          onCopyTask={copyTask}
+          onRemoveTasks={removeTasks}
+          onViewLog={viewLog}
+        />
+        {!!props.definition && (
+          <StartModal
+            v-model:row={props.definition.processDefinition}
+            v-model:show={nodeVariables.startModalShow}
+          />
+        )}
+        {!!props.instance && nodeVariables.logModalShow && (
+          <LogModal
+            taskInstanceId={nodeVariables.logTaskId}
+            taskInstanceType={nodeVariables.logTaskType}
+            onHideLog={hideLog}
+          />
+        )}
       </div>
     )
   }

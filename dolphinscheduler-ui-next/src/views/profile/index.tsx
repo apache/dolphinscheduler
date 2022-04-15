@@ -24,10 +24,13 @@ import Card from '@/components/card'
 import Modal from '@/components/modal'
 import Info from './components/info'
 import utils from '@/utils'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const profile = defineComponent({
   name: 'profile',
   setup() {
+    const userInfo = useUserStore().userInfo as UserInfoRes
     const showModalRef = ref(false)
     const { state, t } = useForm()
     const { handleUpdate } = useUpdate(state)
@@ -39,6 +42,9 @@ const profile = defineComponent({
 
     const onCancel = () => {
       showModalRef.value = false
+      state.profileForm.email = userInfo.email
+      state.profileForm.phone = userInfo.phone
+      state.profileForm.username = userInfo.userName
     }
 
     const onConfirm = async () => {
@@ -78,6 +84,7 @@ const profile = defineComponent({
             !this.profileForm.email ||
             !utils.regex.email.test(this.profileForm.email)
           }
+          confirmLoading={this.saving}
         >
           {{
             default: () => (

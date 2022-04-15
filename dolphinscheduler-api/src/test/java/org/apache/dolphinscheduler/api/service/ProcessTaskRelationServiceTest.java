@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessTaskRelationServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -251,7 +250,7 @@ public class ProcessTaskRelationServiceTest {
         taskDefinition.setProjectCode(1L);
         taskDefinition.setCode(1L);
         taskDefinition.setVersion(1);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setTaskType("SHELL");
         return taskDefinition;
     }
 
@@ -476,7 +475,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(getTaskDefinition());
         TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setTaskType(TaskType.CONDITIONS.getDesc());
+        taskDefinition.setTaskType("CONDITIONS");
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(taskDefinition);
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList();
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();

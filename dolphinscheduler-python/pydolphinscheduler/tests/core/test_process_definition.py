@@ -24,10 +24,8 @@ from unittest.mock import patch
 import pytest
 from freezegun import freeze_time
 
-from pydolphinscheduler.constants import (
-    ProcessDefinitionDefault,
-    ProcessDefinitionReleaseState,
-)
+from pydolphinscheduler.constants import ProcessDefinitionReleaseState
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
@@ -51,22 +49,22 @@ def test_process_definition_key_attr(func):
 @pytest.mark.parametrize(
     "name,value",
     [
-        ("timezone", ProcessDefinitionDefault.TIME_ZONE),
-        ("project", Project(ProcessDefinitionDefault.PROJECT)),
-        ("tenant", Tenant(ProcessDefinitionDefault.TENANT)),
+        ("timezone", configuration.WORKFLOW_TIME_ZONE),
+        ("project", Project(configuration.WORKFLOW_PROJECT)),
+        ("tenant", Tenant(configuration.WORKFLOW_TENANT)),
         (
             "user",
             User(
-                ProcessDefinitionDefault.USER,
-                ProcessDefinitionDefault.USER_PWD,
-                ProcessDefinitionDefault.USER_EMAIL,
-                ProcessDefinitionDefault.USER_PHONE,
-                ProcessDefinitionDefault.TENANT,
-                ProcessDefinitionDefault.QUEUE,
-                ProcessDefinitionDefault.USER_STATE,
+                configuration.USER_NAME,
+                configuration.USER_PASSWORD,
+                configuration.USER_EMAIL,
+                configuration.USER_PHONE,
+                configuration.WORKFLOW_TENANT,
+                configuration.WORKFLOW_QUEUE,
+                configuration.USER_STATE,
             ),
         ),
-        ("worker_group", ProcessDefinitionDefault.WORKER_GROUP),
+        ("worker_group", configuration.WORKFLOW_WORKER_GROUP),
         ("release_state", ProcessDefinitionReleaseState.ONLINE),
     ],
 )
@@ -233,9 +231,9 @@ def test_process_definition_get_define_without_task():
     expect = {
         "name": TEST_PROCESS_DEFINITION_NAME,
         "description": None,
-        "project": ProcessDefinitionDefault.PROJECT,
-        "tenant": ProcessDefinitionDefault.TENANT,
-        "workerGroup": ProcessDefinitionDefault.WORKER_GROUP,
+        "project": configuration.WORKFLOW_PROJECT,
+        "tenant": configuration.WORKFLOW_TENANT,
+        "workerGroup": configuration.WORKFLOW_WORKER_GROUP,
         "timeout": 0,
         "releaseState": ProcessDefinitionReleaseState.ONLINE,
         "param": None,
@@ -311,15 +309,12 @@ def test_process_definition_simple_separate():
     "user_attrs",
     [
         {"tenant": "tenant_specific"},
-        {"queue": "queue_specific"},
-        {"tenant": "tenant_specific", "queue": "queue_specific"},
     ],
 )
 def test_set_process_definition_user_attr(user_attrs):
     """Test user with correct attributes if we specific assigned to process definition object."""
     default_value = {
-        "tenant": ProcessDefinitionDefault.TENANT,
-        "queue": ProcessDefinitionDefault.QUEUE,
+        "tenant": configuration.WORKFLOW_TENANT,
     }
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, **user_attrs) as pd:
         user = pd.user
@@ -407,13 +402,13 @@ def test_schedule_json_start_and_end_time(start_time, end_time, expect_date):
         "crontab": schedule,
         "startTime": expect_date["start_time"],
         "endTime": expect_date["end_time"],
-        "timezoneId": ProcessDefinitionDefault.TIME_ZONE,
+        "timezoneId": configuration.WORKFLOW_TIME_ZONE,
     }
     with ProcessDefinition(
         TEST_PROCESS_DEFINITION_NAME,
         schedule=schedule,
         start_time=start_time,
         end_time=end_time,
-        timezone=ProcessDefinitionDefault.TIME_ZONE,
+        timezone=configuration.WORKFLOW_TIME_ZONE,
     ) as pd:
         assert pd.schedule_json == expect

@@ -17,7 +17,7 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
@@ -42,11 +42,13 @@ export function useTable() {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('security.worker_group.group_name'),
-        key: 'name'
+        key: 'name',
+        className: 'name'
       },
       {
         title: t('security.worker_group.worker_addresses'),
@@ -94,12 +96,14 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        class: 'edit',
                         onClick: () => {
                           handleEdit(row)
                         }
                       },
                       {
-                        icon: () => h(EditOutlined)
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
                       }
                     ),
                   default: () => t('security.worker_group.edit')
@@ -124,10 +128,14 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small'
+                              size: 'small',
+                              class: 'delete'
                             },
                             {
-                              icon: () => h(DeleteOutlined)
+                              icon: () =>
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
                           ),
                         default: () => t('security.worker_group.delete')
@@ -152,7 +160,8 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
-    row: {}
+    row: {},
+    loadingRef: ref(false)
   })
 
   const handleDelete = (row: any) => {
@@ -169,15 +178,17 @@ export function useTable() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryAllWorkerGroupsPaging({ ...params }).then((res: WorkerGroupRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any
         variables.totalPage = res.totalPage
+        variables.loadingRef = false
       }),
       {}
     )

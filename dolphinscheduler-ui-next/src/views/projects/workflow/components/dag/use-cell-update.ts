@@ -22,6 +22,7 @@ import type { Coordinate } from './types'
 import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import { useCustomCellBuilder } from './dag-hooks'
 import utils from '@/utils'
+import type { Edge } from '@antv/x6'
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -34,7 +35,7 @@ interface Options {
 export function useCellUpdate(options: Options) {
   const { graph } = options
 
-  const { buildNode } = useCustomCellBuilder()
+  const { buildNode, buildEdge } = useCustomCellBuilder()
 
   /**
    * Set node name by id
@@ -60,18 +61,73 @@ export function useCellUpdate(options: Options) {
     id: string,
     type: string,
     name: string,
+    flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
   ) {
     if (!TASK_TYPES_MAP[type as TaskType]) {
-      console.warn(`taskType:${type} is invalid!`)
       return
     }
-    const node = buildNode(id, type, name, coordinate)
+    const node = buildNode(id, type, name, flag, coordinate)
     graph.value?.addNode(node)
+  }
+
+  function removeNode(id: string) {
+    graph.value?.removeNode(id)
+  }
+
+  const getNodeEdge = (id: string): Edge[] => {
+    const node = graph.value?.getCellById(id)
+    if (!node) return []
+    const edges = graph.value?.getConnectedEdges(node)
+    return edges || []
+  }
+
+  const setNodeEdge = (id: string, preTaskCode: number[]) => {
+    const edges = getNodeEdge(id)
+    if (edges?.length) {
+      edges.forEach((edge) => {
+        if (edge.getTargetNode()?.id === id) {
+          graph.value?.removeEdge(edge)
+        }
+      })
+    }
+    preTaskCode.forEach((task) => {
+      graph.value?.addEdge(buildEdge(String(task), id))
+    })
+  }
+
+  const getSources = (id: string): number[] => {
+    const edges = getNodeEdge(id)
+    if (!edges.length) return []
+    const sources = [] as number[]
+    edges.forEach((edge) => {
+      const sourceNode = edge.getSourceNode()
+      if (sourceNode && sourceNode.id !== id) {
+        sources.push(Number(sourceNode.id))
+      }
+    })
+    return sources
+  }
+
+  const getTargets = (id: string): number[] => {
+    const edges = getNodeEdge(id)
+    if (!edges.length) return []
+    const targets = [] as number[]
+    edges.forEach((edge) => {
+      const targetNode = edge.getTargetNode()
+      if (targetNode && targetNode.id !== id) {
+        targets.push(Number(targetNode.id))
+      }
+    })
+    return targets
   }
 
   return {
     setNodeName,
-    addNode
+    setNodeEdge,
+    addNode,
+    removeNode,
+    getSources,
+    getTargets
   }
 }

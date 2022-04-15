@@ -19,3 +19,5 @@ dolphinscheduler/dolphinscheduler-alert @kezhenxu94
 dolphinscheduler/dolphinscheduler-e2e @kezhenxu94
 dolphinscheduler/dolphinscheduler-registry @kezhenxu94
 dolphinscheduler/dolphinscheduler-standalone-server @kezhenxu94
+dolphinscheduler/dolphinscheduler-python @zhongjiajie
+dolphinscheduler/docs @zhongjiajie @Tianqi-Dotes

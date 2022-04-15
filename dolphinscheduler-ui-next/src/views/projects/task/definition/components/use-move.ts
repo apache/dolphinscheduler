@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive, ref, SetupContext } from 'vue'
+import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { querySimpleList } from '@/service/modules/process-definition'
@@ -37,6 +37,7 @@ export function useMove() {
       targetProcessDefinitionCode: ref(''),
       generalOptions: []
     },
+    saving: false,
     rules: {
       targetProcessDefinitionCode: {
         required: true,
@@ -77,17 +78,23 @@ export function useMove() {
     })
   }
 
-  const moveTask = () => {
-    const data = {
-      targetProcessDefinitionCode: variables.model.targetProcessDefinitionCode,
-      taskCode: variables.taskCode,
-      processDefinitionCode: variables.processDefinitionCode
-    }
-
-    moveRelation(data, projectCode).then(() => {
+  const moveTask = async () => {
+    if (variables.saving) return
+    variables.saving = true
+    try {
+      const data = {
+        targetProcessDefinitionCode:
+          variables.model.targetProcessDefinitionCode,
+        taskCode: variables.taskCode,
+        processDefinitionCode: variables.processDefinitionCode
+      }
+      await moveRelation(data, projectCode)
+      variables.saving = false
       variables.model.targetProcessDefinitionCode = ''
       variables.refreshTaskDefinition = true
-    })
+    } catch (err) {
+      variables.saving = false
+    }
   }
 
   return {

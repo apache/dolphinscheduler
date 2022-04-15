@@ -22,7 +22,8 @@ import {
   NIcon,
   NDataTable,
   NPagination,
-  NCard
+  NCard,
+  NSpace
 } from 'naive-ui'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
@@ -90,36 +91,45 @@ const tenementManage = defineComponent({
     }
   },
   render() {
-    const { t } = this
+    const { t, loadingRef } = this
     return (
       <div class={styles.container}>
         <NCard>
           <div class={styles.header}>
-            <div>
-              <NButton size='small' onClick={this.handleModalChange}>
-                {t('security.tenant.create_tenant')}
-              </NButton>
-            </div>
-            <div class={styles.search}>
+            <NButton
+              size='small'
+              onClick={this.handleModalChange}
+              type='primary'
+              class='btn-create-tenant'
+            >
+              {t('security.tenant.create_tenant')}
+            </NButton>
+            <NSpace>
               <NInput
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.tenant.search_tips')}
                 clearable
               />
-              <NButton size='small' onClick={this.handleSearch}>
+              <NButton size='small' type='primary' onClick={this.handleSearch}>
                 <NIcon>
                   <SearchOutlined />
                 </NIcon>
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card
           title={t('security.tenant.tenant_manage')}
           class={styles['table-card']}
         >
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
+            row-class-name='items'
+            scrollX={this.tableWidth}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

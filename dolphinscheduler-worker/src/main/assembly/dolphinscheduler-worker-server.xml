@@ -24,6 +24,7 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <baseDirectory>worker-server</baseDirectory>
+
     <fileSets>
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>

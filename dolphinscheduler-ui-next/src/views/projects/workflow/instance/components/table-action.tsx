@@ -62,6 +62,14 @@ export default defineComponent({
       })
     }
 
+    const handleGantt = () => {
+      router.push({
+        name: 'workflow-instance-gantt',
+        params: { id: props.row!.id },
+        query: { code: props.row!.processDefinitionCode }
+      })
+    }
+
     const handleReRun = () => {
       ctx.emit('reRun')
     }
@@ -89,6 +97,7 @@ export default defineComponent({
       handleStop,
       handleSuspend,
       handleDeleteInstance,
+      handleGantt,
       ...toRefs(props)
     }
   },
@@ -104,9 +113,10 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='info'
                 circle
+                class='btn-edit'
                 disabled={
                   (state !== 'SUCCESS' &&
                     state !== 'PAUSE' &&
@@ -130,10 +140,11 @@ export default defineComponent({
               return (
                 <NButton
                   tag='div'
-                  size='tiny'
+                  size='small'
                   type='info'
                   circle
                   onClick={this.handleReRun}
+                  class='btn-rerun'
                   disabled={
                     (state !== 'SUCCESS' &&
                       state !== 'PAUSE' &&
@@ -160,7 +171,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='primary'
                 circle
                 onClick={this.handleReStore}
@@ -180,18 +191,18 @@ export default defineComponent({
         <NTooltip trigger={'hover'}>
           {{
             default: () =>
-              state === 'PAUSE'
-                ? t('project.workflow.recovery_failed')
+              state === 'STOP'
+                ? t('project.workflow.recovery_suspend')
                 : t('project.workflow.stop'),
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='error'
                 circle
                 onClick={this.handleStop}
                 disabled={
-                  (state !== 'RUNNING_EXECUTION' && state !== 'PAUSE') ||
+                  (state !== 'RUNNING_EXECUTION' && state !== 'STOP') ||
                   this.row?.disabled
                 }
               >
@@ -215,7 +226,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='warning'
                 circle
                 disabled={
@@ -241,7 +252,7 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='error'
                 circle
                 disabled={
@@ -277,11 +288,11 @@ export default defineComponent({
             trigger: () => (
               <NButton
                 tag='div'
-                size='tiny'
+                size='small'
                 type='info'
                 circle
-                /* TODO: Goto gantt*/
                 disabled={this.row?.disabled}
+                onClick={this.handleGantt}
               >
                 <NIcon>
                   <ControlOutlined />

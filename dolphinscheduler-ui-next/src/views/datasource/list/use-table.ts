@@ -35,20 +35,14 @@ export function useTable() {
     if (data.loading) return
     data.loading = true
 
-    try {
-      const listRes = await queryDataSourceListPaging({
-        pageNo: data.page,
-        pageSize: data.pageSize,
-        searchVal: data.searchVal
-      })
-      data.loading = false
-      data.list = listRes.totalList
-      data.itemCount = listRes.total
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      data.loading = false
-      data.list = []
-    }
+    const listRes = await queryDataSourceListPaging({
+      pageNo: data.page,
+      pageSize: data.pageSize,
+      searchVal: data.searchVal
+    })
+    data.loading = false
+    data.list = listRes.totalList
+    data.itemCount = listRes.total
   }
 
   const updateList = () => {
@@ -59,12 +53,8 @@ export function useTable() {
   }
 
   const deleteRecord = async (id: number) => {
-    try {
-      const res = await deleteDataSource(id)
-      updateList()
-    } catch (e) {
-      window.$message.error((e as Error).message)
-    }
+    const ignored = await deleteDataSource(id)
+    updateList()
   }
 
   const changePage = (page: number) => {

@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_DATE;
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
+import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
+
+import static org.apache.commons.lang.time.DateUtils.addDays;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_DATE;
-import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
-import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
-import static org.apache.commons.lang.time.DateUtils.addDays;
-
 
 /**
  * business time utils
@@ -53,7 +53,6 @@ public class BusinessTimeUtils {
                 if (runTime == null) {
                     return result;
                 }
-                break;
             case START_PROCESS:
             case START_CURRENT_TASK_PROCESS:
             case RECOVER_TOLERANCE_FAULT_PROCESS:
@@ -72,9 +71,9 @@ public class BusinessTimeUtils {
                 break;
         }
         Date businessCurrentDate = addDays(businessDate, 1);
-        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE));
-        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE));
-        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME));
+        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE, null));
+        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE, null));
+        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME, null));
         return result;
     }
 }

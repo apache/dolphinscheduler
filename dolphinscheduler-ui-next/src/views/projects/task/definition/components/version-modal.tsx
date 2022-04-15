@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
-import { NDataTable, NPagination, useThemeVars } from 'naive-ui'
+import { NDataTable, NPagination } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useVersion } from './use-version'
 import styles from './version.module.scss'
@@ -48,21 +48,12 @@ const VersionModal = defineComponent({
       })
     }
 
-    onMounted(() => {
-      variables.taskVersion = props.row?.taskVersion
-      variables.taskCode = props.row?.taskCode
-
-      createColumns(variables)
-      requestData()
-    })
-
     watch(
       () => props.show,
       () => {
-        variables.taskVersion = props.row?.taskVersion
-        variables.taskCode = props.row?.taskCode
-
         if (props.show) {
+          variables.taskVersion = props.row?.taskVersion
+          variables.taskCode = props.row?.taskCode
           createColumns(variables)
           requestData()
         }
@@ -86,7 +77,7 @@ const VersionModal = defineComponent({
     return { t, ...toRefs(variables), requestData, onConfirm }
   },
   render() {
-    const { t, requestData, onConfirm, show } = this
+    const { t, requestData, onConfirm, show, loadingRef } = this
 
     return (
       <Modal
@@ -95,7 +86,11 @@ const VersionModal = defineComponent({
         cancelShow={false}
         onConfirm={onConfirm}
       >
-        <NDataTable columns={this.columns} data={this.tableData} />
+        <NDataTable
+          loading={loadingRef}
+          columns={this.columns}
+          data={this.tableData}
+        />
         <div class={styles.pagination}>
           <NPagination
             v-model:page={this.page}

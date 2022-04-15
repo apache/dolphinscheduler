@@ -32,6 +32,7 @@ export const useForm = () => {
       name: '',
       file: ''
     },
+    saving: false,
     importRules: {
       file: {
         required: true,
@@ -54,9 +55,10 @@ export const useForm = () => {
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       warningGroupId: null,
-      execType: '',
+      execType: 'START_PROCESS',
       startNodeList: '',
       taskDependType: 'TASK_POST',
+      dependentMode: 'OFF_MODE',
       runMode: 'RUN_MODE_SERIAL',
       processInstancePriority: 'MEDIUM',
       workerGroup: 'default',
@@ -64,7 +66,8 @@ export const useForm = () => {
       startParams: null,
       expectedParallelismNumber: '',
       dryRun: 0
-    }
+    },
+    saving: false
   })
 
   const timingState = reactive({
@@ -79,14 +82,36 @@ export const useForm = () => {
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       processInstancePriority: 'MEDIUM',
-      warningGroupId: '',
+      warningGroupId: null as null | number,
       workerGroup: 'default',
-      environmentCode: null
-    }
+      environmentCode: null as null | string
+    },
+    saving: false
   })
+
+  const copyState = reactive({
+    copyFormRef: ref(),
+    copyForm: {
+      projectCode: null
+    },
+    saving: false,
+    copyRules: {
+      projectCode: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (copyState.copyForm.projectCode === '') {
+            return new Error(t('project.workflow.project_name_required'))
+          }
+        }
+      }
+    } as FormRules
+  })
+
   return {
     importState,
     startState,
-    timingState
+    timingState,
+    copyState
   }
 }

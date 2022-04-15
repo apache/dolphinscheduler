@@ -70,13 +70,15 @@ $bgLight: #ffffff;
   width: 190px;
   height: 100%;
   margin-right: 20px;
+  overflow-y: scroll;
 }
 
 .workflow-name {
   font-size: 14px;
+  font-weight: 700;
 }
 
-.copy-btn {
+.toolbar-btn {
   margin-left: 5px;
 }
 
@@ -100,104 +102,116 @@ $bgLight: #ffffff;
     background-size: 100% 100%;
     margin-right: 10px;
     &.icon-shell {
-      background-image: url('@/assets/images/task-icons/shell.png');
+      background-image: url('/images/task-icons/shell.png');
     }
     &.icon-sub_process {
-      background-image: url('@/assets/images/task-icons/sub_process.png');
+      background-image: url('/images/task-icons/sub_process.png');
+    }
+    &.icon-data_quality {
+      background-image: url('/images/task-icons/data_quality.png');
     }
     &.icon-procedure {
-      background-image: url('@/assets/images/task-icons/procedure.png');
+      background-image: url('/images/task-icons/procedure.png');
     }
     &.icon-sql {
-      background-image: url('@/assets/images/task-icons/sql.png');
+      background-image: url('/images/task-icons/sql.png');
     }
     &.icon-flink {
-      background-image: url('@/assets/images/task-icons/flink.png');
+      background-image: url('/images/task-icons/flink.png');
     }
     &.icon-mr {
-      background-image: url('@/assets/images/task-icons/mr.png');
+      background-image: url('/images/task-icons/mr.png');
     }
     &.icon-python {
-      background-image: url('@/assets/images/task-icons/python.png');
+      background-image: url('/images/task-icons/python.png');
     }
     &.icon-dependent {
-      background-image: url('@/assets/images/task-icons/dependent.png');
+      background-image: url('/images/task-icons/dependent.png');
     }
     &.icon-http {
-      background-image: url('@/assets/images/task-icons/http.png');
+      background-image: url('/images/task-icons/http.png');
     }
     &.icon-datax {
-      background-image: url('@/assets/images/task-icons/datax.png');
+      background-image: url('/images/task-icons/datax.png');
     }
     &.icon-pigeon {
-      background-image: url('@/assets/images/task-icons/pigeon.png');
+      background-image: url('/images/task-icons/pigeon.png');
     }
     &.icon-sqoop {
-      background-image: url('@/assets/images/task-icons/sqoop.png');
+      background-image: url('/images/task-icons/sqoop.png');
     }
     &.icon-conditions {
-      background-image: url('@/assets/images/task-icons/conditions.png');
+      background-image: url('/images/task-icons/conditions.png');
     }
     &.icon-seatunnel {
-      background-image: url('@/assets/images/task-icons/seatunnel.png');
+      background-image: url('/images/task-icons/seatunnel.png');
     }
     &.icon-spark {
-      background-image: url('@/assets/images/task-icons/spark.png');
+      background-image: url('/images/task-icons/spark.png');
     }
     &.icon-switch {
-      background-image: url('@/assets/images/task-icons/switch.png');
+      background-image: url('/images/task-icons/switch.png');
+    }
+    &.icon-emr {
+      background-image: url('/images/task-icons/emr.png');
     }
   }
 
   &:hover {
     .sidebar-icon {
       &.icon-shell {
-        background-image: url('@/assets/images/task-icons/shell_hover.png');
+        background-image: url('/images/task-icons/shell_hover.png');
       }
       &.icon-sub_process {
-        background-image: url('@/assets/images/task-icons/sub_process_hover.png');
+        background-image: url('/images/task-icons/sub_process_hover.png');
+      }
+      &.icon-data_quality {
+        background-image: url('/images/task-icons/data_quality_hover.png');
       }
       &.icon-procedure {
-        background-image: url('@/assets/images/task-icons/procedure_hover.png');
+        background-image: url('/images/task-icons/procedure_hover.png');
       }
       &.icon-sql {
-        background-image: url('@/assets/images/task-icons/sql_hover.png');
+        background-image: url('/images/task-icons/sql_hover.png');
       }
       &.icon-flink {
-        background-image: url('@/assets/images/task-icons/flink_hover.png');
+        background-image: url('/images/task-icons/flink_hover.png');
       }
       &.icon-mr {
-        background-image: url('@/assets/images/task-icons/mr_hover.png');
+        background-image: url('/images/task-icons/mr_hover.png');
       }
       &.icon-python {
-        background-image: url('@/assets/images/task-icons/python_hover.png');
+        background-image: url('/images/task-icons/python_hover.png');
       }
       &.icon-dependent {
-        background-image: url('@/assets/images/task-icons/dependent_hover.png');
+        background-image: url('/images/task-icons/dependent_hover.png');
       }
       &.icon-http {
-        background-image: url('@/assets/images/task-icons/http_hover.png');
+        background-image: url('/images/task-icons/http_hover.png');
       }
       &.icon-datax {
-        background-image: url('@/assets/images/task-icons/datax_hover.png');
+        background-image: url('/images/task-icons/datax_hover.png');
       }
       &.icon-pigeon {
-        background-image: url('@/assets/images/task-icons/pigeon_hover.png');
+        background-image: url('/images/task-icons/pigeon_hover.png');
       }
       &.icon-sqoop {
-        background-image: url('@/assets/images/task-icons/sqoop_hover.png');
+        background-image: url('/images/task-icons/sqoop_hover.png');
       }
       &.icon-conditions {
-        background-image: url('@/assets/images/task-icons/conditions_hover.png');
+        background-image: url('/images/task-icons/conditions_hover.png');
       }
       &.icon-seatunnel {
-        background-image: url('@/assets/images/task-icons/seatunnel_hover.png');
+        background-image: url('/images/task-icons/seatunnel_hover.png');
       }
       &.icon-spark {
-        background-image: url('@/assets/images/task-icons/spark_hover.png');
+        background-image: url('/images/task-icons/spark_hover.png');
       }
       &.icon-switch {
-        background-image: url('@/assets/images/task-icons/switch_hover.png');
+        background-image: url('/images/task-icons/switch_hover.png');
+      }
+      &.icon-emr {
+        background-image: url('/images/task-icons/emr_hover.png');
       }
     }
   }
@@ -225,6 +239,12 @@ $bgLight: #ffffff;
   bottom: 0px;
   border: dashed 1px #e4e4e4;
   z-index: 9;
+}
+
+.toolbar-left-part {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .toolbar-right-part {

@@ -67,12 +67,22 @@ const TokenModal = defineComponent({
             : ''
         variables.model.expireTime = Date.now()
         variables.model.token = ''
+      } else {
+        variables.model.userId = props.row.userId
+        variables.model.expireTime = new Date(props.row.expireTime).getTime()
+        variables.model.token = props.row.token
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
 
     const confirmModal = () => {
       handleValidate(props.statusRef)
+    }
+
+    const changeUser = () => {
+      if (props.statusRef !== 0) {
+        variables.model.token = ''
+      }
     }
 
     watch(
@@ -119,11 +129,12 @@ const TokenModal = defineComponent({
       cancelModal,
       confirmModal,
       getToken,
+      changeUser,
       userStore
     }
   },
   render() {
-    const { t, getToken, userStore } = this
+    const { t, getToken, changeUser, userStore } = this
 
     return (
       <div>
@@ -139,6 +150,9 @@ const TokenModal = defineComponent({
           confirmDisabled={
             !this.model.userId || !this.model.expireTime || !this.model.token
           }
+          confirmClassName='btn-submit'
+          cancelClassName='btn-cancel'
+          confirmLoading={this.saving}
         >
           {{
             default: () => (
@@ -163,22 +177,26 @@ const TokenModal = defineComponent({
                   'GENERAL_USER' && (
                   <NFormItem label={t('security.token.user')} path='userId'>
                     <NSelect
+                      class='input-username'
                       filterable
                       placeholder={t('security.token.user_tips')}
                       options={this.model.generalOptions}
                       v-model={[this.model.userId, 'value']}
+                      onUpdateValue={changeUser}
                     />
                   </NFormItem>
                 )}
                 <NFormItem label={t('security.token.token')} path='token'>
                   <NSpace>
                     <NInput
+                      class='input-token'
                       style={{ width: '504px' }}
                       disabled
                       placeholder={t('security.token.token_tips')}
                       v-model={[this.model.token, 'value']}
                     />
                     <NButton
+                      class='btn-generate-token'
                       strong
                       secondary
                       circle

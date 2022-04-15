@@ -19,13 +19,14 @@ import { useI18n } from 'vue-i18n'
 import { h, reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryRuleListPaging } from '@/service/modules/data-quality'
-import type { Rule, RuleRes } from '@/service/modules/data-quality/types'
+import type { RuleRes } from '@/service/modules/data-quality/types'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import { format } from 'date-fns'
 import { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import { parseTime } from '@/utils/common'
 
-export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
+export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
   const { t } = useI18n()
 
   const variables = reactive({
@@ -34,7 +35,8 @@ export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
     pageSize: ref(10),
     state: ref(null),
     searchVal: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const columns: TableColumns<any> = [
@@ -96,6 +98,8 @@ export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
   ]
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -106,7 +110,7 @@ export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
 
     const { state } = useAsyncState(
       queryRuleListPaging(data).then((res: RuleRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           const ruleName =
             'data_quality.rule.' + item.name.substring(3, item.name.length - 1)
           const ruleNameLocale = t(ruleName)
@@ -120,21 +124,22 @@ export function useTable(viewRuleEntry = (ruleJson: string): void => {}) {
           }
 
           item.createTime = format(
-            new Date(item.createTime),
+            parseTime(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
           )
           item.updateTime = format(
-            new Date(item.updateTime),
+            parseTime(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
           )
 
           return {
-            index: index + 1,
             ...item,
             ruleName: ruleNameLocale,
             ruleTypeName: ruleTypeName
           }
         }) as any
+
+        variables.loadingRef = false
       }),
       {}
     )

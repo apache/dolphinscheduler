@@ -15,124 +15,146 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
-import { NGrid, NGi, NCard, NNumberAnimation, NDataTable } from 'naive-ui'
+import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { NGrid, NGi, NCard, NNumberAnimation, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useWorker } from './use-worker'
 import styles from './index.module.scss'
 import Card from '@/components/card'
+import Result from '@/components/result'
 import Gauge from '@/components/chart/modules/Gauge'
-import Modal from '@/components/modal'
-import type { WorkerRes } from '@/service/modules/monitor/types'
+import WorkerModal from './worker-modal'
 import type { Ref } from 'vue'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import type { RowData } from 'naive-ui/es/data-table/src/interface'
+import type { WorkerNode } from '@/service/modules/monitor/types'
 
-const master = defineComponent({
-  name: 'master',
+const worker = defineComponent({
+  name: 'worker',
   setup() {
     const showModalRef = ref(false)
     const { t } = useI18n()
-    const { getWorker } = useWorker()
-    const workerRef: Ref<Array<WorkerRes>> = ref(getWorker())
-    const columnsRef: TableColumns<any> = [
-      { title: '#', key: 'index' },
-      { title: t('monitor.worker.directory'), key: 'directory' }
-    ]
+    const { variables, getTableWorker } = useWorker()
+    const zkDirectoryRef: Ref<Array<RowData>> = ref([])
 
-    return { t, workerRef, showModalRef, columnsRef }
+    const clickDetails = (zkDirectories: Array<string>) => {
+      zkDirectoryRef.value = zkDirectories.map((zkItem) => {
+        return {
+          directory: zkItem
+        }
+      })
+      showModalRef.value = true
+    }
+
+    const onConfirmModal = () => {
+      showModalRef.value = false
+    }
+
+    onMounted(() => {
+      getTableWorker()
+    })
+
+    return {
+      t,
+      ...toRefs(variables),
+      clickDetails,
+      onConfirmModal,
+      showModalRef,
+      zkDirectoryRef
+    }
   },
   render() {
-    const { t, workerRef, columnsRef } = this
+    const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
+      this
 
-    return (
-      <div>
-        <NCard class={styles['header-card']}>
-          <div class={styles['content']}>
-            <p>
-              <span class={styles.left}>{`${t('monitor.worker.host')}: ${
-                workerRef[0] ? workerRef[0].host : ' - '
-              }`}</span>
-              <span
-                class={styles['link-btn']}
-                onClick={() => (this.showModalRef = true)}
-              >
-                {t('monitor.worker.directory_detail')}
-              </span>
-            </p>
-            <p>
-              <span class={styles.left}>{`${t('monitor.worker.create_time')}: ${
-                workerRef[0] ? workerRef[0].createTime : ' - '
-              }`}</span>
-              <span>{`${t('monitor.worker.last_heartbeat_time')}: ${
-                workerRef[0] ? workerRef[0].lastHeartbeatTime : ' - '
-              }`}</span>
-            </p>
-          </div>
-        </NCard>
-        <NGrid x-gap='12' cols='3'>
-          <NGi>
-            <Card title={t('monitor.worker.cpu_usage')}>
-              <div class={styles.card}>
-                {workerRef[0] && (
-                  <Gauge
-                    data={(
-                      JSON.parse(workerRef[0].resInfo).cpuUsage * 100
-                    ).toFixed(2)}
-                  />
-                )}
-              </div>
-            </Card>
-          </NGi>
-          <NGi>
-            <Card title={t('monitor.worker.memory_usage')}>
-              <div class={styles.card}>
-                {workerRef[0] && (
-                  <Gauge
-                    data={(
-                      JSON.parse(workerRef[0].resInfo).memoryUsage * 100
-                    ).toFixed(2)}
-                  />
-                )}
-              </div>
-            </Card>
-          </NGi>
-          <NGi>
-            <Card title={t('monitor.worker.load_average')}>
-              <div class={[styles.card, styles['load-average']]}>
-                {workerRef[0] && (
-                  <NNumberAnimation
-                    precision={2}
-                    from={0}
-                    to={JSON.parse(workerRef[0].resInfo).loadAverage}
-                  />
-                )}
-              </div>
-            </Card>
-          </NGi>
-        </NGrid>
-        <Modal
-          title={t('monitor.worker.directory_detail')}
-          show={this.showModalRef}
-          cancelShow={false}
-          onConfirm={() => (this.showModalRef = false)}
-        >
-          {{
-            default: () =>
-              workerRef[0] && (
-                <NDataTable
-                  columns={columnsRef}
-                  data={workerRef[0].zkDirectories.map((item, index) => {
-                    return { index: index + 1, directory: item }
-                  })}
-                  striped
-                  size={'small'}
-                />
-              )
-          }}
-        </Modal>
-      </div>
+    return this.data.length < 1 ? (
+      <Result
+        title={t('monitor.worker.worker_no_data_result_title')}
+        description={t('monitor.worker.worker_no_data_result_desc')}
+        status={'info'}
+        size={'medium'}
+      />
+    ) : (
+      <>
+        <NSpace vertical size={25}>
+          {this.data.map((item: WorkerNode) => {
+            return (
+              <NSpace vertical>
+                <NCard>
+                  <NSpace justify='space-between'>
+                    <NSpace>
+                      <span>{`${t('monitor.worker.host')}: ${
+                        item ? item.host : ' - '
+                      }`}</span>
+                      <span
+                        class={styles['link-btn']}
+                        onClick={() => clickDetails(item.zkDirectories)}
+                      >
+                        {t('monitor.worker.directory_detail')}
+                      </span>
+                    </NSpace>
+                    <NSpace>
+                      <span>{`${t('monitor.worker.create_time')}: ${
+                        item ? item.createTime : ' - '
+                      }`}</span>
+                      <span>{`${t('monitor.worker.last_heartbeat_time')}: ${
+                        item ? item.lastHeartbeatTime : ' - '
+                      }`}</span>
+                    </NSpace>
+                  </NSpace>
+                </NCard>
+                <NGrid x-gap='12' cols='3'>
+                  <NGi>
+                    <Card title={t('monitor.worker.cpu_usage')}>
+                      <div class={styles.card}>
+                        {item && (
+                          <Gauge
+                            data={(
+                              JSON.parse(item.resInfo).cpuUsage * 100
+                            ).toFixed(2)}
+                          />
+                        )}
+                      </div>
+                    </Card>
+                  </NGi>
+                  <NGi>
+                    <Card title={t('monitor.worker.memory_usage')}>
+                      <div class={styles.card}>
+                        {item && (
+                          <Gauge
+                            data={(
+                              JSON.parse(item.resInfo).memoryUsage * 100
+                            ).toFixed(2)}
+                          />
+                        )}
+                      </div>
+                    </Card>
+                  </NGi>
+                  <NGi>
+                    <Card title={t('monitor.worker.load_average')}>
+                      <div class={[styles.card, styles['load-average']]}>
+                        {item && (
+                          <NNumberAnimation
+                            precision={2}
+                            from={0}
+                            to={JSON.parse(item.resInfo).loadAverage}
+                          />
+                        )}
+                      </div>
+                    </Card>
+                  </NGi>
+                </NGrid>
+              </NSpace>
+            )
+          })}
+        </NSpace>
+        <WorkerModal
+          showModal={showModalRef}
+          data={zkDirectoryRef}
+          onConfirmModal={onConfirmModal}
+        />
+      </>
     )
   }
 })
 
-export default master
+export default worker

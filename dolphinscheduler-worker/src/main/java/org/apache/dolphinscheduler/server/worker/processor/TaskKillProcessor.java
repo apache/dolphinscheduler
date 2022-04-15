@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -32,9 +35,6 @@ import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -80,21 +80,38 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
-        if (killCommand == null){
+        if (killCommand == null) {
             logger.error("task kill request command is null");
             return;
         }
         logger.info("task kill command : {}", killCommand);
 
-        Pair<Boolean, List<String>> result = doKill(killCommand);
+        int taskInstanceId = killCommand.getTaskInstanceId();
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        if (taskExecutionContext == null) {
+            logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
+            return;
+        }
+
+        Integer processId = taskExecutionContext.getProcessId();
+        if (processId.equals(0)) {
+            workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+            logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
+            return;
+        }
+
+        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
 
         taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(killCommand, result);
-        taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskKillResponseCommand.getTaskInstanceId());
-        TaskCallbackService.remove(killCommand.getTaskInstanceId());
+        taskExecutionContext.setCurrentExecutionStatus(result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
+        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
+
+        taskCallbackService.sendTaskKillResponseCommand(taskExecutionContext);
+        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+
         logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
     }
 
@@ -103,22 +120,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      *
      * @return kill result
      */
-    private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
+    private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
         boolean processFlag = true;
         List<String> appIds = Collections.emptyList();
-        int taskInstanceId = killCommand.getTaskInstanceId();
-        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
 
         try {
-            Integer processId = taskExecutionContext.getProcessId();
-            if (processId.equals(0)) {
-                workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
-                logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
-                return Pair.of(true, appIds);
-            }
-
             String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
             if (!StringUtils.isEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);
@@ -151,11 +157,10 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         TaskKillResponseCommand taskKillResponseCommand = new TaskKillResponseCommand();
         taskKillResponseCommand.setStatus(result.getLeft() ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
         taskKillResponseCommand.setAppIds(result.getRight());
-        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
-        if (taskRequest == null) {
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
+        if (taskExecutionContext == null) {
             return taskKillResponseCommand;
         }
-        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
         if (taskExecutionContext != null) {
             taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskKillResponseCommand.setHost(taskExecutionContext.getHost());

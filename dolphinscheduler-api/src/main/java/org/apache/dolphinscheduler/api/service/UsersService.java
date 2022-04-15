@@ -44,7 +44,7 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> createUser(User loginUser, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws IOException;
+                                   int tenantId, String phone, String queue, int state) throws Exception;
 
     User createUser(String userName, String userPassword, String email,
                     int tenantId, String phone, String queue, int state);
@@ -130,7 +130,7 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws IOException;
+                                   int tenantId, String phone, String queue, int state, String timeZone) throws IOException;
 
     /**
      * delete user
@@ -242,20 +242,20 @@ public interface UsersService {
      * unauthorized user
      *
      * @param loginUser login user
-     * @param alertgroupId alert group id
+     * @param alertGroupId alert group id
      * @return unauthorize result code
      */
-    Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId);
+    Map<String, Object> unauthorizedUser(User loginUser, Integer alertGroupId);
 
 
     /**
      * authorized user
      *
      * @param loginUser login user
-     * @param alertgroupId alert group id
+     * @param alertGroupId alert group id
      * @return authorized result code
      */
-    Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId);
+    Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId);
 
     /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue

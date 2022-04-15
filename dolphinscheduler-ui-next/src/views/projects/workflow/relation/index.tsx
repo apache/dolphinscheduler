@@ -23,6 +23,7 @@ import { ReloadOutlined, EyeOutlined } from '@vicons/antd'
 import { useRelation } from './use-relation'
 import Card from '@/components/card'
 import Graph from './components/Graph'
+import Result from '@/components/result'
 
 const workflowRelation = defineComponent({
   name: 'workflow-relation',
@@ -60,61 +61,76 @@ const workflowRelation = defineComponent({
     const { t, handleResetDate } = this
 
     return (
-      <Card title={t('project.workflow.workflow_relation')}>
-        {{
-          default: () =>
-            Object.keys(this.seriesData).length > 0 && (
-              <Graph seriesData={this.seriesData} labelShow={this.labelShow} />
-            ),
-          'header-extra': () => (
-            <NSpace>
-              <NSelect
-                clearable
-                style={{ width: '300px' }}
-                placeholder={t('project.workflow.workflow_name')}
-                options={this.workflowOptions}
-                v-model={[this.workflow, 'value']}
-              />
-              <NTooltip trigger={'hover'}>
-                {{
-                  default: () => t('project.workflow.refresh'),
-                  trigger: () => (
-                    <NButton
-                      strong
-                      secondary
-                      circle
-                      type='info'
-                      onClick={handleResetDate}
-                    >
-                      <NIcon>
-                        <ReloadOutlined />
-                      </NIcon>
-                    </NButton>
-                  )
-                }}
-              </NTooltip>
-              <NTooltip trigger={'hover'}>
-                {{
-                  default: () => t('project.workflow.show_hide_label'),
-                  trigger: () => (
-                    <NButton
-                      strong
-                      secondary
-                      circle
-                      type='info'
-                      onClick={() => (this.labelShow = !this.labelShow)}
-                    >
-                      <NIcon>
-                        <EyeOutlined />
-                      </NIcon>
-                    </NButton>
-                  )
-                }}
-              </NTooltip>
-            </NSpace>
-          )
-        }}
-      </Card>
+      (this.seriesData.length === 0 && (
+        <Result
+          title={t('project.workflow.workflow_relation_no_data_result_title')}
+          description={t(
+            'project.workflow.workflow_relation_no_data_result_desc'
+          )}
+          status={'info'}
+          size={'medium'}
+        />
+      )) ||
+      (this.seriesData.length > 0 && (
+        <Card title={t('project.workflow.workflow_relation')}>
+          {{
+            default: () =>
+              Object.keys(this.seriesData).length > 0 && (
+                <Graph
+                  seriesData={this.seriesData}
+                  labelShow={this.labelShow}
+                />
+              ),
+            'header-extra': () => (
+              <NSpace>
+                <NSelect
+                  clearable
+                  style={{ width: '300px' }}
+                  placeholder={t('project.workflow.workflow_name')}
+                  options={this.workflowOptions}
+                  v-model={[this.workflow, 'value']}
+                />
+                <NTooltip trigger={'hover'}>
+                  {{
+                    default: () => t('project.workflow.refresh'),
+                    trigger: () => (
+                      <NButton
+                        strong
+                        secondary
+                        circle
+                        type='info'
+                        onClick={handleResetDate}
+                      >
+                        <NIcon>
+                          <ReloadOutlined />
+                        </NIcon>
+                      </NButton>
+                    )
+                  }}
+                </NTooltip>
+                <NTooltip trigger={'hover'}>
+                  {{
+                    default: () => t('project.workflow.show_hide_label'),
+                    trigger: () => (
+                      <NButton
+                        strong
+                        secondary
+                        circle
+                        type='info'
+                        onClick={() => (this.labelShow = !this.labelShow)}
+                      >
+                        <NIcon>
+                          <EyeOutlined />
+                        </NIcon>
+                      </NButton>
+                    )
+                  }}
+                </NTooltip>
+              </NSpace>
+            )
+          }}
+        </Card>
+      ))
     )
   }
 })

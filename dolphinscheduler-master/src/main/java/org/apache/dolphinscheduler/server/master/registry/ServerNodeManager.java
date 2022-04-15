@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -124,6 +125,12 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private AlertDao alertDao;
 
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
     private static volatile int MASTER_SLOT = 0;
 
     private static volatile int MASTER_SIZE = 0;
@@ -188,26 +195,30 @@ public class ServerNodeManager implements InitializingBean {
 
         @Override
         public void run() {
-            // sync worker node info
-            Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
-            syncAllWorkerNodeInfo(newWorkerNodeInfo);
+            try {
+                // sync worker node info
+                Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
+                syncAllWorkerNodeInfo(newWorkerNodeInfo);
 
-            // sync worker group nodes from database
-            List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
-            if (CollectionUtils.isNotEmpty(workerGroupList)) {
-                for (WorkerGroup wg : workerGroupList) {
-                    String workerGroup = wg.getName();
-                    Set<String> nodes = new HashSet<>();
-                    String[] addrs = wg.getAddrList().split(Constants.COMMA);
-                    for (String addr : addrs) {
-                        if (newWorkerNodeInfo.containsKey(addr)) {
-                            nodes.add(addr);
+                // sync worker group nodes from database
+                List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
+                if (CollectionUtils.isNotEmpty(workerGroupList)) {
+                    for (WorkerGroup wg : workerGroupList) {
+                        String workerGroup = wg.getName();
+                        Set<String> nodes = new HashSet<>();
+                        String[] addrs = wg.getAddrList().split(Constants.COMMA);
+                        for (String addr : addrs) {
+                            if (newWorkerNodeInfo.containsKey(addr)) {
+                                nodes.add(addr);
+                            }
+                        }
+                        if (!nodes.isEmpty()) {
+                            syncWorkerGroupNodes(workerGroup, nodes);
                         }
                     }
-                    if (!nodes.isEmpty()) {
-                        syncWorkerGroupNodes(workerGroup, nodes);
-                    }
                 }
+            } catch (Exception e) {
+                logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
     }
@@ -235,7 +246,7 @@ public class ServerNodeManager implements InitializingBean {
                         String group = parseGroup(path);
                         Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
-                        alertDao.sendServerStopedAlert(1, path, "WORKER");
+                        alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
                         String group = parseGroup(path);
@@ -285,7 +296,7 @@ public class ServerNodeManager implements InitializingBean {
                     if (type.equals(Type.REMOVE)) {
                         logger.info("master node : {} down.", path);
                         updateMasterNodes();
-                        alertDao.sendServerStopedAlert(1, path, "MASTER");
+                        alertDao.sendServerStoppedAlert(1, path, "MASTER");
                     }
                 } catch (Exception ex) {
                     logger.error("MasterNodeListener capture data change and get data failed.", ex);
@@ -296,6 +307,7 @@ public class ServerNodeManager implements InitializingBean {
 
     private void updateMasterNodes() {
         MASTER_SLOT = 0;
+        MASTER_SIZE = 0;
         this.masterNodes.clear();
         String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
         try {
@@ -333,18 +345,18 @@ public class ServerNodeManager implements InitializingBean {
     private void syncMasterNodes(Collection<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
-            String host = NetUtils.getHost();
+            String addr = NetUtils.getAddr(NetUtils.getHost(), masterConfig.getListenPort());
             this.masterNodes.addAll(nodes);
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
-            int index = masterPriorityQueue.getIndex(host);
+            int index = masterPriorityQueue.getIndex(addr);
             if (index >= 0) {
                 MASTER_SIZE = nodes.size();
                 MASTER_SLOT = index;
             } else {
-                logger.warn("current host:{} is not in active master list", host);
+                logger.warn("current addr:{} is not in active master list", addr);
             }
-            logger.info("update master nodes, master size: {}, slot: {}", MASTER_SIZE, MASTER_SLOT);
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, addr);
         } finally {
             masterLock.unlock();
         }
@@ -359,7 +371,6 @@ public class ServerNodeManager implements InitializingBean {
     private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
         workerGroupLock.lock();
         try {
-            workerGroup = workerGroup.toLowerCase();
             Set<String> workerNodes = workerGroupNodes.getOrDefault(workerGroup, new HashSet<>());
             workerNodes.clear();
             workerNodes.addAll(nodes);
@@ -385,7 +396,6 @@ public class ServerNodeManager implements InitializingBean {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
-            workerGroup = workerGroup.toLowerCase();
             Set<String> nodes = workerGroupNodes.get(workerGroup);
             if (CollectionUtils.isNotEmpty(nodes)) {
                 return Collections.unmodifiableSet(nodes);

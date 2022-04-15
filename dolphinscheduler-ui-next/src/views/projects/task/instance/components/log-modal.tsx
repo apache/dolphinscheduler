@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
+import { defineComponent, h, PropType, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NLog } from 'naive-ui'
+import { NIcon, NLog } from 'naive-ui'
+import { SyncOutlined } from '@vicons/antd'
 import { useModal } from './use-modal'
 import Modal from '@/components/modal'
 
@@ -39,9 +40,21 @@ const LogModal = defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
     const { variables, getLogs } = useModal()
+    const renderIcon = (icon: any) => {
+      return () => h(NIcon, null, { default: () => h(icon) })
+    }
 
     const confirmModal = () => {
       ctx.emit('confirmModal', props.showModalRef)
+    }
+
+    const refreshLogs = () => {
+      variables.logRef = ''
+      variables.loadingRef = true
+      variables.skipLineNum = 0
+      variables.limit = 1000
+
+      getLogs()
     }
 
     watch(
@@ -60,10 +73,10 @@ const LogModal = defineComponent({
       }
     )
 
-    return { t, ...toRefs(variables), confirmModal }
+    return { t, ...toRefs(variables), confirmModal, renderIcon, refreshLogs }
   },
   render() {
-    const { t } = this
+    const { t, renderIcon, refreshLogs } = this
 
     return (
       <Modal
@@ -72,6 +85,14 @@ const LogModal = defineComponent({
         cancelShow={false}
         onConfirm={this.confirmModal}
         style={{ width: '60%' }}
+        headerLinks={ref([
+          {
+            text: t('project.task.refresh'),
+            show: true,
+            action: refreshLogs,
+            icon: renderIcon(SyncOutlined)
+          }
+        ])}
       >
         <NLog rows={30} log={this.logRef} loading={this.loadingRef} />
       </Modal>

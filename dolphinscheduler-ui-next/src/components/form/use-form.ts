@@ -22,12 +22,23 @@ export function useForm() {
     formRef: ref()
   })
 
-  const validate = (...args: []) => {
-    state.formRef.validate(...args)
+  const validate = async (...args: []) => {
+    await state.formRef.validate(...args)
+  }
+
+  const resetValues = (initialValues: { [field: string]: any }) => {
+    const modelKeys = Object.keys(state.formRef.model)
+    for (const key of modelKeys) {
+      if (!Object.keys(initialValues).includes(key)) {
+        delete state.formRef.model[key]
+      }
+    }
+
+    setValues(initialValues)
   }
 
   const setValues = (initialValues: { [field: string]: any }) => {
-    for (let [key, value] of Object.entries(initialValues)) {
+    for (const [key, value] of Object.entries(initialValues)) {
       state.formRef.model[key] = value
     }
   }
@@ -36,10 +47,16 @@ export function useForm() {
     state.formRef.restoreValidation()
   }
 
+  const getValues = () => {
+    return state.formRef.model
+  }
+
   return {
     state,
     validate,
     setValues,
+    getValues,
+    resetValues,
     restoreValidation
   }
 }

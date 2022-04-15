@@ -22,9 +22,14 @@ import { bytesToSize } from '@/utils/common'
 import { useFileStore } from '@/store/file/file'
 import TableAction from './table-action'
 import { IRenameFile } from '../types'
+import ButtonLink from '@/components/button-link'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/utils/column-width-config'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import styles from './index.module.scss'
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
@@ -44,61 +49,73 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
 
   const columnsRef: TableColumns<any> = [
     {
-      title: t('resource.file.id'),
+      title: '#',
       key: 'id',
-      width: 50,
+      ...COLUMN_WIDTH_CONFIG['index'],
       render: (_row, index) => index + 1
     },
     {
       title: t('resource.file.name'),
       key: 'name',
-      width: 120,
+      ...COLUMN_WIDTH_CONFIG['name'],
       render: (row) =>
         h(
-          'a',
+          ButtonLink,
           {
-            href: 'javascript:',
-            class: styles.links,
-            onClick: () => goSubFolder(router, row)
+            onClick: () => void goSubFolder(router, row)
           },
-          {
-            default: () => {
-              return row.name
-            }
-          }
+          { default: () => row.name }
         )
     },
-    { title: t('resource.file.user_name'), width: 100, key: 'user_name' },
+    {
+      title: t('resource.file.user_name'),
+      ...COLUMN_WIDTH_CONFIG['userName'],
+      key: 'user_name'
+    },
     {
       title: t('resource.file.whether_directory'),
       key: 'whether_directory',
-      width: 100,
+      ...COLUMN_WIDTH_CONFIG['yesOrNo'],
       render: (row) =>
         row.directory ? t('resource.file.yes') : t('resource.file.no')
     },
-    { title: t('resource.file.file_name'), key: 'file_name' },
-    { title: t('resource.file.description'), width: 150, key: 'description' },
+    {
+      title: t('resource.file.file_name'),
+      ...COLUMN_WIDTH_CONFIG['name'],
+      key: 'file_name'
+    },
+    {
+      title: t('resource.file.description'),
+      ...COLUMN_WIDTH_CONFIG['note'],
+      key: 'description'
+    },
     {
       title: t('resource.file.size'),
       key: 'size',
+      ...COLUMN_WIDTH_CONFIG['size'],
       render: (row) => bytesToSize(row.size)
     },
-    { title: t('resource.file.update_time'), width: 150, key: 'update_time' },
+    {
+      title: t('resource.file.update_time'),
+      ...COLUMN_WIDTH_CONFIG['time'],
+      key: 'update_time'
+    },
     {
       title: t('resource.file.operation'),
       key: 'operation',
-      width: 150,
       render: (row) =>
         h(TableAction, {
           row,
           onRenameResource: (id, name, description) =>
             renameResource(id, name, description),
           onUpdateList: () => updateList()
-        })
+        }),
+      ...COLUMN_WIDTH_CONFIG['operation'](4)
     }
   ]
 
   return {
-    columnsRef
+    columnsRef,
+    tableWidth: calculateTableWidth(columnsRef) || DefaultTableWidth
   }
 }

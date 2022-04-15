@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
- .content {
+.content {
   width: 100%;
 
   .card {
@@ -84,13 +84,5 @@
   align-items: center;
   > div:first-child {
     width: 86%;
-  }
-}
-
-.links {
-  color: #2080f0;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
   }
 }

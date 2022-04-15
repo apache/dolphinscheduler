@@ -21,7 +21,7 @@ workDir=`cd ${workDir};pwd`
 
 source ${workDir}/env/install_env.sh
 
-workersGroupMap=()
+declare -A workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
@@ -54,13 +54,6 @@ for apiServer in ${apiServersHost[@]}
 do
   echo "$apiServer api server is starting"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
-done
-
-pythonGatewayHost=(${pythonGatewayServers//,/ })
-for pythonGatewayServer in "${pythonGatewayHost[@]}"
-do
-  echo "$pythonGatewayServer python gateway server is starting"
-  ssh -p $sshPort $pythonGatewayServer "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start python-gateway-server;"
 done
 
 # query server status

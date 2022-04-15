@@ -17,11 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.net.InetSocketAddress;
 import java.util.Date;
 
 import org.junit.After;
@@ -42,41 +47,55 @@ public class TaskResponseServiceTest {
     private ProcessService processService;
 
     @InjectMocks
-    TaskResponseService taskRspService;
+    TaskEventService taskEventService;
 
     @Mock
     private Channel channel;
 
-    private TaskResponseEvent ackEvent;
+    private TaskEvent ackEvent;
 
-    private TaskResponseEvent resultEvent;
+    private TaskEvent resultEvent;
 
     private TaskInstance taskInstance;
 
     @Mock
     private ProcessInstanceExecCacheManagerImpl processInstanceExecCacheManager;
 
+    @Mock
+    private DataQualityResultOperator dataQualityResultOperator;
+
+    @Mock
+    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+
+    @Mock
+    private TaskExecuteThreadPool taskExecuteThreadPool;
+
     @Before
     public void before() {
-        taskRspService.start();
+        taskEventService.start();
 
-        ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,
-                new Date(),
-                "127.*.*.*",
-                "path",
-                "logPath",
-                22,
-                channel,
-                1);
+        Mockito.when(channel.remoteAddress()).thenReturn(InetSocketAddress.createUnresolved("127.0.0.1", 1234));
 
-        resultEvent = TaskResponseEvent.newResult(ExecutionStatus.SUCCESS,
-                new Date(),
-                1,
-                "ids",
-                22,
-                "varPol",
-                channel,
-                1);
+        TaskExecuteRunningCommand taskExecuteRunningCommand = new TaskExecuteRunningCommand();
+        taskExecuteRunningCommand.setProcessId(1);
+        taskExecuteRunningCommand.setTaskInstanceId(22);
+        taskExecuteRunningCommand.setStatus(ExecutionStatus.RUNNING_EXECUTION.getCode());
+        taskExecuteRunningCommand.setExecutePath("path");
+        taskExecuteRunningCommand.setLogPath("logPath");
+        taskExecuteRunningCommand.setHost("127.*.*.*");
+        taskExecuteRunningCommand.setStartTime(new Date());
+
+        ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningCommand, channel);
+
+        TaskExecuteResponseCommand taskExecuteResponseCommand = new TaskExecuteResponseCommand();
+        taskExecuteResponseCommand.setProcessInstanceId(1);
+        taskExecuteResponseCommand.setTaskInstanceId(22);
+        taskExecuteResponseCommand.setStatus(ExecutionStatus.SUCCESS.getCode());
+        taskExecuteResponseCommand.setEndTime(new Date());
+        taskExecuteResponseCommand.setVarPool("varPol");
+        taskExecuteResponseCommand.setAppIds("ids");
+        taskExecuteResponseCommand.setProcessId(1);
+        resultEvent = TaskEvent.newResultEvent(taskExecuteResponseCommand, channel);
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);
@@ -85,16 +104,14 @@ public class TaskResponseServiceTest {
 
     @Test
     public void testAddResponse() {
-        Mockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-        Mockito.when(channel.writeAndFlush(Mockito.any())).thenReturn(null);
-        taskRspService.addResponse(ackEvent);
-        taskRspService.addResponse(resultEvent);
+        taskEventService.addEvent(ackEvent);
+        taskEventService.addEvent(resultEvent);
     }
 
     @After
     public void after() {
-        if (taskRspService != null) {
-            taskRspService.stop();
+        if (taskEventService != null) {
+            taskEventService.stop();
         }
     }
 }

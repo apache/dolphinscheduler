@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
+import { h, unref } from 'vue'
 import { NTreeSelect } from 'naive-ui'
+import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function renderTreeSelect(
   item: IJsonItem,
   fields: { [field: string]: any }
 ) {
-  const { props = {}, field, options = [] } = item
+  const { props = {}, field, options = [] } = isFunction(item) ? item() : item
   return h(NTreeSelect, {
     ...props,
     value: fields[field],
-    onUpdateValue: (value) => void (fields[field] = value),
-    options
+    onUpdateValue: (value: []) => void (fields[field] = value),
+    options: unref(options)
   })
 }

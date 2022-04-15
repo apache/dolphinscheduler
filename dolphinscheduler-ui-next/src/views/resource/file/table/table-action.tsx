@@ -102,6 +102,7 @@ export default defineComponent({
                 }}
                 style={{ marginRight: '-5px' }}
                 circle
+                class='btn-edit'
               >
                 <NIcon>
                   <FormOutlined />
@@ -126,6 +127,7 @@ export default defineComponent({
                 }
                 style={{ marginRight: '-5px' }}
                 circle
+                class='btn-rename'
               >
                 <NIcon>
                   <EditOutlined />
@@ -146,6 +148,7 @@ export default defineComponent({
                 circle
                 style={{ marginRight: '-5px' }}
                 onClick={() => downloadResource(this.row.id)}
+                class='btn-download'
               >
                 <NIcon>
                   <DownloadOutlined />
@@ -158,7 +161,7 @@ export default defineComponent({
           {{
             default: () => t('resource.file.delete'),
             trigger: () => (
-              <NButton size='tiny' type='error' circle>
+              <NButton size='tiny' type='error' circle class='btn-delete'>
                 <NPopconfirm
                   positive-text={t('resource.file.confirm')}
                   negative-text={t('resource.file.cancel')}

@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
-import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
-import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -559,6 +559,25 @@ public class DagHelper {
         for (TaskNode taskNode : taskNodes) {
             List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
             if (preTasksList.contains(parentNodeCode) && taskNode.isConditionsTask()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * is there have blocking node after the parent node
+     */
+    public static boolean haveBlockingAfterNode(String parentNodeCode,
+                                                DAG<String,TaskNode,TaskNodeRelation> dag) {
+        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeCode);
+        if (CollectionUtils.isEmpty(subsequentNodes)) {
+            return false;
+        }
+        for (String nodeName : subsequentNodes) {
+            TaskNode taskNode = dag.getNode(nodeName);
+            List<String> preTaskList = JSONUtils.toList(taskNode.getPreTasks(),String.class);
+            if (preTaskList.contains(parentNodeCode) && taskNode.isBlockingTask()) {
                 return true;
             }
         }

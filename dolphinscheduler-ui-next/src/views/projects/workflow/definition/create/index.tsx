@@ -70,12 +70,13 @@ export default defineComponent({
           locations: JSON.stringify(locations),
           name: saveForm.name,
           tenantCode: saveForm.tenantCode,
+          executionType: saveForm.executionType,
           description: saveForm.description,
           globalParams: JSON.stringify(globalParams),
           timeout: saveForm.timeoutFlag ? saveForm.timeout : 0
         },
         projectCode
-      ).then((res: any) => {
+      ).then((ignored: any) => {
         message.success(t('project.dag.success'))
         router.push({ path: `/projects/${projectCode}/workflow-definition` })
       })

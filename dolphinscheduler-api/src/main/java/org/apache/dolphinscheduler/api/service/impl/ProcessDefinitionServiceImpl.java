@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
@@ -41,16 +43,13 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
-import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
@@ -82,11 +81,14 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.Stat;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -184,6 +186,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
+
+    @Autowired
+    private TaskPluginManager taskPluginManager;
 
     /**
      * create process definition
@@ -298,7 +303,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionLog)) {
+
+                if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                        .taskType(taskDefinitionLog.getTaskType())
+                        .taskParams(taskDefinitionLog.getTaskParams())
+                        .dependence(taskDefinitionLog.getDependence())
+                        .build())) {
                     logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
                     putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                     return result;
@@ -1085,7 +1095,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         sqlParameters.setLocalParams(Collections.emptyList());
         taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
         taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
-        taskDefinition.setTaskType(TaskType.SQL.getDesc());
+        taskDefinition.setTaskType(TASK_TYPE_SQL);
         taskDefinition.setFailRetryTimes(0);
         taskDefinition.setFailRetryInterval(0);
         taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
@@ -1108,16 +1118,20 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return false;
         }
         ProcessDefinition processDefinition = dagDataSchedule.getProcessDefinition();
+
+        // generate import processDefinitionName
+        String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
+        String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
+
         //unique check
-        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, processDefinition.getName());
+        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {
             result.putAll(checkResult);
             return false;
         }
-        String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
-        processDefinition.setName(processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp());
+        processDefinition.setName(importProcessDefinitionName);
         processDefinition.setId(0);
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
@@ -1283,7 +1297,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             // check whether the process definition json is normal
             for (TaskNode taskNode : taskNodes) {
-                if (!CheckUtils.checkTaskNodeParameters(taskNode)) {
+                if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                        .taskType(taskNode.getType())
+                        .taskParams(taskNode.getTaskParams())
+                        .dependence(taskNode.getDependence())
+                        .switchResult(taskNode.getSwitchResult())
+                        .build())) {
                     logger.error("task node {} parameter invalid", taskNode.getName());
                     putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskNode.getName());
                     return result;
@@ -1646,10 +1665,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                    if (TaskType.CONDITIONS.getDesc().equals(taskDefinitionLog.getTaskType())
-                        || TaskType.SWITCH.getDesc().equals(taskDefinitionLog.getTaskType())
-                        || TaskType.SUB_PROCESS.getDesc().equals(taskDefinitionLog.getTaskType())
-                        || TaskType.DEPENDENT.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                    if (COMPLEX_TASK_TYPES.contains(taskDefinitionLog.getTaskType())) {
                         putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
                         return;
                     }
@@ -2133,8 +2149,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
-                scheduleObj.setReleaseState(ReleaseState.ONLINE);
-                scheduleMapper.updateById(scheduleObj);
+                schedulerService.setScheduleState(loginUser, projectCode, scheduleObj.getId(), ReleaseState.ONLINE);
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);

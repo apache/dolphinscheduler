@@ -70,7 +70,6 @@ public class K8sClientService {
                 .withName(k8sNamespace.getNamespace())
                 .get();
 
-
         ResourceQuota body = yaml.loadAs(yamlStr, ResourceQuota.class);
 
         if (queryExist != null) {

@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,8 +81,8 @@ public class JSONUtilsTest {
         String jsonStr = "{\"a\":\"b\",\"b\":\"d\"}";
 
         ObjectNode objectNode = JSONUtils.createObjectNode();
-        objectNode.put("a","b");
-        objectNode.put("b","d");
+        objectNode.put("a", "b");
+        objectNode.put("b", "d");
         String s = JSONUtils.toJsonString(objectNode);
         Assert.assertEquals(s, jsonStr);
     }
@@ -155,7 +156,7 @@ public class JSONUtilsTest {
         Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
         Assert.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
-    
+
     @Test
     public void testJsonByteArray() {
         String str = "foo";
@@ -256,6 +257,24 @@ public class JSONUtilsTest {
         TaskNode taskNode = JSONUtils.parseObject(a, TaskNode.class);
 
         Assert.assertTrue(true);
+    }
+
+    @Test
+    public void dateToString() {
+        String time = "2022-02-22 13:38:24";
+        Date date = DateUtils.stringToDate(time);
+        String json = JSONUtils.toJsonString(date);
+        Assert.assertEquals(json, "\"" + time + "\"");
+
+        String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
+        Assert.assertNull(DateUtils.stringToDate(errorFormatTime));
+    }
+
+    @Test
+    public void stringToDate() {
+        String json = "\"2022-02-22 13:38:24\"";
+        Date date = JSONUtils.parseObject(json, Date.class);
+        Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
     }
 
 }

@@ -18,10 +18,12 @@
 """Init pydolphinscheduler.core package."""
 
 from pydolphinscheduler.core.database import Database
+from pydolphinscheduler.core.engine import Engine
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task
 
 __all__ = [
+    "Engine",
     "ProcessDefinition",
     "Task",
     "Database",

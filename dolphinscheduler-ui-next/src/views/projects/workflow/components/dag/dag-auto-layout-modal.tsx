@@ -55,7 +55,7 @@ const props = {
 export default defineComponent({
   name: 'dag-format-modal',
   props,
-  setup(props, context) {
+  setup(props, unusedContext) {
     const { t } = useI18n()
     const { formValue, formRef, submit, cancel } = props
 
@@ -67,14 +67,7 @@ export default defineComponent({
         onCancel={cancel}
         autoFocus={false}
       >
-        <NForm
-          label-width='80'
-          model={formValue.value}
-          rules={{}}
-          size='medium'
-          label-placement='left'
-          ref={formRef}
-        >
+        <NForm model={formValue.value} rules={{}} size='medium' ref={formRef}>
           <NFormItem label={t('project.dag.layout_type')} path='type'>
             <NRadioGroup
               v-model={[formValue.value.type, 'value']}

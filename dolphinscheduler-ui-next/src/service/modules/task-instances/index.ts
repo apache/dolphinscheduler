@@ -37,5 +37,5 @@ export function forceSuccess(taskId: IdReq, projectCode: ProjectCodeReq): any {
 }
 
 export function downloadLog(id: number): void {
-  downloadFile(`log/download-log`, { taskInstanceId: id })
+  downloadFile('log/download-log', { taskInstanceId: id })
 }

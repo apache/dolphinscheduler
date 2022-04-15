@@ -21,11 +21,8 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-from pydolphinscheduler.constants import (
-    ProcessDefinitionDefault,
-    ProcessDefinitionReleaseState,
-    TaskType,
-)
+from pydolphinscheduler.constants import ProcessDefinitionReleaseState, TaskType
+from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
@@ -58,6 +55,14 @@ class ProcessDefinition(Base):
     """process definition object, will define process definition attribute, task, relation.
 
     TODO: maybe we should rename this class, currently use DS object name.
+
+    :param user: The user for current process definition. Will create a new one if it do not exists. If your
+        parameter ``project`` already exists but project's create do not belongs to ``user``, will grant
+        ``project`` to ``user`` automatically.
+    :param project: The project for current process definition. You could see the workflow in this project
+        thought Web UI after it :func:`submit` or :func:`run`. It will create a new project belongs to
+        ``user`` if it does not exists. And when ``project`` exists but project's create do not belongs
+        to ``user``, will grant `project` to ``user`` automatically.
     """
 
     # key attribute for identify ProcessDefinition object
@@ -90,12 +95,11 @@ class ProcessDefinition(Base):
         schedule: Optional[str] = None,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
-        timezone: Optional[str] = ProcessDefinitionDefault.TIME_ZONE,
-        user: Optional[str] = ProcessDefinitionDefault.USER,
-        project: Optional[str] = ProcessDefinitionDefault.PROJECT,
-        tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
-        queue: Optional[str] = ProcessDefinitionDefault.QUEUE,
-        worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
+        timezone: Optional[str] = configuration.WORKFLOW_TIME_ZONE,
+        user: Optional[str] = configuration.WORKFLOW_USER,
+        project: Optional[str] = configuration.WORKFLOW_PROJECT,
+        tenant: Optional[str] = configuration.WORKFLOW_TENANT,
+        worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
         timeout: Optional[int] = 0,
         release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
         param: Optional[Dict] = None,
@@ -108,7 +112,6 @@ class ProcessDefinition(Base):
         self._user = user
         self._project = project
         self._tenant = tenant
-        self._queue = queue
         self.worker_group = worker_group
         self.timeout = timeout
         self.release_state = release_state
@@ -151,15 +154,7 @@ class ProcessDefinition(Base):
 
         For now we just get from python side but not from java gateway side, so it may not correct.
         """
-        return User(
-            self._user,
-            ProcessDefinitionDefault.USER_PWD,
-            ProcessDefinitionDefault.USER_EMAIL,
-            ProcessDefinitionDefault.USER_PHONE,
-            self._tenant,
-            self._queue,
-            ProcessDefinitionDefault.USER_STATE,
-        )
+        return User(name=self._user, tenant=self._tenant)
 
     @staticmethod
     def _parse_datetime(val: Any) -> Any:
@@ -334,8 +329,6 @@ class ProcessDefinition(Base):
         :class:`pydolphinscheduler.constants.ProcessDefinitionDefault`.
         """
         # TODO used metaclass for more pythonic
-        self.tenant.create_if_not_exists(self._queue)
-        # model User have to create after Tenant created
         self.user.create_if_not_exists()
         # Project model need User object exists
         self.project.create_if_not_exists(self._user)

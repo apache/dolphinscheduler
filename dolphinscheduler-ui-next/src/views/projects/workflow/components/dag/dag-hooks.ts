@@ -26,6 +26,8 @@ import { useCustomCellBuilder } from './use-custom-cell-builder'
 import { useGraphBackfill } from './use-graph-backfill'
 import { useDagDragAndDrop } from './use-dag-drag-drop'
 import { useTaskEdit } from './use-task-edit'
+import { useNodeMenu } from './use-node-menu'
+import { useNodeStatus } from './use-node-status'
 
 export {
   useCanvasInit,
@@ -38,5 +40,7 @@ export {
   useGraphBackfill,
   useCellUpdate,
   useDagDragAndDrop,
-  useTaskEdit
+  useTaskEdit,
+  useNodeMenu,
+  useNodeStatus
 }

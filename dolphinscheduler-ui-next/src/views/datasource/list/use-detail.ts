@@ -47,16 +47,10 @@ export function useDetail(getFieldsValue: Function) {
   const queryById = async (id: number) => {
     if (status.loading) return {}
     status.loading = true
-    try {
-      const dataSourceRes = await queryDataSource(id)
-      status.loading = false
-      PREV_NAME = dataSourceRes.name
-      return dataSourceRes
-    } catch (e) {
-      window.$message.error((e as Error).message)
-      status.loading = false
-      return {}
-    }
+    const dataSourceRes = await queryDataSource(id)
+    status.loading = false
+    PREV_NAME = dataSourceRes.name
+    return dataSourceRes
   }
 
   const testConnect = async () => {
@@ -70,14 +64,14 @@ export function useDetail(getFieldsValue: Function) {
           : `${t('datasource.test_connect')} ${t('datasource.success')}`
       )
       status.testing = false
-    } catch (e) {
-      window.$message.error((e as Error).message)
+    } catch (err) {
       status.testing = false
     }
   }
 
   const createOrUpdate = async (id?: number) => {
     const values = getFieldsValue()
+
     if (status.saving || !values.name) return false
     status.saving = true
 
@@ -92,8 +86,7 @@ export function useDetail(getFieldsValue: Function) {
 
       status.saving = false
       return true
-    } catch (e) {
-      window.$message.error((e as Error).message)
+    } catch (err) {
       status.saving = false
       return false
     }
