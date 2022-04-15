@@ -41,12 +41,12 @@ export default {
       {
         key: 'docs',
         text: 'DOCS',
-        link: '/en-us/docs/latest/user_doc/guide/quick-start.html',
+        link: '/en-us/docs/latest/user_doc/about/introduction.html',
         children: [
           {
             key: 'docs0',
             text: 'latest(3.0.0-alpha)',
-            link: '/en-us/docs/latest/user_doc/guide/quick-start.html',
+            link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
@@ -227,12 +227,12 @@ export default {
       {
         key: 'docs',
         text: '文档',
-        link: '/zh-cn/docs/latest/user_doc/guide/quick-start.html',
+        link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
         children: [
           {
             key: 'docs0',
             text: '最新版本latest(3.0.0-alpha)',
-            link: '/zh-cn/docs/latest/user_doc/guide/quick-start.html',
+            link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
