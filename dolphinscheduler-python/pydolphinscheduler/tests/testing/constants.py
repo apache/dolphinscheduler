@@ -39,7 +39,7 @@ ignore_exec_examples = {
 }
 
 # pydolphinscheduler environment home
-ENV_PYDS_HOME = "PYDOLPHINSCHEDULER_HOME"
+ENV_PYDS_HOME = "PYDS_HOME"
 
 # whether in dev mode, if true we will add or remove some tests. Or make be and more detail infos when
 # test failed.

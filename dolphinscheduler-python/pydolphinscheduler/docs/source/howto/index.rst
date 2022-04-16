@@ -15,10 +15,14 @@
    specific language governing permissions and limitations
    under the License.
 
-How To
+HOWTOs
 ======
 
-In this section 
+pydolphinscheduler HOWTOs are documents that cover a single, specific topic, and attempt to cover it fairly
+completely. This collection is an effort to foster documentation that is more detailed than the :doc:`../concept`
+and :doc:`../tutorial`.
+
+Currently, the HOWTOs are:
 
 .. toctree::
    :maxdepth: 2
