@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -69,7 +69,7 @@ fi
 case $startStop in
   (start)
     echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
-    nohup /bin/sh "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
+    nohup /bin/bash "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
     echo $! > $pid
     ;;
 

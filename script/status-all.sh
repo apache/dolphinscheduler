@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -37,8 +37,6 @@ firstColumn="node  server  state"
 echo $firstColumn
 echo -e '\n'
 
-declare -A workersGroupMap=()
-
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
@@ -52,25 +50,25 @@ StateRunning="Running"
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
-  masterState=`ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status master-server;"`
+  masterState=`ssh -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status master-server;"`
   echo "$master  $masterState"
 done
 
 # 2.worker server check state
 for worker in ${!workersGroupMap[*]}
 do
-  workerState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status worker-server;"`
+  workerState=`ssh -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status worker-server;"`
   echo "$worker  $workerState"
 done
 
 # 3.alter server check state
-alertState=`ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status alert-server;"`
+alertState=`ssh -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status alert-server;"`
 echo "$alertServer  $alertState"
 
 # 4.api server check state
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-  apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status api-server;"`
+  apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
 done
