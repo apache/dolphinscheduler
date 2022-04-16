@@ -115,9 +115,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize,
                                        int groupId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
+
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueuePaging(page, groupId);
 
