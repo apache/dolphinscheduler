@@ -31,9 +31,9 @@
     </select>
 
     <insert id="insertAlertWhenServerCrash">
-        insert into t_ds_alert(title, content, alert_status, warning_type, log, alertgroup_id, create_time, update_time)
+        insert into t_ds_alert(title, content, alert_status, warning_type, log, alertgroup_id, create_time, update_time, alert_type)
         SELECT #{alert.title}, #{alert.content}, #{alert.alertStatus.code}, #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId},
-               #{alert.createTime}, #{alert.updateTime}
+               #{alert.createTime}, #{alert.updateTime}, #{alert.alertType}
         from t_ds_alert
         where content = #{alert.content} and alert_status = #{alert.alertStatus.code}
         having count(*) = 0
