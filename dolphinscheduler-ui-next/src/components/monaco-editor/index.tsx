@@ -25,7 +25,7 @@ import {
 } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
 import { call } from 'naive-ui/es/_utils'
-import {useThemeStore} from "@/store/theme/theme";
+import { useThemeStore } from '@/store/theme/theme'
 import * as monaco from 'monaco-editor'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'

@@ -46,9 +46,7 @@ import type {
   IWorkflowTaskInstance,
   WorkflowInstance
 } from './types'
-import {
-  querySubProcessInstanceByTaskCode
-} from '@/service/modules/process-instances'
+import { querySubProcessInstanceByTaskCode } from '@/service/modules/process-instances'
 
 const props = {
   show: {
@@ -156,18 +154,22 @@ const NodeDetailModal = defineComponent({
         {
           text: t('project.node.enter_this_child_node'),
           show: props.data.taskType === 'SUB_PROCESS',
-          disabled: !props.data.id || (router.currentRoute.value.name === 'workflow-instance-detail' && !props.taskInstance),
+          disabled:
+            !props.data.id ||
+            (router.currentRoute.value.name === 'workflow-instance-detail' &&
+              !props.taskInstance),
           action: () => {
             if (router.currentRoute.value.name === 'workflow-instance-detail') {
-              querySubProcessInstanceByTaskCode({ taskId: props.taskInstance?.id }, { projectCode: props.projectCode }).then(
-                (res: any) => {
-                  router.push({
-                    name: 'workflow-instance-detail',
-                    params: { id: res.subProcessInstanceId },
-                    query: { code: props.data.taskParams?.processDefinitionCode }
-                  })
-                }
-              )
+              querySubProcessInstanceByTaskCode(
+                { taskId: props.taskInstance?.id },
+                { projectCode: props.projectCode }
+              ).then((res: any) => {
+                router.push({
+                  name: 'workflow-instance-detail',
+                  params: { id: res.subProcessInstanceId },
+                  query: { code: props.data.taskParams?.processDefinitionCode }
+                })
+              })
             } else {
               router.push({
                 name: 'workflow-definition-detail',
