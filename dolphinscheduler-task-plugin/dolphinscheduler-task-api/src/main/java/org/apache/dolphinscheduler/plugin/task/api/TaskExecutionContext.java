@@ -24,8 +24,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 
 import java.util.Date;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * to master/worker task transport
