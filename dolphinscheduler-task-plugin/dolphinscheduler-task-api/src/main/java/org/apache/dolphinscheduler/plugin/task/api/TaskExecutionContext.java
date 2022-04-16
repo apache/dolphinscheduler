@@ -566,17 +566,6 @@ public class TaskExecutionContext {
         this.endTime = endTime;
     }
 
-    public String getEnvironmentVariable(String variable) {
-        String pattern = String.format("%s=(.*)", variable);
-        Pattern reg = Pattern.compile(pattern);
-        Matcher matcher = reg.matcher(environmentConfig);
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public String toString() {
         return "TaskExecutionContext{"
