@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ws-3.0.0
+
+env:
+  GITHUB_USERNAME: x-access-token
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  deploy:
+    name: Deploy maven packages to pkg.github
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Deploy
+        shell: bash
+        run: |
+          ./mvnw -B versions:set -DnewVersion=${GITHUB_SHA::7} -DgenerateBackupPoms=false
+          ./mvnw --batch-mode --settings maven-settings.xml clean deploy \
+                -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/whaleops/dolphinscheduler \
+                -Dmaven.test.skip -Dcheckstyle.skip -DretryFailedDeploymentCount=5
