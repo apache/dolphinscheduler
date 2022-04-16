@@ -27,8 +27,8 @@ import java.util.List;
 public class ZeppelinParameters extends AbstractParameters {
 
     /**
-     * job flow define in json format
-     * @see <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples">API_RunJobFlow_Examples</a>
+     * parameters for zeppelin client API
+     * @see <a href="https://zeppelin.apache.org/docs/0.9.0/usage/zeppelin_sdk/client_api.html">Zeppelin_Client_API_Examples</a>
      */
     private String noteId;
     private String paragraphId;
