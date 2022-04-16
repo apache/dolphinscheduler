@@ -19,10 +19,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { defineComponent, toRefs, watch } from 'vue'
 import { NButton, NForm, NFormItem, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
-import MonacoEditor from '@/components/monaco-editor'
 import { useForm } from './use-form'
 import { useEdit } from './use-edit'
+import Card from '@/components/card'
+import MonacoEditor from '@/components/monaco-editor'
 import styles from '../index.module.scss'
 
 export default defineComponent({
@@ -75,11 +75,9 @@ export default defineComponent({
             class={styles['form-content']}
           >
             <NFormItem path='content'>
-              <div style={{ width: '90%' }}>
-                <MonacoEditor
-                  v-model={[this.resourceViewRef.content, 'value']}
-                />
-              </div>
+              <MonacoEditor
+                v-model={[this.resourceViewRef.content, 'value']}
+              />
             </NFormItem>
             {this.componentName === 'resource-file-edit' && (
               <NSpace>
