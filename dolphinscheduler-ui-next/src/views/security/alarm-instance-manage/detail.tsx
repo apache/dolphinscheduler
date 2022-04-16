@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, watch, onMounted, ref } from 'vue'
+import {defineComponent, toRefs, watch, onMounted, ref, computed} from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -26,6 +26,7 @@ import Form from '@/components/form'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import type { IRecord, FormRules, IFormItem } from './types'
 import type { PropType, Ref } from 'vue'
+import _ from 'lodash'
 
 interface IElements extends Omit<Ref, 'value'> {
   value: IFormItem[]
@@ -51,6 +52,8 @@ const DetailModal = defineComponent({
     const rules = ref<FormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
 
+    const editRef = computed(() => props.currentRecord?.id? true:false)
+
     const {
       meta,
       state,
@@ -72,6 +75,7 @@ const DetailModal = defineComponent({
 
     const onSubmit = async () => {
       await state.detailFormRef.validate()
+      console.log('validate..')
       const res = await createOrUpdate(props.currentRecord, state.json)
       if (res) {
         onCancel()
@@ -96,10 +100,20 @@ const DetailModal = defineComponent({
             'security.alarm_instance' + '.' + mergedItem.field
           )
         })
-        const { rules: fieldsRules, elements: fieldsElements } =
-          getElementByJson(state.json, state.detailForm)
+        console.log(editRef.value)
+        if (!editRef.value) {
+          let instanceName = state.detailForm.instanceName
+          let pluginDefineId = state.detailForm.pluginDefineId
+          // console.log(state.json)
+          state.detailForm = {pluginDefineId: pluginDefineId, instanceName: instanceName}
+        }
+        console.log(state.detailForm)
+        const { rules: fieldsRules, elements: fieldsElements } = getElementByJson(state.json, state.detailForm)
         rules.value = fieldsRules
         elements.value = fieldsElements
+        console.log(fieldsRules)
+        console.log(fieldsElements)
+        // elements.value = fieldsElements
       }
     )
 
