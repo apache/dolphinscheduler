@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {defineComponent, toRefs, watch, onMounted, ref, computed} from 'vue'
+import { defineComponent, toRefs, watch, onMounted, ref } from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -26,7 +26,6 @@ import Form from '@/components/form'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import type { IRecord, FormRules, IFormItem } from './types'
 import type { PropType, Ref } from 'vue'
-import _ from 'lodash'
 
 interface IElements extends Omit<Ref, 'value'> {
   value: IFormItem[]
@@ -52,8 +51,6 @@ const DetailModal = defineComponent({
     const rules = ref<FormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
 
-    const editRef = computed(() => props.currentRecord?.id? true:false)
-
     const {
       meta,
       state,
@@ -75,7 +72,6 @@ const DetailModal = defineComponent({
 
     const onSubmit = async () => {
       await state.detailFormRef.validate()
-      console.log('validate..')
       const res = await createOrUpdate(props.currentRecord, state.json)
       if (res) {
         onCancel()
@@ -85,36 +81,26 @@ const DetailModal = defineComponent({
     const onChangePlugin = changePlugin
 
     watch(
-      () => props.show,
-      async () => {
-        props.show && props.currentRecord && setDetail(props.currentRecord)
-      }
+        () => props.show,
+        async () => {
+          props.show && props.currentRecord && setDetail(props.currentRecord)
+        }
     )
     watch(
-      () => state.json,
-      () => {
-        if (!state.json?.length) return
-        state.json.forEach((item) => {
-          const mergedItem = isFunction(item) ? item() : item
-          mergedItem.name = t(
-            'security.alarm_instance' + '.' + mergedItem.field
-          )
-        })
-        console.log(editRef.value)
-        if (!editRef.value) {
-          let instanceName = state.detailForm.instanceName
-          let pluginDefineId = state.detailForm.pluginDefineId
-          // console.log(state.json)
-          state.detailForm = {pluginDefineId: pluginDefineId, instanceName: instanceName}
+        () => state.json,
+        () => {
+          if (!state.json?.length) return
+          state.json.forEach((item) => {
+            const mergedItem = isFunction(item) ? item() : item
+            mergedItem.name = t(
+                'security.alarm_instance' + '.' + mergedItem.field
+            )
+          })
+          const { rules: fieldsRules, elements: fieldsElements } =
+              getElementByJson(state.json, state.detailForm)
+          rules.value = fieldsRules
+          elements.value = fieldsElements
         }
-        console.log(state.detailForm)
-        const { rules: fieldsRules, elements: fieldsElements } = getElementByJson(state.json, state.detailForm)
-        rules.value = fieldsRules
-        elements.value = fieldsElements
-        console.log(fieldsRules)
-        console.log(fieldsElements)
-        // elements.value = fieldsElements
-      }
     )
 
     onMounted(() => {
@@ -151,66 +137,66 @@ const DetailModal = defineComponent({
     } = this
     const { currentRecord } = props
     return (
-      <Modal
-        show={show}
-        title={t(
-          currentRecord?.id
-            ? 'security.alarm_instance.edit_alarm_instance'
-            : 'security.alarm_instance.create_alarm_instance'
-        )}
-        onConfirm={onSubmit}
-        confirmLoading={saving || loading}
-        onCancel={onCancel}
-      >
-        {{
-          default: () => (
-            <Form
-              ref='detailFormRef'
-              loading={loading || pluginsLoading}
-              meta={{
-                ...meta,
-                rules: {
-                  ...meta.rules,
-                  ...rules
-                },
-                elements: [
-                  {
-                    path: 'instanceName',
-                    label: t('security.alarm_instance.alarm_instance_name'),
-                    widget: (
-                      <NInput
-                        v-model={[detailForm.instanceName, 'value']}
-                        placeholder={t(
-                          'security.alarm_instance.alarm_instance_name_tips'
-                        )}
-                      />
-                    )
-                  },
-                  {
-                    path: 'pluginDefineId',
-                    label: t('security.alarm_instance.select_plugin'),
-                    widget: (
-                      <NSelect
-                        v-model={[detailForm.pluginDefineId, 'value']}
-                        options={uiPlugins}
-                        disabled={!!currentRecord?.id}
-                        placeholder={t(
-                          'security.alarm_instance.select_plugin_tips'
-                        )}
-                        on-update:value={onChangePlugin}
-                      />
-                    )
-                  },
-                  ...elements
-                ]
-              }}
-              layout={{
-                cols: 24
-              }}
-            />
-          )
-        }}
-      </Modal>
+        <Modal
+            show={show}
+            title={t(
+                currentRecord?.id
+                    ? 'security.alarm_instance.edit_alarm_instance'
+                    : 'security.alarm_instance.create_alarm_instance'
+            )}
+            onConfirm={onSubmit}
+            confirmLoading={saving || loading}
+            onCancel={onCancel}
+        >
+          {{
+            default: () => (
+                <Form
+                    ref='detailFormRef'
+                    loading={loading || pluginsLoading}
+                    meta={{
+                      ...meta,
+                      rules: {
+                        ...meta.rules,
+                        ...rules
+                      },
+                      elements: [
+                        {
+                          path: 'instanceName',
+                          label: t('security.alarm_instance.alarm_instance_name'),
+                          widget: (
+                              <NInput
+                                  v-model={[detailForm.instanceName, 'value']}
+                                  placeholder={t(
+                                      'security.alarm_instance.alarm_instance_name_tips'
+                                  )}
+                              />
+                          )
+                        },
+                        {
+                          path: 'pluginDefineId',
+                          label: t('security.alarm_instance.select_plugin'),
+                          widget: (
+                              <NSelect
+                                  v-model={[detailForm.pluginDefineId, 'value']}
+                                  options={uiPlugins}
+                                  disabled={!!currentRecord?.id}
+                                  placeholder={t(
+                                      'security.alarm_instance.select_plugin_tips'
+                                  )}
+                                  on-update:value={onChangePlugin}
+                              />
+                          )
+                        },
+                        ...elements
+                      ]
+                    }}
+                    layout={{
+                      cols: 24
+                    }}
+                />
+            )
+          }}
+        </Modal>
     )
   }
 })
