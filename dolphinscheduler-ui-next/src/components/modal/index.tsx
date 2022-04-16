@@ -109,7 +109,10 @@ const Modal = defineComponent({
                     .filter((item: any) => item.show)
                     .map((item: any) => {
                       return (
-                        <ButtonLink onClick={item.action} disabled={item.disabled}>
+                        <ButtonLink
+                          onClick={item.action}
+                          disabled={item.disabled}
+                        >
                           {{
                             default: () => item.text,
                             icon: () => item.icon()
