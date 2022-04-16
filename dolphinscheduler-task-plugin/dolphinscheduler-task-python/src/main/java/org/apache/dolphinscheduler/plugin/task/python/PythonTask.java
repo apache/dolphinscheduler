@@ -238,7 +238,7 @@ public class PythonTask extends AbstractTaskExecutor {
     private String buildPythonExecuteCommand(String pythonFile) {
         Preconditions.checkNotNull(pythonFile, "Python file cannot be null");
 
-        String pythonHome = System.getenv(PYTHON_HOME);
+        String pythonHome = taskRequest.getEnvironmentVariable(PYTHON_HOME);
         if (StringUtils.isEmpty(pythonHome)) {
             return DEFAULT_PYTHON_VERSION + " " + pythonFile;
         }

@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 
 import java.util.Date;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * to master/worker task transport
@@ -562,6 +564,17 @@ public class TaskExecutionContext {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public String getEnvironmentVariable(String variable) {
+        String pattern = String.format("%s=(.*)", variable);
+        Pattern reg = Pattern.compile(pattern);
+        Matcher matcher = reg.matcher(environmentConfig);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return null;
+        }
     }
 
     @Override
