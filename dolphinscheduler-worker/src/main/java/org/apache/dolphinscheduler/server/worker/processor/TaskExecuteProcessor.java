@@ -85,17 +85,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     @Autowired
     private WorkerManagerThread workerManager;
 
-    /**
-     * Pre-cache task to avoid extreme situations when kill task. There is no such task in the cache
-     *
-     * @param taskExecutionContext task
-     */
-    private void setTaskCache(TaskExecutionContext taskExecutionContext) {
-        TaskExecutionContext preTaskCache = new TaskExecutionContext();
-        preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
-    }
-
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
@@ -118,7 +107,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             return;
         }
 
-        setTaskCache(taskExecutionContext);
+        // set cache, it will be used when kill task
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+
         // todo custom logger
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));

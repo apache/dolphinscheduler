@@ -61,7 +61,7 @@ public class ParamUtils {
         Date scheduleTime = taskExecutionContext.getScheduleTime();
 
         // combining local and global parameters
-        Map<String, Property> localParams = parameters.getLocalParametersMap();
+        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
 
         //stream pass params
         Map<String, Property> varParams = parameters.getVarPoolMap();

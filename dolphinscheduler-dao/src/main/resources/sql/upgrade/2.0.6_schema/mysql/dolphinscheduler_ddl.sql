@@ -37,6 +37,27 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_resources_R_full_name;
 DROP PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name;
 
+-- uc_dolphin_T_t_ds_alert_R_sign
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_alert_R_sign;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_alert_R_sign()
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+            WHERE TABLE_NAME='t_ds_alert'
+            AND TABLE_SCHEMA=(SELECT DATABASE())
+            AND COLUMN_NAME='sign')
+    THEN
+        ALTER TABLE `t_ds_alert` ADD COLUMN `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)' after `id`;
+        ALTER TABLE `t_ds_alert` ADD INDEX `idx_sign` (`sign`) USING BTREE;
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_alert_R_sign;
+DROP PROCEDURE uc_dolphin_T_t_ds_alert_R_sign;
+
 -- add unique key to t_ds_relation_project_user
 ALTER TABLE t_ds_relation_project_user ADD UNIQUE KEY uniq_uid_pid(user_id,project_id);
 
