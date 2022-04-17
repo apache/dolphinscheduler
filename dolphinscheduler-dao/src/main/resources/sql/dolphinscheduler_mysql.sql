@@ -707,7 +707,7 @@ CREATE TABLE `t_ds_relation_project_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `user_id_index` (`user_id`) USING BTREE
+  UNIQUE KEY uniq_uid_pid(user_id,project_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

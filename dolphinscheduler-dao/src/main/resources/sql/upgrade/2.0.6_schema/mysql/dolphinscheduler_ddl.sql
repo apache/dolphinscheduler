@@ -36,3 +36,8 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_resources_R_full_name;
 DROP PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name;
+
+-- add unique key to t_ds_relation_project_user
+ALTER TABLE t_ds_relation_project_user ADD UNIQUE KEY uniq_uid_pid(user_id,project_id);
+
+
