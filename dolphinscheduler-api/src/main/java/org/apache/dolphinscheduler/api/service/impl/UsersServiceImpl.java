@@ -63,14 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -521,7 +514,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         userMapper.queryTenantCodeByUserId(id);
 
 
-
         accessTokenMapper.deleteAccessTokenByUserId(id);
 
         userMapper.deleteById(id);
@@ -557,20 +549,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             return result;
         }
-
-        String[] projectIdArr = projectIds.split(",");
-
-        for (String projectId : projectIdArr) {
+        Arrays.stream(projectIds.split(",")).distinct().forEach(pId -> {
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
             projectUser.setUserId(userId);
-            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setProjectId(Integer.parseInt(pId));
             projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
             projectUserMapper.insert(projectUser);
-        }
-
+        });
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -610,14 +598,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 4. maintain the relationship between project and user
-        final Date today = new Date();
-        ProjectUser projectUser = new ProjectUser();
-        projectUser.setUserId(userId);
-        projectUser.setProjectId(project.getId());
-        projectUser.setPerm(7);
-        projectUser.setCreateTime(today);
-        projectUser.setUpdateTime(today);
-        this.projectUserMapper.insert(projectUser);
+        // check if already existed
+        ProjectUser pu = projectUserMapper.queryProjectRelation(project.getId(), userId);
+        if (pu == null) {
+            final Date today = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(project.getId());
+            projectUser.setPerm(7);
+            projectUser.setCreateTime(today);
+            projectUser.setUpdateTime(today);
+            this.projectUserMapper.insert(projectUser);
+        }
 
         this.putMsg(result, Status.SUCCESS);
         return result;
