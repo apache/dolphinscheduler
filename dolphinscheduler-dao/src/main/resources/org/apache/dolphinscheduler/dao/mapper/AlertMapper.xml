@@ -20,9 +20,9 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertMapper">
 
     <insert id="insertAlertWhenServerCrash">
-        insert into t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id, create_time, update_time)
+        insert into t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id, create_time, update_time, alert_type)
         SELECT #{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code}, #{alert.warningType.code},
-               #{alert.log}, #{alert.alertGroupId}, #{alert.createTime}, #{alert.updateTime}
+               #{alert.log}, #{alert.alertGroupId}, #{alert.createTime}, #{alert.updateTime}, #{alert.alertType.code}
         from t_ds_alert
         where create_time >= #{crashAlarmSuppressionStartTime} and sign = #{alert.sign} and alert_status = #{alert.alertStatus.code}
         having count(*) = 0
