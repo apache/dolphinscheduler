@@ -5,7 +5,7 @@
 
 ### Versions: 3.0.0-alpha
 
-#### Links： [3.0.0-alpha 文档](../3.0.0/user_doc/guide/quick-start.md)
+#### Links： [3.0.0-alpha 文档](../3.0.0/user_doc/about/introduction.md)
 
 ### 版本：2.0.5
 
