@@ -82,7 +82,7 @@ public interface ExecutorService {
      * @param processDefinition
      * @return check result
      */
-    Boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
+    boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop

@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -62,7 +61,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.hadoop.mapreduce.TaskType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -236,11 +234,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return check result
      */
     @Override
-    public Boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition) {
+    public boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition) {
         // query all subprocesses under the current process
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryDownstreamByProcessDefinitionCode(processDefinition.getCode());
         if (processTaskRelations.isEmpty()){
-            return Boolean.TRUE;
+            return true;
         }
         Set<Long> relationCodes = processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toSet());
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
