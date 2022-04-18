@@ -69,6 +69,13 @@
             #{relation.conditionType},#{relation.conditionParams},#{relation.createTime},#{relation.updateTime})
         </foreach>
     </insert>
+    <select id="queryDownstreamByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        and process_definition_code = #{processDefinitionCode}
+        and pre_task_version >= 1
+    </select>
     <select id="queryDownstreamByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
         select
         <include refid="baseSql"/>

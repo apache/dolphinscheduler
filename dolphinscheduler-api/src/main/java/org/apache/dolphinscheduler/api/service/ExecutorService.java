@@ -78,6 +78,13 @@ public interface ExecutorService {
     Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode);
 
     /**
+     * check if the current process has subprocesses and all subprocesses are valid
+     * @param processDefinition
+     * @return check result
+     */
+    Boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
+
+    /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
      * @param loginUser login user
