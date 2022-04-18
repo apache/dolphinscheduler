@@ -106,7 +106,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 projectCode,
                 startDate,
                 endDate,
-                (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes));
+                this::countTaskInstanceAllStatesByProjectCodes);
     }
 
     /**
@@ -164,16 +164,18 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
                 : new Long[]{projectCode};
+        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
 
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             processInstanceStateCounts = instanceStateCounter.apply(start, end, projectCodeArray);
         }
 
         if (processInstanceStateCounts != null) {
-            result = processTaskInstanceRecount(start, end, projectCodeArray, processInstanceStateCounts, result);
+            TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
+            result.put(Constants.DATA_LIST, taskCountResult);
+            putMsg(result, Status.SUCCESS);
         }
         return result;
     }
@@ -287,38 +289,24 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Map<String, Object> processTaskInstanceRecount(Date start, Date end, Long[] projectCodeArray, List<ExecuteStatusCount> processInstanceStateCounts, Map<String, Object> result) {
-        TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-        int[] zeroCountStates = taskCountResult.getTaskCountDtos().stream()
-                .filter(e -> e.getCount() == 0).map(TaskStateCount::getTaskStateType)
-                .mapToInt(ExecutionStatus::getCode).toArray();
-        if (zeroCountStates.length == 0) {
-            //no need to recount
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
-            return result;
+    @Override
+    public List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(Date startTime, Date endTime, Long[] projectCodes) {
+        List<ExecuteStatusCount> startTimeStates = this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(startTime, endTime, projectCodes);
+
+        List<ExecutionStatus> allState = Arrays.stream(ExecutionStatus.values()).collect(Collectors.toList());
+        List<ExecutionStatus> instanceState = startTimeStates.stream().map(ExecuteStatusCount::getExecutionStatus).collect(Collectors.toList());
+
+        //value 0 state need to recount by submit time
+        List<ExecutionStatus> needRecountState = allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
+        if (needRecountState.size() == 0) {
+            return startTimeStates;
         }
         //use submit time to recount when 0
         //if have any issues with this code, should change to specified states 0 8 9 17 not state count is 0
-        List<ExecuteStatusCount> recounts = taskInstanceMapper.countTaskInstanceStateByProjectCodesAndStates(start, end, projectCodeArray, zeroCountStates);
-        if (recounts != null && recounts.size() != 0) {
-            Map<Integer, Integer> map = new HashMap<>();
-            recounts.forEach(e -> map.put(e.getExecutionStatus().getCode(), e.getCount()));
-            int recountSum = recounts.stream().mapToInt(ExecuteStatusCount::getCount).sum();
-            taskCountResult.getTaskCountDtos().stream()
-                    .filter(e -> e.getCount() == 0)
-                    .forEach(e -> {
-                        Integer state = e.getTaskStateType().getCode();
-                        if (map.containsKey(state)) {
-                            e.setCount(map.get(state));
-                        }
-                    });
-            taskCountResult.setTotalCount(taskCountResult.getTotalCount() + recountSum);
-        }
+        List<ExecuteStatusCount> recounts = this.taskInstanceMapper
+                .countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(startTime, endTime, projectCodes, needRecountState);
+        startTimeStates.addAll(recounts);
 
-        result.put(Constants.DATA_LIST, taskCountResult);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return startTimeStates;
     }
-
 }

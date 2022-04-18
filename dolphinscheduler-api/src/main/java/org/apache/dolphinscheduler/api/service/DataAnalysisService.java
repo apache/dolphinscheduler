@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,4 +79,17 @@ public interface DataAnalysisService {
      */
     Map<String, Object> countQueueState(User loginUser);
 
+    /**
+     * Statistics task instance group by given project codes list
+     * <p>
+     * We only need project codes to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectCodes Project codes list to filter
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(@Param("startTime") Date startTime,
+                                                                      @Param("endTime") Date endTime,
+                                                                      @Param("projectCodes") Long[] projectCodes);
 }

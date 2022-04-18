@@ -56,7 +56,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                       @Param("taskIds") int[] taskIds);
 
     /**
-     * Statistics task instance group by given project codes list
+     * Statistics task instance group by given project codes list by start time
      * <p>
      * We only need project codes to determine whether the task instance belongs to the user or not.
      *
@@ -70,7 +70,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                                   @Param("projectCodes") Long[] projectCodes);
 
     /**
-     * Statistics task instance group by given project codes list
+     * Statistics task instance group by given project codes list by submit time
      * <p>
      * We only need project codes to determine whether the task instance belongs to the user or not.
      *
@@ -79,10 +79,10 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
      * @param projectCodes Project codes list to filter
      * @return List of ExecuteStatusCount
      */
-    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStates(@Param("startTime") Date startTime,
-                                                                       @Param("endTime") Date endTime,
-                                                                       @Param("projectCodes") Long[] projectCodes,
-                                                                       @Param("states") int[] states);
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(@Param("startTime") Date startTime,
+                                                                                       @Param("endTime") Date endTime,
+                                                                                       @Param("projectCodes") Long[] projectCodes,
+                                                                                       @Param("states") List<ExecutionStatus> states);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,
