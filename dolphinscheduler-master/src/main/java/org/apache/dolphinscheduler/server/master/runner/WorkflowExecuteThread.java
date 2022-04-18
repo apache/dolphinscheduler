@@ -84,7 +84,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -637,6 +636,18 @@ public class WorkflowExecuteThread {
     public TaskInstance getTaskInstance(int taskInstanceId) {
         if (taskInstanceMap.containsKey(taskInstanceId)) {
             return taskInstanceMap.get(taskInstanceId);
+        }
+        return null;
+    }
+
+    public TaskInstance getTaskInstance(long taskCode) {
+        if (taskInstanceMap == null || taskInstanceMap.size() == 0) {
+            return null;
+        }
+        for (TaskInstance taskInstance : taskInstanceMap.values()) {
+            if (taskInstance.getTaskCode() == taskCode) {
+                return taskInstance;
+            }
         }
         return null;
     }
@@ -1280,7 +1291,9 @@ public class WorkflowExecuteThread {
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
             TaskNode taskNodeObject = dag.getNode(taskNode);
-            if (checkTaskInstanceByCode(taskNodeObject.getCode())) {
+            TaskInstance existTaskInstance = getTaskInstance(taskNodeObject.getCode());
+            if (existTaskInstance != null) {
+                taskInstances.add(existTaskInstance);
                 continue;
             }
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
@@ -1692,12 +1705,6 @@ public class WorkflowExecuteThread {
                 logger.warn("task was found in ready submit queue, task code:{}", taskInstance.getTaskCode());
                 return;
             }
-            // need to check if the tasks with same task code is active
-            boolean active = hadNotFailTask(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
-            if (active) {
-                logger.warn("task was found in active task list, task code:{}", taskInstance.getTaskCode());
-                return;
-            }
             logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
                 taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
             readyToSubmitTaskQueue.put(taskInstance);
@@ -1947,27 +1954,6 @@ public class WorkflowExecuteThread {
         } else {
             return false;
         }
-    }
-
-    /**
-     * check if had not fail task by taskCode and version
-     *
-     * @param taskCode
-     * @param version
-     * @return
-     */
-    private boolean hadNotFailTask(long taskCode, int version) {
-        boolean result = false;
-        for (Entry<Integer, TaskInstance> entry : taskInstanceMap.entrySet()) {
-            TaskInstance taskInstance = entry.getValue();
-            if (taskInstance.getTaskCode() == taskCode && taskInstance.getTaskDefinitionVersion() == version) {
-                if (!taskInstance.getState().typeIsFailure()) {
-                    result = true;
-                    break;
-                }
-            }
-        }
-        return result;
     }
 
 }
