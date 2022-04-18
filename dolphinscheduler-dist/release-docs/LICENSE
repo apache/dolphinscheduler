@@ -465,7 +465,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jline 0.9.94: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
-    postgresql 42.2.5: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.2.5, BSD 2-clause
+    postgresql 42.3.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.3.4, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
     threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.3.6,  BSD 3-clause

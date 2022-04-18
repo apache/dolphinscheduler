@@ -173,7 +173,7 @@ parquet-hadoop-bundle-1.8.1.jar
 poi-4.1.2.jar
 poi-ooxml-4.1.2.jar
 poi-ooxml-schemas-4.1.2.jar
-postgresql-42.2.5.jar
+postgresql-42.3.4.jar
 presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
 protostuff-core-1.7.2.jar
