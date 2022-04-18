@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
+import org.apache.dolphinscheduler.api.dto.TaskStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -101,11 +102,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
 
         return countStateByProject(
-            loginUser,
-            projectCode,
-            startDate,
-            endDate,
-            (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes));
+                loginUser,
+                projectCode,
+                startDate,
+                endDate,
+                (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes));
     }
 
     /**
@@ -119,15 +120,15 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      */
     @Override
     public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
-        Map<String, Object> result =  this.countStateByProject(
+        Map<String, Object> result = this.countStateByProject(
                 loginUser,
                 projectCode,
                 startDate,
                 endDate,
-            (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
+                (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
         // process state count needs to remove state of forced success
         if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
-            ((TaskCountDto)result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
+            ((TaskCountDto) result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
         }
         return result;
     }
@@ -165,7 +166,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-            : new Long[] {projectCode};
+                : new Long[]{projectCode};
 
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             processInstanceStateCounts = instanceStateCounter.apply(start, end, projectCodeArray);
@@ -173,6 +174,17 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
+            int recount = 0;
+            for (TaskStateCount taskCountDto : taskCountResult.getTaskCountDtos()) {
+                if (taskCountDto.getCount() == 0) {
+                    //use submit time to recount when 0
+                    //if have any issues with this code should change to specified states 0 8 9 17 not state count is 0
+                    int count = taskInstanceMapper.countTaskInstanceStateByProjectCodesAndState(start, end, projectCodeArray, taskCountDto.getTaskStateType().getCode());
+                    taskCountDto.setCount(count);
+                    recount += count;
+                }
+            }
+            taskCountResult.setTotalCount(taskCountResult.getTotalCount() + recount);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
         }
@@ -203,7 +215,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-            : new Long[] {projectCode};
+                : new Long[]{projectCode};
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
         }
