@@ -173,20 +173,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         if (processInstanceStateCounts != null) {
-            TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-            int recount = 0;
-            for (TaskStateCount taskCountDto : taskCountResult.getTaskCountDtos()) {
-                if (taskCountDto.getCount() == 0) {
-                    //use submit time to recount when 0
-                    //if have any issues with this code should change to specified states 0 8 9 17 not state count is 0
-                    int count = taskInstanceMapper.countTaskInstanceStateByProjectCodesAndState(start, end, projectCodeArray, taskCountDto.getTaskStateType().getCode());
-                    taskCountDto.setCount(count);
-                    recount += count;
-                }
-            }
-            taskCountResult.setTotalCount(taskCountResult.getTotalCount() + recount);
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
+            result = processTaskInstanceRecount(start, end, projectCodeArray, processInstanceStateCounts, result);
         }
         return result;
     }
@@ -296,6 +283,40 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
         result.put(Constants.DATA_LIST, dataMap);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    private Map<String, Object> processTaskInstanceRecount(Date start, Date end, Long[] projectCodeArray, List<ExecuteStatusCount> processInstanceStateCounts, Map<String, Object> result) {
+        TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
+        int[] zeroCountStates = taskCountResult.getTaskCountDtos().stream()
+                .filter(e -> e.getCount() == 0).map(TaskStateCount::getTaskStateType)
+                .mapToInt(ExecutionStatus::getCode).toArray();
+        if (zeroCountStates.length == 0) {
+            //no need to recount
+            result.put(Constants.DATA_LIST, taskCountResult);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        //use submit time to recount when 0
+        //if have any issues with this code, should change to specified states 0 8 9 17 not state count is 0
+        List<ExecuteStatusCount> recounts = taskInstanceMapper.countTaskInstanceStateByProjectCodesAndStates(start, end, projectCodeArray, zeroCountStates);
+        if (recounts != null && recounts.size() != 0) {
+            Map<Integer, Integer> map = new HashMap<>();
+            recounts.forEach(e -> map.put(e.getExecutionStatus().getCode(), e.getCount()));
+            int recountSum = recounts.stream().mapToInt(ExecuteStatusCount::getCount).sum();
+            taskCountResult.getTaskCountDtos().stream()
+                    .filter(e -> e.getCount() == 0)
+                    .forEach(e -> {
+                        Integer state = e.getTaskStateType().getCode();
+                        if (map.containsKey(state)) {
+                            e.setCount(map.get(state));
+                        }
+                    });
+            taskCountResult.setTotalCount(taskCountResult.getTotalCount() + recountSum);
+        }
+
+        result.put(Constants.DATA_LIST, taskCountResult);
         putMsg(result, Status.SUCCESS);
         return result;
     }

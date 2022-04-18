@@ -29,10 +29,10 @@ public interface DataAnalysisService {
     /**
      * statistical task instance status data
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param startDate start date
-     * @param endDate end date
+     * @param startDate   start date
+     * @param endDate     end date
      * @return task state count data
      */
     Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate);
@@ -40,20 +40,20 @@ public interface DataAnalysisService {
     /**
      * statistical process instance status data
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param startDate start date
-     * @param endDate end date
+     * @param startDate   start date
+     * @param endDate     end date
      * @return process instance state count data
      */
     Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
      * statistics the process definition quantities of a certain person
-     *
+     * <p>
      * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return definition count data
      */

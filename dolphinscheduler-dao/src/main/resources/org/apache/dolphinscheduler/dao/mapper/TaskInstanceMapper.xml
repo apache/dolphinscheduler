@@ -89,13 +89,19 @@
         </if>
         group by t.state
     </select>
-    <select id="countTaskInstanceStateByProjectCodesAndState" resultType="int">
+    <select id="countTaskInstanceStateByProjectCodesAndStates" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select
-        count(0)
+        state, count(0) as count
         from t_ds_task_instance t
         left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
         left join t_ds_project p on p.code=d.project_code
-        where 1=1 and t.state=#{state}
+        where 1=1
+        <if test="states != null and states.length != 0">
+            and t.state in
+            <foreach collection="states" index="index" item="state" open="(" separator="," close=")">
+                #{state}
+            </foreach>
+        </if>
         <if test="projectCodes != null and projectCodes.length != 0">
             and d.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
@@ -108,6 +114,7 @@
         <if test="endTime != null">
             and t.submit_time <![CDATA[ <= ]]> #{endTime}
         </if>
+        group by t.state
     </select>
     <select id="queryByInstanceIdAndName" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select

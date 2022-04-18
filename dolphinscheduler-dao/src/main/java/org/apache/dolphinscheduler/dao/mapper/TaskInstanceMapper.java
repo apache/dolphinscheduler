@@ -79,10 +79,10 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
      * @param projectCodes Project codes list to filter
      * @return List of ExecuteStatusCount
      */
-    int countTaskInstanceStateByProjectCodesAndState(@Param("startTime") Date startTime,
-                                                     @Param("endTime") Date endTime,
-                                                     @Param("projectCodes") Long[] projectCodes,
-                                                     @Param("state") int state);
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStates(@Param("startTime") Date startTime,
+                                                                       @Param("endTime") Date endTime,
+                                                                       @Param("projectCodes") Long[] projectCodes,
+                                                                       @Param("states") int[] states);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,
