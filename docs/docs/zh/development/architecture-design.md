@@ -86,7 +86,7 @@
 
 * **UI** 
 
-    系统的前端页面，提供系统的各种可视化操作界面，详见 [快速开始](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/quick-start.html) 部分。
+    系统的前端页面，提供系统的各种可视化操作界面，详见 [快速开始](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/about/introduction.html) 部分。
 
 #### 2.3 架构设计思想
 

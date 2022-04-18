@@ -97,7 +97,7 @@ Before explaining the architecture of the schedule system, let us first understa
 
      - **UI**
 
-       The front-end page of the system provides various visual operation interfaces of the system. For details, see the [quick start](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/quick-start.html) section.
+       The front-end page of the system provides various visual operation interfaces of the system. For details, see the [quick start](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/about/introduction.html) section.
 
      
 
