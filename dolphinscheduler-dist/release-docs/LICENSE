@@ -441,6 +441,15 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-s3 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.12.160  Apache 2.0
     aws-java-sdk-core-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
     aws-java-sdk-kms-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.160  Apache 2.0
+    commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
+    httpasyncclient 4.1.4: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
+    httpcore-nio 4.4.14: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.14, Apache 2.0
+    jetty-client 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-client/9.4.44.v20210927, Apache 2.0
+    websocket-api 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-api/9.4.44.v20210927, Apache 2.0
+    websocket-client 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client/9.4.44.v20210927, Apache 2.0
+    websocket-common 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-common/9.4.44.v20210927, Apache 2.0
+    zeppelin-client 0.10.1: https://mvnrepository.com/artifact/org.apache.zeppelin/zeppelin-client/0.10.1, Apache 2.0
+    zeppelin-common 0.10.1: https://mvnrepository.com/artifact/org.apache.zeppelin/zeppelin-common/0.10.1, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -517,6 +526,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     checker-qual 3.10.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.10.0, MIT + GPLv2
     Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
+    unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
 
 ========================================================================
 MPL 1.1 licenses
