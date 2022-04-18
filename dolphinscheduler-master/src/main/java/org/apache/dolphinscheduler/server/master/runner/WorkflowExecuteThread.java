@@ -382,10 +382,11 @@ public class WorkflowExecuteThread {
             return true;
         }
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
-        if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy) {
+        if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.TIMEOUT);
-        } else {
+        }
+        if (TaskTimeoutStrategy.WARN == taskTimeoutStrategy || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
             ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
             processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
         }
