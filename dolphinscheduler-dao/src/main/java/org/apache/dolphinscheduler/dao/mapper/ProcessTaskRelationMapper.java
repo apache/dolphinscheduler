@@ -180,4 +180,12 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
                     @Param("preTaskCode") long preTaskCode,
                     @Param("postTaskCode") long postTaskCode);
 
+    /**
+     * query downstream process task relation by processDefinitionCode
+     * @param processDefinitionCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
+
+
 }

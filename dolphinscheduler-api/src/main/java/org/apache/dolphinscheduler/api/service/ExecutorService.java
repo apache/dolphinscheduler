@@ -95,4 +95,11 @@ public interface ExecutorService {
      * @return check result code
      */
     Map<String, Object> startCheckByProcessDefinedCode(long processDefinitionCode);
+
+    /**
+     * check if the current process has subprocesses and all subprocesses are valid
+     * @param processDefinition
+     * @return check result
+     */
+    boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
 }
