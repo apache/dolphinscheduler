@@ -232,7 +232,7 @@ springfox-swagger2-2.9.2.jar
 swagger-annotations-1.5.20.jar
 swagger-bootstrap-ui-1.9.3.jar
 swagger-models-1.5.24.jar
-tomcat-embed-el-9.0.54.jar
+tomcat-embed-el-9.0.60.jar
 tephra-api-0.6.0.jar
 transaction-api-1.1.jar
 xercesImpl-2.9.1.jar
