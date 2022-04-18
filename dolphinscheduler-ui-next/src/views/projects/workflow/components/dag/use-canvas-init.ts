@@ -114,7 +114,15 @@ export function useCanvasInit(options: Options) {
             const sourceData = sourceCell.getData()
             if (!sourceData) return true
             if (sourceData.taskType !== 'CONDITIONS') return true
-            return (graph.value?.getConnectedEdges(sourceCell).length || 0) <= 2
+            const edges = graph.value?.getConnectedEdges(sourceCell)
+            if (!edges || edges.length < 2) return true
+            let len = 0
+            return !edges.some((edge) => {
+              if (edge.getSourceCellId() === sourceCell.id) {
+                len++
+              }
+              return len > 2
+            })
           }
 
           return true
