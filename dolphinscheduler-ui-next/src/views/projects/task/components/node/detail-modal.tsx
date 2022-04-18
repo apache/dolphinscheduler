@@ -118,9 +118,7 @@ const NodeDetailModal = defineComponent({
         {
           text: t('project.node.instructions'),
           show:
-            taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable
-              ? true
-              : false,
+            !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
           action: () => {
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
@@ -134,7 +132,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_history'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             router.push({
               name: 'task-instance',
@@ -145,7 +143,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_log'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             handleViewLog()
           },
