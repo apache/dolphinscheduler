@@ -12,16 +12,16 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Install DolphinScheduler
 
-Please download the source code package `apache-dolphinscheduler-1.3.8-src.tar.gz`, download address: [download address](/en-us/download/download.html)
+Please download the source code package `apache-dolphinscheduler-3.0.0-alpha-src.tar.gz`, download address: [download address](/en-us/download/download.html)
 
 To publish the release name `dolphinscheduler` version, please execute the following commands:
 
 ```
-$ tar -zxvf apache-dolphinscheduler-1.3.8-src.tar.gz
-$ cd apache-dolphinscheduler-1.3.8-src/docker/kubernetes/dolphinscheduler
+$ tar -zxvf apache-dolphinscheduler-3.0.0-alpha-src.tar.gz
+$ cd apache-dolphinscheduler-3.0.0-alpha-src/docker/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
-$ helm install dolphinscheduler . --set image.tag=1.3.8
+$ helm install dolphinscheduler . --set image.tag=3.0.0-alpha
 ```
 
 To publish the release name `dolphinscheduler` version to `test` namespace:
@@ -193,7 +193,7 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:3.0.0-alpha
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
 ```
 
@@ -236,7 +236,7 @@ externalDatabase:
 2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:3.0.0-alpha
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
 ```
 
@@ -265,7 +265,7 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 2. Create a new `Dockerfile` to add Oracle driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:3.0.0-alpha
 COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
 ```
 
@@ -288,7 +288,7 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 1. Create a new `Dockerfile` to install pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:3.0.0-alpha
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -321,7 +321,7 @@ docker build -t apache/dolphinscheduler:pip .
 1. Create a new `Dockerfile` to install Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:1.3.8
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:3.0.0-alpha
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*
