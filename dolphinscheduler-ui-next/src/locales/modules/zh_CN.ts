@@ -527,6 +527,8 @@ const project = {
       '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    cancel_full_screen: '取消全屏',
+    enter_full_screen: '全屏',
     current_task_settings: '当前任务设置',
     online: '已上线',
     offline: '已下线',
