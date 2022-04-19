@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive, Ref } from 'vue'
+import { reactive, ref, Ref } from 'vue'
 import { onMounted } from 'vue'
 import type { Graph, Cell } from '@antv/x6'
 
@@ -32,12 +32,17 @@ export function useNodeMenu(options: Options) {
   const nodeVariables = reactive({
     menuVisible: false,
     startModalShow: false,
-    logModalShow: false,
     logTaskId: -1,
     logTaskType: '',
     pageX: 0,
     pageY: 0,
-    menuCell: {} as Cell
+    menuCell: {} as Cell,
+    showModalRef: ref(false),
+    row: {},
+    logRef: '',
+    logLoadingRef: ref(true),
+    skipLineNum: ref(0),
+    limit: ref(1000)
   })
 
   const menuHide = () => {
@@ -54,11 +59,7 @@ export function useNodeMenu(options: Options) {
   const viewLog = (taskId: number, taskType: string) => {
     nodeVariables.logTaskId = taskId
     nodeVariables.logTaskType = taskType
-    nodeVariables.logModalShow = true
-  }
-
-  const hideLog = () => {
-    nodeVariables.logModalShow = false
+    nodeVariables.showModalRef = true
   }
 
   onMounted(() => {
@@ -83,7 +84,6 @@ export function useNodeMenu(options: Options) {
     nodeVariables,
     menuHide,
     menuStart,
-    viewLog,
-    hideLog
+    viewLog
   }
 }
