@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -101,6 +102,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1415,6 +1417,60 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList = processDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, dagDataList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @return process definition list in the project
+     */
+    @Override
+    public Map<String, Object> queryProcessDefinitionListByProjectCode(long projectCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        Map<String, Object> result = new HashMap<>();
+        List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
+        result.put(Constants.DATA_LIST, processDefinitions);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query process definition list by process definition code
+     *
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @return task definition list in the process definition
+     */
+    @Override
+    public Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode, Long processDefinitionCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        Map<String, Object> result = new HashMap<>();
+
+        Set<Long> definitionCodesSet = new HashSet<>();
+        definitionCodesSet.add(processDefinitionCode);
+        List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
+
+        //query process task relation
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(
+                processDefinitions.get(0).getCode(),
+                processDefinitions.get(0).getVersion());
+
+        //query task definition log
+        List<TaskDefinitionLog> taskDefinitionLogsList = processService.genTaskDefineList(processTaskRelations);
+
+        List<DependentSimplifyDefinition> taskDefinitionList = new ArrayList<>();
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogsList) {
+            DependentSimplifyDefinition dependentSimplifyDefinition = new DependentSimplifyDefinition();
+            dependentSimplifyDefinition.setCode(taskDefinitionLog.getCode());
+            dependentSimplifyDefinition.setName(taskDefinitionLog.getName());
+            dependentSimplifyDefinition.setVersion(taskDefinitionLog.getVersion());
+            taskDefinitionList.add(dependentSimplifyDefinition);
+        }
+
+        result.put(Constants.DATA_LIST, taskDefinitionList);
         putMsg(result, Status.SUCCESS);
         return result;
     }

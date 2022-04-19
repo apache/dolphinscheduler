@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -123,6 +124,16 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode, @Param("preTaskCodes") Long[] preTaskCodes);
+
+    /**
+     * query process task relation by process definition code
+     *
+     * @param processDefinitionCode process definition code
+     * @param processDefinitionVersion process definition version
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryProcessTaskRelationsByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode,
+                                                                               @Param("processDefinitionVersion") Integer processDefinitionVersion);
 
     /**
      * count upstream by codes
