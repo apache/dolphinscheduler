@@ -117,8 +117,7 @@ const NodeDetailModal = defineComponent({
       headerLinks.value = [
         {
           text: t('project.node.instructions'),
-          show:
-            !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
+          show: !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
           action: () => {
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +

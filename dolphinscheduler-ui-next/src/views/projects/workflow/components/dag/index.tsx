@@ -114,10 +114,9 @@ export default defineComponent({
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     // Right click cell
-    const { nodeVariables, menuHide, menuStart, viewLog } =
-      useNodeMenu({
-        graph
-      })
+    const { nodeVariables, menuHide, menuStart, viewLog } = useNodeMenu({
+      graph
+    })
 
     // start button in the dag node menu
     const startReadonly = computed(() => {
@@ -254,7 +253,7 @@ export default defineComponent({
         }),
         {}
       )
-  
+
       return state
     }
 

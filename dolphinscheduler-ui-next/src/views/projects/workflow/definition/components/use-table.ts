@@ -66,7 +66,7 @@ export function useTable(
     },
     {
       title: t('project.workflow.create_time'),
-      key: 'createTime'
+      key: 'operateTime'
     },
     {
       title: t('project.workflow.operation'),
