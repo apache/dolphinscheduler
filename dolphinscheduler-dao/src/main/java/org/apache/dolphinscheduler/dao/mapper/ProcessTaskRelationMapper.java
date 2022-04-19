@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

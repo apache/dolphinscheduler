@@ -1429,7 +1429,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     public Map<String, Object> queryProcessDefinitionListByProjectCode(long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
         Map<String, Object> result = new HashMap<>();
         List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
         result.put(Constants.DATA_LIST, processDefinitions);
@@ -1446,7 +1445,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     public Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode, Long processDefinitionCode) {
-        Project project = projectMapper.queryByCode(projectCode);
         Map<String, Object> result = new HashMap<>();
 
         Set<Long> definitionCodesSet = new HashSet<>();
