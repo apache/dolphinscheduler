@@ -78,7 +78,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     validate: {
       trigger: ['input', 'blur'],
       // required: true,
-      required: require,
+      required: model.programType !== 'SQL',
       validator(validate: any, value: string) {
         if (!value) {
           return new Error(t('project.node.main_package_tips'))

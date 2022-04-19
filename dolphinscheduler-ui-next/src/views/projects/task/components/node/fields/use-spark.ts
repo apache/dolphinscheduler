@@ -71,7 +71,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: model.programType !== 'PYTHON',
+        // required: model.programType !== 'PYTHON',
+        required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
           if (model.programType !== 'PYTHON' && !value) {
             return new Error(t('project.node.main_class_tips'))
@@ -155,5 +156,9 @@ export const SPARK_VERSIONS = [
   {
     label: 'SPARK1',
     value: 'SPARK1'
+  },
+  {
+    label: 'SPARKSQL',
+    value: 'SPARKSQL'
   }
 ]

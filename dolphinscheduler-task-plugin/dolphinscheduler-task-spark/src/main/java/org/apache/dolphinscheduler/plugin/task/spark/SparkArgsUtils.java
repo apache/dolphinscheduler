@@ -50,8 +50,6 @@ public class SparkArgsUtils {
 
     private static final String SPARK_ON_YARN = "yarn";
 
-    private static TaskExecutionContext taskRequest;
-
     private SparkArgsUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -62,7 +60,7 @@ public class SparkArgsUtils {
      * @param param param
      * @return argument list
      */
-    public static List<String> buildArgs(SparkParameters param) throws IOException {
+    public static List<String> buildArgs(SparkParameters param,TaskExecutionContext taskRequest) throws IOException {
         List<String> args = new ArrayList<>();
         args.add(SparkConstants.MASTER);
 

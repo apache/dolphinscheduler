@@ -61,13 +61,13 @@ public class SparkTask extends AbstractYarnTask {
             return;
         }
 
-//        if (!sparkParameters.checkParameters()) {
-        ProgramType programType = sparkParameters.getProgramType();
-        if (programType != ProgramType.SQL && !sparkParameters.checkParameters()) {
+        if (!sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
         sparkParameters.setQueue(taskExecutionContext.getQueue());
-        setMainJarName();
+        if (sparkParameters.getProgramType() != ProgramType.SQL){
+            setMainJarName();
+        }
     }
 
     /**
@@ -76,7 +76,7 @@ public class SparkTask extends AbstractYarnTask {
      */
     @Override
     protected String buildCommand() {
-        // spark-submit [options] <app jar | python file> [app arguments]
+        // spark-submit | spark-sql [options] <app jar | python file> [app arguments]
         List<String> args = new ArrayList<>();
 
         // spark version
@@ -94,7 +94,7 @@ public class SparkTask extends AbstractYarnTask {
 
         // other parameters
         try {
-            args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
+            args.addAll(SparkArgsUtils.buildArgs(sparkParameters,taskExecutionContext));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,10 +118,12 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     protected void setMainJarName() {
         // main jar
-        ResourceInfo mainJar = sparkParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        sparkParameters.setMainJar(mainJar);
+        if (sparkParameters.getProgramType() != ProgramType.SQL){
+            ResourceInfo mainJar = sparkParameters.getMainJar();
+            String resourceName = getResourceNameOfMainJar(mainJar);
+            mainJar.setRes(resourceName);
+            sparkParameters.setMainJar(mainJar);
+        }
     }
 
     @Override
