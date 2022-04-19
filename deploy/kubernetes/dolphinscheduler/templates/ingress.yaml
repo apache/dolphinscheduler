@@ -28,6 +28,10 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   rules:
   - host: {{ .Values.ingress.host }}
