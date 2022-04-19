@@ -30,7 +30,7 @@ jobs:
       - name: Deploy
         shell: bash
         run: |
-          ./mvnw -B versions:set -DnewVersion=${GITHUB_SHA::7} -DgenerateBackupPoms=false
+          ./mvnw -B versions:set -DnewVersion=${GITHUB_SHA::7}-SNAPSHOT -DgenerateBackupPoms=false
           ./mvnw --batch-mode --settings maven-settings.xml clean deploy \
                 -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/whaleops/dolphinscheduler \
                 -Dmaven.test.skip -Dcheckstyle.skip -DretryFailedDeploymentCount=5
