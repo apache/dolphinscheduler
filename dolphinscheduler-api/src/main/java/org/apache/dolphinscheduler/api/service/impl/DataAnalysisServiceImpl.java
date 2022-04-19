@@ -313,6 +313,6 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 .countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(startTime, endTime, projectCodes, needRecountState);
         startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
 
-        return startTimeStates.get();
+        return startTimeStates.orElse(null);
     }
 }
