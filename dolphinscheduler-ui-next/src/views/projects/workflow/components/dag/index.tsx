@@ -49,8 +49,11 @@ import DagSaveModal from './dag-save-modal'
 import ContextMenuItem from './dag-context-menu'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import StartModal from '@/views/projects/workflow/definition/components/start-modal'
-import LogModal from '@/views/projects/workflow/instance/components/log-modal'
+import LogModal from '@/components/log-modal'
 import './x6-style.scss'
+import { queryLog } from '@/service/modules/log'
+import { useAsyncState } from '@vueuse/core'
+import { downloadFile } from '@/service/service'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -111,7 +114,7 @@ export default defineComponent({
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     // Right click cell
-    const { nodeVariables, menuHide, menuStart, viewLog, hideLog } =
+    const { nodeVariables, menuHide, menuStart, viewLog } =
       useNodeMenu({
         graph
       })
@@ -230,6 +233,46 @@ export default defineComponent({
     const handleViewLog = (taskId: number, taskType: string) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
+      getLogs()
+    }
+
+    const getLogs = () => {
+      const { state } = useAsyncState(
+        queryLog({
+          taskInstanceId: nodeVariables.logTaskId,
+          limit: nodeVariables.limit,
+          skipLineNum: nodeVariables.skipLineNum
+        }).then((res: string) => {
+          nodeVariables.logRef += res
+          if (res) {
+            nodeVariables.limit += 1000
+            nodeVariables.skipLineNum += 1000
+            getLogs()
+          } else {
+            nodeVariables.logLoadingRef = false
+          }
+        }),
+        {}
+      )
+  
+      return state
+    }
+
+    const refreshLogs = () => {
+      nodeVariables.logRef = ''
+      nodeVariables.limit = 1000
+      nodeVariables.skipLineNum = 0
+      getLogs()
+    }
+
+    const downloadLogs = () => {
+      downloadFile('log/download-log', {
+        taskInstanceId: nodeVariables.logTaskId
+      })
+    }
+
+    const onConfirmModal = () => {
+      nodeVariables.showModalRef = false
     }
 
     watch(
@@ -317,11 +360,16 @@ export default defineComponent({
             v-model:show={nodeVariables.startModalShow}
           />
         )}
-        {!!props.instance && nodeVariables.logModalShow && (
+        {!!props.instance && (
           <LogModal
-            taskInstanceId={nodeVariables.logTaskId}
-            taskInstanceType={nodeVariables.logTaskType}
-            onHideLog={hideLog}
+            showModalRef={nodeVariables.showModalRef}
+            logRef={nodeVariables.logRef}
+            row={nodeVariables.row}
+            showDownloadLog={true}
+            logLoadingRef={nodeVariables.logLoadingRef}
+            onConfirmModal={onConfirmModal}
+            onRefreshLogs={refreshLogs}
+            onDownloadLogs={downloadLogs}
           />
         )}
       </div>

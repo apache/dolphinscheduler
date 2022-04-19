@@ -63,7 +63,11 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     row: {},
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    logRef: '',
+    logLoadingRef: ref(true),
+    skipLineNum: ref(0),
+    limit: ref(1000)
   })
 
   const createColumns = (variables: any) => {
