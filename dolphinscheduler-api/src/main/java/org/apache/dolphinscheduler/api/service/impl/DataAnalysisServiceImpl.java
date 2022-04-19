@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
+import org.apache.dolphinscheduler.api.dto.TaskStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -52,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -101,11 +103,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
 
         return countStateByProject(
-            loginUser,
-            projectCode,
-            startDate,
-            endDate,
-            (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes));
+                loginUser,
+                projectCode,
+                startDate,
+                endDate,
+                this::countTaskInstanceAllStatesByProjectCodes);
     }
 
     /**
@@ -119,15 +121,15 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      */
     @Override
     public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
-        Map<String, Object> result =  this.countStateByProject(
+        Map<String, Object> result = this.countStateByProject(
                 loginUser,
                 projectCode,
                 startDate,
                 endDate,
-            (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
+                (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
         // process state count needs to remove state of forced success
         if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
-            ((TaskCountDto)result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
+            ((TaskCountDto) result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
         }
         return result;
     }
@@ -163,9 +165,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-            : new Long[] {projectCode};
+                : new Long[]{projectCode};
+        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
 
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             processInstanceStateCounts = instanceStateCounter.apply(start, end, projectCodeArray);
@@ -203,7 +205,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-            : new Long[] {projectCode};
+                : new Long[]{projectCode};
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
         }
@@ -288,4 +290,29 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
+    @Override
+    public List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(Date startTime, Date endTime, Long[] projectCodes) {
+        Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(startTime, endTime, projectCodes));
+
+        List<ExecutionStatus> allState = Arrays.stream(ExecutionStatus.values()).collect(Collectors.toList());
+        List<ExecutionStatus> needRecountState;
+        if (startTimeStates.isPresent() && startTimeStates.get().size() != 0) {
+            List<ExecutionStatus> instanceState = startTimeStates.get().stream().map(ExecuteStatusCount::getExecutionStatus).collect(Collectors.toList());
+            //value 0 state need to recount by submit time
+            needRecountState = allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
+            if (needRecountState.size() == 0) {
+                return startTimeStates.get();
+            }
+        } else {
+            needRecountState = allState;
+        }
+
+        //use submit time to recount when 0
+        //if have any issues with this code, should change to specified states 0 8 9 17 not state count is 0
+        List<ExecuteStatusCount> recounts = this.taskInstanceMapper
+                .countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(startTime, endTime, projectCodes, needRecountState);
+        startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
+
+        return startTimeStates.orElse(null);
+    }
 }
