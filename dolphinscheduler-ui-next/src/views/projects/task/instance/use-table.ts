@@ -63,7 +63,11 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     row: {},
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    logRef: '',
+    logLoadingRef: ref(true),
+    skipLineNum: ref(0),
+    limit: ref(1000)
   })
 
   const createColumns = (variables: any) => {
@@ -327,6 +331,8 @@ export function useTable() {
 }
 
 export function renderStateCell(state: ITaskState, t: Function) {
+  if (!state) return ''
+
   const stateOption = tasksState(t)[state]
 
   const Icon = h(
@@ -336,14 +342,15 @@ export function renderStateCell(state: ITaskState, t: Function) {
       class: stateOption.classNames,
       style: {
         display: 'flex'
-      }
+      },
+      size: 20
     },
     () => h(stateOption.icon)
   )
   return h(NTooltip, null, {
     trigger: () => {
       if (!stateOption.isSpin) return Icon
-      return h(NSpin, { size: 18 }, { icon: () => Icon })
+      return h(NSpin, { size: 20 }, { icon: () => Icon })
     },
     default: () => stateOption.desc
   })

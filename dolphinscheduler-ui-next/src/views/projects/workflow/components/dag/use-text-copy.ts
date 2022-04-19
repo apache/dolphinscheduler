@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { useClipboard } from '@vueuse/core'
+import { copy } from '@/utils/clipboard'
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
@@ -24,12 +24,11 @@ import { useI18n } from 'vue-i18n'
  */
 export function useTextCopy() {
   const { t } = useI18n()
-  const { copy } = useClipboard()
   const message = useMessage()
   const copyText = (text: string) => {
-    copy(text).then(() => {
+    if (copy(text)) {
       message.success(t('project.dag.copy_success'))
-    })
+    }
   }
   return {
     copy: copyText

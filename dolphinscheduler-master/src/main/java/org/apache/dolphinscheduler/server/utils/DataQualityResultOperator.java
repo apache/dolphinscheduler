@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.CheckType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqFailureStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OperatorType;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -59,7 +59,7 @@ public class DataQualityResultOperator {
      * @param taskResponseEvent
      * @param taskInstance
      */
-    public void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
+    public void operateDqExecuteResult(TaskEvent taskResponseEvent, TaskInstance taskInstance) {
         if (TASK_TYPE_DATA_QUALITY.equals(taskInstance.getTaskType())) {
 
             ProcessInstance processInstance =
@@ -92,7 +92,7 @@ public class DataQualityResultOperator {
      * @param dqExecuteResult
      * @param processInstance
      */
-    private void checkDqExecuteResult(TaskResponseEvent taskResponseEvent,
+    private void checkDqExecuteResult(TaskEvent taskResponseEvent,
                                       DqExecuteResult dqExecuteResult,
                                       ProcessInstance processInstance) {
         if (isFailure(dqExecuteResult)) {

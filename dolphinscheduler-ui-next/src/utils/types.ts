@@ -32,6 +32,7 @@ export type ITaskState =
   | 'DELAY_EXECUTION'
   | 'FORCED_SUCCESS'
   | 'SERIAL_WAIT'
+  | 'DISPATCH'
 
 export type ITaskStateConfig = {
   [key in ITaskState]: {

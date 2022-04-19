@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -337,8 +338,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.SUCCESS);
             return result;
         } catch (Exception e) {
-            logger.error("datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type, connectionParam, e.getMessage());
-            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), e.getMessage());
+            String message = Optional.of(e).map(Throwable::getCause)
+                    .map(Throwable::getMessage)
+                    .orElse(e.getMessage());
+            logger.error("datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type, connectionParam, message);
+            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), message);
         }
     }
 

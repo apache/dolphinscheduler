@@ -208,6 +208,16 @@ public class TaskExecutionContext {
     private ResourceParametersHelper resourceParametersHelper;
 
     /**
+     * endTime
+     */
+    private Date endTime;
+
+    /**
+     * sql TaskExecutionContext
+     */
+    private SQLTaskExecutionContext sqlTaskExecutionContext;
+
+    /**
      * resources full name and tenant code
      */
     private Map<String, String> resources;
@@ -538,12 +548,61 @@ public class TaskExecutionContext {
         this.dataQualityTaskExecutionContext = dataQualityTaskExecutionContext;
     }
 
+    public void setCurrentExecutionStatus(ExecutionStatus currentExecutionStatus) {
+        this.currentExecutionStatus = currentExecutionStatus;
+    }
+
     public ExecutionStatus getCurrentExecutionStatus() {
         return currentExecutionStatus;
     }
 
-    public void setCurrentExecutionStatus(ExecutionStatus currentExecutionStatus) {
-        this.currentExecutionStatus = currentExecutionStatus;
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskExecutionContext{"
+                + "taskInstanceId=" + taskInstanceId
+                + ", taskName='" + taskName + '\''
+                + ", currentExecutionStatus=" + currentExecutionStatus
+                + ", firstSubmitTime=" + firstSubmitTime
+                + ", startTime=" + startTime
+                + ", taskType='" + taskType + '\''
+                + ", host='" + host + '\''
+                + ", executePath='" + executePath + '\''
+                + ", logPath='" + logPath + '\''
+                + ", taskJson='" + taskJson + '\''
+                + ", processId=" + processId
+                + ", processDefineCode=" + processDefineCode
+                + ", processDefineVersion=" + processDefineVersion
+                + ", appIds='" + appIds + '\''
+                + ", processInstanceId=" + processInstanceId
+                + ", scheduleTime=" + scheduleTime
+                + ", globalParams='" + globalParams + '\''
+                + ", executorId=" + executorId
+                + ", cmdTypeIfComplement=" + cmdTypeIfComplement
+                + ", tenantCode='" + tenantCode + '\''
+                + ", queue='" + queue + '\''
+                + ", projectCode=" + projectCode
+                + ", taskParams='" + taskParams + '\''
+                + ", envFile='" + envFile + '\''
+                + ", dryRun='" + dryRun + '\''
+                + ", definedParams=" + definedParams
+                + ", taskAppId='" + taskAppId + '\''
+                + ", taskTimeoutStrategy=" + taskTimeoutStrategy
+                + ", taskTimeout=" + taskTimeout
+                + ", workerGroup='" + workerGroup + '\''
+                + ", environmentConfig='" + environmentConfig + '\''
+                + ", delayTime=" + delayTime
+                + ", resources=" + resources
+                + ", sqlTaskExecutionContext=" + sqlTaskExecutionContext
+                + ", dataQualityTaskExecutionContext=" + dataQualityTaskExecutionContext
+                + '}';
     }
 
 }

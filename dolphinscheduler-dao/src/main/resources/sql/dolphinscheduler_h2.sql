@@ -272,6 +272,7 @@ CREATE TABLE t_ds_alert
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
     title         varchar(64) DEFAULT NULL,
+    sign           char(40) NOT NULL DEFAULT '',
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
     warning_type  tinyint(4) DEFAULT '2',
@@ -279,7 +280,12 @@ CREATE TABLE t_ds_alert
     alertgroup_id int(11) DEFAULT NULL,
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
-    PRIMARY KEY (id)
+    project_code        bigint(20) DEFAULT NULL,
+    process_definition_code        bigint(20) DEFAULT NULL,
+    process_instance_id     int(11) DEFAULT NULL,
+    alert_type     int(11) DEFAULT NULL,
+    PRIMARY KEY (id),
+    KEY            idx_sign (sign)
 );
 
 -- ----------------------------
@@ -1910,3 +1916,20 @@ CREATE TABLE t_ds_k8s_namespace (
 -- ----------------------------
 INSERT INTO t_ds_k8s_namespace
 VALUES (1, 10000, 'default', 99, 'owner',1,NULL,1,'test',NULL,'default',null,null);
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status CASCADE;
+CREATE TABLE t_ds_alert_send_status
+(
+    id                            int NOT NULL AUTO_INCREMENT,
+    alert_id                      int NOT NULL,
+    alert_plugin_instance_id      int NOT NULL,
+    send_status                   tinyint(4) DEFAULT '0',
+    log                           text,
+    create_time                   timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
+);
+

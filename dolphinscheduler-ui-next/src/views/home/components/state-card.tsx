@@ -55,7 +55,14 @@ const StateCard = defineComponent({
     return { onUpdateDatePickerValue }
   },
   render() {
-    const { title, date, tableData, chartData, onUpdateDatePickerValue, loadingRef } = this
+    const {
+      title,
+      date,
+      tableData,
+      chartData,
+      onUpdateDatePickerValue,
+      loadingRef
+    } = this
     const { columnsRef } = useTable()
     return (
       <Card title={title}>

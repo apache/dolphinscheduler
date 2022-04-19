@@ -33,7 +33,8 @@ import { formatModel } from './format-data'
 import {
   HistoryOutlined,
   ProfileOutlined,
-  QuestionCircleTwotone
+  QuestionCircleTwotone,
+  BranchesOutlined
 } from '@vicons/antd'
 import { NIcon } from 'naive-ui'
 import { TASK_TYPES_MAP } from '../../constants/task-type'
@@ -45,6 +46,7 @@ import type {
   IWorkflowTaskInstance,
   WorkflowInstance
 } from './types'
+import { querySubProcessInstanceByTaskCode } from '@/service/modules/process-instances'
 
 const props = {
   show: {
@@ -57,7 +59,8 @@ const props = {
   },
   projectCode: {
     type: Number as PropType<number>,
-    required: true
+    required: true,
+    default: 0
   },
   readonly: {
     type: Boolean as PropType<boolean>,
@@ -115,9 +118,7 @@ const NodeDetailModal = defineComponent({
         {
           text: t('project.node.instructions'),
           show:
-            taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable
-              ? true
-              : false,
+            !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
           action: () => {
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
@@ -131,7 +132,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_history'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             router.push({
               name: 'task-instance',
@@ -142,11 +143,39 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_log'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             handleViewLog()
           },
           icon: renderIcon(ProfileOutlined)
+        },
+        {
+          text: t('project.node.enter_this_child_node'),
+          show: props.data.taskType === 'SUB_PROCESS',
+          disabled:
+            !props.data.id ||
+            (router.currentRoute.value.name === 'workflow-instance-detail' &&
+              !props.taskInstance),
+          action: () => {
+            if (router.currentRoute.value.name === 'workflow-instance-detail') {
+              querySubProcessInstanceByTaskCode(
+                { taskId: props.taskInstance?.id },
+                { projectCode: props.projectCode }
+              ).then((res: any) => {
+                router.push({
+                  name: 'workflow-instance-detail',
+                  params: { id: res.subProcessInstanceId },
+                  query: { code: props.data.taskParams?.processDefinitionCode }
+                })
+              })
+            } else {
+              router.push({
+                name: 'workflow-definition-detail',
+                params: { code: props.data.taskParams?.processDefinitionCode }
+              })
+            }
+          },
+          icon: renderIcon(BranchesOutlined)
         }
       ]
     }
@@ -181,7 +210,11 @@ const NodeDetailModal = defineComponent({
     return () => (
       <Modal
         show={props.show}
-        title={`${t('project.node.current_node_settings')}`}
+        title={
+          props.from === 1
+            ? `${t('project.task.current_task_settings')}`
+            : `${t('project.node.current_node_settings')}`
+        }
         onConfirm={onConfirm}
         confirmLoading={props.saving}
         confirmDisabled={props.readonly}

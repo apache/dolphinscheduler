@@ -18,7 +18,15 @@
 import { defineComponent, ref, inject, PropType, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Styles from './dag.module.scss'
-import { NTooltip, NIcon, NButton, NSelect, NPopover, NText } from 'naive-ui'
+import {
+  NTooltip,
+  NIcon,
+  NButton,
+  NSelect,
+  NPopover,
+  NText,
+  NTag
+} from 'naive-ui'
 import {
   SearchOutlined,
   DownloadOutlined,
@@ -132,7 +140,22 @@ export default defineComponent({
      * Back to the entrance
      */
     const onClose = () => {
-      router.go(-1)
+      if (history.state.back !== '/login') {
+        router.go(-1)
+        return
+      }
+      if (history.state.current.includes('workflow/definitions')) {
+        router.push({
+          path: `/projects/${route.params.projectCode}/workflow-definition`
+        })
+        return
+      }
+      if (history.state.current.includes('workflow/instances')) {
+        router.push({
+          path: `/projects/${route.params.projectCode}/workflow/instances`
+        })
+        return
+      }
     }
 
     /**
@@ -195,6 +218,12 @@ export default defineComponent({
           ></NTooltip>
         )}
         <div class={Styles['toolbar-left-part']}>
+          {route.name !== 'workflow-instance-detail' &&
+            props.definition?.processDefinition?.releaseState === 'ONLINE' && (
+              <NTag round size='small' type='info'>
+                {t('project.dag.online')}
+              </NTag>
+            )}
           {route.name === 'workflow-instance-detail' && (
             <>
               <NTooltip
@@ -467,6 +496,10 @@ export default defineComponent({
             type='info'
             secondary
             round
+            disabled={
+              props.definition?.processDefinition?.releaseState === 'ONLINE' &&
+              !props.instance
+            }
             onClick={() => {
               context.emit('saveModelToggle', true)
             }}

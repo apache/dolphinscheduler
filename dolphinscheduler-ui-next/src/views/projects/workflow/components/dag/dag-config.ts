@@ -125,17 +125,15 @@ export const NODE_STATUS_MARKUP = [
     selector: 'fo',
     children: [
       {
-        tagName: 'body',
+        tagName: 'div',
         selector: 'fo-body',
-        ns: 'http://www.w3.org/1999/xhtml',
-        children: [
-          {
-            tagName: 'div',
-            selector: 'status'
-          }
-        ]
+        ns: 'http://www.w3.org/1999/xhtml'
       }
-    ]
+    ],
+    style: {
+      width: 20,
+      height: 20
+    }
   }
 ]
 
@@ -187,9 +185,7 @@ export const NODE = {
     },
     fo: {
       refX: '46%',
-      refY: -25,
-      width: 18,
-      height: 18
+      refY: -25
     }
   },
   ports: {

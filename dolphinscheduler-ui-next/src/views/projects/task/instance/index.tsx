@@ -31,7 +31,10 @@ import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import LogModal from './components/log-modal'
+import LogModal from '@/components/log-modal'
+import { useAsyncState } from '@vueuse/core'
+import { queryLog } from '@/service/modules/log'
+import { stateType } from '@/utils/common'
 import styles from './index.module.scss'
 
 const TaskInstance = defineComponent({
@@ -67,6 +70,35 @@ const TaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
+    const getLogs = (row:any) => {
+      const { state } = useAsyncState(
+        queryLog({
+          taskInstanceId: Number(row.id),
+          limit: variables.limit,
+          skipLineNum: variables.skipLineNum
+        }).then((res: string) => {
+          variables.logRef += res
+          if (res) {
+            variables.limit += 1000
+            variables.skipLineNum += 1000
+            getLogs(row)
+          } else {
+            variables.logLoadingRef = false
+          }
+        }),
+        {}
+      )
+  
+      return state
+    }
+
+    const refreshLogs = (row:any) => {
+      variables.logRef = ''
+      variables.limit = 1000
+      variables.skipLineNum = 0
+      getLogs(row)
+    }
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -76,18 +108,41 @@ const TaskInstance = defineComponent({
       createColumns(variables)
     })
 
+    watch(
+      () => variables.showModalRef,
+      () => {
+        if (variables.showModalRef) {
+          getLogs(variables.row)
+        } else {
+          variables.row = {}
+          variables.logRef = ''
+          variables.logLoadingRef = true
+          variables.skipLineNum = 0
+          variables.limit = 1000
+        }
+      }
+    )
+
     return {
       t,
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
       onSearch,
-      onConfirmModal
+      onConfirmModal,
+      refreshLogs
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch, onConfirmModal, loadingRef } =
-      this
+    const {
+      t,
+      requestTableData,
+      onUpdatePageSize,
+      onSearch,
+      onConfirmModal,
+      loadingRef,
+      refreshLogs
+    } = this
 
     return (
       <>
@@ -120,44 +175,7 @@ const TaskInstance = defineComponent({
             <NSelect
               v-model={[this.stateType, 'value']}
               size='small'
-              options={[
-                {
-                  label: t('project.task.submitted_success'),
-                  value: 'SUBMITTED_SUCCESS'
-                },
-                {
-                  label: t('project.task.running_execution'),
-                  value: 'RUNNING_EXECUTION'
-                },
-                { label: t('project.task.ready_pause'), value: 'READY_PAUSE' },
-                { label: t('project.task.pause'), value: 'PAUSE' },
-                { label: t('project.task.ready_stop'), value: 'READY_STOP' },
-                { label: t('project.task.stop'), value: 'STOP' },
-                { label: t('project.task.failure'), value: 'FAILURE' },
-                { label: t('project.task.success'), value: 'SUCCESS' },
-                {
-                  label: t('project.task.need_fault_tolerance'),
-                  value: 'NEED_FAULT_TOLERANCE'
-                },
-                { label: t('project.task.kill'), value: 'KILL' },
-                {
-                  label: t('project.task.waiting_thread'),
-                  value: 'WAITING_THREAD'
-                },
-                {
-                  label: t('project.task.waiting_depend'),
-                  value: 'WAITING_DEPEND'
-                },
-                {
-                  label: t('project.task.delay_execution'),
-                  value: 'DELAY_EXECUTION'
-                },
-                {
-                  label: t('project.task.forced_success'),
-                  value: 'FORCED_SUCCESS'
-                },
-                { label: t('project.task.serial_wait'), value: 'SERIAL_WAIT' }
-              ]}
+              options={stateType(t).slice(1)}
               placeholder={t('project.task.state')}
               style={{ width: '180px' }}
               clearable
@@ -203,8 +221,11 @@ const TaskInstance = defineComponent({
         </Card>
         <LogModal
           showModalRef={this.showModalRef}
+          logRef={this.logRef}
           row={this.row}
+          logLoadingRef={this.logLoadingRef}
           onConfirmModal={onConfirmModal}
+          onRefreshLogs={refreshLogs}
         />
       </>
     )

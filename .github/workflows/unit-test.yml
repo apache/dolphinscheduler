@@ -36,8 +36,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paths-filter:
+    name: Unit-Test-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
   unit-test:
-    name: Unit Test
+    name: Unit-Test
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -96,3 +111,20 @@ jobs:
         with:
           name: unit-test-logs
           path: ${LOG_DIR}
+  result:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ unit-test, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip Unit Test!"
+            exit 0
+          fi
+          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+            echo "Unit Test Failed!"
+            exit -1
+          fi
