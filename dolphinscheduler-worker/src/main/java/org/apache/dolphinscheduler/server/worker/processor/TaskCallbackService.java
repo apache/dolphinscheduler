@@ -256,6 +256,5 @@ public class TaskCallbackService {
     public void sendTaskKillResponseCommand(TaskExecutionContext taskExecutionContext) {
         TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(taskExecutionContext);
         send(taskExecutionContext.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
-        TaskCallbackService.remove(taskExecutionContext.getTaskInstanceId());
     }
 }
