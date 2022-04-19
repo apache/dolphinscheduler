@@ -33,7 +33,7 @@ public class DependentSimplifyDefinition {
     private String name;
 
     /**
-     * definition name version
+     * definition version
      */
     private Integer version;
 
