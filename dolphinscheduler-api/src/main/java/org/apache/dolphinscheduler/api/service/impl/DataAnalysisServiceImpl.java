@@ -53,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -291,22 +292,27 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     @Override
     public List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(Date startTime, Date endTime, Long[] projectCodes) {
-        List<ExecuteStatusCount> startTimeStates = this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(startTime, endTime, projectCodes);
+        Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(startTime, endTime, projectCodes));
 
         List<ExecutionStatus> allState = Arrays.stream(ExecutionStatus.values()).collect(Collectors.toList());
-        List<ExecutionStatus> instanceState = startTimeStates.stream().map(ExecuteStatusCount::getExecutionStatus).collect(Collectors.toList());
-
-        //value 0 state need to recount by submit time
-        List<ExecutionStatus> needRecountState = allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
-        if (needRecountState.size() == 0) {
-            return startTimeStates;
+        List<ExecutionStatus> needRecountState;
+        if (startTimeStates.isPresent() && startTimeStates.get().size() != 0) {
+            List<ExecutionStatus> instanceState = startTimeStates.get().stream().map(ExecuteStatusCount::getExecutionStatus).collect(Collectors.toList());
+            //value 0 state need to recount by submit time
+            needRecountState = allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
+            if (needRecountState.size() == 0) {
+                return startTimeStates.get();
+            }
+        } else {
+            needRecountState = allState;
         }
+
         //use submit time to recount when 0
         //if have any issues with this code, should change to specified states 0 8 9 17 not state count is 0
         List<ExecuteStatusCount> recounts = this.taskInstanceMapper
                 .countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(startTime, endTime, projectCodes, needRecountState);
-        startTimeStates.addAll(recounts);
+        startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
 
-        return startTimeStates;
+        return startTimeStates.orElseGet(ArrayList::new);
     }
 }
