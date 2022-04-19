@@ -50,13 +50,23 @@
     <logger name="org.apache.hbase" level="WARN"/>
     <logger name="org.apache.hadoop" level="WARN"/>
 
+<!--    <root level="INFO">-->
+<!--        <if condition="${DOCKER:-false}">-->
+<!--            <then>-->
+<!--                <appender-ref ref="STDOUT"/>-->
+<!--            </then>-->
+<!--        </if>-->
+<!--        <appender-ref ref="STDOUT"/>-->
+<!--        <appender-ref ref="APILOGFILE"/>-->
+<!--    </root>-->
     <root level="INFO">
         <if condition="${DOCKER:-false}">
             <then>
                 <appender-ref ref="STDOUT"/>
             </then>
         </if>
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="APILOGFILE"/>
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="TASKLOGFILE"/>
+        <appender-ref ref="MASTERLOGFILE"/>
     </root>
 </configuration>

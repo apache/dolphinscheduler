@@ -38,10 +38,14 @@ spring:
     init:
       schema-locations: classpath:sql/dolphinscheduler_h2.sql
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
-    username: sa
-    password: ""
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
+#    username: sa
+#    password: ""
+  driver-class-name: com.mysql.jdbc.Driver
+  url: jdbc:mysql://localhost:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+  username: root
+  password: root
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -194,6 +198,7 @@ spring:
       on-profile: postgresql
   quartz:
     properties:
+<<<<<<< HEAD
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 
 ---
@@ -209,3 +214,6 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: root
+=======
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+>>>>>>> 2b1b26413e (flink_sql)

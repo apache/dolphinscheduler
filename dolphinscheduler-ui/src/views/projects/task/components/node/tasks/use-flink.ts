@@ -45,6 +45,7 @@ export function useFlink({
     timeout: 30,
     programType: 'SCALA',
     deployMode: 'cluster',
+    rawScript: '',
     flinkVersion: '<1.10',
     jobManagerMemory: '1G',
     taskManagerMemory: '2G',

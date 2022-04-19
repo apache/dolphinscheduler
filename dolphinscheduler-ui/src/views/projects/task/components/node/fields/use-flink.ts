@@ -22,7 +22,12 @@ import type { IJsonItem } from '../types'
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-    model.programType === 'PYTHON' ? 0 : 24
+    // model.programType === 'PYTHON' ? 0 : 24
+      (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+  )
+
+  const rawScriptSpan = computed(() =>
+      model.programType === 'SQL' ? 24 : 0
   )
 
   const taskManagerNumberSpan = computed(() =>
@@ -68,7 +73,22 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useMainJar(model),
+<<<<<<< HEAD
     useDeployMode(24, ref(false)),
+=======
+    {
+      type: 'editor',
+      field: 'rawScript',
+      span: rawScriptSpan,
+      name: t('project.node.script'),
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: model.programType === 'SQL',
+        message: t('project.node.script_tips')
+      }
+    },
+    useDeployMode(24, false),
+>>>>>>> 7c048165d6 (flink_sql)
     {
       type: 'select',
       field: 'flinkVersion',
@@ -214,7 +234,10 @@ const PROGRAM_TYPES = [
   {
     label: 'PYTHON',
     value: 'PYTHON'
-  }
+  },
+  {
+    label: 'SQL',
+    value: 'SQL'}
 ]
 
 const FLINK_VERSIONS = [

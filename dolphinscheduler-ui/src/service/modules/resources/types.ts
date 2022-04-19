@@ -66,6 +66,10 @@ interface OnlineCreateReq extends CreateReq, ContentReq {
 }
 
 interface ProgramTypeReq {
+<<<<<<< HEAD
+=======
+  // programType: 'JAVA' | 'SCALA' | 'PYTHON'
+>>>>>>> 7c048165d6 (flink_sql)
   programType: 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
 }
 

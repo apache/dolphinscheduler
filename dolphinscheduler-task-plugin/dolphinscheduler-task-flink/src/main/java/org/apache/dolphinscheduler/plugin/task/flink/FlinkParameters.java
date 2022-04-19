@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,9 +99,24 @@ public class FlinkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
     private ProgramType programType;
+
+    /**
+     * sql script
+     */
+    private String rawScript;
+
+    /**
+     *sql-client execution result-mode
+     */
+    private String resultMode;
+
+    /**
+     *execution runtime-mode
+     */
+    private String runtimeMode;
 
     public ResourceInfo getMainJar() {
         return mainJar;
@@ -224,9 +238,33 @@ public class FlinkParameters extends AbstractParameters {
         this.flinkVersion = flinkVersion;
     }
 
+    public String getRawScript() {
+        return rawScript;
+    }
+
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
+    }
+
+    public String getResultMode() {
+        return resultMode;
+    }
+
+    public void setResultMode(String resultMode) {
+        this.resultMode = resultMode;
+    }
+
+    public String getRuntimeMode() {
+        return runtimeMode;
+    }
+
+    public void setRuntimeMode(String runtimeMode) {
+        this.runtimeMode = runtimeMode;
+    }
+
     @Override
     public boolean checkParameters() {
-        return mainJar != null && programType != null;
+        return  programType != null && (rawScript !=null ||  mainJar != null);
     }
 
     @Override

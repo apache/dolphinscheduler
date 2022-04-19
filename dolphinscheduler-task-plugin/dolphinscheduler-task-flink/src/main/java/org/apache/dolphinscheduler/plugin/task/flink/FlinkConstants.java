@@ -39,4 +39,19 @@ public class FlinkConstants {
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
 
+    /**
+     * flink sql
+     */
+    public static final String FLINK_SQL_EXECUTION_RESULT_MODE = "set execution.result-mode=";
+    public static final String FLINK_SQL_EXECUTION_TARGET = "set execution.target=yarn-per-job;";
+    public static final String FLINK_SQL_YARN_APPLICATION_NAME = "set yarn.application.name=";
+    public static final String FLINK_SQL_YARN_APPLICATION_QUEUE = "set yarn.application.queue=";
+    public static final String FLINK_SQL_JOBMANAGER_MEMORY_PROCESS_SIZE = "set jobmanager.memory.process.size=";
+    public static final String FLINK_SQL_TASKMANAGER_MEMORY_PROCESS_SIZE = "set taskmanager.memory.process.size=";
+    public static final String FLINK_SQL_TASKMANAGER_NUMBEROFTASKSLOTS = "set taskmanager.numberOfTaskSlots=";
+    public static final String FLINK_SQL_PARALLELISM_DEFAULT = "set parallelism.default=";
+    public static final String FLINK_SQL_EXECUTION_RUNTIME_MODE = "set execution.runtime-mode=";
+    public static final String FLINK_SQL_FILE = "-f";
+    public static final String FLINK_SQL_NEWLINE = ";\n";
+
 }
