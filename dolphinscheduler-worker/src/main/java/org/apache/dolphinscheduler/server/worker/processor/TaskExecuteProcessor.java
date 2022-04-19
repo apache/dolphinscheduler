@@ -87,12 +87,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     @Autowired
     private WorkerManagerThread workerManager;
 
-    /**
-     * storage Operate Manager
-     */
-    @Autowired
-    private StorageOperateManager storageOperateManager;
-
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
@@ -169,7 +163,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
 
         // submit task to manager
-        boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager, storageOperateManager.storageOperate(ResUploadType.HDFS)));
+        boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager, StorageOperateManager.storageOperate(ResUploadType.HDFS)));
         if (!offer) {
             logger.error("submit task to manager error, queue is full, queue size is {}, taskInstanceId: {}",
                     workerManager.getDelayQueueSize(), taskExecutionContext.getTaskInstanceId());
