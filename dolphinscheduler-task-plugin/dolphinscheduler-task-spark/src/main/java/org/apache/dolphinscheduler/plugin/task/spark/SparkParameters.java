@@ -240,7 +240,6 @@ public class SparkParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-//        return mainJar != null && programType != null;
         return programType != null && (mainJar != null || rawScript != null);
     }
 

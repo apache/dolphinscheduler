@@ -60,7 +60,7 @@ public class SparkArgsUtils {
      * @param param param
      * @return argument list
      */
-    public static List<String> buildArgs(SparkParameters param,TaskExecutionContext taskRequest) throws IOException {
+    public static List<String> buildArgs(SparkParameters param, TaskExecutionContext taskRequest) throws IOException {
         List<String> args = new ArrayList<>();
         args.add(SparkConstants.MASTER);
 

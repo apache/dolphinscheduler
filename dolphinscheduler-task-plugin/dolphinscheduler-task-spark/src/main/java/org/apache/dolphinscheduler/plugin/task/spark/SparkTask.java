@@ -65,6 +65,7 @@ public class SparkTask extends AbstractYarnTask {
             throw new RuntimeException("spark task params is not valid");
         }
         sparkParameters.setQueue(taskExecutionContext.getQueue());
+
         if (sparkParameters.getProgramType() != ProgramType.SQL){
             setMainJarName();
         }
@@ -86,7 +87,7 @@ public class SparkTask extends AbstractYarnTask {
             sparkCommand = SparkVersion.SPARK1.getCommand();
         }
 
-        if (SparkVersion.SPARKSQL.name().equals(sparkParameters.getSparkVersion())){
+        if (sparkParameters.getProgramType() == ProgramType.SQL){
             sparkCommand = SparkVersion.SPARKSQL.getCommand();
         }
 
@@ -94,13 +95,13 @@ public class SparkTask extends AbstractYarnTask {
 
         // other parameters
         try {
-            args.addAll(SparkArgsUtils.buildArgs(sparkParameters,taskExecutionContext));
+            args.addAll(SparkArgsUtils.buildArgs(sparkParameters, taskExecutionContext));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
         if (MapUtils.isEmpty(paramsMap)) {
             paramsMap = new HashMap<>();
         }

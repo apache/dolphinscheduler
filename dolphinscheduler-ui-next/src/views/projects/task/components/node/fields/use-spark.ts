@@ -156,9 +156,5 @@ export const SPARK_VERSIONS = [
   {
     label: 'SPARK1',
     value: 'SPARK1'
-  },
-  {
-    label: 'SPARKSQL',
-    value: 'SPARKSQL'
   }
 ]
