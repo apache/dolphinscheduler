@@ -899,7 +899,7 @@ public class ProcessServiceImpl implements ProcessService {
         } else {
             processInstance = this.findProcessInstanceDetailById(processInstanceId);
             if (processInstance == null) {
-                return processInstance;
+                return null;
             }
         }
         if (cmdParam != null) {
@@ -1482,11 +1482,12 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
-        if (processInstanceState.typeIsFinished()
-            || processInstanceState == ExecutionStatus.READY_PAUSE
-            || processInstanceState == ExecutionStatus.READY_STOP) {
+        if (processInstanceState.typeIsFinished() || processInstanceState == ExecutionStatus.READY_STOP) {
             logger.warn("processInstance {} was {}, skip submit task", processInstance.getProcessDefinitionCode(), processInstanceState);
             return null;
+        }
+        if (processInstanceState == ExecutionStatus.READY_PAUSE) {
+            taskInstance.setState(ExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
