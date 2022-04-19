@@ -22,9 +22,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Map;
+import java.util.EnumMap;
 
 /**
  * @author StorageOperateManagerTest
@@ -37,10 +38,13 @@ public class StorageOperateManagerTest {
 
     @Test
     public void testManager() {
-        Map<ResUploadType, StorageOperate> storageOperateMap = StorageOperateManager.STORAGE_OPERATE_MAP;
+        StorageOperateManager mock = Mockito.mock(StorageOperateManager.class);
+        Assert.assertNotNull(mock);
+
+        EnumMap<ResUploadType, StorageOperate> storageOperateMap = StorageOperateManager.OPERATE_MAP;
         storageOperateMap.put(ResUploadType.HDFS, hadoopUtils);
 
-        StorageOperate storageOperate = StorageOperateManager.storageOperate(ResUploadType.HDFS);
+        StorageOperate storageOperate = StorageOperateManager.getStorageOperate(ResUploadType.HDFS);
         Assert.assertNotNull(storageOperate);
     }
 }
