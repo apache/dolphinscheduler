@@ -531,6 +531,8 @@ const project = {
       'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    cancel_full_screen: 'Cancel full screen',
+    enter_full_screen: 'Enter full screen',
     current_task_settings: 'Current task settings',
     online: 'Online',
     offline: 'Offline',
