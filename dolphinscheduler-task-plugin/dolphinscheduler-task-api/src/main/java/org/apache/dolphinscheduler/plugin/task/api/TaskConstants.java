@@ -398,4 +398,10 @@ public class TaskConstants {
     public static final String AWS_SECRET_ACCESS_KEY= "aws.secret.access.key";
     public static final String AWS_REGION = "aws.region";
 
+    /**
+     * zeppelin config
+     */
+    public static final String ZEPPELIN_REST_URL= "zeppelin.rest.url";
+
+
 }

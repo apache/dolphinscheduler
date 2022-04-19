@@ -44,18 +44,9 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
@@ -67,11 +58,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -109,6 +96,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     StateEventCallbackService stateEventCallbackService;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * execute process instance
@@ -226,11 +219,41 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         } else if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
             // check process definition online
             putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefineCode);
+        } else if (!checkSubProcessDefinitionValid(processDefinition)){
+            // check sub process definition online
+            putMsg(result, Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
         return result;
     }
+
+    /**
+     * check if the current process has subprocesses and all subprocesses are valid
+     * @param processDefinition
+     * @return check result
+     */
+    @Override
+    public boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition) {
+        // query all subprocesses under the current process
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryDownstreamByProcessDefinitionCode(processDefinition.getCode());
+        if (processTaskRelations.isEmpty()){
+            return true;
+        }
+        Set<Long> relationCodes = processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toSet());
+        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
+
+        // find out the process definition code
+        Set<Long> processDefinitionCodeSet = new HashSet<>();
+        taskDefinitions.stream()
+                .filter(task -> TaskConstants.TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(task.getTaskType()))
+                .forEach(taskDefinition -> processDefinitionCodeSet.add(Long.valueOf(JSONUtils.getNodeString(taskDefinition.getTaskParams(), Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE))));
+
+        // check sub releaseState
+        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryByCodes(processDefinitionCodeSet);
+        return processDefinitions.stream().filter(definition -> definition.getReleaseState().equals(ReleaseState.OFFLINE)).collect(Collectors.toSet()).isEmpty();
+    }
+
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
@@ -619,7 +642,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode
      * @return
      */
-    private int createComplementCommandList(Date start, Date end, RunMode runMode, Command command,
+    protected int createComplementCommandList(Date start, Date end, RunMode runMode, Command command,
                                             Integer expectedParallelismNumber, ComplementDependentMode complementDependentMode) {
         int createCount = 0;
         int dependentProcessDefinitionCreateCount = 0;
@@ -713,7 +736,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * create complement dependent command
      */
-    private int createComplementDependentCommand(List<Schedule> schedules, Command command) {
+    protected int createComplementDependentCommand(List<Schedule> schedules, Command command) {
         int dependentProcessDefinitionCreateCount = 0;
         Command dependentCommand;
 

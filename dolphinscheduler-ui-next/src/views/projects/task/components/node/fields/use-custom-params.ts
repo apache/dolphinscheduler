@@ -183,6 +183,10 @@ export const TYPE_LIST = [
   {
     value: 'BOOLEAN',
     label: 'BOOLEAN'
+  },
+  {
+    value: 'LIST',
+    label: 'LIST'
   }
 ]
 

@@ -20,12 +20,12 @@ import {
   onMounted,
   onUnmounted,
   PropType,
-  nextTick,
   ref,
   watch
 } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
 import { call } from 'naive-ui/es/_utils'
+import { useThemeStore } from '@/store/theme/theme'
 import * as monaco from 'monaco-editor'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
@@ -83,30 +83,13 @@ export default defineComponent({
   emits: ['change', 'focus', 'blur'],
   setup(props, ctx) {
     let editor = null as monaco.editor.IStandaloneCodeEditor | null
-
+    const themeStore = useThemeStore()
+    const monacoEditorThemeRef = ref(themeStore.darkTheme ? 'vs-dark' : 'vs')
     const editorRef = ref()
-
     const getValue = () => editor?.getValue()
-
     const formItem = useFormItem({})
 
-    watch(
-      () => props.value,
-      (val) => {
-        if (val !== getValue()) {
-          editor?.setValue(val)
-        }
-      }
-    )
-    watch(
-      () => formItem.mergedDisabledRef.value,
-      (value) => {
-        editor?.updateOptions({ readOnly: value })
-      }
-    )
-
-    onMounted(async () => {
-      await nextTick()
+    const initMonacoEditor = () => {
       const dom = editorRef.value
       if (dom) {
         editor = monaco.editor.create(dom, {
@@ -114,7 +97,8 @@ export default defineComponent({
           readOnly: formItem.mergedDisabledRef.value || props.options?.readOnly,
           value: props.defaultValue ?? props.value,
           language: props.language,
-          automaticLayout: true
+          automaticLayout: true,
+          theme: monacoEditorThemeRef.value
         })
         editor.onDidChangeModelContent(() => {
           const { onUpdateValue, 'onUpdate:value': _onUpdateValue } = props
@@ -136,11 +120,38 @@ export default defineComponent({
           formItem.nTriggerFormFocus()
         })
       }
-    })
+    }
+
+    onMounted(() => initMonacoEditor())
 
     onUnmounted(() => {
       editor?.dispose()
     })
+
+    watch(
+      () => props.value,
+      (val) => {
+        if (val !== getValue()) {
+          editor?.setValue(val)
+        }
+      }
+    )
+
+    watch(
+      () => formItem.mergedDisabledRef.value,
+      (value) => {
+        editor?.updateOptions({ readOnly: value })
+      }
+    )
+
+    watch(
+      () => themeStore.darkTheme,
+      () => {
+        editor?.dispose()
+        monacoEditorThemeRef.value = themeStore.darkTheme ? 'vs-dark' : 'vs'
+        initMonacoEditor()
+      }
+    )
 
     ctx.expose({ getValue })
 
@@ -155,7 +166,7 @@ export default defineComponent({
           width: '100%',
           border: '1px solid #eee'
         }}
-      ></div>
+      />
     )
   }
 })

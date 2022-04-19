@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -50,5 +50,6 @@
         <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-emr</module>
         <module>dolphinscheduler-task-blocking</module>
+        <module>dolphinscheduler-task-zeppelin</module>
     </modules>
 </project>

@@ -695,7 +695,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 });
             }
             taskMainInfoIPage.setRecords(Lists.newArrayList(taskMainInfoMap.values()));
-            taskMainInfoIPage.setTotal(taskMainInfoMap.values().size());
         }
         PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
