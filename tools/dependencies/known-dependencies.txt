@@ -27,7 +27,7 @@ commons-codec-1.11.jar
 commons-collections-3.2.2.jar
 commons-collections4-4.1.jar
 commons-compiler-3.1.6.jar
-commons-compress-1.19.jar
+commons-compress-1.21.jar
 commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
 commons-beanutils-1.9.4.jar

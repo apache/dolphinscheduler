@@ -232,7 +232,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
     commons-collections 3.2.2: https://mvnrepository.com/artifact/commons-collections/commons-collections/3.2.2, Apache 2.0
     commons-collections4 4.1: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.1, Apache 2.0
-    commons-compress 1.19: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.19, Apache 2.0
+    commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
     commons-configuration 1.10: https://mvnrepository.com/artifact/commons-configuration/commons-configuration/1.10, Apache 2.0
     commons-daemon 1.0.13 https://mvnrepository.com/artifact/commons-daemon/commons-daemon/1.0.13, Apache 2.0
     commons-dbcp 1.4: https://github.com/apache/commons-dbcp, Apache 2.0
