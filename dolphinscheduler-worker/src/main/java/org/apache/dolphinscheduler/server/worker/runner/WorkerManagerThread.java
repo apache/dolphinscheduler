@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,7 +55,7 @@ public class WorkerManagerThread implements Runnable {
     /**
      * thread executor service
      */
-    private final ExecutorService workerExecService;
+    private final WorkerExecService workerExecService;
 
     /**
      * task callback service
@@ -62,8 +63,20 @@ public class WorkerManagerThread implements Runnable {
     @Autowired
     private TaskCallbackService taskCallbackService;
 
+    /**
+     * running task
+     */
+    private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap = new ConcurrentHashMap<>();
+
     public WorkerManagerThread(WorkerConfig workerConfig) {
-        workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads());
+        workerExecService = new WorkerExecService(
+            ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
+            taskExecuteThreadMap
+        );
+    }
+
+    public TaskExecuteThread getTaskExecuteThread(Integer taskInstanceId) {
+        return this.taskExecuteThreadMap.get(taskInstanceId);
     }
 
     /**
@@ -81,7 +94,7 @@ public class WorkerManagerThread implements Runnable {
      * @return queue size
      */
     public int getThreadPoolQueueSize() {
-        return ((ThreadPoolExecutor) workerExecService).getQueue().size();
+        return this.workerExecService.getThreadPoolQueueSize();
     }
 
     /**

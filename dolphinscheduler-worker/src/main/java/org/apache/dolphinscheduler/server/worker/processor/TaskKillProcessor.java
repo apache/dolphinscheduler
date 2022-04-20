@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
@@ -27,12 +28,12 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
@@ -93,8 +94,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             return;
         }
 
-        Integer processId = taskExecutionContext.getProcessId();
-        if (processId.equals(0)) {
+        int processId = taskExecutionContext.getProcessId();
+        if (processId == 0) {
+            this.cancelApplication(taskInstanceId);
             workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
             logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
@@ -121,22 +123,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @return kill result
      */
     private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
-        boolean processFlag = true;
-        List<String> appIds = Collections.emptyList();
-
-        try {
-            String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
-            if (!StringUtils.isEmpty(pidsStr)) {
-                String cmd = String.format("kill -9 %s", pidsStr);
-                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
-                logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
-                OSUtils.exeCmd(cmd);
-            }
-
-        } catch (Exception e) {
-            processFlag = false;
-            logger.error("kill task error", e);
-        }
+        // kill system process
+        boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
         // find log and kill yarn job
         Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
                 taskExecutionContext.getLogPath(),
@@ -146,27 +134,51 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     }
 
     /**
-     * build TaskKillResponseCommand
-     *
-     * @param killCommand kill command
-     * @param result exe result
-     * @return build TaskKillResponseCommand
+     * kill task by cancel application
+     * @param taskInstanceId
      */
-    private TaskKillResponseCommand buildKillTaskResponseCommand(TaskKillRequestCommand killCommand,
-                                                                 Pair<Boolean, List<String>> result) {
-        TaskKillResponseCommand taskKillResponseCommand = new TaskKillResponseCommand();
-        taskKillResponseCommand.setStatus(result.getLeft() ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
-        taskKillResponseCommand.setAppIds(result.getRight());
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
-        if (taskExecutionContext == null) {
-            return taskKillResponseCommand;
+    protected void cancelApplication(int taskInstanceId) {
+        TaskExecuteThread taskExecuteThread = workerManager.getTaskExecuteThread(taskInstanceId);
+        if (taskExecuteThread == null) {
+            logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
+            return;
         }
-        if (taskExecutionContext != null) {
-            taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            taskKillResponseCommand.setHost(taskExecutionContext.getHost());
-            taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
+        AbstractTask task = taskExecuteThread.getTask();
+        if (task == null) {
+            logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
+            return;
         }
-        return taskKillResponseCommand;
+        try {
+            task.cancelApplication(true);
+        } catch (Exception e) {
+            logger.error("kill task error", e);
+        }
+        logger.info("kill task by cancelApplication, task id:{}", taskInstanceId);
+    }
+
+    /**
+     * kill system process
+     * @param tenantCode
+     * @param processId
+     */
+    protected boolean killProcess(String tenantCode, Integer processId) {
+        boolean processFlag = true;
+        if (processId == null || processId.equals(0)) {
+            return true;
+        }
+        try {
+            String pidsStr = ProcessUtils.getPidsStr(processId);
+            if (!StringUtils.isEmpty(pidsStr)) {
+                String cmd = String.format("kill -9 %s", pidsStr);
+                cmd = OSUtils.getSudoCmd(tenantCode, cmd);
+                logger.info("process id:{}, cmd:{}", processId, cmd);
+                OSUtils.exeCmd(cmd);
+            }
+        } catch (Exception e) {
+            processFlag = false;
+            logger.error("kill task error", e);
+        }
+        return processFlag;
     }
 
     /**
