@@ -58,6 +58,7 @@
                   <el-dropdown-item @click.native="_authFile(scope.row,scope.$index)">{{$t('Resources')}}</el-dropdown-item>
                   <el-dropdown-item @click.native="_authDataSource(scope.row,scope.$index)">{{$t('Datasource')}}</el-dropdown-item>
                   <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.$index)">{{$t('UDF Function')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authNamespace(scope.row,scope.$index)">{{$t('K8s Namespace')}}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-tooltip>
@@ -107,6 +108,13 @@
       width="auto">
       <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
     </el-dialog>
+
+    <el-dialog
+      v-if="authNamespaceDialog"
+      :visible.sync="authNamespaceDialog"
+      width="auto">
+      <m-transfer :transferData="transferData" @onUpdateAuthNamespace="onUpdateAuthNamespace" @closeAuthNamespace="closeAuthNamespace"></m-transfer>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -141,7 +149,8 @@
             name: ''
           }
         },
-        resourceDialog: false
+        resourceDialog: false,
+        authNamespaceDialog: false
       }
     },
     props: {
@@ -348,6 +357,35 @@
           this.$message.error(e.msg || '')
         })
       },
+
+      _authNamespace (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'namespace',
+          category: 'k8s-namespace'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.namespace
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.namespace
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = i18n.$t('K8s Namespace')
+          this.authNamespaceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
       onUpdateAuthUdfFunc (udfIds) {
         this._grantAuthorization('users/grant-udf-func', {
           userId: this.item.id,
@@ -358,6 +396,18 @@
 
       closeAuthUdfFunc () {
         this.authUdfFuncDialog = false
+      },
+
+      onUpdateAuthNamespace (namespaceIds) {
+        this._grantAuthorization('users/grant-namespace', {
+          userId: this.item.id,
+          namespaceIds: namespaceIds
+        })
+        this.authNamespaceDialog = false
+      },
+
+      closeAuthNamespace () {
+        this.authNamespaceDialog = false
       },
 
       _grantAuthorization (api, param) {
