@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.storage.StorageOperateManager;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
@@ -85,17 +87,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     @Autowired
     private WorkerManagerThread workerManager;
 
-    /**
-     * Pre-cache task to avoid extreme situations when kill task. There is no such task in the cache
-     *
-     * @param taskExecutionContext task
-     */
-    private void setTaskCache(TaskExecutionContext taskExecutionContext) {
-        TaskExecutionContext preTaskCache = new TaskExecutionContext();
-        preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
-    }
-
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
@@ -118,7 +109,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             return;
         }
 
-        setTaskCache(taskExecutionContext);
+        // set cache, it will be used when kill task
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+
         // todo custom logger
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
@@ -170,7 +163,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
 
         // submit task to manager
-        boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager));
+        boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager, StorageOperateManager.getStorageOperate(ResUploadType.HDFS)));
         if (!offer) {
             logger.error("submit task to manager error, queue is full, queue size is {}, taskInstanceId: {}",
                     workerManager.getDelayQueueSize(), taskExecutionContext.getTaskInstanceId());

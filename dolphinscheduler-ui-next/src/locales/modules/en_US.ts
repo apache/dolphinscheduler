@@ -531,6 +531,8 @@ const project = {
       'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    cancel_full_screen: 'Cancel full screen',
+    enter_full_screen: 'Enter full screen',
     current_task_settings: 'Current task settings',
     online: 'Online',
     offline: 'Offline',
@@ -615,6 +617,7 @@ const project = {
     online: 'Online'
   },
   node: {
+    return_back: 'Return',
     current_node_settings: 'Current node settings',
     instructions: 'Instructions',
     view_history: 'View history',
@@ -627,7 +630,6 @@ const project = {
     workflow_name: 'Workflow Name',
     workflow_name_tips: 'Please select a workflow (required)',
     child_node: 'Child Node',
-    enter_child_node: 'Enter child node',
     run_flag: 'Run flag',
     normal: 'Normal',
     prohibition_execution: 'Prohibition execution',

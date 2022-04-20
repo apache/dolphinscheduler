@@ -35,6 +35,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
+      - uses: actions/checkout@v2
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -44,7 +45,7 @@ jobs:
   build:
     name: E2E-Build
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -160,7 +161,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' ]]; then
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
             echo "Skip E2E!"
             exit 0
           fi

@@ -105,7 +105,7 @@
                                     <arguments>
                                         <argument>-c</argument>
                                         <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
-                                        <argument>gpg --armor --sign dist/*.tar.gz</argument>
+                                        <argument>gpg --armor --detach-sign --digest-algo=SHA512 dist/*.tar.gz</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -122,7 +122,7 @@
                                     <arguments>
                                         <argument>-c</argument>
                                         <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
-                                        <argument>gpg --armor --sign dist/*.whl</argument>
+                                        <argument>gpg --armor --detach-sign --digest-algo=SHA512 dist/*.whl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

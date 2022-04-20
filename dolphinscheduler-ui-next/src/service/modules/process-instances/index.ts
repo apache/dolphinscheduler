@@ -64,7 +64,7 @@ export function querySubProcessInstanceByTaskCode(
   code: CodeReq
 ): any {
   return axios({
-    url: `/projects/${code}/process-instances/query-sub-by-parent`,
+    url: `/projects/${code.projectCode}/process-instances/query-sub-by-parent`,
     method: 'get',
     params
   })

@@ -279,6 +279,7 @@ DROP TABLE IF EXISTS `t_ds_alert`;
 CREATE TABLE `t_ds_alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `title` varchar(64) DEFAULT NULL COMMENT 'title',
+  `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
   `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed',
@@ -291,7 +292,8 @@ CREATE TABLE `t_ds_alert` (
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'process_instance_id',
   `alert_type` int(11) DEFAULT NULL COMMENT 'alert_type',
   PRIMARY KEY (`id`),
-  KEY `idx_status` (`alert_status`) USING BTREE
+  KEY `idx_status` (`alert_status`) USING BTREE,
+  KEY `idx_sign` (`sign`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

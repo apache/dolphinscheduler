@@ -86,16 +86,26 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         }
         logger.info("task kill command : {}", killCommand);
 
-        Pair<Boolean, List<String>> result = doKill(killCommand);
-
-        taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
-
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
+        int taskInstanceId = killCommand.getTaskInstanceId();
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
             logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
             return;
         }
+
+        Integer processId = taskExecutionContext.getProcessId();
+        if (processId.equals(0)) {
+            workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+            logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
+            return;
+        }
+
+        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
+
+        taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
+                new NettyRemoteChannel(channel, command.getOpaque()));
+
         taskExecutionContext.setCurrentExecutionStatus(result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
 
@@ -110,21 +120,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      *
      * @return kill result
      */
-    private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
+    private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
         boolean processFlag = true;
         List<String> appIds = Collections.emptyList();
-        int taskInstanceId = killCommand.getTaskInstanceId();
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
 
         try {
-            Integer processId = taskExecutionContext.getProcessId();
-            if (processId.equals(0)) {
-                workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
-                logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
-                return Pair.of(true, appIds);
-            }
-
             String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
             if (!StringUtils.isEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);

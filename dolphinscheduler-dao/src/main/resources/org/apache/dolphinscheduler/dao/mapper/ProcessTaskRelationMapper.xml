@@ -69,6 +69,13 @@
             #{relation.conditionType},#{relation.conditionParams},#{relation.createTime},#{relation.updateTime})
         </foreach>
     </insert>
+    <select id="queryDownstreamByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        where process_definition_code = #{processDefinitionCode}
+        and pre_task_version >= 1
+    </select>
     <select id="queryDownstreamByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
         select
         <include refid="baseSql"/>
@@ -119,6 +126,16 @@
             </foreach>
         </if>
         group by process_definition_code
+    </select>
+
+    <select id="queryProcessTaskRelationsByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        SELECT
+        <include refid="baseSql"/>
+        FROM
+        t_ds_process_task_relation
+        WHERE 1=1
+        AND process_definition_code = #{processDefinitionCode}
+        AND process_definition_version = #{processDefinitionVersion}
     </select>
 
     <update id="batchUpdateProcessTaskRelationPreTask" parameterType="java.util.List">
