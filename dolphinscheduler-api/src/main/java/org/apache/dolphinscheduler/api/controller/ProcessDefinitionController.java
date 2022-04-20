@@ -567,6 +567,49 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
+     * get process definition list map by project code
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return process definition list data
+     */
+    @ApiOperation(value = "getProcessListByProjectCode", notes = "GET_PROCESS_LIST_BY_PROCESS_CODE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100")
+    })
+    @GetMapping(value = "/query-process-definition-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
+    public Result getProcessListByProjectCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode
+                                               ) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionListByProjectCode(projectCode);
+        return returnDataList(result);
+    }
+
+    /**
+     * get task definition list by process definition code
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return process definition list data
+     */
+    @ApiOperation(value = "getTaskListByProcessDefinitionCode", notes = "GET_TASK_LIST_BY_PROCESS_CODE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100"),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
+    })
+    @GetMapping(value = "/query-task-definition-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
+    public Result getTaskListByProcessDefinitionCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                     @RequestParam(value = "processDefinitionCode") Long processDefinitionCode) {
+        Map<String, Object> result = processDefinitionService.queryTaskDefinitionListByProcessDefinitionCode(projectCode, processDefinitionCode);
+        return returnDataList(result);
+    }
+
+    /**
      * delete process definition by code
      *
      * @param loginUser login user
