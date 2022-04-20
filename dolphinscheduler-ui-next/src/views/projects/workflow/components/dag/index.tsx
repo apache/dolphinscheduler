@@ -53,7 +53,7 @@ import LogModal from '@/components/log-modal'
 import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
-import { downloadFile } from '@/service/service'
+import utils from '@/utils'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -265,7 +265,7 @@ export default defineComponent({
     }
 
     const downloadLogs = () => {
-      downloadFile('log/download-log', {
+      utils.downloadFile('log/download-log', {
         taskInstanceId: nodeVariables.logTaskId
       })
     }
