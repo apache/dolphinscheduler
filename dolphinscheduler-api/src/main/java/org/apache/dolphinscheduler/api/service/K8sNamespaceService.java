@@ -18,14 +18,16 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * k8s namespace service impl
  */
-public interface K8sNameSpaceService {
+public interface K8sNamespaceService {
     /**
      * query namespace list paging
      *
@@ -44,26 +46,23 @@ public interface K8sNameSpaceService {
      * @param loginUser    login user
      * @param namespace    namespace
      * @param k8s          k8s not null
-     * @param owner        owner can null
-     * @param tag          can null,if set means just used for one type job,such as flink,spark
      * @param limitsCpu    limits cpu, can null means not limit
      * @param limitsMemory limits memory, can null means not limit
      * @return
      */
-    Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, String owner, String tag, Double limitsCpu, Integer limitsMemory);
+    Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, Double limitsCpu, Integer limitsMemory);
 
 
     /**
      * update K8s Namespace tag and resource limit
      *
      * @param loginUser    login user
-     * @param owner        owner
-     * @param tag          Which type of job is available,such as flink,means only flink job can use, can be empty, all available
+     * @param userName     owner
      * @param limitsCpu    max cpu
      * @param limitsMemory max memory
      * @return
      */
-    Map<String, Object> updateK8sNamespace(User loginUser, int id, String owner, String tag, Double limitsCpu, Integer limitsMemory);
+    Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu, Integer limitsMemory);
 
     /**
      * verify namespace and k8s
@@ -82,4 +81,30 @@ public interface K8sNameSpaceService {
      * @return
      */
     Map<String, Object> deleteNamespaceById(User loginUser, int id);
+
+    /**
+     * query unauthorized namespace
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return the namespaces which user have not permission to see
+     */
+    Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId);
+
+    /**
+     * query unauthorized namespace
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return namespaces which the user have permission to see
+     */
+    Map<String, Object> queryAuthorizedNamespace(User loginUser, Integer userId);
+
+    /**
+     * query namespace can use
+     *
+     * @param loginUser login user
+     * @return namespace list
+     */
+    List<K8sNamespace> queryNamespaceAvailable(User loginUser);
 }

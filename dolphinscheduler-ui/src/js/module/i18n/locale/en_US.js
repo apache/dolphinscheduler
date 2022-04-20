@@ -906,14 +906,13 @@ export default {
   'Create namespace': 'Create namespace',
   'Edit namespace': 'Edit namespace',
   'Namespace manage': 'K8s namespace manage',
-  'K8s Namespace': 'k8s Namespace',
+  'K8s Namespace': 'K8s Namespace',
   'Limits Cpu': 'Limit Cpu',
   'Limits Memory': 'Limit Memory',
-  'K8s Cluster': 'k8s',
+  'K8s Cluster': 'k8s Cluster',
   'Namespace Owner': 'Owner',
   'Please enter k8s cluster': 'Please enter k8s cluster',
   'Please enter namespace': 'Please enter namespace',
   'Please enter namespace tag': 'Please enter namespace tag can null',
-  'Please enter owner': 'Please enter owner can null',
-  'K8s Tag': 'tag'
+  'Please enter owner': 'Please enter owner can null'
 }

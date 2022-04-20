@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.K8sNameSpaceService;
+import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,15 +29,20 @@ import org.apache.dolphinscheduler.service.k8s.K8sClientService;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -45,9 +50,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * k8s namespace service impl
  */
 @Service
-public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameSpaceService {
+public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNamespaceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(K8sNameSpaceServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8SNamespaceServiceImpl.class);
 
     private static String resourceYaml = "apiVersion: v1\n"
         + "kind: ResourceQuota\n"
@@ -100,14 +105,12 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * @param loginUser    login user
      * @param namespace    namespace
      * @param k8s          k8s not null
-     * @param owner        owner can null
-     * @param tag          can null,if set means just used for one type job,such as flink,spark
      * @param limitsCpu    limits cpu, can null means not limit
      * @param limitsMemory limits memory, can null means not limit
      * @return
      */
     @Override
-    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, String owner, String tag, Double limitsCpu, Integer limitsMemory) {
+    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, Double limitsCpu, Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -143,8 +146,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
 
         k8sNamespaceObj.setNamespace(namespace);
         k8sNamespaceObj.setK8s(k8s);
-        k8sNamespaceObj.setOwner(owner);
-        k8sNamespaceObj.setTag(tag);
+        k8sNamespaceObj.setUserId(loginUser.getId());
         k8sNamespaceObj.setLimitsCpu(limitsCpu);
         k8sNamespaceObj.setLimitsMemory(limitsMemory);
         k8sNamespaceObj.setOnlineJobNum(0);
@@ -154,13 +156,15 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
         k8sNamespaceObj.setCreateTime(now);
         k8sNamespaceObj.setUpdateTime(now);
 
-        try {
-            String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
-            k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
-        } catch (Exception e) {
-            logger.error("namespace create to k8s error", e);
-            putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
-            return result;
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER.equals(k8sNamespaceObj.getK8s())) {
+            try {
+                String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
+                k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
+            } catch (Exception e) {
+                logger.error("namespace create to k8s error", e);
+                putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
+                return result;
+            }
         }
 
         k8sNamespaceMapper.insert(k8sNamespaceObj);
@@ -173,14 +177,13 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * update K8s Namespace tag and resource limit
      *
      * @param loginUser    login user
-     * @param owner        owner
-     * @param tag          Which type of job is available,such as flink,means only flink job can use, can be empty, all available
+     * @param userName     owner
      * @param limitsCpu    max cpu
      * @param limitsMemory max memory
      * @return
      */
     @Override
-    public Map<String, Object> updateK8sNamespace(User loginUser, int id, String owner, String tag, Double limitsCpu, Integer limitsMemory) {
+    public Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu, Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -203,18 +206,19 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
         }
 
         Date now = new Date();
-        k8sNamespaceObj.setTag(tag);
         k8sNamespaceObj.setLimitsCpu(limitsCpu);
         k8sNamespaceObj.setLimitsMemory(limitsMemory);
         k8sNamespaceObj.setUpdateTime(now);
-        k8sNamespaceObj.setOwner(owner);
-        try {
-            String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
-            k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
-        } catch (Exception e) {
-            logger.error("namespace update to k8s error", e);
-            putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
-            return result;
+
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER.equals(k8sNamespaceObj.getK8s())) {
+            try {
+                String yamlStr = genDefaultResourceYaml(k8sNamespaceObj);
+                k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj, yamlStr);
+            } catch (Exception e) {
+                logger.error("namespace update to k8s error", e);
+                putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
+                return result;
+            }
         }
         // update to db
         k8sNamespaceMapper.updateById(k8sNamespaceObj);
@@ -271,8 +275,9 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
             putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
             return result;
         }
-
-        k8sClientService.deleteNamespaceToK8s(k8sNamespaceObj.getNamespace(), k8sNamespaceObj.getK8s());
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER.equals(k8sNamespaceObj.getK8s())) {
+            k8sClientService.deleteNamespaceToK8s(k8sNamespaceObj.getNamespace(), k8sNamespaceObj.getK8s());
+        }
         k8sNamespaceMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -323,4 +328,96 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
         }
         return result;
     }
+
+
+    /**
+     * query unauthorized namespace
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return the namespaces which user have not permission to see
+     */
+    @Override
+    public Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        // query all namespace list,this auth does not like project
+        List<K8sNamespace> namespaceList = k8sNamespaceMapper.selectList(null);
+        List<K8sNamespace> resultList = new ArrayList<>();
+        Set<K8sNamespace> namespaceSet;
+        if (namespaceList != null && !namespaceList.isEmpty()) {
+            namespaceSet = new HashSet<>(namespaceList);
+            List<K8sNamespace> authedProjectList = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+            resultList = getUnauthorizedNamespaces(namespaceSet, authedProjectList);
+        }
+        result.put(Constants.DATA_LIST, resultList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query authorized namespace
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return namespaces which the user have permission to see
+     */
+    @Override
+    public Map<String, Object> queryAuthorizedNamespace(User loginUser, Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
+            return result;
+        }
+
+        List<K8sNamespace> namespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+        result.put(Constants.DATA_LIST, namespaces);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * query namespace can use
+     *
+     * @param loginUser login user
+     * @return namespace list
+     */
+    @Override
+    public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
+        if (isAdmin(loginUser)) {
+            return k8sNamespaceMapper.selectList(null);
+        } else {
+            return k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
+        }
+    }
+
+    /**
+     * get unauthorized namespace
+     *
+     * @param namespaceSet        namespace set
+     * @param authedNamespaceList authed namespace list
+     * @return namespace list that authorization
+     */
+    private List<K8sNamespace> getUnauthorizedNamespaces(Set<K8sNamespace> namespaceSet, List<K8sNamespace> authedNamespaceList) {
+        List<K8sNamespace> resultList = new ArrayList<>();
+        for (K8sNamespace k8sNamespace : namespaceSet) {
+            boolean existAuth = false;
+            if (authedNamespaceList != null && !authedNamespaceList.isEmpty()) {
+                for (K8sNamespace k8sNamespaceAuth : authedNamespaceList) {
+                    if (k8sNamespace.equals(k8sNamespaceAuth)) {
+                        existAuth = true;
+                    }
+                }
+            }
+
+            if (!existAuth) {
+                resultList.add(k8sNamespace);
+            }
+        }
+        return resultList;
+    }
+
 }

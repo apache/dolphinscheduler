@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -46,6 +47,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
@@ -116,6 +118,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
+
+    @Autowired
+    private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
     /**
      * create user, only system admin have permission
@@ -797,6 +802,54 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         return result;
     }
+
+
+    /**
+     * grant namespace
+     *
+     * @param loginUser    login user
+     * @param userId       user id
+     * @param namespaceIds namespace id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        //only admin can operate
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+
+        //check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        k8sNamespaceUserMapper.deleteNamespaceRelation(0, userId);
+        if (StringUtils.isNotEmpty(namespaceIds)) {
+            String[] namespaceIdArr = namespaceIds.split(",");
+            for (String namespaceId : namespaceIdArr) {
+                Date now = new Date();
+                K8sNamespaceUser namespaceUser = new K8sNamespaceUser();
+                namespaceUser.setUserId(userId);
+                namespaceUser.setNamespaceId(Integer.parseInt(namespaceId));
+                namespaceUser.setPerm(7);
+                namespaceUser.setCreateTime(now);
+                namespaceUser.setUpdateTime(now);
+                k8sNamespaceUserMapper.insert(namespaceUser);
+            }
+        }
+
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
 
     /**
      * grant datasource

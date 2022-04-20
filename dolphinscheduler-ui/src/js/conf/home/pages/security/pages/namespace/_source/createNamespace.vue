@@ -48,18 +48,6 @@
             </el-input>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name">{{$t('K8s Tag')}}</template>
-          <template slot="content">
-            <el-input
-              type="input"
-              v-model="tag"
-              maxlength="60"
-              size="mini"
-              :placeholder="$t('Please enter k8s cluster')">
-            </el-input>
-          </template>
-        </m-list-box-f>
 
         <m-list-box-f>
           <template slot="name">{{$t('Limits Cpu')}}</template>
@@ -90,7 +78,7 @@
           <template slot="content">
             <el-input
               type="input"
-              v-model="owner"
+              v-model="userName"
               maxlength="60"
               size="mini"
               :placeholder="$t('Please enter owner')">
@@ -116,8 +104,7 @@
         store,
         namespace: '',
         k8s: '',
-        owner: '',
-        tag: '',
+        userName: '',
         limitsCpu: '',
         limitsMemory: ''
       }
@@ -134,8 +121,7 @@
         let param = {
           namespace: _.trim(this.namespace),
           k8s: _.trim(this.k8s),
-          owner: _.trim(this.owner),
-          tag: _.trim(this.tag),
+          userName: _.trim(this.userName),
           limitsCpu: _.trim(this.limitsCpu),
           limitsMemory: _.trim(this.limitsMemory)
         }
@@ -205,8 +191,7 @@
       if (this.item) {
         this.namespace = this.item.namespace
         this.k8s = this.item.k8s
-        this.owner = this.item.owner
-        this.tag = this.item.tag
+        this.userName = this.item.userName
         this.limitsCpu = this.item.limitsCpu
         this.limitsMemory = this.item.limitsMemory
       }

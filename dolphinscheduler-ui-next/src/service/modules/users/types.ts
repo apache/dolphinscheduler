@@ -66,6 +66,10 @@ interface GrantUDFReq {
   udfIds: string
 }
 
+interface GrantNamespaceReq {
+  namespaceIds: string
+}
+
 interface ListAllReq extends UserReq {
   alertGroup?: string
   createTime?: string
@@ -127,6 +131,7 @@ export {
   GrantProject,
   ProjectCodeReq,
   GrantUDFReq,
+  GrantNamespaceReq,
   ListAllReq,
   ListReq,
   RegisterUserReq,

@@ -30,10 +30,15 @@ import {
   unAuthUDFFunc
 } from '@/service/modules/resources'
 import {
+  authNamespaceFunc,
+  unAuthNamespaceFunc
+} from '@/service/modules/k8s-namespace'
+import {
   grantProject,
   grantResource,
   grantDataSource,
-  grantUDFFunc
+  grantUDFFunc,
+  grantNamespaceFunc
 } from '@/service/modules/users'
 import { removeUselessChildren } from '@/utils/tree-format'
 import type { TAuthType, IResourceOption, IOption } from '../types'
@@ -48,6 +53,8 @@ export function useAuthorize() {
     unauthorizedDatasources: [] as IOption[],
     authorizedUdfs: [] as number[],
     unauthorizedUdfs: [] as IOption[],
+    authorizedNamespaces: [] as number[],
+    unauthorizedNamespaces: [] as IOption[],
     resourceType: 'file',
     fileResources: [] as IResourceOption[],
     udfResources: [] as IResourceOption[],
@@ -139,6 +146,25 @@ export function useAuthorize() {
     state.authorizedUdfResources = udfTargets
   }
 
+  const getNamespaces = async (userId: number) => {
+    if (state.loading) return
+    state.loading = true
+    const namespaces = await Promise.all([
+      authNamespaceFunc({ userId }),
+      unAuthNamespaceFunc({ userId })
+    ])
+    state.loading = false
+    state.authorizedNamespaces = namespaces[0].map(
+      (item: { id: number }) => item.id
+    )
+    state.unauthorizedNamespaces = [...namespaces[0], ...namespaces[1]].map(
+      (item: { namespace: string; id: number }) => ({
+        label: item.namespace,
+        value: item.id
+      })
+    )
+  }
+
   const onInit = (type: TAuthType, userId: number) => {
     if (type === 'authorize_project') {
       getProjects(userId)
@@ -151,6 +177,9 @@ export function useAuthorize() {
     }
     if (type === 'authorize_resource') {
       getResources(userId)
+    }
+    if (type === 'authorize_namespace') {
+      getNamespaces(userId)
     }
   }
 
@@ -240,6 +269,12 @@ export function useAuthorize() {
       await grantResource({
         userId,
         resourceIds: allPathId.join(',')
+      })
+    }
+    if (type === 'authorize_namespace') {
+      await grantNamespaceFunc({
+        userId,
+        namespaceIds: state.authorizedNamespaces.join(',')
       })
     }
     state.saving = false

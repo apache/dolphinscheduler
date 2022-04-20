@@ -17,6 +17,7 @@
 
 import { axios } from '@/service/service'
 import { ListReq, K8SReq } from './types'
+import { UserIdReq } from '@/service/modules/resources/types'
 
 export function queryNamespaceListPaging(params: ListReq): any {
   return axios({
@@ -58,5 +59,21 @@ export function delNamespaceById(id: number): any {
     url: '/k8s-namespace/delete',
     method: 'post',
     params: { id }
+  })
+}
+
+export function authNamespaceFunc(params: UserIdReq): any {
+  return axios({
+    url: '/k8s-namespace/authed-namespace',
+    method: 'get',
+    params
+  })
+}
+
+export function unAuthNamespaceFunc(params: UserIdReq): any {
+  return axios({
+    url: '/k8s-namespace/unauth-namespace',
+    method: 'get',
+    params
   })
 }
