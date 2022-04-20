@@ -172,6 +172,7 @@ export function useTable() {
                     h(
                       NButton,
                       {
+                        tag: 'div',
                         circle: true,
                         type: 'info',
                         size: 'small',
