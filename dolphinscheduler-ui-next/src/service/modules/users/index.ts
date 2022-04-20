@@ -123,7 +123,7 @@ export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
 
 export function grantNamespaceFunc(data: GrantNamespaceReq & UserIdReq) {
   return axios({
-    url: '/users/grant-udf-func',
+    url: '/users/grant-namespace',
     method: 'post',
     data
   })

@@ -137,7 +137,8 @@ export function useColumns(onCallback: Function) {
                       label: t('security.user.datasource'),
                       key: 'authorize_datasource'
                     },
-                    { label: t('security.user.udf'), key: 'authorize_udf' }
+                    { label: t('security.user.udf'), key: 'authorize_udf' },
+                    { label: t('security.user.namespace'), key: 'authorize_namespace' }
                   ],
                   onSelect: (key) =>
                     void onCallback({ rowData, key }, 'authorize')
