@@ -620,6 +620,7 @@ const project = {
     view_log: '查看日志',
     enter_this_child_node: '进入该子节点',
     name: '节点名称',
+    task_name: '任务名称',
     name_tips: '请输入名称(必填)',
     task_type: '任务类型',
     task_type_tips: '请选择任务类型(必选)',
