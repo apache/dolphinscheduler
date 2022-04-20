@@ -137,9 +137,11 @@ public class ProjectControllerTest {
 
     @Test
     public void testQueryAllProjectList() {
+        User user = new User();
+        user.setId(0);
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
-        Mockito.when(projectService.queryAllProjectList()).thenReturn(result);
+        Mockito.when(projectService.queryAllProjectList(user)).thenReturn(result);
         Result response = projectController.queryAllProjectList(user);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }

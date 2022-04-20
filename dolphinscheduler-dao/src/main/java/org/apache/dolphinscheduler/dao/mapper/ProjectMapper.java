@@ -123,7 +123,8 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query all project
+     * @param userId
      * @return projectList
      */
-    List<Project> queryAllProject();
+    List<Project> queryAllProject(@Param("userId") int userId);
 }

@@ -287,7 +287,7 @@ public class ProjectController extends BaseController {
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = projectService.queryAllProjectList();
+        Map<String, Object> result = projectService.queryAllProjectList(loginUser);
         return returnDataList(result);
     }
 }
