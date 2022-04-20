@@ -32,7 +32,8 @@ export const useTaskNodeStore = defineStore({
     postTaskOptions: [],
     preTasks: [],
     resources: [],
-    mainJars: {}
+    mainJars: {},
+    name: ''
   }),
   persist: true,
   getters: {
@@ -50,6 +51,9 @@ export const useTaskNodeStore = defineStore({
     },
     getMainJar(state) {
       return (type: ProgramType): IMainJar[] | undefined => state.mainJars[type]
+    },
+    getName(): string {
+      return this.name
     }
   },
   actions: {
@@ -116,12 +120,16 @@ export const useTaskNodeStore = defineStore({
     updateMainJar(type: ProgramType, mainJar: IMainJar[]) {
       this.mainJars[type] = mainJar
     },
+    updateName(name: string) {
+      this.name = name
+    },
     init() {
       this.preTaskOptions = []
       this.postTaskOptions = []
       this.preTasks = []
       this.resources = []
       this.mainJars = {}
+      this.name = ''
     }
   }
 })
