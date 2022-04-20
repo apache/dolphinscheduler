@@ -30,7 +30,7 @@ export function useUdfs(model: { [field: string]: any }): IJsonItem {
     loading.value = true
     const res = await queryUdfFuncList({ type: model.type })
     options.value = res.map((udf: { id: number; funcName: string }) => ({
-      value: udf.id,
+      value: String(udf.id),
       label: udf.funcName
     }))
     loading.value = false
