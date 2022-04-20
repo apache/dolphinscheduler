@@ -125,6 +125,16 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode, @Param("preTaskCodes") Long[] preTaskCodes);
 
     /**
+     * query process task relation by process definition code
+     *
+     * @param processDefinitionCode process definition code
+     * @param processDefinitionVersion process definition version
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryProcessTaskRelationsByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode,
+                                                                               @Param("processDefinitionVersion") Integer processDefinitionVersion);
+
+    /**
      * count upstream by codes
      *
      * @param projectCode projectCode
