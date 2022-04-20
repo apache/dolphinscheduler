@@ -26,8 +26,7 @@ for workerGroup in ${workersGroup[@]}
 do
   echo $workerGroup;
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupName)
+  workerNames+=($worker)
 done
 
 mastersHost=(${masters//,/ })
@@ -38,7 +37,7 @@ do
 
 done
 
-for worker in ${!workersGroupMap[*]}
+for worker in ${workerNames[@]}
 do
   echo "$worker worker server is starting"
 
