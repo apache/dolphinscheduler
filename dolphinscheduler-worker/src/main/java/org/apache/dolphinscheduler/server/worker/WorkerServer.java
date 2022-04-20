@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.verify.WorkerServerStartVerify;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
@@ -122,6 +123,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private LoggerRequestProcessor loggerRequestProcessor;
 
+    @Autowired
+    private WorkerServerStartVerify workerServerStartVerify;
+
     /**
      * worker server startup, not use web service
      *
@@ -137,6 +141,14 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run() {
+        // check before run
+        try{
+            this.workerServerStartVerify.verify();
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
