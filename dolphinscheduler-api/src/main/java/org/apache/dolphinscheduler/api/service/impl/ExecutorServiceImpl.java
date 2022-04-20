@@ -68,6 +68,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import javax.annotation.PostConstruct;
+
 /**
  * executor service impl
  */
@@ -248,6 +250,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskDefinitions.stream()
                 .filter(task -> TaskConstants.TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(task.getTaskType()))
                 .forEach(taskDefinition -> processDefinitionCodeSet.add(Long.valueOf(JSONUtils.getNodeString(taskDefinition.getTaskParams(), Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE))));
+        if (processDefinitionCodeSet.isEmpty()){
+            return true;
+        }
 
         // check sub releaseState
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryByCodes(processDefinitionCodeSet);
