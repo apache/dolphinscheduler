@@ -36,6 +36,7 @@ interface TaskNodeState {
   preTasks: number[]
   resources: IResource[]
   mainJars: { [key in ProgramType]?: IMainJar[] }
+  name: string
 }
 export {
   TaskNodeState,
