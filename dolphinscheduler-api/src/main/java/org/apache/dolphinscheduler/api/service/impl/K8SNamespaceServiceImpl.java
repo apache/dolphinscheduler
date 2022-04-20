@@ -275,8 +275,9 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
             return result;
         }
-
-        k8sClientService.deleteNamespaceToK8s(k8sNamespaceObj.getNamespace(), k8sNamespaceObj.getK8s());
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER.equals(k8sNamespaceObj.getK8s())) {
+            k8sClientService.deleteNamespaceToK8s(k8sNamespaceObj.getNamespace(), k8sNamespaceObj.getK8s());
+        }
         k8sNamespaceMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;

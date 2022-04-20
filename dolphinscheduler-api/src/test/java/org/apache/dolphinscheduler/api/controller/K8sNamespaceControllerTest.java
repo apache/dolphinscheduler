@@ -141,7 +141,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void delNamespaceById() throws Exception {
+    public void deleteNamespaceById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "1");
 
@@ -153,7 +153,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.DELETE_K8S_NAMESPACE_BY_ID_ERROR.getCode(), result.getCode().intValue());//there is no k8s cluster in test env
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());//there is no k8s cluster in test env
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
