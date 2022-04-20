@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
@@ -500,13 +501,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project list
-     *
+     * @param user
      * @return project list
      */
     @Override
-    public Map<String, Object> queryAllProjectList() {
+    public Map<String, Object> queryAllProjectList(User user) {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.queryAllProject();
+        List<Project> projects = projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
