@@ -22,7 +22,7 @@ If you don't care about its internal design, but simply want to know how to deve
 
 * dolphinscheduler-alert-plugins
 
-  This module is currently a plug-in provided by us, and now we have supported ten plug-ins, such as Email, DingTalk, Script, etc.
+  This module is currently a plug-in provided by us, and now we have supported dozens of plug-ins, such as Email, DingTalk, Script, etc.
 
 
 #### Alert SPI Main class information.
