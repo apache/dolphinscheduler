@@ -18,13 +18,13 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
-export function useName(): IJsonItem {
+export function useName(from?: number): IJsonItem {
   const { t } = useI18n()
   return {
     type: 'input',
     field: 'name',
     class: 'input-node-name',
-    name: t('project.node.name'),
+    name: from === 1 ? t('project.node.task_name') : t('project.node.name'),
     props: {
       placeholder: t('project.node.name_tips'),
       maxLength: 100

@@ -81,7 +81,7 @@ export function useSqoop({
 
   return {
     json: [
-      Fields.useName(),
+      Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
       Fields.useDescription(),

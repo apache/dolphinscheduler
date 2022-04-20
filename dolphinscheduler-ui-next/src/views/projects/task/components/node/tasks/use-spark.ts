@@ -69,7 +69,7 @@ export function useSpark({
 
   return {
     json: [
-      Fields.useName(),
+      Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
       Fields.useDescription(),
