@@ -283,7 +283,7 @@ public class DagHelperTest {
      * process:
      * 1->2->3->5->7
      * 4->3->6
-     * 2->8->5->7
+     * 1->2->8->5->7
      * DAG graph:
      *    8->5->7
      *    ↑  ↑
