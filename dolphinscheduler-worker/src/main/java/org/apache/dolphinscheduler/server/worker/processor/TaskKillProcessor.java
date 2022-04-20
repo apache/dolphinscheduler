@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -124,9 +123,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @return kill result
      */
     private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
-        boolean processFlag = true;
         // kill system process
-        killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
+        boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
         // find log and kill yarn job
         Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
                 taskExecutionContext.getLogPath(),
@@ -163,9 +161,10 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @param tenantCode
      * @param processId
      */
-    protected void killProcess(String tenantCode, Integer processId) {
+    protected boolean killProcess(String tenantCode, Integer processId) {
+        boolean processFlag = true;
         if (processId == null || processId.equals(0)) {
-            return;
+            return true;
         }
         try {
             String pidsStr = ProcessUtils.getPidsStr(processId);
@@ -176,8 +175,10 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 OSUtils.exeCmd(cmd);
             }
         } catch (Exception e) {
+            processFlag = false;
             logger.error("kill task error", e);
         }
+        return processFlag;
     }
 
     /**
