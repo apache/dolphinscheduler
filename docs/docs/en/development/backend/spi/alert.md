@@ -22,7 +22,7 @@ If you don't care about its internal design, but simply want to know how to deve
 
 * dolphinscheduler-alert-plugins
 
-  This module is currently a plug-in provided by us, such as Email, DingTalk, Script, etc.
+  This module is currently a plug-in provided by us, and now we have supported dozens of plug-ins, such as Email, DingTalk, Script, etc.
 
 
 #### Alert SPI Main class information.
@@ -59,6 +59,8 @@ The specific design of alert_spi can be seen in the issue: [Alert Plugin Design]
 * DingTalk
 
      Alert for DingTalk group chat bots
+  
+     Related parameter configuration can refer to the DingTalk robot document.
 
 * EnterpriseWeChat
 
@@ -73,3 +75,27 @@ The specific design of alert_spi can be seen in the issue: [Alert Plugin Design]
 * SMS
 
      SMS alerts
+* FeiShu
+
+  FeiShu alert notification
+* Slack
+
+  Slack alert notification
+* PagerDuty
+
+  PagerDuty alert notification
+* WebexTeams
+
+  WebexTeams alert notification
+
+  Related parameter configuration can refer to the WebexTeams document.
+
+* Telegram
+
+  Telegram alert notification
+  
+  Related parameter configuration can refer to the Telegram document.
+
+* Http
+
+  We have implemented a Http script for alerting. And calling most of the alerting plug-ins end up being Http requests, if we not support your alert plug-in yet, you can use Http to realize your alert login. Also welcome to contribute your common plug-ins to the community :)

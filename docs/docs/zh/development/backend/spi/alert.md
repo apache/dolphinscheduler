@@ -22,7 +22,7 @@ DolphinScheduler 正在处于微内核 + 插件化的架构更改之中，所有
 
 * dolphinscheduler-alert-plugins
 
-  该模块是目前我们提供的插件，如 Email、DingTalk、Script等。
+  该模块是目前我们提供的插件，目前我们已经支持数十种插件，如 Email、DingTalk、Script等。
 
 
 #### Alert SPI 主要类信息：
@@ -61,6 +61,7 @@ alert_spi 具体设计可见 issue：[Alert Plugin Design](https://github.com/ap
 
   钉钉群聊机器人告警
 
+  相关参数配置可以参考钉钉机器人文档。
 * EnterpriseWeChat
 
   企业微信告警通知
@@ -69,3 +70,24 @@ alert_spi 具体设计可见 issue：[Alert Plugin Design](https://github.com/ap
 * Script
 
   我们实现了 Shell 脚本告警，我们会将相关告警参数透传给脚本，你可以在 Shell 中实现你的相关告警逻辑，如果你需要对接内部告警应用，这是一种不错的方法。
+* FeiShu
+
+  飞书告警通知
+* Slack
+
+  Slack告警通知
+* PagerDuty
+
+  PagerDuty告警通知
+* WebexTeams
+
+  WebexTeams告警通知
+  相关参数配置可以参考WebexTeams文档。
+* Telegram
+
+  Telegram告警通知
+  相关参数配置可以参考Telegram文档。
+* Http
+
+  我们实现了Http告警，调用大部分的告警插件最终都是Http请求，如果我们没有支持你常用插件，可以使用Http来实现你的告警需求，同时也欢迎将你常用插件贡献到社区。
+
