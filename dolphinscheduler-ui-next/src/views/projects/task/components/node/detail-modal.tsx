@@ -119,11 +119,13 @@ const NodeDetailModal = defineComponent({
           text: t('project.node.instructions'),
           show: !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
           action: () => {
+            let linkedTaskType = taskType?.toLowerCase().replace('_', '-')
+            if (taskType === 'PROCEDURE') linkedTaskType = 'stored-procedure'
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
               locale.value.toLowerCase().replace('_', '-') +
               '/docs/latest/user_doc/guide/task/' +
-              taskType?.toLowerCase().replace('_', '-') +
+              linkedTaskType +
               '.html'
             window.open(helpUrl)
           },

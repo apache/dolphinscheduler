@@ -42,8 +42,7 @@ export const TASK_TYPES_MAP = {
     alias: 'SUB_PROCESS'
   },
   PROCEDURE: {
-    alias: 'PROCEDURE',
-    helperLinkDisable: true
+    alias: 'PROCEDURE'
   },
   SQL: {
     alias: 'SQL'
