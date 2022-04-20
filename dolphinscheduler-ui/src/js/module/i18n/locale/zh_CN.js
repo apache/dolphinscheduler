@@ -914,6 +914,5 @@ export default {
   'Please enter k8s cluster': '请输入k8s集群值',
   'Please enter namespace': '请输入命名空间',
   'Please enter namespace tag': '请输入命名空间标签可空',
-  'Please enter owner': '请输入owner可空',
-  'K8s Tag': '标签'
+  'Please enter owner': '请输入owner可空'
 }

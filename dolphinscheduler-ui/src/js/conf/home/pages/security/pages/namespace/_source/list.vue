@@ -21,8 +21,6 @@
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="namespace" :label="$t('K8s Namespace')"></el-table-column>
         <el-table-column prop="k8s" :label="$t('K8s Cluster')"></el-table-column>
-        <el-table-column prop="owner" :label="$t('Namespace Owner')"></el-table-column>
-        <el-table-column prop="tag" :label="$t('K8s Tag')"></el-table-column>
         <el-table-column prop="limitsCpu" :label="$t('Limits Cpu')"></el-table-column>
         <el-table-column prop="limitsMemory" :label="$t('Limits Memory')"></el-table-column>
 
