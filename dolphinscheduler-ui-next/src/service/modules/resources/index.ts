@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-import { axios, downloadFile } from '@/service/service'
+import { axios } from '@/service/service'
+import utils from '@/utils'
 import {
   ResourceTypeReq,
   NameReq,
@@ -211,7 +212,7 @@ export function deleteResource(id: number): any {
 }
 
 export function downloadResource(id: number): void {
-  downloadFile(`resources/${id}/download`)
+  utils.downloadFile(`resources/${id}/download`)
 }
 
 export function viewUIUdfFunction(id: IdReq): any {
