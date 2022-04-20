@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.worker;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.exception.BaseException;
+import org.apache.dolphinscheduler.common.exception.ServerRunVerifyException;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
@@ -142,12 +144,7 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         // check before run
-        try{
-            this.workerServerStartVerify.verify();
-        }catch (Exception e){
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
+        this.workerServerStartVerify.verify();
 
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();

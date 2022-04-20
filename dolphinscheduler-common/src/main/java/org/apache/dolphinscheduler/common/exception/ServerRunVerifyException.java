@@ -15,31 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.verify;
-
-import org.apache.dolphinscheduler.common.exception.ServerRunVerifyException;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
-
+package org.apache.dolphinscheduler.common.exception;
 
 /**
- * Server start verify
+ * ServerRunVerifyException
  */
-@RunWith(PowerMockRunner.class)
-public class WorkerServerStartVerifyTest {
+public class ServerRunVerifyException extends RuntimeException {
 
-    @Test
-    public void verifyTest() {
-        WorkerServerStartVerify workerServerStartVerify = PowerMockito.mock(WorkerServerStartVerify.class);
-        Assert.assertNotNull(workerServerStartVerify);
+    public ServerRunVerifyException() {
+    }
 
-        try{
-            workerServerStartVerify.verify();
-        }catch (ServerRunVerifyException e){
-            Assert.assertNotNull(e);
-        }
+    public ServerRunVerifyException(String message) {
+        super(message);
+    }
+
+    public ServerRunVerifyException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ServerRunVerifyException(Throwable cause) {
+        super(cause);
+    }
+
+    public ServerRunVerifyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
