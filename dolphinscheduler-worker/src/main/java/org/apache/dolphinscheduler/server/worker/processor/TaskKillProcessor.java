@@ -142,10 +142,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     protected void cancelApplication(int taskInstanceId) {
         TaskExecuteThread taskExecuteThread = workerManager.getTaskExecuteThread(taskInstanceId);
         if (taskExecuteThread == null) {
+            logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
         AbstractTask task = taskExecuteThread.getTask();
         if (task == null) {
+            logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
         try {
