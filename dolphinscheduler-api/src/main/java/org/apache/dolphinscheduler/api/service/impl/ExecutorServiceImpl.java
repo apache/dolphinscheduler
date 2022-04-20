@@ -68,8 +68,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import javax.annotation.PostConstruct;
-
 /**
  * executor service impl
  */
