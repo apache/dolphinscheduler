@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.verify;
 
-import org.apache.dolphinscheduler.common.exception.ServerRunVerifyException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,9 +38,9 @@ public class WorkerServerStartVerify {
     /**
      * verify
      */
-    public void verify() throws ServerRunVerifyException {
+    public void verify() {
         if(Objects.isNull(storageOperate)){
-            throw new ServerRunVerifyException("Worker startup verifies that StorageOperate is empty!");
+            throw new RuntimeException("Worker startup verifies that StorageOperate is empty!");
         }
     }
 }

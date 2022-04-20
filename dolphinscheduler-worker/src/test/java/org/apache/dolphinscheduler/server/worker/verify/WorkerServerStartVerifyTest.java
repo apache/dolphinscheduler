@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.verify;
 
-import org.apache.dolphinscheduler.common.exception.ServerRunVerifyException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,10 +35,6 @@ public class WorkerServerStartVerifyTest {
         WorkerServerStartVerify workerServerStartVerify = PowerMockito.mock(WorkerServerStartVerify.class);
         Assert.assertNotNull(workerServerStartVerify);
 
-        try{
-            workerServerStartVerify.verify();
-        }catch (ServerRunVerifyException e){
-            Assert.assertNotNull(e);
-        }
+        workerServerStartVerify.verify();
     }
 }
