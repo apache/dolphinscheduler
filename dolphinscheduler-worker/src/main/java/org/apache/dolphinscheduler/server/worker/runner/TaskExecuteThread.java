@@ -328,6 +328,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
         return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
     }
 
+    public AbstractTask getTask() {
+        return task;
+    }
+
     private void preBuildBusinessParams() {
         Map<String, Property> paramsMap = new HashMap<>();
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
