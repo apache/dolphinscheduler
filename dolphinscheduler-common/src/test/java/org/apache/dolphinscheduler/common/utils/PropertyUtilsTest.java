@@ -35,9 +35,4 @@ public class PropertyUtilsTest {
     public void getResUploadStartupState(){
         Assert.assertFalse(PropertyUtils.getResUploadStartupState());
     }
-
-    @Test
-    public void getDouble(){
-        PropertyUtils.getDouble("Test", 0.1);
-    }
 }
