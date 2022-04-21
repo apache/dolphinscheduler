@@ -56,7 +56,9 @@ The goal of the null value check is to check the number of empty rows in the spe
     SELECT COUNT(*) AS miss FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '') AND (${src_filter})
     ```
 - The SQL to calculate the total number of rows in the table is as follows:
-    - SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})
+     ```sql
+     SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})
+     ```
 ### 2.1.2 UI Guide
 ![dataquality_null_check](/img/tasks/demo/null_check.png)
 - Src data type: select MySQL, PostgreSQL, etc.
