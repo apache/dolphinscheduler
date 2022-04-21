@@ -52,7 +52,9 @@ Assuming that the actual value is 10, the operator is >, and the expected value 
 ### 2.1.1 Introduction
 The goal of the null value check is to check the number of empty rows in the specified column. The number of empty rows can be compared with the total number of rows or a specified threshold. If it is greater than a certain threshold, it will be judged as failure.
 - Calculate the SQL statement that the specified column is empty as follows:
-    - SELECT COUNT(*) AS miss FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '') AND (${src_filter})
+    ```sql
+    SELECT COUNT(*) AS miss FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '') AND (${src_filter})
+    ```
 - The SQL to calculate the total number of rows in the table is as follows:
     - SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})
 ### 2.1.2 UI Guide
