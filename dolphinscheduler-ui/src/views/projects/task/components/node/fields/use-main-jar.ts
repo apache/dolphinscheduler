@@ -66,7 +66,11 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     type: 'tree-select',
     field: 'mainJar',
     name: t('project.node.main_package'),
+<<<<<<< HEAD
     span: mainJarSpan,
+=======
+    span: span,
+>>>>>>> 4d65bc7c46 ('[refactor]flinksql')
     props: {
       cascade: true,
       showPath: true,
