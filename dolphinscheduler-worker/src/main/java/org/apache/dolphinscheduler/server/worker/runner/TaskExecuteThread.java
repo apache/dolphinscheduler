@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
@@ -139,7 +140,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskCallbackService.sendTaskExecuteRunningCommand(taskExecutionContext);
 
             // copy hdfs/minio file to local
-            downloadResource(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources(), logger);
+            List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources());
+            if (!fileDownloads.isEmpty()){
+                downloadResource(taskExecutionContext.getExecutePath(), logger, fileDownloads);
+            }
 
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
             taskExecutionContext.setDefinedParams(getGlobalParamsMap());
@@ -269,37 +273,49 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * download resource file
      *
      * @param execLocalPath execLocalPath
-     * @param projectRes projectRes
+     * @param fileDownloads projectRes
      * @param logger logger
      */
-    private void downloadResource(String execLocalPath, Map<String, String> projectRes, Logger logger) {
-        if (!PropertyUtils.getResUploadStartupState()){
-            throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
-        }
-        if (MapUtils.isEmpty(projectRes)) {
-            return;
-        }
-
-        Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
-
-        for (Map.Entry<String, String> resource : resEntries) {
-            String fullName = resource.getKey();
-            String tenantCode = resource.getValue();
-            File resFile = new File(execLocalPath, fullName);
-            if (!resFile.exists()) {
-                try {
-                    // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
-                    logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    throw new ServiceException(e.getMessage());
-                }
-            } else {
-                logger.info("file : {} exists ", resFile.getName());
+    private void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
+        for (Pair<String, String> fileDownload : fileDownloads) {
+            try {
+                // query the tenant code of the resource according to the name of the resource
+                String fullName = fileDownload.getLeft();
+                String tenantCode = fileDownload.getRight();
+                String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
+                logger.info("get resource file from hdfs :{}", resHdfsPath);
+                storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new ServiceException(e.getMessage());
             }
         }
+    }
+
+    /**
+     * download resource check
+     * @param execLocalPath
+     * @param projectRes
+     * @return
+     */
+    private List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes){
+        if (MapUtils.isEmpty(projectRes)) {
+            return Collections.emptyList();
+        }
+        List<Pair<String, String>> downloadFile = new ArrayList<>();
+        projectRes.forEach((key, value) -> {
+            File resFile = new File(execLocalPath, key);
+            boolean notExist = !resFile.exists();
+            if (notExist){
+                downloadFile.add(Pair.of(key, value));
+            } else{
+                logger.info("file : {} exists ", resFile.getName());
+            }
+        });
+        if (!downloadFile.isEmpty() && !PropertyUtils.getResUploadStartupState()){
+            throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
+        }
+        return downloadFile;
     }
 
     /**
