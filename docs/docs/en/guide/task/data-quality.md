@@ -10,7 +10,9 @@ Worker runs the data quality task. After the data quality task finishes running,
 `Worker` sends the task result to `Master`, after `Master` receives `TaskResponse`, it will judge whether the task type is `DataQualityTask`, if so, it will read the corresponding result from `t_ds_dq_execute_result` according to `taskInstanceId`, and then The result is judged according to the check mode, operator and threshold configured by the user. If the result is a failure, the corresponding operation, alarm or interruption will be performed according to the failure policy configured by the user.## 1.2 注意事项
 
 Add config : `<server-name>/conf/common.properties`
-> data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
+
+```properties
+data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 
 Please fill in `data-quality.jar.name` according to the actual package name,
 If you package `data-quality` separately, remember to modify the package name to be consistent with `data-quality.jar.name`.
