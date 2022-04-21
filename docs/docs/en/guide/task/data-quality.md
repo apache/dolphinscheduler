@@ -7,7 +7,7 @@ The data quality task is used to check the data accuracy during the integration 
 > The user defines the task in the interface, and the user input value is stored in `TaskParam`
 When running a task, `Master` will parse `TaskParam`, encapsulate the parameters required by `DataQualityTask` and send it to `Worker`.
 Worker runs the data quality task. After the data quality task finishes running, it writes the statistical results to the specified storage engine. The current data quality task result is stored in the `t_ds_dq_execute_result` table of `dolphinscheduler`
-`Worker` sends the task result to `Master`, after `Master` receives `TaskResponse`, it will judge whether the task type is `DataQualityTask`, if so, it will read the corresponding result from `t_ds_dq_execute_result` according to `taskInstanceId`, and then The result is judged according to the check mode, operator and threshold configured by the user. If the result is a failure, the corresponding operation, alarm or interruption will be performed according to the failure policy configured by the user.## 1.2 注意事项
+`Worker` sends the task result to `Master`, after `Master` receives `TaskResponse`, it will judge whether the task type is `DataQualityTask`, if so, it will read the corresponding result from `t_ds_dq_execute_result` according to `taskInstanceId`, and then The result is judged according to the check mode, operator and threshold configured by the user. If the result is a failure, the corresponding operation, alarm or interruption will be performed according to the failure policy configured by the user.
 
 Add config : `<server-name>/conf/common.properties`
 
