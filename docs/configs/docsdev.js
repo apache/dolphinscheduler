@@ -119,7 +119,7 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/dependent.html',
                             },
                             {
-                                title: 'Stored Procedure',
+                                title: 'PROCEDURE',
                                 link: '/en-us/docs/dev/user_doc/guide/task/stored-procedure.html',
                             },
                             {
@@ -441,7 +441,7 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dependent.html',
                             },
                             {
-                                title: 'Stored Procedure',
+                                title: 'PROCEDURE',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/stored-procedure.html',
                             },
                             {
