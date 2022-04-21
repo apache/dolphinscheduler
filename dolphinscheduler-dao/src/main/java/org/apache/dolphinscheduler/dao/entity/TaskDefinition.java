@@ -26,12 +26,12 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang.StringUtils;
-
+import org.apache.commons.collections4.CollectionUtils;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -309,9 +309,17 @@ public class TaskDefinition {
     public Map<String, String> getTaskParamMap() {
         if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
-            if (localParams != null) {
+
+            //If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
+            if (localParams != null && !localParams.isNull()) {
                 List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
-                taskParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+
+                if (CollectionUtils.isNotEmpty(propList)) {
+                    taskParamMap = new HashMap<>();
+                    for (Property property : propList) {
+                        taskParamMap.put(property.getProp(), property.getValue());
+                    }
+                }
             }
         }
         return taskParamMap;
