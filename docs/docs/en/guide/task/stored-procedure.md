@@ -30,13 +30,13 @@
 
 This sample is a common entry type in MySQL data sources, mainly for calling stored procedures in MySQL.
 
-![resource_upload](/img/tasks/demo/proceduce_task01.png)
+![resource_upload](/img/tasks/demo/procedure_task01.png)
 
 #### Configure MapReduce Nodes
 
 Configure the required content according to the parameter descriptions above.
 
-![demo-mr-simple](/img/tasks/demo/proceduce_task01.png)
+![demo-mr-simple](/img/tasks/demo/procedure_task01.png)
 
 - Node name: The node name in a workflow definition is unique.
 - Run flag: Identifies whether this node schedules normally, if it does not need to execute, select the `prohibition execution`.
