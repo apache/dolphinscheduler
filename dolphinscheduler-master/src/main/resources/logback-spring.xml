@@ -63,15 +63,6 @@
         </encoder>
     </appender>
 
-<!--    <root level="INFO">-->
-<!--        <if condition="${DOCKER:-false}">-->
-<!--            <then>-->
-<!--                <appender-ref ref="STDOUT"/>-->
-<!--            </then>-->
-<!--        </if>-->
-<!--        <appender-ref ref="TASKLOGFILE"/>-->
-<!--        <appender-ref ref="MASTERLOGFILE"/>-->
-<!--    </root>-->
     <root level="INFO">
         <if condition="${DOCKER:-false}">
             <then>
