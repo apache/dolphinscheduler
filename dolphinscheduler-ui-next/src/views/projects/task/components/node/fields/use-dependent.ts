@@ -18,10 +18,10 @@
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRelationCustomParams, useDependentTimeout } from '.'
-import { queryProjectCreatedAndAuthorizedByUser } from '@/service/modules/projects'
+import { queryAllProjectList } from '@/service/modules/projects'
 import {
-  queryAllByProjectCode,
-  getTasksByDefinitionCode
+  queryProcessDefinitionList,
+  getTasksByDefinitionList
 } from '@/service/modules/process-definition'
 import type { IJsonItem, IDependpendItem, IDependTask } from '../types'
 
@@ -161,7 +161,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   }
 
   const getProjectList = async () => {
-    const result = await queryProjectCreatedAndAuthorizedByUser()
+    const result = await queryAllProjectList()
     projectList.value = result.map((item: { code: number; name: string }) => ({
       value: item.code,
       label: item.name
@@ -172,13 +172,11 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     if (processCache[code]) {
       return processCache[code]
     }
-    const result = await queryAllByProjectCode(code)
-    const processList = result.map(
-      (item: { processDefinition: { code: number; name: string } }) => ({
-        value: item.processDefinition.code,
-        label: item.processDefinition.name
-      })
-    )
+    const result = await queryProcessDefinitionList(code)
+    const processList = result.map((item: { code: number; name: string }) => ({
+      value: item.code,
+      label: item.name
+    }))
     processCache[code] = processList
 
     return processList
@@ -188,7 +186,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     if (taskCache[processCode]) {
       return taskCache[processCode]
     }
-    const result = await getTasksByDefinitionCode(code, processCode)
+    const result = await getTasksByDefinitionList(code, processCode)
     const taskList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
       label: item.name
