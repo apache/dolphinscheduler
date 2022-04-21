@@ -42,10 +42,15 @@ spring:
   messages:
     basename: i18n/messages
   datasource:
+<<<<<<< HEAD
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+=======
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+>>>>>>> 177addd080 ('[refactor]flinksql')
     username: root
     password: root
     hikari:
