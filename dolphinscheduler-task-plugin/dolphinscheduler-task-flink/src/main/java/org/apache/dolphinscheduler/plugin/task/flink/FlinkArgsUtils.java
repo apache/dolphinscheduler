@@ -263,9 +263,6 @@ public class FlinkArgsUtils {
                 Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, param.getRawScript().getBytes(), StandardOpenOption.APPEND);
             }
-
-            //FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
-            Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
             args.add(fileName);
         }
 
