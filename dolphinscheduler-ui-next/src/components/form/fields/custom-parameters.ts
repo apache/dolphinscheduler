@@ -110,8 +110,9 @@ export function renderCustomParameters(
       return h(
         NFormItemGi,
         {
-          showLabel: false,
+          showLabel: !!mergedChild.name,
           path: `${field}[${i}].${mergedChild.field}`,
+          label: mergedChild.name,
           span: unref(mergedChild.span),
           class: mergedChild.class
         },

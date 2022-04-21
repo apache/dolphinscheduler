@@ -241,7 +241,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
           (j = 0) => ({
             type: 'select',
             field: 'projectCode',
-            span: 12,
+            name: t('project.node.project_name'),
+            span: 24,
             props: {
               filterable: true,
               onUpdateValue: async (projectCode: number) => {
@@ -256,7 +257,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
           (j = 0) => ({
             type: 'select',
             field: 'definitionCode',
-            span: 12,
+            span: 24,
+            name: t('project.node.process_name'),
             props: {
               filterable: true,
               onUpdateValue: async (processCode: number) => {
@@ -275,7 +277,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
           (j = 0) => ({
             type: 'select',
             field: 'depTaskCode',
-            span: 12,
+            span: 24,
+            name: t('project.node.task_name'),
             props: {
               filterable: true
             },
@@ -286,7 +289,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
           (j = 0) => ({
             type: 'select',
             field: 'cycle',
-            span: 12,
+            span: 10,
+            name: t('project.node.cycle_time'),
             props: {
               onUpdateValue: (value: 'month') => {
                 model.dependTaskList[i].dependItemList[j].dateOptions =
@@ -298,7 +302,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
           (j = 0) => ({
             type: 'select',
             field: 'dateValue',
-            span: 12,
+            span: 10,
+            name: ' ',
             options:
               model.dependTaskList[i]?.dependItemList[j]?.dateOptions || []
           })
