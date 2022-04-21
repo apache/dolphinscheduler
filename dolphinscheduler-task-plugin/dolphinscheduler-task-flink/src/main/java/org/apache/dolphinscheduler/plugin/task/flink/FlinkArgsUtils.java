@@ -260,11 +260,12 @@ public class FlinkArgsUtils {
                 }
                 // write data to file
               //  FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
-                FileUtils.writeByteArrayToFile(file,sb.toString().getBytes("UTF-8"));
+                Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, param.getRawScript().getBytes(), StandardOpenOption.APPEND);
             }
 
-            FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
+            //FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
+            Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
             args.add(fileName);
         }
 
