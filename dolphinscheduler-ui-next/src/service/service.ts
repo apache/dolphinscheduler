@@ -93,5 +93,4 @@ service.interceptors.response.use((res: AxiosResponse) => {
   }
 }, err)
 
-
 export { service as axios }
