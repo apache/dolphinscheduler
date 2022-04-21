@@ -43,7 +43,7 @@ public class FlinkConstants {
      * flink sql
      */
     public static final String FLINK_SQL_EXECUTION_RESULT_MODE = "set execution.result-mode=";
-    public static final String FLINK_SQL_EXECUTION_TARGET = "set execution.target=yarn-per-job;";
+    public static final String FLINK_SQL_EXECUTION_TARGET = "set execution.target=yarn-per-job";
     public static final String FLINK_SQL_YARN_APPLICATION_NAME = "set yarn.application.name=";
     public static final String FLINK_SQL_YARN_APPLICATION_QUEUE = "set yarn.application.queue=";
     public static final String FLINK_SQL_JOBMANAGER_MEMORY_PROCESS_SIZE = "set jobmanager.memory.process.size=";

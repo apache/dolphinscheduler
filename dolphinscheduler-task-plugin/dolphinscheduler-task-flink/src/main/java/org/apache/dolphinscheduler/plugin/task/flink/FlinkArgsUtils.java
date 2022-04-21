@@ -168,6 +168,7 @@ public class FlinkArgsUtils {
         String others = param.getOthers();
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
             sb.append(FlinkConstants.FLINK_SQL_EXECUTION_TARGET);  //-m execution.target=YARN_PER_JOB;
+            sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
 
             int slot = param.getSlot();
             if (slot > 0) {
