@@ -52,6 +52,6 @@ public class FlinkConstants {
     public static final String FLINK_SQL_PARALLELISM_DEFAULT = "set parallelism.default=";
     public static final String FLINK_SQL_EXECUTION_RUNTIME_MODE = "set execution.runtime-mode=";
     public static final String FLINK_SQL_FILE = "-f";
-    public static final String FLINK_SQL_NEWLINE = ";\n";
+    public static final String FLINK_SQL_NEWLINE = ";";
 
 }
