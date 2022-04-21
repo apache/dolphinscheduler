@@ -140,7 +140,22 @@ export default defineComponent({
      * Back to the entrance
      */
     const onClose = () => {
-      router.go(-1)
+      if (history.state.back !== '/login') {
+        router.go(-1)
+        return
+      }
+      if (history.state.current.includes('workflow/definitions')) {
+        router.push({
+          path: `/projects/${route.params.projectCode}/workflow-definition`
+        })
+        return
+      }
+      if (history.state.current.includes('workflow/instances')) {
+        router.push({
+          path: `/projects/${route.params.projectCode}/workflow/instances`
+        })
+        return
+      }
     }
 
     /**
@@ -481,6 +496,10 @@ export default defineComponent({
             type='info'
             secondary
             round
+            disabled={
+              props.definition?.processDefinition?.releaseState === 'ONLINE' &&
+              !props.instance
+            }
             onClick={() => {
               context.emit('saveModelToggle', true)
             }}

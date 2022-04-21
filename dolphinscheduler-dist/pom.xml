@@ -65,14 +65,16 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-tools</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-python</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
         <profile>
             <id>release</id>
-            <properties>
-                <python.sign.skip>false</python.sign.skip>
-            </properties>
             <build>
                 <plugins>
                     <plugin>

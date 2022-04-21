@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.jets3t.service.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Collections;
@@ -45,6 +46,7 @@ import java.util.stream.Stream;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
 
+@Component
 public class S3Utils implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(S3Utils.class);

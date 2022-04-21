@@ -28,6 +28,7 @@ import {
   GrantProject,
   ProjectCodeReq,
   GrantUDFReq,
+  GrantNamespaceReq,
   ListAllReq,
   ListReq,
   RegisterUserReq
@@ -115,6 +116,14 @@ export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
 export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
   return axios({
     url: '/users/grant-udf-func',
+    method: 'post',
+    data
+  })
+}
+
+export function grantNamespaceFunc(data: GrantNamespaceReq & UserIdReq) {
+  return axios({
+    url: '/users/grant-namespace',
     method: 'post',
     data
   })

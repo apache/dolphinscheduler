@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 
 import org.apache.ibatis.annotations.MapKey;
@@ -123,6 +124,15 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return process definition list
      */
     List<ProcessDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
+
+    /**
+     * query process definition list
+     *
+     * @param projectCode projectCode
+     * @return process definition list
+     */
+    List<DependentSimplifyDefinition> queryDefinitionListByProjectCodeAndProcessDefinitionCodes(@Param("projectCode") long projectCode,
+                                                                                                @Param("codes") Collection<Long> codes);
 
     /**
      * query process definition by ids

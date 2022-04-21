@@ -17,6 +17,7 @@
 
 """Test class :mod:`pydolphinscheduler.core.configuration`' method."""
 
+import importlib
 import os
 from pathlib import Path
 from typing import Any
@@ -44,6 +45,56 @@ def teardown_file_env():
     if config_file_path.exists():
         config_file_path.unlink()
     os.environ.pop(ENV_PYDS_HOME, None)
+
+
+@pytest.mark.parametrize(
+    "val, expect",
+    [
+        ("1", 1),
+        ("123", 123),
+        ("4567", 4567),
+        (b"1234", 1234),
+    ],
+)
+def test_get_int(val: Any, expect: int):
+    """Test function :func:`configuration.get_int`."""
+    assert configuration.get_int(val) == expect
+
+
+@pytest.mark.parametrize(
+    "val",
+    [
+        "a",
+        "1a",
+        "1d2",
+        "1723-",
+    ],
+)
+def test_get_int_error(val: Any):
+    """Test function :func:`configuration.get_int`."""
+    with pytest.raises(ValueError):
+        configuration.get_int(val)
+
+
+@pytest.mark.parametrize(
+    "val, expect",
+    [
+        ("t", True),
+        ("true", True),
+        (1, True),
+        (True, True),
+        ("f", False),
+        ("false", False),
+        (0, False),
+        (123, False),
+        ("abc", False),
+        ("abc1", False),
+        (False, False),
+    ],
+)
+def test_get_bool(val: Any, expect: bool):
+    """Test function :func:`configuration.get_bool`."""
+    assert configuration.get_bool(val) == expect
 
 
 @pytest.mark.parametrize(
@@ -176,3 +227,40 @@ def test_single_config_get_set_not_exists_key():
 def test_get_configuration(config_name: str, expect: Any):
     """Test get exists attribute in :mod:`configuration`."""
     assert expect == getattr(configuration, config_name)
+
+
+@pytest.mark.parametrize(
+    "config_name, src, dest",
+    [
+        ("JAVA_GATEWAY_ADDRESS", "127.0.0.1", "192.168.1.1"),
+        ("JAVA_GATEWAY_PORT", 25333, 25334),
+        ("JAVA_GATEWAY_AUTO_CONVERT", True, False),
+        ("USER_NAME", "userPythonGateway", "envUserPythonGateway"),
+        ("USER_PASSWORD", "userPythonGateway", "envUserPythonGateway"),
+        (
+            "USER_EMAIL",
+            "userPythonGateway@dolphinscheduler.com",
+            "userPythonGateway@dolphinscheduler.com",
+        ),
+        ("USER_PHONE", "11111111111", "22222222222"),
+        ("USER_STATE", 1, 0),
+        ("WORKFLOW_PROJECT", "project-pydolphin", "env-project-pydolphin"),
+        ("WORKFLOW_TENANT", "tenant_pydolphin", "env-tenant_pydolphin"),
+        ("WORKFLOW_USER", "userPythonGateway", "envUserPythonGateway"),
+        ("WORKFLOW_QUEUE", "queuePythonGateway", "envQueuePythonGateway"),
+        ("WORKFLOW_WORKER_GROUP", "default", "custom"),
+        ("WORKFLOW_TIME_ZONE", "Asia/Shanghai", "America/Los_Angeles"),
+    ],
+)
+def test_get_configuration_env(config_name: str, src: Any, dest: Any):
+    """Test get exists attribute from environment variable in :mod:`configuration`."""
+    assert getattr(configuration, config_name) == src
+
+    env_name = f"PYDS_{config_name}"
+    os.environ[env_name] = str(dest)
+    # reload module configuration to re-get config from environment.
+    importlib.reload(configuration)
+    assert getattr(configuration, config_name) == dest
+
+    os.environ.pop(env_name, None)
+    assert env_name not in os.environ
