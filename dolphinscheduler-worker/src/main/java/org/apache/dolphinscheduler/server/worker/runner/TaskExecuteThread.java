@@ -276,7 +276,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * @param fileDownloads projectRes
      * @param logger logger
      */
-    private void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
+    public void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
         for (Pair<String, String> fileDownload : fileDownloads) {
             try {
                 // query the tenant code of the resource according to the name of the resource
@@ -298,7 +298,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * @param projectRes
      * @return
      */
-    private List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes){
+    public List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes){
         if (MapUtils.isEmpty(projectRes)) {
             return Collections.emptyList();
         }
