@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.config;
 
-import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -47,7 +46,7 @@ public class StoreConfiguration {
             case STORAGE_HDFS:
                 return HadoopUtils.getInstance();
             default:
-                throw new StorageOperateNoConfiguredException("Please check StorageOperate configuration!");
+                return null;
         }
     }
 

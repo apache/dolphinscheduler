@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.exception;
+package org.apache.dolphinscheduler.common.config;
 
-/**
- * exception for store
- */
-public class StorageOperateNoConfiguredException extends RuntimeException {
 
-    public StorageOperateNoConfiguredException() {
-    }
+import org.apache.dolphinscheduler.common.verify.CommonConfigCheckHandle;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
 
-    public StorageOperateNoConfiguredException(String message) {
-        super(message);
-    }
+@Ignore
+public class SingleStoreVerifyTest {
 
-    public StorageOperateNoConfiguredException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    private CommonConfigCheckHandle singleStoreVerify;
 
-    public StorageOperateNoConfiguredException(Throwable cause) {
-        super(cause);
-    }
+    @Test
+    public void test(){
+        singleStoreVerify = PowerMockito.mock(CommonConfigCheckHandle.class);
+        Assert.assertNotNull(singleStoreVerify);
 
-    public StorageOperateNoConfiguredException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        singleStoreVerify.check();
     }
 }

@@ -15,29 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.exception;
+package org.apache.dolphinscheduler.common.verify;
+
+import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Objects;
+
 
 /**
- * exception for store
+ * common configuration check
  */
-public class StorageOperateNoConfiguredException extends RuntimeException {
+@Component
+public class CommonConfigCheckHandle {
 
-    public StorageOperateNoConfiguredException() {
-    }
+    /**
+     * store check
+     */
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
 
-    public StorageOperateNoConfiguredException(String message) {
-        super(message);
-    }
-
-    public StorageOperateNoConfiguredException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public StorageOperateNoConfiguredException(Throwable cause) {
-        super(cause);
-    }
-
-    public StorageOperateNoConfiguredException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    @PostConstruct
+    public void check(){
+        if (Objects.isNull(storageOperate)){
+            throw new StorageOperateNoConfiguredException("Please check this config of storageOperate!");
+        }
     }
 }
