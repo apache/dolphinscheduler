@@ -15,29 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.common.exception;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.junit.Assert;
+
 import org.junit.Test;
+import org.mockito.junit.MockitoJUnit;
 
-import static org.junit.Assert.assertNotNull;
-
-public class PropertyUtilsTest {
-
-    @Test
-    public void getString() {
-        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
-    }
+public class StorageOperateNoConfiguredExceptionTest {
 
     @Test
-    public void getResUploadStartupState(){
-        Assert.assertFalse(PropertyUtils.getResUploadStartupState());
-    }
-
-    @Test
-    public void getDouble(){
-        PropertyUtils.getDouble("Test", 0.1);
+    public void test(){
+        String message = "Test";
+        RuntimeException time = new RuntimeException(message);
+        MockitoJUnit.testRule(new StorageOperateNoConfiguredException());
+        MockitoJUnit.testRule(new StorageOperateNoConfiguredException(message));
+        MockitoJUnit.testRule(new StorageOperateNoConfiguredException(message, time));
+        MockitoJUnit.testRule(new StorageOperateNoConfiguredException(time));
+        MockitoJUnit.testRule(new StorageOperateNoConfiguredException(message, time, false, false));
     }
 }
