@@ -35,118 +35,8 @@ export function useTable(
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const columns: TableColumns<any> = [
-    {
-      title: '#',
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('project.workflow.version'),
-      key: 'version',
-      render: (_row) => {
-        if (_row.version === variables.row.version) {
-          return h(
-            NTag,
-            { type: 'success', size: 'small' },
-            {
-              default: () =>
-                `V${_row.version} ${t('project.workflow.current_version')}`
-            }
-          )
-        } else {
-          return `V${_row.version}`
-        }
-      }
-    },
-    {
-      title: t('project.workflow.description'),
-      key: 'description'
-    },
-    {
-      title: t('project.workflow.create_time'),
-      key: 'operateTime'
-    },
-    {
-      title: t('project.workflow.operation'),
-      key: 'operation',
-      className: styles.operation,
-      render: (_row) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleSwitchVersion(_row.version)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'info',
-                            size: 'tiny',
-                            disabled: _row.version === variables.row.version
-                          },
-                          {
-                            icon: () => h(ExclamationCircleOutlined)
-                          }
-                        ),
-                      default: () => t('project.workflow.switch_version')
-                    }
-                  ),
-                default: () => t('project.workflow.confirm_switch_version')
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleDeleteVersion(_row.version)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'error',
-                            size: 'tiny',
-                            disabled: _row.version === variables.row.version
-                          },
-                          {
-                            icon: () => h(DeleteOutlined)
-                          }
-                        ),
-                      default: () => t('project.workflow.delete')
-                    }
-                  ),
-                default: () => t('project.workflow.delete_confirm')
-              }
-            )
-          ]
-        })
-      }
-    }
-  ]
-
   const variables = reactive({
-    columns,
+    columns: [],
     row: {} as any,
     tableData: [],
     page: ref(1),
@@ -155,6 +45,118 @@ export function useTable(
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
     loadingRef: ref(false)
   })
+
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        width: 50,
+        render: (_row, index) => index + 1
+      },
+      {
+        title: t('project.workflow.version'),
+        key: 'version',
+        render: (_row) => {
+          if (_row.version === variables.row.version) {
+            return h(
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () =>
+                  `V${_row.version} ${t('project.workflow.current_version')}`
+              }
+            )
+          } else {
+            return `V${_row.version}`
+          }
+        }
+      },
+      {
+        title: t('project.workflow.description'),
+        key: 'description'
+      },
+      {
+        title: t('project.workflow.create_time'),
+        key: 'operateTime'
+      },
+      {
+        title: t('project.workflow.operation'),
+        key: 'operation',
+        className: styles.operation,
+        render: (_row) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleSwitchVersion(_row.version)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'info',
+                              size: 'tiny',
+                              disabled: _row.version === variables.row.version
+                            },
+                            {
+                              icon: () => h(ExclamationCircleOutlined)
+                            }
+                          ),
+                        default: () => t('project.workflow.switch_version')
+                      }
+                    ),
+                  default: () => t('project.workflow.confirm_switch_version')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDeleteVersion(_row.version)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'tiny',
+                              disabled: _row.version === variables.row.version
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('project.workflow.delete')
+                      }
+                    ),
+                  default: () => t('project.workflow.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ] as TableColumns<any>
+  }
 
   const getTableData = (row: any) => {
     if (variables.loadingRef) return
@@ -178,9 +180,9 @@ export function useTable(
   const handleSwitchVersion = (version: number) => {
     switchVersion(variables.projectCode, variables.row.code, version).then(
       () => {
+        variables.row.version = version
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
-        getTableData(variables.row)
       }
     )
   }
@@ -190,6 +192,9 @@ export function useTable(
       () => {
         window.$message.success(t('project.workflow.success'))
         ctx.emit('updateList')
+        if (variables.tableData.length === 1 && variables.page > 1) {
+          variables.page -= 1
+        }
         getTableData(variables.row)
       }
     )
@@ -197,6 +202,7 @@ export function useTable(
 
   return {
     variables,
+    createColumns,
     getTableData
   }
 }
