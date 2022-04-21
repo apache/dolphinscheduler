@@ -41,7 +41,7 @@ export default defineComponent({
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
-    const { variables, getTableData } = useTable(ctx)
+    const { variables, createColumns, getTableData } = useTable(ctx)
     const { importState } = useForm()
     const { handleImportDefinition } = useModal(importState, ctx)
 
@@ -66,8 +66,15 @@ export default defineComponent({
 
     watch(
       () => props.show,
-      () => requestData()
+      () => {
+        createColumns(variables)
+        requestData()
+      }
     )
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
 
     return {
       hideModal,
