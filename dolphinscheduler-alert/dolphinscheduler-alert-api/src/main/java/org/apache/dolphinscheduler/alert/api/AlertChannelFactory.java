@@ -23,9 +23,21 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
 
+/**
+ * alert channel factory
+ */
 public interface AlertChannelFactory {
+    /**
+     * Returns the name of the alert channel
+     * @return the name of the alert channel
+     */
     String name();
 
+    /**
+     * Create an alert channel
+     *
+     * @return alert channel
+     */
     AlertChannel create();
 
     /**
