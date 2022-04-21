@@ -87,6 +87,7 @@ public class SparkTask extends AbstractYarnTask {
             sparkCommand = SparkVersion.SPARK1.getCommand();
         }
 
+        //If the programType is SQL, execute bin/spark-sql
         if (sparkParameters.getProgramType() == ProgramType.SQL){
             sparkCommand = SparkVersion.SPARKSQL.getCommand();
         }

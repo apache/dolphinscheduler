@@ -71,6 +71,8 @@ public class SparkArgsUtils {
         }
         args.add(deployMode);
 
+        //sparksql -f fileName
+        //The file name is randomly generated and is automatically deleted at the end of the program
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
         String rawScript = param.getRawScript();

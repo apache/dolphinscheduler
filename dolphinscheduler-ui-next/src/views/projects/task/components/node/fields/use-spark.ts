@@ -74,7 +74,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         // required: model.programType !== 'PYTHON',
         required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
-          if (model.programType !== 'PYTHON' && !value) {
+          if (model.programType !== 'PYTHON' && !value && model.programType !== 'SQL') {
             return new Error(t('project.node.main_class_tips'))
           }
         }
@@ -145,6 +145,21 @@ export const PROGRAM_TYPES = [
   {
     label: 'SQL',
     value: 'SQL'
+  }
+]
+
+export const PROGRAM_TYPES2 = [
+  {
+    label: 'JAVA',
+    value: 'JAVA'
+  },
+  {
+    label: 'SCALA',
+    value: 'SCALA'
+  },
+  {
+    label: 'PYTHON',
+    value: 'PYTHON'
   }
 ]
 

@@ -240,6 +240,7 @@ public class SparkParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
+        //When saving a task, the parameters cannot be empty and mainJar or rawScript cannot be empty
         return programType != null && (mainJar != null || rawScript != null);
     }
 
