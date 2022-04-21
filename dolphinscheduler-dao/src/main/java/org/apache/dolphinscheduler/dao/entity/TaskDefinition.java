@@ -316,7 +316,6 @@ public class TaskDefinition {
 
                 if (CollectionUtils.isNotEmpty(propList)) {
                     taskParamMap = new HashMap<>();
-                    // Don't use java 8 stream to convert map, because the value will probably null,and it will cause the NullPointException.
                     for (Property property : propList) {
                         taskParamMap.put(property.getProp(), property.getValue());
                     }
