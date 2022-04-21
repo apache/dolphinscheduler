@@ -276,7 +276,7 @@ If you compare the data in c1 and c21, the tables test1 and test2 are exactly th
     - Alert: The data quality task failed, the DolphinScheduler task result is successful, and an alert is sent
     - Blocking: The data quality task fails, the DolphinScheduler task result is failed, and an alarm is sent
 - Expected value type: select the desired type in the drop-down menu, only SrcTableTotalRow, TargetTableTotalRow and fixed value are suitable for selection here
-## Comparison of the values ​​checked by the two tables
+## Comparison of the values checked by the two tables
 ### Introduction
 Two-table value comparison allows users to customize different SQL statistics for two tables and compare the corresponding values. For example, for the source table A, the total amount of a certain column is calculated, and for the target table, the total amount of a certain column is calculated. value sum2, compare sum1 and sum2 to determine the check result
 ### UI Guide
