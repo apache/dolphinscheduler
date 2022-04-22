@@ -525,7 +525,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             String nameSuffix = Files.getFileExtension(name);
 
             // determine file suffix
-            if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
+            if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
                 // rename file suffix and original suffix must be consistent
                 logger.error("rename file suffix and original suffix must be consistent: {}", RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
@@ -629,7 +629,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String nameSuffix = Files.getFileExtension(fullName);
 
         // determine file suffix
-        if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
+        if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
             return false;
         }
         // query tenant
