@@ -22,7 +22,9 @@ import type {
   IOption,
   IResource,
   ProgramType,
-  IMainJar
+  IMainJar,
+  DependentResultType,
+  BDependentResultType
 } from './types'
 
 export const useTaskNodeStore = defineStore({
@@ -33,7 +35,8 @@ export const useTaskNodeStore = defineStore({
     preTasks: [],
     resources: [],
     mainJars: {},
-    name: ''
+    name: '',
+    dependentResult: {}
   }),
   persist: true,
   getters: {
@@ -54,6 +57,9 @@ export const useTaskNodeStore = defineStore({
     },
     getName(): string {
       return this.name
+    },
+    getDependentResult(): DependentResultType {
+      return this.dependentResult
     }
   },
   actions: {
@@ -122,6 +128,13 @@ export const useTaskNodeStore = defineStore({
     },
     updateName(name: string) {
       this.name = name
+    },
+    updateDependentResult(dependentResult: BDependentResultType) {
+      const result = {} as DependentResultType
+      for (let [key, value] of Object.entries(dependentResult)) {
+        result[key] = value === 'FAILED' ? 'FAILURE' : value
+      }
+      this.dependentResult = result
     },
     init() {
       this.preTaskOptions = []
