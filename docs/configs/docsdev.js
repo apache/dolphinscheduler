@@ -97,6 +97,10 @@ export default {
                                 title: 'Task Instance',
                                 link: '/en-us/docs/dev/user_doc/guide/project/task-instance.html',
                             },
+                            {
+                                title: 'Task Definition',
+                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
+                            },
                         ]
                     },
                     {
@@ -240,6 +244,10 @@ export default {
                         ],
                     },
                     {
+                        title: 'Data Quality',
+                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
+                    },
+                    {
                         title: 'Resource',
                         link: '/en-us/docs/dev/user_doc/guide/resource.html',
                     },
@@ -250,6 +258,15 @@ export default {
                     {
                         title: 'Security',
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
+                    },
+                    {
+                        title: 'How-To',
+                        children: [
+                            {
+                                title: 'General Setting',
+                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                            }
+                        ],
                     },
                     {
                         title: 'Open API',
@@ -295,16 +312,6 @@ export default {
                     {
                         title: 'Cache',
                         link: '/en-us/docs/dev/user_doc/architecture/cache.html',
-                    },
-                ],
-            },
-            {
-                title: 'Observability',
-                children: [
-
-                    {
-                        title: 'SkyWalking-Agent',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/skywalking-agent.html',
                     },
                 ],
             },
@@ -407,6 +414,10 @@ export default {
                             {
                                 title: '任务实例',
                                 link: '/zh-cn/docs/dev/user_doc/guide/project/task-instance.html',
+                            },
+                            {
+                                title: '任务定义',
+                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
                             },
                         ]
                     },
@@ -551,6 +562,10 @@ export default {
                         ],
                     },
                     {
+                        title: '数据质量',
+                        link: '/zh-cn/docs/dev/user_doc/guide /data-quality.html',
+                    },
+                    {
                         title: '资源中心',
                         link: '/zh-cn/docs/dev/user_doc/guide/resource.html',
                     },
@@ -561,6 +576,15 @@ export default {
                     {
                         title: '安全中心',
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
+                    },
+                    {
+                        title: '常见操作',
+                        children: [
+                            {
+                                title: '通用设置',
+                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                            }
+                        ],
                     },
                     {
                         title: 'API调用',
@@ -606,15 +630,6 @@ export default {
                     {
                         title: '缓存',
                         link: '/zh-cn/docs/dev/user_doc/architecture/cache.html',
-                    },
-                ],
-            },
-            {
-                title: '可观测性',
-                children: [
-                    {
-                        title: 'SkyWalking-Agent',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/skywalking-agent.html',
                     },
                 ],
             },

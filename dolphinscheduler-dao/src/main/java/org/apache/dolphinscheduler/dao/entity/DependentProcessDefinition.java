@@ -110,7 +110,7 @@ public class DependentProcessDefinition {
         return this.processDefinitionName;
     }
 
-    public void setprocessDefinitionName(String name) {
+    public void setProcessDefinitionName(String name) {
         this.processDefinitionName = name;
     }
 

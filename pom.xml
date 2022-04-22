@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>2.0.4-SNAPSHOT</version>
+    <version>dev-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>https://dolphinscheduler.apache.org</url>
@@ -83,7 +83,7 @@
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
         <commons.collections4.version>4.1</commons.collections4.version>
         <guava.version>24.1-jre</guava.version>
-        <postgresql.version>42.2.5</postgresql.version>
+        <postgresql.version>42.3.4</postgresql.version>
         <hive.jdbc.version>2.1.0</hive.jdbc.version>
         <commons.io.version>2.4</commons.io.version>
         <oshi.core.version>6.1.1</oshi.core.version>
@@ -93,7 +93,7 @@
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.1.2</checkstyle.version>
         <curator.test>2.12.0</curator.test>
-        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
+        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -123,7 +123,7 @@
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <powermock.version>2.0.9</powermock.version>
         <jsr305.version>3.0.0</jsr305.version>
-        <commons-compress.version>1.19</commons-compress.version>
+        <commons-compress.version>1.21</commons-compress.version>
         <commons-math3.version>3.1.1</commons-math3.version>
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>

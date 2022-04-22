@@ -23,7 +23,7 @@ timezone: "Asia/Shanghai"
 
 image:
   registry: "dolphinscheduler.docker.scarf.sh/apache"
-  tag: "2.0.4-SNAPSHOT"
+  tag: "dev-SNAPSHOT"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
 
@@ -403,6 +403,7 @@ ingress:
   enabled: false
   host: "dolphinscheduler.org"
   path: "/dolphinscheduler"
+  annotations: {}
   tls:
     enabled: false
     secretName: "dolphinscheduler-tls"

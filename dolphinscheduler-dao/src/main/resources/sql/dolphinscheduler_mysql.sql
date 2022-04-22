@@ -279,6 +279,7 @@ DROP TABLE IF EXISTS `t_ds_alert`;
 CREATE TABLE `t_ds_alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `title` varchar(64) DEFAULT NULL COMMENT 'title',
+  `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
   `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed',
@@ -286,8 +287,13 @@ CREATE TABLE `t_ds_alert` (
   `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project_code',
+  `process_definition_code` bigint(20) DEFAULT NULL COMMENT 'process_definition_code',
+  `process_instance_id` int(11) DEFAULT NULL COMMENT 'process_instance_id',
+  `alert_type` int(11) DEFAULT NULL COMMENT 'alert_type',
   PRIMARY KEY (`id`),
-  KEY `idx_status` (`alert_status`) USING BTREE
+  KEY `idx_status` (`alert_status`) USING BTREE,
+  KEY `idx_sign` (`sign`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -1885,11 +1891,10 @@ CREATE TABLE `t_ds_k8s_namespace` (
   `limits_memory` int(11) DEFAULT NULL,
   `namespace` varchar(100) DEFAULT NULL,
   `online_job_num` int(11) DEFAULT NULL,
-  `owner` varchar(100) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `pod_replicas` int(11) DEFAULT NULL,
   `pod_request_cpu` decimal(14,3) DEFAULT NULL,
   `pod_request_memory` int(11) DEFAULT NULL,
-  `tag` varchar(100) DEFAULT NULL,
   `limits_cpu` decimal(14,3) DEFAULT NULL,
   `k8s` varchar(100) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
@@ -1897,3 +1902,33 @@ CREATE TABLE `t_ds_k8s_namespace` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `k8s_namespace_unique` (`namespace`,`k8s`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_namespace_user`;
+CREATE TABLE `t_ds_relation_namespace_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `namespace_id` int(11) DEFAULT NULL COMMENT 'namespace id',
+  `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+  `id`                            int(11) NOT NULL AUTO_INCREMENT,
+  `alert_id`                      int(11) NOT NULL,
+  `alert_plugin_instance_id`      int(11) NOT NULL,
+  `send_status`                   tinyint(4) DEFAULT '0',
+  `log`                           text,
+  `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

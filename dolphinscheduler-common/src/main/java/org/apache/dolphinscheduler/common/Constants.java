@@ -327,6 +327,7 @@ public final class Constants {
     public static final String NULL = "NULL";
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
+    public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
 
     /**
      * command parameter keys
@@ -815,4 +816,5 @@ public final class Constants {
     public static final String K8S = "k8s";
     public static final String LIMITS_CPU = "limitsCpu";
     public static final String LIMITS_MEMORY = "limitsMemory";
+    public static final String K8S_LOCAL_TEST_CLUSTER = "ds_null_k8s";
 }

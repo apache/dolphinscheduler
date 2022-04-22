@@ -18,6 +18,7 @@ byte-buddy-1.9.16.jar
 caffeine-2.9.2.jar
 checker-compat-qual-2.0.0.jar
 checker-qual-3.10.0.jar
+checker-qual-3.5.0.jar
 classmate-1.5.1.jar
 clickhouse-jdbc-0.1.52.jar
 commons-email-1.5.jar
@@ -26,7 +27,7 @@ commons-codec-1.11.jar
 commons-collections-3.2.2.jar
 commons-collections4-4.1.jar
 commons-compiler-3.1.6.jar
-commons-compress-1.19.jar
+commons-compress-1.21.jar
 commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
 commons-beanutils-1.9.4.jar
@@ -173,7 +174,7 @@ parquet-hadoop-bundle-1.8.1.jar
 poi-4.1.2.jar
 poi-ooxml-4.1.2.jar
 poi-ooxml-schemas-4.1.2.jar
-postgresql-42.2.5.jar
+postgresql-42.3.4.jar
 presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
 protostuff-core-1.7.2.jar
@@ -273,3 +274,14 @@ aws-java-sdk-s3-1.12.160.jar
 aws-java-sdk-kms-1.12.160.jar
 aws-java-sdk-emr-1.12.160.jar
 aws-java-sdk-core-1.12.160.jar
+commons-text-1.8.jar
+httpasyncclient-4.1.4.jar
+httpcore-nio-4.4.14.jar
+jetty-client-9.4.44.v20210927.jar
+unirest-java-3.7.04-standalone.jar
+websocket-api-9.4.44.v20210927.jar
+websocket-client-9.4.44.v20210927.jar
+websocket-common-9.4.44.v20210927.jar
+zeppelin-client-0.10.1.jar
+zeppelin-common-0.10.1.jar
+

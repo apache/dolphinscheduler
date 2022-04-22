@@ -32,7 +32,9 @@ then go and see :doc:`tutorial` for more detail.
    tutorial
    concept
    tasks/index
+   howto/index
    cli
+   config
    api
 
 Indices and tables

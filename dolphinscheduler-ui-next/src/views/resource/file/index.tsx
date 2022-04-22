@@ -16,15 +16,7 @@
  */
 
 import { useRouter } from 'vue-router'
-import {
-  defineComponent,
-  onMounted,
-  ref,
-  reactive,
-  Ref,
-  watch,
-  inject
-} from 'vue'
+import { defineComponent, onMounted, ref, reactive, Ref } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -56,12 +48,10 @@ import { ResourceFile } from '@/service/modules/resources/types'
 
 export default defineComponent({
   name: 'File',
-  inject: ['reload'],
   setup() {
     const router: Router = useRouter()
     const fileId = ref(Number(router.currentRoute.value.params.id) || -1)
 
-    const reload: any = inject('reload')
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -171,24 +161,18 @@ export default defineComponent({
       }
     ])
 
-    watch(
-      () => router.currentRoute.value.params.id,
-      // @ts-ignore
-      () => {
-        reload()
-        const currFileId = Number(router.currentRoute.value.params.id) || -1
-
-        if (currFileId === -1) {
-          fileStore.setCurrentDir('/')
-        } else {
-          queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
-            if (res.fullName) {
-              fileStore.setCurrentDir(res.fullName)
-            }
-          })
-        }
+    onMounted(() => {
+      const currFileId = Number(router.currentRoute.value.params.id) || -1
+      if (currFileId === -1) {
+        fileStore.setCurrentDir('/')
+      } else {
+        queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
+          if (res.fullName) {
+            fileStore.setCurrentDir(res.fullName)
+          }
+        })
       }
-    )
+    })
 
     const initBreadcrumb = async (dirs: string[]) => {
       let index = 0

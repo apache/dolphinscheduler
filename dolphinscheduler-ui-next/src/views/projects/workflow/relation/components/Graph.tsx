@@ -47,9 +47,9 @@ const GraphChart = defineComponent({
     const { t } = useI18n()
 
     const legendData = [
-      { name: t('project.workflow.online') },
-      { name: t('project.workflow.workflow_offline') },
-      { name: t('project.workflow.schedule_offline') }
+      { color: '#2D8DF0', name: t('project.workflow.online') },
+      { color: '#f37373', name: t('project.workflow.workflow_offline') },
+      { color: '#ba3e3e', name: t('project.workflow.schedule_offline') }
     ]
 
     const getCategory = (schedulerStatus: number, workflowStatus: number) => {
@@ -100,11 +100,16 @@ const GraphChart = defineComponent({
           `
         }
       },
-      legend: [
-        {
-          data: legendData?.map((item) => item.name)
-        }
-      ],
+      legend: {
+        data: legendData?.map((item) => {
+          return {
+            name: item.name,
+            itemStyle: {
+              color: item.color
+            }
+          }
+        })
+      },
       series: [
         {
           type: 'graph',
@@ -132,13 +137,26 @@ const GraphChart = defineComponent({
             }
           },
           data: props.seriesData.map((item) => {
+            const category = getCategory(
+              Number(item.schedulePublishStatus),
+              Number(item.workFlowPublishStatus)
+            )
+            const itemStyle = {
+              color: ''
+            }
+
+            if (category === 1) {
+              itemStyle.color = '#f37373'
+            } else if (category === 2) {
+              itemStyle.color = '#ba3e3e'
+            } else if (category === 0) {
+              itemStyle.color = '#2D8DF0'
+            }
+
             return {
               name: item.name,
               id: item.id,
-              category: getCategory(
-                Number(item.schedulePublishStatus),
-                Number(item.workFlowPublishStatus)
-              ),
+              category,
               workFlowPublishStatus:
                 Number(item.workFlowPublishStatus) === 0
                   ? t('project.workflow.offline')
@@ -151,7 +169,10 @@ const GraphChart = defineComponent({
               scheduleStartTime: item.scheduleStartTime
                 ? item.scheduleStartTime
                 : '-',
-              scheduleEndTime: item.scheduleEndTime ? item.scheduleEndTime : '-'
+              scheduleEndTime: item.scheduleEndTime
+                ? item.scheduleEndTime
+                : '-',
+              itemStyle
             }
           }),
           categories: legendData

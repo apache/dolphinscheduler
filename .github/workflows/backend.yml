@@ -38,8 +38,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paths-filter:
+    name: Backend-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
   build:
-    name: Build
+    name: Backend-Build
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -63,3 +78,20 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
+  result:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ build, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip Build!"
+            exit 0
+          fi
+          if [[ ${{ needs.build.result }} != 'success' ]]; then
+            echo "Build Failed!"
+            exit -1
+          fi

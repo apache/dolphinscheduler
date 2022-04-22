@@ -74,9 +74,6 @@ export default defineComponent({
   setup(props, context) {
     const { t } = useI18n()
 
-    const startupPopoverRef = ref(false)
-    const paramPopoverRef = ref(false)
-
     const themeStore = useThemeStore()
 
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
@@ -140,7 +137,22 @@ export default defineComponent({
      * Back to the entrance
      */
     const onClose = () => {
-      router.go(-1)
+      if (history.state.back !== '/login') {
+        router.go(-1)
+        return
+      }
+      if (history.state.current.includes('workflow/definitions')) {
+        router.push({
+          path: `/projects/${route.params.projectCode}/workflow-definition`
+        })
+        return
+      }
+      if (history.state.current.includes('workflow/instances')) {
+        router.push({
+          path: `/projects/${route.params.projectCode}/workflow/instances`
+        })
+        return
+      }
     }
 
     /**
@@ -214,19 +226,12 @@ export default defineComponent({
               <NTooltip
                 v-slots={{
                   trigger: () => (
-                    <NPopover
-                      show={paramPopoverRef.value}
-                      placement='bottom'
-                      trigger='manual'
-                    >
+                    <NPopover placement='bottom' trigger='click'>
                       {{
                         trigger: () => (
                           <NButton
                             quaternary
                             circle
-                            onClick={() =>
-                              (paramPopoverRef.value = !paramPopoverRef.value)
-                            }
                             class={Styles['toolbar-btn']}
                           >
                             <NIcon>
@@ -249,20 +254,12 @@ export default defineComponent({
               <NTooltip
                 v-slots={{
                   trigger: () => (
-                    <NPopover
-                      show={startupPopoverRef.value}
-                      placement='bottom'
-                      trigger='manual'
-                    >
+                    <NPopover placement='bottom' trigger='click'>
                       {{
                         trigger: () => (
                           <NButton
                             quaternary
                             circle
-                            onClick={() =>
-                              (startupPopoverRef.value =
-                                !startupPopoverRef.value)
-                            }
                             class={Styles['toolbar-btn']}
                           >
                             <NIcon>
@@ -481,6 +478,10 @@ export default defineComponent({
             type='info'
             secondary
             round
+            disabled={
+              props.definition?.processDefinition?.releaseState === 'ONLINE' &&
+              !props.instance
+            }
             onClick={() => {
               context.emit('saveModelToggle', true)
             }}

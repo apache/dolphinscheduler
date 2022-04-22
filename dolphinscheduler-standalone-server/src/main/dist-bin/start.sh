@@ -28,9 +28,12 @@ if [[ "$DOCKER" == "true" ]]; then
 fi
 
 CP=$DOLPHINSCHEDULER_HOME/libs/standalone-server/*
-for d in alert-server api-server master-server python-gateway-server worker-server; do
+for d in alert-server api-server master-server worker-server; do
   for f in $DOLPHINSCHEDULER_HOME/../$d/libs/*.jar; do
-    CP=$CP:$f
+    JAR_FILE_NAME=${f##*/}
+    if [[ ! $CP =~ $JAR_FILE_NAME ]];then
+      CP=$CP:$f
+    fi
   done
 done
 

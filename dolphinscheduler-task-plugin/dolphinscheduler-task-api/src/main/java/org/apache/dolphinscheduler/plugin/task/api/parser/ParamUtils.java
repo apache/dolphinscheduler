@@ -61,11 +61,12 @@ public class ParamUtils {
         Date scheduleTime = taskExecutionContext.getScheduleTime();
 
         // combining local and global parameters
-        Map<String, Property> localParams = parameters.getLocalParametersMap();
+        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
 
+        //stream pass params
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams == null && localParams == null) {
+        if (globalParams.size() == 0 && localParams.size() == 0 && varParams.size() == 0) {
             return null;
         }
         // if it is a complement,
@@ -85,15 +86,13 @@ public class ParamUtils {
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskExecutionContext.getTaskInstanceId()));
 
-        if (globalParams != null && localParams != null) {
+        if (varParams.size() != 0) {
+            globalParams.putAll(varParams);
+        }
+        if (localParams.size() != 0) {
             globalParams.putAll(localParams);
-        } else if (globalParams == null && localParams != null) {
-            globalParams = localParams;
         }
-        if (varParams != null) {
-            varParams.putAll(globalParams);
-            globalParams = varParams;
-        }
+
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
@@ -143,16 +142,15 @@ public class ParamUtils {
      * @return parameters map
      */
     public static Map<String, Property> getUserDefParamsMap(Map<String, String> definedParams) {
+        Map<String, Property> userDefParamsMaps = new HashMap<>();
         if (definedParams != null) {
-            Map<String, Property> userDefParamsMaps = new HashMap<>();
             Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, String> en = iter.next();
                 Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
                 userDefParamsMaps.put(property.getProp(),property);
             }
-            return userDefParamsMaps;
         }
-        return null;
+        return userDefParamsMaps;
     }
 }

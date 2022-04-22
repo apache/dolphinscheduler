@@ -33,11 +33,14 @@ import { formatModel } from './format-data'
 import {
   HistoryOutlined,
   ProfileOutlined,
-  QuestionCircleTwotone
+  QuestionCircleTwotone,
+  BranchesOutlined
 } from '@vicons/antd'
 import { NIcon } from 'naive-ui'
 import { TASK_TYPES_MAP } from '../../constants/task-type'
 import { Router, useRouter } from 'vue-router'
+import { querySubProcessInstanceByTaskCode } from '@/service/modules/process-instances'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import type {
   ITaskData,
   ITaskType,
@@ -57,7 +60,8 @@ const props = {
   },
   projectCode: {
     type: Number as PropType<number>,
-    required: true
+    required: true,
+    default: 0
   },
   readonly: {
     type: Boolean as PropType<boolean>,
@@ -89,6 +93,8 @@ const NodeDetailModal = defineComponent({
   setup(props, { emit }) {
     const { t, locale } = useI18n()
     const router: Router = useRouter()
+    const taskStore = useTaskNodeStore()
+
     const renderIcon = (icon: any) => {
       return () => h(NIcon, null, { default: () => h(icon) })
     }
@@ -114,16 +120,15 @@ const NodeDetailModal = defineComponent({
       headerLinks.value = [
         {
           text: t('project.node.instructions'),
-          show:
-            taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable
-              ? true
-              : false,
+          show: !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
           action: () => {
+            let linkedTaskType = taskType?.toLowerCase().replace('_', '-')
+            if (taskType === 'PROCEDURE') linkedTaskType = 'stored-procedure'
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
               locale.value.toLowerCase().replace('_', '-') +
               '/docs/latest/user_doc/guide/task/' +
-              taskType?.toLowerCase().replace('_', '-') +
+              linkedTaskType +
               '.html'
             window.open(helpUrl)
           },
@@ -131,7 +136,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_history'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             router.push({
               name: 'task-instance',
@@ -142,11 +147,39 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_log'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             handleViewLog()
           },
           icon: renderIcon(ProfileOutlined)
+        },
+        {
+          text: t('project.node.enter_this_child_node'),
+          show: props.data.taskType === 'SUB_PROCESS',
+          disabled:
+            !props.data.id ||
+            (router.currentRoute.value.name === 'workflow-instance-detail' &&
+              !props.taskInstance),
+          action: () => {
+            if (router.currentRoute.value.name === 'workflow-instance-detail') {
+              querySubProcessInstanceByTaskCode(
+                { taskId: props.taskInstance?.id },
+                { projectCode: props.projectCode }
+              ).then((res: any) => {
+                router.push({
+                  name: 'workflow-instance-detail',
+                  params: { id: res.subProcessInstanceId },
+                  query: { code: props.data.taskParams?.processDefinitionCode }
+                })
+              })
+            } else {
+              router.push({
+                name: 'workflow-definition-detail',
+                params: { code: props.data.taskParams?.processDefinitionCode }
+              })
+            }
+          },
+          icon: renderIcon(BranchesOutlined)
         }
       ]
     }
@@ -173,6 +206,7 @@ const NodeDetailModal = defineComponent({
       async () => {
         if (!props.show) return
         initHeaderLinks(props.processInstance, props.data.taskType)
+        taskStore.init()
         await nextTick()
         detailRef.value.value.setValues(formatModel(props.data))
       }
@@ -181,7 +215,11 @@ const NodeDetailModal = defineComponent({
     return () => (
       <Modal
         show={props.show}
-        title={`${t('project.node.current_node_settings')}`}
+        title={
+          props.from === 1
+            ? `${t('project.task.current_task_settings')}`
+            : `${t('project.node.current_node_settings')}`
+        }
         onConfirm={onConfirm}
         confirmLoading={props.saving}
         confirmDisabled={props.readonly}

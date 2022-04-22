@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-data-quality</artifactId>
@@ -32,7 +32,8 @@
     <properties>
         <scala.binary.version>2.11</scala.binary.version>
         <spark.version>2.4.0</spark.version>
-        <jackson.version>2.9.0</jackson.version>
+        <jackson.version>2.9.10</jackson.version>
+        <jackson.databind.version>2.9.10.8</jackson.databind.version>
         <scope>provided</scope>
     </properties>
 
@@ -139,7 +140,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson.databind.version}</version>
             <scope>${scope}</scope>
             <exclusions>
                 <exclusion>
