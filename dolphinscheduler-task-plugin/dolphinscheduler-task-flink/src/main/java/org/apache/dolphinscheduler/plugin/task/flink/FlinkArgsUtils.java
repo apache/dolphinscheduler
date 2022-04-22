@@ -258,9 +258,9 @@ public class FlinkArgsUtils {
                     }
                     Files.createFile(path, attr);
                 }
-                // write data to file
-              //  FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
+                // Common parameters of flink sql
                 Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
+                //  write data to file
                 Files.write(path, param.getRawScript().getBytes(), StandardOpenOption.APPEND);
             }
             args.add(fileName);
@@ -269,7 +269,6 @@ public class FlinkArgsUtils {
         if (StringUtils.isNotEmpty(others)) {
             args.add(others);
         }
-
         return args;
     }
 }

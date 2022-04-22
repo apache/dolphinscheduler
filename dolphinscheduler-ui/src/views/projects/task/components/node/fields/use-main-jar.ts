@@ -14,6 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2ad2801cd0 ('[refactor]flinksql')
 import { computed, ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
@@ -25,18 +29,13 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
-  const span = ref(24)
-  const require = ref(true)
+
+  const mainJarsSpan = computed(() =>
+      model.programType === 'SQL' ? 0 : 24
+  )
 
   const mainJarSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
   const getMainJars = async (programType: ProgramType) => {
-    if (programType === 'SQL') {
-      span.value = 0
-      require.value = false
-    } else {
-      span.value = 24
-      require.value = true
-    }
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
       mainJarOptions.value = storeMainJar
@@ -67,10 +66,14 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     field: 'mainJar',
     name: t('project.node.main_package'),
 <<<<<<< HEAD
+<<<<<<< HEAD
     span: mainJarSpan,
 =======
     span: span,
 >>>>>>> 4d65bc7c46 ('[refactor]flinksql')
+=======
+    span: mainJarsSpan,
+>>>>>>> 2ad2801cd0 ('[refactor]flinksql')
     props: {
       cascade: true,
       showPath: true,
@@ -82,13 +85,17 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     validate: {
       trigger: ['input', 'blur'],
 <<<<<<< HEAD
+<<<<<<< HEAD
       required: model.programType !== 'SQL',
 =======
       // required: true,
       required: require,
 >>>>>>> 7c048165d6 (flink_sql)
+=======
+      required: model.programType !== 'SQL',
+>>>>>>> 2ad2801cd0 ('[refactor]flinksql')
       validator(validate: any, value: string) {
-        if (!value) {
+        if (!value && model.programType !== 'SQL') {
           return new Error(t('project.node.main_package_tips'))
         }
       }

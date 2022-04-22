@@ -22,8 +22,11 @@ import type { IJsonItem } from '../types'
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-    // model.programType === 'PYTHON' ? 0 : 24
       (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+  )
+
+  const mainArgsSpan = computed(() =>
+      model.programType === 'SQL' ? 0 : 24
   )
 
   const rawScriptSpan = computed(() =>
@@ -64,9 +67,9 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: model.programType !== 'PYTHON',
+        required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
-          if (model.programType !== 'PYTHON' && !value) {
+          if (model.programType !== 'PYTHON' && !value && model.programType !== 'SQL') {
             return new Error(t('project.node.main_class_tips'))
           }
         }
@@ -198,6 +201,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'mainArgs',
+      span: mainArgsSpan,
       name: t('project.node.main_arguments'),
       props: {
         type: 'textarea',
@@ -237,7 +241,8 @@ const PROGRAM_TYPES = [
   },
   {
     label: 'SQL',
-    value: 'SQL'}
+    value: 'SQL'
+  }
 ]
 
 const FLINK_VERSIONS = [
