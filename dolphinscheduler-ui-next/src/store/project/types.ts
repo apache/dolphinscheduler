@@ -19,6 +19,9 @@ import type { EditWorkflowDefinition } from '@/views/projects/workflow/component
 import type { IOption } from '@/components/form/types'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+type DependentResultType = {
+  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
+}
 
 interface IResource {
   id: number
@@ -37,6 +40,7 @@ interface TaskNodeState {
   resources: IResource[]
   mainJars: { [key in ProgramType]?: IMainJar[] }
   name: string
+  dependentResult: DependentResultType
 }
 export {
   TaskNodeState,
@@ -44,5 +48,6 @@ export {
   IOption,
   IResource,
   ProgramType,
+  DependentResultType,
   IMainJar
 }
