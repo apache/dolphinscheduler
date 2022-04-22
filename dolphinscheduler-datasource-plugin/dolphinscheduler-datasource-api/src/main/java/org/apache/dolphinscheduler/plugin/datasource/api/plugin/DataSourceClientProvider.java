@@ -39,9 +39,9 @@ import java.util.concurrent.TimeUnit;
 public class DataSourceClientProvider {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
-    private final static long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
+    private static long DURATION = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(duration, TimeUnit.HOURS)
+            .expireAfterWrite(DURATION, TimeUnit.HOURS)
             .maximumSize(100)
             .build();
 
