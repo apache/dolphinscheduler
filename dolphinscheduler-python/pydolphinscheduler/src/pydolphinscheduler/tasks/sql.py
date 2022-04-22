@@ -77,9 +77,7 @@ class Sql(Task):
     @property
     def sql_type(self) -> int:
         """Judgement sql type, use regexp to check which type of the sql is."""
-        pattern_select_str = (
-            "^(?!(.* |)insert |(.* |)delete |(.* |)drop |(.* |)update |(.* |)alter |(.* |)create ).*"
-        )
+        pattern_select_str = "^(?!(.* |)insert |(.* |)delete |(.* |)drop |(.* |)update |(.* |)alter |(.* |)create ).*"
         pattern_select = re.compile(pattern_select_str, re.IGNORECASE)
         if pattern_select.match(self.sql) is None:
             return SqlType.NOT_SELECT
