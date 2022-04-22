@@ -40,13 +40,13 @@
 
 ```
 $ tar -zxvf apache-dolphinscheduler-<version>-src.tar.gz
-$ cd apache-dolphinscheduler-<version>-src/docker/docker-swarm
+$ cd apache-dolphinscheduler-<version>-src/deploy/docker
 $ docker pull dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
 $ docker tag apache/dolphinscheduler:<version> apache/dolphinscheduler:latest
 $ docker-compose up -d
 ```
 
-> PowerShell 应该使用 `cd apache-dolphinscheduler-<version>-src\docker\docker-swarm`
+> PowerShell 应该使用 `cd apache-dolphinscheduler-<version>-src\deploy\docker`
 
 **PostgreSQL** (用户 `root`, 密码 `root`, 数据库 `dolphinscheduler`) 和 **ZooKeeper** 服务将会默认启动
 
