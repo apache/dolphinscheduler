@@ -40,12 +40,12 @@ Please download the source package apache-dolphinscheduler-x.x.x-src.tar.gz from
 
 ```
 $ tar -zxvf apache-dolphinscheduler-<version>-src.tar.gz
-$ cd apache-dolphinscheduler-<version>-src/docker/docker-swarm
+$ cd apache-dolphinscheduler-<version>-src/deploy/docker
 $ docker pull dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
 $ docker tag apache/dolphinscheduler:<version> apache/dolphinscheduler:latest
 $ docker-compose up -d
 ```
-> PowerShell should use `cd apache-dolphinscheduler-<version>-src\docker\docker-swarm`
+> PowerShell should use `cd apache-dolphinscheduler-<version>-src\deploy\docker`
 
 **PostgreSQL** (user `root`, password `root`, database `dolphinscheduler`) and **ZooKeeper** services will be started by default
 
@@ -225,15 +225,15 @@ Lists all running containers:
 
 ```
 docker ps
-docker ps --format "{{.Names}}" # 只打印名字
+docker ps --format "{{.Names}}" # Show container name only
 ```
 
 View the logs of the container named docker-swarm_dolphinscheduler-api_1:
 
 ```
 docker logs docker-swarm_dolphinscheduler-api_1
-docker logs -f docker-swarm_dolphinscheduler-api_1 # 跟随日志输出
-docker logs --tail 10 docker-swarm_dolphinscheduler-api_1 # 显示倒数10行日志
+docker logs -f docker-swarm_dolphinscheduler-api_1 # Follow the latest logs
+docker logs --tail 10 docker-swarm_dolphinscheduler-api_1 # Follow the latest ten lines of logs
 ```
 
 ### How to scale master and worker with docker-compose?

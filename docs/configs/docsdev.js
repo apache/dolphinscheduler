@@ -244,6 +244,10 @@ export default {
                         ],
                     },
                     {
+                        title: 'Data Quality',
+                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
+                    },
+                    {
                         title: 'Resource',
                         link: '/en-us/docs/dev/user_doc/guide/resource.html',
                     },
@@ -556,6 +560,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
                             },
                         ],
+                    },
+                    {
+                        title: '数据质量',
+                        link: '/zh-cn/docs/dev/user_doc/guide /data-quality.html',
                     },
                     {
                         title: '资源中心',
