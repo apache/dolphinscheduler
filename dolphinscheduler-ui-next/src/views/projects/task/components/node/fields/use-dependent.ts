@@ -15,18 +15,32 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, h } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { NIcon } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryAllProjectList } from '@/service/modules/projects'
+import { tasksState } from '@/utils/common'
 import {
   queryProcessDefinitionList,
   getTasksByDefinitionList
 } from '@/service/modules/process-definition'
-import type { IJsonItem, IDependpendItem, IDependTask } from '../types'
+import { Router, useRouter } from 'vue-router'
+import type {
+  IJsonItem,
+  IDependpendItem,
+  IDependTask,
+  ITaskState
+} from '../types'
 
 export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
+  const router: Router = useRouter()
+  const nodeStore = useTaskNodeStore()
+
+  const dependentResult = nodeStore.getDependentResult
+  const TasksStateConfig = tasksState(t)
   const projectList = ref([] as { label: string; value: number }[])
   const processCache = {} as {
     [key: number]: { label: string; value: number }[]
@@ -199,6 +213,21 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     return taskList
   }
 
+  const renderState = (item: {
+    definitionCode: number
+    depTaskCode: number
+    cycle: string
+    dateValue: string
+  }) => {
+    if (!item || router.currentRoute.value.name !== 'workflow-instance-detail')
+      return null
+    const key = `${item.definitionCode}-${item.depTaskCode}-${item.cycle}-${item.dateValue}`
+    const state: ITaskState = dependentResult[key] || 'WAITING_THREAD'
+    return h(NIcon, { size: 24, color: TasksStateConfig[state].color }, () =>
+      h(TasksStateConfig[state].icon)
+    )
+  }
+
   onMounted(() => {
     getProjectList()
   })
@@ -306,6 +335,13 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             name: ' ',
             options:
               model.dependTaskList[i]?.dependItemList[j]?.dateOptions || []
+          }),
+          (j = 0) => ({
+            type: 'custom',
+            field: 'state',
+            span: 2,
+            name: ' ',
+            widget: renderState(model.dependTaskList[i]?.dependItemList[j])
           })
         ]
       }),
