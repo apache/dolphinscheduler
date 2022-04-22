@@ -16,7 +16,7 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PROGRAM_TYPES2 } from './use-spark'
+// import { PROGRAM_TYPES2 } from './use-spark'
 import { useCustomParams, useMainJar, useResources } from '.'
 import type { IJsonItem } from '../types'
 
@@ -34,7 +34,7 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
       field: 'programType',
       span: 12,
       name: t('project.node.program_type'),
-      options: PROGRAM_TYPES2,
+      options: PROGRAM_TYPES,
       props: {
         'on-update:value': () => {
           model.mainJar = null
@@ -92,3 +92,18 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
+
+export const PROGRAM_TYPES = [
+  {
+    label: 'JAVA',
+    value: 'JAVA'
+  },
+  {
+    label: 'SCALA',
+    value: 'SCALA'
+  },
+  {
+    label: 'PYTHON',
+    value: 'PYTHON'
+  }
+]

@@ -32,8 +32,11 @@ import type { IJsonItem } from '../types'
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-    // model.programType === 'PYTHON' ? 0 : 24
       (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+  )
+
+  const mainArgsSpan = computed(() =>
+      model.programType === 'SQL' ? 0 : 24
   )
 
   const rawScriptSpan = computed(() =>
@@ -109,6 +112,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'mainArgs',
+      span: mainArgsSpan,
       name: t('project.node.main_arguments'),
       props: {
         type: 'textarea',
@@ -145,21 +149,6 @@ export const PROGRAM_TYPES = [
   {
     label: 'SQL',
     value: 'SQL'
-  }
-]
-
-export const PROGRAM_TYPES2 = [
-  {
-    label: 'JAVA',
-    value: 'JAVA'
-  },
-  {
-    label: 'SCALA',
-    value: 'SCALA'
-  },
-  {
-    label: 'PYTHON',
-    value: 'PYTHON'
   }
 ]
 

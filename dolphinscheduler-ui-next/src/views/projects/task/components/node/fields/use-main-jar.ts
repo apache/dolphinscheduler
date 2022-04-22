@@ -26,17 +26,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
-  const span = ref(24)
-  const require = ref(true)
-
   const getMainJars = async (programType: ProgramType) => {
-    if (programType === 'SQL') {
-      span.value = 0
-      require.value = false
-    } else {
-      span.value = 24
-      require.value = true
-    }
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
       mainJarOptions.value = storeMainJar
@@ -66,7 +56,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     type: 'tree-select',
     field: 'mainJar',
     name: t('project.node.main_package'),
-    span: span,
+    span: model.programType === 'SQL' ? 0 : 24,
     props: {
       cascade: true,
       showPath: true,
