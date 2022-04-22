@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLC
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
@@ -30,6 +31,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.junit.Assert;
@@ -89,9 +91,9 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testGetConnection() {
+    public void testGetConnection() throws ExecutionException {
         PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getLong(Constants.KERBEROS_RENEW_LIFETIME_HOURS, 24L)).thenReturn(24L);
+        PowerMockito.when(PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24L)).thenReturn(24L);
         PowerMockito.mockStatic(DataSourceClientProvider.class);
         DataSourceClientProvider clientProvider = PowerMockito.mock(DataSourceClientProvider.class);
         PowerMockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
