@@ -557,11 +557,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             return result;
         }
-        Arrays.stream(projectIds.split(",")).distinct().forEach(pId -> {
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
             projectUser.setUserId(userId);
-            projectUser.setProjectId(Integer.parseInt(pId));
+            projectUser.setProjectId(Integer.parseInt(projectId));
             projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
