@@ -55,7 +55,15 @@ There is only the "id" value. Although the user-defined SQL query both "id" and 
 ### SHELL
 
 `prop` is user-specified and the direction is `OUT`. The output is defined as an export parameter only when the direction is `OUT`. Choose data structures for data type according to the scenario, and leave the value part blank.
-The user needs to pass the parameter when creating the shell script, the output statement format is `${setValue(key=value)}`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
+
+The user needs to pass the parameter when creating the shell script, the output statement format is `${setValue(key=value)}` or `#{setValue(key=value)}`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
+
+The statement with output format of `#{setValue(key=value)}` supports `value` to refer to other variables.
+
+```shell script
+d=$(date "+%F")
+echo "#{setValue(day=${d})}"
+```
 
 For example, in the figure below:
 
