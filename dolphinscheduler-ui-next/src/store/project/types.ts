@@ -22,6 +22,9 @@ type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type DependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
 }
+type BDependentResultType = {
+  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
+}
 
 interface IResource {
   id: number
@@ -49,5 +52,6 @@ export {
   IResource,
   ProgramType,
   DependentResultType,
+  BDependentResultType,
   IMainJar
 }
