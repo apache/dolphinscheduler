@@ -28,6 +28,7 @@ import {
   useResources
 } from '.'
 import type { IJsonItem } from '../types'
+import {DEPLOY_MODES} from "@/views/projects/task/components/node/fields/use-deploy-mode";
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -95,7 +96,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.script_tips')
       }
     },
-    useDeployMode(),
+    useDeployMode(24,true,model.programType !== 'SQL'),
     {
       type: 'input',
       field: 'appName',
@@ -162,3 +163,18 @@ export const SPARK_VERSIONS = [
     value: 'SPARK1'
   }
 ]
+
+// export const DEPLOY_MODES = [
+//   {
+//     label: 'cluster',
+//     value: 'cluster'
+//   },
+//   {
+//     label: 'client',
+//     value: 'client'
+//   },
+//   {
+//     label: 'local',
+//     value: 'local'
+//   }
+// ]

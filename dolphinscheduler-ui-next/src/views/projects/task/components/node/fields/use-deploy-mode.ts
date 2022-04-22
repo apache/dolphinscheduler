@@ -14,34 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../types'
+import {useI18n} from 'vue-i18n'
+import type {IJsonItem} from '../types'
 
-export function useDeployMode(span = 24, showClient = true): IJsonItem {
-  const { t } = useI18n()
+export function useDeployMode(span = 24, showClient = true,showCluster = true): IJsonItem {
+    const {t} = useI18n()
 
-  return {
-    type: 'radio',
-    field: 'deployMode',
-    name: t('project.node.deploy_mode'),
-    options: DEPLOY_MODES.filter((option) =>
-      option.value === 'client' ? showClient : true
-    ),
-    span
-  }
+    return {
+        type: 'radio',
+        field: 'deployMode',
+        name: t('project.node.deploy_mode'),
+        options: DEPLOY_MODES.filter((option) => {
+            if(option.value === 'client') {
+                return showClient
+            }
+            if(option.value === 'cluster') {
+                return showCluster
+            }
+            return true
+            }
+        ),
+    }
 }
 
 export const DEPLOY_MODES = [
-  {
-    label: 'cluster',
-    value: 'cluster'
-  },
-  {
-    label: 'client',
-    value: 'client'
-  },
-  {
-    label: 'local',
-    value: 'local'
-  }
+    {
+        label: 'cluster',
+        value: 'cluster'
+    },
+    {
+        label: 'client',
+        value: 'client'
+    },
+    {
+        label: 'local',
+        value: 'local'
+    }
 ]
