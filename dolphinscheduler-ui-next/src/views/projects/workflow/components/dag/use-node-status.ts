@@ -22,6 +22,7 @@ import { tasksState } from '@/utils/common'
 import { NODE, NODE_STATUS_MARKUP } from './dag-config'
 import { queryTaskListByProcessId } from '@/service/modules/process-instances'
 import NodeStatus from '@/views/projects/workflow/components/dag/dag-node-status'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import type { IWorkflowTaskInstance, ITaskState } from './types'
 import type { Graph } from '@antv/x6'
 import type { Ref } from 'vue'
@@ -39,6 +40,8 @@ export function useNodeStatus(options: Options) {
   const taskList = ref<Array<IWorkflowTaskInstance>>([])
 
   const { t } = useI18n()
+
+  const nodeStore = useTaskNodeStore()
 
   const setNodeStatus = (
     code: string,
@@ -76,6 +79,9 @@ export function useNodeStatus(options: Options) {
       if (taskList.value) {
         taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
+          nodeStore.updateDependentResult(
+            JSON.parse(taskInstance.dependentResult)
+          )
         })
       }
     })
