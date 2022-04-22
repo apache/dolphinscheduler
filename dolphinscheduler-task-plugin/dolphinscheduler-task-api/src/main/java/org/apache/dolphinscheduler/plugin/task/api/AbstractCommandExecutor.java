@@ -318,7 +318,7 @@ public abstract class AbstractCommandExecutor {
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = inReader.readLine()) != null) {
-                    if (line.startsWith("${setValue(")) {
+                    if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
                         varPool.append(findVarPool(line));
                         varPool.append("$VarPool$");
                     } else {
