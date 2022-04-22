@@ -606,10 +606,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 4. maintain the relationship between project and user if not exists
-        ProjectUser pu = projectUserMapper.queryProjectRelation(project.getId(), userId);
-        if (pu == null) {
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
+        if (projectUser == null) {
             final Date today = new Date();
-            ProjectUser projectUser = new ProjectUser();
+            projectUser = new ProjectUser();
             projectUser.setUserId(userId);
             projectUser.setProjectId(project.getId());
             projectUser.setPerm(7);
