@@ -29,7 +29,7 @@ public class PythonTaskTest {
         String methodName = "buildPythonExecuteCommand";
         String pythonFile = "test.py";
         String result1 = Whitebox.invokeMethod(pythonTask, methodName, pythonFile);
-        Assert.assertEquals("python test.py", result1);
+        Assert.assertEquals("${PYTHON_HOME} test.py", result1);
     }
 
     private PythonTask createPythonTask() {

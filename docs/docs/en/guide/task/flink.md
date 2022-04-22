@@ -52,7 +52,7 @@ If you are using the flink task type in a production environment, it is necessar
 
 #### Upload the Main Package
 
-When using the Flink task node, you need to upload the jar package to the Resource Centre for the execution, refer to the [resource center](../resource.md).
+When using the Flink task node, you need to upload the jar package to the Resource Center for the execution, refer to the [resource center](../resource.md).
 
 After finish the Resource Centre configuration, upload the required target files directly by dragging and dropping.
 

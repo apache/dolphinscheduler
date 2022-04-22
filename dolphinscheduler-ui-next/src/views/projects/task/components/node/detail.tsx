@@ -35,7 +35,6 @@ const NodeDetail = defineComponent({
   emits: ['taskTypeChange'],
   setup(props, { expose, emit }) {
     const taskStore = useTaskNodeStore()
-    taskStore.init()
 
     const formRef = ref()
     const detailData: IDetailPanel = inject('data') || {
@@ -58,6 +57,7 @@ const NodeDetail = defineComponent({
     watch(
       () => model.taskType,
       async (taskType) => {
+        taskStore.updateName(model.name || '')
         emit('taskTypeChange', taskType)
       }
     )

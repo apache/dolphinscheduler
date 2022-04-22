@@ -164,5 +164,9 @@
         select
         <include refid="baseSql"/>
         from t_ds_project
+        where 1=1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
     </select>
 </mapper>

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -30,7 +30,7 @@ if [ ! -d $installPath ];then
 fi
 
 echo "2.scp resources"
-sh ${workDir}/scp-hosts.sh
+bash ${workDir}/scp-hosts.sh
 if [ $? -eq 0 ];then
 	echo 'scp copy completed'
 else
@@ -39,10 +39,10 @@ else
 fi
 
 echo "3.stop server"
-sh ${workDir}/stop-all.sh
+bash ${workDir}/stop-all.sh
 
 echo "4.delete zk node"
-sh ${workDir}/remove-zk-node.sh $zkRoot
+bash ${workDir}/remove-zk-node.sh $zkRoot
 
 echo "5.startup"
-sh ${workDir}/start-all.sh
+bash ${workDir}/start-all.sh

@@ -31,7 +31,9 @@ import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import LogModal from './components/log-modal'
+import LogModal from '@/components/log-modal'
+import { useAsyncState } from '@vueuse/core'
+import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/utils/common'
 import styles from './index.module.scss'
 
@@ -68,6 +70,35 @@ const TaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
+    const getLogs = (row: any) => {
+      const { state } = useAsyncState(
+        queryLog({
+          taskInstanceId: Number(row.id),
+          limit: variables.limit,
+          skipLineNum: variables.skipLineNum
+        }).then((res: string) => {
+          variables.logRef += res
+          if (res) {
+            variables.limit += 1000
+            variables.skipLineNum += 1000
+            getLogs(row)
+          } else {
+            variables.logLoadingRef = false
+          }
+        }),
+        {}
+      )
+
+      return state
+    }
+
+    const refreshLogs = (row: any) => {
+      variables.logRef = ''
+      variables.limit = 1000
+      variables.skipLineNum = 0
+      getLogs(row)
+    }
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -77,13 +108,29 @@ const TaskInstance = defineComponent({
       createColumns(variables)
     })
 
+    watch(
+      () => variables.showModalRef,
+      () => {
+        if (variables.showModalRef) {
+          getLogs(variables.row)
+        } else {
+          variables.row = {}
+          variables.logRef = ''
+          variables.logLoadingRef = true
+          variables.skipLineNum = 0
+          variables.limit = 1000
+        }
+      }
+    )
+
     return {
       t,
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
       onSearch,
-      onConfirmModal
+      onConfirmModal,
+      refreshLogs
     }
   },
   render() {
@@ -93,7 +140,8 @@ const TaskInstance = defineComponent({
       onUpdatePageSize,
       onSearch,
       onConfirmModal,
-      loadingRef
+      loadingRef,
+      refreshLogs
     } = this
 
     return (
@@ -173,8 +221,11 @@ const TaskInstance = defineComponent({
         </Card>
         <LogModal
           showModalRef={this.showModalRef}
+          logRef={this.logRef}
           row={this.row}
+          logLoadingRef={this.logLoadingRef}
           onConfirmModal={onConfirmModal}
+          onRefreshLogs={refreshLogs}
         />
       </>
     )

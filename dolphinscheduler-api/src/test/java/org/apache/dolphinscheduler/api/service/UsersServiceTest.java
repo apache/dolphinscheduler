@@ -91,6 +91,9 @@ public class UsersServiceTest {
     private UDFUserMapper udfUserMapper;
 
     @Mock
+    private K8sNamespaceUserMapper k8sNamespaceUserMapper;
+
+    @Mock
     private ProjectMapper projectMapper;
 
     @Mock
@@ -430,6 +433,24 @@ public class UsersServiceTest {
         //success
         when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
         result = usersService.grantUDFFunction(loginUser, 1, udfIds);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testGrantNamespaces() {
+        String namespaceIds = "100000,120000";
+        when(userMapper.selectById(1)).thenReturn(getUser());
+        User loginUser = new User();
+
+        //user not exist
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Map<String, Object> result = usersService.grantNamespaces(loginUser, 2, namespaceIds);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        //success
+        when(k8sNamespaceUserMapper.deleteNamespaceRelation(0,1)).thenReturn(1);
+        result = usersService.grantNamespaces(loginUser, 1, namespaceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }

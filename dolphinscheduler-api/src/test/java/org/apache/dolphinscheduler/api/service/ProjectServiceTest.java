@@ -345,9 +345,11 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAllProjectList() {
-        Mockito.when(projectMapper.queryAllProject()).thenReturn(getList());
+        Mockito.when(projectMapper.queryAllProject(0)).thenReturn(getList());
 
-        Map<String, Object> result = projectService.queryAllProjectList();
+        User user = new User();
+        user.setId(0);
+        Map<String, Object> result = projectService.queryAllProjectList(user);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
