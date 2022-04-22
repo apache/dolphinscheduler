@@ -112,5 +112,5 @@ alert.rpc.port=50052
 > **_Note:_**
 >
 > * If only the `api-server/conf/common.properties` file is configured, then only resource uploading is enabled, not normal use. If you want to execute the files in the workflow you need to configure `worker-server/conf/common.properties` additionally.
-> * If you want to use the resource upload function, the deployment user in [installation and deployment](installation/standalone.md) must have relevant operation authority.
+> * If you want to use the resource upload function, the deployment user in [installation and deployment](../installation/standalone.md) must have relevant operation authority.
 > * If you using a Hadoop cluster with HA, you need to enable HDFS resource upload, and you need to copy the `core-site.xml` and `hdfs-site.xml` under the Hadoop cluster to `/opt/dolphinscheduler/conf`, otherwise skip this copy step.
