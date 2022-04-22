@@ -15,24 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.common.exception;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * exception for store
+ */
+public class StorageOperateNoConfiguredException extends RuntimeException {
 
-import static org.junit.Assert.assertNotNull;
-
-public class PropertyUtilsTest {
-
-    @Test
-    public void getString() {
-        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
+    public StorageOperateNoConfiguredException() {
     }
 
-    @Test
-    public void getResUploadStartupState(){
-        Assert.assertFalse(PropertyUtils.getResUploadStartupState());
+    public StorageOperateNoConfiguredException(String message) {
+        super(message);
+    }
+
+    public StorageOperateNoConfiguredException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public StorageOperateNoConfiguredException(Throwable cause) {
+        super(cause);
+    }
+
+    public StorageOperateNoConfiguredException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
