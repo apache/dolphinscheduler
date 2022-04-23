@@ -56,6 +56,8 @@ from pydolphinscheduler.tasks.sql import Sql, SqlType
         ("create table table_name2 (col1 int)", None, SqlType.NOT_SELECT),
         ("create table table_name2 (col1 int)", SqlType.SELECT, SqlType.SELECT),
         ("select 1", SqlType.NOT_SELECT, SqlType.NOT_SELECT),
+        ("create table table_name2 (col1 int)", SqlType.NOT_SELECT, SqlType.NOT_SELECT),
+        ("select 1", SqlType.SELECT, SqlType.SELECT),
     ],
 )
 @patch(

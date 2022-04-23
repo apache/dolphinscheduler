@@ -17,12 +17,15 @@
 
 """Task sql."""
 
+import logging
 import re
 from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.database import Database
 from pydolphinscheduler.core.task import Task
+
+log = logging.getLogger(__file__)
 
 
 class SqlType:
@@ -78,13 +81,21 @@ class Sql(Task):
 
     @property
     def sql_type(self) -> int:
-        """If sql type is specified by parameter"""
+        """Judgement sql type, it will return the SQL type for type `SELECT` or `NOT_SELECT`.
+
+        If parameter :param:`param_sql_type` dot not specific, will use regexp to check
+        which type of the SQL is. But if parameter :param:`param_sql_type` is specific
+        will use the parameter overwrites the regexp way
+        """
         if (
             self.param_sql_type == SqlType.SELECT
             or self.param_sql_type == SqlType.NOT_SELECT
         ):
+            log.info(
+                "The sql type is specified by a parameter, with value %s",
+                self.param_sql_type,
+            )
             return self.param_sql_type
-        """Judgement sql type, use regexp to check which type of the sql is."""
         pattern_select_str = (
             "^(?!(.* |)insert |(.* |)delete |(.* |)drop "
             "|(.* |)update |(.* |)alter |(.* |)create ).*"
