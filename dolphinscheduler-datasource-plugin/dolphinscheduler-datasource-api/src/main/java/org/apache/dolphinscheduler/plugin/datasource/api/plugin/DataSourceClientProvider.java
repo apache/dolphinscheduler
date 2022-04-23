@@ -39,9 +39,9 @@ import java.util.concurrent.TimeUnit;
 public class DataSourceClientProvider {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
-    private static long DURATION = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
+    private static long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(DURATION, TimeUnit.HOURS)
+            .expireAfterWrite(duration, TimeUnit.HOURS)
             .maximumSize(100)
             .build();
 
@@ -64,8 +64,7 @@ public class DataSourceClientProvider {
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
 
-        DataSourceClient dataSourceClient;
-        dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
+        DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
             DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
             if (null == dataSourceChannel) {
