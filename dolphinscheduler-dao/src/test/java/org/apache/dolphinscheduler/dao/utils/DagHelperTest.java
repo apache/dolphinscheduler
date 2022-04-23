@@ -280,9 +280,16 @@ public class DagHelperTest {
     }
 
     /**
+     * process:
      * 1->2->3->5->7
      * 4->3->6
-     * 2->8->5->7
+     * 1->2->8->5->7
+     * DAG graph:
+     *      4 ->   -> 6
+     *          \ /
+     * 1 -> 2 -> 3 -> 5 -> 7
+     *       \       /
+     *        -> 8 ->
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
@@ -377,9 +384,12 @@ public class DagHelperTest {
     }
 
     /**
-     * 1->2->3->5->7
-     * 4->3->6
-     * 2->8->5->7
+     * DAG graph:
+     *    2
+     *    ↑
+     * 0->1(switch)
+     *    ↓
+     *    4
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
