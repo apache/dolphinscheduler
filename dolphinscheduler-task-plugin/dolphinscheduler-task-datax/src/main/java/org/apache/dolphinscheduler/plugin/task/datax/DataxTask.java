@@ -559,7 +559,7 @@ public class DataxTask extends AbstractTaskExecutor {
                 columnNames[i - 1] = md.getColumnName(i);
             }
         } catch (SQLException | ExecutionException e) {
-            logger.warn(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
