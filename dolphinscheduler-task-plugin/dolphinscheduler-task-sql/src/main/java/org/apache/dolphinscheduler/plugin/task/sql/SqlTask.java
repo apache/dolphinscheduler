@@ -192,7 +192,7 @@ public class SqlTask extends AbstractTaskExecutor {
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
 
 
-            //hive sql日志打印
+            //hive log listener
             if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
                 logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
 

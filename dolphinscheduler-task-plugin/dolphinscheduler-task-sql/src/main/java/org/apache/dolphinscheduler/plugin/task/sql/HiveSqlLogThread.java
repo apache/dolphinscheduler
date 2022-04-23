@@ -10,17 +10,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+
 /**
- * @title: HiveSqlLogThread
- * @projectName dolphinscheduler
- * @Description 收集hive sql日志
- * @Author fengjian
- * @Date 2022/3/21 7:20 下午
+ * hive log listener thread
  */
 public class HiveSqlLogThread extends Thread{
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThread.class);
+    /**
+     * hive statement
+     */
     private HiveStatement statement;
+    /**
+     * logger
+     */
     private Logger logger;
+
     private TaskExecutionContext taskExecutionContext;
 
     public HiveSqlLogThread(Statement statement, Logger logger, TaskExecutionContext taskExecutionContext){
@@ -36,8 +40,14 @@ public class HiveSqlLogThread extends Thread{
         try {
             while (!statement.isClosed() && statement.hasMoreLogs()){
                 for (String log: statement.getQueryLog(true,500)){
+
+                    //hive mapreduce log
                     logger.info(log);
+
                     List<String> appIds = LoggerUtils.getAppIds(log, logger);
+
+
+                    //get sql task yarn's application_id
                     if (!appIds.isEmpty()){
                         taskExecutionContext.setAppIds(String.join(",", appIds));
                     }
@@ -45,11 +55,7 @@ public class HiveSqlLogThread extends Thread{
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.error("查看hive 日志线程失败,exception:[{}]",e.getMessage());
+            logger.error("Failed to view hive log,exception:[{}]",e.getMessage());
         }
-    }
-
-
-    public static void main(String[] args) {
     }
 }
