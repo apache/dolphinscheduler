@@ -1332,7 +1332,14 @@ public class WorkflowExecuteThread implements Runnable {
             readyToSubmitTaskQueue.clear();
         }
 
+        boolean needStopProcessInstance = false;
         for (int taskId : activeTaskProcessorMaps.keySet()) {
+            if (taskRetryCheckList.containsKey(taskId)) {
+                taskRetryCheckList.remove(taskId);
+                logger.info("task id {} removed from taskRetryCheckList", taskId);
+                needStopProcessInstance = true;
+            }
+
             TaskInstance taskInstance = processService.findTaskInstanceById(taskId);
             if (taskInstance == null || taskInstance.getState().typeIsFinished()) {
                 continue;
@@ -1348,8 +1355,7 @@ public class WorkflowExecuteThread implements Runnable {
             }
         }
 
-        if (taskRetryCheckList.size() > 0) {
-            this.taskRetryCheckList.clear();
+        if (needStopProcessInstance) {
             this.addProcessStopEvent(processInstance);
         }
     }
