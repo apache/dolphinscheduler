@@ -1,6 +1,6 @@
 # File Management
 
-When third party jars are used in the scheduling process or user defined scripts are required, these can be created from this page. The types of files that can be created include: `txt/log/sh/conf/py/java` and so on. Files can be edited, renamed, downloaded and deleted.
+When third party jars are used in the scheduling process or user defined scripts are required, these can be created from this page. The types of files that can be created include: txt, log, sh, conf, py, java and so on. Files can be edited, renamed, downloaded and deleted.
 
 ![file-manage](/img/new_ui/dev/resource/file-manage.png)
 

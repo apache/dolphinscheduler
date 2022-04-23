@@ -1,10 +1,10 @@
 # UDF Manage
 
-> The resource management and file management functions are similar. The difference is that the resource management is the UDF upload function, and the file management uploads the user programs, scripts and configuration files.
-> Operation function: rename, download, delete.
+The resource management and file management functions are similar. The difference is that the resource management is the UDF upload function, and the file management uploads the user programs, scripts and configuration files. Operation function: rename, download, delete.
 
 - Upload UDF resources
-  > Same as uploading files.
+
+> Same as uploading files.
 
 ### Function Management
 
