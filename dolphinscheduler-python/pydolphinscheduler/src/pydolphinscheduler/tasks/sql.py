@@ -83,8 +83,8 @@ class Sql(Task):
     def sql_type(self) -> int:
         """Judgement sql type, it will return the SQL type for type `SELECT` or `NOT_SELECT`.
 
-        If parameter :param:`param_sql_type` dot not specific, will use regexp to check
-        which type of the SQL is. But if parameter :param:`param_sql_type` is specific
+        If `param_sql_type` dot not specific, will use regexp to check
+        which type of the SQL is. But if `param_sql_type` is specific
         will use the parameter overwrites the regexp way
         """
         if (
