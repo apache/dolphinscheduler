@@ -385,7 +385,7 @@ export default defineComponent({
             ) : (
               <NSpace vertical>
                 {this.startParamsList.map((item, index) => (
-                  <NSpace class={styles.startup} key={item.prop + item.value}>
+                  <NSpace class={styles.startup} key={Date.now() + index}>
                     <NInput
                       pair
                       separator=':'
