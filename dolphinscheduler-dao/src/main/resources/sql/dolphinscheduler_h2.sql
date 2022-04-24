@@ -456,7 +456,8 @@ CREATE TABLE t_ds_process_definition_log
     operate_time     datetime     DEFAULT NULL,
     create_time      datetime NOT NULL,
     update_time      datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY t_ds_pdl (code, version)
 );
 
 -- ----------------------------
@@ -524,7 +525,8 @@ CREATE TABLE t_ds_task_definition_log
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY t_ds_tdl (code, version)
 );
 
 -- ----------------------------

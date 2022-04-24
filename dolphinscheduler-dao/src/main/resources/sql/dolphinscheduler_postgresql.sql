@@ -373,7 +373,8 @@ CREATE TABLE t_ds_process_definition_log (
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_pdl_unique_key UNIQUE (code, version)
 ) ;
 
 --
@@ -443,7 +444,8 @@ CREATE TABLE t_ds_task_definition_log (
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_tdl_unique_key UNIQUE (code, version)
 ) ;
 
 create index idx_task_definition_log_code_version on t_ds_task_definition_log (code,version);
