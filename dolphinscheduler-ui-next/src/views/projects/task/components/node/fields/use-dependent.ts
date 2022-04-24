@@ -21,7 +21,7 @@ import { NIcon } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryAllProjectList } from '@/service/modules/projects'
-import { tasksState } from '@/utils/common'
+import { tasksState } from '@/common/common'
 import {
   queryProcessDefinitionList,
   getTasksByDefinitionList

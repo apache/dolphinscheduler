@@ -32,12 +32,12 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import { parseTime, tasksState } from '@/utils/common'
+import { parseTime, tasksState } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {

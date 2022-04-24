@@ -20,7 +20,7 @@ import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryAuditLogListPaging } from '@/service/modules/audit'
 import { format } from 'date-fns'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import type { AuditListRes } from '@/service/modules/audit/types'
 
 export function useTable() {

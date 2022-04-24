@@ -35,7 +35,7 @@ import {
   updateSchedule,
   previewSchedule
 } from '@/service/modules/schedules'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import { EnvironmentItem } from '@/service/modules/environment/types'
 import { ITimingState } from './types'
 
