@@ -107,7 +107,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         if (processDefinition.getProjectCode() != projectCode) {
@@ -122,7 +122,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 .collect(Collectors.toMap(ProcessTaskRelation::getPreTaskCode, processTaskRelation -> processTaskRelation));
             if (!preTaskCodeMap.isEmpty()) {
                 if (preTaskCodeMap.containsKey(preTaskCode) || (!preTaskCodeMap.containsKey(0L) && preTaskCode == 0L)) {
-                    putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, processDefinitionCode);
+                    putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, String.valueOf(processDefinitionCode));
                     return result;
                 }
                 if (preTaskCodeMap.containsKey(0L) && preTaskCode != 0L) {
@@ -202,12 +202,12 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (null == taskDefinition) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
@@ -305,7 +305,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(upstreamList.get(0).getProcessDefinitionCode());
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, upstreamList.get(0).getProcessDefinitionCode());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(upstreamList.get(0).getProcessDefinitionCode()));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
@@ -364,7 +364,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(downstreamList.get(0).getProcessDefinitionCode());
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, downstreamList.get(0).getProcessDefinitionCode());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(downstreamList.get(0).getProcessDefinitionCode()));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
@@ -468,7 +468,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
