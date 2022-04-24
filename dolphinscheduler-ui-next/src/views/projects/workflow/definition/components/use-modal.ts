@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import _ from 'lodash'
+import _, { cloneDeep } from 'lodash'
 import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -55,6 +55,10 @@ export function useModal(
     startParamsList: [],
     schedulePreviewList: []
   })
+
+  const cachedStartParams = {} as {
+    [key: string]: { prop: string; value: string }[]
+  }
 
   const resetImportForm = () => {
     state.importForm.name = ''
@@ -237,9 +241,14 @@ export function useModal(
   }
 
   const getStartParamsList = (code: number) => {
+    if (cachedStartParams[code]) {
+      variables.startParamsList = cloneDeep(cachedStartParams[code])
+      return
+    }
     queryProcessDefinitionByCode(code, variables.projectCode).then(
       (res: any) => {
         variables.startParamsList = res.processDefinition.globalParamList
+        cachedStartParams[code] = cloneDeep(variables.startParamsList)
       }
     )
   }
