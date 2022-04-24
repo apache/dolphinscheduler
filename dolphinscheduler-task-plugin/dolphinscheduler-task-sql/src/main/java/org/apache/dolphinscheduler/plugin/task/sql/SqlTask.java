@@ -177,6 +177,7 @@ public class SqlTask extends AbstractTaskExecutor {
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
+        HiveSqlLogThread queryThread = null;
         try {
 
             // create connection
@@ -189,6 +190,15 @@ public class SqlTask extends AbstractTaskExecutor {
             // pre sql
             preSql(connection, preStatementsBinds);
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
+
+
+            //hive log listener
+            if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+
+                queryThread = new HiveSqlLogThread(stmt, logger,taskExecutionContext);
+                queryThread.start();
+            }
 
             String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
