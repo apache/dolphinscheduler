@@ -209,7 +209,7 @@ export default defineComponent({
             <NSwitch v-model:value={formValue.value.timeoutFlag} />
           </NFormItem>
           {formValue.value.timeoutFlag && (
-            <NFormItem label=' ' path='timeout'>
+            <NFormItem showLabel={false} path='timeout'>
               <NInputNumber
                 v-model:value={formValue.value.timeout}
                 show-button={false}
@@ -255,14 +255,14 @@ export default defineComponent({
             />
           </NFormItem>
           {props.definition && !props.instance && (
-            <NFormItem path='timeoutFlag'>
+            <NFormItem path='timeoutFlag' showLabel={false}>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
               </NCheckbox>
             </NFormItem>
           )}
           {props.instance && (
-            <NFormItem path='sync'>
+            <NFormItem path='sync' showLabel={false}>
               <NCheckbox v-model:checked={formValue.value.sync}>
                 {t('project.dag.update_directly')}
               </NCheckbox>
