@@ -39,6 +39,8 @@ import {
 import { NIcon } from 'naive-ui'
 import { TASK_TYPES_MAP } from '../../constants/task-type'
 import { Router, useRouter } from 'vue-router'
+import { querySubProcessInstanceByTaskCode } from '@/service/modules/process-instances'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import type {
   ITaskData,
   ITaskType,
@@ -46,7 +48,6 @@ import type {
   IWorkflowTaskInstance,
   WorkflowInstance
 } from './types'
-import { querySubProcessInstanceByTaskCode } from '@/service/modules/process-instances'
 
 const props = {
   show: {
@@ -92,6 +93,8 @@ const NodeDetailModal = defineComponent({
   setup(props, { emit }) {
     const { t, locale } = useI18n()
     const router: Router = useRouter()
+    const taskStore = useTaskNodeStore()
+
     const renderIcon = (icon: any) => {
       return () => h(NIcon, null, { default: () => h(icon) })
     }
@@ -117,16 +120,15 @@ const NodeDetailModal = defineComponent({
       headerLinks.value = [
         {
           text: t('project.node.instructions'),
-          show:
-            taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable
-              ? true
-              : false,
+          show: !!(taskType && !TASK_TYPES_MAP[taskType]?.helperLinkDisable),
           action: () => {
+            let linkedTaskType = taskType?.toLowerCase().replace('_', '-')
+            if (taskType === 'PROCEDURE') linkedTaskType = 'stored-procedure'
             const helpUrl =
               'https://dolphinscheduler.apache.org/' +
               locale.value.toLowerCase().replace('_', '-') +
               '/docs/latest/user_doc/guide/task/' +
-              taskType?.toLowerCase().replace('_', '-') +
+              linkedTaskType +
               '.html'
             window.open(helpUrl)
           },
@@ -134,7 +136,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_history'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             router.push({
               name: 'task-instance',
@@ -145,7 +147,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.view_log'),
-          show: props.taskInstance ? true : false,
+          show: !!props.taskInstance,
           action: () => {
             handleViewLog()
           },
@@ -204,6 +206,7 @@ const NodeDetailModal = defineComponent({
       async () => {
         if (!props.show) return
         initHeaderLinks(props.processInstance, props.data.taskType)
+        taskStore.init()
         await nextTick()
         detailRef.value.value.setValues(formatModel(props.data))
       }

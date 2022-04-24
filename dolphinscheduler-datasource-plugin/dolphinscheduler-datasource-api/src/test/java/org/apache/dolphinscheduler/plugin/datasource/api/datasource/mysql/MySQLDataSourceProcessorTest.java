@@ -99,6 +99,9 @@ public class MySQLDataSourceProcessorTest {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         mysqlConnectionParam.setUser("root");
-        Assert.assertEquals("mysql@root@jdbc:mysql://localhost:3306/default", mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
+        mysqlConnectionParam.setPassword("123456");
+        PowerMockito.mockStatic(PasswordUtils.class);
+        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
+        Assert.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default", mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
     }
 }

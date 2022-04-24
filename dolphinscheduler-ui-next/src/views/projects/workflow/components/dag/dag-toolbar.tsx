@@ -74,9 +74,6 @@ export default defineComponent({
   setup(props, context) {
     const { t } = useI18n()
 
-    const startupPopoverRef = ref(false)
-    const paramPopoverRef = ref(false)
-
     const themeStore = useThemeStore()
 
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
@@ -229,19 +226,12 @@ export default defineComponent({
               <NTooltip
                 v-slots={{
                   trigger: () => (
-                    <NPopover
-                      show={paramPopoverRef.value}
-                      placement='bottom'
-                      trigger='manual'
-                    >
+                    <NPopover placement='bottom' trigger='click'>
                       {{
                         trigger: () => (
                           <NButton
                             quaternary
                             circle
-                            onClick={() =>
-                              (paramPopoverRef.value = !paramPopoverRef.value)
-                            }
                             class={Styles['toolbar-btn']}
                           >
                             <NIcon>
@@ -264,20 +254,12 @@ export default defineComponent({
               <NTooltip
                 v-slots={{
                   trigger: () => (
-                    <NPopover
-                      show={startupPopoverRef.value}
-                      placement='bottom'
-                      trigger='manual'
-                    >
+                    <NPopover placement='bottom' trigger='click'>
                       {{
                         trigger: () => (
                           <NButton
                             quaternary
                             circle
-                            onClick={() =>
-                              (startupPopoverRef.value =
-                                !startupPopoverRef.value)
-                            }
                             class={Styles['toolbar-btn']}
                           >
                             <NIcon>
@@ -497,7 +479,8 @@ export default defineComponent({
             secondary
             round
             disabled={
-              props.definition?.processDefinition?.releaseState === 'ONLINE'
+              props.definition?.processDefinition?.releaseState === 'ONLINE' &&
+              !props.instance
             }
             onClick={() => {
               context.emit('saveModelToggle', true)

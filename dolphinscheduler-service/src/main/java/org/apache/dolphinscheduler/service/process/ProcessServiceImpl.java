@@ -899,7 +899,7 @@ public class ProcessServiceImpl implements ProcessService {
         } else {
             processInstance = this.findProcessInstanceDetailById(processInstanceId);
             if (processInstance == null) {
-                return processInstance;
+                return null;
             }
         }
         if (cmdParam != null) {
@@ -1482,14 +1482,14 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
-        if (processInstanceState.typeIsFinished()
-            || processInstanceState == ExecutionStatus.READY_PAUSE
-            || processInstanceState == ExecutionStatus.READY_STOP) {
+        if (processInstanceState.typeIsFinished() || processInstanceState == ExecutionStatus.READY_STOP) {
             logger.warn("processInstance {} was {}, skip submit task", processInstance.getProcessDefinitionCode(), processInstanceState);
             return null;
         }
+        if (processInstanceState == ExecutionStatus.READY_PAUSE) {
+            taskInstance.setState(ExecutionStatus.PAUSE);
+        }
         taskInstance.setExecutorId(processInstance.getExecutorId());
-        taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
         if (taskInstance.getSubmitTime() == null) {
             taskInstance.setSubmitTime(new Date());
@@ -1669,6 +1669,7 @@ public class ProcessServiceImpl implements ProcessService {
     public void packageTaskInstance(TaskInstance taskInstance, ProcessInstance processInstance) {
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setProcessDefine(processInstance.getProcessDefinition());
+        taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         TaskDefinition taskDefinition = this.findTaskDefinition(
             taskInstance.getTaskCode(),
             taskInstance.getTaskDefinitionVersion());

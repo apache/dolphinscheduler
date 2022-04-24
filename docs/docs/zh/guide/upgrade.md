@@ -13,24 +13,17 @@
 - 以下升级操作都需要在新版本的目录进行
 
 ## 4. 数据库升级
-- 修改conf/datasource.properties中的下列属性
+- 将`./tools/conf/application.yaml`中的username和password改成你设定数据库用户名和密码
 
-- 如果选择 MySQL，请注释掉 PostgreSQL 相关配置(反之同理), 还需要手动添加 [[ mysql-connector-java 驱动 jar ](https://downloads.MySQL.com/archives/c-j/)] 包到 lib 目录下，这里下载的是mysql-connector-java-8.0.16.jar，然后正确配置数据库连接相关信息
+- 如果选择 MySQL，请修改`./tools/bin/dolphinscheduler_env.sh`中的如下配置, 还需要手动添加 [[ mysql-connector-java 驱动 jar ](https://downloads.MySQL.com/archives/c-j/)] 包到 lib 目录（`./tools/lib`）下，这里下载的是mysql-connector-java-8.0.16.jar
 
-    ```properties
-      # postgre
-      #spring.datasource.driver-class-name=org.postgresql.Driver
-      #spring.datasource.url=jdbc:postgresql://localhost:5432/dolphinscheduler
-      # mysql
-      spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-      spring.datasource.url=jdbc:mysql://xxx:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true     需要修改ip，本机localhost即可
-      spring.datasource.username=xxx						需要修改为上面的{user}值
-      spring.datasource.password=xxx						需要修改为上面的{password}值
+    ```shell
+    export DATABASE=${DATABASE:-mysql}
     ```
 
 - 执行数据库升级脚本
 
-`sh ./script/upgrade-dolphinscheduler.sh`
+`sh ./tools/bin/upgrade-schema.sh`
 
 ## 5. 服务升级
 

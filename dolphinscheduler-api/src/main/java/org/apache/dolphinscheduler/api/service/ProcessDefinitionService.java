@@ -297,6 +297,23 @@ public interface ProcessDefinitionService {
     Map<String, Object> queryAllProcessDefinitionByProjectCode(User loginUser, long projectCode);
 
     /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @return process definitions in the project
+     */
+    Map<String, Object> queryProcessDefinitionListByProjectCode(long projectCode);
+
+    /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @return process definitions in the project
+     */
+    Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode, Long processDefinitionCode);
+
+    /**
      * Encapsulates the TreeView structure
      *
      * @param projectCode project code
