@@ -948,7 +948,7 @@ public class WorkflowExecuteThread {
                         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                             processDefinition.getGlobalParamMap(),
                             processDefinition.getGlobalParamList(),
-                            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+                            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE)));
                         processService.updateProcessInstance(processInstance);
                     }
                 }
