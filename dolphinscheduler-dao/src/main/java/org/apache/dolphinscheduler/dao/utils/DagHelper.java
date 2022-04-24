@@ -575,7 +575,7 @@ public class DagHelper {
      * Whether there is a specified type of child node after the parent node
      */
     public static boolean haveSubAfterNode(String parentNodeCode,
-                                           DAG<String,TaskNode,TaskNodeRelation> dag, boolean typeCheck, String checkType) {
+                                           DAG<String,TaskNode,TaskNodeRelation> dag, boolean additionalNodeTypeFiltering, String filterNodeType) {
         Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeCode);
         if (CollectionUtils.isEmpty(subsequentNodes)) {
             return false;
@@ -583,11 +583,11 @@ public class DagHelper {
         for (String nodeName : subsequentNodes) {
             TaskNode taskNode = dag.getNode(nodeName);
             List<String> preTaskList = JSONUtils.toList(taskNode.getPreTasks(),String.class);
-            boolean contains = preTaskList.contains(parentNodeCode);
-            if (typeCheck){
-                return contains && taskNode.getType().equalsIgnoreCase(checkType);
+            boolean containsParentNodeCode = preTaskList.contains(parentNodeCode);
+            if (additionalNodeTypeFiltering){
+                return containsParentNodeCode && taskNode.getType().equalsIgnoreCase(filterNodeType);
             } else {
-                return contains;
+                return containsParentNodeCode;
             }
         }
         return false;
