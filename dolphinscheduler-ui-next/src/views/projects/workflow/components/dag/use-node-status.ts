@@ -79,9 +79,12 @@ export function useNodeStatus(options: Options) {
       if (taskList.value) {
         taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
-          nodeStore.updateDependentResult(
-            JSON.parse(taskInstance.dependentResult)
-          )
+
+          if (taskInstance.dependentResult) {
+            nodeStore.updateDependentResult(
+              JSON.parse(taskInstance.dependentResult)
+            )
+          }
         })
       }
     })
