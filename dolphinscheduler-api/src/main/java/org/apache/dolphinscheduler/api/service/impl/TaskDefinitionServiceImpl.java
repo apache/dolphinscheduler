@@ -180,11 +180,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinitionCode);
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, String.valueOf(processDefinitionCode));
             return result;
         }
         TaskDefinitionLog taskDefinition = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
@@ -314,7 +314,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
             return result;
         }
         if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
@@ -406,7 +406,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
             return null;
         }
         if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
@@ -557,7 +557,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
             return result;
         }
         TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
@@ -618,7 +618,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
 
         if (taskDefinition == null) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         } else {
             if (taskDefinition.getVersion() == version) {
                 putMsg(result, Status.MAIN_TABLE_USING_VERSION);
@@ -645,7 +645,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         } else {
             result.put(Constants.DATA_LIST, taskDefinition);
             putMsg(result, Status.SUCCESS);
@@ -752,12 +752,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(code);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, code);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, taskDefinition.getVersion());
         if (taskDefinitionLog == null) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, code);
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         switch (releaseState) {
