@@ -21,7 +21,7 @@ import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
-import { uuid } from '@/utils/common'
+import { uuid } from '@/common/common'
 import { IWorkflowTaskInstance } from './types'
 
 const props = {

@@ -24,7 +24,7 @@ import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import { useCreate } from './use-create'
 import { useForm } from './use-form'
-import { fileTypeArr } from '@/utils/common'
+import { fileTypeArr } from '@/common/common'
 
 import styles from '../index.module.scss'
 

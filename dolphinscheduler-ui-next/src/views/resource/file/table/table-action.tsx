@@ -28,7 +28,7 @@ import {
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { ResourceFileTableData } from '../types'
-import { fileTypeArr } from '@/utils/common'
+import { fileTypeArr } from '@/common/common'
 import { downloadResource, deleteResource } from '@/service/modules/resources'
 import { IRenameFile, IRtDisb } from '../types'
 import type { Router } from 'vue-router'
