@@ -52,10 +52,12 @@ public class SqlTaskExecutionTest {
         Class.forName("org.apache.hive.jdbc.HiveDriver");
         ResultSet res = null;
         try{
-            if(con == null)
+            if(con == null) {
                 con = DriverManager.getConnection(url);
-            if(stmt == null)
+            }
+            if(stmt == null) {
                 stmt = con.createStatement();
+            }
             HiveSqlLogThread queryThread = new HiveSqlLogThread(stmt, LoggerFactory.getLogger("log test"), taskExecutionContext);
             queryThread.setName("sql log print");
             queryThread.start();
