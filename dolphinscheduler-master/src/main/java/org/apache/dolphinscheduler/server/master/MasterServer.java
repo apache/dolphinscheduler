@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.PostConstruct;
 
@@ -67,6 +68,9 @@ public class MasterServer implements IStoppable {
 
     @Autowired
     private MasterRegistryClient masterRegistryClient;
+
+    @Autowired
+    private TaskPluginManager taskPluginManager;
 
     @Autowired
     private MasterSchedulerService masterSchedulerService;
@@ -130,6 +134,9 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
 
         this.nettyRemotingServer.start();
+
+        // install task plugin
+        this.taskPluginManager.installPlugin();
 
         // self tolerant
         this.masterRegistryClient.init();
