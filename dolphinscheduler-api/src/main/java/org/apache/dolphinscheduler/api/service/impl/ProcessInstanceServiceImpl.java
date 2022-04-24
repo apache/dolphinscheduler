@@ -480,7 +480,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         //
         Map<String, String> commandParamMap = JSONUtils.toMap(processInstance.getCommandParam());
         String timezoneId = null;
-        if (StringUtils.isBlank(commandParamMap.get(Constants.SCHEDULE_TIMEZONE))) {
+        if (commandParamMap == null || StringUtils.isBlank(commandParamMap.get(Constants.SCHEDULE_TIMEZONE))) {
             timezoneId = loginUser.getTimeZone();
         } else {
             timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
@@ -687,9 +687,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         Map<String, String> commandParam = JSONUtils.toMap(processInstance.getCommandParam());
+        String timezone = null;
+        if (commandParam != null) {
+            timezone = commandParam.get(Constants.SCHEDULE_TIMEZONE);
+        }
         Map<String, String> timeParams = BusinessTimeUtils
             .getBusinessTime(processInstance.getCmdTypeIfComplement(),
-                processInstance.getScheduleTime(), commandParam.get(Constants.SCHEDULE_TIMEZONE));
+                processInstance.getScheduleTime(), timezone);
         String userDefinedParams = processInstance.getGlobalParams();
         // global params
         List<Property> globalParams = new ArrayList<>();
