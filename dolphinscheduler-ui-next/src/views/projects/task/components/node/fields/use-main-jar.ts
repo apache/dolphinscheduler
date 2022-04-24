@@ -19,7 +19,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
-import { removeUselessChildren } from '@/utils/tree-format'
+import utils from '@/utils'
 import type { IJsonItem, ProgramType, IMainJar } from '../types'
 
 export function useMainJar(model: { [field: string]: any }): IJsonItem {
@@ -37,7 +37,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
       type: 'FILE',
       programType
     })
-    removeUselessChildren(res)
+    utils.removeUselessChildren(res)
     mainJarOptions.value = res || []
     taskStore.updateMainJar(programType, res)
   }

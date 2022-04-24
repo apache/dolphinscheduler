@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { copy } from '@/utils/clipboard'
+import utils from '@/utils'
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
@@ -26,7 +26,7 @@ export function useTextCopy() {
   const { t } = useI18n()
   const message = useMessage()
   const copyText = (text: string) => {
-    if (copy(text)) {
+    if (utils.copy(text)) {
       message.success(t('project.dag.copy_success'))
     }
   }
