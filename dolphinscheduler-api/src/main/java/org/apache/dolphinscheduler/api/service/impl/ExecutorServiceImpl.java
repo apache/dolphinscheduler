@@ -222,10 +222,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> result = new HashMap<>();
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             // check process definition exists
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
         } else if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
             // check process definition online
-            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefineCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(processDefineCode));
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
@@ -462,7 +462,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setProcessInstanceId(instanceId);
 
         if (!processService.verifyIsNeedCreateCommand(command)) {
-            putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, processDefinitionCode);
+            putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, String.valueOf(processDefinitionCode));
             return result;
         }
 

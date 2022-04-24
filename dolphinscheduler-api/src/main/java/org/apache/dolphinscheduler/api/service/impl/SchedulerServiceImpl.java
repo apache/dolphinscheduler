@@ -257,7 +257,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, schedule.getProcessDefinitionCode());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(schedule.getProcessDefinitionCode()));
             return result;
         }
 
@@ -306,7 +306,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, scheduleObj.getProcessDefinitionCode());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(scheduleObj.getProcessDefinitionCode()));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
@@ -336,7 +336,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                         if (subProcessDefinition.getReleaseState() != ReleaseState.ONLINE) {
                             logger.info("not release process definition id: {} , name : {}",
                                     subProcessDefinition.getId(), subProcessDefinition.getName());
-                            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, subProcessDefinition.getId());
+                            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(subProcessDefinition.getId()));
                             return result;
                         }
                     }
@@ -406,7 +406,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
             return result;
         }
 
@@ -618,7 +618,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
 
