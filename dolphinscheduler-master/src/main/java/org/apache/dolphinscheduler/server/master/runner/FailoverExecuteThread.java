@@ -50,6 +50,9 @@ public class FailoverExecuteThread extends Thread {
 
     @Override
     public void run() {
+        // when startup, wait 10s for ready
+        ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * 10);
+
         logger.info("failover execute thread started");
         while (Stopper.isRunning()) {
             try {

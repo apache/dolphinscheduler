@@ -155,6 +155,9 @@ public class WorkerServer implements IStoppable {
 
         this.nettyRemotingServer.start();
 
+        // install task plugin
+        this.taskPluginManager.installPlugin();
+
         // worker registry
         try {
             this.workerRegistryClient.registry();
