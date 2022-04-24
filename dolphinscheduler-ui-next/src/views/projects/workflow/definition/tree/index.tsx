@@ -27,7 +27,7 @@ import { Router, useRouter } from 'vue-router'
 import { viewTree } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { find } from 'lodash'
-import { tasksState } from '@/utils/common'
+import { tasksState } from '@/common/common'
 import type { ITaskTypeNodeOption } from './types'
 
 export default defineComponent({

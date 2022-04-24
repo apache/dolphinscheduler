@@ -50,7 +50,7 @@ import {
 } from '@vicons/antd'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
-import { timezoneList } from '@/utils/timezone'
+import { timezoneList } from '@/common/timezone'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useDataList() {

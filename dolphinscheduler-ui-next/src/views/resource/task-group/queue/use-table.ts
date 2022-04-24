@@ -29,8 +29,8 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
-import { parseTime } from '@/utils/common'
+} from '@/common/column-width-config'
+import { parseTime } from '@/common/common'
 
 export function useTable(
   updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},

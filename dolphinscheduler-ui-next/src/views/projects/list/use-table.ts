@@ -20,7 +20,7 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import ButtonLink from '@/components/button-link'
 import { queryProjectListPaging } from '@/service/modules/projects'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
@@ -36,7 +36,7 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'

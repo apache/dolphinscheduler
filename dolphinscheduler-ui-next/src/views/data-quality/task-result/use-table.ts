@@ -24,12 +24,12 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type {
   ResultItem,
   ResultListRes
 } from '@/service/modules/data-quality/types'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 
 export function useTable() {
   const { t } = useI18n()

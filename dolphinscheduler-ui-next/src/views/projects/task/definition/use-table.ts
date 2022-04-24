@@ -35,7 +35,7 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type {
   TaskDefinitionItem,
   TaskDefinitionRes

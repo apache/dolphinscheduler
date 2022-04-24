@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ITaskState } from '@/utils/types'
+import { ITaskState } from '@/common/types'
 
 export type { Router } from 'vue-router'
 export type { TaskInstancesRes } from '@/service/modules/task-instances/types'

@@ -47,7 +47,7 @@ import {
   NPopover
 } from 'naive-ui'
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
-import { timezoneList } from '@/utils/timezone'
+import { timezoneList } from '@/common/timezone'
 import Crontab from '@/components/crontab'
 
 const props = {

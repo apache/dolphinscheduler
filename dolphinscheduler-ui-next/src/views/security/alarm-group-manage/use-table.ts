@@ -25,7 +25,7 @@ import {
   delAlertGroupById
 } from '@/service/modules/alert-group'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import type { AlarmGroupRes } from '@/service/modules/alert-group/types'
 
 export function useTable() {

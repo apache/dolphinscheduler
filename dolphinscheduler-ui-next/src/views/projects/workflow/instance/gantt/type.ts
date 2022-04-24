@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ITaskState } from '@/utils/types'
+import { ITaskState } from '@/common/types'
 
 interface ITask {
   taskName: string

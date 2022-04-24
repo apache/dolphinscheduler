@@ -28,7 +28,7 @@ import {
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { stateType } from '@/utils/common'
+import { stateType } from '@/common/common'
 
 export default defineComponent({
   name: 'ProcessInstanceCondition',

@@ -31,7 +31,7 @@ export type {
   WorkflowInstance
 } from '@/views/projects/workflow/components/dag/types'
 export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
-export type { ITaskState } from '@/utils/types'
+export type { ITaskState } from '@/common/types'
 
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'

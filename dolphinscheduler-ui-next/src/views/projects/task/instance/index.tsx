@@ -34,7 +34,7 @@ import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
-import { stateType } from '@/utils/common'
+import { stateType } from '@/common/common'
 import styles from './index.module.scss'
 
 const TaskInstance = defineComponent({

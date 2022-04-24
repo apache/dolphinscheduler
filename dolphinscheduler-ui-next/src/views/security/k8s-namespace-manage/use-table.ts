@@ -29,12 +29,12 @@ import type {
   NamespaceListRes,
   NamespaceItem
 } from '@/service/modules/k8s-namespace/types'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 
 export function useTable() {
   const { t } = useI18n()

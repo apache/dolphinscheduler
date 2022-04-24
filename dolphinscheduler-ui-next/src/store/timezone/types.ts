@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { timezoneList } from '@/utils/timezone'
+import { timezoneList } from '@/common/timezone'
 
 type Timezone = typeof timezoneList[number]
 
