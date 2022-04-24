@@ -43,7 +43,7 @@ public class ParamsTest {
         // start process
         Map<String,String> timeParams = BusinessTimeUtils
                 .getBusinessTime(CommandType.START_PROCESS,
-                        new Date());
+                        new Date(), null);
 
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);
 
@@ -57,7 +57,7 @@ public class ParamsTest {
         // complement data
         timeParams = BusinessTimeUtils
                 .getBusinessTime(CommandType.COMPLEMENT_DATA,
-                        calendar.getTime());
+                        calendar.getTime(), null);
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);
         logger.info("complement data : {}",command);
 

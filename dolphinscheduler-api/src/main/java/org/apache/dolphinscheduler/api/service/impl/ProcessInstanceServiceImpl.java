@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
@@ -148,6 +149,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     private TaskPluginManager taskPluginManager;
+
+    @Autowired
+    private ScheduleMapper scheduleMapper;
 
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime
@@ -472,7 +476,17 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
-        setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout);
+
+        //
+        Map<String, String> commandParamMap = JSONUtils.toMap(processInstance.getCommandParam());
+        String timezoneId = null;
+        if (commandParamMap == null || StringUtils.isBlank(commandParamMap.get(Constants.SCHEDULE_TIMEZONE))) {
+            timezoneId = loginUser.getTimeZone();
+        } else {
+            timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
+        }
+
+        setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
@@ -538,7 +552,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * update process instance attributes
      */
-    private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime, String globalParams, int timeout) {
+    private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime, String globalParams, int timeout, String timezone) {
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
@@ -546,7 +560,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         processInstance.setScheduleTime(schedule);
         List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);
         Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
-        globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, processInstance.getCmdTypeIfComplement(), schedule);
+        globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, processInstance.getCmdTypeIfComplement(), schedule, timezone);
         processInstance.setTimeout(timeout);
         processInstance.setTenantCode(tenantCode);
         processInstance.setGlobalParams(globalParams);
@@ -672,9 +686,14 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
+        Map<String, String> commandParam = JSONUtils.toMap(processInstance.getCommandParam());
+        String timezone = null;
+        if (commandParam != null) {
+            timezone = commandParam.get(Constants.SCHEDULE_TIMEZONE);
+        }
         Map<String, String> timeParams = BusinessTimeUtils
             .getBusinessTime(processInstance.getCmdTypeIfComplement(),
-                processInstance.getScheduleTime());
+                processInstance.getScheduleTime(), timezone);
         String userDefinedParams = processInstance.getGlobalParams();
         // global params
         List<Property> globalParams = new ArrayList<>();
