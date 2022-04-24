@@ -48,6 +48,40 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * dag helper test
  */
 public class DagHelperTest {
+
+    @Test
+    public void testHaveSubAfterNode(){
+        String parentNodeCode = "5293789969856";
+        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
+        TaskNodeRelation relation = new TaskNodeRelation();
+        relation.setStartNode("5293789969856");
+        relation.setEndNode("5293789969857");
+        taskNodeRelations.add(relation);
+
+        List<TaskNode> taskNodes = new ArrayList<>();
+        TaskNode node = new TaskNode();
+        node.setCode(5293789969856L);
+        node.setType("SHELL");
+
+        TaskNode subNode = new TaskNode();
+        subNode.setCode(5293789969857L);
+        subNode.setType("SHELL");
+        subNode.setPreTasks("[5293789969856]");
+
+        taskNodes.add(node);
+        taskNodes.add(subNode);
+
+        ProcessDag processDag = new ProcessDag();
+        processDag.setEdges(taskNodeRelations);
+        processDag.setNodes(taskNodes);
+        DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
+        Assert.assertTrue(canSubmit);
+
+        boolean haveBlocking = DagHelper.haveBlockingAfterNode(parentNodeCode, dag);
+        Assert.assertFalse(haveBlocking);
+    }
+
     /**
      * test task node can submit
      *
