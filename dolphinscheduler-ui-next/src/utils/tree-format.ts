@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-export function removeUselessChildren(
+const removeUselessChildren = (
   list: { children?: []; dirctory?: boolean; disabled?: boolean }[]
-) {
+) => {
   if (!list.length) return
   list.forEach((item) => {
     if (item.dirctory && item.children?.length === 0) item.disabled = true
@@ -29,3 +29,5 @@ export function removeUselessChildren(
     removeUselessChildren(item.children)
   })
 }
+
+export default removeUselessChildren

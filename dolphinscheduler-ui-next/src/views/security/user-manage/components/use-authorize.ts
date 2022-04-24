@@ -40,7 +40,7 @@ import {
   grantUDFFunc,
   grantNamespaceFunc
 } from '@/service/modules/users'
-import { removeUselessChildren } from '@/utils/tree-format'
+import utils from '@/utils'
 import type { TAuthType, IResourceOption, IOption } from '../types'
 
 export function useAuthorize() {
@@ -127,7 +127,7 @@ export function useAuthorize() {
       authorizedFile({ userId })
     ])
     state.loading = false
-    removeUselessChildren(resources[0])
+    utils.removeUselessChildren(resources[0])
     const udfResources = [] as IResourceOption[]
     const fileResources = [] as IResourceOption[]
     resources[0].forEach((item: IResourceOption) => {

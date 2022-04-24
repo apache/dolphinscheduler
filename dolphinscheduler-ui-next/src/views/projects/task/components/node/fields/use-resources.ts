@@ -19,7 +19,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
-import { removeUselessChildren } from '@/utils/tree-format'
+import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
 
 export function useResources(): IJsonItem {
@@ -38,7 +38,7 @@ export function useResources(): IJsonItem {
     if (resourcesLoading.value) return
     resourcesLoading.value = true
     const res = await queryResourceList({ type: 'FILE' })
-    removeUselessChildren(res)
+    utils.removeUselessChildren(res)
     resourcesOptions.value = res || []
     resourcesLoading.value = false
     taskStore.updateResource(res)

@@ -20,13 +20,17 @@ import regex from './regex'
 import truncateText from './truncate-text'
 import log from './log'
 import downloadFile from './downloadFile'
+import copy from './clipboard'
+import removeUselessChildren from './tree-format'
 
 const utils = {
   mapping,
   regex,
   truncateText,
   log,
-  downloadFile
+  downloadFile,
+  copy,
+  removeUselessChildren
 }
 
 export default utils

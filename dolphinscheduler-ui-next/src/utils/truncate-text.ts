@@ -21,7 +21,7 @@
  * @param {string} text
  * Each Chinese character is equal to two chars
  */
-export default function truncateText(text: string, n: number) {
+const truncateText = (text: string, n: number) => {
   const exp = /[\u4E00-\u9FA5]/
   let res = ''
   let len = text.length
@@ -49,3 +49,5 @@ export default function truncateText(text: string, n: number) {
   }
   return res
 }
+
+export default truncateText

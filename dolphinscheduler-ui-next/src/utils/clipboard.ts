@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export const copy = (text: string): boolean => {
+const copy = (text: string): boolean => {
   const inp = document.createElement('input')
   document.body.appendChild(inp)
   inp.value = text
@@ -27,3 +27,5 @@ export const copy = (text: string): boolean => {
   inp.remove()
   return result
 }
+
+export default copy
