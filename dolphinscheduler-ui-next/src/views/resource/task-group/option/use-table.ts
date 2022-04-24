@@ -17,12 +17,11 @@
 
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { format } from 'date-fns'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
-import { parseTime } from '@/common/common'
+import { renderTableTime } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -139,14 +138,8 @@ export function useTable(
             }
 
             item.projectName = projectName
-            item.createTime = format(
-              parseTime(item.createTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.updateTime = format(
-              parseTime(item.updateTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
+            item.createTime = renderTableTime(item.createTime)
+            item.updateTime = renderTableTime(item.updateTime)
             return {
               ...item
             }
