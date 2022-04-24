@@ -88,7 +88,7 @@ public class ParameterUtils {
      * @return curing user define parameters
      */
     public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
-                                            CommandType commandType, Date scheduleTime) {
+                                            CommandType commandType, Date scheduleTime, String timezone) {
 
         if (globalParamList == null || globalParamList.isEmpty()) {
             return null;
@@ -101,7 +101,7 @@ public class ParameterUtils {
         Map<String, String> allParamMap = new HashMap<>();
         //If it is a complement, a complement time needs to be passed in, according to the task type
         Map<String, String> timeParams = BusinessTimeUtils.
-            getBusinessTime(commandType, scheduleTime);
+            getBusinessTime(commandType, scheduleTime, timezone);
 
         if (timeParams != null) {
             allParamMap.putAll(timeParams);
