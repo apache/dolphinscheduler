@@ -19,6 +19,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.sql.HiveSqlLogThread;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +44,11 @@ public class SqlTaskExecutionTest {
         taskExecutionContext.setTaskType("hive");
         taskExecutionContext.setTaskParams(taskJson);
         SqlParameters sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
+
+        Assert.assertNotNull(sqlParameters);
         String type = sqlParameters.getType();
         String sql = sqlParameters.getSql();
-        System.out.println(type);
+
 
         // hive connection
 
@@ -58,6 +62,8 @@ public class SqlTaskExecutionTest {
             if(stmt == null) {
                 stmt = con.createStatement();
             }
+            Assert.assertNotNull(stmt);
+
             HiveSqlLogThread queryThread = new HiveSqlLogThread(stmt, LoggerFactory.getLogger("log test"), taskExecutionContext);
             queryThread.setName("sql log print");
             queryThread.start();

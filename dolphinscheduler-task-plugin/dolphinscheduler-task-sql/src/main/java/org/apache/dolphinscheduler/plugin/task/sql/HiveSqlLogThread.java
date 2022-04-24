@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.hive.jdbc.HiveStatement;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -31,48 +29,47 @@ import java.util.List;
 /**
  * hive log listener thread
  */
-public class HiveSqlLogThread extends Thread{
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThread.class);
+public class HiveSqlLogThread extends Thread {
     /**
      * hive statement
      */
-    private HiveStatement statement;
+    private final HiveStatement statement;
     /**
      * logger
      */
-    private Logger logger;
+    private final Logger threadLogger;
 
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    public HiveSqlLogThread(Statement statement, Logger logger, TaskExecutionContext taskExecutionContext){
+    public HiveSqlLogThread(Statement statement, Logger logger, TaskExecutionContext taskExecutionContext) {
         this.statement = (HiveStatement) statement;
-        this.logger = logger;
+        this.threadLogger = logger;
         this.taskExecutionContext = taskExecutionContext;
     }
     @Override
     public void run() {
-        if (statement == null){
-            LOGGER.info("hive statement is null,end this log query!");
+        if (statement == null) {
+            threadLogger.info("hive statement is null,end this log query!");
+            return;
         }
         try {
-            while (!statement.isClosed() && statement.hasMoreLogs()){
-                for (String log: statement.getQueryLog(true,500)){
+            while (!statement.isClosed() && statement.hasMoreLogs()) {
+                for (String log: statement.getQueryLog(true,500)) {
 
                     //hive mapreduce log
-                    logger.info(log);
+                    threadLogger.info(log);
 
-                    List<String> appIds = LoggerUtils.getAppIds(log, logger);
+                    List<String> appIds = LoggerUtils.getAppIds(log, threadLogger);
 
 
                     //get sql task yarn's application_id
-                    if (!appIds.isEmpty()){
+                    if (!appIds.isEmpty()) {
                         taskExecutionContext.setAppIds(String.join(",", appIds));
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            logger.error("Failed to view hive log,exception:[{}]",e.getMessage());
+            threadLogger.error("Failed to view hive log,exception:[{}]",e.getMessage());
         }
     }
 }
