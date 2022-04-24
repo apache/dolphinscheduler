@@ -21,7 +21,7 @@ import {
   deleteAlertPluginInstance
 } from '@/service/modules/alert-plugin'
 import { format } from 'date-fns'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import type { IRecord } from './types'
 
 export function useTable() {
