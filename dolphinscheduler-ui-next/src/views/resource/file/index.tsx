@@ -134,6 +134,12 @@ export default defineComponent({
       handleShowModal(renameShowRef)
     }
 
+    const handleGoRoot = () => {
+      router.push({
+        name: 'file-manage'
+      })
+    }
+
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
@@ -226,6 +232,7 @@ export default defineComponent({
       handleRenameFile,
       handleUpdatePage,
       handleUpdatePageSize,
+      handleGoRoot,
       pagination: paginationReactive,
       renameInfo,
       breadcrumbItemsRef
@@ -291,11 +298,19 @@ export default defineComponent({
             'header-extra': () => (
               <NBreadcrumb separator='>' class={styles['breadcrumb']}>
                 {this.breadcrumbItemsRef?.map((item: BreadcrumbItem) => {
-                  return (
-                    <NBreadcrumbItem href={item.id.toString()}>
-                      {item.fullName}
-                    </NBreadcrumbItem>
-                  )
+                  if (item.id === 0) {
+                    return (
+                      <NBreadcrumbItem>
+                        <span onClick={this.handleGoRoot}>{item.fullName}</span>
+                      </NBreadcrumbItem>
+                    )
+                  } else {
+                    return (
+                      <NBreadcrumbItem href={item.id.toString()}>
+                        {item.fullName}
+                      </NBreadcrumbItem>
+                    )
+                  }
                 })}
               </NBreadcrumb>
             ),
