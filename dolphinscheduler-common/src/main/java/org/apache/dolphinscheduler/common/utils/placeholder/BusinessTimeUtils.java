@@ -45,7 +45,7 @@ public class BusinessTimeUtils {
      * @param runTime     run time or schedule time
      * @return business time
      */
-    public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime) {
+    public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime, String timezone) {
         Date businessDate = runTime;
         Map<String, String> result = new HashMap<>();
         switch (commandType) {
@@ -71,9 +71,9 @@ public class BusinessTimeUtils {
                 break;
         }
         Date businessCurrentDate = addDays(businessDate, 1);
-        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE, null));
-        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE, null));
-        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME, null));
+        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE, timezone));
+        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE, timezone));
+        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME, timezone));
         return result;
     }
 }
