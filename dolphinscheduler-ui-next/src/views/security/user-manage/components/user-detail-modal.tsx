@@ -86,7 +86,7 @@ export const UserModal = defineComponent({
         show={this.show}
         title={`${t(
           currentRecord?.id
-            ? 'security.user.update_user'
+            ? 'security.user.edit_user'
             : 'security.user.create_user'
         )}`}
         onCancel={this.onCancel}

@@ -1037,7 +1037,7 @@ const security = {
   user: {
     user_manage: 'User Manage',
     create_user: 'Create User',
-    update_user: 'Update User',
+    edit_user: 'Edit User',
     delete_user: 'Delete User',
     delete_confirm: 'Are you sure to delete?',
     delete_confirm_tip:
