@@ -87,7 +87,13 @@ sh script/create-dolphinscheduler.sh
 
 ## Modify Configuration
 
-After completing the preparation of the basic environment, you need to modify the configuration file according to your environment. The configuration file is in the path of `conf/config/install_config.conf`. Generally, you just need to modify the **INSTALL MACHINE, DolphinScheduler ENV, Database, Registry Server** part to complete the deployment, the following describes the parameters that must be modified:
+After completing the preparation of the basic environment, you need to modify the configuration file according to the
+environment you used. The configuration files are both in directory `bin/env` and named `install_env.sh` and `dolphinscheduler_env.sh`.
+
+### Modify `install_env.sh`
+
+File `install_env.sh` describes which machines will be installed DolphinScheduler and what server will be installed on
+each machine. You could find this file in the path `bin/env/install_env.sh` and the detail of the configuration as below.
 
 ```shell
 # ---------------------------------------------------------
@@ -105,29 +111,30 @@ installPath="~/dolphinscheduler"
 
 # Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
+```
 
-# ---------------------------------------------------------
-# DolphinScheduler ENV
-# ---------------------------------------------------------
-# The path of JAVA_HOME, which JDK install path in section **Preparation**
-javaHome="/your/java/home/here"
+### Modify `dolphinscheduler_env.sh`
 
-# ---------------------------------------------------------
-# Database
-# ---------------------------------------------------------
-# Database type, username, password, IP, port, metadata. For now `dbtype` supports `mysql` and `postgresql`
-dbtype="mysql"
-dbhost="localhost:3306"
-# Need to modify if you are not using `dolphinscheduler/dolphinscheduler` as your username and password
-username="dolphinscheduler"
-password="dolphinscheduler"
-dbname="dolphinscheduler"
+File `dolphinscheduler_env.sh` describes the database configuration of DolphinScheduler, which in the path `bin/env/dolphinscheduler_env.sh`
+and some tasks which need external dependencies or libraries such as `JAVA_HOME` and `SPARK_HOME`. You could ignore the
+task external dependencies if you do not use those tasks, but you have to change `JAVA_HOME`, registry center and database
+related configurations based on your environment.
 
-# ---------------------------------------------------------
-# Registry Server
-# ---------------------------------------------------------
-# Registration center address, the address of ZooKeeper service
-registryServers="localhost:2181"
+```sh
+# JAVA_HOME, will use it to start DolphinScheduler server
+export JAVA_HOME=${JAVA_HOME:-/custom/path}
+
+# Database related configuration, set database type, username and password
+export DATABASE=${DATABASE:-postgresql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
+export SPRING_DATASOURCE_USERNAME="username"
+export SPRING_DATASOURCE_PASSWORD="password"
+
+# Registry center configuration, determines the type and link of the registry center
+export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
+export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
 ```
 
 ## Initialize the Database
@@ -178,7 +185,7 @@ sh tools/bin/create-schema.sh
 Use **deployment user** you created above, running the following command to complete the deployment, and the server log will be stored in the logs folder.
 
 ```shell
-sh install.sh
+sh ./bin/install.sh
 ```
 
 > **_Note:_** For the first time deployment, there maybe occur five times of `sh: bin/dolphinscheduler-daemon.sh: No such file or directory` in the terminal,

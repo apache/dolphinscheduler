@@ -218,7 +218,7 @@ A:   1, in **the process definition list**, click the **Start** button.
 
 ## Q : Python task setting Python version
 
-A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in conf/env/.dolphinscheduler_env.sh
+A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in `worker-server/conf/dolphinscheduler_env.sh`
 
 ```
 export PYTHON_HOME=/bin/python

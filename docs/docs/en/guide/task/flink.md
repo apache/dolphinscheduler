@@ -46,7 +46,7 @@ This is a common introductory case in the big data ecosystem, which often apply 
 
 #### Configure the flink environment in DolphinScheduler
 
-If you are using the flink task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+If you are using the flink task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `worker-server/conf/dolphinscheduler_env.sh`.
 
 ![demo-flink-simple](/img/tasks/demo/flink_task01.png)
 

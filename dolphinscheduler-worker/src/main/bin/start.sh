@@ -19,6 +19,8 @@
 BIN_DIR=$(dirname $0)
 DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
+source "$BIN_DIR/../conf/dolphinscheduler_env.sh"
+
 chmod -R 700 ${DOLPHINSCHEDULER_HOME}/config
 export DOLPHINSCHEDULER_WORK_HOME=${DOLPHINSCHEDULER_HOME}
 

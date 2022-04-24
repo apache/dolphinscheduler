@@ -6,7 +6,7 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Deployment Steps
 
-Cluster deployment uses the same scripts and configuration files as [pseudo-cluster deployment](pseudo-cluster.md), so the preparation and deployment steps are the same as pseudo-cluster deployment. The difference is that [pseudo-cluster deployment](pseudo-cluster.md) is for one machine, while cluster deployment (Cluster) is for multiple machines. And steps of "Modify Configuration" are quite different between pseudo-cluster deployment and cluster deployment.
+Cluster deployment uses the same scripts and configuration files as [pseudo-cluster deployment](pseudo-cluster.md), so the preparation and deployment steps are the same as pseudo-cluster deployment. The difference is that pseudo-cluster deployment is for one machine, while cluster deployment (Cluster) is for multiple machines. And steps of "Modify Configuration" are quite different between pseudo-cluster deployment and cluster deployment.
 
 ### Prerequisites and DolphinScheduler Startup Environment Preparations
 
@@ -32,8 +32,8 @@ apiServers="ds5"
 
 ## Start and Login DolphinScheduler
 
-Same as pseudo-cluster.md](pseudo-cluster.md)
+Same as [pseudo-cluster](pseudo-cluster.md)
 
 ## Start and Stop Server
 
-Same as pseudo-cluster.md](pseudo-cluster.md)
+Same as [pseudo-cluster](pseudo-cluster.md)

@@ -54,7 +54,7 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 
 #### 在 DolphinScheduler 中配置 MapReduce 环境
 
-若生产环境中要是使用到 MapReduce 任务类型，则需要先配置好所需的环境。配置文件如下：`/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
+若生产环境中要是使用到 MapReduce 任务类型，则需要先配置好所需的环境。配置文件如下：`worker-server/conf/dolphinscheduler_env.sh`。
 
 ![mr_configure](/img/tasks/demo/mr_task01.png)
 

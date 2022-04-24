@@ -87,47 +87,51 @@ sh script/create-dolphinscheduler.sh
 
 ## 修改相关配置
 
-完成了基础环境的准备后，在运行部署命令前，还需要根据环境修改配置文件。配置文件在路径在`conf/config/install_config.conf`下，一般部署只需要修改**INSTALL MACHINE、DolphinScheduler ENV、Database、Registry Server**部分即可完成部署，下面对必须修改参数进行说明
+完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env` 中找到，他们分别是 并命名为 `install_env.sh` 和 `dolphinscheduler_env.sh`。
+
+### 修改 `install_env.sh` 文件
+
+文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，配置详情如下。
 
 ```shell
 # ---------------------------------------------------------
 # INSTALL MACHINE
 # ---------------------------------------------------------
-# 因为是在单节点上部署master、worker、API server，所以服务器的IP均为机器IP或者localhost
+# Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
 ips="localhost"
 masters="localhost"
 workers="localhost:default"
 alertServer="localhost"
 apiServers="localhost"
 
-# DolphinScheduler安装路径，如果不存在会创建
+# DolphinScheduler installation path, it will auto-create if not exists
 installPath="~/dolphinscheduler"
 
-# 部署用户，填写在 **配置用户免密及权限** 中创建的用户
+# Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
+```
 
-# ---------------------------------------------------------
-# DolphinScheduler ENV
-# ---------------------------------------------------------
-# JAVA_HOME 的路径，是在 **前置准备工作** 安装的JDK中 JAVA_HOME 所在的位置
-javaHome="/your/java/home/here"
+### 修改 `dolphinscheduler_env.sh` 文件
 
-# ---------------------------------------------------------
-# Database
-# ---------------------------------------------------------
-# 数据库的类型，用户名，密码，IP，端口，元数据库db。其中dbtype目前支持 mysql 和 postgresql
-dbtype="mysql"
-dbhost="localhost:3306"
-# 如果你不是以 dolphinscheduler/dolphinscheduler 作为用户名和密码的，需要进行修改
-username="dolphinscheduler"
-password="dolphinscheduler"
-dbname="dolphinscheduler"
+文件 `dolphinscheduler_env.sh` 描述了 DolphinScheduler 的数据库配置，一些任务类型外部依赖路径或库文件，注册中心，其中 `JAVA_HOME`
+和 `SPARK_HOME`都是在这里定义的，其路径是 `bin/env/dolphinscheduler_env.sh`。如果您不使用某些任务类型，您可以忽略任务外部依赖项，
+但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 
-# ---------------------------------------------------------
-# Registry Server
-# ---------------------------------------------------------
-# 注册中心地址，zookeeper服务的地址
-registryServers="localhost:2181"
+```sh
+# JAVA_HOME, will use it to start DolphinScheduler server
+export JAVA_HOME=${JAVA_HOME:-/custom/path}
+
+# Database related configuration, set database type, username and password
+export DATABASE=${DATABASE:-postgresql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
+export SPRING_DATASOURCE_USERNAME="username"
+export SPRING_DATASOURCE_PASSWORD="password"
+
+# Registry center configuration, determines the type and link of the registry center
+export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
+export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
 ```
 
 ## 初始化数据库
@@ -178,7 +182,7 @@ sh tools/bin/create-schema.sh
 使用上面创建的**部署用户**运行以下命令完成部署，部署后的运行日志将存放在 logs 文件夹内
 
 ```shell
-sh install.sh
+sh ./bin/install.sh
 ```
 
 > **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，次为非重要信息直接忽略即可
