@@ -67,24 +67,6 @@ chmod 600 ~/.ssh/authorized_keys
 ./bin/zkServer.sh start
 ```
 
-<!--
-修改数据库配置，并初始化
-
-```properties
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.url=jdbc:mysql://localhost:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
-# 如果你不是以 dolphinscheduler/dolphinscheduler 作为用户名和密码的，需要进行修改
-spring.datasource.username=dolphinscheduler
-spring.datasource.password=dolphinscheduler
-```
-
-修改并保存完后，执行 script 目录下的创建表及导入基础数据脚本
-
-```shell
-sh script/create-dolphinscheduler.sh
-```
--->
-
 ## 修改相关配置
 
 完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env` 中找到，他们分别是 并命名为 `install_env.sh` 和 `dolphinscheduler_env.sh`。
@@ -113,25 +95,46 @@ deployUser="dolphinscheduler"
 
 ### 修改 `dolphinscheduler_env.sh` 文件
 
-文件 `dolphinscheduler_env.sh` 描述了 DolphinScheduler 的数据库配置，一些任务类型外部依赖路径或库文件，注册中心，其中 `JAVA_HOME`
-和 `SPARK_HOME`都是在这里定义的，其路径是 `bin/env/dolphinscheduler_env.sh`。如果您不使用某些任务类型，您可以忽略任务外部依赖项，
-但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
+文件 `./bin/env/dolphinscheduler_env.sh` 描述了下列配置：
+* DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
+* 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
+* 注册中心`zookeeper`
+* 服务端相关配置，比如缓存，时区设置等
+
+如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 
 ```sh
 # JAVA_HOME, will use it to start DolphinScheduler server
-export JAVA_HOME=${JAVA_HOME:-/custom/path}
+export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
-export SPRING_DATASOURCE_USERNAME="username"
-export SPRING_DATASOURCE_PASSWORD="password"
+export SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
+
+# DolphinScheduler server related configuration
+export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
+export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
+export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
 
 # Registry center configuration, determines the type and link of the registry center
 export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
 export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
+
+# Tasks related configurations, need to change the configuration if you use the related tasks.
+export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
+export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
+export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
+export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
+export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ## 初始化数据库
@@ -167,9 +170,16 @@ mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
 mysql> FLUSH PRIVILEGES;
 ```
 
-将`tools/conf/application.yaml`中的username和password改成你在上一步中设置的用户名{user}和密码{password} 
+然后修改`./bin/env/dolphinscheduler_env.sh`，将username和password改成你在上一步中设置的用户名{user}和密码{password}
 
-然后修改`tools/bin/dolphinscheduler_env.sh`，将mysql设置为默认数据类型`export DATABASE=${DATABASE:-mysql}`.  
+```shell
+export DATABASE=${DATABASE:-mysql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver
+export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
+```  
 
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
 

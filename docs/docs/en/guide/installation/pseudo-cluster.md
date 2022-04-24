@@ -67,24 +67,6 @@ Go to the ZooKeeper installation directory, copy configure file `zoo_sample.cfg`
 ./bin/zkServer.sh start
 ```
 
-<!--
-Modify the database configuration and initialize
-
-```properties
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.url=jdbc:mysql://localhost:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
-# Modify it if you are not using dolphinscheduler/dolphinscheduler as your username and password
-spring.datasource.username=dolphinscheduler
-spring.datasource.password=dolphinscheduler
-```
-
-After modifying and saving, execute the following command to create database tables and init basic data.
-
-```shell
-sh script/create-dolphinscheduler.sh
-```
--->
-
 ## Modify Configuration
 
 After completing the preparation of the basic environment, you need to modify the configuration file according to the
@@ -115,26 +97,47 @@ deployUser="dolphinscheduler"
 
 ### Modify `dolphinscheduler_env.sh`
 
-File `dolphinscheduler_env.sh` describes the database configuration of DolphinScheduler, which in the path `bin/env/dolphinscheduler_env.sh`
-and some tasks which need external dependencies or libraries such as `JAVA_HOME` and `SPARK_HOME`. You could ignore the
-task external dependencies if you do not use those tasks, but you have to change `JAVA_HOME`, registry center and database
+File  `./bin/env/dolphinscheduler_env.sh` describes the following configurations:
+* Database configuration of DolphinScheduler, see [Initialize the Database](#initialize-the-database) for detailed instructions.
+* Some tasks which need external dependencies or libraries such as `JAVA_HOME` and `SPARK_HOME`.
+* Registry center `zookeeper`.
+* Server related configuration, such as cache type, timezone, etc.
+
+You could ignore the task external dependencies if you do not use those tasks, but you have to change `JAVA_HOME`, registry center and database
 related configurations based on your environment.
 
-```sh
+```shell
 # JAVA_HOME, will use it to start DolphinScheduler server
-export JAVA_HOME=${JAVA_HOME:-/custom/path}
+export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
-export SPRING_DATASOURCE_USERNAME="username"
-export SPRING_DATASOURCE_PASSWORD="password"
+export SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
+
+# DolphinScheduler server related configuration
+export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
+export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
+export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
 
 # Registry center configuration, determines the type and link of the registry center
 export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
 export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
+
+# Tasks related configurations, need to change the configuration if you use the related tasks.
+export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
+export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
+export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
+export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
+export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ## Initialize the Database
@@ -168,13 +171,20 @@ mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
 mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
 mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
 mysql> FLUSH PRIVILEGES;
+``` 
+
+Then, modify `./bin/env/dolphinscheduler_env.sh` to use mysql, change {user} and {password} to what you set in the previous step.
+
+```shell
+export DATABASE=${DATABASE:-mysql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver
+export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
 ```
 
-Change the username and password in `tools/conf/application.yaml` to {user} and {password} you set in the previous step. 
-
-Then, modify `tools/bin/dolphinscheduler_env.sh`, set mysql as default database `export DATABASE=${DATABASE:-mysql}`.  
-
-After the above steps done you would create a new database for DolphinScheduler, then run Shell scripts to init database:
+After the above steps done you would create a new database for DolphinScheduler, then run the Shell script to init database:
 
 ```shell
 sh tools/bin/create-schema.sh

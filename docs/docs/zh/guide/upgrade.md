@@ -13,12 +13,16 @@
 - 以下升级操作都需要在新版本的目录进行
 
 ## 4. 数据库升级
-- 将`./tools/conf/application.yaml`中的username和password改成你设定数据库用户名和密码
 
-- 如果选择 MySQL，请修改`./tools/bin/dolphinscheduler_env.sh`中的如下配置, 还需要手动添加 [ mysql-connector-java 驱动 jar ](https://downloads.MySQL.com/archives/c-j/) 包到 lib 目录（`./tools/lib`）下，这里下载的是mysql-connector-java-8.0.16.jar
+- 如果选择 MySQL，请修改`./bin/env/dolphinscheduler_env.sh`中的如下配置（{user}和{password}改成你数据库的用户名和密码）, 还需要手动添加 [ mysql-connector-java 驱动 jar ](https://downloads.MySQL.com/archives/c-j/) 包到 lib 目录（`./tools/lib`）下，这里下载的是mysql-connector-java-8.0.16.jar
 
     ```shell
     export DATABASE=${DATABASE:-mysql}
+    export SPRING_PROFILES_ACTIVE=${DATABASE}
+    export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver
+    export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    export SPRING_DATASOURCE_USERNAME={user}
+    export SPRING_DATASOURCE_PASSWORD={password}
     ```
 
 - 执行数据库升级脚本
