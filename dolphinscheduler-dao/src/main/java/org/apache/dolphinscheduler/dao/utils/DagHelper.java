@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -534,19 +535,7 @@ public class DagHelper {
     public static boolean haveConditionsAfterNode(String parentNodeCode,
                                                   DAG<String, TaskNode, TaskNodeRelation> dag
     ) {
-        boolean result = false;
-        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeCode);
-        if (CollectionUtils.isEmpty(subsequentNodes)) {
-            return result;
-        }
-        for (String nodeCode : subsequentNodes) {
-            TaskNode taskNode = dag.getNode(nodeCode);
-            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
-            if (preTasksList.contains(parentNodeCode) && taskNode.isConditionsTask()) {
-                return true;
-            }
-        }
-        return result;
+        return haveSubAfterNode(parentNodeCode, dag, true, TaskConstants.TASK_TYPE_CONDITIONS);
     }
 
     /**
@@ -565,11 +554,28 @@ public class DagHelper {
         return false;
     }
 
+
     /**
      * is there have blocking node after the parent node
      */
     public static boolean haveBlockingAfterNode(String parentNodeCode,
                                                 DAG<String,TaskNode,TaskNodeRelation> dag) {
+        return haveSubAfterNode(parentNodeCode, dag, true, TaskConstants.TASK_TYPE_BLOCKING);
+    }
+
+    /**
+     * is there have all node after the parent node
+     */
+    public static boolean haveAllNodeAfterNode(String parentNodeCode,
+                                               DAG<String,TaskNode,TaskNodeRelation> dag) {
+        return haveSubAfterNode(parentNodeCode, dag, false, null);
+    }
+
+    /**
+     * Whether there is a specified type of child node after the parent node
+     */
+    public static boolean haveSubAfterNode(String parentNodeCode,
+                                           DAG<String,TaskNode,TaskNodeRelation> dag, boolean typeCheck, String checkType) {
         Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeCode);
         if (CollectionUtils.isEmpty(subsequentNodes)) {
             return false;
@@ -577,8 +583,11 @@ public class DagHelper {
         for (String nodeName : subsequentNodes) {
             TaskNode taskNode = dag.getNode(nodeName);
             List<String> preTaskList = JSONUtils.toList(taskNode.getPreTasks(),String.class);
-            if (preTaskList.contains(parentNodeCode) && taskNode.isBlockingTask()) {
-                return true;
+            boolean contains = preTaskList.contains(parentNodeCode);
+            if (typeCheck){
+                return contains && taskNode.getType().equalsIgnoreCase(checkType);
+            } else {
+                return contains;
             }
         }
         return false;
