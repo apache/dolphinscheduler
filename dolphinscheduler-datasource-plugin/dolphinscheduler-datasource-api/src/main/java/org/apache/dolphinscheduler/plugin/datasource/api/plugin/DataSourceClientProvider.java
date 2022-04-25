@@ -35,8 +35,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-
 
 public class DataSourceClientProvider {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
@@ -46,10 +44,6 @@ public class DataSourceClientProvider {
             .expireAfterWrite(duration, TimeUnit.HOURS)
             .maximumSize(100)
             .build();
-    /**
-     * retry get hive connection when connect failed
-     */
-    private boolean isRetry = true;
     private DataSourcePluginManager dataSourcePluginManager;
 
     private DataSourceClientProvider() {
@@ -77,13 +71,7 @@ public class DataSourceClientProvider {
             }
             return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
         });
-        Connection connection = dataSourceClient.getConnection();
-        if (null == connection && dbType.isHive() && isRetry && PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-            isRetry = false;
-            uniqueId2dataSourceClientCache.invalidate(datasourceUniqueId);
-            return getConnection(dbType, connectionParam);
-        }
-        return connection;
+        return dataSourceClient.getConnection();
     }
 
     private void initDataSourcePlugin() {

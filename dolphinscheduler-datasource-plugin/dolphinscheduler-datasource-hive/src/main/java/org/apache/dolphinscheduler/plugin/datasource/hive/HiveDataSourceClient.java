@@ -39,6 +39,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -57,6 +58,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     private Configuration hadoopConf;
     protected HikariDataSource oneSessionDataSource;
     private UserGroupInformation ugi;
+    private boolean isRetry = true;
 
     public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -147,9 +149,17 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     public Connection getConnection() {
         try {
-            return oneSessionDataSource.getConnection();
+            Connection connection = oneSessionDataSource.getConnection();
+            isRetry = true;
+            return connection;
         } catch (SQLException e) {
             logger.error("get oneSessionDataSource Connection fail SQLException: {}", e.getMessage(), e);
+            boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+            if (isRetry && kerberosStartupState) {
+                isRetry = false;
+                createUserGroupInformation(baseConnectionParam.getUser());
+                return getConnection();
+            }
             return null;
         }
     }
