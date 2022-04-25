@@ -1501,7 +1501,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         // if process is sub process, the return sub id, or sub id=0
                         if (taskInstance.isSubProcess()) {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
-                            subProcessCode = Integer.parseInt(JSONUtils.parseObject(
+                            subProcessCode = Long.parseLong(JSONUtils.parseObject(
                                     taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_CODE).asText());
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskCode(),
