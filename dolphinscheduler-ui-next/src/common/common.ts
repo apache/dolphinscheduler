@@ -320,7 +320,7 @@ export const parseTime = (dateTime: string | number): Date => {
     : new Date(dateTime)
 }
 
-export const simpleDateFormat = (dateTime: number | string): string => {
+export const simpleDateFormat = (dateTime: string | number): string => {
   return format(parseTime(dateTime), 'yyyy-MM-dd HH:mm:ss')
 }
 
