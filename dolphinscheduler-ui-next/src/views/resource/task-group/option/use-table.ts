@@ -21,7 +21,7 @@ import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
-import {renderTableTime, simpleDateFormat} from '@/common/common'
+import { simpleDateFormat } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
