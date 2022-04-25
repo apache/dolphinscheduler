@@ -53,6 +53,7 @@ export function useTable() {
       record.updateTime = record.updateTime
         ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
         : ''
+      record.tenantId = record.tenantId === 0 ? null : record.tenantId
       return record
     })
 
