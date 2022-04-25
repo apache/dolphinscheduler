@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.api;
 
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -27,8 +32,16 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("org.apache.dolphinscheduler")
 public class ApiApplicationServer {
 
+    @Autowired
+    private TaskPluginManager taskPluginManager;
+
     public static void main(String[] args) {
         SpringApplication.run(ApiApplicationServer.class);
     }
 
+    @PostConstruct
+    public void run() {
+        // install task plugin
+        taskPluginManager.installPlugin();
+    }
 }
