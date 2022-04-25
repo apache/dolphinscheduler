@@ -76,7 +76,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
     dolphinscheduler_env.sh: environment Variables
     ````
 
-- Modify the `dolphinscheduler_env.sh` environment variable in the `worker-server/conf/dolphinscheduler_env.sh` directory according to the machine configuration (the following is the example that all the used software install under `/opt/soft`)
+- Modify the `dolphinscheduler_env.sh` environment variable in the `bin/env/dolphinscheduler_env.sh` directory according to the machine configuration (the following is the example that all the used software install under `/opt/soft`)
 
     ```shell
         export HADOOP_HOME=/opt/soft/hadoop

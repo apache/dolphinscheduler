@@ -54,7 +54,7 @@ This example is a common introductory type of MapReduce application, which used 
 
 #### Configure the MapReduce Environment in DolphinScheduler
 
-If you are using the MapReduce task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `worker-server/conf/dolphinscheduler_env.sh`.
+If you are using the MapReduce task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `bin/env/dolphinscheduler_env.sh`.
 
 ![mr_configure](/img/tasks/demo/mr_task01.png)
 

@@ -34,6 +34,21 @@ echo "Begin $startStop $command......"
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
+BIN_ENV_FILE="${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
+
+# Overwrite server dolphinscheduler_env.sh in path `<server>/conf/dolphinscheduler_env.sh` when exists
+# `bin/env/dolphinscheduler_env.sh` file. User could only change `bin/env/dolphinscheduler_env.sh` instead
+# of each server's dolphinscheduler_env.sh when they want to start the server
+function overwrite_server_env() {
+  local server=$1
+  local server_env_file="${DOLPHINSCHEDULER_HOME}/${server}/conf/dolphinscheduler_env.sh"
+  if [ -f "${BIN_ENV_FILE}" ]; then
+    echo "Overwrite ${server}/conf/dolphinscheduler_env.sh using bin/env/dolphinscheduler_env.sh."
+    cp "${BIN_ENV_FILE}" "${server_env_file}"
+  else
+    echo "Start server ${server} using env config path ${server_env_file}, because file ${BIN_ENV_FILE} not exists."
+  fi
+}
 
 source "${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
 
@@ -69,6 +84,7 @@ fi
 case $startStop in
   (start)
     echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
+    overwrite_server_env "${command}"
     nohup /bin/bash "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
     echo $! > $pid
     ;;

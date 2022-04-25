@@ -203,7 +203,7 @@ A： 1，在 **流程定义列表**，点击 **启动** 按钮
 
 ## Q：Python 任务设置 Python 版本
 
-A：  只需要修改 `worker-server/conf/dolphinscheduler_env.sh` 中的 PYTHON_HOME
+A：  只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_HOME
 
 ```
 export PYTHON_HOME=/bin/python

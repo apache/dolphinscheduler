@@ -397,7 +397,7 @@ apiServers="ds1"
 
 ### dolphinscheduler_env.sh [load environment variables configs]
 
-When using shell to commit tasks, DolphinScheduler will export environment variables from `dolphinscheduler_env.sh`. The
+When using shell to commit tasks, DolphinScheduler will export environment variables from `bin/env/dolphinscheduler_env.sh`. The
 mainly configuration including `JAVA_HOME`, mata database, registry center, and task configuration.
 
 ```bash
