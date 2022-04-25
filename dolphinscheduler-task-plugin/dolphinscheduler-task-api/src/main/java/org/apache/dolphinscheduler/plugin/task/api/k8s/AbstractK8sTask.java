@@ -32,22 +32,20 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
      *
      * @param taskRequest taskRequest
      */
-    public AbstractK8sTask(TaskExecutionContext taskRequest) {
+    protected AbstractK8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger,taskRequest);
     }
 
     @Override
     public void handle() throws Exception {
-        TaskResponse response = null;
         try {
-            response = abstractK8sTaskExecutor.run(buildCommand());
+            TaskResponse response = abstractK8sTaskExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
         } catch (Exception e) {
-            logger.error("k8s process failure", e);
-            setExitStatusCode(response.getExitStatusCode());
-            throw e;
+            exitStatusCode = -1;
+            throw new RuntimeException("k8s process failure",e);
         }
     }
 

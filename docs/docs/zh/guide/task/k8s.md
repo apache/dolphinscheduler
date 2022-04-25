@@ -39,7 +39,7 @@ K8S任务类型，用于在K8S上执行一个短时和批处理的任务。worke
 
 根据上述参数说明，配置所需的内容即可。
 
-![K8S](/img/tasks/demo/k8s_task_test.jpg.png)
+![K8S](/img/tasks/demo/k8s-task-zh.png)
 
 ## 注意事项
 
