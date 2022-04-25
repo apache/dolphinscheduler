@@ -627,6 +627,7 @@ const project = {
     workflow_name: '工作流名称',
     workflow_name_tips: '请选择工作流(必选)',
     child_node: '子节点',
+    child_node_tips: '请选择子节点(必选)',
     run_flag: '运行标志',
     normal: '正常',
     prohibition_execution: '禁止执行',

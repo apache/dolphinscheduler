@@ -631,6 +631,7 @@ const project = {
     workflow_name: 'Workflow Name',
     workflow_name_tips: 'Please select a workflow (required)',
     child_node: 'Child Node',
+    child_node_tips: 'Please select a child node (required)',
     run_flag: 'Run flag',
     normal: 'Normal',
     prohibition_execution: 'Prohibition execution',

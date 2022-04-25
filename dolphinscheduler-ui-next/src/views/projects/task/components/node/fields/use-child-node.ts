@@ -52,19 +52,11 @@ export function useChildNode({
         value: option.code
       }))
     loading.value = false
-    if (!model.processDefinitionCode) {
-      model.processDefinitionCode = options.value[0].value
-      if (!model.name) model.name = options.value[0].label
-    }
   }
   const getProcessListByCode = async (processCode: number) => {
     if (!processCode) return
     const res = await queryProcessDefinitionByCode(processCode, projectCode)
     model.definition = res
-  }
-
-  const onChange = (code: number, options: { label: string }) => {
-    if (!model.name) model.name = options.label
   }
 
   onMounted(() => {
@@ -80,10 +72,18 @@ export function useChildNode({
     span: 24,
     name: t('project.node.child_node'),
     props: {
-      loading: loading,
-      'on-update:value': onChange
+      loading: loading
     },
     options: options,
-    class: 'select-child-node'
+    class: 'select-child-node',
+    validate: {
+      trigger: ['input', 'blur'],
+      required: true,
+      validator(unuse: any, value: number) {
+        if (!value) {
+          return Error(t('project.node.child_node_tips'))
+        }
+      }
+    }
   }
 }
