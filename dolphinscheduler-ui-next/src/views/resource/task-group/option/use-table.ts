@@ -21,7 +21,7 @@ import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
-import { renderTableTime } from '@/common/common'
+import {renderTableTime, simpleDateFormat} from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -138,8 +138,8 @@ export function useTable(
             }
 
             item.projectName = projectName
-            item.createTime = renderTableTime(item.createTime)
-            item.updateTime = renderTableTime(item.updateTime)
+            item.createTime = simpleDateFormat(item.createTime)
+            item.updateTime = simpleDateFormat(item.updateTime)
             return {
               ...item
             }

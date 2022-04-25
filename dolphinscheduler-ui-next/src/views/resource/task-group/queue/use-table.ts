@@ -30,7 +30,7 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import { parseTime } from '@/common/common'
+import {parseTime, simpleDateFormat} from '@/common/common'
 
 export function useTable(
   updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},
@@ -149,14 +149,8 @@ export function useTable(
           }
 
           item.taskGroupName = taskGroupName
-          item.createTime = format(
-            parseTime(item.createTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          item.updateTime = format(
-            parseTime(item.updateTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
+          item.createTime = simpleDateFormat(item.createTime)
+          item.updateTime = simpleDateFormat(item.updateTime)
           return {
             ...item
           }

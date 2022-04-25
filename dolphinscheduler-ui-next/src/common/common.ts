@@ -33,9 +33,9 @@ import {
   IssuesCloseOutlined,
   SendOutlined
 } from '@vicons/antd'
-import { format, parseISO } from 'date-fns'
+import {format, parseISO} from 'date-fns'
 import _ from 'lodash'
-import { ITaskStateConfig } from './types'
+import {ITaskStateConfig} from './types'
 
 /**
  * Intelligent display kb m
@@ -320,8 +320,10 @@ export const parseTime = (dateTime: string | number): Date => {
     : new Date(dateTime)
 }
 
-export const renderTableTime = (
-  dateTime: string | number | null | undefined
-): string => {
-  return dateTime ? format(parseTime(dateTime), 'yyyy-MM-dd HH:mm:ss') : '-'
+export const simpleDateFormat = (dateTime: number | string): string => {
+  return format(parseTime(dateTime), 'yyyy-MM-dd HH:mm:ss')
+}
+
+export const renderTableTime = (dateTime?: string | number | null): string => {
+  return dateTime ? simpleDateFormat(dateTime) : '-'
 }
