@@ -235,9 +235,8 @@ public class FlinkArgsUtils {
             args.add(FlinkConstants.FLINK_SQL_FILE);
 
             // generate scripts
-            String fileName = String.format("%s/%s_node.%s",
-                    taskExecutionContext.getExecutePath(),
-                    taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sql");
+            String fileName = String.format("%s/%s_node.sql",
+                taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
 
             File file = new File(fileName);
             Path path = file.toPath();
