@@ -33,7 +33,7 @@ import {
   IssuesCloseOutlined,
   SendOutlined
 } from '@vicons/antd'
-import { parseISO } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
 import { ITaskStateConfig } from './types'
 
@@ -314,10 +314,14 @@ export const warningTypeList = [
   }
 ]
 
-export const parseTime = (dateTime: string | number) => {
-  if (_.isString(dateTime) === true) {
-    return parseISO(dateTime as string)
-  } else {
-    return new Date(dateTime)
-  }
+export const parseTime = (dateTime: string | number): Date => {
+  return _.isString(dateTime) === true
+    ? parseISO(dateTime as string)
+    : new Date(dateTime)
+}
+
+export const renderTableTime = (
+  dateTime: string | number | null | undefined
+): string => {
+  return dateTime ? format(parseTime(dateTime), 'yyyy-MM-dd HH:mm:ss') : '-'
 }

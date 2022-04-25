@@ -16,7 +16,6 @@
  */
 
 import _ from 'lodash'
-import { format } from 'date-fns'
 import { reactive, h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -29,8 +28,7 @@ import {
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
-import { runningType } from '@/common/common'
-import { parseTime } from '@/common/common'
+import { renderTableTime, runningType } from '@/common/common'
 import styles from './index.module.scss'
 import { renderStateCell } from '../../task/instance/use-table'
 import {
@@ -119,28 +117,19 @@ export function useTable() {
         title: t('project.workflow.scheduling_time'),
         key: 'scheduleTime',
         ...COLUMN_WIDTH_CONFIG['time'],
-        render: (_row: IWorkflowInstance) =>
-          _row.scheduleTime
-            ? format(parseTime(_row.scheduleTime), 'yyyy-MM-dd HH:mm:ss')
-            : '-'
+        render: (_row: IWorkflowInstance) => renderTableTime(_row.scheduleTime)
       },
       {
         title: t('project.workflow.start_time'),
         key: 'startTime',
         ...COLUMN_WIDTH_CONFIG['time'],
-        render: (_row: IWorkflowInstance) =>
-          _row.startTime
-            ? format(parseTime(_row.startTime), 'yyyy-MM-dd HH:mm:ss')
-            : '-'
+        render: (_row: IWorkflowInstance) => renderTableTime(_row.startTime)
       },
       {
         title: t('project.workflow.end_time'),
         key: 'endTime',
         ...COLUMN_WIDTH_CONFIG['time'],
-        render: (_row: IWorkflowInstance) =>
-          _row.endTime
-            ? format(parseTime(_row.endTime), 'yyyy-MM-dd HH:mm:ss')
-            : '-'
+        render: (_row: IWorkflowInstance) => renderTableTime(_row.endTime)
       },
       {
         title: t('project.workflow.duration'),
