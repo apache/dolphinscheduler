@@ -32,7 +32,7 @@ import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import styles from './index.module.scss'
 import type { TableColumns } from './types'
-import { DefaultTableWidth } from '@/utils/column-width-config'
+import { DefaultTableWidth } from '@/common/column-width-config'
 
 const list = defineComponent({
   name: 'list',
