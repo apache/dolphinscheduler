@@ -18,6 +18,8 @@
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.sql.HiveSqlLogThread;
+import org.apache.dolphinscheduler.plugin.task.sql.SqlBinds;
+import org.apache.dolphinscheduler.plugin.task.sql.SqlTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.junit.Assert;
@@ -29,6 +31,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * sql task execution test
@@ -70,6 +74,27 @@ public class SqlTaskExecutionTest {
             res = stmt.executeQuery(sql);
         }catch (Exception e){
            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void sqlTaskHiveSqlTest(){
+        String taskJson="{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select * from tmp.test_doris limit 10\",\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\",\"groupId\":null,\"localParams\":[],\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},\"switchResult\":{}}";
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskType("hive");
+        taskExecutionContext.setTaskParams(taskJson);
+
+        SqlParameters sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
+
+        Assert.assertNotNull(sqlParameters);
+        String sql = sqlParameters.getSql();
+        SqlTask sqlTask = new SqlTask(taskExecutionContext);
+
+        SqlBinds sqlBinds = new SqlBinds(sql, new HashMap<>());
+        try {
+            sqlTask.executeFuncAndSql(sqlBinds,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
