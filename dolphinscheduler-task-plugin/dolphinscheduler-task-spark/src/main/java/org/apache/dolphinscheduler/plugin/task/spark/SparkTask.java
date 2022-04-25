@@ -120,12 +120,10 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     protected void setMainJarName() {
         // main jar
-        if (sparkParameters.getProgramType() != ProgramType.SQL){
             ResourceInfo mainJar = sparkParameters.getMainJar();
             String resourceName = getResourceNameOfMainJar(mainJar);
             mainJar.setRes(resourceName);
             sparkParameters.setMainJar(mainJar);
-        }
     }
 
     @Override

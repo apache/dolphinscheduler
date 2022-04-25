@@ -14,26 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {ref, watchEffect } from 'vue'
 import {useI18n} from 'vue-i18n'
-import type {IJsonItem} from '../types'
+import type {IJsonItem, IOption} from '../types'
 
-export function useDeployMode(span = 24, showClient = true,showCluster = true): IJsonItem {
+export function useDeployMode(span = 24, showClient= ref(true), showCluster= ref(true)): IJsonItem {
     const {t} = useI18n()
 
+    const deployModeOptions = ref(DEPLOY_MODES as IOption[])
+
+    const changeDeployModeOptions = (showClient: boolean, showCluster: boolean) => {
+        deployModeOptions.value = DEPLOY_MODES.filter((option) => {
+            switch (option.value) {
+                case 'cluster':
+                    return showCluster
+                case 'client':
+                    return showClient
+                default:
+                    return true
+            }
+        })
+    }
+
+    watchEffect(
+        () => changeDeployModeOptions(showClient.value, showCluster.value)
+    )
     return {
         type: 'radio',
         field: 'deployMode',
         name: t('project.node.deploy_mode'),
-        options: DEPLOY_MODES.filter((option) => {
-            if(option.value === 'client') {
-                return showClient
-            }
-            if(option.value === 'cluster') {
-                return showCluster
-            }
-            return true
-            }
-        ),
+        options: deployModeOptions,
+        span
     }
 }
 

@@ -71,7 +71,7 @@ public class SparkConstants {
     public static final String EXECUTOR_MEMORY = "--executor-memory";
 
     /**
-     * -f flie
+     * -f FILENAME
      */
     public static final String SQL_FILE = "-f";
 

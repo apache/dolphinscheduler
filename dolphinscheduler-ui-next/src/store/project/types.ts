@@ -18,18 +18,13 @@
 import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
 import type { IOption } from '@/components/form/types'
 
-<<<<<<< HEAD
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
 type DependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
 }
 type BDependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
 }
-=======
-// type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
->>>>>>> 03c99d899 ([refactor] Dolphinscheduler sparkSQL)
 
 interface IResource {
   id: number

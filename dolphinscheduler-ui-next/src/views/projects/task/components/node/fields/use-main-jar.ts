@@ -70,7 +70,6 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     },
     validate: {
       trigger: ['input', 'blur'],
-      // required: true,
       required: model.programType !== 'SQL',
       validator(validate: any, value: string) {
         if (!value) {

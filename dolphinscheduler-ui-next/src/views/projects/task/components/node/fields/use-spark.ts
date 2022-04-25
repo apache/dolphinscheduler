@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   useCustomParams,
@@ -28,7 +28,6 @@ import {
   useResources
 } from '.'
 import type { IJsonItem } from '../types'
-import {DEPLOY_MODES} from "@/views/projects/task/components/node/fields/use-deploy-mode";
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -42,6 +41,10 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
 
   const rawScriptSpan = computed(() =>
       model.programType === 'SQL' ? 24 : 0
+  )
+
+  const showCluster = computed(() =>
+      model.programType !== 'SQL'
   )
 
   return [
@@ -75,7 +78,6 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        // required: model.programType !== 'PYTHON',
         required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
           if (model.programType !== 'PYTHON' && !value && model.programType !== 'SQL') {
@@ -96,7 +98,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.script_tips')
       }
     },
-    useDeployMode(24,true,model.programType !== 'SQL'),
+    useDeployMode(24, ref(true), showCluster),
     {
       type: 'input',
       field: 'appName',
@@ -163,18 +165,3 @@ export const SPARK_VERSIONS = [
     value: 'SPARK1'
   }
 ]
-
-// export const DEPLOY_MODES = [
-//   {
-//     label: 'cluster',
-//     value: 'cluster'
-//   },
-//   {
-//     label: 'client',
-//     value: 'client'
-//   },
-//   {
-//     label: 'local',
-//     value: 'local'
-//   }
-// ]

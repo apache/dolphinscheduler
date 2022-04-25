@@ -72,7 +72,6 @@ public class SparkArgsUtils {
         args.add(deployMode);
 
         //sparksql -f fileName
-        //The file name is randomly generated and is automatically deleted at the end of the program
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
         String rawScript = param.getRawScript();
@@ -89,9 +88,8 @@ public class SparkArgsUtils {
             sb.append(";\n");
 
             // generate scripts
-            String fileName = String.format("%s/%s_node.%s",
-                    taskRequest.getExecutePath(),
-                    taskRequest.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sql");
+            // The file name is automatically generated
+            String fileName = String.format("%s/%s_node.sql", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
 
             File file = new File(fileName);
             Path path = file.toPath();
