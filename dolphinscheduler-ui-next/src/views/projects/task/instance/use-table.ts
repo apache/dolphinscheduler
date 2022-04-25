@@ -155,7 +155,8 @@ export function useTable() {
       {
         title: t('project.task.host'),
         key: 'host',
-        ...COLUMN_WIDTH_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: IRecord) => row.host || '-'
       },
       {
         title: t('project.task.operation'),
@@ -206,6 +207,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        disabled: !row.host,
                         onClick: () => handleLog(row)
                       },
                       {
