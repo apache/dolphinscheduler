@@ -46,7 +46,7 @@ Spark  任务类型，用于执行 Spark 程序。对于 Spark 节点，worker �
 
 #### 在 DolphinScheduler 中配置 Spark 环境
 
-若生产环境中要是使用到 Spark 任务类型，则需要先配置好所需的环境。配置文件如下：`/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
+若生产环境中要是使用到 Spark 任务类型，则需要先配置好所需的环境。配置文件如下：`bin/env/dolphinscheduler_env.sh`。
 
 ![spark_configure](/img/tasks/demo/spark_task01.png)
 

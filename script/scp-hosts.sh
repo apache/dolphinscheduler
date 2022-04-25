@@ -40,7 +40,7 @@ do
   fi
 
   echo "scp dirs to $host/$installPath starting"
-	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
+	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ master-server/ worker-server/ alert-server/ api-server/ ui/ tools/"
 
   for i in ${!workerNames[@]}; do
     if [[ ${workerNames[$i]} == $host ]]; then
@@ -51,7 +51,7 @@ do
   # set worker groups in application.yaml
   [[ -n ${workerIndex} ]] && sed -i "s/- default/- ${groupNames[$workerIndex]}/" worker-server/conf/application.yaml
 
-  for dsDir in bin master-server worker-server alert-server api-server ui
+  for dsDir in bin master-server worker-server alert-server api-server ui tools
   do
     echo "start to scp $dsDir to $host/$installPath"
     # Use quiet mode to reduce command line output
