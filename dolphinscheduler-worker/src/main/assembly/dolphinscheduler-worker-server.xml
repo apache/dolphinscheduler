@@ -42,7 +42,7 @@
         </fileSet>
         <fileSet>
             <directory>${basedir}/../script/env</directory>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>dolphinscheduler_env.sh</include>
             </includes>

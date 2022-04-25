@@ -120,7 +120,7 @@ public final class Constants {
     /**
      * environment properties default path
      */
-    public static final String ENV_PATH = "env/dolphinscheduler_env.sh";
+    public static final String ENV_PATH = "dolphinscheduler_env.sh";
 
     /**
      * resource.view.suffixs

@@ -15,7 +15,7 @@
 ## 4. 数据库升级
 - 将`./tools/conf/application.yaml`中的username和password改成你设定数据库用户名和密码
 
-- 如果选择 MySQL，请修改`./tools/bin/dolphinscheduler_env.sh`中的如下配置, 还需要手动添加 [[ mysql-connector-java 驱动 jar ](https://downloads.MySQL.com/archives/c-j/)] 包到 lib 目录（`./tools/lib`）下，这里下载的是mysql-connector-java-8.0.16.jar
+- 如果选择 MySQL，请修改`./tools/bin/dolphinscheduler_env.sh`中的如下配置, 还需要手动添加 [ mysql-connector-java 驱动 jar ](https://downloads.MySQL.com/archives/c-j/) 包到 lib 目录（`./tools/lib`）下，这里下载的是mysql-connector-java-8.0.16.jar
 
     ```shell
     export DATABASE=${DATABASE:-mysql}
