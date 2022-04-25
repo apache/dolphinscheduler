@@ -17,7 +17,6 @@
 
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { format } from 'date-fns'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import {
   queryTaskGroupListPaging,
