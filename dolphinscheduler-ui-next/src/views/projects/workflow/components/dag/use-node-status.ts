@@ -18,7 +18,7 @@
 import { render, h, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { tasksState } from '@/utils/common'
+import { tasksState } from '@/common/common'
 import { NODE, NODE_STATUS_MARKUP } from './dag-config'
 import { queryTaskListByProcessId } from '@/service/modules/process-instances'
 import NodeStatus from '@/views/projects/workflow/components/dag/dag-node-status'
@@ -79,9 +79,12 @@ export function useNodeStatus(options: Options) {
       if (taskList.value) {
         taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
-          nodeStore.updateDependentResult(
-            JSON.parse(taskInstance.dependentResult)
-          )
+
+          if (taskInstance.dependentResult) {
+            nodeStore.updateDependentResult(
+              JSON.parse(taskInstance.dependentResult)
+            )
+          }
         })
       }
     })

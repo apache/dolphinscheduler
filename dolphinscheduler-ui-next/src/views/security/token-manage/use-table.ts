@@ -22,7 +22,7 @@ import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import { queryAccessTokenList, deleteToken } from '@/service/modules/token'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import type { TokenRes } from '@/service/modules/token/types'
 
 export function useTable() {

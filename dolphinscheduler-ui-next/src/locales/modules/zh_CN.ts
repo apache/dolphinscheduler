@@ -1026,7 +1026,7 @@ const security = {
   user: {
     user_manage: '用户管理',
     create_user: '创建用户',
-    update_user: '更新用户',
+    edit_user: '编辑用户',
     delete_user: '删除用户',
     delete_confirm: '确定删除吗?',
     project: '项目',

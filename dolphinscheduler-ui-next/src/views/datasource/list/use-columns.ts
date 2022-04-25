@@ -32,7 +32,7 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { TableColumns } from './types'
 
 export function useColumns(onCallback: Function) {
@@ -108,6 +108,7 @@ export function useColumns(onCallback: Function) {
                     {
                       circle: true,
                       type: 'info',
+                      size: 'small',
                       onClick: () => void onCallback(rowData.id, 'edit')
                     },
                     {
@@ -134,6 +135,7 @@ export function useColumns(onCallback: Function) {
                           {
                             circle: true,
                             type: 'error',
+                            size: 'small',
                             class: 'btn-delete'
                           },
                           {

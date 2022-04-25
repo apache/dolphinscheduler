@@ -20,9 +20,9 @@ import * as echarts from 'echarts'
 import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import initChart from '@/components/chart'
-import { tasksState } from '@/utils/common'
+import { tasksState } from '@/common/common'
 import { format } from 'date-fns'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import type { ISeriesData, ITaskState } from '../type'
 
 const props = {
