@@ -351,7 +351,7 @@ export default defineComponent({
           onEdit={editTask}
           onCopyTask={copyTask}
           onRemoveTasks={removeTasks}
-          onViewLog={viewLog}
+          onViewLog={handleViewLog}
         />
         {!!props.definition && (
           <StartModal
