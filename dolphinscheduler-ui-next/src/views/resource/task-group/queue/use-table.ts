@@ -30,7 +30,7 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import {parseTime, simpleDateFormat} from '@/common/common'
+import { simpleDateFormat } from '@/common/common'
 
 export function useTable(
   updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},
