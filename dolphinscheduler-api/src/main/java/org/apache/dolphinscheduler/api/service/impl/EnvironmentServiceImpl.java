@@ -425,13 +425,14 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     private Map<String, Object> checkUsedEnvironmentWorkerGroupRelation(Set<String> deleteKeySet,String environmentName, Long environmentCode) {
         Map<String, Object> result = new HashMap<>();
         for (String workerGroup : deleteKeySet) {
-            TaskDefinition taskDefinition = taskDefinitionMapper
-                    .selectOne(new QueryWrapper<TaskDefinition>().lambda()
+            List<TaskDefinition> taskDefinitionList = taskDefinitionMapper
+                    .selectList(new QueryWrapper<TaskDefinition>().lambda()
                             .eq(TaskDefinition::getEnvironmentCode,environmentCode)
                             .eq(TaskDefinition::getWorkerGroup,workerGroup));
 
-            if (Objects.nonNull(taskDefinition)) {
-                putMsg(result, Status.UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR,workerGroup,environmentName,taskDefinition.getName());
+            if (Objects.nonNull(taskDefinitionList) && taskDefinitionList.size() != 0) {
+                Set<String> collect = taskDefinitionList.stream().map(TaskDefinition::getName).collect(Collectors.toSet());
+                putMsg(result, Status.UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR,workerGroup,environmentName, collect);
                 return result;
             }
         }
