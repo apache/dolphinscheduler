@@ -581,16 +581,13 @@ public class DagHelper {
         if (CollectionUtils.isEmpty(subsequentNodes)) {
             return false;
         }
-
+        if (StringUtils.isBlank(filterNodeType)){
+            return true;
+        }
         for (String nodeName : subsequentNodes) {
             TaskNode taskNode = dag.getNode(nodeName);
-            if (StringUtils.isBlank(filterNodeType)){
-                List<String> preTaskList = JSONUtils.toList(taskNode.getPreTasks(),String.class);
-                return preTaskList.contains(parentNodeCode);
-            } else {
-                if (taskNode.getType().equalsIgnoreCase(filterNodeType)){
-                    return true;
-                }
+            if (taskNode.getType().equalsIgnoreCase(filterNodeType)){
+                return true;
             }
         }
         return false;
