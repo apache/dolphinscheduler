@@ -17,12 +17,15 @@
 
 """Task sql."""
 
+import logging
 import re
 from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.database import Database
 from pydolphinscheduler.core.task import Task
+
+log = logging.getLogger(__file__)
 
 
 class SqlType:
@@ -61,6 +64,7 @@ class Sql(Task):
         name: str,
         datasource_name: str,
         sql: str,
+        sql_type: Optional[int] = None,
         pre_statements: Optional[str] = None,
         post_statements: Optional[str] = None,
         display_rows: Optional[int] = 10,
@@ -69,6 +73,7 @@ class Sql(Task):
     ):
         super().__init__(name, TaskType.SQL, *args, **kwargs)
         self.sql = sql
+        self.param_sql_type = sql_type
         self.datasource_name = datasource_name
         self.pre_statements = pre_statements or []
         self.post_statements = post_statements or []
@@ -76,9 +81,24 @@ class Sql(Task):
 
     @property
     def sql_type(self) -> int:
-        """Judgement sql type, use regexp to check which type of the sql is."""
+        """Judgement sql type, it will return the SQL type for type `SELECT` or `NOT_SELECT`.
+
+        If `param_sql_type` dot not specific, will use regexp to check
+        which type of the SQL is. But if `param_sql_type` is specific
+        will use the parameter overwrites the regexp way
+        """
+        if (
+            self.param_sql_type == SqlType.SELECT
+            or self.param_sql_type == SqlType.NOT_SELECT
+        ):
+            log.info(
+                "The sql type is specified by a parameter, with value %s",
+                self.param_sql_type,
+            )
+            return self.param_sql_type
         pattern_select_str = (
-            "^(?!(.* |)insert |(.* |)delete |(.* |)drop |(.* |)update |(.* |)alter ).*"
+            "^(?!(.* |)insert |(.* |)delete |(.* |)drop "
+            "|(.* |)update |(.* |)alter |(.* |)create ).*"
         )
         pattern_select = re.compile(pattern_select_str, re.IGNORECASE)
         if pattern_select.match(self.sql) is None:

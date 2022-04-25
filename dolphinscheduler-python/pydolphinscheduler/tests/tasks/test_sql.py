@@ -26,24 +26,38 @@ from pydolphinscheduler.tasks.sql import Sql, SqlType
 
 
 @pytest.mark.parametrize(
-    "sql, sql_type",
+    "sql, param_sql_type, sql_type",
     [
-        ("select 1", SqlType.SELECT),
-        (" select 1", SqlType.SELECT),
-        (" select 1 ", SqlType.SELECT),
-        (" select 'insert' ", SqlType.SELECT),
-        (" select 'insert ' ", SqlType.SELECT),
-        ("with tmp as (select 1) select * from tmp ", SqlType.SELECT),
-        ("insert into table_name(col1, col2) value (val1, val2)", SqlType.NOT_SELECT),
+        ("select 1", None, SqlType.SELECT),
+        (" select 1", None, SqlType.SELECT),
+        (" select 1 ", None, SqlType.SELECT),
+        (" select 'insert' ", None, SqlType.SELECT),
+        (" select 'insert ' ", None, SqlType.SELECT),
+        ("with tmp as (select 1) select * from tmp ", None, SqlType.SELECT),
         (
-            "insert into table_name(select, col2) value ('select', val2)",
+            "insert into table_name(col1, col2) value (val1, val2)",
+            None,
             SqlType.NOT_SELECT,
         ),
-        ("update table_name SET col1=val1 where col1=val2", SqlType.NOT_SELECT),
-        ("update table_name SET col1='select' where col1=val2", SqlType.NOT_SELECT),
-        ("delete from table_name where id < 10", SqlType.NOT_SELECT),
-        ("delete from table_name where id < 10", SqlType.NOT_SELECT),
-        ("alter table table_name add column col1 int", SqlType.NOT_SELECT),
+        (
+            "insert into table_name(select, col2) value ('select', val2)",
+            None,
+            SqlType.NOT_SELECT,
+        ),
+        ("update table_name SET col1=val1 where col1=val2", None, SqlType.NOT_SELECT),
+        (
+            "update table_name SET col1='select' where col1=val2",
+            None,
+            SqlType.NOT_SELECT,
+        ),
+        ("delete from table_name where id < 10", None, SqlType.NOT_SELECT),
+        ("delete from table_name where id < 10", None, SqlType.NOT_SELECT),
+        ("alter table table_name add column col1 int", None, SqlType.NOT_SELECT),
+        ("create table table_name2 (col1 int)", None, SqlType.NOT_SELECT),
+        ("create table table_name2 (col1 int)", SqlType.SELECT, SqlType.SELECT),
+        ("select 1", SqlType.NOT_SELECT, SqlType.NOT_SELECT),
+        ("create table table_name2 (col1 int)", SqlType.NOT_SELECT, SqlType.NOT_SELECT),
+        ("select 1", SqlType.SELECT, SqlType.SELECT),
     ],
 )
 @patch(
@@ -54,11 +68,13 @@ from pydolphinscheduler.tasks.sql import Sql, SqlType
     "pydolphinscheduler.core.database.Database.get_database_info",
     return_value=({"id": 1, "type": "mock_type"}),
 )
-def test_get_sql_type(mock_datasource, mock_code_version, sql, sql_type):
+def test_get_sql_type(
+    mock_datasource, mock_code_version, sql, param_sql_type, sql_type
+):
     """Test property sql_type could return correct type."""
     name = "test_get_sql_type"
     datasource_name = "test_datasource"
-    task = Sql(name, datasource_name, sql)
+    task = Sql(name, datasource_name, sql, sql_type=param_sql_type)
     assert (
         sql_type == task.sql_type
     ), f"Sql {sql} expect sql type is {sql_type} but got {task.sql_type}"
