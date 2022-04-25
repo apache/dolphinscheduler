@@ -29,7 +29,7 @@ interface AlertGroupIdReq {
 
 interface UserReq {
   email: string
-  tenantId: number
+  tenantId: number | null
   userName: string
   userPassword: string
   phone?: string
