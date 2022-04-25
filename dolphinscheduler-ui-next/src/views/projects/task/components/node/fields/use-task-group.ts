@@ -66,7 +66,8 @@ export function useTaskGroup(
       span: 12,
       name: t('project.node.task_group_name'),
       props: {
-        loading
+        loading,
+        clearable: true
       },
       options
     },
