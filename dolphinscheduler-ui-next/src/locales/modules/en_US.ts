@@ -480,7 +480,7 @@ const project = {
     recovery_waiting_thread: 'Recovery waiting thread',
     recover_serial_wait: 'Recover serial wait',
     recovery_suspend: 'Recovery Suspend',
-    recovery_failed: 'Recovery Failed',
+    failed_to_retry: 'Failed to retry',
     gantt: 'Gantt',
     name: 'Name',
     all_status: 'AllStatus',
