@@ -18,7 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { bytesToSize } from '@/utils/common'
+import { bytesToSize } from '@/common/common'
 import { useFileStore } from '@/store/file/file'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
@@ -36,7 +36,7 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { IUdfResourceParam } from './types'
 
 const goSubFolder = (router: Router, item: any) => {

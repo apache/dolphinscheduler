@@ -351,8 +351,6 @@ public class WorkflowExecuteThread {
         if (taskGroupQueue.getForceStart() == Flag.YES.getCode()) {
             TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
-            ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
-            taskProcessor.init(taskInstance, processInstance);
             taskProcessor.action(TaskAction.DISPATCH);
             this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
             return true;
@@ -362,8 +360,6 @@ public class WorkflowExecuteThread {
             if (acquireTaskGroup) {
                 TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
-                ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
-                taskProcessor.init(taskInstance, processInstance);
                 taskProcessor.action(TaskAction.DISPATCH);
                 return true;
             }
@@ -952,7 +948,7 @@ public class WorkflowExecuteThread {
                         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                             processDefinition.getGlobalParamMap(),
                             processDefinition.getGlobalParamList(),
-                            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+                            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE)));
                         processService.updateProcessInstance(processInstance);
                     }
                 }

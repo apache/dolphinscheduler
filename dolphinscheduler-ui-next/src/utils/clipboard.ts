@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-export const copy = (text: string): boolean => {
-  const range = document.createRange()
-  const node = document.createTextNode(text)
-  document.body.append(node)
-  range.selectNode(node)
-  window.getSelection()?.addRange(range)
+const copy = (text: string): boolean => {
+  const inp = document.createElement('input')
+  document.body.appendChild(inp)
+  inp.value = text
+  inp.select()
   let result = false
   try {
     result = document.execCommand('copy')
   } catch (err) {}
-  window.getSelection()?.removeAllRanges()
-  document.body.removeChild(node)
+  inp.remove()
   return result
 }
+
+export default copy

@@ -28,10 +28,10 @@ public class RegexUtilsTest {
     @Test
     public void testIsValidLinuxUserName() {
         String name1 = "10000";
-        Assert.assertFalse(RegexUtils.isValidLinuxUserName(name1));
+        Assert.assertTrue(RegexUtils.isValidLinuxUserName(name1));
 
         String name2 = "00hayden";
-        Assert.assertFalse(RegexUtils.isValidLinuxUserName(name2));
+        Assert.assertTrue(RegexUtils.isValidLinuxUserName(name2));
 
         String name3 = "hayde123456789123456789123456789";
         Assert.assertFalse(RegexUtils.isValidLinuxUserName(name3));
@@ -44,6 +44,12 @@ public class RegexUtilsTest {
 
         String name6 = "hayden";
         Assert.assertTrue(RegexUtils.isValidLinuxUserName(name6));
+
+        String name7 = "00hayden_0";
+        Assert.assertTrue(RegexUtils.isValidLinuxUserName(name2));
+
+        String name8 = "00hayden.8";
+        Assert.assertTrue(RegexUtils.isValidLinuxUserName(name2));
     }
 
     @Test

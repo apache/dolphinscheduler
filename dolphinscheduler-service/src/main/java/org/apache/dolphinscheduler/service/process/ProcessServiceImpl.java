@@ -399,6 +399,13 @@ public class ProcessServiceImpl implements ProcessService {
     public int createCommand(Command command) {
         int result = 0;
         if (command != null) {
+            // add command timezone
+            Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
+            Map<String, String> commandParams = JSONUtils.toMap(command.getCommandParam());
+            if (commandParams != null && schedule != null) {
+                commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
+                command.setCommandParam(JSONUtils.toJsonString(commandParams));
+            }
             result = commandMapper.insert(command);
         }
         return result;
@@ -771,11 +778,17 @@ public class ProcessServiceImpl implements ProcessService {
         setGlobalParamIfCommanded(processDefinition, cmdParam);
 
         // curing global params
+        Map<String, String> commandParamMap = JSONUtils.toMap(command.getCommandParam());
+        String timezoneId = null;
+        if (commandParamMap != null) {
+            timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
+        }
+
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             getCommandTypeIfComplement(processInstance, command),
-            processInstance.getScheduleTime()));
+            processInstance.getScheduleTime(), timezoneId));
 
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
@@ -909,12 +922,15 @@ public class ProcessServiceImpl implements ProcessService {
                 setGlobalParamIfCommanded(processDefinition, cmdParam);
             }
 
+            // time zone
+            String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+
             // Recalculate global parameters after rerun.
             processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
                 processDefinition.getGlobalParamList(),
                 commandTypeIfComplement,
-                processInstance.getScheduleTime()));
+                processInstance.getScheduleTime(), timezoneId));
             processInstance.setProcessDefinition(processDefinition);
         }
         //reset command parameter
@@ -1092,10 +1108,14 @@ public class ProcessServiceImpl implements ProcessService {
             && Flag.NO == processInstance.getIsSubProcess()) {
             processInstance.setScheduleTime(complementDate.get(0));
         }
+
+        // time zone
+        String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
-            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId));
     }
 
     /**
@@ -1181,7 +1201,7 @@ public class ProcessServiceImpl implements ProcessService {
     private String joinVarPool(String parentValPool, String subValPool) {
         List<Property> parentValPools = Lists.newArrayList(JSONUtils.toList(parentValPool, Property.class));
         parentValPools = parentValPools.stream().filter(valPool -> valPool.getDirect() == Direct.OUT).collect(Collectors.toList());
-        
+
         List<Property> subValPools = Lists.newArrayList(JSONUtils.toList(subValPool, Property.class));
 
         Set<String> parentValPoolKeys = parentValPools.stream().map(Property::getProp).collect(toSet());
@@ -1490,7 +1510,6 @@ public class ProcessServiceImpl implements ProcessService {
             taskInstance.setState(ExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
-        taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
         if (taskInstance.getSubmitTime() == null) {
             taskInstance.setSubmitTime(new Date());
@@ -1670,6 +1689,7 @@ public class ProcessServiceImpl implements ProcessService {
     public void packageTaskInstance(TaskInstance taskInstance, ProcessInstance processInstance) {
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setProcessDefine(processInstance.getProcessDefinition());
+        taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         TaskDefinition taskDefinition = this.findTaskDefinition(
             taskInstance.getTaskCode(),
             taskInstance.getTaskDefinitionVersion());

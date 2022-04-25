@@ -132,24 +132,45 @@ registryServers="localhost:2181"
 
 ## Initialize the Database
 
-DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the lib directory of DolphinScheduler. Let's take MySQL as an example for how to initialize the database:
+DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the lib directory of DolphinScheduler, which is `tools/libs/`. Let's take MySQL as an example for how to initialize the database:
+
+For mysql 5.6 / 5.7
 
 ```shell
 mysql -uroot -p
 
 mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
-# Change {user} and {password} by requests
+# Replace {user} and {password} with your username and password
 mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
 mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
 
 mysql> flush privileges;
 ```
 
+For mysql 8:
+
+```shell
+mysql -uroot -p
+
+mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+
+# Replace {user} and {password} with your username and password
+mysql> CREATE USER '{user}'@'%' IDENTIFIED BY '{password}';
+mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
+mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
+mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
+mysql> FLUSH PRIVILEGES;
+```
+
+Change the username and password in `tools/conf/application.yaml` to {user} and {password} you set in the previous step. 
+
+Then, modify `tools/bin/dolphinscheduler_env.sh`, set mysql as default database `export DATABASE=${DATABASE:-mysql}`.  
+
 After the above steps done you would create a new database for DolphinScheduler, then run Shell scripts to init database:
 
 ```shell
-sh script/create-dolphinscheduler.sh
+sh tools/bin/create-schema.sh
 ```
 
 ## Start DolphinScheduler

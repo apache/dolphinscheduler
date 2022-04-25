@@ -977,7 +977,7 @@ Configure the mail service port for `alert-server`, default value `empty`.
 
 Configure the mail sender for `alert-server`, default value `empty`.
 
-**`MAIL_USER=`**
+**`MAIL_USER`**
 
 Configure the user name of the mail service for `alert-server`, default value `empty`.
 
