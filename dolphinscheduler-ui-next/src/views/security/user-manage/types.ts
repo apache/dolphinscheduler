@@ -34,6 +34,7 @@ interface IRecord {
   userName: string
   userType: TUserType
   tenantCode: string
+  tenantId: null | number
   queueName: string
   email: string
   phone: string

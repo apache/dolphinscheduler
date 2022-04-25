@@ -32,7 +32,7 @@ export function useUserDetail() {
   const initialValues = {
     userName: '',
     userPassword: '',
-    tenantId: 0,
+    tenantId: null,
     email: '',
     queue: '',
     phone: '',
