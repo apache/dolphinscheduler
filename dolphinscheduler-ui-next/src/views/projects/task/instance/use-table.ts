@@ -32,7 +32,7 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import { parseTime, tasksState } from '@/common/common'
+import { parseTime, renderTableTime, tasksState } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -123,17 +123,20 @@ export function useTable() {
       {
         title: t('project.task.submit_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
-        key: 'submitTime'
+        key: 'submitTime',
+        render: (row: IRecord) => renderTableTime(row.submitTime)
       },
       {
         title: t('project.task.start_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
-        key: 'startTime'
+        key: 'startTime',
+        render: (row: IRecord) => renderTableTime(row.startTime)
       },
       {
         title: t('project.task.end_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
-        key: 'endTime'
+        key: 'endTime',
+        render: (row: IRecord) => renderTableTime(row.endTime)
       },
       {
         title: t('project.task.duration'),
@@ -298,23 +301,7 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
-          variables.tableData = res.totalList.map((item, unused) => {
-            item.submitTime = format(
-              parseTime(item.submitTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.startTime = format(
-              parseTime(item.startTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.endTime = format(
-              parseTime(item.endTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            return {
-              ...item
-            }
-          }) as any
+          variables.tableData = res.totalList as IRecord[]
           variables.totalPage = res.totalPage
           variables.loadingRef = false
         }
