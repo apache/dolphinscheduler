@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -58,6 +59,11 @@ public class DagHelperTest {
         relation.setEndNode("5293789969857");
         taskNodeRelations.add(relation);
 
+        TaskNodeRelation relationNext = new TaskNodeRelation();
+        relationNext.setStartNode("5293789969856");
+        relationNext.setEndNode("5293789969858");
+        taskNodeRelations.add(relationNext);
+
         List<TaskNode> taskNodes = new ArrayList<>();
         TaskNode node = new TaskNode();
         node.setCode(5293789969856L);
@@ -65,11 +71,17 @@ public class DagHelperTest {
 
         TaskNode subNode = new TaskNode();
         subNode.setCode(5293789969857L);
-        subNode.setType("SHELL");
+        subNode.setType("BLOCKING");
         subNode.setPreTasks("[5293789969856]");
+
+        TaskNode subNextNode = new TaskNode();
+        subNextNode.setCode(5293789969858L);
+        subNextNode.setType("CONDITIONS");
+        subNextNode.setPreTasks("[5293789969856]");
 
         taskNodes.add(node);
         taskNodes.add(subNode);
+        taskNodes.add(subNextNode);
 
         ProcessDag processDag = new ProcessDag();
         processDag.setEdges(taskNodeRelations);
@@ -79,7 +91,13 @@ public class DagHelperTest {
         Assert.assertTrue(canSubmit);
 
         boolean haveBlocking = DagHelper.haveBlockingAfterNode(parentNodeCode, dag);
-        Assert.assertFalse(haveBlocking);
+        Assert.assertTrue(haveBlocking);
+
+        boolean haveConditions = DagHelper.haveConditionsAfterNode(parentNodeCode, dag);
+        Assert.assertTrue(haveConditions);
+
+        boolean dependent = DagHelper.haveSubAfterNode(parentNodeCode, dag, TaskConstants.TASK_TYPE_DEPENDENT);
+        Assert.assertFalse(dependent);
     }
 
     /**
