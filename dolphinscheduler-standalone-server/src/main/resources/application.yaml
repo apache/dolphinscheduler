@@ -195,3 +195,17 @@ spring:
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  sql:
+     init:
+       schema-locations: classpath:sql/dolphinscheduler_mysql.sql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: root
