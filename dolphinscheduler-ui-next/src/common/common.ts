@@ -320,8 +320,10 @@ export const parseTime = (dateTime: string | number): Date => {
     : new Date(dateTime)
 }
 
-export const renderTableTime = (
-  dateTime: string | number | null | undefined
-): string => {
-  return dateTime ? format(parseTime(dateTime), 'yyyy-MM-dd HH:mm:ss') : '-'
+export const renderFormat = (dateTime: string | number): string => {
+  return format(parseTime(dateTime), 'yyyy-MM-dd HH:mm:ss')
+}
+
+export const renderTableTime = (dateTime?: string | number | null): string => {
+  return dateTime ? renderFormat(dateTime) : '-'
 }
