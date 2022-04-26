@@ -30,13 +30,13 @@ public abstract class AbstractK8sTaskExecutor {
     protected Logger logger;
     protected TaskExecutionContext taskRequest;
     protected K8sUtils k8sUtils;
-    protected StringBuffer logStringBuffer;
+    protected StringBuilder logStringBuffer;
 
-    public AbstractK8sTaskExecutor(Logger logger, TaskExecutionContext taskRequest) {
+    protected AbstractK8sTaskExecutor(Logger logger, TaskExecutionContext taskRequest) {
         this.logger = logger;
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
-        this.logStringBuffer = new StringBuffer();
+        this.logStringBuffer = new StringBuilder();
     }
 
     public abstract TaskResponse run(String k8sParameterStr) throws Exception;
@@ -44,10 +44,9 @@ public abstract class AbstractK8sTaskExecutor {
     public abstract void cancelApplication(String k8sParameterStr);
 
     public void waitTimeout(Boolean timeout) throws TaskException {
-        if (timeout) {
+        if (Boolean.TRUE.equals(timeout)) {
             throw new TaskException("K8sTask is timeout");
         }
-        return;
     }
 
     public void flushLog(TaskResponse taskResponse) {

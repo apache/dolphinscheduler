@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -45,7 +46,7 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
             setAppIds(response.getAppIds());
         } catch (Exception e) {
             exitStatusCode = -1;
-            throw new RuntimeException("k8s process failure",e);
+            throw new TaskException("k8s process failure",e);
         }
     }
 

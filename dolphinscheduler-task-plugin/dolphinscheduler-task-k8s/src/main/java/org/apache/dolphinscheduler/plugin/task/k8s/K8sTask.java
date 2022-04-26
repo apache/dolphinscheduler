@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.k8s;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
@@ -52,7 +53,7 @@ public class K8sTask extends AbstractK8sTask {
         this.taskExecutionContext = taskRequest;
         this.k8sTaskParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), K8sTaskParameters.class);
         if (!k8sTaskParameters.checkParameters()) {
-            throw new RuntimeException("K8S task params is not valid");
+            throw new TaskException("K8S task params is not valid");
         }
     }
 

@@ -47,12 +47,11 @@ public class K8sUtils {
                 .inNamespace(namespace)
                 .create(job);
         } catch (Exception e) {
-            log.error("fail to create job: ", e);
-            throw new TaskException("fail to create job");
+            throw new TaskException("fail to create job",e);
         }
     }
 
-    public void deleteJob(String jobName, String namespace, String k8s) {
+    public void deleteJob(String jobName, String namespace) {
         try {
             client.batch().v1()
                 .jobs()
@@ -60,12 +59,11 @@ public class K8sUtils {
                 .withName(jobName)
                 .delete();
         } catch (Exception e) {
-            log.error("fail to delete job: ", e);
-            throw new TaskException("fail to delete job");
+            throw new TaskException("fail to delete job",e);
         }
     }
 
-    public Boolean jobExist(String jobName, String namespace, String k8s) {
+    public Boolean jobExist(String jobName, String namespace) {
         Optional<Job> result;
         try {
             JobList jobList = client.batch().v1().jobs().inNamespace(namespace).list();
@@ -75,18 +73,16 @@ public class K8sUtils {
                 .findFirst();
             return result.isPresent();
         } catch (Exception e) {
-            log.error("fail to check job: ", e);
             throw new TaskException("fail to check job: ", e);
         }
     }
 
-    public Watch createBatchJobWatcher(String jobName, Watcher watcher) {
+    public Watch createBatchJobWatcher(String jobName, Watcher<Job> watcher) {
         try {
             return client.batch().v1()
                 .jobs().withName(jobName).watch(watcher);
         } catch (Exception e) {
-            log.error("fail to register batch job watcher: ", e);
-            throw new TaskException("fail to register batch job watcher");
+            throw new TaskException("fail to register batch job watcher",e);
         }
     }
 
@@ -116,8 +112,7 @@ public class K8sUtils {
             Config config = Config.fromKubeconfig(configYaml);
             client = new DefaultKubernetesClient(config);
         } catch (Exception e) {
-            log.error("fail to build k8s ApiClient", e);
-            throw new TaskException("fail to build k8s ApiClient");
+            throw new TaskException("fail to build k8s ApiClient",e);
         }
     }
 

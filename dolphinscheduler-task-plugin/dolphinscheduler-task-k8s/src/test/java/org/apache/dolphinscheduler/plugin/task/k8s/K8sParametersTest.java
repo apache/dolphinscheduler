@@ -42,6 +42,12 @@ public class K8sParametersTest {
     }
 
     @Test
+    public void testGetResourceFilesListNormal() {
+       Assert.assertNotNull(k8sTaskParameters.getResourceFilesList());
+       Assert.assertEquals(0, k8sTaskParameters.getResourceFilesList().size());
+    }
+
+    @Test
     public void testK8sParameters() {
         Assert.assertEquals(image, k8sTaskParameters.getImage());
         Assert.assertEquals(namespace, k8sTaskParameters.getNamespace());
