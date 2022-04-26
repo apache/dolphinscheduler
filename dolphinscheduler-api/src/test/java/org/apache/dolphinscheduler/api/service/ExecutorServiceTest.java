@@ -26,23 +26,10 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -95,6 +82,12 @@ public class ExecutorServiceTest {
     @Mock
     private MonitorService monitorService;
 
+    @Mock
+    private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Mock
+    private ProcessInstanceMapper processInstanceMapper;
+
     private int processDefinitionId = 1;
 
     private long processDefinitionCode = 1L;
@@ -105,9 +98,13 @@ public class ExecutorServiceTest {
 
     private int userId = 1;
 
+    private int taskQueueId = 1;
+
     private ProcessDefinition processDefinition = new ProcessDefinition();
 
     private ProcessInstance processInstance = new ProcessInstance();
+
+    private TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
 
     private User loginUser = new User();
 
@@ -145,6 +142,11 @@ public class ExecutorServiceTest {
         project.setCode(projectCode);
         project.setName(projectName);
 
+        // taskGroupQueue
+        taskGroupQueue.setId(taskQueueId);
+        taskGroupQueue.setStatus(TaskGroupQueueStatus.WAIT_QUEUE);
+        taskGroupQueue.setProcessId(processInstanceId);
+
         // cronRangeTime
         cronTime = "2020-01-01 00:00:00,2020-01-31 23:00:00";
 
@@ -157,6 +159,15 @@ public class ExecutorServiceTest {
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId)).thenReturn(processInstance);
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
+        Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
+        Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
+    }
+
+    @Test
+    public void testForceStartTaskInstance(){
+
+        Map<String, Object> result = executorService.forceStartTaskInstance(loginUser, taskQueueId);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     /**

@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -102,6 +103,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private TaskGroupQueueMapper taskGroupQueueMapper;
 
     /**
      * execute process instance
@@ -349,6 +353,26 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         return result;
     }
 
+    @Override
+    public Map<String, Object> forceStartTaskInstance(User loginUser, int queueId) {
+        Map<String, Object> result = new HashMap<>();
+        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
+        processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(), TaskGroupQueueStatus.WAIT_QUEUE.getCode());
+
+        // check process instance exist
+        ProcessInstance processInstance = processInstanceMapper.selectById(taskGroupQueue.getProcessId());
+        if (processInstance == null) {
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId());
+            return result;
+        }
+
+        // check master exists
+        if (!checkMasterExists(result)) {
+            return result;
+        }
+        return forceStart(processInstance, taskGroupQueue);
+    }
+
     /**
      * check tenant suitable
      *
@@ -444,16 +468,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param processInstance process instance
      * @return update result
      */
-    private Map<String, Object> forceStartTaskInstance(ProcessInstance processInstance, int taskId) {
+    private Map<String, Object> forceStart(ProcessInstance processInstance, TaskGroupQueue taskGroupQueue) {
         Map<String, Object> result = new HashMap<>();
-        TaskGroupQueue taskGroupQueue = processService.loadTaskGroupQueue(taskId);
         if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
             putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
             return result;
         }
+
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         processService.updateTaskGroupQueue(taskGroupQueue);
-        processService.sendStartTask2Master(processInstance,taskId
+        processService.sendStartTask2Master(processInstance, taskGroupQueue.getTaskId()
                 ,org.apache.dolphinscheduler.remote.command.CommandType.TASK_FORCE_STATE_EVENT_REQUEST);
         putMsg(result, Status.SUCCESS);
         return result;

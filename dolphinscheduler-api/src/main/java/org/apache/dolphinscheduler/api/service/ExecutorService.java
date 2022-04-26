@@ -102,4 +102,12 @@ public interface ExecutorService {
      * @return check result
      */
     boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
+
+    /**
+     * force start Task Instance
+     * @param loginUser
+     * @param queueId
+     * @return
+     */
+    Map<String, Object> forceStartTaskInstance(User loginUser, int queueId);
 }
