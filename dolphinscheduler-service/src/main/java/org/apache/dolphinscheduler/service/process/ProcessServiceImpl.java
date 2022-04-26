@@ -3031,8 +3031,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public ProcessInstance loadNextProcess4Serial(long code, int state) {
-        return this.processInstanceMapper.loadNextProcess4Serial(code, state);
+    public ProcessInstance loadNextProcess4Serial(long code, int state, int id) {
+        return this.processInstanceMapper.loadNextProcess4Serial(code, state, id);
     }
 
     protected void deleteCommandWithCheck(int commandId) {
