@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,29 +67,34 @@ public class SparkTask extends AbstractYarnTask {
         }
         sparkParameters.setQueue(taskExecutionContext.getQueue());
 
-        if (sparkParameters.getProgramType() != ProgramType.SQL){
+        if (sparkParameters.getProgramType() != ProgramType.SQL) {
             setMainJarName();
         }
     }
 
     /**
      * create command
+     *
      * @return command
      */
     @Override
-    protected String buildCommand() {
-        // spark-submit | spark-sql [options] <app jar | python file> [app arguments]
+    protected String buildCommand() throws Exception {
+        /**
+         * (1) spark-submit [options] <app jar | python file> [app arguments]
+         * (2) spark-sql [options] -f <filename>
+         */
         List<String> args = new ArrayList<>();
 
         // spark version
         String sparkCommand = SparkVersion.SPARK2.getCommand();
 
+        // If the programType is non-SQL, execute bin/spark-submit
         if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
             sparkCommand = SparkVersion.SPARK1.getCommand();
         }
 
-        //If the programType is SQL, execute bin/spark-sql
-        if (sparkParameters.getProgramType() == ProgramType.SQL){
+        // If the programType is SQL, execute bin/spark-sql
+        if (sparkParameters.getProgramType() == ProgramType.SQL) {
             sparkCommand = SparkVersion.SPARKSQL.getCommand();
         }
 
@@ -97,8 +103,9 @@ public class SparkTask extends AbstractYarnTask {
         // other parameters
         try {
             args.addAll(SparkArgsUtils.buildArgs(sparkParameters, taskExecutionContext));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("spark task error", e);
+            throw e;
         }
 
         // replace placeholder, and combining local and global parameters
@@ -120,10 +127,10 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     protected void setMainJarName() {
         // main jar
-            ResourceInfo mainJar = sparkParameters.getMainJar();
-            String resourceName = getResourceNameOfMainJar(mainJar);
-            mainJar.setRes(resourceName);
-            sparkParameters.setMainJar(mainJar);
+        ResourceInfo mainJar = sparkParameters.getMainJar();
+        String resourceName = getResourceNameOfMainJar(mainJar);
+        mainJar.setRes(resourceName);
+        sparkParameters.setMainJar(mainJar);
     }
 
     @Override

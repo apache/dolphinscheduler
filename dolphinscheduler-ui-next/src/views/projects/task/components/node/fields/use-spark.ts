@@ -94,7 +94,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.script'),
       validate: {
         trigger: ['input', 'trigger'],
-        required: model.programType === 'SQL',
+        required: true,
         message: t('project.node.script_tips')
       }
     },

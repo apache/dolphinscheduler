@@ -101,7 +101,7 @@ public class SparkParameters extends AbstractParameters {
     private String sparkVersion;
 
     /**
-     * shell script
+     * spark sql script
      */
     private String rawScript;
 
@@ -240,7 +240,11 @@ public class SparkParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        //When saving a task, the parameters cannot be empty and mainJar or rawScript cannot be empty
+        /**
+         * When saving a task, the parameters cannot be empty and mainJar or rawScript cannot be empty:
+         * (1) When ProgramType is SQL, rawScript cannot be empty.
+         * (2) When ProgramType is Java/Scala/Python, mainJar cannot be empty.
+         */
         return programType != null && (mainJar != null || rawScript != null);
     }
 

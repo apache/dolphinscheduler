@@ -1,8 +1,12 @@
 package org.apache.dolphinscheduler.plugin.task.spark;
 
+import java.util.Collections;
+
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,20 +15,19 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.Collections;
-
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
-        JSONUtils.class
+    JSONUtils.class
 })
 @PowerMockIgnore({"javax.*"})
+
 public class SparkTaskTest {
 
     @Test
-    public void testbuildCommandWithSparkSql() {
+    public void testBuildCommandWithSparkSql() throws Exception {
         String parameters = buildSparkParametersWithSparkSql();
         TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
@@ -34,16 +37,16 @@ public class SparkTaskTest {
         SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
         Assert.assertEquals(sparkTask.buildCommand(),
-                "${SPARK_HOME2}/bin/spark-sql " +
-                        "--master yarn " +
-                        "--deploy-mode client " +
-                        "-f /tmp/5536_node.sql " +
-                        "--driver-cores 1 " +
-                        "--driver-memory 512M " +
-                        "--num-executors 2 " +
-                        "--executor-cores 2 " +
-                        "--executor-memory 1G " +
-                        "--name sparksql");
+            "${SPARK_HOME2}/bin/spark-sql " +
+                "--master yarn " +
+                "--deploy-mode client " +
+                "--driver-cores 1 " +
+                "--driver-memory 512M " +
+                "--num-executors 2 " +
+                "--executor-cores 2 " +
+                "--executor-memory 1G " +
+                "--name sparksql " +
+                "-f /tmp/5536_node.sql");
     }
 
     private String buildSparkParametersWithSparkSql() {

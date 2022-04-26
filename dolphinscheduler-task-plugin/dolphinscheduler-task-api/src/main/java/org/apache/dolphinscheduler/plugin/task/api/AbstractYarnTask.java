@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
+import java.io.IOException;
+
 /**
  * abstract yarn task
  */
@@ -37,8 +39,8 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                logger);
+            taskRequest,
+            logger);
     }
 
     @Override
@@ -75,7 +77,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      * @return String
      * @throws Exception exception
      */
-    protected abstract String buildCommand();
+    protected abstract String buildCommand() throws Exception;
 
     /**
      * set main jar name
@@ -94,8 +96,8 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
         }
 
         return mainJar.getId() == 0
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst("/", "");
+            ? mainJar.getRes()
+            // when update resource maybe has error
+            : mainJar.getResourceName().replaceFirst("/", "");
     }
 }
