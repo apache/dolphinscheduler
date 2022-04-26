@@ -93,6 +93,14 @@ export function useForm(id?: number) {
           }
         }
       },
+      password: {
+        trigger: ['input'],
+        validator() {
+          if (!state.detailForm.password) {
+            return new Error(t('datasource.user_password_tips'))
+          }
+        }
+      },
       database: {
         trigger: ['input'],
         validator() {
@@ -138,9 +146,15 @@ export function useForm(id?: number) {
   const resetFieldsValue = () => {
     state.detailForm = { ...initialValues }
   }
-  const setFieldsValue = (values: object) => {
-    state.detailForm = { ...state.detailForm, ...values }
+
+  const setFieldsValue = (values: IDataSourceDetail) => {
+    state.detailForm = {
+      ...state.detailForm,
+      ...values,
+      password: values.password ? values.password : '******'
+    }
   }
+
   const getFieldsValue = () => state.detailForm
 
   return {

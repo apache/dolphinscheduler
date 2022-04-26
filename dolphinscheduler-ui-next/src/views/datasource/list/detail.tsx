@@ -264,9 +264,10 @@ const DetailModal = defineComponent({
                 <NFormItem
                   label={t('datasource.user_password')}
                   path='password'
+                  show-require-mark
                 >
                   <NInput
-                    class='input-password'
+                    class='input-pessword'
                     v-model={[detailForm.password, 'value']}
                     type='password'
                     placeholder={t('datasource.user_password_tips')}
