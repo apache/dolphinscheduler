@@ -42,7 +42,8 @@ export function useNodeMenu(options: Options) {
     logRef: '',
     logLoadingRef: ref(true),
     skipLineNum: ref(0),
-    limit: ref(1000)
+    limit: ref(1000),
+    taskCode: ''
   })
 
   const menuHide = () => {
@@ -52,8 +53,9 @@ export function useNodeMenu(options: Options) {
     graph.value?.unlockScroller()
   }
 
-  const menuStart = () => {
+  const menuStart = (code: number) => {
     nodeVariables.startModalShow = true
+    nodeVariables.taskCode = String(code)
   }
 
   const viewLog = (taskId: number, taskType: string) => {
