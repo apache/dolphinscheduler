@@ -142,8 +142,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     public Connection getConnection() {
         try {
-            Connection connection = oneSessionDataSource.getConnection();
-            return connection;
+            return oneSessionDataSource.getConnection();
         } catch (SQLException e) {
             boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
             if (retryGetConnection && kerberosStartupState) {
