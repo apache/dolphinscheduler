@@ -284,6 +284,19 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => nodeVariables.showModalRef,
+      () => {
+        if (!nodeVariables.showModalRef) {
+          nodeVariables.row = {}
+          nodeVariables.logRef = ''
+          nodeVariables.logLoadingRef = true
+          nodeVariables.skipLineNum = 0
+          nodeVariables.limit = 1000
+        }
+      }
+    )
+
     onBeforeUnmount(() => clearInterval(statusTimerRef.value))
 
     return () => (
