@@ -70,7 +70,7 @@ export default defineComponent({
     }
 
     const startRunning = () => {
-      ctx.emit('start')
+      ctx.emit('start', Number(props.cell?.id))
     }
 
     const handleEdit = () => {
@@ -156,7 +156,10 @@ export default defineComponent({
             {t('project.node.delete')}
           </NButton>
           {this.taskInstance && (
-            <NButton class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
+            <NButton
+              class={`${styles['menu-item']}`}
+              onClick={this.handleViewLog}
+            >
               {t('project.node.view_log')}
             </NButton>
           )}
