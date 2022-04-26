@@ -255,5 +255,5 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     boolean updateNextProcessIdById(@Param("thisInstanceId") int thisInstanceId, @Param("runningInstanceId") int runningInstanceId);
 
-    ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode, @Param("state") int state);
+    ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode, @Param("state") int state, @Param("id") int id);
 }
