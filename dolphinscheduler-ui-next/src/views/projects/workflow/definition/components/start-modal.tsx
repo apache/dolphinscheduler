@@ -59,6 +59,9 @@ const props = {
   show: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  taskCode: {
+    type: String
   }
 }
 
@@ -190,6 +193,8 @@ export default defineComponent({
       () => {
         if (props.show) {
           getStartParamsList(props.row.code)
+          if (props.taskCode)
+            startState.startForm.startNodeList = props.taskCode
         }
       }
     )

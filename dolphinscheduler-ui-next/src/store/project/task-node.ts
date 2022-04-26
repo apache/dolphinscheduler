@@ -131,7 +131,7 @@ export const useTaskNodeStore = defineStore({
     },
     updateDependentResult(dependentResult: BDependentResultType) {
       const result = {} as DependentResultType
-      for (let [key, value] of Object.entries(dependentResult)) {
+      for (const [key, value] of Object.entries(dependentResult)) {
         result[key] = value === 'FAILED' ? 'FAILURE' : value
       }
       this.dependentResult = result

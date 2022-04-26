@@ -357,6 +357,7 @@ export default defineComponent({
           <StartModal
             v-model:row={props.definition.processDefinition}
             v-model:show={nodeVariables.startModalShow}
+            taskCode={nodeVariables.taskCode}
           />
         )}
         {!!props.instance && (
