@@ -120,7 +120,7 @@ const list = defineComponent({
                   <div class={styles['conditions-search-input']}>
                     <NInput
                       v-model={[this.searchVal, 'value']}
-                      placeholder={`${t('datasource.search_input_tips')}`}
+                      placeholder={`${t('datasource.datasource_name_tips')}`}
                     />
                   </div>
                   <NButton type='primary' onClick={onUpdatedList}>
