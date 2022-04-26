@@ -241,6 +241,10 @@ export default {
                                 title: 'Enterprise Webexteams',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: 'Script',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/script.html',
+                            },
                         ],
                     },
                     {
@@ -554,6 +558,10 @@ export default {
                             {
                                 title: 'Webexteams',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
+                            },
+                            {
+                                title: '脚本告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/script.html',
                             },
                         ],
                     },
