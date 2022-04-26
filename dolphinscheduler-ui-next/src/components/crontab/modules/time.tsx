@@ -220,12 +220,14 @@ export default defineComponent({
         v-model:value={this.radioRef}
         onUpdateValue={this.updateRadioTime}
       >
-        <NRadio class={styles['crontab-list']} value={'everyTime'}>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'everyTime'} />
           <div class={styles['crontab-list-item']}>
             <div>{t(this.timeI18n!.everyTime)}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'intervalTime'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'intervalTime'} />
           <div class={styles['crontab-list-item']}>
             <div class={styles['item-text']}>{t(this.timeI18n!.every)}</div>
             <div class={styles['number-input']}>
@@ -251,8 +253,9 @@ export default defineComponent({
             </div>
             <div class={styles['item-text']}>{t(this.timeI18n!.timeStart)}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'specificTime'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'specificTime'} />
           <div class={styles['crontab-list-item']}>
             <div>{t(this.timeI18n!.specificTime)}</div>
             <div class={styles['select-input']}>
@@ -265,8 +268,9 @@ export default defineComponent({
               />
             </div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'cycleTime'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'cycleTime'} />
           <div class={styles['crontab-list-item']}>
             <div>{t(this.timeI18n!.cycleFrom)}</div>
             <div class={styles['number-input']}>
@@ -290,7 +294,7 @@ export default defineComponent({
             </div>
             <div>{t(this.timeI18n!.time)}</div>
           </div>
-        </NRadio>
+        </div>
       </NRadioGroup>
     )
   }

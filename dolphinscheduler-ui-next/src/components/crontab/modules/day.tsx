@@ -470,12 +470,14 @@ export default defineComponent({
         v-model:value={this.radioRef}
         onUpdateValue={this.updateRadioDay}
       >
-        <NRadio class={styles['crontab-list']} value={'everyDay'}>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'everyDay'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.every_day')}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'WkintervalWeek'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'WkintervalWeek'} />
           <div class={styles['crontab-list-item']}>
             <div class={styles['item-text']}>{t('crontab.every')}</div>
             <div class={styles['number-input']}>
@@ -500,8 +502,9 @@ export default defineComponent({
             </div>
             <div>{t('crontab.start')}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'intervalDay'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'intervalDay'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.every')}</div>
             <div class={styles['number-input']}>
@@ -525,8 +528,9 @@ export default defineComponent({
             </div>
             <div>{t('crontab.day_start')}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'WkspecificWeek'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'WkspecificWeek'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.specific_week')}</div>
             <div>
@@ -540,8 +544,9 @@ export default defineComponent({
               />
             </div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'specificDay'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'specificDay'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.specific_day')}</div>
             <div>
@@ -555,18 +560,21 @@ export default defineComponent({
               />
             </div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'monthLastDays'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'monthLastDays'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.last_day_of_month')}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'monthLastWorkingDays'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'monthLastWorkingDays'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.last_work_day_of_month')}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'monthLastWeeks'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'monthLastWeeks'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.last_of_month')}</div>
             <div>
@@ -579,8 +587,9 @@ export default defineComponent({
               />
             </div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'monthTailBefore'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'monthTailBefore'} />
           <div class={styles['crontab-list-item']}>
             <div class={styles['number-input']}>
               <NInputNumber
@@ -593,11 +602,9 @@ export default defineComponent({
             </div>
             <div>{t('crontab.before_end_of_month')}</div>
           </div>
-        </NRadio>
-        <NRadio
-          class={styles['crontab-list']}
-          value={'recentlyWorkingDaysMonth'}
-        >
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'recentlyWorkingDaysMonth'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.recent_business_day_to_month')}</div>
             <div class={styles['number-input']}>
@@ -612,8 +619,9 @@ export default defineComponent({
             </div>
             <div style={{ width: '50px' }}>{t('crontab.one_day')}</div>
           </div>
-        </NRadio>
-        <NRadio class={styles['crontab-list']} value={'WkmonthNumWeeks'}>
+        </div>
+        <div class={styles['crontab-list']}>
+          <NRadio value={'WkmonthNumWeeks'} />
           <div class={styles['crontab-list-item']}>
             <div>{t('crontab.in_this_months')}</div>
             <div class={styles['number-input']}>
@@ -635,7 +643,7 @@ export default defineComponent({
               />
             </div>
           </div>
-        </NRadio>
+        </div>
       </NRadioGroup>
     )
   }
