@@ -73,9 +73,10 @@ public interface ExecutorService {
      * @param projectCode project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
+     * @param verison process definition version
      * @return check result code
      */
-    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode);
+    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode, Integer verison);
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
