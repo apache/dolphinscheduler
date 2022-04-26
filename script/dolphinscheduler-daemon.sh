@@ -42,7 +42,9 @@ BIN_ENV_FILE="${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
 function overwrite_server_env() {
   local server=$1
   local server_env_file="${DOLPHINSCHEDULER_HOME}/${server}/conf/dolphinscheduler_env.sh"
-  if [ -f "${BIN_ENV_FILE}" ]; then
+  if [ "$server" = "standalone-server" ]; then
+    echo "standalone-server skip overwrite_server_env"
+  elif [ -f "${BIN_ENV_FILE}" ]; then
     echo "Overwrite ${server}/conf/dolphinscheduler_env.sh using bin/env/dolphinscheduler_env.sh."
     cp "${BIN_ENV_FILE}" "${server_env_file}"
   else
