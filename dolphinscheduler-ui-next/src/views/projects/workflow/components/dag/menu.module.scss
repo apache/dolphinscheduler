@@ -26,18 +26,8 @@
   .menu-item {
     padding: 5px 10px;
     border-bottom: solid 1px #f2f3f7;
-    cursor: pointer;
     color: rgb(89, 89, 89);
     font-size: 12px;
-
-    &:hover:not(.disabled) {
-      color: #262626;
-      background-color: #f5f5f5;
-    }
-
-    &.disabled {
-      cursor: not-allowed;
-      color: rgba(89, 89, 89, 0.4);
-    }
+    width: 100%;
   }
 }
