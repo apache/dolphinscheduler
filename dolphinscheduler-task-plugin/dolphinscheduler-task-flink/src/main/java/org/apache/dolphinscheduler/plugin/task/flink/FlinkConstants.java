@@ -41,6 +41,7 @@ public class FlinkConstants {
 
     /**
      * flink sql
+     * -f <filename> SQL from files
      */
     public static final String FLINK_SQL_EXECUTION_RESULT_MODE = "set execution.result-mode=";
     public static final String FLINK_SQL_EXECUTION_TARGET = "set execution.target=yarn-per-job";

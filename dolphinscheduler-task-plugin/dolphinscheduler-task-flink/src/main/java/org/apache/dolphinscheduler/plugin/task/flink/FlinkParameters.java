@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,17 +105,17 @@ public class FlinkParameters extends AbstractParameters {
     private ProgramType programType;
 
     /**
-     * sql script
+     * flink sql script
      */
     private String rawScript;
 
     /**
-     *sql-client execution result-mode
+     * sql-client execution result-mode
      */
     private String resultMode;
 
     /**
-     *execution runtime-mode
+     * execution runtime-mode
      */
     private String runtimeMode;
 
@@ -264,7 +265,12 @@ public class FlinkParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return  programType != null && (rawScript !=null ||  mainJar != null);
+        /**
+         * When saving a task, the parameter cannot be empty. There are two judgments:
+         * (1) When ProgramType is SQL, rawScript cannot be empty.
+         * (2) When ProgramType is Java/Scala/Python, mainJar cannot be empty.
+         */
+        return programType != null && (rawScript != null || mainJar != null);
     }
 
     @Override
@@ -274,5 +280,4 @@ public class FlinkParameters extends AbstractParameters {
         }
         return resourceList;
     }
-
 }

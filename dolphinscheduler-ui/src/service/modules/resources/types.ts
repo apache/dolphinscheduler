@@ -67,9 +67,12 @@ interface OnlineCreateReq extends CreateReq, ContentReq {
 
 interface ProgramTypeReq {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   // programType: 'JAVA' | 'SCALA' | 'PYTHON'
 >>>>>>> 7c048165d6 (flink_sql)
+=======
+>>>>>>> 527aa36ae5 ([refactor] dolphinscheduler flinksql)
   programType: 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
 }
 

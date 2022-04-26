@@ -18,17 +18,17 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-import org.apache.commons.io.FileUtils;
+
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -56,58 +56,58 @@ public class FlinkArgsUtils {
     /**
      * build args
      *
-     * @param param flink parameters
+     * @param flinkParameters FlinkParameters
      * @return argument list
      */
-    public static List<String> buildArgs(FlinkParameters param) {
+    public static List<String> buildArgs(FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
         String deployMode = "cluster";
-        String tmpDeployMode = param.getDeployMode();
+        String tmpDeployMode = flinkParameters.getDeployMode();
         if (StringUtils.isNotEmpty(tmpDeployMode)) {
             deployMode = tmpDeployMode;
         }
-        String others = param.getOthers();
+        String others = flinkParameters.getOthers();
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
-            args.add(FlinkConstants.FLINK_RUN_MODE);  //-m
+            args.add(FlinkConstants.FLINK_RUN_MODE);  // -m
 
-            args.add(FlinkConstants.FLINK_YARN_CLUSTER);   //yarn-cluster
+            args.add(FlinkConstants.FLINK_YARN_CLUSTER);   // yarn-cluster
 
-            int slot = param.getSlot();
+            int slot = flinkParameters.getSlot();
             if (slot > 0) {
                 args.add(FlinkConstants.FLINK_YARN_SLOT);
-                args.add(String.format("%d", slot));   //-ys
+                args.add(String.format("%d", slot));   // -ys
             }
 
-            String appName = param.getAppName();
-            if (StringUtils.isNotEmpty(appName)) { //-ynm
+            String appName = flinkParameters.getAppName();
+            if (StringUtils.isNotEmpty(appName)) { // -ynm
                 args.add(FlinkConstants.FLINK_APP_NAME);
                 args.add(ArgsUtils.escape(appName));
             }
 
             // judge flink version, the parameter -yn has removed from flink 1.10
-            String flinkVersion = param.getFlinkVersion();
+            String flinkVersion = flinkParameters.getFlinkVersion();
             if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
-                int taskManager = param.getTaskManager();
-                if (taskManager > 0) {                        //-yn
+                int taskManager = flinkParameters.getTaskManager();
+                if (taskManager > 0) {                        // -yn
                     args.add(FlinkConstants.FLINK_TASK_MANAGE);
                     args.add(String.format("%d", taskManager));
                 }
             }
-            String jobManagerMemory = param.getJobManagerMemory();
+            String jobManagerMemory = flinkParameters.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
                 args.add(FlinkConstants.FLINK_JOB_MANAGE_MEM);
-                args.add(jobManagerMemory); //-yjm
+                args.add(jobManagerMemory); // -yjm
             }
 
-            String taskManagerMemory = param.getTaskManagerMemory();
+            String taskManagerMemory = flinkParameters.getTaskManagerMemory();
             if (StringUtils.isNotEmpty(taskManagerMemory)) { // -ytm
                 args.add(FlinkConstants.FLINK_TASK_MANAGE_MEM);
                 args.add(taskManagerMemory);
             }
 
             if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
-                String queue = param.getQueue();
+                String queue = flinkParameters.getQueue();
                 if (StringUtils.isNotEmpty(queue)) { // -yqu
                     args.add(FlinkConstants.FLINK_QUEUE);
                     args.add(queue);
@@ -115,7 +115,7 @@ public class FlinkArgsUtils {
             }
         }
 
-        int parallelism = param.getParallelism();
+        int parallelism = flinkParameters.getParallelism();
         if (parallelism > 0) {
             args.add(FlinkConstants.FLINK_PARALLELISM);
             args.add(String.format("%d", parallelism));   // -p
@@ -130,19 +130,19 @@ public class FlinkArgsUtils {
             args.add(others);
         }
 
-        ProgramType programType = param.getProgramType();
-        String mainClass = param.getMainClass();
+        ProgramType programType = flinkParameters.getProgramType();
+        String mainClass = flinkParameters.getMainClass();
         if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
             args.add(FlinkConstants.FLINK_MAIN_CLASS);    //-c
-            args.add(param.getMainClass());          //main class
+            args.add(flinkParameters.getMainClass());          //main class
         }
 
-        ResourceInfo mainJar = param.getMainJar();
+        ResourceInfo mainJar = flinkParameters.getMainJar();
         if (mainJar != null) {
             args.add(mainJar.getRes());
         }
 
-        String mainArgs = param.getMainArgs();
+        String mainArgs = flinkParameters.getMainArgs();
         if (StringUtils.isNotEmpty(mainArgs)) {
             args.add(mainArgs);
         }
@@ -150,124 +150,129 @@ public class FlinkArgsUtils {
         return args;
     }
 
+
     /**
      * build args for flink sql
      *
-     * @param param flink parameters
+     * @param flinkParameters      FlinkParameters
+     * @param taskExecutionContext TaskExecutionContext
      * @return argument list
+     * @throws Exception
      */
-    public static List<String> buildSqlArgs(FlinkParameters param,TaskExecutionContext taskExecutionContext) throws IOException {
+    public static List<String> buildSqlArgs(FlinkParameters flinkParameters, TaskExecutionContext taskExecutionContext) throws Exception {
         List<String> args = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder parameters = new StringBuilder();
 
         String deployMode = "cluster";
-        String tmpDeployMode = param.getDeployMode();
+        String tmpDeployMode = flinkParameters.getDeployMode();
         if (StringUtils.isNotEmpty(tmpDeployMode)) {
             deployMode = tmpDeployMode;
         }
-        String others = param.getOthers();
+        String others = flinkParameters.getOthers();
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
-            sb.append(FlinkConstants.FLINK_SQL_EXECUTION_TARGET);  //-m execution.target=YARN_PER_JOB;
-            sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+            parameters.append(FlinkConstants.FLINK_SQL_EXECUTION_TARGET);  // -m execution.target=YARN_PER_JOB;
+            parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
 
-            int slot = param.getSlot();
+            int slot = flinkParameters.getSlot();
             if (slot > 0) {
-                sb.append(FlinkConstants.FLINK_SQL_TASKMANAGER_NUMBEROFTASKSLOTS);
-                sb.append(String.format("%d", slot));   //-ys
-                sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+                parameters.append(FlinkConstants.FLINK_SQL_TASKMANAGER_NUMBEROFTASKSLOTS);
+                parameters.append(String.format("%d", slot));   // -ys taskmanager.numberOfTaskSlots
+                parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
             }
 
-            String appName = param.getAppName();
-            if (StringUtils.isNotEmpty(appName)) { //-ynm
-                sb.append(FlinkConstants.FLINK_SQL_YARN_APPLICATION_NAME);
-                sb.append(ArgsUtils.escape(appName));
-                sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+            String appName = flinkParameters.getAppName();
+            if (StringUtils.isNotEmpty(appName)) {
+                parameters.append(FlinkConstants.FLINK_SQL_YARN_APPLICATION_NAME);
+                parameters.append(ArgsUtils.escape(appName));  // -ynm yarn.application.name
+                parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
             }
 
-            String jobManagerMemory = param.getJobManagerMemory();
+            String jobManagerMemory = flinkParameters.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
-                sb.append(FlinkConstants.FLINK_SQL_JOBMANAGER_MEMORY_PROCESS_SIZE);
-                sb.append(jobManagerMemory); //-yjm
-                sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+                parameters.append(FlinkConstants.FLINK_SQL_JOBMANAGER_MEMORY_PROCESS_SIZE);
+                parameters.append(jobManagerMemory); // -yjm  jobmanager.memory.process.size
+                parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
             }
 
-            String taskManagerMemory = param.getTaskManagerMemory();
-            if (StringUtils.isNotEmpty(taskManagerMemory)) { // -ytm
-                sb.append(FlinkConstants.FLINK_SQL_TASKMANAGER_MEMORY_PROCESS_SIZE);
-                sb.append(taskManagerMemory);
-                sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+            String taskManagerMemory = flinkParameters.getTaskManagerMemory();
+            if (StringUtils.isNotEmpty(taskManagerMemory)) {
+                parameters.append(FlinkConstants.FLINK_SQL_TASKMANAGER_MEMORY_PROCESS_SIZE);
+                parameters.append(taskManagerMemory);  // -ytm  taskmanager.memory.process.size
+                parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
             }
 
             if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
-                String queue = param.getQueue();
-                if (StringUtils.isNotEmpty(queue)) { // -yqu
-                    sb.append(FlinkConstants.FLINK_SQL_YARN_APPLICATION_QUEUE);
-                    sb.append(queue);
-                    sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+                String queue = flinkParameters.getQueue();
+                if (StringUtils.isNotEmpty(queue)) {
+                    parameters.append(FlinkConstants.FLINK_SQL_YARN_APPLICATION_QUEUE);
+                    parameters.append(queue); // -yqu   yarn.application.queue
+                    parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
                 }
             }
         }
 
-        int parallelism = param.getParallelism();
+        int parallelism = flinkParameters.getParallelism();
         if (parallelism > 0) {
-            sb.append(FlinkConstants.FLINK_SQL_PARALLELISM_DEFAULT);
-            sb.append(String.format("%d", parallelism));   // -p
-            sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+            parameters.append(FlinkConstants.FLINK_SQL_PARALLELISM_DEFAULT);
+            parameters.append(String.format("%d", parallelism));   // -p  parallelism.default
+            parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
         }
 
-        String resultMode = param.getResultMode();
+        String resultMode = flinkParameters.getResultMode();
         if (StringUtils.isNotEmpty(resultMode)) {
-            sb.append(FlinkConstants.FLINK_SQL_EXECUTION_RESULT_MODE);
-            sb.append(resultMode); //sql-client execution result-mode
-            sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+            parameters.append(FlinkConstants.FLINK_SQL_EXECUTION_RESULT_MODE);
+            parameters.append(resultMode);   // sql-client    execution result-mode
+            parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
         }
 
-        String runtimeMode = param.getRuntimeMode();
+        String runtimeMode = flinkParameters.getRuntimeMode();
         if (StringUtils.isNotEmpty(runtimeMode)) {
-            sb.append(FlinkConstants.FLINK_SQL_EXECUTION_RUNTIME_MODE);
-            sb.append(runtimeMode); //execution runtime-mode
-            sb.append(FlinkConstants.FLINK_SQL_NEWLINE);
+            parameters.append(FlinkConstants.FLINK_SQL_EXECUTION_RUNTIME_MODE);
+            parameters.append(runtimeMode);     // execution runtime-mode
+            parameters.append(FlinkConstants.FLINK_SQL_NEWLINE);
         }
 
-        ProgramType programType = param.getProgramType();
-        String rawScript = param.getRawScript();
-        if (programType != null && programType == ProgramType.SQL && StringUtils.isNotEmpty(rawScript)) {
+        ProgramType programType = flinkParameters.getProgramType();
+
+        if (ProgramType.SQL == programType) {
             args.add(FlinkConstants.FLINK_SQL_FILE);
-
-            // generate scripts
-            String fileName = String.format("%s/%s_node.sql",
-                taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
-
-            File file = new File(fileName);
-            Path path = file.toPath();
-
-            if (!Files.exists(path)) {
-                String script = param.getRawScript().replaceAll("\\r\\n", "\n");
-                param.setRawScript(script);
-                logger.info("raw script : {}", param.getRawScript());
-                logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
-
-                Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
-                FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-                if (OSUtils.isWindows()) {
-                    Files.createFile(path);
-                } else {
-                    if (!file.getParentFile().exists()){
-                        file.getParentFile().mkdirs();
-                    }
-                    Files.createFile(path, attr);
-                }
-                // Common parameters of flink sql
-                Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
-                //  write data to file
-                Files.write(path, param.getRawScript().getBytes(), StandardOpenOption.APPEND);
-            }
-            args.add(fileName);
+            args.add(generateSqlScript(flinkParameters, taskExecutionContext, parameters)); // -f
         }
 
         if (StringUtils.isNotEmpty(others)) {
             args.add(others);
         }
         return args;
+    }
+
+
+    private static String generateSqlScript(FlinkParameters flinkParameters, TaskExecutionContext taskExecutionContext, StringBuilder parameters) throws Exception {
+        String sqlScriptfileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+
+        File file = new File(sqlScriptfileName);
+        Path path = file.toPath();
+
+        if (!Files.exists(path)) {
+            String script = flinkParameters.getRawScript().replaceAll("\\r\\n", "\n");
+            flinkParameters.setRawScript(script);
+            logger.info("raw script : {}", flinkParameters.getRawScript());
+            logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
+
+            Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+            if (OSUtils.isWindows()) {
+                Files.createFile(path);
+            } else {
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                Files.createFile(path, attr);
+            }
+            // Flink sql common parameters are written to the script file
+            Files.write(path, parameters.toString().getBytes(), StandardOpenOption.APPEND);
+
+            Files.write(path, flinkParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+        }
+        return sqlScriptfileName;
     }
 }

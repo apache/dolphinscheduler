@@ -198,7 +198,6 @@ spring:
       on-profile: postgresql
   quartz:
     properties:
-<<<<<<< HEAD
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 
 ---
@@ -214,6 +213,3 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: root
-=======
-      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
->>>>>>> 2b1b26413e (flink_sql)

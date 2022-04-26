@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,20 +36,20 @@ import java.util.Map;
 public class FlinkTask extends AbstractYarnTask {
 
     /**
-     *  flink command
-     *  usage: flink run [OPTIONS] <jar-file> <arguments>
+     * flink command
+     * usage: flink run [OPTIONS] <jar-file> <arguments>
      */
     private static final String FLINK_COMMAND = "flink";
     private static final String FLINK_RUN = "run";
 
     /**
-     *  flink sql command
-     *  usage: sql-client.sh -i <initialization file>, -j <JAR file>, -f <script file>...
+     * flink sql command
+     * usage: sql-client.sh -i <initialization file>, -j <JAR file>, -f <script file>...
      */
     private static final String FLINK_SQL_COMMAND = "sql-client.sh";
 
     /**
-     *  flink parameters
+     * flink parameters
      */
     private FlinkParameters flinkParameters;
 
@@ -75,7 +75,7 @@ public class FlinkTask extends AbstractYarnTask {
         }
         flinkParameters.setQueue(taskExecutionContext.getQueue());
 
-        if ((flinkParameters.getMainJar() != null ) && (flinkParameters.getProgramType() != ProgramType.SQL)) {
+        if (ProgramType.SQL != flinkParameters.getProgramType()) {
             setMainJarName();
         }
 
@@ -100,14 +100,15 @@ public class FlinkTask extends AbstractYarnTask {
 
     /**
      * create command
+     *
      * @return command
      */
     @Override
-    protected String buildCommand() {
+    protected String buildCommand() throws Exception {
         List<String> args = new ArrayList<>();
 
-        if (flinkParameters.getProgramType() != ProgramType.SQL) {
-            // flink run [OPTIONS] <jar-file> <arguments>
+        if (ProgramType.SQL != flinkParameters.getProgramType()) {
+            // If the programType is non-SQL, execute  flink run [OPTIONS] <jar-file> <arguments>
             args.add(FLINK_COMMAND);
             args.add(FLINK_RUN);
             logger.info("flink task args : {}", args);
@@ -115,18 +116,20 @@ public class FlinkTask extends AbstractYarnTask {
             // other parameters
             args.addAll(FlinkArgsUtils.buildArgs(flinkParameters));
         } else {
-            //sql-client.sh -f $FLINK_HOME/xxx/xx.sql
+            // If the programType is SQL, execute  sql-client.sh -f $FLINK_HOME/xxx/xx.sql
             args.add(FLINK_SQL_COMMAND);
             logger.info("flink sql client : {}", args);
             try {
-                args.addAll(FlinkArgsUtils.buildSqlArgs(flinkParameters,taskExecutionContext)); // -f xxx/xx.sql
-            } catch (IOException e) {
-                e.printStackTrace();
+                // -f <filename> SQL from files
+                args.addAll(FlinkArgsUtils.buildSqlArgs(flinkParameters, taskExecutionContext));
+            } catch (Exception e) {
+                logger.error("flink sql task error", e);
+                throw e;
             }
         }
 
         String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
+            .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
         logger.info("flink task command : {}", command);
 

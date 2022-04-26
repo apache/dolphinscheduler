@@ -19,21 +19,21 @@ import type { EditWorkflowDefinition } from '@/views/projects/workflow/component
 import type { IOption } from '@/components/form/types'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
 =======
 <<<<<<< HEAD
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 >>>>>>> 7c048165d6 (flink_sql)
+=======
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
+>>>>>>> 527aa36ae5 ([refactor] dolphinscheduler flinksql)
 type DependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
 }
 type BDependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
 }
-=======
-// type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
->>>>>>> 2b1b26413e (flink_sql)
 
 interface IResource {
   id: number

@@ -74,7 +74,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      *
      * @return String
      */
-    protected abstract String buildCommand();
+    protected abstract String buildCommand() throws Exception;
 
     /**
      * set main jar name
