@@ -245,6 +245,11 @@ export default {
                                 title: 'Script',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/script.html',
                             },
+                            ,
+                            {
+                                title: 'Http',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
+                            },
                         ],
                     },
                     {
@@ -566,6 +571,10 @@ export default {
                             {
                                 title: '脚本告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/http.html',
                             },
                         ],
                     },
