@@ -4,7 +4,8 @@ Standalone only for quick experience for DolphinScheduler.
 
 If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
 
-> **_Note:_** Standalone only recommends the usage of fewer than 20 workflows, because it uses H2 Database, ZooKeeper Testing Server, too many tasks may cause instability.
+> **_Note:_** Standalone only recommends the usage of fewer than 20 workflows, because it uses in-memory H2 Database in default, ZooKeeper Testing Server, too many tasks may cause instability.
+> When Standalone stops or restarts, in-memory H2 database will clear up. To use Standalone with external databases like mysql or postgresql, please see [`Database Configuration`](#database-configuration).    
 
 ## Preparation
 
@@ -44,3 +45,20 @@ sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
 > path `api-server/conf/application.yaml`
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+### Database Configuration
+
+* Use mysql as an example to illustrate how to configure an external database:
+* First of all, follow the instructions in [pseudo-cluster deployment](pseudo-cluster.md) `Initialize the Database` section to create and initialize database
+* Set the following environment variables in your terminal with your database username and password for {user} and {password}:
+
+```shell
+export DATABASE=${DATABASE:-mysql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
+```
+
+* Add mysql-connector-java driver to `./standalone-server/libs/standalone-server/`, see [pseudo-cluster deployment](pseudo-cluster.md) `Initialize the Database` section about where to download
+
+* Start standalone-server, now you are using mysql as database and it will not clear up your data when you stop or restart standalone-server.
