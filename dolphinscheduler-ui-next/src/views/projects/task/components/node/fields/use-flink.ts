@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDeployMode, useMainJar, useResources } from '.'
 import type { IJsonItem } from '../types'
@@ -68,7 +68,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useMainJar(model),
-    useDeployMode(24, false),
+    useDeployMode(24, ref(false)),
     {
       type: 'select',
       field: 'flinkVersion',

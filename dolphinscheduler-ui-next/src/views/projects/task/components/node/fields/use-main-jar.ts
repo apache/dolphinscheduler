@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
@@ -27,6 +26,9 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
+  const mainJarSpan = computed(() =>
+      model.programType === 'SQL' ? 0 : 24
+  )
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
@@ -57,6 +59,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     type: 'tree-select',
     field: 'mainJar',
     name: t('project.node.main_package'),
+    span: mainJarSpan,
     props: {
       cascade: true,
       showPath: true,
@@ -67,7 +70,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     },
     validate: {
       trigger: ['input', 'blur'],
-      required: true,
+      required: model.programType !== 'SQL',
       validator(validate: any, value: string) {
         if (!value) {
           return new Error(t('project.node.main_package_tips'))
