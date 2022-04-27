@@ -136,10 +136,10 @@
         join t_ds_project as p on p_f.project_code = p.code
         where queue.group_id = #{groupId}
         <if test="taskName != null and taskName != ''">
-            and task_name =#{taskName}
+            and task_name like concat('%', #{taskName}, '%')
         </if>
         <if test="processName != null and processName != ''">
-            and process.name =#{processName}
+            and process.name like concat('%', #{processName}, '%')
         </if>
         <if test="status != null">
             and queue.status =#{status}

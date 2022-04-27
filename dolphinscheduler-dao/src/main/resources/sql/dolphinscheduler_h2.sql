@@ -709,7 +709,8 @@ CREATE TABLE t_ds_relation_project_user
     perm        int(11) DEFAULT '1',
     create_time datetime DEFAULT NULL,
     update_time datetime DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_uid_pid(user_id,project_id)
 );
 
 -- ----------------------------
