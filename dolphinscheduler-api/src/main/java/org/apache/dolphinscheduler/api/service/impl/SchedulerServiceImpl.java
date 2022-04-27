@@ -459,17 +459,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         String jobName = QuartzExecutors.buildJobName(scheduleId);
         String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
-
-        JobKey jobKey = new JobKey(jobName, jobGroupName);
-        try {
-            if (scheduler.checkExists(jobKey)) {
-                logger.info("Try to delete job: {}, group name: {},", jobName, jobGroupName);
-                scheduler.deleteJob(jobKey);
-            }
-        } catch (SchedulerException e) {
-            logger.error("Failed to delete job: {}", jobKey);
-            throw new ServiceException("Failed to delete job: " + jobKey);
+        boolean result = QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName);
+        if (!result) {
+            throw new ServiceException(String.format("Failed to delete job, jobName:%s, jobGroupName:%s", jobName, jobGroupName));
         }
+        logger.info("delete job success, job name: {}, job group name: {},", jobName, jobGroupName);
     }
 
     /**
