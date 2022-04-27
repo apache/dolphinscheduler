@@ -187,6 +187,7 @@ def test_get_configs_build_in():
         ("default.workflow.queue", "queuePythonGateway", "editQueuePythonGateway"),
         ("default.workflow.worker_group", "default", "specific"),
         ("default.workflow.time_zone", "Asia/Shanghai", "Asia/Beijing"),
+        ("default.workflow.warning_type", "NONE", "ALL"),
     ],
 )
 def test_single_config_get_set(teardown_file_env, key: str, val: Any, new_val: Any):
@@ -222,6 +223,7 @@ def test_single_config_get_set_not_exists_key():
         ("WORKFLOW_QUEUE", "queuePythonGateway"),
         ("WORKFLOW_WORKER_GROUP", "default"),
         ("WORKFLOW_TIME_ZONE", "Asia/Shanghai"),
+        ("WORKFLOW_WARNING_TYPE", "NONE"),
     ],
 )
 def test_get_configuration(config_name: str, expect: Any):
@@ -250,6 +252,7 @@ def test_get_configuration(config_name: str, expect: Any):
         ("WORKFLOW_QUEUE", "queuePythonGateway", "envQueuePythonGateway"),
         ("WORKFLOW_WORKER_GROUP", "default", "custom"),
         ("WORKFLOW_TIME_ZONE", "Asia/Shanghai", "America/Los_Angeles"),
+        ("WORKFLOW_WARNING_TYPE", "NONE", "ALL"),
     ],
 )
 def test_get_configuration_env(config_name: str, src: Any, dest: Any):
@@ -262,5 +265,8 @@ def test_get_configuration_env(config_name: str, src: Any, dest: Any):
     importlib.reload(configuration)
     assert getattr(configuration, config_name) == dest
 
+    # pop and reload configuration to test whether this config equal to `src` value
     os.environ.pop(env_name, None)
+    importlib.reload(configuration)
+    assert getattr(configuration, config_name) == src
     assert env_name not in os.environ

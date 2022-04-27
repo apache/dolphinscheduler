@@ -61,6 +61,7 @@ expects = [
         "default.workflow.queue": ("queuePythonGateway", "SmithEdit"),
         "default.workflow.worker_group": ("default", "SmithEdit"),
         "default.workflow.time_zone": ("Asia/Shanghai", "SmithEdit"),
+        "default.workflow.warning_type": ("NONE", "SmithEdit"),
     },
 ]
 
