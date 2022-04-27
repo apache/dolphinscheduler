@@ -26,7 +26,7 @@ from freezegun import freeze_time
 
 from pydolphinscheduler.constants import ProcessDefinitionReleaseState
 from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.process_definition import ProcessDefinition, WarningType
+from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
@@ -65,7 +65,7 @@ def test_process_definition_key_attr(func):
             ),
         ),
         ("worker_group", configuration.WORKFLOW_WORKER_GROUP),
-        ("warning_type", WarningType.NONE),
+        ("warning_type", configuration.WORKFLOW_WARNING_TYPE),
         ("warning_group_id", 0),
         ("release_state", ProcessDefinitionReleaseState.ONLINE),
     ],
@@ -87,7 +87,7 @@ def test_process_definition_default_value(name, value):
         ("schedule", str, "schedule"),
         ("timezone", str, "timezone"),
         ("worker_group", str, "worker_group"),
-        ("warning_type", str, WarningType.FAILURE),
+        ("warning_type", str, "FAILURE"),
         ("warning_group_id", int, 1),
         ("timeout", int, 1),
         ("release_state", str, "OFFLINE"),
@@ -238,7 +238,7 @@ def test_process_definition_get_define_without_task():
         "project": configuration.WORKFLOW_PROJECT,
         "tenant": configuration.WORKFLOW_TENANT,
         "workerGroup": configuration.WORKFLOW_WORKER_GROUP,
-        "warningType": WarningType.NONE,
+        "warningType": configuration.WORKFLOW_WARNING_TYPE,
         "warningGroupId": 0,
         "timeout": 0,
         "releaseState": ProcessDefinitionReleaseState.ONLINE,

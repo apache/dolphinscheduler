@@ -30,15 +30,6 @@ from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
 
-class WarningType:
-    """Warning Type, types for whether to send warning when process ends."""
-
-    NONE = "NONE"
-    SUCCESS = "SUCCESS"
-    FAILURE = "FAILURE"
-    ALL = "ALL"
-
-
 class ProcessDefinitionContext:
     """Class process definition context, use when task get process definition from context expression."""
 
@@ -111,7 +102,7 @@ class ProcessDefinition(Base):
         project: Optional[str] = configuration.WORKFLOW_PROJECT,
         tenant: Optional[str] = configuration.WORKFLOW_TENANT,
         worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
-        warning_type: Optional[str] = WarningType.NONE,
+        warning_type: Optional[str] = configuration.WORKFLOW_WARNING_TYPE,
         warning_group_id: Optional[int] = 0,
         timeout: Optional[int] = 0,
         release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
@@ -127,6 +118,12 @@ class ProcessDefinition(Base):
         self._tenant = tenant
         self.worker_group = worker_group
         self.warning_type = warning_type
+        if warning_type.strip().upper() not in ("FAILURE", "SUCCESS", "ALL", "NONE"):
+            raise PyDSParamException(
+                "Parameter `warning_type` with unexpect value `%s`", warning_type
+            )
+        else:
+            self.warning_type = warning_type.strip().upper()
         self.warning_group_id = warning_group_id
         self.timeout = timeout
         self.release_state = release_state
