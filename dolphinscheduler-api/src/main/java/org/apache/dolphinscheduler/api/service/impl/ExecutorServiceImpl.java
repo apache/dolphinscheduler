@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -357,8 +356,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public Map<String, Object> forceStartTaskInstance(User loginUser, int queueId) {
         Map<String, Object> result = new HashMap<>();
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
-        processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(), TaskGroupQueueStatus.WAIT_QUEUE.getCode());
-
         // check process instance exist
         ProcessInstance processInstance = processInstanceMapper.selectById(taskGroupQueue.getProcessId());
         if (processInstance == null) {
