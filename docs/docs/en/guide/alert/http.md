@@ -1,34 +1,35 @@
-# HTTP告警
+# HTTP
 
-如果您需要使用到`Http`（GET或POST）进行告警，请在告警实例管理里创建告警实例，选择`Http`插件。
+If you need to use `Http script` for alerting, create an alert instance in the alert instance management and select the `Http` plugin.
 
-参数配置
+## Parameter Configuration
 
 * URL
-  > 访问的`Http`连接URL,需要包含协议、Host、路径，如果是GET方法可以添加参数
-* 请求方式
-  > 选择该请求为POST或GET方法
-* 请求头
-  > `Http`请求的完整请求头，以JSON为格式
-* 请求体
-  > `Http`请求的完整请求体，以JSON为格式，GET方法不需要写该参数
-* 内容字段
-  > 放置本次告警告警信息的字段名称
+  > The `Http` request URL needs to contain protocol, host, path and parameters if the method is `GET`
+* Request Type
+  > Select the request type from `POST` or `GET`
+* Headers
+  > The headers of the `Http` request in JSON format
+* Body
+  > The request body of the `Http` request in JSON format, when using `POST` method to alert
+* Content Field
+  > The field name to place the alert information
 
-## 发送类型
+## Send Type
 
-其中`Request Type`分别对应使用`POST`方法和`GET`方法进行`Http`告警。
+Using `POST` and `GET` method to send `Http` request in the `Request Type`.
 
-### GET Http告警
+### GET Http
 
+Send alert information by `Http` GET method.
 GET `Http`告警指将告警结果作为参数通过`Http` GET方法进行请求。
-下图是应用告警配置的示例:
+The following shows the `GET` configuration example:
 
 ![enterprise-wechat-app-msg-config](/img/alert/http-get-example.png)
 
-### POST Http告警
+### POST Http
 
-POST `Http`告警指将告警结果作为`BODY`参数通过`Http`POST方法进行请求。
-下图是应用告警配置的示例:
+Send alert information inside `Http` body by `Http` POST method.
+The following shows the `POST` configuration example:
 
 ![enterprise-wechat-app-msg-config](/img/alert/http-post-example.png)

@@ -2,7 +2,7 @@
 
 如果您需要使用到`Http`（GET或POST）进行告警，请在告警实例管理里创建告警实例，选择`Http`插件。
 
-参数配置
+## 参数配置
 
 * URL
   > 访问的`Http`连接URL,需要包含协议、Host、路径，如果是GET方法可以添加参数
@@ -22,13 +22,13 @@
 ### GET Http告警
 
 GET `Http`告警指将告警结果作为参数通过`Http` GET方法进行请求。
-下图是应用告警配置的示例:
+下图是GET告警配置的示例:
 
 ![enterprise-wechat-app-msg-config](/img/alert/http-get-example.png)
 
 ### POST Http告警
 
 POST `Http`告警指将告警结果作为`BODY`参数通过`Http`POST方法进行请求。
-下图是应用告警配置的示例:
+下图是POST告警配置的示例:
 
 ![enterprise-wechat-app-msg-config](/img/alert/http-post-example.png)
