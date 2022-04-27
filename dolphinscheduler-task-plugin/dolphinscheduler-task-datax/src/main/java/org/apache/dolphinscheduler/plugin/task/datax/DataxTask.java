@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -557,8 +558,8 @@ public class DataxTask extends AbstractTaskExecutor {
             for (int i = 1; i <= num; i++) {
                 columnNames[i - 1] = md.getColumnName(i);
             }
-        } catch (SQLException e) {
-            logger.warn(e.getMessage(), e);
+        } catch (SQLException | ExecutionException e) {
+            logger.error(e.getMessage(), e);
             return null;
         }
 
