@@ -157,6 +157,21 @@ def test__parse_datetime_not_support_type(val: Any):
 
 
 @pytest.mark.parametrize(
+    "val",
+    [
+        "ALLL",
+        "nonee",
+    ],
+)
+def test__warn_type_not_support_type(val: str):
+    """Test process definition param warning_type not support type error."""
+    with pytest.raises(
+        PyDSParamException, match="Parameter `warning_type` with unexpect value.*?"
+    ):
+        ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, warning_type=val)
+
+
+@pytest.mark.parametrize(
     "param, expect",
     [
         (

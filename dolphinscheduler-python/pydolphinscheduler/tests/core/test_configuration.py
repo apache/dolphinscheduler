@@ -265,6 +265,7 @@ def test_get_configuration_env(config_name: str, src: Any, dest: Any):
     importlib.reload(configuration)
     assert getattr(configuration, config_name) == dest
 
+    # pop and reload configuration to test whether this config equal to `src` value
     os.environ.pop(env_name, None)
     importlib.reload(configuration)
     assert getattr(configuration, config_name) == src
