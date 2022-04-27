@@ -46,7 +46,7 @@ export function useSpark({
     programType: 'SCALA',
     sparkVersion: 'SPARK2',
     rawScript: '',
-    deployMode: 'cluster',
+    deployMode: 'local',
     driverCores: 1,
     driverMemory: '512M',
     numExecutors: 2,

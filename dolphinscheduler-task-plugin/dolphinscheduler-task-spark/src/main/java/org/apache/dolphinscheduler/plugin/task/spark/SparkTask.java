@@ -77,7 +77,7 @@ public class SparkTask extends AbstractYarnTask {
      * @return command
      */
     @Override
-    protected String buildCommand() throws Exception {
+    protected String buildCommand() {
         /**
          * (1) spark-submit [options] <app jar | python file> [app arguments]
          * (2) spark-sql [options] -f <filename>
@@ -100,12 +100,7 @@ public class SparkTask extends AbstractYarnTask {
         args.add(sparkCommand);
 
         // other parameters
-        try {
-            args.addAll(SparkArgsUtils.buildArgs(sparkParameters, taskExecutionContext));
-        } catch (Exception e) {
-            logger.error("spark task error", e);
-            throw e;
-        }
+        args.addAll(SparkArgsUtils.buildArgs(sparkParameters, taskExecutionContext));
 
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
