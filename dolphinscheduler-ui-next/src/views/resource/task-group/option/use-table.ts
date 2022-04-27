@@ -27,7 +27,6 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import { renderFormat } from '@/common/common'
 
 export function useTable(
   updateItem = (
@@ -138,8 +137,6 @@ export function useTable(
             }
 
             item.projectName = projectName
-            item.createTime = renderFormat(item.createTime)
-            item.updateTime = renderFormat(item.updateTime)
             return {
               ...item
             }

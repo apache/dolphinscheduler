@@ -29,7 +29,6 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import { renderFormat } from '@/common/common'
 
 export function useTable(
   updatePriority = (unusedQueueId: number, unusedPriority: number): void => {},
@@ -148,8 +147,6 @@ export function useTable(
           }
 
           item.taskGroupName = taskGroupName
-          item.createTime = renderFormat(item.createTime)
-          item.updateTime = renderFormat(item.updateTime)
           return {
             ...item
           }
