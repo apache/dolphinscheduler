@@ -35,8 +35,7 @@ BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 export DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
 
-chmod 700 -R ${DOLPHINSCHEDULER_HOME}
-
+chmod -R 700 ${DOLPHINSCHEDULER_HOME}/config
 source /etc/profile
 set -a
 source "${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh"

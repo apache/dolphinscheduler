@@ -454,7 +454,6 @@ public class ProcessService {
 
     /**
      * recursive delete all task instance by process instance id
-     * @param processInstanceId
      */
     public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
         List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
@@ -1337,6 +1336,9 @@ public class ProcessService {
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
+        if (taskInstance.getSubmitTime() == null) {
+            taskInstance.setSubmitTime(new Date());
+        }
         if (taskInstance.getFirstSubmitTime() == null) {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
@@ -1717,9 +1719,9 @@ public class ProcessService {
      * @reutrn
      */
     public boolean changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
-                                String executePath,
-                                String logPath,
-                                int taskInstId) {
+                                   String executePath,
+                                   String logPath,
+                                   int taskInstId) {
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
         taskInstance.setHost(host);
@@ -1745,14 +1747,13 @@ public class ProcessService {
      * @param endTime endTime
      * @param taskInstId taskInstId
      * @param varPool varPool
-     * @return
      */
     public boolean changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
-                                Date endTime,
-                                int processId,
-                                String appIds,
-                                int taskInstId,
-                                String varPool) {
+                                   Date endTime,
+                                   int processId,
+                                   String appIds,
+                                   int taskInstId,
+                                   String varPool) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
@@ -2261,23 +2262,6 @@ public class ProcessService {
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLog.setOperator(operator.getId());
             taskDefinitionLog.setResourceIds(getResourceIds(taskDefinitionLog));
-            if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
-                TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
-                        .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
-                if (definitionCodeAndVersion != null) {
-                    if (!taskDefinitionLog.equals(definitionCodeAndVersion)) {
-                        taskDefinitionLog.setUserId(definitionCodeAndVersion.getUserId());
-                        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionLog.getCode());
-                        taskDefinitionLog.setVersion(version + 1);
-                        taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
-                        updateTaskDefinitionLogs.add(taskDefinitionLog);
-                    }
-                    continue;
-                }
-            }
-            taskDefinitionLog.setUserId(operator.getId());
-            taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
-            taskDefinitionLog.setCreateTime(now);
             if (taskDefinitionLog.getCode() == 0) {
                 try {
                     taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
@@ -2286,7 +2270,27 @@ public class ProcessService {
                     return Constants.DEFINITION_FAILURE;
                 }
             }
-            newTaskDefinitionLogs.add(taskDefinitionLog);
+            if (taskDefinitionLog.getVersion() == 0) {
+                // init first version
+                taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
+            }
+            TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
+                    .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+            if (definitionCodeAndVersion == null) {
+                taskDefinitionLog.setUserId(operator.getId());
+                taskDefinitionLog.setCreateTime(now);
+                newTaskDefinitionLogs.add(taskDefinitionLog);
+                continue;
+            }
+            if (taskDefinitionLog.equals(definitionCodeAndVersion)) {
+                // do nothing if equals
+                continue;
+            }
+            taskDefinitionLog.setUserId(definitionCodeAndVersion.getUserId());
+            Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionLog.getCode());
+            taskDefinitionLog.setVersion(version + 1);
+            taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
+            updateTaskDefinitionLogs.add(taskDefinitionLog);
         }
         int insertResult = 0;
         int updateResult = 0;
@@ -2304,7 +2308,7 @@ public class ProcessService {
                 }
             }
         }
-        if (!newTaskDefinitionLogs.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs)) {
             insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
             if (Boolean.TRUE.equals(syncDefine)) {
                 updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
@@ -2461,7 +2465,7 @@ public class ProcessService {
                 taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
             }
         }
-        taskCodeVersionMap.forEach((code,version) -> {
+        taskCodeVersionMap.forEach((code, version) -> {
             taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
         });
         return taskDefinitionLogs;
