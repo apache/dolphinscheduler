@@ -266,4 +266,6 @@ def test_get_configuration_env(config_name: str, src: Any, dest: Any):
     assert getattr(configuration, config_name) == dest
 
     os.environ.pop(env_name, None)
+    importlib.reload(configuration)
+    assert getattr(configuration, config_name) == src
     assert env_name not in os.environ
