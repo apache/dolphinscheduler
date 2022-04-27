@@ -48,7 +48,7 @@ const taskGroupQueue = defineComponent({
     const idRef = ref(Number(router.currentRoute.value.params.id))
 
     const searchParamRef = reactive({
-      groupId: 0,
+      groupId: ref<number| null>(),
       processName: '',
       instanceName: '',
       pageSize: 10,
