@@ -49,3 +49,4 @@ default:
     queue: queuePythonGateway
     worker_group: default
     time_zone: Asia/Shanghai
+    warning_type: NONE

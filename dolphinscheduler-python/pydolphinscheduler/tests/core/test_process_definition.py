@@ -65,6 +65,8 @@ def test_process_definition_key_attr(func):
             ),
         ),
         ("worker_group", configuration.WORKFLOW_WORKER_GROUP),
+        ("warning_type", configuration.WORKFLOW_WARNING_TYPE),
+        ("warning_group_id", 0),
         ("release_state", ProcessDefinitionReleaseState.ONLINE),
     ],
 )
@@ -85,6 +87,8 @@ def test_process_definition_default_value(name, value):
         ("schedule", str, "schedule"),
         ("timezone", str, "timezone"),
         ("worker_group", str, "worker_group"),
+        ("warning_type", str, "FAILURE"),
+        ("warning_group_id", int, 1),
         ("timeout", int, 1),
         ("release_state", str, "OFFLINE"),
         ("param", dict, {"key": "value"}),
@@ -150,6 +154,21 @@ def test__parse_datetime_not_support_type(val: Any):
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         with pytest.raises(PyDSParamException, match="Do not support value type.*?"):
             pd._parse_datetime(val)
+
+
+@pytest.mark.parametrize(
+    "val",
+    [
+        "ALLL",
+        "nonee",
+    ],
+)
+def test_warn_type_not_support_type(val: str):
+    """Test process definition param warning_type not support type error."""
+    with pytest.raises(
+        PyDSParamException, match="Parameter `warning_type` with unexpect value.*?"
+    ):
+        ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, warning_type=val)
 
 
 @pytest.mark.parametrize(
@@ -234,6 +253,8 @@ def test_process_definition_get_define_without_task():
         "project": configuration.WORKFLOW_PROJECT,
         "tenant": configuration.WORKFLOW_TENANT,
         "workerGroup": configuration.WORKFLOW_WORKER_GROUP,
+        "warningType": configuration.WORKFLOW_WARNING_TYPE,
+        "warningGroupId": 0,
         "timeout": 0,
         "releaseState": ProcessDefinitionReleaseState.ONLINE,
         "param": None,
