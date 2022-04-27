@@ -55,7 +55,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
         InputParam bodyParams = InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
                                           .setPlaceholder("input request body as JSON format ")
                                           .addValidate(Validate.newBuilder()
-                                                               .setRequired(true)
+                                                               .setRequired(false)
                                                                .build())
                                           .build();
 
