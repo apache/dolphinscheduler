@@ -95,11 +95,11 @@ export function useModal(
       if (state.startForm.startEndTime) {
         const start = format(
           new Date(state.startForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         const end = format(
           new Date(state.startForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         state.startForm.scheduleTime = `${start},${end}`
       }
@@ -186,11 +186,11 @@ export function useModal(
   const getTimingData = () => {
     const start = format(
       parseTime(state.timingForm.startEndTime[0]),
-      'yyyy-MM-dd hh:mm:ss'
+      'yyyy-MM-dd HH:mm:ss'
     )
     const end = format(
       parseTime(state.timingForm.startEndTime[1]),
-      'yyyy-MM-dd hh:mm:ss'
+      'yyyy-MM-dd HH:mm:ss'
     )
 
     const data = {
@@ -260,11 +260,11 @@ export function useModal(
 
         const start = format(
           new Date(state.timingForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         const end = format(
           new Date(state.timingForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
 
         const schedule = JSON.stringify({
