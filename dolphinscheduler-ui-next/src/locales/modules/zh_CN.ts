@@ -326,7 +326,7 @@ const resource = {
     task_name: '任务名称',
     task_group_name: '任务组名称',
     project_name: '项目名称',
-    workflow_name: '工作流名称',
+    task_instance_name: '任务实例',
     workflow_instance_name: '工作流实例',
     queue: '任务组队列',
     priority: '组内优先级',
