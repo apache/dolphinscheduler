@@ -40,6 +40,8 @@ public class SparkConstants {
 
     public static final String DEPLOY_MODE = "--deploy-mode";
 
+    public static final String DEPLOY_MODE_LOCAL = "local";
+
     /**
      * --driver-cores NUM
      */
@@ -54,6 +56,8 @@ public class SparkConstants {
      * master
      */
     public static final String MASTER = "--master";
+
+    public static final String SPARK_ON_YARN = "yarn";
 
     /**
      * --num-executors NUM

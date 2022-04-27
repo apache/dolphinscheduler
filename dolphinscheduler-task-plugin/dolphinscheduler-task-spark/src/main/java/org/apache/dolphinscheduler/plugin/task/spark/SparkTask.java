@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -24,13 +26,25 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SparkTask extends AbstractYarnTask {
 
@@ -99,8 +113,8 @@ public class SparkTask extends AbstractYarnTask {
 
         args.add(sparkCommand);
 
-        // other parameters
-        args.addAll(SparkArgsUtils.buildArgs(sparkParameters, taskExecutionContext));
+        // populate spark options
+        args.addAll(populateSparkOptions(sparkParameters, taskExecutionContext));
 
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
@@ -116,6 +130,136 @@ public class SparkTask extends AbstractYarnTask {
         logger.info("spark task command: {}", command);
 
         return command;
+    }
+
+    /**
+     * build spark options
+     *
+     * @param sparkParameters SparkParameters
+     * @param taskRequest     TaskExecutionContext
+     * @return argument list
+     */
+    private List<String> populateSparkOptions(SparkParameters sparkParameters, TaskExecutionContext taskRequest) {
+        List<String> args = new ArrayList<>();
+        args.add(SparkConstants.MASTER);
+
+        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode() : SparkConstants.DEPLOY_MODE_LOCAL;
+        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
+            args.add(SparkConstants.SPARK_ON_YARN);
+            args.add(SparkConstants.DEPLOY_MODE);
+        }
+        args.add(deployMode);
+
+        ProgramType programType = sparkParameters.getProgramType();
+        String mainClass = sparkParameters.getMainClass();
+        if (programType != ProgramType.PYTHON && programType != ProgramType.SQL && StringUtils.isNotEmpty(mainClass)) {
+            args.add(SparkConstants.MAIN_CLASS);
+            args.add(mainClass);
+        }
+
+        populateSparkResourceDefinitions(sparkParameters, args);
+
+        String appName = sparkParameters.getAppName();
+        if (StringUtils.isNotEmpty(appName)) {
+            args.add(SparkConstants.SPARK_NAME);
+            args.add(ArgsUtils.escape(appName));
+        }
+
+        String others = sparkParameters.getOthers();
+        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode) && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
+            String queue = sparkParameters.getQueue();
+            if (StringUtils.isNotEmpty(queue)) {
+                args.add(SparkConstants.SPARK_QUEUE);
+                args.add(queue);
+            }
+        }
+
+        // --conf --files --jars --packages
+        if (StringUtils.isNotEmpty(others)) {
+            args.add(others);
+        }
+
+        ResourceInfo mainJar = sparkParameters.getMainJar();
+        if (programType != ProgramType.SQL) {
+            args.add(mainJar.getRes());
+        }
+
+        String mainArgs = sparkParameters.getMainArgs();
+        if (programType != ProgramType.SQL && StringUtils.isNotEmpty(mainArgs)) {
+            args.add(mainArgs);
+        }
+
+        // bin/spark-sql -f fileName
+        if (ProgramType.SQL == programType) {
+            args.add(SparkConstants.SQL_FROM_FILE);
+            args.add(generateScriptFile(sparkParameters, taskRequest));
+        }
+        return args;
+    }
+
+    private void populateSparkResourceDefinitions(SparkParameters sparkParameters, List<String> args) {
+        int driverCores = sparkParameters.getDriverCores();
+        if (driverCores > 0) {
+            args.add(SparkConstants.DRIVER_CORES);
+            args.add(String.format("%d", driverCores));
+        }
+
+        String driverMemory = sparkParameters.getDriverMemory();
+        if (StringUtils.isNotEmpty(driverMemory)) {
+            args.add(SparkConstants.DRIVER_MEMORY);
+            args.add(driverMemory);
+        }
+
+        int numExecutors = sparkParameters.getNumExecutors();
+        if (numExecutors > 0) {
+            args.add(SparkConstants.NUM_EXECUTORS);
+            args.add(String.format("%d", numExecutors));
+        }
+
+        int executorCores = sparkParameters.getExecutorCores();
+        if (executorCores > 0) {
+            args.add(SparkConstants.EXECUTOR_CORES);
+            args.add(String.format("%d", executorCores));
+        }
+
+        String executorMemory = sparkParameters.getExecutorMemory();
+        if (StringUtils.isNotEmpty(executorMemory)) {
+            args.add(SparkConstants.EXECUTOR_MEMORY);
+            args.add(executorMemory);
+        }
+    }
+
+    private String generateScriptFile(SparkParameters sparkParameters, TaskExecutionContext taskRequest) {
+        String scriptFileName = String.format("%s/%s_node.sql", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
+
+        File file = new File(scriptFileName);
+        Path path = file.toPath();
+
+        if (!Files.exists(path)) {
+            String script = sparkParameters.getRawScript().replaceAll("\\r\\n", "\n");
+            sparkParameters.setRawScript(script);
+
+            logger.info("raw script : {}", sparkParameters.getRawScript());
+            logger.info("task execute path : {}", taskRequest.getExecutePath());
+
+            Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+            try {
+                if (OSUtils.isWindows()) {
+                    Files.createFile(path);
+                } else {
+                    if (!file.getParentFile().exists()) {
+                        file.getParentFile().mkdirs();
+                    }
+                    Files.createFile(path, attr);
+                }
+                Files.write(path, sparkParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+            } catch (IOException e) {
+                throw new RuntimeException("generate spark sql script error", e);
+            }
+
+        }
+        return scriptFileName;
     }
 
     @Override
