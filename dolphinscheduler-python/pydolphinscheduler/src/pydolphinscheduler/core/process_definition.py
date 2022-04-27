@@ -120,7 +120,7 @@ class ProcessDefinition(Base):
         self.warning_type = warning_type
         if warning_type.strip().upper() not in ("FAILURE", "SUCCESS", "ALL", "NONE"):
             raise PyDSParamException(
-                "Parameter `warning_type` with unexpect  value `%s`", warning_type
+                "Parameter `warning_type` with unexpect value `%s`", warning_type
             )
         else:
             self.warning_type = warning_type.strip().upper()
