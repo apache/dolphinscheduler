@@ -37,7 +37,7 @@ There are two ways to configure the DolphinScheduler development environment, st
 
 > **_Note:_** Use standalone server only for development and debugging, because it uses H2 Database as default database and Zookeeper Testing Server which may not be stable in production.
 > Standalone is only supported in DolphinScheduler 1.3.9 and later versions.
-> Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](../guide/installation/standalone.md) for instructions.
+> Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/installation/standalone.html) for instructions.
 
 ### Git Branch Choose
 
