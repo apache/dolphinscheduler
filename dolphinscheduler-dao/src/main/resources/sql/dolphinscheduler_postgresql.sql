@@ -625,7 +625,8 @@ CREATE TABLE t_ds_relation_project_user (
   perm int DEFAULT '1' ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_relation_project_user_un UNIQUE (user_id, project_id)
 ) ;
 create index relation_project_user_id_index on t_ds_relation_project_user (user_id);
 
