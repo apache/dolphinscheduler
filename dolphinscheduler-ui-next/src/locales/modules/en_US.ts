@@ -330,7 +330,7 @@ const resource = {
     task_name: 'Task name',
     task_group_name: 'Task group name',
     project_name: 'Project name',
-    workflow_name: 'Workflow name',
+    task_instance_name: 'Task instance',
     workflow_instance_name: 'Workflow instance',
     queue: 'Task group queue',
     priority: 'Priority',
