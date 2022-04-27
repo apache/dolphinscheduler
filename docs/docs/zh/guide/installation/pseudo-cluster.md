@@ -96,6 +96,7 @@ deployUser="dolphinscheduler"
 ### 修改 `dolphinscheduler_env.sh` 文件
 
 文件 `./bin/env/dolphinscheduler_env.sh` 描述了下列配置：
+
 * DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
 * 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
 * 注册中心`zookeeper`

@@ -98,6 +98,7 @@ deployUser="dolphinscheduler"
 ### Modify `dolphinscheduler_env.sh`
 
 File  `./bin/env/dolphinscheduler_env.sh` describes the following configurations:
+
 * Database configuration of DolphinScheduler, see [Initialize the Database](#initialize-the-database) for detailed instructions.
 * Some tasks which need external dependencies or libraries such as `JAVA_HOME` and `SPARK_HOME`.
 * Registry center `zookeeper`.
