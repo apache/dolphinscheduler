@@ -156,7 +156,12 @@ export default defineComponent({
           }
         ])}
       >
-        <NLog rows={30} log={this.logRef} loading={this.logLoadingRef} />
+        <NLog
+          rows={30}
+          log={this.logRef}
+          loading={this.logLoadingRef}
+          style={{ height: isFullscreen ? 'calc(100vh - 140px)' : '525px' }}
+        />
       </Modal>
     )
   }
