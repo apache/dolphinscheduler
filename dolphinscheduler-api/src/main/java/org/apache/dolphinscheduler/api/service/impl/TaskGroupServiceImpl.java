@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -58,6 +59,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private ExecutorService executorService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupServiceImpl.class);
 
@@ -303,11 +307,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public Map<String, Object> forceStartTask(User loginUser, int queueId) {
-        Map<String, Object> result = new HashMap<>();
-
-        taskGroupQueueService.forceStartTask(queueId, Flag.YES.getCode());
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return executorService.forceStartTaskInstance(loginUser, queueId);
     }
 
     @Override
