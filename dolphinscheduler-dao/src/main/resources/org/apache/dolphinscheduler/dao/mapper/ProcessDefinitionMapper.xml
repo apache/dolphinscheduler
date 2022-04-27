@@ -94,6 +94,19 @@
         where project_code = #{projectCode}
         order by create_time desc
     </select>
+    <select id="queryDefinitionListByProjectCodeAndProcessDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition">
+        select
+            code, name, version
+        from t_ds_process_definition
+        where 1=1
+        AND project_code = #{projectCode}
+        <if test="codes != null and codes.size() != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
     <select id="queryDefinitionListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select
         <include refid="baseSql"/>
@@ -145,7 +158,7 @@
                 and ptr.project_code=pd.project_code and  pd.release_state = 1
         join t_ds_task_definition td
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
         WHERE  td.resource_ids is not null and td.resource_ids != ''
     </select>
 
@@ -157,7 +170,7 @@
                 and ptr.project_code=pd.project_code and  pd.release_state = 1
         join t_ds_task_definition td
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
         WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
     </select>
 

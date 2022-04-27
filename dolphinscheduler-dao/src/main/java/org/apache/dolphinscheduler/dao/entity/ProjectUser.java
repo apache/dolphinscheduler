@@ -14,21 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.util.Date;
-
 @TableName("t_ds_relation_project_user")
 public class ProjectUser {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     @TableField("user_id")
@@ -36,6 +37,12 @@ public class ProjectUser {
 
     @TableField("project_id")
     private int projectId;
+
+    /**
+     * project code
+     */
+    @TableField(exist = false)
+    private long projectCode;
 
     /**
      * project name
@@ -124,12 +131,21 @@ public class ProjectUser {
         this.perm = perm;
     }
 
+    public long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(long projectCode) {
+        this.projectCode = projectCode;
+    }
+
     @Override
     public String toString() {
         return "ProjectUser{"
                + "id=" + id
                + ", userId=" + userId
                + ", projectId=" + projectId
+               + ", projectCode=" + projectCode
                + ", projectName='" + projectName + '\''
                + ", userName='" + userName + '\''
                + ", perm=" + perm

@@ -19,7 +19,6 @@ import { defineComponent, PropType, ref } from 'vue'
 import initChart from '@/components/chart'
 import { useI18n } from 'vue-i18n'
 import type { Ref } from 'vue'
-import { format } from 'date-fns'
 
 const props = {
   height: {
@@ -47,17 +46,13 @@ const GraphChart = defineComponent({
     const graphChartRef: Ref<HTMLDivElement | null> = ref(null)
     const { t } = useI18n()
 
-    console.log(props.seriesData)
-
     const legendData = [
-      { name: t('project.workflow.online') },
-      { name: t('project.workflow.workflow_offline') },
-      { name: t('project.workflow.schedule_offline') }
+      { color: '#2D8DF0', name: t('project.workflow.online') },
+      { color: '#f37373', name: t('project.workflow.workflow_offline') },
+      { color: '#ba3e3e', name: t('project.workflow.schedule_offline') }
     ]
 
     const getCategory = (schedulerStatus: number, workflowStatus: number) => {
-      console.log(schedulerStatus, workflowStatus)
-
       switch (true) {
         case workflowStatus === 0:
           return 1
@@ -105,11 +100,16 @@ const GraphChart = defineComponent({
           `
         }
       },
-      legend: [
-        {
-          data: legendData?.map((item) => item.name)
-        }
-      ],
+      legend: {
+        data: legendData?.map((item) => {
+          return {
+            name: item.name,
+            itemStyle: {
+              color: item.color
+            }
+          }
+        })
+      },
       series: [
         {
           type: 'graph',
@@ -121,7 +121,7 @@ const GraphChart = defineComponent({
           },
           symbol: 'roundRect',
           symbolSize: 70,
-          roam: false,
+          roam: true,
           label: {
             show: props.labelShow,
             formatter: (val: any) => {
@@ -137,30 +137,42 @@ const GraphChart = defineComponent({
             }
           },
           data: props.seriesData.map((item) => {
+            const category = getCategory(
+              Number(item.schedulePublishStatus),
+              Number(item.workFlowPublishStatus)
+            )
+            const itemStyle = {
+              color: ''
+            }
+
+            if (category === 1) {
+              itemStyle.color = '#f37373'
+            } else if (category === 2) {
+              itemStyle.color = '#ba3e3e'
+            } else if (category === 0) {
+              itemStyle.color = '#2D8DF0'
+            }
+
             return {
               name: item.name,
               id: item.id,
-              category: getCategory(
-                Number(item.schedulePublishStatus),
-                Number(item.workFlowPublishStatus)
-              ),
-              workFlowPublishStatus: format(
-                new Date(item.workFlowPublishStatus),
-                'yyyy-MM-dd HH:mm:ss'
-              ),
-              schedulePublishStatus: format(
-                new Date(item.schedulePublishStatus),
-                'yyyy-MM-dd HH:mm:ss'
-              ),
-              crontab: item.crontab,
-              scheduleStartTime:
-                Number(item.scheduleStartTime) === 0
+              category,
+              workFlowPublishStatus:
+                Number(item.workFlowPublishStatus) === 0
                   ? t('project.workflow.offline')
                   : t('project.workflow.online'),
-              scheduleEndTime:
-                Number(item.scheduleEndTime) === 0
+              schedulePublishStatus:
+                Number(item.schedulePublishStatus) === 0
                   ? t('project.workflow.offline')
-                  : t('project.workflow.online')
+                  : t('project.workflow.online'),
+              crontab: item.crontab,
+              scheduleStartTime: item.scheduleStartTime
+                ? item.scheduleStartTime
+                : '-',
+              scheduleEndTime: item.scheduleEndTime
+                ? item.scheduleEndTime
+                : '-',
+              itemStyle
             }
           }),
           categories: legendData

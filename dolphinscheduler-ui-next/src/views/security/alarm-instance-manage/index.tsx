@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -40,10 +40,12 @@ const AlarmInstanceManage = defineComponent({
     const { t } = useI18n()
     const showDetailModal = ref(false)
     const currentRecord = ref()
-
+    const columns = ref()
     const { IS_ADMIN } = useUserInfo()
+    const { data, changePage, changePageSize, deleteRecord, updateList } =
+      useTable()
 
-    const { columnsRef } = useColumns(
+    const { getColumns } = useColumns(
       (record: IRecord, type: 'edit' | 'delete') => {
         if (type === 'edit') {
           showDetailModal.value = true
@@ -53,9 +55,6 @@ const AlarmInstanceManage = defineComponent({
         }
       }
     )
-
-    const { data, changePage, changePageSize, deleteRecord, updateList } =
-      useTable()
 
     const onCreate = () => {
       currentRecord.value = null
@@ -69,6 +68,11 @@ const AlarmInstanceManage = defineComponent({
 
     onMounted(() => {
       changePage(1)
+      columns.value = getColumns()
+    })
+
+    watch(useI18n().locale, () => {
+      columns.value = getColumns()
     })
 
     return {
@@ -76,7 +80,7 @@ const AlarmInstanceManage = defineComponent({
       IS_ADMIN,
       showDetailModal,
       currentRecord: currentRecord,
-      columnsRef,
+      columns,
       ...toRefs(data),
       changePage,
       changePageSize,
@@ -91,7 +95,7 @@ const AlarmInstanceManage = defineComponent({
       IS_ADMIN,
       currentRecord,
       showDetailModal,
-      columnsRef,
+      columns,
       list,
       page,
       pageSize,
@@ -111,9 +115,9 @@ const AlarmInstanceManage = defineComponent({
             default: () => (
               <div class={styles['conditions']}>
                 {IS_ADMIN && (
-                  <NButton onClick={onCreate} type='primary'>{`${t(
-                    'security.alarm_instance.create'
-                  )} ${t('security.alarm_instance.alarm_instance')}`}</NButton>
+                  <NButton onClick={onCreate} type='primary'>
+                    {t('security.alarm_instance.create_alarm_instance')}
+                  </NButton>
                 )}
                 <NSpace
                   class={styles['conditions-search']}
@@ -139,12 +143,7 @@ const AlarmInstanceManage = defineComponent({
           }}
         </Card>
         <Card title='' class={styles['mt-8']}>
-          <NDataTable
-            columns={columnsRef}
-            data={list}
-            loading={loading}
-            striped
-          />
+          <NDataTable columns={columns} data={list} loading={loading} striped />
           <NPagination
             page={page}
             page-size={pageSize}

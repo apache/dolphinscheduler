@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler-alert</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-alert-plugins</artifactId>
@@ -37,6 +37,7 @@
         <module>dolphinscheduler-alert-slack</module>
         <module>dolphinscheduler-alert-pagerduty</module>
         <module>dolphinscheduler-alert-webexteams</module>
+        <module>dolphinscheduler-alert-telegram</module>
     </modules>
 
     <dependencies>

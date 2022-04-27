@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef } from 'vue'
+import { defineComponent, Ref, toRefs, onMounted, toRef, watch } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -37,7 +37,8 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'resource-manage',
   setup() {
-    const { variables, getTableData, goUdfManage, goBread } = useTable()
+    const { variables, createColumns, getTableData, goUdfManage, goBread } =
+      useTable()
 
     const requestData = () => {
       getTableData({
@@ -85,7 +86,12 @@ export default defineComponent({
       goBread(breadName)
     }
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     onMounted(() => {
+      createColumns(variables)
       requestData()
     })
 
@@ -103,16 +109,26 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.handleCreateFolder}>
+              <NButton
+                type='primary'
+                onClick={this.handleCreateFolder}
+                class='btn-create-directory'
+              >
                 {t('resource.udf.create_folder')}
               </NButton>
-              <NButton strong secondary onClick={this.handleUploadFile}>
+              <NButton
+                strong
+                secondary
+                onClick={this.handleUploadFile}
+                class='btn-upload-udf'
+              >
                 {t('resource.udf.upload_udf_resources')}
               </NButton>
             </NSpace>
@@ -140,11 +156,14 @@ export default defineComponent({
             default: () => (
               <div>
                 <NDataTable
+                  loading={loadingRef}
                   columns={this.columns}
                   data={this.tableData}
                   striped
                   size={'small'}
                   class={styles.table}
+                  row-class-name='items'
+                  scrollX={this.tableWidth}
                 />
                 <div class={styles.pagination}>
                   <NPagination

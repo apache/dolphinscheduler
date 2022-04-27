@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -26,13 +27,11 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,7 +107,7 @@ public class ProcessAlertManager {
         if (processInstance.getState().typeIsSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                    .projectId(projectUser.getProjectId())
+                    .projectCode(projectUser.getProjectCode())
                     .projectName(projectUser.getProjectName())
                     .owner(projectUser.getUserName())
                     .processId(processInstance.getId())
@@ -132,7 +131,7 @@ public class ProcessAlertManager {
                     continue;
                 }
                 ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                        .projectId(projectUser.getProjectId())
+                        .projectCode(projectUser.getProjectCode())
                         .projectName(projectUser.getProjectName())
                         .owner(projectUser.getUserName())
                         .processId(processInstance.getId())
@@ -193,8 +192,10 @@ public class ProcessAlertManager {
             alert.setTitle("worker fault tolerance");
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
+            alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
+            alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
             alertDao.addAlert(alert);
             logger.info("add alert to db , alert : {}", alert);
 
@@ -223,10 +224,15 @@ public class ProcessAlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
-        String content = getContentProcessInstance(processInstance, taskInstances,projectUser);
+        alert.setWarningType(processInstance.getState().typeIsSuccess() ? WarningType.SUCCESS : WarningType.FAILURE);
+        String content = getContentProcessInstance(processInstance, taskInstances, projectUser);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProjectCode(projectUser.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -268,10 +274,10 @@ public class ProcessAlertManager {
      * send process timeout alert
      *
      * @param processInstance process instance
-     * @param processDefinition process definition
+     * @param projectUser projectUser
      */
-    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
+        alertDao.sendProcessTimeoutAlert(processInstance, projectUser);
     }
 
     /**
@@ -285,6 +291,11 @@ public class ProcessAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProjectCode(result.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        //might need to change to data quality status
+        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -299,6 +310,9 @@ public class ProcessAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.TASK_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -357,7 +371,46 @@ public class ProcessAlertManager {
         return JSONUtils.toJsonString(content);
     }
 
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
-        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, ProjectUser projectUser) {
+        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
+    }
+
+    /**
+     *
+     * check node type and process blocking flag, then insert a block record into db
+     *
+     * @param processInstance process instance
+     * @param projectUser the project owner
+     */
+    public void sendProcessBlockingAlert(ProcessInstance processInstance,
+                                         ProjectUser projectUser) {
+        Alert alert = new Alert();
+        String cmdName = getCommandCnName(processInstance.getCommandType());
+        List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
+        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .projectCode(projectUser.getProjectCode())
+                .projectName(projectUser.getProjectName())
+                .owner(projectUser.getUserName())
+                .processId(processInstance.getId())
+                .processName(processInstance.getName())
+                .processType(processInstance.getCommandType())
+                .processState(processInstance.getState())
+                .runTimes(processInstance.getRunTimes())
+                .processStartTime(processInstance.getStartTime())
+                .processEndTime(processInstance.getEndTime())
+                .processHost(processInstance.getHost())
+                .build();
+        blockingNodeList.add(processAlertContent);
+        String content = JSONUtils.toJsonString(blockingNodeList);
+        alert.setTitle(cmdName + " Blocked");
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alert.setProjectCode(projectUser.getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.PROCESS_INSTANCE_BLOCKED);
+        alertDao.addAlert(alert);
+        logger.info("add alert to db, alert: {}",alert);
     }
 }

@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_USER;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_PROJECT;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_USER;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
@@ -287,7 +287,7 @@ public class ProjectController extends BaseController {
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = projectService.queryAllProjectList();
+        Map<String, Object> result = projectService.queryAllProjectList(loginUser);
         return returnDataList(result);
     }
 }

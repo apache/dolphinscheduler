@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-import * as Field from './fields'
+import { toRef, Ref } from 'vue'
 import { formatValidate } from './utils'
+import getField from './fields/get-field'
+import { omit, isFunction } from 'lodash'
 import type { FormRules } from 'naive-ui'
-import type { IJsonItem } from './types'
+import type { IFormItem, IJsonItem } from './types'
 
 export default function getElementByJson(
   json: IJsonItem[],
@@ -26,40 +28,24 @@ export default function getElementByJson(
 ) {
   const rules: FormRules = {}
   const initialValues: { [field: string]: any } = {}
-  const elements = []
-
-  const getElement = (item: IJsonItem) => {
-    const { type, props = {}, field, options } = item
-    // TODO Support other widgets later
-    if (type === 'radio') {
-      return Field.renderRadio({
-        field,
-        fields,
-        props,
-        options
-      })
+  const elements: IFormItem[] = []
+  for (const item of json) {
+    const mergedItem = isFunction(item) ? item() : item
+    const { name, value, field, children, validate, ...rest } = mergedItem
+    if (value || value === 0) {
+      fields[field] = value
+      initialValues[field] = value
     }
-    if (type === 'editor') {
-      return Field.renderEditor({
-        field,
-        fields,
-        props
-      })
+    if (validate) rules[field] = formatValidate(validate)
+    const element: IFormItem = {
+      showLabel: !!name,
+      ...omit(rest, ['type', 'props', 'options']),
+      label: name,
+      path: !children ? field : '',
+      widget: () => getField(item, fields, rules),
+      span: toRef(mergedItem, 'span') as Ref<number>
     }
-
-    return Field.renderInput({ field, fields, props })
+    elements.push(element)
   }
-
-  for (let item of json) {
-    fields[item.field] = item.value
-    initialValues[item.field] = item.value
-    if (item.validate) rules[item.field] = formatValidate(item.validate)
-    elements.push({
-      label: item.name,
-      path: item.field,
-      widget: () => getElement(item)
-    })
-  }
-
   return { rules, elements, initialValues }
 }

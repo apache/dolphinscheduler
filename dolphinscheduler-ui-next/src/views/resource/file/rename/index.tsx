@@ -75,17 +75,16 @@ export default defineComponent({
         title={t('resource.file.rename')}
         onCancel={this.hideModal}
         onConfirm={this.handleFile}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+        confirmLoading={this.saving}
       >
-        <NForm
-          rules={this.rules}
-          ref='renameFormRef'
-          label-placement='left'
-          label-width='160'
-        >
+        <NForm rules={this.rules} ref='renameFormRef'>
           <NFormItem label={t('resource.file.name')} path='name'>
             <NInput
               v-model={[this.renameForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
+              class='input-name'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
@@ -93,6 +92,7 @@ export default defineComponent({
               type='textarea'
               v-model={[this.renameForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}
+              class='input-description'
             />
           </NFormItem>
         </NForm>

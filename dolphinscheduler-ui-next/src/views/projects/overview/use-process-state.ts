@@ -19,23 +19,31 @@ import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { countProcessInstanceState } from '@/service/modules/projects-analysis'
 import { format } from 'date-fns'
-import { TaskStateRes } from '@/service/modules/projects-analysis/types'
-import { StateData } from './types'
+import { toLower } from 'lodash'
+import { useI18n } from 'vue-i18n'
+import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
+import type { StateData } from './types'
+import { reactive, ref } from 'vue'
 
 export function useProcessState() {
   const route = useRoute()
+  const { t } = useI18n()
+  const processVariables = reactive({
+    processLoadingRef: ref(false)
+  })
 
   const getProcessState = (date: Array<number>) => {
+    if (processVariables.processLoadingRef) return
+    processVariables.processLoadingRef = true
     const { state } = useAsyncState(
       countProcessInstanceState({
-        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: Number(route.params.projectCode)
       }).then((res: TaskStateRes): StateData => {
-        const table = res.taskCountDtos.map((item, index) => {
+        const table = res.taskCountDtos.map((item, unused) => {
           return {
-            index: index + 1,
-            state: item.taskStateType,
+            state: t('home.' + toLower(item.taskStateType)),
             number: item.count
           }
         })
@@ -43,9 +51,10 @@ export function useProcessState() {
         const chart = res.taskCountDtos.map((item) => {
           return {
             value: item.count,
-            name: item.taskStateType
+            name: t('home.' + toLower(item.taskStateType))
           }
         })
+        processVariables.processLoadingRef = false
 
         return { table, chart }
       }),
@@ -55,5 +64,5 @@ export function useProcessState() {
     return state
   }
 
-  return { getProcessState }
+  return { getProcessState, processVariables }
 }

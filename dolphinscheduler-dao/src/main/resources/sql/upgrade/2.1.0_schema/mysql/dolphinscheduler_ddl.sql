@@ -18,6 +18,8 @@
 ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;
+ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`);
+ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`);
 ALTER TABLE `t_ds_process_task_relation_log` ADD KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`) USING BTREE;
 
 ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_project_code` (`project_code`) USING BTREE;
@@ -26,6 +28,11 @@ alter table t_ds_task_definition_log add `task_group_id` int(11) DEFAULT NULL CO
 alter table t_ds_task_definition_log add `task_group_priority` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `task_group_id`;
 alter table t_ds_task_definition add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
 alter table t_ds_task_definition add `task_group_priority` int(11) DEFAULT '0' COMMENT 'task group id' AFTER `task_group_id`;
+
+ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone';
+ALTER TABLE `t_ds_alert` ADD COLUMN `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed';
+
+ALTER TABLE `t_ds_alert` ADD INDEX `idx_status` (`alert_status`) USING BTREE;
 
 --
 -- Table structure for table `t_ds_dq_comparison_type`
@@ -168,3 +175,54 @@ CREATE TABLE `t_ds_relation_rule_input_entry` (
                                                   `update_time` datetime DEFAULT NULL,
                                                   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for t_ds_k8s
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_k8s`;
+CREATE TABLE `t_ds_k8s` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `k8s_name` varchar(100) DEFAULT NULL,
+  `k8s_config` text DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_k8s_namespace
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_k8s_namespace`;
+CREATE TABLE `t_ds_k8s_namespace` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `limits_memory` int(11) DEFAULT NULL,
+  `namespace` varchar(100) DEFAULT NULL,
+  `online_job_num` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `pod_replicas` int(11) DEFAULT NULL,
+  `pod_request_cpu` decimal(14,3) DEFAULT NULL,
+  `pod_request_memory` int(11) DEFAULT NULL,
+  `limits_cpu` decimal(14,3) DEFAULT NULL,
+  `k8s` varchar(100) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `k8s_namespace_unique` (`namespace`,`k8s`)
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_namespace_user`;
+CREATE TABLE `t_ds_relation_namespace_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `namespace_id` int(11) DEFAULT NULL COMMENT 'namespace id',
+  `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  KEY `user_id_index` (`user_id`),
+  UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;

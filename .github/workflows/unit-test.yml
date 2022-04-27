@@ -23,6 +23,7 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'dolphinscheduler-ui'
+      - 'dolphinscheduler-ui-next'
       - 'dolphinscheduler-python/pydolphinscheduler'
     branches:
       - dev
@@ -35,9 +36,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit-test:
-    name: Unit Test
+  paths-filter:
+    name: Unit-Test-Path-Filter
     runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
+  unit-test:
+    name: Unit-Test
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
         with:
@@ -76,7 +93,7 @@ jobs:
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
-          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
+          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-ui-next/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -94,3 +111,20 @@ jobs:
         with:
           name: unit-test-logs
           path: ${LOG_DIR}
+  result:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ unit-test, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip Unit Test!"
+            exit 0
+          fi
+          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+            echo "Unit Test Failed!"
+            exit -1
+          fi

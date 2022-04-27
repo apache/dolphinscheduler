@@ -19,15 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.python;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
-import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -58,18 +58,18 @@ public class PythonTask extends AbstractTaskExecutor {
      */
     private ShellCommandExecutor shellCommandExecutor;
 
-    private TaskRequest taskRequest;
+    private TaskExecutionContext taskRequest;
 
-    private final String PYTHON_HOME = "PYTHON_HOME";
+    private static final String PYTHON_HOME = "PYTHON_HOME";
 
-    private final String DEFAULT_PYTHON_VERSION = "python";
+    private static final String DEFAULT_PYTHON_VERSION = "python";
 
     /**
      * constructor
      *
      * @param taskRequest taskRequest
      */
-    public PythonTask(TaskRequest taskRequest) {
+    public PythonTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskRequest = taskRequest;
 
@@ -238,10 +238,8 @@ public class PythonTask extends AbstractTaskExecutor {
     private String buildPythonExecuteCommand(String pythonFile) {
         Preconditions.checkNotNull(pythonFile, "Python file cannot be null");
 
-        String pythonHome = System.getenv(PYTHON_HOME);
-        if (StringUtils.isEmpty(pythonHome)) {
-            return DEFAULT_PYTHON_VERSION + " " + pythonFile;
-        }
+        String pythonHome = String.format("${%s}", PYTHON_HOME);
+
         return pythonHome + " " + pythonFile;
     }
 

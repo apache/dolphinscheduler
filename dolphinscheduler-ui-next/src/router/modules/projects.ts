@@ -26,8 +26,7 @@ export default {
   path: '/projects',
   name: 'projects',
   meta: {
-    title: '项目管理',
-    showSide: false
+    title: '项目管理'
   },
   redirect: { name: 'projects-list' },
   component: () => import('@/layouts/content'),
@@ -38,7 +37,9 @@ export default {
       component: components['projects-list'],
       meta: {
         title: '项目',
-        showSide: false
+        activeMenu: 'projects',
+        showSide: false,
+        auth: []
       }
     },
     {
@@ -47,7 +48,9 @@ export default {
       component: components['projects-overview'],
       meta: {
         title: '项目概览',
-        showSide: true
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -56,16 +59,32 @@ export default {
       component: components['projects-workflow-relation'],
       meta: {
         title: '工作流关系',
-        showSide: true
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
       }
     },
     {
-      path: '/projects/:projectCode/workflow/definitions',
+      path: '/projects/:projectCode/workflow-definition',
       name: 'workflow-definition-list',
       component: components['projects-workflow-definition'],
       meta: {
         title: '工作流定义',
-        showSide: true
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-definition/timing/:definitionCode',
+      name: 'workflow-definition-timing',
+      component: components['projects-workflow-definition-timing'],
+      meta: {
+        title: '定时管理',
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -74,7 +93,10 @@ export default {
       component: components['projects-workflow-definition-create'],
       meta: {
         title: '创建工作流定义',
-        showSide: true
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -83,7 +105,10 @@ export default {
       component: components['projects-workflow-definition-detail'],
       meta: {
         title: '工作流定义详情',
-        showSide: true
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -92,7 +117,9 @@ export default {
       component: components['projects-workflow-instance'],
       meta: {
         title: '工作流实例',
-        showSide: true
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -101,25 +128,56 @@ export default {
       component: components['projects-workflow-instance-detail'],
       meta: {
         title: '工作流实例详情',
-        showSide: true
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow/instances',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow/instances/:id/gantt',
+      name: 'workflow-instance-gantt',
+      component: components['projects-workflow-instance-gantt'],
+      meta: {
+        title: '工作流实例甘特图',
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow/instances',
+        showSide: true,
+        auth: []
       }
     },
     {
       path: '/projects/:projectCode/task/definitions',
-      name: 'task-definition-list',
+      name: 'task-definition',
       component: components['projects-task-definition'],
       meta: {
         title: '任务定义',
-        showSide: true
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
       }
     },
     {
       path: '/projects/:projectCode/task/instances',
-      name: 'task-instance-list',
+      name: 'task-instance',
       component: components['projects-task-instance'],
       meta: {
         title: '任务实例',
-        showSide: true
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/projects/:projectCode/workflow-definition/tree/:definitionCode',
+      name: 'workflow-definition-tree',
+      component: components['projects-workflow-definition-tree'],
+      meta: {
+        title: '工作流定义树形图',
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
+        showSide: true,
+        auth: []
       }
     }
   ]

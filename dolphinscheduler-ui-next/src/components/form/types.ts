@@ -14,22 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { Ref } from 'vue'
 import type {
   GridProps,
   FormProps,
-  FormItemGiProps,
   FormItemRule,
   FormRules,
-  SelectOption
+  SelectOption,
+  TreeSelectOption
 } from 'naive-ui'
 
-type IType = 'input' | 'radio' | 'editor'
+type IType =
+  | 'input'
+  | 'radio'
+  | 'editor'
+  | 'custom-parameters'
+  | 'switch'
+  | 'input-number'
+  | 'select'
+  | 'checkbox'
+  | 'tree-select'
+  | 'multi-input'
+  | 'custom'
+  | 'multi-condition'
 
-type IOption = SelectOption
+type IOption = SelectOption | TreeSelectOption
 
-interface IFormItem extends FormItemGiProps {
+interface IFormItem {
+  showLabel?: boolean
+  path: string
+  label?: string
   widget: any
+  span?: number | Ref<number>
+  type?: 'custom'
+  class?: string
 }
 
 interface IMeta extends Omit<FormProps, 'model'> {
@@ -37,23 +55,25 @@ interface IMeta extends Omit<FormProps, 'model'> {
   model: object
 }
 
-interface IFieldParams {
-  field: string
-  props: object
-  fields: { [field: string]: any }
-  options?: IOption[]
-}
-
-interface IJsonItem {
+interface IJsonItemParams {
   field: string
   name?: string
-  props?: object
+  props?: any
   title?: string
   type?: IType
   validate?: FormItemRule
   value?: any
-  options?: IOption[]
+  options?: IOption[] | Ref<IOption[]>
+  children?: IJsonItem[]
+  slots?: object
+  span?: number | Ref<number>
+  widget?: any
+  class?: string
 }
+
+type IJsonItemFn = (i?: number) => IJsonItemParams
+
+type IJsonItem = IJsonItemParams | IJsonItemFn
 
 export {
   IMeta,
@@ -64,5 +84,5 @@ export {
   FormRules,
   IFormItem,
   GridProps,
-  IFieldParams
+  IJsonItemParams
 }

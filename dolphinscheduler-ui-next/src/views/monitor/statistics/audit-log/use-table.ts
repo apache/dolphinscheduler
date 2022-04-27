@@ -20,6 +20,7 @@ import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryAuditLogListPaging } from '@/service/modules/audit'
 import { format } from 'date-fns'
+import { parseTime } from '@/common/common'
 import type { AuditListRes } from '@/service/modules/audit/types'
 
 export function useTable() {
@@ -34,14 +35,16 @@ export function useTable() {
     operationType: ref(null),
     userName: ref(null),
     datePickerRange: ref(null),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    loadingRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
     variables.columns = [
       {
         title: '#',
-        key: 'index'
+        key: 'index',
+        render: (row: any, index: number) => index + 1
       },
       {
         title: t('monitor.audit_log.user_name'),
@@ -67,6 +70,8 @@ export function useTable() {
   }
 
   const getTableData = (params: any) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
@@ -74,21 +79,21 @@ export function useTable() {
       operationType: params.operationType,
       userName: params.userName,
       startDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       endDate: params.datePickerRange
-        ? format(new Date(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
+        ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : ''
     }
 
     const { state } = useAsyncState(
       queryAuditLogListPaging(data).then((res: AuditListRes) => {
-        variables.tableData = res.totalList.map((item, index) => {
+        variables.tableData = res.totalList.map((item, unused) => {
           return {
-            index: index + 1,
             ...item
           }
         }) as any
+        variables.loadingRef = false
       }),
       {}
     )

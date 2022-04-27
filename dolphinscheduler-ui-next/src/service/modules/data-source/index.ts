@@ -128,3 +128,27 @@ export function connectionTest(id: IdReq): any {
     method: 'get'
   })
 }
+
+export function getDatasourceTablesById(datasourceId: number): any {
+  return axios({
+    url: '/datasources/tables',
+    method: 'get',
+    params: {
+      datasourceId
+    }
+  })
+}
+
+export function getDatasourceTableColumnsById(
+  datasourceId: number,
+  tableName: string
+): any {
+  return axios({
+    url: '/datasources/tableColumns',
+    method: 'get',
+    params: {
+      datasourceId,
+      tableName
+    }
+  })
+}

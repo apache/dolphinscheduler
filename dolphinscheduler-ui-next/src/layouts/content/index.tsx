@@ -20,8 +20,8 @@ import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
-import { useMenuStore } from '@/store/menu/menu'
 import { useLocalesStore } from '@/store/locales/locales'
+import { useRouteStore } from '@/store/route/route'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
@@ -31,9 +31,9 @@ const Content = defineComponent({
     window.$message = useMessage()
 
     const route = useRoute()
-    const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
+    const routeStore = useRouteStore()
     const {
       state,
       changeMenuOption,
@@ -42,14 +42,21 @@ const Content = defineComponent({
     } = useDataList()
     const sideKeyRef = ref()
 
-    locale.value = localesStore.getLocales
-
     onMounted(() => {
+      locale.value = localesStore.getLocales
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       getSideMenu(state)
       changeUserDropdown(state)
     })
+
+    const getSideMenu = (state: any) => {
+      const key = route.meta.activeMenu
+      state.sideMenuOptions =
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
+          ?.children || state.menuOptions
+      state.isShowSide = route.meta.showSide
+    }
 
     watch(useI18n().locale, () => {
       changeMenuOption(state)
@@ -58,42 +65,38 @@ const Content = defineComponent({
       changeUserDropdown(state)
     })
 
-    const getSideMenu = (state: any) => {
-      const key = menuStore.getMenuKey
-      state.sideMenuOptions =
-        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]?.children || state.menuOptions
-      state.isShowSide = menuStore.getShowSideStatus
-    }
-
-    const getSideMenuOptions = (item: any) => {
-      menuStore.setMenuKey(item.key)
-      getSideMenu(state)
-    }
-
     watch(
       () => route.path,
       () => {
-        state.isShowSide = menuStore.getShowSideStatus
-        route.matched[1].path.includes(':projectCode')
-        if (route.matched[1].path === '/projects/:projectCode') {
-          changeMenuOption(state)
+        if (route.path !== '/login') {
+          routeStore.setLastRoute(route.path)
+
+          state.isShowSide = route.meta.showSide as boolean
+          if (route.matched[1].path === '/projects/:projectCode') {
+            changeMenuOption(state)
+          }
+
           getSideMenu(state)
+
+          const currentSide = (
+            route.meta.activeSide
+              ? route.meta.activeSide
+              : route.matched[1].path
+          ) as string
+          sideKeyRef.value = currentSide.includes(':projectCode')
+            ? currentSide.replace(
+                ':projectCode',
+                route.params.projectCode as string
+              )
+            : currentSide
         }
-        sideKeyRef.value = route.matched[1].path.includes(':projectCode')
-          ? route.matched[1].path.replace(
-              ':projectCode',
-              menuStore.getProjectCode
-            )
-          : route.matched[1].path
       },
       { immediate: true }
     )
 
     return {
       ...toRefs(state),
-      menuStore,
       changeMenuOption,
-      getSideMenuOptions,
       sideKeyRef
     }
   },
@@ -102,9 +105,10 @@ const Content = defineComponent({
       <NLayout style='height: 100%'>
         <NLayoutHeader style='height: 65px'>
           <NavBar
-            onHandleMenuClick={this.getSideMenuOptions}
+            class='tab-horizontal'
             headerMenuOptions={this.headerMenuOptions}
             localesOptions={this.localesOptions}
+            timezoneOptions={this.timezoneOptions}
             userDropdownOptions={this.userDropdownOptions}
           />
         </NLayoutHeader>
@@ -115,7 +119,11 @@ const Content = defineComponent({
               sideKey={this.sideKeyRef}
             />
           )}
-          <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
+          <NLayoutContent
+            native-scrollbar={false}
+            style='padding: 16px 22px'
+            contentStyle={'height: 100%'}
+          >
             <router-view key={this.$route.fullPath} />
           </NLayoutContent>
         </NLayout>

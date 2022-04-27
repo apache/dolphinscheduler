@@ -27,110 +27,20 @@ import {
   queryUdfFuncListPaging,
   deleteUdfFunc
 } from '@/service/modules/resources'
-import { IUdfFunctionParam } from './types'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/common/column-width-config'
+import type { IUdfFunctionParam } from './types'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const columns: TableColumns<any> = [
-    {
-      title: t('resource.function.id'),
-      key: 'id',
-      width: 50,
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('resource.function.udf_function_name'),
-      key: 'funcName'
-    },
-    {
-      title: t('resource.function.class_name'),
-      key: 'className'
-    },
-    {
-      title: t('resource.function.type'),
-      key: 'type'
-    },
-    {
-      title: t('resource.function.description'),
-      key: 'description'
-    },
-    {
-      title: t('resource.function.jar_package'),
-      key: 'resourceName'
-    },
-    {
-      title: t('resource.function.update_time'),
-      key: 'updateTime'
-    },
-    {
-      title: t('resource.function.operation'),
-      key: 'operation',
-      render: (row) => {
-        return h(NSpace, null, {
-          default: () => [
-            h(
-              NTooltip,
-              {},
-              {
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      circle: true,
-                      type: 'info',
-                      size: 'tiny',
-                      onClick: () => {
-                        handleEdit(row)
-                      }
-                    },
-                    {
-                      icon: () => h(EditOutlined)
-                    }
-                  ),
-                default: () => t('resource.function.edit')
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => {
-                  handleDelete(row.id)
-                }
-              },
-              {
-                trigger: () =>
-                  h(
-                    NTooltip,
-                    {},
-                    {
-                      trigger: () =>
-                        h(
-                          NButton,
-                          {
-                            circle: true,
-                            type: 'error',
-                            size: 'tiny'
-                          },
-                          {
-                            icon: () => h(DeleteOutlined)
-                          }
-                        ),
-                      default: () => t('resource.function.delete')
-                    }
-                  ),
-                default: () => t('resource.function.delete_confirm')
-              }
-            )
-          ]
-        })
-      }
-    }
-  ]
-
   const variables = reactive({
-    columns,
+    columns: [],
+    tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
     id: ref(Number(router.currentRoute.value.params.id) || -1),
@@ -138,16 +48,130 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
-    showRef: ref(false)
+    showRef: ref(false),
+    loadingRef: ref(false)
   })
 
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        render: (_row, index) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
+      },
+      {
+        title: t('resource.function.udf_function_name'),
+        key: 'funcName',
+        ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('resource.function.class_name'),
+        key: 'className',
+        ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('resource.function.type'),
+        key: 'type',
+        ...COLUMN_WIDTH_CONFIG['type']
+      },
+      {
+        title: t('resource.function.description'),
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
+      },
+      {
+        title: t('resource.function.jar_package'),
+        key: 'resourceName',
+        ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('resource.function.update_time'),
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('resource.function.operation'),
+        key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
+        render: (row) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'tiny',
+                        class: 'btn-edit',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () => h(EditOutlined)
+                      }
+                    ),
+                  default: () => t('resource.function.edit')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row.id)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'tiny',
+                              class: 'btn-delete'
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('resource.function.delete')
+                      }
+                    ),
+                  default: () => t('resource.function.delete_confirm')
+                }
+              )
+            ]
+          })
+        }
+      }
+    ] as TableColumns<any>
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
+  }
+
   const getTableData = (params: IUdfFunctionParam) => {
+    if (variables.loadingRef) return
+    variables.loadingRef = true
     const { state } = useAsyncState(
       queryUdfFuncListPaging({ ...params }).then((res: any) => {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+        variables.loadingRef = false
       }),
       { total: 0, table: [] }
     )
@@ -177,6 +201,7 @@ export function useTable() {
 
   return {
     variables,
+    createColumns,
     getTableData
   }
 }

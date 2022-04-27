@@ -20,11 +20,14 @@
 from pathlib import Path
 from typing import Any, Generator
 
-path_code_tasks = Path(__file__).parent.parent.parent.joinpath(
-    "src", "pydolphinscheduler", "tasks"
+project_root = Path(__file__).parent.parent.parent
+
+path_code_tasks = project_root.joinpath("src", "pydolphinscheduler", "tasks")
+path_example = project_root.joinpath("src", "pydolphinscheduler", "examples")
+path_doc_tasks = project_root.joinpath("docs", "source", "tasks")
+path_default_config_yaml = project_root.joinpath(
+    "src", "pydolphinscheduler", "core", "default_config.yaml"
 )
-path_example = Path(__file__).parent.parent.parent.joinpath("examples")
-path_doc_tasks = Path(__file__).parent.parent.parent.joinpath("docs", "source", "tasks")
 
 
 def get_all_examples() -> Generator[Path, Any, None]:

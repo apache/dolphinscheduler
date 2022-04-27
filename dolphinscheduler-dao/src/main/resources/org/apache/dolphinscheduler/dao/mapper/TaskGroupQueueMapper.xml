@@ -46,6 +46,7 @@
                 and group_id = #{groupId}
             </if>
         </where>
+        order by update_time desc
     </select>
 
     <select id="queryByStatus" resultMap="TaskGroupQueueMap" resultType="map">
@@ -79,13 +80,13 @@
 
     <update id="updateForceStart">
         update t_ds_task_group_queue
-               set priority = #{priority}
+        set force_start = #{forceStart}
         where id = #{queueId}
     </update>
 
     <update id="modifyPriority">
         update t_ds_task_group_queue
-               set force_start = #{forceStart}
+        set priority = #{priority}
         where id = #{queueId}
     </update>
 
@@ -135,10 +136,10 @@
         join t_ds_project as p on p_f.project_code = p.code
         where queue.group_id = #{groupId}
         <if test="taskName != null and taskName != ''">
-            and task_name =#{taskName}
+            and task_name like concat('%', #{taskName}, '%')
         </if>
         <if test="processName != null and processName != ''">
-            and process.name =#{processName}
+            and process.name like concat('%', #{processName}, '%')
         </if>
         <if test="status != null">
             and queue.status =#{status}
@@ -149,6 +150,7 @@
                 #{i.code}
             </foreach>
         </if>
+        order by queue.update_time desc
     </select>
 
 </mapper>

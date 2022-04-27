@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef } from 'vue'
+import { defineComponent, Ref, toRefs, onMounted, toRef, watch } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -34,7 +34,7 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'function-manage',
   setup() {
-    const { variables, getTableData } = useTable()
+    const { variables, createColumns, getTableData } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -68,7 +68,12 @@ export default defineComponent({
       handleShowModal(toRef(variables, 'showRef'))
     }
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     onMounted(() => {
+      createColumns(variables)
       requestData()
     })
 
@@ -83,13 +88,18 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+    const { loadingRef } = this
 
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButton type='primary' onClick={this.handleCreateFolder}>
+              <NButton
+                type='primary'
+                onClick={this.handleCreateFolder}
+                class='btn-create-udf-function'
+              >
                 {t('resource.function.create_udf_function')}
               </NButton>
             </NSpace>
@@ -114,11 +124,14 @@ export default defineComponent({
         </Card>
         <Card title={t('resource.function.udf_function')}>
           <NDataTable
+            loading={loadingRef}
             columns={this.columns}
             data={this.tableData}
             striped
             size={'small'}
             class={styles.table}
+            row-class-name='items'
+            scrollX={this.tableWidth}
           />
           <div class={styles.pagination}>
             <NPagination

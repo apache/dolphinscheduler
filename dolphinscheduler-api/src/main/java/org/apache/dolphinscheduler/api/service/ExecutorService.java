@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.RunMode;
@@ -63,7 +64,8 @@ public interface ExecutorService {
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
-                                            int dryRun);
+                                            int dryRun,
+                                            ComplementDependentMode complementDependentMode);
 
     /**
      * check whether the process definition can be executed
@@ -71,9 +73,10 @@ public interface ExecutorService {
      * @param projectCode project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
+     * @param verison process definition version
      * @return check result code
      */
-    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode);
+    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode, Integer verison);
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
@@ -93,4 +96,11 @@ public interface ExecutorService {
      * @return check result code
      */
     Map<String, Object> startCheckByProcessDefinedCode(long processDefinitionCode);
+
+    /**
+     * check if the current process has subprocesses and all subprocesses are valid
+     * @param processDefinition
+     * @return check result
+     */
+    boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
 }

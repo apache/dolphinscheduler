@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -30,14 +31,13 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -181,33 +181,26 @@ public class MasterSchedulerService extends Thread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
-        if (CollectionUtils.isEmpty(commands)) {
-            return null;
-        }
-
-        ProcessInstance[] processInstances = new ProcessInstance[commands.size()];
+        List<ProcessInstance> processInstances = Collections.synchronizedList(new ArrayList<>(commands.size()));
         CountDownLatch latch = new CountDownLatch(commands.size());
-        for (int i = 0; i < commands.size(); i++) {
-            int index = i;
-            this.masterPrepareExecService.execute(() -> {
-                Command command = commands.get(index);
-                // slot check again
-                if (!slotCheck(command)) {
-                    latch.countDown();
-                    return;
-                }
-
+        for (final Command command : commands) {
+            masterPrepareExecService.execute(() -> {
                 try {
+                    // slot check again
+                    SlotCheckState slotCheckState = slotCheck(command);
+                    if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
+                        logger.info("handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
+                        return;
+                    }
                     ProcessInstance processInstance = processService.handleCommand(logger,
                             getLocalAddress(),
                             command);
                     if (processInstance != null) {
-                        processInstances[index] = processInstance;
-                        logger.info("handle command command {} end, create process instance {}",
-                                command.getId(), processInstance.getId());
+                        processInstances.add(processInstance);
+                        logger.info("handle command {} end, create process instance {}", command.getId(), processInstance.getId());
                     }
                 } catch (Exception e) {
-                    logger.error("scan command error ", e);
+                    logger.error("handle command error ", e);
                     processService.moveToErrorCommand(command, e.toString());
                 } finally {
                     latch.countDown();
@@ -222,41 +215,35 @@ public class MasterSchedulerService extends Thread {
             logger.error("countDownLatch await error ", e);
         }
 
-        return Arrays.asList(processInstances);
+        return processInstances;
     }
 
     private List<Command> findCommands() {
         int pageNumber = 0;
         int pageSize = masterConfig.getFetchCommandNum();
         List<Command> result = new ArrayList<>();
-        while (Stopper.isRunning()) {
-            if (ServerNodeManager.MASTER_SIZE == 0) {
-                return result;
+        if (Stopper.isRunning()) {
+            int thisMasterSlot = ServerNodeManager.getSlot();
+            int masterCount = ServerNodeManager.getMasterSize();
+            if (masterCount > 0) {
+                result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             }
-            List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
-            if (commandList.size() == 0) {
-                return result;
-            }
-            for (Command command : commandList) {
-                if (slotCheck(command)) {
-                    result.add(command);
-                }
-            }
-            if (CollectionUtils.isNotEmpty(result)) {
-                logger.info("find {} commands, slot:{}", result.size(), ServerNodeManager.getSlot());
-                break;
-            }
-            pageNumber += 1;
         }
         return result;
     }
 
-    private boolean slotCheck(Command command) {
+    private SlotCheckState slotCheck(Command command) {
         int slot = ServerNodeManager.getSlot();
-        if (ServerNodeManager.MASTER_SIZE != 0 && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
-            return true;
+        int masterSize = ServerNodeManager.getMasterSize();
+        SlotCheckState state;
+        if (masterSize <= 0) {
+            state = SlotCheckState.CHANGE;
+        } else if (command.getId() % masterSize == slot) {
+            state = SlotCheckState.PASS;
+        } else {
+            state = SlotCheckState.INJECT;
         }
-        return false;
+        return state;
     }
 
     private String getLocalAddress() {

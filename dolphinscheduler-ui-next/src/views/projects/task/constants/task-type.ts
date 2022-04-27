@@ -14,8 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export type TaskType =
+  | 'SHELL'
+  | 'SUB_PROCESS'
+  | 'PROCEDURE'
+  | 'SQL'
+  | 'SPARK'
+  | 'FLINK'
+  | 'MR'
+  | 'PYTHON'
+  | 'DEPENDENT'
+  | 'HTTP'
+  | 'DATAX'
+  | 'PIGEON'
+  | 'SQOOP'
+  | 'CONDITIONS'
+  | 'DATA_QUALITY'
+  | 'SWITCH'
+  | 'SEATUNNEL'
+  | 'EMR'
 
-export const ALL_TASK_TYPES: any = {
+export const TASK_TYPES_MAP = {
   SHELL: {
     alias: 'SHELL'
   },
@@ -35,7 +54,8 @@ export const ALL_TASK_TYPES: any = {
     alias: 'FLINK'
   },
   MR: {
-    alias: 'MapReduce'
+    alias: 'MapReduce',
+    helperLinkDisable: true
   },
   PYTHON: {
     alias: 'PYTHON'
@@ -53,15 +73,25 @@ export const ALL_TASK_TYPES: any = {
     alias: 'PIGEON'
   },
   SQOOP: {
-    alias: 'SQOOP'
+    alias: 'SQOOP',
+    helperLinkDisable: true
   },
   CONDITIONS: {
     alias: 'CONDITIONS'
+  },
+  DATA_QUALITY: {
+    alias: 'DATA_QUALITY',
+    helperLinkDisable: true
   },
   SWITCH: {
     alias: 'SWITCH'
   },
   SEATUNNEL: {
-    alias: 'WATERDROP'
+    alias: 'WATERDROP',
+    helperLinkDisable: true
+  },
+  EMR: {
+    alias: 'AmazonEMR',
+    helperLinkDisable: true
   }
-}
+} as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

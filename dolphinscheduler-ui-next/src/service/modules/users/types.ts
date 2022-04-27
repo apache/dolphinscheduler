@@ -28,13 +28,14 @@ interface AlertGroupIdReq {
 }
 
 interface UserReq {
-  email?: string
-  tenantId?: number
-  userName?: string
-  userPassword?: string
+  email: string
+  tenantId: number | null
+  userName: string
+  userPassword: string
   phone?: string
   queue?: string
   state?: number
+  timeZone?: string
 }
 
 interface IdReq {
@@ -63,6 +64,10 @@ interface ProjectCodeReq {
 
 interface GrantUDFReq {
   udfIds: string
+}
+
+interface GrantNamespaceReq {
+  namespaceIds: string
 }
 
 interface ListAllReq extends UserReq {
@@ -126,6 +131,7 @@ export {
   GrantProject,
   ProjectCodeReq,
   GrantUDFReq,
+  GrantNamespaceReq,
   ListAllReq,
   ListReq,
   RegisterUserReq,

@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class StandaloneServer {
+
     public static void main(String[] args) throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.zookeeper.connect-string", server.getConnectString());

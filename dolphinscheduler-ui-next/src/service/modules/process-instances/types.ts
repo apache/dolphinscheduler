@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { ITaskState } from '@/common/types'
 
 interface CodeReq {
   projectCode: number
@@ -34,7 +35,7 @@ interface ProcessInstanceListReq {
 
 interface BatchDeleteReq {
   processInstanceIds: string
-  projectName: string
+  projectName?: string
   alertGroup?: string
   createTime?: string
   email?: string
@@ -56,8 +57,8 @@ interface SubIdReq {
 }
 
 interface TaskReq {
-  taskCode: string
-  taskId: number
+  taskCode?: string
+  taskId?: number
 }
 
 interface LongestReq {
@@ -71,7 +72,7 @@ interface IdReq {
 }
 
 interface ProcessInstanceReq {
-  syncDefine: string
+  syncDefine: boolean
   flag?: string
   globalParams?: string
   locations?: string
@@ -79,7 +80,27 @@ interface ProcessInstanceReq {
   taskDefinitionJson?: string
   taskRelationJson?: string
   tenantCode?: string
-  timeout?: string
+  timeout?: number
+}
+
+interface IWorkflowInstance {
+  id: number
+  name: string
+  state: ITaskState
+  commandType: string
+  scheduleTime?: string
+  processDefinitionCode?: number
+  startTime: string
+  endTime: string
+  duration?: string
+  runTimes: number
+  recovery: string
+  dryRun: number
+  executorName: string
+  host: string
+  count?: number
+  disabled?: boolean
+  buttonType?: string
 }
 
 export {
@@ -90,5 +111,6 @@ export {
   TaskReq,
   LongestReq,
   IdReq,
-  ProcessInstanceReq
+  ProcessInstanceReq,
+  IWorkflowInstance
 }

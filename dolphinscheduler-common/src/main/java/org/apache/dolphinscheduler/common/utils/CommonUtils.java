@@ -40,7 +40,7 @@ public class CommonUtils {
 
     private static final Base64 BASE64 = new Base64();
 
-    private CommonUtils() {
+    protected CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
     }
 

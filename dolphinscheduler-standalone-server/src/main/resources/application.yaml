@@ -18,8 +18,11 @@
 spring:
   application:
     name: standalone-server
-  main:
-    banner-mode: off
+  jackson:
+    time-zone: UTC
+    date-format: "yyyy-MM-dd HH:mm:ss"
+  banner:
+    charset: UTF-8
   cache:
     # default enable cache, you can disable by `type: none`
     type: none
@@ -59,8 +62,6 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-  jackson:
-    time-zone: GMT+8
   servlet:
     multipart:
       max-file-size: 1024MB
@@ -139,6 +140,8 @@ alert:
   port: 50052
 
 python-gateway:
+  # Weather enable python gateway server or not. The default value is true.
+  enabled: true
   # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
   # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
   gateway-server-address: 0.0.0.0
@@ -180,6 +183,9 @@ management:
 audit:
   enabled: true
 
+metrics:
+  enabled: true
+
 # Override by profile
 ---
 spring:
@@ -189,3 +195,17 @@ spring:
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  sql:
+     init:
+       schema-locations: classpath:sql/dolphinscheduler_mysql.sql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: root

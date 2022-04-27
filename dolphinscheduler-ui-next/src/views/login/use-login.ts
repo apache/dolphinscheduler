@@ -22,10 +22,14 @@ import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
 import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
+import { useRouteStore } from '@/store/route/route'
+import { useTimezoneStore } from '@/store/timezone/timezone'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
+  const routeStore = useRouteStore()
+  const timezoneStore = useTimezoneStore()
 
   const handleLogin = () => {
     state.loginFormRef.validate(async (valid: any) => {
@@ -36,7 +40,12 @@ export function useLogin(state: any) {
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
 
-        router.push({ path: 'home' })
+        const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
+        await timezoneStore.setTimezone(timezone)
+
+        const path = routeStore.lastRoute
+
+        router.push({ path: path || 'home' })
       }
     })
   }

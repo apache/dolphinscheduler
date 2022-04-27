@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  toRefs,
-  ref,
-  toRaw,
-  Ref,
-  onMounted
-} from 'vue'
+import { defineComponent, PropType, toRefs, onMounted } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
@@ -51,12 +43,18 @@ const FormModal = defineComponent({
       state.formData.priority = props.data.priority
     })
 
-    const onConfirm = () => {
-      let value = state.formData.priority + ''
-      if (value) {
-        modifyTaskGroupQueuePriority(state.formData).then(() => {
+    const onConfirm = async () => {
+      if (state.saving) return
+      state.saving = true
+      try {
+        const value = state.formData.priority + ''
+        if (value) {
+          await modifyTaskGroupQueuePriority(state.formData)
           emit('confirm')
-        })
+        }
+        state.saving = false
+      } catch (err) {
+        state.saving = false
       }
     }
 
@@ -75,6 +73,7 @@ const FormModal = defineComponent({
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
+        confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
           <NFormItem

@@ -21,11 +21,11 @@
  * @param {string} text
  * Each Chinese character is equal to two chars
  */
-export default function truncateText(text: string, n: number) {
+const truncateText = (text: string, n: number) => {
   const exp = /[\u4E00-\u9FA5]/
   let res = ''
   let len = text.length
-  let chinese = text.match(new RegExp(exp, 'g'))
+  const chinese = text.match(new RegExp(exp, 'g'))
   if (chinese) {
     len += chinese.length
   }
@@ -33,7 +33,7 @@ export default function truncateText(text: string, n: number) {
     let i = 0
     let acc = 0
     while (true) {
-      let char = text[i]
+      const char = text[i]
       if (exp.test(char)) {
         acc += 2
       } else {
@@ -49,3 +49,5 @@ export default function truncateText(text: string, n: number) {
   }
   return res
 }
+
+export default truncateText

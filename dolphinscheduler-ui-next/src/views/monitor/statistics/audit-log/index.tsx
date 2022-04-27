@@ -77,7 +77,7 @@ const AuditLog = defineComponent({
     }
   },
   render() {
-    const { t, requestTableData, onUpdatePageSize, onSearch } = this
+    const { t, requestTableData, onUpdatePageSize, onSearch, loadingRef } = this
 
     return (
       <>
@@ -139,7 +139,11 @@ const AuditLog = defineComponent({
           </NSpace>
         </NCard>
         <Card class={styles['table-card']}>
-          <NDataTable columns={this.columns} data={this.tableData} />
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
+          />
           <div class={styles.pagination}>
             <NPagination
               v-model:page={this.page}

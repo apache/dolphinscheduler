@@ -28,6 +28,7 @@ import {
   GrantProject,
   ProjectCodeReq,
   GrantUDFReq,
+  GrantNamespaceReq,
   ListAllReq,
   ListReq,
   RegisterUserReq
@@ -80,7 +81,7 @@ export function getUserInfo(): any {
   })
 }
 
-export function grantDataSource(data: GrantDataSourceReq): any {
+export function grantDataSource(data: GrantDataSourceReq) {
   return axios({
     url: '/users/grant-datasource',
     method: 'post',
@@ -88,7 +89,7 @@ export function grantDataSource(data: GrantDataSourceReq): any {
   })
 }
 
-export function grantResource(data: GrantResourceReq): any {
+export function grantResource(data: GrantResourceReq) {
   return axios({
     url: '/users/grant-file',
     method: 'post',
@@ -96,7 +97,7 @@ export function grantResource(data: GrantResourceReq): any {
   })
 }
 
-export function grantProject(data: GrantProject): any {
+export function grantProject(data: GrantProject) {
   return axios({
     url: '/users/grant-project',
     method: 'post',
@@ -112,9 +113,17 @@ export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   })
 }
 
-export function grantUDFFunc(data: GrantUDFReq & UserIdReq): any {
+export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
   return axios({
     url: '/users/grant-udf-func',
+    method: 'post',
+    data
+  })
+}
+
+export function grantNamespaceFunc(data: GrantNamespaceReq & UserIdReq) {
+  return axios({
+    url: '/users/grant-namespace',
     method: 'post',
     data
   })
@@ -135,7 +144,7 @@ export function listAll(params?: ListAllReq): any {
   })
 }
 
-export function queryUserList(params: ListReq) {
+export function queryUserList(params: ListReq): any {
   return axios({
     url: '/users/list-paging',
     method: 'get',

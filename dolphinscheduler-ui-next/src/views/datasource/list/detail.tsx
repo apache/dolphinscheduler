@@ -123,6 +123,7 @@ const DetailModal = defineComponent({
     } = this
     return (
       <Modal
+        class='dialog-create-data-source'
         show={show}
         title={`${t(id ? 'datasource.edit' : 'datasource.create')}${t(
           'datasource.datasource'
@@ -130,6 +131,8 @@ const DetailModal = defineComponent({
         onConfirm={onSubmit}
         confirmLoading={saving || loading}
         onCancel={onCancel}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
       >
         {{
           default: () => (
@@ -138,9 +141,7 @@ const DetailModal = defineComponent({
                 rules={rules}
                 ref='detailFormRef'
                 require-mark-placement='left'
-                label-placement='left'
-                label-width={180}
-                label-align='right'
+                label-align='left'
               >
                 <NFormItem
                   label={t('datasource.datasource')}
@@ -148,6 +149,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NSelect
+                    class='btn-data-source-type-drop-down'
                     v-model={[detailForm.type, 'value']}
                     options={datasourceTypeList}
                     disabled={!!id}
@@ -160,6 +162,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
+                    class='input-data-source-name'
                     v-model={[detailForm.name, 'value']}
                     maxlength={60}
                     placeholder={t('datasource.datasource_name_tips')}
@@ -167,6 +170,7 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 <NFormItem label={t('datasource.description')} path='note'>
                   <NInput
+                    class='input-data-source-description'
                     v-model={[detailForm.note, 'value']}
                     type='textarea'
                     placeholder={t('datasource.description_tips')}
@@ -178,6 +182,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
+                    class='input-ip'
                     v-model={[detailForm.host, 'value']}
                     type='text'
                     maxlength={255}
@@ -190,6 +195,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInputNumber
+                    class='input-port'
                     v-model={[detailForm.port, 'value']}
                     show-button={false}
                     placeholder={t('datasource.port_tips')}
@@ -248,6 +254,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
+                    class='input-username'
                     v-model={[detailForm.userName, 'value']}
                     type='text'
                     maxlength={60}
@@ -259,6 +266,7 @@ const DetailModal = defineComponent({
                   path='password'
                 >
                   <NInput
+                    class='input-password'
                     v-model={[detailForm.password, 'value']}
                     type='password'
                     placeholder={t('datasource.user_password_tips')}
@@ -270,6 +278,7 @@ const DetailModal = defineComponent({
                   show-require-mark={requiredDataBase}
                 >
                   <NInput
+                    class='input-data-base'
                     v-model={[detailForm.database, 'value']}
                     type='text'
                     maxlength={60}
@@ -298,6 +307,7 @@ const DetailModal = defineComponent({
                   path='other'
                 >
                   <NInput
+                    class='input-jdbc-params'
                     v-model={[detailForm.other, 'value']}
                     type='textarea'
                     autosize={{
@@ -315,6 +325,7 @@ const DetailModal = defineComponent({
           ),
           'btn-middle': () => (
             <NButton
+              class='btn-test-connection'
               type='primary'
               size='small'
               onClick={onTest}

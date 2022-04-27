@@ -91,9 +91,8 @@ We would like to express our deep gratitude to all the open-source projects used
 
 ## Get Help
 
-1. Submit an [issue](https://github.com/apache/dolphinscheduler/issues/new/choose).
-2. Join the DolphinSchedudler Slack workspace [Slack](http://asf-dolphinscheduler.slack.com/).
-3. Subscribe to this mailing list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org.
+1. Submit an [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
+2. [Join our slack](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw) and send your question to channel `#troubleshooting`
 
 ## Community
 
@@ -115,7 +114,7 @@ The community welcomes everyone to contribute, please refer to this page to find
 <br/><br/>
 <img src="https://landscape.cncf.io/images/left-logo.svg" width="150"/>&nbsp;&nbsp;<img src="https://landscape.cncf.io/images/right-logo.svg" width="200"/>
 <br/><br/>
-DolphinScheduler enriches the <a href="https://landscape.cncf.io/landscape=observability-and-analysis&license=apache-license-2-0">CNCF CLOUD NATIVE Landscape.</a >
+DolphinScheduler enriches the <a href="https://landscape.cncf.io/?landscape=observability-and-analysis&license=apache-license-2-0">CNCF CLOUD NATIVE Landscape.</a >
 
 </p >
 

@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-import type { Node } from '@antv/x6'
-import { ref, onMounted, Ref, onUnmounted } from 'vue'
+import type { Markup, Node } from '@antv/x6'
+import { ref, onMounted, Ref } from 'vue'
 import { Graph } from '@antv/x6'
 import { NODE, EDGE, X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import { debounce } from 'lodash'
+import { useResizeObserver } from '@vueuse/core'
+import ContextMenuTool from './dag-context-menu'
 
 interface Options {
   readonly: Ref<boolean>
@@ -44,6 +46,8 @@ export function useCanvasInit(options: Options) {
    * Graph Init, bind graph to the dom
    */
   function graphInit() {
+    Graph.registerNodeTool('contextmenu', ContextMenuTool, true)
+
     return new Graph({
       container: paper.value,
       selecting: {
@@ -97,6 +101,31 @@ export function useCanvasInit(options: Options) {
         highlight: true,
         createEdge() {
           return graph.value?.createEdge({ shape: X6_EDGE_NAME })
+        },
+        validateConnection(data) {
+          const { sourceCell, targetCell } = data
+
+          if (
+            sourceCell &&
+            targetCell &&
+            sourceCell.isNode() &&
+            targetCell.isNode()
+          ) {
+            const sourceData = sourceCell.getData()
+            if (!sourceData) return true
+            if (sourceData.taskType !== 'CONDITIONS') return true
+            const edges = graph.value?.getConnectedEdges(sourceCell)
+            if (!edges || edges.length < 2) return true
+            let len = 0
+            return !edges.some((edge) => {
+              if (edge.getSourceCellId() === sourceCell.id) {
+                len++
+              }
+              return len > 2
+            })
+          }
+
+          return true
         }
       },
       highlighting: {
@@ -131,23 +160,51 @@ export function useCanvasInit(options: Options) {
         edge.setSource(sourceNode)
       }
     })
+
+    // Add a node tool when the mouse entering
+    graph.value.on('node:mouseenter', ({ node }) => {
+      const nodeName = node.getData().taskName
+      const markup = node.getMarkup() as Markup.JSONMarkup[]
+      const fo = markup.filter((m) => m.tagName === 'foreignObject')[0]
+
+      node.addTools({
+        name: 'button',
+        args: {
+          markup: [
+            {
+              tagName: 'text',
+              textContent: nodeName,
+              attrs: {
+                fill: '#868686',
+                'font-size': 16,
+                'text-anchor': 'center'
+              }
+            }
+          ],
+          x: 0,
+          y: 0,
+          offset: { x: 0, y: fo ? -28 : -10 }
+        }
+      })
+    })
+
+    // Remove all tools when the mouse leaving
+    graph.value.on('node:mouseleave', ({ node }) => {
+      node.removeTool('button')
+    })
   })
 
   /**
    * Redraw when the page is resized
    */
-  const paperResize = debounce(() => {
-    if (!container.value) return
-    const w = container.value.offsetWidth
-    const h = container.value.offsetHeight
-    graph.value?.resize(w, h)
+  const resize = debounce(() => {
+    if (container.value && true) {
+      const w = container.value.offsetWidth
+      const h = container.value.offsetHeight
+      graph.value?.resize(w, h)
+    }
   }, 200)
-  onMounted(() => {
-    window.addEventListener('resize', paperResize)
-  })
-  onUnmounted(() => {
-    window.removeEventListener('resize', paperResize)
-  })
+  useResizeObserver(container, resize)
 
   /**
    * Register custom cells

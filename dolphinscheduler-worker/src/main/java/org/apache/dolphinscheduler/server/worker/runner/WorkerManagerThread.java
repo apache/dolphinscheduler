@@ -17,19 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
-import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -52,10 +49,13 @@ public class WorkerManagerThread implements Runnable {
      */
     private final DelayQueue<TaskExecuteThread> workerExecuteQueue = new DelayQueue<>();
 
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
     /**
      * thread executor service
      */
-    private final ExecutorService workerExecService;
+    private final WorkerExecService workerExecService;
 
     /**
      * task callback service
@@ -63,8 +63,20 @@ public class WorkerManagerThread implements Runnable {
     @Autowired
     private TaskCallbackService taskCallbackService;
 
+    /**
+     * running task
+     */
+    private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap = new ConcurrentHashMap<>();
+
     public WorkerManagerThread(WorkerConfig workerConfig) {
-        workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads());
+        workerExecService = new WorkerExecService(
+            ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
+            taskExecuteThreadMap
+        );
+    }
+
+    public TaskExecuteThread getTaskExecuteThread(Integer taskInstanceId) {
+        return this.taskExecuteThreadMap.get(taskInstanceId);
     }
 
     /**
@@ -82,7 +94,7 @@ public class WorkerManagerThread implements Runnable {
      * @return queue size
      */
     public int getThreadPoolQueueSize() {
-        return ((ThreadPoolExecutor) workerExecService).getQueue().size();
+        return this.workerExecService.getThreadPoolQueueSize();
     }
 
     /**
@@ -100,15 +112,12 @@ public class WorkerManagerThread implements Runnable {
      * kill task before execute , like delay task
      */
     private void sendTaskKillResponse(Integer taskInstanceId) {
-        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        if (taskRequest == null) {
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        if (taskExecutionContext == null) {
             return;
         }
-        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
-        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getProcessInstanceId());
-        responseCommand.setStatus(ExecutionStatus.KILL.getCode());
-        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
-        taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.KILL);
+        taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
     }
 
     /**
@@ -134,6 +143,7 @@ public class WorkerManagerThread implements Runnable {
         while (Stopper.isRunning()) {
             try {
                 taskExecuteThread = workerExecuteQueue.take();
+                taskExecuteThread.setStorageOperate(storageOperate);
                 workerExecService.submit(taskExecuteThread);
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "

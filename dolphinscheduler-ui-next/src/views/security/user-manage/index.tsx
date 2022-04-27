@@ -15,127 +15,113 @@
  * limitations under the License.
  */
 
-import { defineComponent, provide } from 'vue'
+import { defineComponent, toRefs } from 'vue'
 import {
-  NCard,
   NButton,
-  NInputGroup,
   NInput,
   NIcon,
   NSpace,
-  NGrid,
-  NGridItem,
   NDataTable,
-  NPagination,
-  NSkeleton
+  NPagination
 } from 'naive-ui'
+import Card from '@/components/card'
+import UserDetailModal from './components/user-detail-modal'
+import AuthorizeModal from './components/authorize-modal'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
+import { useColumns } from './use-columns'
 import { useTable } from './use-table'
-import UserModal from './components/user-modal'
-import {
-  useSharedUserModalState,
-  UserModalSharedStateKey,
-  Mode
-} from './components/use-modal'
 
 const UsersManage = defineComponent({
   name: 'user-manage',
   setup() {
     const { t } = useI18n()
-    const { show, mode, user } = useSharedUserModalState()
-    const tableState = useTable({
-      onEdit: (u) => {
-        show.value = true
-        mode.value = 'edit'
-        user.value = u
-      },
-      onDelete: (u) => {
-        show.value = true
-        mode.value = 'delete'
-        user.value = u
-      }
-    })
-
-    const onSuccess = (mode: Mode) => {
-      if (mode === 'add') {
-        tableState.resetPage()
-      }
-      tableState.getUserList()
-    }
+    const { state, changePage, changePageSize, updateList, onOperationClick } =
+      useTable()
+    const { columnsRef } = useColumns(onOperationClick)
 
     const onAddUser = () => {
-      show.value = true
-      mode.value = 'add'
-      user.value = undefined
+      state.detailModalShow = true
+      state.currentRecord = null
     }
-
-    provide(UserModalSharedStateKey, { show, mode, user, onSuccess })
+    const onDetailModalCancel = () => {
+      state.detailModalShow = false
+    }
+    const onAuthorizeModalCancel = () => {
+      state.authorizeModalShow = false
+    }
 
     return {
       t,
+      columnsRef,
+      ...toRefs(state),
+      changePage,
+      changePageSize,
       onAddUser,
-      ...tableState
+      onUpdatedList: updateList,
+      onDetailModalCancel,
+      onAuthorizeModalCancel
     }
   },
   render() {
-    const { t, onSearchValOk, onSearchValClear, userListLoading } = this
     return (
       <>
-        <NGrid cols={1} yGap={16}>
-          <NGridItem>
-            <NCard>
-              <NSpace justify='space-between'>
-                <NButton onClick={this.onAddUser} type='primary'>
-                  {t('security.user.create_user')}
+        <NSpace vertical>
+          <Card>
+            <NSpace justify='space-between'>
+              <NButton
+                onClick={this.onAddUser}
+                type='primary'
+                class='btn-create-user'
+              >
+                {this.t('security.user.create_user')}
+              </NButton>
+              <NSpace>
+                <NInput v-model:value={this.searchVal} clearable />
+                <NButton type='primary' onClick={this.onUpdatedList}>
+                  <NIcon>
+                    <SearchOutlined />
+                  </NIcon>
                 </NButton>
-                <NInputGroup>
-                  <NInput
-                    v-model:value={this.searchInputVal}
-                    clearable
-                    onClear={onSearchValClear}
-                    onKeyup={(e) => {
-                      if (e.key === 'Enter') {
-                        onSearchValOk()
-                      }
-                    }}
-                  />
-                  <NButton type='primary' onClick={onSearchValOk}>
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  </NButton>
-                </NInputGroup>
               </NSpace>
-            </NCard>
-          </NGridItem>
-          <NGridItem>
-            <NCard>
-              {userListLoading ? (
-                <NSkeleton text repeat={6}></NSkeleton>
-              ) : (
-                <NSpace v-show={!userListLoading} vertical size={20}>
-                  <NDataTable
-                    columns={this.columns}
-                    data={this.userList}
-                    scrollX={this.scrollX}
-                    bordered={false}
-                  />
-                  <NSpace justify='center'>
-                    <NPagination
-                      v-model:page={this.page}
-                      v-model:page-size={this.pageSize}
-                      pageCount={this.pageCount}
-                      pageSizes={this.pageSizes}
-                      showSizePicker
-                    />
-                  </NSpace>
-                </NSpace>
-              )}
-            </NCard>
-          </NGridItem>
-        </NGrid>
-        <UserModal />
+            </NSpace>
+          </Card>
+          <Card>
+            <NSpace vertical>
+              <NDataTable
+                row-class-name='items'
+                columns={this.columnsRef.columns}
+                data={this.list}
+                loading={this.loading}
+                scrollX={this.columnsRef.tableWidth}
+              />
+              <NSpace justify='center'>
+                <NPagination
+                  v-model:page={this.page}
+                  v-model:page-size={this.pageSize}
+                  item-count={this.itemCount}
+                  show-size-picker
+                  page-sizes={[10, 30, 50]}
+                  show-quick-jumper
+                  on-update:page={this.changePage}
+                  on-update:page-size={this.changePageSize}
+                />
+              </NSpace>
+            </NSpace>
+          </Card>
+        </NSpace>
+        <UserDetailModal
+          show={this.detailModalShow}
+          currentRecord={this.currentRecord}
+          onCancel={this.onDetailModalCancel}
+          onUpdate={this.onUpdatedList}
+        />
+        <AuthorizeModal
+          show={this.authorizeModalShow}
+          type={this.authorizeType}
+          userId={this.currentRecord?.id}
+          onCancel={this.onAuthorizeModalCancel}
+        />
       </>
     )
   }

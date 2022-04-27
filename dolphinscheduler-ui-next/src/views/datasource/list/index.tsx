@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -31,6 +31,8 @@ import { useI18n } from 'vue-i18n'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import styles from './index.module.scss'
+import type { TableColumns } from './types'
+import { DefaultTableWidth } from '@/common/column-width-config'
 
 const list = defineComponent({
   name: 'list',
@@ -38,8 +40,14 @@ const list = defineComponent({
     const { t } = useI18n()
     const showDetailModal = ref(false)
     const selectId = ref()
+    const columns = ref({
+      columns: [] as TableColumns,
+      tableWidth: DefaultTableWidth
+    })
+    const { data, changePage, changePageSize, deleteRecord, updateList } =
+      useTable()
 
-    const { columnsRef } = useColumns((id: number, type: 'edit' | 'delete') => {
+    const { getColumns } = useColumns((id: number, type: 'edit' | 'delete') => {
       if (type === 'edit') {
         showDetailModal.value = true
         selectId.value = id
@@ -48,9 +56,6 @@ const list = defineComponent({
       }
     })
 
-    const { data, changePage, changePageSize, deleteRecord, updateList } =
-      useTable()
-
     const onCreate = () => {
       selectId.value = null
       showDetailModal.value = true
@@ -58,13 +63,18 @@ const list = defineComponent({
 
     onMounted(() => {
       changePage(1)
+      columns.value = getColumns()
+    })
+
+    watch(useI18n().locale, () => {
+      columns.value = getColumns()
     })
 
     return {
       t,
       showDetailModal,
       id: selectId,
-      columnsRef,
+      columns,
       ...toRefs(data),
       changePage,
       changePageSize,
@@ -77,7 +87,7 @@ const list = defineComponent({
       t,
       id,
       showDetailModal,
-      columnsRef,
+      columns,
       list,
       page,
       pageSize,
@@ -95,10 +105,13 @@ const list = defineComponent({
           {{
             default: () => (
               <div class={styles['conditions']}>
-                <NButton onClick={onCreate} type='primary'>{`${t(
-                  'datasource.create_datasource'
-                )}`}</NButton>
-
+                <NButton
+                  onClick={onCreate}
+                  type='primary'
+                  class='btn-create-data-source'
+                >
+                  {t('datasource.create_datasource')}
+                </NButton>
                 <NSpace
                   class={styles['conditions-search']}
                   justify='end'
@@ -122,10 +135,12 @@ const list = defineComponent({
         </Card>
         <Card title='' class={styles['mt-8']}>
           <NDataTable
-            columns={columnsRef}
+            row-class-name='data-source-items'
+            columns={columns.columns}
             data={list}
             loading={loading}
             striped
+            scrollX={columns.tableWidth}
           />
           <NPagination
             page={page}

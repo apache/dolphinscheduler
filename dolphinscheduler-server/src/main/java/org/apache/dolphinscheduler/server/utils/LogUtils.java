@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,7 +63,7 @@ public class LogUtils {
             .map(TaskLogDiscriminator::getLogBase)
             .map(e -> Paths.get(e)
                 .toAbsolutePath()
-                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD))
+                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD, null))
                 .resolve(taskLogFileName))
             .map(Path::toString)
             .orElse("");

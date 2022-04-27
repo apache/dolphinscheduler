@@ -33,6 +33,7 @@ export function useForm() {
       email: userInfo.email,
       phone: userInfo.phone
     },
+    saving: false,
     rules: {
       username: {
         trigger: ['input', 'blur'],
@@ -49,7 +50,7 @@ export function useForm() {
         validator() {
           if (state.profileForm.email === '') {
             return new Error(t('profile.email_tips'))
-          } else if (!utils.regex.email.test(state.profileForm.email)) {
+          } else if (!utils.regex.email.test(state.profileForm.email || '')) {
             return new Error(t('profile.email_correct_tips'))
           }
         }

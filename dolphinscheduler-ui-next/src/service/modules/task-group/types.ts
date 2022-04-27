@@ -18,7 +18,7 @@
 interface ListReq {
   pageNo: number
   pageSize: number
-  searchVal?: string
+  projectCode?: number
 }
 
 interface TaskGroupIdReq {
@@ -27,8 +27,8 @@ interface TaskGroupIdReq {
 
 interface TaskGroupReq {
   name: string
-  projectCode: number
-  groupSize: number
+  projectCode: string
+  groupSize: string
   status: number
   description: string
 }

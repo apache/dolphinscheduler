@@ -15,35 +15,12 @@
  * limitations under the License.
  */
 
-@mixin base {
+ @mixin base {
   font-size: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 400px;
-}
-
-.header-card {
-  margin-bottom: 8px;
-
-  .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .left {
-      margin-right: 20px;
-    }
-  }
-
-  .link-btn {
-    color: #579cd8;
-    cursor: pointer;
-
-    &:hover {
-      color: #80bef7;
-    }
-  }
 }
 
 .card {
@@ -52,5 +29,15 @@
 
 .load-average {
   @include base;
-  color: dodgerblue;
+  color: var(--n-color-target);
+}
+
+.link-btn {
+  color: var(--n-color-target);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--n-color-target);
+    opacity: 0.8;
+  }
 }

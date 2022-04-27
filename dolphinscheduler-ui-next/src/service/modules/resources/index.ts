@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import { axios, downloadFile } from '@/service/service'
+import { axios } from '@/service/service'
+import utils from '@/utils'
 import {
   ResourceTypeReq,
-  UdfTypeReq,
   NameReq,
   FileNameReq,
   FullNameReq,
@@ -53,6 +53,13 @@ export function queryResourceById(
     url: `/resources/${id}`,
     method: 'get',
     params
+  })
+}
+
+export function queryCurrentResourceById(id: number): any {
+  return axios({
+    url: `/resources/${id}/query`,
+    method: 'get'
   })
 }
 
@@ -118,7 +125,9 @@ export function onlineCreateResource(
   })
 }
 
-export function queryResourceByProgramType(params: ResourceTypeReq): any {
+export function queryResourceByProgramType(
+  params: ResourceTypeReq & ProgramTypeReq
+): any {
   return axios({
     url: '/resources/query-by-type',
     method: 'get',
@@ -134,7 +143,7 @@ export function queryUdfFuncListPaging(params: ListReq): any {
   })
 }
 
-export function queryUdfFuncList(params: IdReq & ListReq): any {
+export function queryUdfFuncList(params: { type: 'HIVE' | 'SPARK' }): any {
   return axios({
     url: '/resources/udf-func/list',
     method: 'get',
@@ -203,7 +212,7 @@ export function deleteResource(id: number): any {
 }
 
 export function downloadResource(id: number): void {
-  downloadFile(`resources/${id}/download`)
+  utils.downloadFile(`resources/${id}/download`)
 }
 
 export function viewUIUdfFunction(id: IdReq): any {

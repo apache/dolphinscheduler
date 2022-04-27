@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
@@ -41,6 +40,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
@@ -260,14 +260,14 @@ public class DataAnalysisServiceTest {
         commandCounts.add(commandCount);
 
         Mockito.when(commandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
-        Mockito.when(errorCommandMapper.countCommandState(null, null, new Long[]{1L})).thenReturn(commandCounts);
+        Mockito.when(errorCommandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
 
         Map<String, Object> result = dataAnalysisServiceImpl.countCommandState(user);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         // when no command found then return all count are 0
         Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
-        Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());
+        Mockito.when(errorCommandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
         Map<String, Object> result5 = dataAnalysisServiceImpl.countCommandState(user);
         assertThat(result5).containsEntry(Constants.STATUS, Status.SUCCESS);
         assertThat(result5.get(Constants.DATA_LIST)).asList().extracting("errorCount").allMatch(count -> count.equals(0));
@@ -281,7 +281,7 @@ public class DataAnalysisServiceTest {
         errorCommandCount.setCommandType(CommandType.START_PROCESS);
         errorCommandCount.setCount(5);
         Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.singletonList(normalCommandCount));
-        Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.singletonList(errorCommandCount));
+        Mockito.when(errorCommandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.singletonList(errorCommandCount));
 
         Map<String, Object> result6 = dataAnalysisServiceImpl.countCommandState(user);
 

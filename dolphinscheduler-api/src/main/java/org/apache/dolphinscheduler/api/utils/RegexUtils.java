@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 /**
@@ -24,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class RegexUtils {
 
-    private static final String LINUX_USERNAME_PATTERN = "[a-z_][a-z\\d_]{0,30}";
+    private static final String LINUX_USERNAME_PATTERN = "^[a-zA-Z0-9_].{0,30}";
 
     private RegexUtils() {
     }
@@ -41,7 +43,7 @@ public class RegexUtils {
 
     public static String escapeNRT(String str) {
         // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-        if (str != null && !str.isEmpty()) {
+        if (!StringUtils.isEmpty(str)) {
             return str.replaceAll("[\n|\r|\t]", "_");
         }
         return null;

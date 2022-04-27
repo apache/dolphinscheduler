@@ -19,17 +19,24 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
+import java.util.Objects;
+
+/**
+ * alert data
+ */
 public class AlertData {
     private int id;
     private String title;
     private String content;
     private String log;
+    private int warnType;
 
-    public AlertData(int id, String title, String content, String log) {
+    public AlertData(int id, String title, String content, String log, int warnType) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.log = log;
+        this.warnType = warnType;
     }
 
     public AlertData() {
@@ -75,6 +82,15 @@ public class AlertData {
         return this;
     }
 
+    public int getWarnType() {
+        return warnType;
+    }
+
+    public void setWarnType(int warnType) {
+        this.warnType = warnType;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (o == this) {
             return true;
@@ -83,49 +99,52 @@ public class AlertData {
             return false;
         }
         final AlertData other = (AlertData) o;
-        if (!other.canEqual((Object) this)) {
+        if (!other.canEqual(this)) {
             return false;
         }
         if (this.getId() != other.getId()) {
             return false;
         }
-        final Object this$title = this.getTitle();
-        final Object other$title = other.getTitle();
-        if (this$title == null ? other$title != null : !this$title.equals(other$title)) {
+        if (this.getWarnType() != other.getWarnType()) {
             return false;
         }
-        final Object this$content = this.getContent();
-        final Object other$content = other.getContent();
-        if (this$content == null ? other$content != null : !this$content.equals(other$content)) {
+        final Object thisTitle = this.getTitle();
+        final Object otherTitle = other.getTitle();
+        if (!Objects.equals(thisTitle, otherTitle)) {
             return false;
         }
-        final Object this$log = this.getLog();
-        final Object other$log = other.getLog();
-        if (this$log == null ? other$log != null : !this$log.equals(other$log)) {
+        final Object thisContent = this.getContent();
+        final Object otherContent = other.getContent();
+        if (!Objects.equals(thisContent, otherContent)) {
             return false;
         }
-        return true;
+        final Object thisLog = this.getLog();
+        final Object otherLog = other.getLog();
+        return Objects.equals(thisLog, otherLog);
     }
 
     protected boolean canEqual(final Object other) {
         return other instanceof AlertData;
     }
 
+    @Override
     public int hashCode() {
-        final int PRIME = 59;
+        final int prime = 59;
         int result = 1;
-        result = result * PRIME + this.getId();
-        final Object $title = this.getTitle();
-        result = result * PRIME + ($title == null ? 43 : $title.hashCode());
-        final Object $content = this.getContent();
-        result = result * PRIME + ($content == null ? 43 : $content.hashCode());
-        final Object $log = this.getLog();
-        result = result * PRIME + ($log == null ? 43 : $log.hashCode());
+        result = result * prime + this.getId();
+        result = result * prime + this.getWarnType();
+        final Object title = this.getTitle();
+        result = result * prime + (title == null ? 43 : title.hashCode());
+        final Object content = this.getContent();
+        result = result * prime + (content == null ? 43 : content.hashCode());
+        final Object log = this.getLog();
+        result = result * prime + (log == null ? 43 : log.hashCode());
         return result;
     }
 
+    @Override
     public String toString() {
-        return "AlertData(id=" + this.getId() + ", title=" + this.getTitle() + ", content=" + this.getContent() + ", log=" + this.getLog() + ")";
+        return "AlertData(id=" + this.getId() + ", title=" + this.getTitle() + ", content=" + this.getContent() + ", log=" + this.getLog() + ", warnType=" + this.getWarnType() + ")";
     }
 
     public static class AlertDataBuilder {
@@ -133,6 +152,7 @@ public class AlertData {
         private String title;
         private String content;
         private String log;
+        private int warnType;
 
         AlertDataBuilder() {
         }
@@ -157,12 +177,19 @@ public class AlertData {
             return this;
         }
 
-        public AlertData build() {
-            return new AlertData(id, title, content, log);
+        public AlertDataBuilder warnType(int warnType) {
+            this.warnType = warnType;
+            return this;
         }
 
-        public String toString() {
-            return "AlertData.AlertDataBuilder(id=" + this.id + ", title=" + this.title + ", content=" + this.content + ", log=" + this.log + ")";
+        public AlertData build() {
+            return new AlertData(id, title, content, log, warnType);
         }
+
+        @Override
+        public String toString() {
+            return "AlertData.AlertDataBuilder(id=" + this.id + ", title=" + this.title + ", content=" + this.content + ", log=" + this.log + ", warnType=" + this.warnType + ")";
+        }
+
     }
 }

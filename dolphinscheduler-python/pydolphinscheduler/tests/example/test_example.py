@@ -44,7 +44,7 @@ def test_task_without_example():
     Avoiding add new type of tasks but without adding example describe how to use it.
     """
     # We use example/tutorial.py as shell task example
-    ignore_name = {"__init__.py", "shell.py"}
+    ignore_name = {"__init__.py", "shell.py", "func_wrap.py"}
     all_tasks = {task.stem for task in get_tasks(ignore_name=ignore_name)}
 
     have_example_tasks = set()
@@ -96,8 +96,8 @@ def test_example_basic():
             ex.suffix == ".py"
         ), f"We expect all examples is python script, but get {ex.name}."
 
-        # All except tutorial is end with keyword "_example"
-        if ex.stem != "tutorial":
+        # All except tutorial and __init__ is end with keyword "_example"
+        if ex.stem not in ("tutorial", "tutorial_decorator") and ex.stem != "__init__":
             assert ex.stem.endswith(
                 "_example"
             ), f"We expect all examples script end with keyword '_example', but get {ex.stem}."
@@ -159,6 +159,9 @@ def test_file_name_in_process_definition(mock_code_version, mock_submit, mock_st
     """
     global process_definition_name
     for ex in get_all_examples():
+        # Skip __init__ file
+        if ex.stem == "__init__":
+            continue
         # Skip bulk_create_example check, cause it contain multiple workflow and
         # without one named bulk_create_example
         if ex.stem == "bulk_create_example":

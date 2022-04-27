@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 
 import java.util.Date;
@@ -32,18 +32,15 @@ public class CycleDependency {
     /**
      * last schedule time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date lastScheduleTime;
     /**
      * expiration time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date expirationTime;
     /**
      * cycle enum
      */
     private CycleEnum cycleEnum;
-
 
     public CycleDependency(int processDefineId, Date lastScheduleTime, Date expirationTime, CycleEnum cycleEnum) {
         this.processDefineId = processDefineId;
@@ -86,11 +83,11 @@ public class CycleDependency {
 
     @Override
     public String toString() {
-        return "CycleDependency{" +
-                "processDefineId=" + processDefineId +
-                ", lastScheduleTime=" + lastScheduleTime +
-                ", expirationTime=" + expirationTime +
-                ", cycleEnum=" + cycleEnum +
-                '}';
+        return "CycleDependency{"
+                + "processDefineId=" + processDefineId
+                + ", lastScheduleTime=" + lastScheduleTime
+                + ", expirationTime=" + expirationTime
+                + ", cycleEnum=" + cycleEnum
+                + '}';
     }
 }

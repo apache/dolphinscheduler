@@ -16,22 +16,81 @@
  */
 
 import { defineComponent } from 'vue'
+import { useMessage } from 'naive-ui'
 import Dag from '../../components/dag'
-import { NCard } from 'naive-ui'
-import styles from './index.module.scss'
+import { useThemeStore } from '@/store/theme/theme'
+import { useRoute, useRouter } from 'vue-router'
+import {
+  SaveForm,
+  TaskDefinition,
+  Connect,
+  Location
+} from '../../components/dag/types'
+import { createProcessDefinition } from '@/service/modules/process-definition'
+import { useI18n } from 'vue-i18n'
+import Styles from './index.module.scss'
+
+interface SaveData {
+  saveForm: SaveForm
+  taskDefinitions: TaskDefinition[]
+  connects: Connect[]
+  locations: Location[]
+}
 
 export default defineComponent({
   name: 'WorkflowDefinitionCreate',
   setup() {
-    const slots = {
-      toolbarLeft: () => <span>left-operations</span>,
-      toolbarRight: () => <span>right-operations</span>
+    const theme = useThemeStore()
+
+    const message = useMessage()
+    const { t } = useI18n()
+    const route = useRoute()
+    const router = useRouter()
+    const projectCode = Number(route.params.projectCode)
+
+    const onSave = ({
+      taskDefinitions,
+      saveForm,
+      connects,
+      locations
+    }: SaveData) => {
+      const globalParams = saveForm.globalParams.map((p) => {
+        return {
+          prop: p.key,
+          value: p.value,
+          direct: 'IN',
+          type: 'VARCHAR'
+        }
+      })
+
+      createProcessDefinition(
+        {
+          taskDefinitionJson: JSON.stringify(taskDefinitions),
+          taskRelationJson: JSON.stringify(connects),
+          locations: JSON.stringify(locations),
+          name: saveForm.name,
+          tenantCode: saveForm.tenantCode,
+          executionType: saveForm.executionType,
+          description: saveForm.description,
+          globalParams: JSON.stringify(globalParams),
+          timeout: saveForm.timeoutFlag ? saveForm.timeout : 0
+        },
+        projectCode
+      ).then((ignored: any) => {
+        message.success(t('project.dag.success'))
+        router.push({ path: `/projects/${projectCode}/workflow-definition` })
+      })
     }
 
     return () => (
-      <NCard class={styles.container}>
-        <Dag v-slots={slots} />
-      </NCard>
+      <div
+        class={[
+          Styles.container,
+          theme.darkTheme ? Styles['dark'] : Styles['light']
+        ]}
+      >
+        <Dag projectCode={projectCode} onSave={onSave} />
+      </div>
     )
   }
 })

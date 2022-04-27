@@ -22,21 +22,25 @@ import {
   RouteLocationNormalized
 } from 'vue-router'
 import routes from './routes'
-
-import { useMenuStore } from '@/store/menu/menu'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 // NProgress
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(
+    import.meta.env.MODE === 'production' ? '/dolphinscheduler/ui/' : '/'
+  ),
   routes
 })
 
 interface metaData {
   title?: string
+  activeMenu?: string
   showSide?: boolean
+  auth?: Array<string>
 }
 
 /**
@@ -49,10 +53,19 @@ router.beforeEach(
     next: NavigationGuardNext
   ) => {
     NProgress.start()
-    const menuStore = useMenuStore()
+    const userStore = useUserStore()
     const metaData: metaData = to.meta
-    menuStore.setShowSideStatus(metaData.showSide || false)
-    next()
+    if (
+      metaData.auth?.includes('ADMIN_USER') &&
+      (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' &&
+      metaData.activeMenu === 'security'
+    ) {
+      to.fullPath = '/security/token-manage'
+      next({ name: 'token-manage' })
+    } else {
+      next()
+    }
+
     NProgress.done()
   }
 )

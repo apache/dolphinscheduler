@@ -56,21 +56,14 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                                            .build();
 
         InputParam usersParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USERS)
-                                          .setPlaceholder("please input users ")
+                                          .setPlaceholder("use `|` to separate userIds and `@all` to everyone ")
                                           .addValidate(Validate.newBuilder()
-                                                               .setRequired(true)
+                                                               .setRequired(false)
                                                                .build())
                                           .build();
 
-        InputParam userSendMsgParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USER_SEND_MSG)
-                                                .setPlaceholder("please input corp id ")
-                                                .addValidate(Validate.newBuilder()
-                                                                     .setRequired(true)
-                                                                     .build())
-                                                .build();
-
         InputParam agentIdParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_AGENT_ID)
-                                            .setPlaceholder("please input agent id ")
+                                            .setPlaceholder("please input agent id or chat id ")
                                             .addValidate(Validate.newBuilder()
                                                                  .setRequired(true)
                                                                  .build())
@@ -84,13 +77,13 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, AlertConstants.SHOW_TYPE)
-                                        .addParamsOptions(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false))
+                                        .addParamsOptions(new ParamsOptions(ShowType.MARKDOWN.getDescp(), ShowType.MARKDOWN.getDescp(), false))
                                         .addParamsOptions(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false))
-                                        .setValue(ShowType.TABLE.getDescp())
+                                        .setValue(ShowType.MARKDOWN.getDescp())
                                         .addValidate(Validate.newBuilder().setRequired(true).build())
                                         .build();
 
-        return Arrays.asList(corpIdParam, secretParam, usersParam, userSendMsgParam, agentIdParam, sendType, showType);
+        return Arrays.asList(corpIdParam, secretParam, usersParam, agentIdParam, sendType, showType);
     }
 
     @Override

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -52,7 +53,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         DatasourceUser dataSourceUser = insertOne();
         //update
@@ -65,7 +66,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
 
         DatasourceUser dataSourceUser = insertOne();
         int delete = dataSourceUserMapper.deleteById(dataSourceUser.getId());

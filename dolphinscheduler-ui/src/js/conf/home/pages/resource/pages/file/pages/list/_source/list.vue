@@ -51,8 +51,11 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="150">
+        <el-table-column :label="$t('Operation')" width="180">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('ReUpload File')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="_reUploadFile(scope.row)" v-show="scope.row.directory? false: true" circle></el-button></span>
+            </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
               <span><el-button id="btnEdit" type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
             </el-tooltip>
@@ -80,6 +83,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
+      v-if="renameDialog"
       width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
@@ -92,7 +96,9 @@
   import { filtTypeArr } from '../../_source/common'
   import { bytesToSize } from '@/module/util/util'
   import { downloadFile } from '@/module/download'
+  import { findComponentDownward } from '@/module/util/'
   import localStore from '@/module/util/localStorage'
+
   export default {
     name: 'file-manage-list',
     data () {
@@ -122,6 +128,9 @@
         } else {
           this.$router.push({ path: `/resource/file/list/${item.id}` })
         }
+      },
+      _reUploadFile (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload(item)
       },
       _downloadFile (item) {
         downloadFile(`resources/${item.id}/download`)

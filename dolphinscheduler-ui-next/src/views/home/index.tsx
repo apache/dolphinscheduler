@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
@@ -27,17 +27,17 @@ import DefinitionCard from './components/definition-card'
 export default defineComponent({
   name: 'home',
   setup() {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
-    const { getTaskState } = useTaskState()
-    const { getProcessState } = useProcessState()
     const taskStateRef = ref()
     const processStateRef = ref()
+    const { getTaskState, taskVariables } = useTaskState()
+    const { getProcessState, processVariables } = useProcessState()
 
-    onMounted(() => {
+    const initData = () => {
       taskStateRef.value = getTaskState(dateRef.value)
       processStateRef.value = getProcessState(dateRef.value)
-    })
+    }
 
     const handleTaskDate = (val: any) => {
       taskStateRef.value = getTaskState(val)
@@ -47,17 +47,35 @@ export default defineComponent({
       processStateRef.value = getProcessState(val)
     }
 
+    onMounted(() => {
+      initData()
+    })
+
+    watch(
+      () => locale.value,
+      () => initData()
+    )
+
     return {
       t,
       dateRef,
       handleTaskDate,
       handleProcessDate,
       taskStateRef,
-      processStateRef
+      processStateRef,
+      ...toRefs(taskVariables),
+      ...toRefs(processVariables)
     }
   },
   render() {
-    const { t, dateRef, handleTaskDate, handleProcessDate } = this
+    const {
+      t,
+      dateRef,
+      handleTaskDate,
+      handleProcessDate,
+      taskLoadingRef,
+      processLoadingRef
+    } = this
 
     return (
       <div>
@@ -69,6 +87,7 @@ export default defineComponent({
               tableData={this.taskStateRef?.value.table}
               chartData={this.taskStateRef?.value.chart}
               onUpdateDatePickerValue={handleTaskDate}
+              loadingRef={taskLoadingRef}
             />
           </NGi>
           <NGi>
@@ -78,6 +97,7 @@ export default defineComponent({
               tableData={this.processStateRef?.value.table}
               chartData={this.processStateRef?.value.chart}
               onUpdateDatePickerValue={handleProcessDate}
+              loadingRef={processLoadingRef}
             />
           </NGi>
         </NGrid>

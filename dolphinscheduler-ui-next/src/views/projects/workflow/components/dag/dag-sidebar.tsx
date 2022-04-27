@@ -15,52 +15,38 @@
  * limitations under the License.
  */
 
-import type { PropType, Ref } from 'vue'
-import type { Dragged } from './index'
-import { defineComponent, ref, inject } from 'vue'
-import { ALL_TASK_TYPES } from '../../../task/constants/task-type'
-import { useSidebarDrag } from './dag-hooks'
-import Styles from './dag.module.scss'
-
-const props = {
-  dragged: {
-    type: Object as PropType<Ref<Dragged>>,
-    default: ref({
-      x: 0,
-      y: 0,
-      type: ''
-    })
-  }
-}
+import { defineComponent } from 'vue'
+import {
+  TaskType,
+  TASK_TYPES_MAP
+} from '@/views/projects/task/constants/task-type'
+import styles from './dag.module.scss'
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
-  props,
-  setup(props) {
-    const readonly = inject('readonly', ref(false))
-    const dragged = props.dragged
-    const { onDragStart } = useSidebarDrag({
-      readonly,
-      dragged
-    })
-    const allTaskTypes = Object.keys(ALL_TASK_TYPES).map((type) => ({
+  emits: ['dragStart'],
+  setup(props, context) {
+    const allTaskTypes = Object.keys(TASK_TYPES_MAP).map((type) => ({
       type,
-      ...ALL_TASK_TYPES[type]
+      ...TASK_TYPES_MAP[type as TaskType]
     }))
 
     return () => (
-      <div class={Styles.sidebar}>
+      <div class={styles.sidebar}>
         {allTaskTypes.map((task) => (
           <div
-            class={Styles.draggable}
+            class={[styles.draggable, `task-item-${task.type}`]}
             draggable='true'
-            onDragstart={(e) => onDragStart(e, task.type)}
+            onDragstart={(e) => {
+              context.emit('dragStart', e, task.type as TaskType)
+            }}
           >
             <em
-              class={`${Styles['sidebar-icon']} ${
-                Styles['icon-' + task.type.toLocaleLowerCase()]
-              }`}
-            ></em>
+              class={[
+                styles['sidebar-icon'],
+                styles['icon-' + task.type.toLocaleLowerCase()]
+              ]}
+            />
             <span>{task.alias}</span>
           </div>
         ))}

@@ -17,7 +17,6 @@
 
 .file-edit-content {
   width: 100%;
-  background: #fff;
   padding-bottom: 20px;
   > h2 {
     line-height: 60px;
@@ -69,6 +68,16 @@
       }
     }
   }
+}
+
+.table-card {
+  > div div {
+    flex: none !important;
+  }
+}
+
+.breadcrumb {
+  padding-left: 10px;
 }
 
 .conditions-model {

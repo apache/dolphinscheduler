@@ -18,11 +18,19 @@
 import mapping from './mapping'
 import regex from './regex'
 import truncateText from './truncate-text'
+import log from './log'
+import downloadFile from './downloadFile'
+import copy from './clipboard'
+import removeUselessChildren from './tree-format'
 
 const utils = {
   mapping,
   regex,
-  truncateText
+  truncateText,
+  log,
+  downloadFile,
+  copy,
+  removeUselessChildren
 }
 
 export default utils

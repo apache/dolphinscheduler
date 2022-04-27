@@ -1,0 +1,39 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^http://localhost"
+    },
+    {
+      "pattern": "^https://hive.apache.org"
+    },
+    {
+      "pattern": "^http://192"
+    },
+    {
+      "pattern": "^https://img.shields.io/badge"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/en-us/download/download.html$",
+      "replacement": "https://dolphinscheduler.apache.org/en-us/download/download.html"
+    },
+    {
+      "pattern": "^/zh-cn/download/download.html$",
+      "replacement": "https://dolphinscheduler.apache.org/zh-cn/download/download.html"
+    },
+    {
+      "pattern": "^/img",
+      "replacement": "{{BASEURL}}/docs/img"
+    }
+  ],
+  "timeout": "10s",
+  "retryOn429": true,
+  "retryCount": 10,
+  "fallbackRetryDelay": "1000s",
+  "aliveStatusCodes": [
+    200,
+    401,
+    0
+  ]
+}

@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +46,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -54,7 +53,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * scheduler service test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(QuartzExecutors.class)
+@PrepareForTest(QuartzExecutorImpl.class)
 public class SchedulerServiceTest {
 
     @InjectMocks
@@ -81,19 +80,11 @@ public class SchedulerServiceTest {
     @Mock
     private ProjectServiceImpl projectService;
 
-    @Mock
-    private QuartzExecutors quartzExecutors;
+    @InjectMocks
+    private QuartzExecutorImpl quartzExecutors;
 
     @Before
     public void setUp() {
-
-        quartzExecutors = PowerMockito.mock(QuartzExecutors.class);
-        PowerMockito.mockStatic(QuartzExecutors.class);
-        try {
-            PowerMockito.doReturn(quartzExecutors).when(QuartzExecutors.class, "getInstance");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 

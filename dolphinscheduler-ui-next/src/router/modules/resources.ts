@@ -35,7 +35,9 @@ export default {
       component: components['resource-file'],
       meta: {
         title: '文件管理',
-        showSide: true
+        activeMenu: 'resource',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -44,7 +46,10 @@ export default {
       component: components['resource-file-create'],
       meta: {
         title: '文件创建',
-        showSide: true
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -53,7 +58,10 @@ export default {
       component: components['resource-file-edit'],
       meta: {
         title: '文件编辑',
-        showSide: true
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -62,7 +70,10 @@ export default {
       component: components['resource-file'],
       meta: {
         title: '文件管理',
-        showSide: true
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -71,7 +82,10 @@ export default {
       component: components['resource-file-edit'],
       meta: {
         title: '文件详情',
-        showSide: true
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -80,25 +94,33 @@ export default {
       component: components['resource-file-create'],
       meta: {
         title: '文件创建',
-        showSide: true
+        activeMenu: 'resource',
+        activeSide: '/resource/file-manage',
+        showSide: true,
+        auth: []
       }
     },
     {
       path: '/resource/resource-manage',
       name: 'resource-manage',
-      component: components['resource'],
+      component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
-        showSide: true
+        activeMenu: 'resource',
+        showSide: true,
+        auth: []
       }
     },
     {
       path: '/resource/resource-manage/:id',
       name: 'resource-sub-manage',
-      component: components['resource'],
+      component: components['resource-udf-resource'],
       meta: {
         title: '资源管理',
-        showSide: true
+        activeMenu: 'resource',
+        activeSide: '/resource/resource-manage',
+        showSide: true,
+        auth: []
       }
     },
     {
@@ -106,18 +128,33 @@ export default {
       name: 'function-manage',
       component: components['resource-udf-function'],
       meta: {
-        title: '函数管理'
+        title: '函数管理',
+        activeMenu: 'resource',
+        showSide: true,
+        auth: []
       }
     },
     {
       path: '/resource/task-group-option',
       name: 'task-group-option',
-      component: components['resource-task-group-option']
+      component: components['resource-task-group-option'],
+      meta: {
+        title: '任务组配置',
+        activeMenu: 'resource',
+        showSide: true,
+        auth: []
+      }
     },
     {
       path: '/resource/task-group-queue',
       name: 'task-group-queue',
-      component: components['resource-task-group-queue']
+      component: components['resource-task-group-queue'],
+      meta: {
+        title: '任务组队列',
+        activeMenu: 'resource',
+        showSide: true,
+        auth: []
+      }
     }
   ]
 }

@@ -48,7 +48,7 @@ const taskGroupQueue = defineComponent({
     const idRef = ref(Number(router.currentRoute.value.params.id))
 
     const searchParamRef = reactive({
-      groupId: 0,
+      groupId: ref<number| null>(),
       processName: '',
       instanceName: '',
       pageSize: 10,
@@ -59,14 +59,6 @@ const taskGroupQueue = defineComponent({
       queueId: 0,
       priority: 0
     })
-
-    const requestData = () => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        groupId: variables.groupId
-      })
-    }
 
     const resetTableData = () => {
       getTableData({
@@ -120,7 +112,10 @@ const taskGroupQueue = defineComponent({
             if (!searchParamRef.groupId) {
               searchParamRef.groupId = item.id
             }
-            let option: SelectMixedOption = { label: item.name, value: item.id }
+            const option: SelectMixedOption = {
+              label: item.name,
+              value: item.id
+            }
             taskGroupOptions.value.push(option)
           })
         }
@@ -155,7 +150,8 @@ const taskGroupQueue = defineComponent({
       onSearch,
       showModalRef,
       updateItemData,
-      taskGroupOptions
+      taskGroupOptions,
+      loadingRef
     } = this
 
     const { columns } = useTable(updatePriority, resetTableData)
@@ -174,13 +170,13 @@ const taskGroupQueue = defineComponent({
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.processName, 'value']}
-                placeholder={t('resource.task_group_queue.process_name')}
+                placeholder={t('resource.task_group_queue.workflow_name')}
               ></NInput>
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.instanceName, 'value']}
                 placeholder={t(
-                  'resource.task_group_queue.process_instance_name'
+                  'resource.task_group_queue.workflow_instance_name'
                 )}
               ></NInput>
               <NButton size='small' type='primary' onClick={onSearch}>
@@ -193,14 +189,16 @@ const taskGroupQueue = defineComponent({
         </NCard>
         <Card
           class={styles['table-card']}
-          title={t('resource.task_group_option.option')}
+          title={t('resource.task_group_queue.queue')}
         >
           <div>
             <NDataTable
+              loading={loadingRef}
               columns={columns}
               size={'small'}
               data={this.tableData}
               striped
+              scrollX={this.tableWidth}
             />
             <div class={styles.pagination}>
               <NPagination

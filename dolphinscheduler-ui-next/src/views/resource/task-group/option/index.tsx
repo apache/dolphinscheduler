@@ -22,9 +22,7 @@ import {
   NInput,
   NCard,
   NDataTable,
-  NSwitch,
-  NPagination,
-  NTooltip
+  NPagination
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
@@ -43,7 +41,7 @@ const taskGroupOption = defineComponent({
 
     const searchParamRef = ref()
 
-    let updateItemData = reactive({
+    const updateItemData = reactive({
       id: 0,
       name: '',
       projectCode: 0,
@@ -74,14 +72,6 @@ const taskGroupOption = defineComponent({
 
     const onConfirm = () => {
       showModalRef.value = false
-      updateItemData = {
-        id: 0,
-        name: '',
-        projectCode: 0,
-        groupSize: 0,
-        status: 1,
-        description: ''
-      }
       resetTableData()
     }
 
@@ -146,7 +136,8 @@ const taskGroupOption = defineComponent({
       resetTableData,
       onUpdatePageSize,
       updateItem,
-      onSearch
+      onSearch,
+      loadingRef
     } = this
 
     const { columns } = useTable(updateItem, resetTableData)
@@ -186,10 +177,12 @@ const taskGroupOption = defineComponent({
         >
           <div>
             <NDataTable
+              loading={loadingRef}
               columns={columns}
               size={'small'}
               data={this.tableData}
               striped
+              scrollX={this.tableWidth}
             />
             <div class={styles.pagination}>
               <NPagination

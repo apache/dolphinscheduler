@@ -26,9 +26,9 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -46,10 +46,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- *  netty executor manager
+ * netty executor manager
  */
 @Service
-public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
+public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
@@ -60,13 +60,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     private ServerNodeManager serverNodeManager;
 
     @Autowired
-    private TaskAckProcessor taskAckProcessor;
+    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
 
     @Autowired
     private TaskKillResponseProcessor taskKillResponseProcessor;
 
     @Autowired
-    private TaskResponseProcessor taskResponseProcessor;
+    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
 
     /**
      * netty remote client
@@ -76,20 +76,21 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     /**
      * constructor
      */
-    public NettyExecutorManager(){
+    public NettyExecutorManager() {
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     @PostConstruct
-    public void init(){
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
+    public void init() {
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
     }
 
     /**
      * execute logic
+     *
      * @param context context
      * @return result
      * @throws ExecuteException if error throws ExecuteException
@@ -119,7 +120,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         boolean success = false;
         while (!success) {
             try {
-                doExecute(host,command);
+                doExecute(host, command);
                 success = true;
                 context.setHost(host);
             } catch (ExecuteException ex) {
@@ -150,7 +151,8 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     }
 
     /**
-     *  execute logic
+     * execute logic
+     *
      * @param host host
      * @param command command
      * @throws ExecuteException if error throws ExecuteException
@@ -178,17 +180,18 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     }
 
     /**
-     *  get all nodes
+     * get all nodes
+     *
      * @param context context
      * @return nodes
      */
-    private Set<String> getAllNodes(ExecutionContext context){
+    private Set<String> getAllNodes(ExecutionContext context) {
         Set<String> nodes = Collections.emptySet();
         /**
          * executor type
          */
         ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
+        switch (executorType) {
             case WORKER:
                 nodes = serverNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;
