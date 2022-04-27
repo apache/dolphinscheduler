@@ -22,7 +22,6 @@ Using `POST` and `GET` method to send `Http` request in the `Request Type`.
 ### GET Http
 
 Send alert information by `Http` GET method.
-GET `Http`告警指将告警结果作为参数通过`Http` GET方法进行请求。
 The following shows the `GET` configuration example:
 
 ![enterprise-wechat-app-msg-config](/img/alert/http-get-example.png)
