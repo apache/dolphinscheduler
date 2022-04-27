@@ -73,22 +73,23 @@ export default defineComponent({
             rules={this.rules}
             ref='fileFormRef'
             class={styles['form-content']}
+            disabled={this.componentName !== 'resource-file-edit'}
           >
             <NFormItem path='content'>
               <MonacoEditor v-model={[this.resourceViewRef.content, 'value']} />
             </NFormItem>
-            {this.componentName === 'resource-file-edit' && (
-              <NSpace>
-                <NButton
-                  type='info'
-                  size='small'
-                  text
-                  style={{ marginRight: '15px' }}
-                  onClick={this.handleReturn}
-                  class='btn-cancel'
-                >
-                  {t('resource.file.return')}
-                </NButton>
+            <NSpace>
+              <NButton
+                type='info'
+                size='small'
+                text
+                style={{ marginRight: '15px' }}
+                onClick={this.handleReturn}
+                class='btn-cancel'
+              >
+                {t('resource.file.return')}
+              </NButton>
+              {this.componentName === 'resource-file-edit' && (
                 <NButton
                   type='info'
                   size='small'
@@ -98,8 +99,8 @@ export default defineComponent({
                 >
                   {t('resource.file.save')}
                 </NButton>
-              </NSpace>
-            )}
+              )}
+            </NSpace>
           </NForm>
         </div>
       </Card>
