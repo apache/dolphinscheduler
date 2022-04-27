@@ -217,6 +217,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
 
+        String oldConnectionParams = dataSource.getConnectionParams();
+        ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
+        baseDataSourceParamDTO.setPassword(oldParams.path(Constants.PASSWORD).asText());
+
         result.put(Constants.DATA_LIST, baseDataSourceParamDTO);
         putMsg(result, Status.SUCCESS);
         return result;

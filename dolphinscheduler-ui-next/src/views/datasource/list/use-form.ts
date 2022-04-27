@@ -93,6 +93,14 @@ export function useForm(id?: number) {
           }
         }
       },
+      password: {
+        trigger: ['input'],
+        validator() {
+          if (!state.detailForm.password) {
+            return new Error(t('datasource.user_password'))
+          }
+        }
+      },
       database: {
         trigger: ['input'],
         validator() {
