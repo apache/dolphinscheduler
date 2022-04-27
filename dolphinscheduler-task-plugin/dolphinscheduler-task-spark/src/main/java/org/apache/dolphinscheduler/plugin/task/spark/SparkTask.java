@@ -114,7 +114,7 @@ public class SparkTask extends AbstractYarnTask {
         args.add(sparkCommand);
 
         // populate spark options
-        args.addAll(populateSparkOptions(sparkParameters, taskExecutionContext));
+        args.addAll(populateSparkOptions());
 
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
@@ -135,11 +135,9 @@ public class SparkTask extends AbstractYarnTask {
     /**
      * build spark options
      *
-     * @param sparkParameters SparkParameters
-     * @param taskRequest     TaskExecutionContext
      * @return argument list
      */
-    private List<String> populateSparkOptions(SparkParameters sparkParameters, TaskExecutionContext taskRequest) {
+    private List<String> populateSparkOptions() {
         List<String> args = new ArrayList<>();
         args.add(SparkConstants.MASTER);
 
@@ -157,7 +155,7 @@ public class SparkTask extends AbstractYarnTask {
             args.add(mainClass);
         }
 
-        populateSparkResourceDefinitions(sparkParameters, args);
+        populateSparkResourceDefinitions(args);
 
         String appName = sparkParameters.getAppName();
         if (StringUtils.isNotEmpty(appName)) {
@@ -192,12 +190,12 @@ public class SparkTask extends AbstractYarnTask {
         // bin/spark-sql -f fileName
         if (ProgramType.SQL == programType) {
             args.add(SparkConstants.SQL_FROM_FILE);
-            args.add(generateScriptFile(sparkParameters, taskRequest));
+            args.add(generateScriptFile());
         }
         return args;
     }
 
-    private void populateSparkResourceDefinitions(SparkParameters sparkParameters, List<String> args) {
+    private void populateSparkResourceDefinitions(List<String> args) {
         int driverCores = sparkParameters.getDriverCores();
         if (driverCores > 0) {
             args.add(SparkConstants.DRIVER_CORES);
@@ -229,8 +227,8 @@ public class SparkTask extends AbstractYarnTask {
         }
     }
 
-    private String generateScriptFile(SparkParameters sparkParameters, TaskExecutionContext taskRequest) {
-        String scriptFileName = String.format("%s/%s_node.sql", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
+    private String generateScriptFile() {
+        String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
 
         File file = new File(scriptFileName);
         Path path = file.toPath();
@@ -240,7 +238,7 @@ public class SparkTask extends AbstractYarnTask {
             sparkParameters.setRawScript(script);
 
             logger.info("raw script : {}", sparkParameters.getRawScript());
-            logger.info("task execute path : {}", taskRequest.getExecutePath());
+            logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
