@@ -155,6 +155,9 @@ $bgLight: #ffffff;
     &.icon-emr {
       background-image: url('/images/task-icons/emr.png');
     }
+    &.icon-zeppelin {
+      background-image: url('/images/task-icons/zeppelin.png');
+    }
   }
 
   &:hover {
@@ -209,6 +212,9 @@ $bgLight: #ffffff;
       }
       &.icon-switch {
         background-image: url('/images/task-icons/switch_hover.png');
+      }
+      &.icon-emr {
+        background-image: url('/images/task-icons/emr_hover.png');
       }
       &.icon-emr {
         background-image: url('/images/task-icons/emr_hover.png');
