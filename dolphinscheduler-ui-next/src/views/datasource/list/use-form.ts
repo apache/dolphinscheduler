@@ -97,7 +97,7 @@ export function useForm(id?: number) {
         trigger: ['input'],
         validator() {
           if (!state.detailForm.password) {
-            return new Error(t('datasource.user_password'))
+            return new Error(t('datasource.user_password_tips'))
           }
         }
       },
