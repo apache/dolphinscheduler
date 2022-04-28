@@ -88,7 +88,7 @@ export const TASK_TYPES_MAP = {
     alias: 'SWITCH'
   },
   SEATUNNEL: {
-    alias: 'WATERDROP',
+    alias: 'SeaTunnel',
     helperLinkDisable: true
   },
   EMR: {
