@@ -106,7 +106,7 @@ export function useTaskEdit(options: Options) {
 
   /**
    * Remove task
-   * @param {number} code
+   * @param {number} codes
    */
   function removeTasks(codes: number[]) {
     processDefinition.value.taskDefinitionList =
