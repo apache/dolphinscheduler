@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -47,12 +48,12 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
-import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -173,8 +174,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
             return result;
         }
-        scheduleObj.setStartTime(scheduleParam.getStartTime());
-        scheduleObj.setEndTime(scheduleParam.getEndTime());
+
+        // transform timezone from system default timezone to schedule timezone
+        Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
+        Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
+        scheduleObj.setStartTime(startTime);
+        scheduleObj.setEndTime(endTime);
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
             logger.error("{} verify failure", scheduleParam.getCrontab());
 
@@ -414,6 +419,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode,
             searchVal);
 
+        String userTimezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        String timezone = StringUtils.isNotEmpty(userTimezone) ? userTimezone : ZoneId.systemDefault().getId();
+        for (Schedule schedule : scheduleIPage.getRecords()) {
+            // transform timezone from schedule timezone to user timezone
+            // todo return string directly to avoid date timezone transform
+            schedule.setStartTime(DateUtils.transformTimezoneDate(schedule.getStartTime(), schedule.getTimezoneId(), timezone));
+            schedule.setEndTime(DateUtils.transformTimezoneDate(schedule.getEndTime(), schedule.getTimezoneId(), timezone));
+        }
+
         PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) scheduleIPage.getTotal());
         pageInfo.setTotalList(scheduleIPage.getRecords());
@@ -441,6 +455,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(project.getName());
+
+        String userTimezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        String timezone = StringUtils.isNotEmpty(userTimezone) ? userTimezone : ZoneId.systemDefault().getId();
+        for (Schedule schedule : schedules) {
+            // transform timezone from schedule timezone to user timezone
+            // todo return string directly to avoid date timezone transform
+            schedule.setStartTime(DateUtils.transformTimezoneDate(schedule.getStartTime(), schedule.getTimezoneId(), timezone));
+            schedule.setEndTime(DateUtils.transformTimezoneDate(schedule.getEndTime(), schedule.getTimezoneId(), timezone));
+        }
 
         result.put(Constants.DATA_LIST, schedules);
         putMsg(result, Status.SUCCESS);
@@ -561,8 +584,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         Date now = new Date();
 
-        Date startTime = now.after(scheduleParam.getStartTime()) ? now : scheduleParam.getStartTime();
-        Date endTime = scheduleParam.getEndTime();
+        Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
+        Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
+        startTime =  now.after(startTime) ? now : startTime;
+
         try {
             cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
         } catch (ParseException e) {
@@ -660,8 +685,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return;
             }
 
-            schedule.setStartTime(scheduleParam.getStartTime());
-            schedule.setEndTime(scheduleParam.getEndTime());
+            Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
+            Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
+            schedule.setStartTime(startTime);
+            schedule.setEndTime(endTime);
             if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
                 putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
                 return;

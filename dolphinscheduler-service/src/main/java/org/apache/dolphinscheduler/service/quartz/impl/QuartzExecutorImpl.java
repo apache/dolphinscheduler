@@ -107,8 +107,8 @@ public class QuartzExecutorImpl implements QuartzExecutor {
              */
             CronTrigger cronTrigger = newTrigger()
                     .withIdentity(triggerKey)
-                    .startAt(DateUtils.getTimezoneDate(startDate, timezoneId))
-                    .endAt(DateUtils.getTimezoneDate(endDate, timezoneId))
+                    .startAt(DateUtils.transformTimezoneDate(startDate, timezoneId))
+                    .endAt(DateUtils.transformTimezoneDate(endDate, timezoneId))
                     .withSchedule(
                             cronSchedule(cronExpression)
                                     .withMisfireHandlingInstructionDoNothing()

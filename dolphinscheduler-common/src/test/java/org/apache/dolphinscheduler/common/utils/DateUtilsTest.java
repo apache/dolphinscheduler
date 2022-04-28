@@ -215,7 +215,7 @@ public class DateUtilsTest {
     @Test
     public void testTransformToTimezone() {
         Date date = new Date();
-        Date mst = DateUtils.getTimezoneDate(date, TimeZone.getDefault().getID());
+        Date mst = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID());
         Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(mst));
     }
 
