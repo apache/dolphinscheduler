@@ -32,7 +32,7 @@ export function useZeppelin({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'EMR',
+    taskType: 'ZEPPELIN',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
