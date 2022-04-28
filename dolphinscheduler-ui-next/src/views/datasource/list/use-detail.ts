@@ -50,7 +50,7 @@ export function useDetail(getFieldsValue: Function) {
     const dataSourceRes = await queryDataSource(id)
     status.loading = false
     PREV_NAME = dataSourceRes.name
-    return dataSourceRes as IDataSource
+    return dataSourceRes
   }
 
   const testConnect = async () => {
