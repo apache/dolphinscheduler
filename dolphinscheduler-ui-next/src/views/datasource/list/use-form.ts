@@ -23,7 +23,8 @@ import type {
   IDataSourceDetail,
   IDataBase,
   IDataBaseOption,
-  IDataBaseOptionKeys
+  IDataBaseOptionKeys,
+  IDataSource
 } from './types'
 
 export function useForm(id?: number) {
@@ -93,6 +94,14 @@ export function useForm(id?: number) {
           }
         }
       },
+      password: {
+        trigger: ['input'],
+        validator() {
+          if (!state.detailForm.password) {
+            return new Error(t('datasource.user_password_tips'))
+          }
+        }
+      },
       database: {
         trigger: ['input'],
         validator() {
@@ -138,9 +147,15 @@ export function useForm(id?: number) {
   const resetFieldsValue = () => {
     state.detailForm = { ...initialValues }
   }
-  const setFieldsValue = (values: object) => {
-    state.detailForm = { ...state.detailForm, ...values }
+
+  const setFieldsValue = (values: IDataSource) => {
+    state.detailForm = {
+      ...state.detailForm,
+      ...values,
+      other: JSON.stringify(values.other)
+    }
   }
+
   const getFieldsValue = () => state.detailForm
 
   return {
