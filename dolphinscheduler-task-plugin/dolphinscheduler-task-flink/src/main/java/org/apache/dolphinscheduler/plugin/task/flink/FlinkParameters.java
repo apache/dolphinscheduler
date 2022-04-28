@@ -109,16 +109,6 @@ public class FlinkParameters extends AbstractParameters {
      */
     private String rawScript;
 
-    /**
-     * sql-client execution result-mode
-     */
-    private String resultMode;
-
-    /**
-     * execution runtime-mode
-     */
-    private String runtimeMode;
-
     public ResourceInfo getMainJar() {
         return mainJar;
     }
@@ -245,22 +235,6 @@ public class FlinkParameters extends AbstractParameters {
 
     public void setRawScript(String rawScript) {
         this.rawScript = rawScript;
-    }
-
-    public String getResultMode() {
-        return resultMode;
-    }
-
-    public void setResultMode(String resultMode) {
-        this.resultMode = resultMode;
-    }
-
-    public String getRuntimeMode() {
-        return runtimeMode;
-    }
-
-    public void setRuntimeMode(String runtimeMode) {
-        this.runtimeMode = runtimeMode;
     }
 
     @Override

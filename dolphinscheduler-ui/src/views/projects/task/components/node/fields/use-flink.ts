@@ -76,9 +76,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useMainJar(model),
-<<<<<<< HEAD
     useDeployMode(24, ref(false)),
-=======
     {
       type: 'editor',
       field: 'rawScript',
@@ -90,8 +88,6 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.script_tips')
       }
     },
-    useDeployMode(24, false),
->>>>>>> 7c048165d6 (flink_sql)
     {
       type: 'select',
       field: 'flinkVersion',

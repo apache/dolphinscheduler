@@ -14,10 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-<<<<<<< HEAD
-=======
-
->>>>>>> 2ad2801cd0 ('[refactor]flinksql')
 import { computed, ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceByProgramType } from '@/service/modules/resources'
@@ -30,11 +26,17 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
+<<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-main-jar.ts
   const mainJarsSpan = computed(() =>
       model.programType === 'SQL' ? 0 : 24
   )
 
   const mainJarSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
+=======
+  const mainJarSpan = computed(() =>
+      model.programType === 'SQL' ? 0 : 24
+  )
+>>>>>>> d479ad38a6 ([refactor] flink sql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-main-jar.ts
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
@@ -65,15 +67,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     type: 'tree-select',
     field: 'mainJar',
     name: t('project.node.main_package'),
-<<<<<<< HEAD
-<<<<<<< HEAD
     span: mainJarSpan,
-=======
-    span: span,
->>>>>>> 4d65bc7c46 ('[refactor]flinksql')
-=======
-    span: mainJarsSpan,
->>>>>>> 2ad2801cd0 ('[refactor]flinksql')
     props: {
       cascade: true,
       showPath: true,
@@ -84,16 +78,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     },
     validate: {
       trigger: ['input', 'blur'],
-<<<<<<< HEAD
-<<<<<<< HEAD
       required: model.programType !== 'SQL',
-=======
-      // required: true,
-      required: require,
->>>>>>> 7c048165d6 (flink_sql)
-=======
-      required: model.programType !== 'SQL',
->>>>>>> 2ad2801cd0 ('[refactor]flinksql')
       validator(validate: any, value: string) {
         if (!value && model.programType !== 'SQL') {
           return new Error(t('project.node.main_package_tips'))

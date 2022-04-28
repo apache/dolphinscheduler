@@ -33,9 +33,12 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
 <<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-spark.ts
+<<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-spark.ts
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> d479ad38a6 ([refactor] flink sql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-spark.ts
       (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
 >>>>>>> d271cb1677 ([refactor] dolphinscheduler flinksql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-spark.ts
   )
@@ -49,9 +52,6 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
 =======
   const showCluster = computed(() =>
       model.programType !== 'SQL'
-=======
-      model.programType === 'PYTHON' ? 0 : 24
->>>>>>> 527aa36ae5 ([refactor] dolphinscheduler flinksql)
   )
 >>>>>>> d271cb1677 ([refactor] dolphinscheduler flinksql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-spark.ts
 
