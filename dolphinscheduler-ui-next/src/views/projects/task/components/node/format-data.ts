@@ -506,6 +506,14 @@ export function formatModel(data: ITaskData) {
     params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
   }
 
+  if (data.taskParams?.zeppelinNoteId) {
+    params.zeppelinNoteId = data.taskParams.zeppelinNoteId
+  }
+
+  if (data.taskParams?.zeppelinParagraphId) {
+    params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
+  }
+
   if (data.taskParams?.processDefinitionCode) {
     params.processDefinitionCode = data.taskParams.processDefinitionCode
   }

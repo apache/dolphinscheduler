@@ -923,7 +923,7 @@ const project = {
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: 'Please enter the note id of your zeppelin note',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
-    zeppelin_note_id_tips: 'Please enter the paragraph id of your zeppelin paragraph',
+    zeppelin_paragraph_id_tips: 'Please enter the paragraph id of your zeppelin paragraph',
     send_email: 'Send Email',
     log_display: 'Log display',
     rows_of_result: 'rows of result',

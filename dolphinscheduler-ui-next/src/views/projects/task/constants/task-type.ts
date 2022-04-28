@@ -96,6 +96,7 @@ export const TASK_TYPES_MAP = {
     helperLinkDisable: true
   },
   ZEPPELIN: {
-    alias: 'ZEPPELIN'
+    alias: 'ZEPPELIN',
+    helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }
