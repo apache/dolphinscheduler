@@ -144,7 +144,7 @@ export function useForm(id?: number) {
     state.detailForm = {
       ...state.detailForm,
       ...values,
-      other: JSON.stringify(values.other)
+      other: values.other ? JSON.stringify(values.other) : ''
     }
   }
 
