@@ -250,8 +250,8 @@
         from t_ds_process_instance
         where process_definition_code=#{processDefinitionCode}
         and state = #{state}
-        and id <![CDATA[ < ]]> #{id}
-        order by id desc limit 1
+        and id <![CDATA[ > ]]> #{id}
+        order by id asc limit 1
     </select>
     <update id="updateGlobalParamsById">
         update t_ds_process_instance
