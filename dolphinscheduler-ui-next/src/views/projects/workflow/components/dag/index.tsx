@@ -328,6 +328,7 @@ export default defineComponent({
         />
         {!!props.definition && (
           <VersionModal
+            isInstance={props.instance ? true : false}
             v-model:row={props.definition.processDefinition}
             v-model:show={versionModalShow.value}
             onUpdateList={refreshDetail}
