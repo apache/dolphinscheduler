@@ -280,6 +280,10 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  zeppelinNoteId?: string
+  zeppelinParagraphId?: string
+  noteId?: string
+  paragraphId?: string
   processDefinitionCode?: number
   conditionResult?: {
     successNode?: number[]

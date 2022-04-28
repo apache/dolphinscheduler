@@ -33,6 +33,7 @@ import { useDataX } from './use-datax'
 import { useDependent } from './use-dependent'
 import { useDataQuality } from './use-data-quality'
 import { useEmr } from './use-emr'
+import { useZeppelin } from './use-zeppelin'
 
 export default {
   SHELL: useShell,
@@ -52,5 +53,6 @@ export default {
   DATAX: useDataX,
   DEPENDENT: useDependent,
   DATA_QUALITY: useDataQuality,
-  EMR: useEmr
+  EMR: useEmr,
+  ZEPPELIN: useZeppelin
 }
