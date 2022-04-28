@@ -23,7 +23,8 @@ import type {
   IDataSourceDetail,
   IDataBase,
   IDataBaseOption,
-  IDataBaseOptionKeys
+  IDataBaseOptionKeys,
+  IDataSource
 } from './types'
 
 export function useForm(id?: number) {
@@ -138,9 +139,15 @@ export function useForm(id?: number) {
   const resetFieldsValue = () => {
     state.detailForm = { ...initialValues }
   }
-  const setFieldsValue = (values: object) => {
-    state.detailForm = { ...state.detailForm, ...values }
+
+  const setFieldsValue = (values: IDataSource) => {
+    state.detailForm = {
+      ...state.detailForm,
+      ...values,
+      other: values.other ? JSON.stringify(values.other) : values.other
+    }
   }
+
   const getFieldsValue = () => state.detailForm
 
   return {
