@@ -174,14 +174,4 @@ public class TaskGroupServiceTest {
         result = taskGroupService.startTaskGroup(loginUser, 1);
         Assert.assertEquals(Status.TASK_GROUP_STATUS_OPENED, result.get(Constants.STATUS));
     }
-
-    @Test
-    public void testWakeTaskFroceManually() {
-
-        TreeMap<Integer, Integer> tm = new TreeMap<>();
-        tm.put(1, 1);
-        Map<String, Object> map1 = taskGroupService.forceStartTask(getLoginUser(), 1);
-        Assert.assertEquals(Status.SUCCESS, map1.get(Constants.STATUS));
-
-    }
 }

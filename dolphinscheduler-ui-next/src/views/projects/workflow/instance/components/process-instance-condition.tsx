@@ -46,11 +46,11 @@ export default defineComponent({
       if (startEndTimeRef.value) {
         startDate = format(
           new Date(startEndTimeRef.value[0]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         endDate = format(
           new Date(startEndTimeRef.value[1]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
       }
 

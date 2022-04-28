@@ -17,9 +17,9 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData, ITaskData } from '../types'
+import type { IJsonItem, INodeData, ITaskData  } from '../types'
 
-export function useSpark({
+export function useZeppelin({
   projectCode,
   from = 0,
   readonly,
@@ -31,8 +31,8 @@ export function useSpark({
   data?: ITaskData
 }) {
   const model = reactive({
-    taskType: 'SPARK',
     name: '',
+    taskType: 'ZEPPELIN',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -42,16 +42,7 @@ export function useSpark({
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30,
-    programType: 'SCALA',
-    sparkVersion: 'SPARK2',
-    rawScript: '',
-    deployMode: 'local',
-    driverCores: 1,
-    driverMemory: '512M',
-    numExecutors: 2,
-    executorMemory: '2G',
-    executorCores: 2
+    timeout: 30
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -76,12 +67,12 @@ export function useSpark({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useSpark(model),
+      ...Fields.useZeppelin(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model
