@@ -874,7 +874,7 @@ const project = {
     check_interval: 'Check interval',
     waiting_dependent_complete: 'Waiting Dependent complete',
     project_name: 'Project Name',
-    process_name: 'Wrokflow Name',
+    process_name: 'Workflow Name',
     cycle_time: 'Cycle Time',
     rule_name: 'Rule Name',
     null_check: 'NullCheck',
