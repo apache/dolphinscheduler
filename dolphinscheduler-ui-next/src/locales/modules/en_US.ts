@@ -1171,8 +1171,6 @@ const security = {
     k8s_cluster_tips: 'Please enter k8s cluster',
     owner: 'Owner',
     owner_tips: 'Please enter owner',
-    tag: 'Tag',
-    tag_tips: 'Please enter tag',
     limit_cpu: 'Limit CPU',
     limit_cpu_tips: 'Please enter limit CPU',
     limit_memory: 'Limit Memory',
