@@ -123,6 +123,8 @@
           this.$emit('closeAuthDataSource')
         } else if (this.transferData.type.name === `${i18n.$t('UDF Function')}`) {
           this.$emit('closeAuthUdfFunc')
+        } else if (this.transferData.type.name === `${i18n.$t('Namespace')}`) {
+          this.$emit('closeAuthNamespace')
         }
       }
     },
