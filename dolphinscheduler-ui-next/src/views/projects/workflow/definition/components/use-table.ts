@@ -46,7 +46,7 @@ export function useTable(
     loadingRef: ref(false)
   })
 
-  const createColumns = (variables: any) => {
+  const createColumns = (variables: any, isInstance: boolean) => {
     variables.columns = [
       {
         title: '#',
@@ -79,12 +79,15 @@ export function useTable(
       {
         title: t('project.workflow.create_time'),
         key: 'operateTime'
-      },
-      {
+      }
+    ] as TableColumns<any>
+
+    if (!isInstance) {
+      variables.columns.push({
         title: t('project.workflow.operation'),
         key: 'operation',
         className: styles.operation,
-        render: (_row) => {
+        render: (_row: any) => {
           return h(NSpace, null, {
             default: () => [
               h(
@@ -154,8 +157,8 @@ export function useTable(
             ]
           })
         }
-      }
-    ] as TableColumns<any>
+      })
+    }
   }
 
   const getTableData = (row: any) => {
