@@ -84,6 +84,7 @@ export default defineComponent({
      * Node search and navigate
      */
     const {
+      searchSelectValue,
       navigateTo,
       toggleSearchInput,
       searchInputVisible,
@@ -315,6 +316,7 @@ export default defineComponent({
           >
             <NSelect
               size='small'
+              value={searchSelectValue.value}
               options={nodesDropdown.value}
               onFocus={reQueryNodes}
               onUpdateValue={navigateTo}
