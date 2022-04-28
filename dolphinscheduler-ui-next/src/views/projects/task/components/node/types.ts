@@ -282,6 +282,8 @@ interface ITaskParams {
   jobFlowDefineJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
+  noteId?: string
+  paragraphId?: string
   processDefinitionCode?: number
   conditionResult?: {
     successNode?: number[]
