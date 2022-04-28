@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref } from 'vue'
+import { computed, ref , watchEffect} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDeployMode, useMainJar, useResources } from '.'
 import type { IJsonItem } from '../types'
@@ -22,15 +22,19 @@ import type { IJsonItem } from '../types'
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-      (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+    (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
   )
 
   const mainArgsSpan = computed(() =>
-      model.programType === 'SQL' ? 0 : 24
+    model.programType === 'SQL' ? 0 : 24
   )
 
   const rawScriptSpan = computed(() =>
-      model.programType === 'SQL' ? 24 : 0
+    model.programType === 'SQL' ? 24 : 0
+  )
+
+  const flinkVersionOptions = computed(() =>
+    model.programType === 'SQL' ? [{label: '>=1.13', value: '>=1.13'}] : FLINK_VERSIONS
   )
 
   const taskManagerNumberSpan = computed(() =>
@@ -42,6 +46,10 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   )
 
   const appNameSpan = computed(() => (model.deployMode === 'cluster' ? 24 : 0))
+
+  watchEffect(() => {
+    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : '<1.10'
+  })
 
   return [
     {
@@ -92,7 +100,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'flinkVersion',
       name: t('project.node.flink_version'),
-      options: FLINK_VERSIONS,
+      options: flinkVersionOptions,
       value: model.flinkVersion,
       span: deployModeSpan
     },

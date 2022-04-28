@@ -554,7 +554,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-<!--                <scope>test</scope>-->
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -1070,7 +1070,7 @@
                             <goal>restore-instrumented-classes</goal>
                         </goals>
                         <configuration>
-           <!--                 <excludes>com/github/dreamhead/moco/*</excludes>-->
+                            <excludes>com/github/dreamhead/moco/*</excludes>
                         </configuration>
                     </execution>
                     <execution>
