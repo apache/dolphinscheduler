@@ -300,6 +300,12 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
   }
+
+  if (data.taskType === 'ZEPPELIN') {
+    taskParams.noteId = data.zeppelinNoteId
+    taskParams.paragraphId = data.zeppelinParagraphId
+  }
+
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
@@ -498,6 +504,14 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.jobFlowDefineJson) {
     params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
+  if (data.taskParams?.zeppelinNoteId) {
+    params.zeppelinNoteId = data.taskParams.zeppelinNoteId
+  }
+
+  if (data.taskParams?.zeppelinParagraphId) {
+    params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
   }
 
   if (data.taskParams?.processDefinitionCode) {
