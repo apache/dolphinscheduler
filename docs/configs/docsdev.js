@@ -245,7 +245,6 @@ export default {
                                 title: 'Script',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/script.html',
                             },
-                            ,
                             {
                                 title: 'Http',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
