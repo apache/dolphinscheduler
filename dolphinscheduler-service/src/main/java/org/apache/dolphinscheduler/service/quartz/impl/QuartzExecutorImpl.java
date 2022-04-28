@@ -73,11 +73,20 @@ public class QuartzExecutorImpl implements QuartzExecutor {
     public void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule) {
         String jobName = this.buildJobName(schedule.getId());
         String jobGroupName = this.buildJobGroupName(projectId);
-        Date startDate = schedule.getStartTime();
-        Date endDate = schedule.getEndTime();
+
         Map<String, Object> jobDataMap = this.buildDataMap(projectId, schedule);
         String cronExpression = schedule.getCrontab();
         String timezoneId = schedule.getTimezoneId();
+
+        /**
+         * transform from server default timezone to schedule timezone
+         * e.g. server default timezone is `UTC`
+         * user set a schedule with startTime `2022-04-28 10:00:00`, timezone is `Asia/Shanghai`,
+         * api skip to transform it and save into databases directly, startTime `2022-04-28 10:00:00`, timezone is `UTC`, which actually added 8 hours,
+         * so when add job to quartz, it should recover by transform timezone
+         */
+        Date startDate = DateUtils.transformTimezoneDate(schedule.getStartTime(), timezoneId);
+        Date endDate = DateUtils.transformTimezoneDate(schedule.getEndTime(), timezoneId);
 
         lock.writeLock().lock();
         try {
