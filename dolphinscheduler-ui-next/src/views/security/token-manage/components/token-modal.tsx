@@ -192,7 +192,7 @@ const TokenModal = defineComponent({
                       class='input-token'
                       style={{ width: '504px' }}
                       disabled
-                      placeholder={t('security.token.token_tips')}
+                      placeholder={''}
                       v-model={[this.model.token, 'value']}
                     />
                     <NButton
