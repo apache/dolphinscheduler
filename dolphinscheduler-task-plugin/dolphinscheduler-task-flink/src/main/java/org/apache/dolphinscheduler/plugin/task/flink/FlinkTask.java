@@ -241,41 +241,7 @@ public class FlinkTask extends AbstractYarnTask {
          * Currently flink sql on yarn only supports yarn-per-job mode
          */
         if (!FlinkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
-            // execution.target
-            defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.EXECUTION_TARGET_YARN_PER_JOB));
-
-            // taskmanager.numberOfTaskSlots
-            int slot = flinkParameters.getSlot();
-            if (slot > 0) {
-                defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_NUMBEROFTASKSLOTS, slot));
-            }
-
-            // yarn.application.name
-            String appName = flinkParameters.getAppName();
-            if (StringUtils.isNotEmpty(appName)) {
-                defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_NAME, ArgsUtils.escape(appName)));
-            }
-
-            // jobmanager.memory.process.size
-            String jobManagerMemory = flinkParameters.getJobManagerMemory();
-            if (StringUtils.isNotEmpty(jobManagerMemory)) {
-                defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_JOBMANAGER_MEMORY_PROCESS_SIZE, jobManagerMemory));
-            }
-
-            // taskmanager.memory.process.size
-            String taskManagerMemory = flinkParameters.getTaskManagerMemory();
-            if (StringUtils.isNotEmpty(taskManagerMemory)) {
-                defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE, taskManagerMemory));
-            }
-
-            // yarn.application.queue
-            String others = flinkParameters.getOthers();
-            if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
-                String queue = flinkParameters.getQueue();
-                if (StringUtils.isNotEmpty(queue)) {
-                    defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_QUEUE, queue));
-                }
-            }
+            populateFlinkSqlOnYarnOptions(defalutOptions);
         } else {
             // execution.target
             defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.EXECUTION_TARGET_LOACL));
@@ -298,6 +264,44 @@ public class FlinkTask extends AbstractYarnTask {
             args.add(others);
         }
         return args;
+    }
+
+    private void populateFlinkSqlOnYarnOptions(List<String> defalutOptions) {
+        // execution.target
+        defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.EXECUTION_TARGET_YARN_PER_JOB));
+
+        // taskmanager.numberOfTaskSlots
+        int slot = flinkParameters.getSlot();
+        if (slot > 0) {
+            defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_NUMBEROFTASKSLOTS, slot));
+        }
+
+        // yarn.application.name
+        String appName = flinkParameters.getAppName();
+        if (StringUtils.isNotEmpty(appName)) {
+            defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_NAME, ArgsUtils.escape(appName)));
+        }
+
+        // jobmanager.memory.process.size
+        String jobManagerMemory = flinkParameters.getJobManagerMemory();
+        if (StringUtils.isNotEmpty(jobManagerMemory)) {
+            defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_JOBMANAGER_MEMORY_PROCESS_SIZE, jobManagerMemory));
+        }
+
+        // taskmanager.memory.process.size
+        String taskManagerMemory = flinkParameters.getTaskManagerMemory();
+        if (StringUtils.isNotEmpty(taskManagerMemory)) {
+            defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE, taskManagerMemory));
+        }
+
+        // yarn.application.queue
+        String others = flinkParameters.getOthers();
+        if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
+            String queue = flinkParameters.getQueue();
+            if (StringUtils.isNotEmpty(queue)) {
+                defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_QUEUE, queue));
+            }
+        }
     }
 
     private String generateScriptFile(String parameters) {

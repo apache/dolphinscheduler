@@ -51,7 +51,7 @@ public class FlinkTaskTest {
         when(taskExecutionContext.getQueue()).thenReturn("default");
         FlinkTask flinkTask = spy(new FlinkTask(taskExecutionContext));
         flinkTask.init();
-        Assert.assertEquals(flinkTask.buildCommand(),
+        Assert.assertEquals(
             "flink run " +
                 "-m yarn-cluster " +
                 "-ys 1 " +
@@ -61,7 +61,7 @@ public class FlinkTaskTest {
                 "-yqu default " +
                 "-p 2 -sae " +
                 "-c org.apache.flink.streaming.examples.windowing.TopSpeedWindowing " +
-                "TopSpeedWindowing.jar");
+                "TopSpeedWindowing.jar", flinkTask.buildCommand());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class FlinkTaskTest {
         when(taskExecutionContext.getTaskAppId()).thenReturn("4483");
         FlinkTask flinkTask = spy(new FlinkTask(taskExecutionContext));
         flinkTask.init();
-        Assert.assertEquals(flinkTask.buildCommand(), "sql-client.sh -f /tmp/4483_node.sql");
+        Assert.assertEquals("sql-client.sh -f /tmp/4483_node.sql", flinkTask.buildCommand());
     }
 
     private String buildFlinkParameters() {
