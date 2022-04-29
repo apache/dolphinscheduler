@@ -329,7 +329,7 @@ public class FlinkTask extends AbstractYarnTask {
                 logger.info("common parameters : {}", parameters);
                 Files.write(path, parameters.getBytes(), StandardOpenOption.APPEND);
 
-                // Flink sql init script is written to the script file
+                // Flink init script is written to the script file
                 if (StringUtils.isNotEmpty(flinkParameters.getInitScript())) {
                     String script = flinkParameters.getInitScript().replaceAll("\\r\\n", "\n");
                     flinkParameters.setInitScript(script);
