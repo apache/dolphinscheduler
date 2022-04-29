@@ -837,7 +837,9 @@ public class WorkflowExecuteThread {
         cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, nextInstanceId);
         Command command = new Command();
         command.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
+        command.setProcessInstanceId(nextProcessInstance.getId());
         command.setProcessDefinitionCode(processDefinition.getCode());
+        command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         processService.createCommand(command);
     }
