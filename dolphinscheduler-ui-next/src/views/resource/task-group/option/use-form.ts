@@ -28,7 +28,6 @@ export function useForm() {
     formData: {
       id: 0,
       name: '',
-      projectCode: undefined,
       groupSize: '',
       status: 1,
       description: ''
