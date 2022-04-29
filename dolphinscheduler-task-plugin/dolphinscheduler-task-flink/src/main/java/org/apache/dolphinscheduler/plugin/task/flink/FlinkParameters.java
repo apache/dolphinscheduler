@@ -105,7 +105,12 @@ public class FlinkParameters extends AbstractParameters {
     private ProgramType programType;
 
     /**
-     * flink sql script
+     * flink sql initialization file
+     */
+    private String initScript;
+
+    /**
+     * flink sql script file
      */
     private String rawScript;
 
@@ -227,6 +232,14 @@ public class FlinkParameters extends AbstractParameters {
 
     public void setFlinkVersion(String flinkVersion) {
         this.flinkVersion = flinkVersion;
+    }
+
+    public String getInitScript() {
+        return initScript;
+    }
+
+    public void setInitScript(String initScript) {
+        this.initScript = initScript;
     }
 
     public String getRawScript() {

@@ -339,6 +339,7 @@ export function formatParams(data: INodeData): {
           item.value = item.value || ''
           return item
         }),
+        initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
           ? data.resourceList.map((id: number) => ({ id }))
@@ -462,6 +463,10 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.rawScript) {
     params.rawScript = data.taskParams?.rawScript
+  }
+
+  if (data.taskParams?.initScript) {
+    params.initScript = data.taskParams?.initScript
   }
 
   if (data.taskParams?.switchResult) {

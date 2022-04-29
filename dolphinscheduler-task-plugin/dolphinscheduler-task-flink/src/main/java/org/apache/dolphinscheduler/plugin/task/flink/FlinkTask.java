@@ -253,11 +253,13 @@ public class FlinkTask extends AbstractYarnTask {
             defalutOptions.add(String.format(FlinkConstants.FLINK_FORMAT_PARALLELISM_DEFAULT, parallelism));
         }
 
-        // -f
-        args.add(FlinkConstants.FLINK_SQL_FILE);
+        // -i
+        args.add(FlinkConstants.FLINK_SQL_INIT_FILE);
+        args.add(generateInitScriptFile(StringUtils.join(defalutOptions, FlinkConstants.FLINK_SQL_NEWLINE).concat(FlinkConstants.FLINK_SQL_NEWLINE)));
 
-        // generate flink sql script and populate defalut options
-        args.add(generateScriptFile(StringUtils.join(defalutOptions, FlinkConstants.FLINK_SQL_NEWLINE).concat(FlinkConstants.FLINK_SQL_NEWLINE)));
+        // -f
+        args.add(FlinkConstants.FLINK_SQL_SCRIPT_FILE);
+        args.add(generateScriptFile());
 
         String others = flinkParameters.getOthers();
         if (StringUtils.isNotEmpty(others)) {
@@ -304,7 +306,44 @@ public class FlinkTask extends AbstractYarnTask {
         }
     }
 
-    private String generateScriptFile(String parameters) {
+    private String generateInitScriptFile(String parameters) {
+        String initScriptFileName = String.format("%s/%s_init.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+
+        File file = new File(initScriptFileName);
+        Path path = file.toPath();
+
+        if (!Files.exists(path)) {
+            Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+            try {
+                if (OSUtils.isWindows()) {
+                    Files.createFile(path);
+                } else {
+                    if (!file.getParentFile().exists()) {
+                        file.getParentFile().mkdirs();
+                    }
+                    Files.createFile(path, attr);
+                }
+
+                // Flink sql common parameters are written to the script file
+                logger.info("common parameters : {}", parameters);
+                Files.write(path, parameters.getBytes(), StandardOpenOption.APPEND);
+
+                // Flink sql init script is written to the script file
+                if (StringUtils.isNotEmpty(flinkParameters.getInitScript())) {
+                    String script = flinkParameters.getInitScript().replaceAll("\\r\\n", "\n");
+                    flinkParameters.setInitScript(script);
+                    logger.info("init script : {}", flinkParameters.getInitScript());
+                    Files.write(path, flinkParameters.getInitScript().getBytes(), StandardOpenOption.APPEND);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("generate flink sql script error", e);
+            }
+        }
+        return initScriptFileName;
+    }
+
+    private String generateScriptFile() {
         String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
 
         File file = new File(scriptFileName);
@@ -328,8 +367,6 @@ public class FlinkTask extends AbstractYarnTask {
                     }
                     Files.createFile(path, attr);
                 }
-                // Flink sql common parameters are written to the script file
-                Files.write(path, parameters.getBytes(), StandardOpenOption.APPEND);
                 // Flink sql raw script is written to the script file
                 Files.write(path, flinkParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {

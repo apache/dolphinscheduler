@@ -2,7 +2,11 @@
 
 ## Overview
 
-Flink task type for executing Flink programs. For Flink nodes, the worker submits the task by using the Flink command `flink run`. See [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) for more details.
+Flink task type, used to execute Flink programs. For Flink nodes:
+
+(1) When the program type is Java, Scala or Python, the worker submits the task `flink run` using the Flink command. See [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) for more details.
+
+(2) When the program type is Sql, the worker submits the task `sql-client.sh` using Flink Sql. See [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/en/docs/dev/table/sqlclient/) for more details.
 
 ## Create Task
 
@@ -25,6 +29,8 @@ Flink task type for executing Flink programs. For Flink nodes, the worker submit
 - **The class of main function**: The **full path** of Main Class, the entry point of the Flink program.
 - **Main jar package**: The jar package of the Flink program (upload by Resource Center).
 - **Deployment mode**: Support 2 deployment modes: cluster and local.
+- **Initialization script**: Script file to initialize session context.
+- **Script**: The sql script file developed by the user that should be executed.
 - **Flink version**: Select version according to the execution env.
 - **Task name** (optional): Flink task name.
 - **JobManager memory size**: Used to set the size of jobManager memories, which can be set according to the actual production environment.
@@ -64,6 +70,14 @@ Configure the required content according to the parameter descriptions above.
 
 ![demo-flink-simple](/img/tasks/demo/flink_task02.png)
 
+### Execute the FlinkSQL Program
+
+Configure the required content according to the parameter descriptions above.
+
+![demo-flink-sql-simple](/img/tasks/demo/flink_sql_test.png)
+
 ## Notice
 
-JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
+- JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
+
+- Use sql to execute flink sql tasks, currently only flink 1.13 and above are supported.

@@ -32,7 +32,7 @@ public class FlinkConstants {
 
     /**
      * flink sql command
-     * usage: sql-client.sh -i <initialization file>, -j <JAR file>, -f <script file>...
+     * usage: sql-client.sh -i <initialization file>, -f <script file>
      */
     public static final String FLINK_SQL_COMMAND = "sql-client.sh";
 
@@ -58,7 +58,8 @@ public class FlinkConstants {
     public static final String FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE = "set taskmanager.memory.process.size=%s";
     public static final String FLINK_FORMAT_TASKMANAGER_NUMBEROFTASKSLOTS = "set taskmanager.numberOfTaskSlots=%d";
     public static final String FLINK_FORMAT_PARALLELISM_DEFAULT = "set parallelism.default=%d";
-    public static final String FLINK_SQL_FILE = "-f";
+    public static final String FLINK_SQL_SCRIPT_FILE = "-f";
+    public static final String FLINK_SQL_INIT_FILE = "-i";
     public static final String FLINK_SQL_NEWLINE = ";\n";
 
     // execution.target options

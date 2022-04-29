@@ -73,7 +73,7 @@ public class FlinkTaskTest {
         when(taskExecutionContext.getTaskAppId()).thenReturn("4483");
         FlinkTask flinkTask = spy(new FlinkTask(taskExecutionContext));
         flinkTask.init();
-        Assert.assertEquals("sql-client.sh -f /tmp/4483_node.sql", flinkTask.buildCommand());
+        Assert.assertEquals("sql-client.sh -i /tmp/4483_init.sql -f /tmp/4483_node.sql", flinkTask.buildCommand());
     }
 
     private String buildFlinkParameters() {
@@ -102,6 +102,7 @@ public class FlinkTaskTest {
     private String buildFlinkParametersWithFlinkSql() {
         FlinkParameters parameters = new FlinkParameters();
         parameters.setLocalParams(Collections.emptyList());
+        parameters.setInitScript("set sql-client.execution.result-mode=tableau;");
         parameters.setRawScript("selcet 11111;");
         parameters.setProgramType(ProgramType.SQL);
         parameters.setMainClass(StringUtils.EMPTY);

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref , watchEffect} from 'vue'
+import { computed, ref, watchEffect} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDeployMode, useMainJar, useResources } from '.'
 import type { IJsonItem } from '../types'
@@ -29,7 +29,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'SQL' ? 0 : 24
   )
 
-  const rawScriptSpan = computed(() =>
+  const scriptSpan = computed(() =>
     model.programType === 'SQL' ? 24 : 0
   )
 
@@ -87,8 +87,19 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     useDeployMode(24, ref(false)),
     {
       type: 'editor',
+      field: 'initScript',
+      span: scriptSpan,
+      name: t('project.node.init_script'),
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: false,
+        message: t('project.node.init_script_tips')
+      }
+    },
+    {
+      type: 'editor',
       field: 'rawScript',
-      span: rawScriptSpan,
+      span: scriptSpan,
       name: t('project.node.script'),
       validate: {
         trigger: ['input', 'trigger'],
