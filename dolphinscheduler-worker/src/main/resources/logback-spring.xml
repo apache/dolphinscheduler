@@ -17,6 +17,7 @@
   -->
 
 <configuration scan="true" scanPeriod="120 seconds">
+
     <property name="log.base" value="logs"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
