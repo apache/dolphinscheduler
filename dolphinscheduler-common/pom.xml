@@ -274,12 +274,6 @@
             </exclusions>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
@@ -496,8 +490,6 @@
             </exclusions>
         </dependency>
 
-
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -512,44 +504,8 @@
         </dependency>
 
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
-            <artifactId>clickhouse-jdbc</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>com.fasterxml.jackson.core</artifactId>
-                    <groupId>jackson-core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>com.fasterxml.jackson.core</artifactId>
-                    <groupId>jackson-databind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>azure-keyvault</artifactId>
-                    <groupId>com.microsoft.azure</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.facebook.presto</groupId>
-            <artifactId>presto-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-annotation</artifactId>
-            <version>${mybatis-plus.version}</version>
         </dependency>
 
         <dependency>
