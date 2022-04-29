@@ -137,7 +137,7 @@ export function useModal(
       variables.model.userId =
         (userStore.getUserInfo as UserInfoRes).userType === 'GENERAL_USER'
           ? (userStore.getUserInfo as UserInfoRes).id
-          : ''
+          : null
       variables.model.expireTime = Date.now()
       variables.model.token = ''
       ctx.emit('confirmModal', props.showModalRef)
