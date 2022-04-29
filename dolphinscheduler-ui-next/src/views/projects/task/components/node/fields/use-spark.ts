@@ -32,20 +32,14 @@ import type { IJsonItem } from '../types'
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-      (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+    model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
 
-  const mainArgsSpan = computed(() =>
-      model.programType === 'SQL' ? 0 : 24
-  )
+  const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
 
-  const rawScriptSpan = computed(() =>
-      model.programType === 'SQL' ? 24 : 0
-  )
+  const rawScriptSpan = computed(() => (model.programType === 'SQL' ? 24 : 0))
 
-  const showCluster = computed(() =>
-      model.programType !== 'SQL'
-  )
+  const showCluster = computed(() => model.programType !== 'SQL')
 
   return [
     {
@@ -80,7 +74,11 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'blur'],
         required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
-          if (model.programType !== 'PYTHON' && !value && model.programType !== 'SQL') {
+          if (
+            model.programType !== 'PYTHON' &&
+            !value &&
+            model.programType !== 'SQL'
+          ) {
             return new Error(t('project.node.main_class_tips'))
           }
         }

@@ -69,6 +69,8 @@ interface IJsonItemParams {
   span?: number | Ref<number>
   widget?: any
   class?: string
+  path?: string
+  rule?: FormItemRule
 }
 
 type IJsonItemFn = (i?: number) => IJsonItemParams

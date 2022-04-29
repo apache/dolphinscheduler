@@ -17,7 +17,7 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData, ITaskData  } from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
 export function useZeppelin({
   projectCode,

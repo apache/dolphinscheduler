@@ -26,9 +26,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
-  const mainJarSpan = computed(() =>
-      model.programType === 'SQL' ? 0 : 24
-  )
+  const mainJarSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {

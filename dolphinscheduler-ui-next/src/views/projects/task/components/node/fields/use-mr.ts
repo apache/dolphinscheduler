@@ -23,7 +23,7 @@ export function useMr(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
   const mainClassSpan = computed(() =>
-      (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+    model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
 
   return [

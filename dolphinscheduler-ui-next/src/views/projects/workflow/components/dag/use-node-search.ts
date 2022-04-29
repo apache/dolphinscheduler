@@ -48,7 +48,9 @@ export function useNodeSearch(options: Options) {
       label: node.getData().taskName,
       value: node.id
     }))
-    const filterSelect = nodesDropdown.value.findIndex(item => item.value === searchSelectValue.value)
+    const filterSelect = nodesDropdown.value.findIndex(
+      (item) => item.value === searchSelectValue.value
+    )
     filterSelect === -1 && (searchSelectValue.value = '')
   }
 
