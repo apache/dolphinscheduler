@@ -26,6 +26,8 @@ interface Options {
  * Node search and navigate
  */
 export function useNodeSearch(options: Options) {
+  const searchSelectValue = ref('')
+
   const { graph } = options
 
   /**
@@ -46,6 +48,10 @@ export function useNodeSearch(options: Options) {
       label: node.getData().taskName,
       value: node.id
     }))
+    const filterSelect = nodesDropdown.value.findIndex(
+      (item) => item.value === searchSelectValue.value
+    )
+    filterSelect === -1 && (searchSelectValue.value = '')
   }
 
   /**
@@ -53,6 +59,7 @@ export function useNodeSearch(options: Options) {
    * @param {string} code
    */
   function navigateTo(code: string) {
+    searchSelectValue.value = code
     if (!graph.value) return
     const cell = graph.value.getCellById(code)
     graph.value.scrollToCell(cell, { animation: { duration: 600 } })
@@ -61,6 +68,7 @@ export function useNodeSearch(options: Options) {
   }
 
   return {
+    searchSelectValue,
     navigateTo,
     toggleSearchInput,
     searchInputVisible,

@@ -14,49 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ref, watchEffect} from 'vue'
-import {useI18n} from 'vue-i18n'
-import type {IJsonItem, IOption} from '../types'
+import { ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem, IOption } from '../types'
 
-export function useDeployMode(span = 24, showClient = ref(true), showCluster = ref(true)): IJsonItem {
-    const {t} = useI18n()
+export function useDeployMode(
+  span = 24,
+  showClient = ref(true),
+  showCluster = ref(true)
+): IJsonItem {
+  const { t } = useI18n()
 
-    const deployModeOptions = ref(DEPLOY_MODES as IOption[])
+  const deployModeOptions = ref(DEPLOY_MODES as IOption[])
 
-    watchEffect(
-        () => {
-            deployModeOptions.value = DEPLOY_MODES.filter((option) => {
-                switch (option.value) {
-                    case 'cluster':
-                        return showCluster.value
-                    case 'client':
-                        return showClient.value
-                    default:
-                        return true
-                }
-            })
-        }
-    )
-    return {
-        type: 'radio',
-        field: 'deployMode',
-        name: t('project.node.deploy_mode'),
-        options: deployModeOptions,
-        span
-    }
+  watchEffect(() => {
+    deployModeOptions.value = DEPLOY_MODES.filter((option) => {
+      switch (option.value) {
+        case 'cluster':
+          return showCluster.value
+        case 'client':
+          return showClient.value
+        default:
+          return true
+      }
+    })
+  })
+  return {
+    type: 'radio',
+    field: 'deployMode',
+    name: t('project.node.deploy_mode'),
+    options: deployModeOptions,
+    span
+  }
 }
 
 export const DEPLOY_MODES = [
-    {
-        label: 'cluster',
-        value: 'cluster'
-    },
-    {
-        label: 'client',
-        value: 'client'
-    },
-    {
-        label: 'local',
-        value: 'local'
-    }
+  {
+    label: 'cluster',
+    value: 'cluster'
+  },
+  {
+    label: 'client',
+    value: 'client'
+  },
+  {
+    label: 'local',
+    value: 'local'
+  }
 ]
