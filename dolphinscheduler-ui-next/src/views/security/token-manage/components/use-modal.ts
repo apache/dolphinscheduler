@@ -42,7 +42,7 @@ export function useModal(
       userId: ref(
         (userStore.getUserInfo as UserInfoRes).userType === 'GENERAL_USER'
           ? (userStore.getUserInfo as UserInfoRes).id
-          : ''
+          : null
       ),
       expireTime: ref(Date.now()),
       token: ref(''),
@@ -54,7 +54,7 @@ export function useModal(
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (variables.model.userId === '') {
+          if (!variables.model.userId) {
             return new Error(t('security.token.user_tips'))
           }
         }
@@ -137,7 +137,7 @@ export function useModal(
       variables.model.userId =
         (userStore.getUserInfo as UserInfoRes).userType === 'GENERAL_USER'
           ? (userStore.getUserInfo as UserInfoRes).id
-          : ''
+          : null
       variables.model.expireTime = Date.now()
       variables.model.token = ''
       ctx.emit('confirmModal', props.showModalRef)

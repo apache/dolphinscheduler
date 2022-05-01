@@ -1023,7 +1023,7 @@ const security = {
     user: '用户',
     user_tips: '请选择用户',
     token: '令牌',
-    token_tips: '请输入令牌',
+    token_tips: '请点击获取令牌',
     expiration_time: '失效时间',
     expiration_time_tips: '请选择失效时间',
     create_time: '创建时间',

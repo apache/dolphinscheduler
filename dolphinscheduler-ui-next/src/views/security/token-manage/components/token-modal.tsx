@@ -64,7 +64,7 @@ const TokenModal = defineComponent({
         variables.model.userId =
           (userStore.getUserInfo as UserInfoRes).userType === 'GENERAL_USER'
             ? (userStore.getUserInfo as UserInfoRes).id
-            : ''
+            : null
         variables.model.expireTime = Date.now()
         variables.model.token = ''
       } else {
@@ -101,7 +101,7 @@ const TokenModal = defineComponent({
           variables.model.userId =
             (userStore.getUserInfo as UserInfoRes).userType === 'GENERAL_USER'
               ? (userStore.getUserInfo as UserInfoRes).id
-              : ''
+              : null
           variables.model.expireTime = Date.now()
           variables.model.token = ''
         } else {
