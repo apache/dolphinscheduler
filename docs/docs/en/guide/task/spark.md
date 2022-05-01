@@ -2,7 +2,7 @@
 
 ## Overview
 
-Spark task type for executing Spark programs. For Spark nodes, the worker will do this by using the spark command:
+Spark task type for executing Spark application. When executing the Spark task, the worker will submits a job to the Spark cluster by following commands:
 
 (1) `spark submit` method to submit tasks. See [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit) for more details.
 
@@ -25,7 +25,7 @@ Spark task type for executing Spark programs. For Spark nodes, the worker will d
 - **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
 - **Delayed execution time**: The time (unit minute) that a task delays in execution.
 - **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- **Program type**: Supports Java, Scala, Python and Sql.
+- **Program type**: Supports Java, Scala, Python and SQL.
 - **Spark version**: Support Spark1 and Spark2.
 - **The class of main function**: The **full path** of Main Class, the entry point of the Spark program.
 - **Main jar package**: The Spark jar package (upload by Resource Center).
@@ -45,7 +45,7 @@ Spark task type for executing Spark programs. For Spark nodes, the worker will d
 
 ## Task Example
 
-### (1) spark submit
+### spark submit
 
 #### Execute the WordCount Program
 
@@ -71,7 +71,7 @@ Configure the required content according to the parameter descriptions above.
 
 ![demo-spark-simple](/img/tasks/demo/spark_task02.png)
 
-### (2) spark sql
+### spark sql
 
 #### Execute DDL and DML statements
 
@@ -81,6 +81,6 @@ This case is to create a view table terms and write three rows of data and a tab
 
 ## Notice
 
-JAVA and Scala are only used for identification, and there is no difference. If it is Spark developed by Python, there is no class for the main function. Others are the same. JAVA, Scala and Python do not have SQL scripts.
+JAVA and Scala are only used for identification, and there is no difference when you use the Spark task. If your application is developed by Python, you could just ignore the parameter **Main Class** in the form. Parameter **SQL scripts** is only for SQL type and could be ignored in JAVA, Scala and Python.
 
-If it is Spark developed by SQL, there is no main function, main package and main program parameters. SQL does not currently support cluster mode.
+SQL does not currently support cluster mode.

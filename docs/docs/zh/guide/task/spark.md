@@ -2,7 +2,7 @@
 
 ## 综述
 
-Spark  任务类型，用于执行 Spark 程序。对于 Spark 节点，worker 会通过使用 spark 命令：
+Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支持两个不同类型的 spark 命令提交任务：
 
 (1) `spark submit` 方式提交任务。更多详情查看 [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit)。
 
@@ -26,7 +26,7 @@ Spark  任务类型，用于执行 Spark 程序。对于 Spark 节点，worker �
 - 失败重试间隔：任务失败重新提交任务的时间间隔，以分为单位。
 - 延迟执行时间：任务延迟执行的时间，以分为单位。
 - 超时警告：勾选超时警告、超时失败，当任务超过“超时时长”后，会发送告警邮件并且任务执行失败。
-- 程序类型：支持 Java、Scala、Python 和 Sql 四种语言。
+- 程序类型：支持 Java、Scala、Python 和 SQL 四种语言。
 - Spark 版本：支持 Spark1 和 Spark2。
 - 主函数的 Class：Spark 程序的入口 Main class 的全路径。
 - 主程序包：执行 Spark 程序的 jar 包（通过资源中心上传）。
@@ -46,7 +46,7 @@ Spark  任务类型，用于执行 Spark 程序。对于 Spark 节点，worker �
 
 ## 任务样例
 
-### (1) spark submit
+### spark submit
 
 #### 执行 WordCount 程序
 
@@ -72,7 +72,7 @@ Spark  任务类型，用于执行 Spark 程序。对于 Spark 节点，worker �
 
 ![demo-spark-simple](/img/tasks/demo/spark_task02.png)
 
-### (2) spark sql
+### spark sql
 
 #### 执行 DDL 和 DML 语句
 
@@ -84,6 +84,6 @@ Spark  任务类型，用于执行 Spark 程序。对于 Spark 节点，worker �
 
 注意：
 
-JAVA 和 Scala 只是用来标识，没有区别，如果是 Python 开发的 Spark 则没有主函数的 class，其他都是一样，JAVA、Scala 和 Python 没有 SQL 脚本。
+JAVA 和 Scala 只用于标识，使用 Spark 任务时没有区别。如果应用程序是由 Python 开发的，那么可以忽略表单中的参数**Main Class**。参数**SQL脚本**仅适用于 SQL 类型，在 JAVA、Scala 和 Python 中可以忽略。
 
-如果是 Sql 开发的 Spark 则没有主函数、主程序包和主程序参数，SQL 目前不支持 cluster 模式。
+SQL 目前不支持 cluster 模式。
