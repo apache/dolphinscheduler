@@ -1035,7 +1035,7 @@ const security = {
     user: 'User',
     user_tips: 'Please select user',
     token: 'Token',
-    token_tips: 'Please enter your token',
+    token_tips: 'Please click to get token',
     expiration_time: 'Expiration Time',
     expiration_time_tips: 'Please select expiration time',
     create_time: 'Create Time',
