@@ -241,7 +241,19 @@ export default {
                                 title: 'Enterprise Webexteams',
                                 link: '/en-us/docs/3.0.0/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: 'Script',
+                                link: '/en-us/docs/3.0.0/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http',
+                                link: '/en-us/docs/3.0.0/user_doc/guide/alert/http.html',
+                            },
                         ],
+                    },
+                    {
+                        title: 'Data Quality',
+                        link: '/en-us/docs/3.0.0/user_doc/guide/data-quality.html',
                     },
                     {
                         title: 'Resource',
@@ -555,7 +567,19 @@ export default {
                                 title: 'Webexteams',
                                 link: '/zh-cn/docs/3.0.0/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: '脚本告警',
+                                link: '/zh-cn/docs/3.0.0/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http告警',
+                                link: '/zh-cn/docs/3.0.0/user_doc/guide/alert/http.html',
+                            },
                         ],
+                    },
+                    {
+                        title: '数据质量',
+                        link: '/zh-cn/docs/3.0.0/user_doc/guide /data-quality.html',
                     },
                     {
                         title: '资源中心',

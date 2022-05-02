@@ -203,7 +203,7 @@ A： 1，在 **流程定义列表**，点击 **启动** 按钮
 
 ## Q：Python 任务设置 Python 版本
 
-A：  只需要修改 conf/env/dolphinscheduler_env.sh 中的 PYTHON_HOME
+A：  只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_HOME
 
 ```
 export PYTHON_HOME=/bin/python
@@ -290,10 +290,9 @@ A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/do
 
 ​	3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
 
-​	4，到 bin 下，启动 worker server 和 logger server
+​	4，到 bin 下，启动 worker server
 ```
         ./dolphinscheduler-daemon.sh start worker-server
-        ./dolphinscheduler-daemon.sh start logger-server
 ```
 
 ---
@@ -582,7 +581,7 @@ A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EM
    
    2. 将 `conf/common.properties` 中的 `yarn.application.status.address` 修改为当前集群的 Yarn 的信息
    
-   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 和 `bin/dolphinscheduler-daemon.sh start logger-server` 分别启动 worker-server 和 logger-server
+   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 启动 worker-server
 
 ---
 
@@ -682,5 +681,39 @@ update t_ds_version set version='2.0.1';
 ```
 
 ---
+
+## 在二进制分发包中找不到 python-gateway-server 文件夹
+
+在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server 中，当您启动 api server 后，Python gateway server 将启动。
+如果您不想在 api server 启动的时候启动 Python gateway server，您可以修改 api server 中的配置文件 `api-server/conf/application.yaml`
+并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
+
+## 如果构建自定义的 Docker 镜像
+
+DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 docker hub 中找到这些镜像，如果你因为个性化需求想要自己打包 docker 镜像，最佳实践是基于 DolphinScheduler 对应镜像编写 Dockerfile 文件
+
+```Dockerfile
+FROM dolphinscheduler-standalone-server
+RUN apt update ; \
+    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
+```
+
+如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行
+
+```shell
+./mvnw -B clean deploy \
+  -Dmaven.test.skip \
+  -Dmaven.javadoc.skip \
+  -Dmaven.checkstyle.skip \
+  -Dmaven.deploy.skip \
+  -Ddocker.tag=latest \
+  -Pdocker,release
+```
+
+如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义，你可以在源码项目根目录中运行以下命令找到所有的 Dockerfile 文件
+
+```shell
+find . -iname 'Dockerfile'
+```
 
 我们会持续收集更多的 FAQ。
