@@ -218,7 +218,7 @@ A:   1, in **the process definition list**, click the **Start** button.
 
 ## Q : Python task setting Python version
 
-A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in conf/env/.dolphinscheduler_env.sh
+A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in `worker/bin/dolphinscheduler_env.sh`
 
 ```
 export PYTHON_HOME=/bin/python
@@ -306,11 +306,10 @@ A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluste
 
 ​		3, Copy the deployment directory from worker server that has already deployed
 
-​		4, Go to bin dir, then start worker server and logger server
+​		4, Go to bin dir, then start worker server
 
         ```
         ./dolphinscheduler-daemon.sh start worker-server
-        ./dolphinscheduler-daemon.sh start logger-server
         ```
 
 ---
@@ -602,7 +601,7 @@ A：By deploying different worker in different yarn clusters，the steps are as 
    
    2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
    
-   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` and `bin/dolphinscheduler-daemon.sh start logger-server` to start worker-server and logger-server
+   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` to start worker-server
 
 ---
 
@@ -706,6 +705,34 @@ update t_ds_version set version='2.0.1';
 After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
 start API server. If you want disabled when Python gateway service you could change API server configuration in path
 `api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
+
+## 如果构建自定义的 Docker 镜像
+
+DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 docker hub 中找到这些镜像，如果你因为个性化需求想要自己打包 docker 镜像，最佳实践是基于 DolphinScheduler 对应镜像编写 Dockerfile 文件
+
+```Dockerfile
+FROM dolphinscheduler-standalone-server
+RUN apt update ; \
+    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
+```
+
+如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行
+
+```shell
+./mvnw -B clean deploy \
+  -Dmaven.test.skip \
+  -Dmaven.javadoc.skip \
+  -Dmaven.checkstyle.skip \
+  -Dmaven.deploy.skip \
+  -Ddocker.tag=latest \
+  -Pdocker,release
+```
+
+如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义，你可以在源码项目根目录中运行以下命令找到所有的 Dockerfile 文件
+
+```shell
+find . -iname 'Dockerfile'
+```
 
 ---
 

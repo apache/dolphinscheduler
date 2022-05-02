@@ -37,3 +37,7 @@ login.user.keytab.username=hdfs-mycluster@ESZ.COM
 # login user from keytab path
 login.user.keytab.path=/opt/hdfs.headless.keytab
 ```
+
+## Native Supported
+
+Yes, could use this datasource by default. 
