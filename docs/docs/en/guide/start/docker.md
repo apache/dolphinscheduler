@@ -131,5 +131,5 @@ and use `admin` and `dolphinscheduler123` as default username and password in th
 
 You can modify some environment variables to change configurations when you are starting servers through Docker. We have
 an example in [using exists PostgreSQL ZooKeeper](#using-exists-postgresql-zookeeper) to change database and ZooKeeper configurations,
-and you could find all environment variables in [all environment variables](https://github.com/apache/dolphinscheduler/blob/<version>/script/env/dolphinscheduler_env.sh) <!-- markdown-link-check -disable-line -->
+and you could find all environment variables in [all environment variables](https://github.com/apache/dolphinscheduler/blob/<version>/script/env/dolphinscheduler_env.sh) <!-- markdown-link-check-disable-line -->
 and change them if you want.
