@@ -1,8 +1,8 @@
 # Docker 快速使用教程
 
-本教程使用三种不同的方式通过 Docker 完成 DolphinScheduler 的部署，如果你想要快速体验，推荐使用 [standalone-server 镜像](#使用standalone-server镜像)，
-如果你想要体验比较完成的服务，推荐[使用 docker-compose 启动服务](#使用docker-compose启动服务)。如果你已经有自己的数据库或者 Zookeeper 服务
-你想要沿用这些基础服务，你可以参考[沿用已有的 PostgreSQL 和 ZooKeeper 服务](#沿用已有的PostgreSQL和ZooKeeper服务)完成部署。 
+本教程使用三种不同的方式通过 Docker 完成 DolphinScheduler 的部署，如果你想要快速体验，推荐使用 standalone-server 镜像，
+如果你想要体验比较完成的服务，推荐使用 docker-compose 启动服务。如果你已经有自己的数据库或者 Zookeeper 服务
+你想要沿用这些基础服务，你可以参考沿用已有的 PostgreSQL 和 ZooKeeper 服务完成部署。 
 
 ## 前置条件
 
@@ -57,7 +57,7 @@ $ docker-compose up -d
 
 ### 沿用已有的 PostgreSQL 和 ZooKeeper 服务
 
-[使用 docker-compose 启动服务](#使用docker-compose启动服务)会新启动数据库，以及 ZooKeeper 服务。如果你已经有在运行中的数据库，或者
+使用 docker-compose 启动服务会新启动数据库，以及 ZooKeeper 服务。如果你已经有在运行中的数据库，或者
 ZooKeeper 且不想启动新的服务，可以使用这个方式分别启动 DolphinScheduler 容器。
 
 ```shell
@@ -117,10 +117,10 @@ $ docker run -d --name dolphinscheduler-alert-server \
 
 ![login](/img/new_ui/dev/quick-start/login.png)
 
-> 注意：如果你使用 [沿用已有的 PostgreSQL 和 ZooKeeper 服务](#沿用已有的PostgreSQL和ZooKeeper服务) 方式启动服务，且服务分布在多台机器中，
+> 注意：如果你使用沿用已有的 PostgreSQL 和 ZooKeeper 服务方式启动服务，且服务分布在多台机器中，
 > 请将上述的地址改成你 API 容器启动的 hostname 或者 IP。
 
 ## 环境变量
 
-可以通过环境变量来修改 Docker 运行的配置，我们在[沿用已有的 PostgreSQL 和 ZooKeeper 服务](#沿用已有的PostgreSQL和ZooKeeper服务) 中
-就通过环境变量修改了 Docker 的数据库配置和注册中心配置，关于全部的配置环境可以查看[全部的配置文件](https://github.com/apache/dolphinscheduler/blob/<version>/script/env/dolphinscheduler_env.sh) 了解 <!-- markdown-link-check-disable-line -->
+可以通过环境变量来修改 Docker 运行的配置，我们在沿用已有的 PostgreSQL 和 ZooKeeper 服务中就通过环境变量修改了 Docker 的数据库配置和
+注册中心配置，关于全部的配置环境可以查看[全部的配置文件](https://github.com/apache/dolphinscheduler/blob/<version>/script/env/dolphinscheduler_env.sh) 了解 <!-- markdown-link-check-disable-line -->
