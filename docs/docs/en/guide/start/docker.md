@@ -3,7 +3,7 @@
 There are three ways to start DolphinScheduler with Docker, [Standalone-server](#using-standalone-server-docker-image) is the way you
 find if you just want to start and try DolphinScheduler as a beginner. [docker-compose](#using-docker-compose-to-start-server) is for
 some who want to deploy DolphinScheduler in small or event middle scale workflows in their daily work.
-[Using exists postgresql and zookeeper server](#using-exists-postgresql-and-zookeeper-server) is for users who want to reuse the database
+[Using exists postgresql and zookeeper server](#using-exists-postgresql-zookeeper) is for users who want to reuse the database
 or zookeeper server already exists.
 
 ## Prepare
