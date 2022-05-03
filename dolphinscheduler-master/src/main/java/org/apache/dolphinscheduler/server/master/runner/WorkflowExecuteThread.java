@@ -804,7 +804,7 @@ public class WorkflowExecuteThread {
      */
     private void endProcess() {
         this.stateEvents.clear();
-        if (processService.theLatestVersionOfProcessDefinition(processDefinition.getCode()).getExecutionType().typeIsSerialWait()) {
+        if (checkProcessDefinitionTypeIsSerialWait()) {
             checkSerialProcess(processDefinition);
         }
         if (processInstance.getState().typeIsWaitingThread()) {
@@ -818,6 +818,10 @@ public class WorkflowExecuteThread {
             //release task group
             processService.releaseAllTaskGroup(processInstance.getId());
         }
+    }
+
+    public boolean checkProcessDefinitionTypeIsSerialWait(){
+        return processService.theLatestVersionOfProcessDefinition(processDefinition.getCode()).getExecutionType().typeIsSerialWait();
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {

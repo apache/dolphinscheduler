@@ -127,6 +127,28 @@ public class WorkflowExecuteThreadTest {
     }
 
     @Test
+    public void testEndProcess(){
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setProcessDefinitionCode(1L);
+        processInstance.setProcessDefinitionVersion(1);
+        Mockito.when(processService.findProcessInstanceById(1)).thenReturn(processInstance);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setExecutionType(ProcessExecutionTypeEnum.SERIAL_WAIT);
+        Mockito.when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
+
+        workflowExecuteThread.refreshProcessInstance(1);
+        Assert.assertNotNull(processDefinition);
+
+        Mockito.when(processService.theLatestVersionOfProcessDefinition(1L)).thenReturn(processDefinition);
+        boolean isSerialWait = workflowExecuteThread.checkProcessDefinitionTypeIsSerialWait();
+        Assert.assertTrue(isSerialWait);
+    }
+
+    @Test
     public void testParseStartNodeName() throws ParseException {
         try {
             Map<String, String> cmdParam = new HashMap<>();
