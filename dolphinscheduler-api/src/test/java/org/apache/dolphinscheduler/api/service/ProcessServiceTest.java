@@ -22,18 +22,17 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * process service test
  */
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessServiceTest {
 
     @InjectMocks
@@ -42,18 +41,14 @@ public class ProcessServiceTest {
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
 
-    @Before
-    public void init(){
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(0L);
-        processDefinition.setExecutionType(ProcessExecutionTypeEnum.SERIAL_WAIT);
-
-        PowerMockito.when(processDefineMapper.queryByCode(0L)).thenReturn(processDefinition);
-    }
-
     @Test
     public void testTheLatestVersionOfProcessDefinition(){
-        ProcessDefinition processDefinition = processService.theLatestVersionOfProcessDefinition(0L);
-        Assert.assertNotNull(processDefinition);
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setExecutionType(ProcessExecutionTypeEnum.SERIAL_WAIT);
+
+        Mockito.when(processDefineMapper.queryByCode(1L)).thenReturn(processDefinition);
+        ProcessDefinition definition = processService.theLatestVersionOfProcessDefinition(1L);
+        Assert.assertTrue(definition.getExecutionType().typeIsSerial());
     }
 }
