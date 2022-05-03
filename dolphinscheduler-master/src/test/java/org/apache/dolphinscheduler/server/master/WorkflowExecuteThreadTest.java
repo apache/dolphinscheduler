@@ -24,9 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -39,6 +37,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -89,6 +88,8 @@ public class WorkflowExecuteThreadTest {
 
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+    private ProcessAlertManager processAlertManager;
+
     @Before
     public void init() throws Exception {
         applicationContext = mock(ApplicationContext.class);
@@ -130,6 +131,7 @@ public class WorkflowExecuteThreadTest {
     public void testCheckProcessDefinitionTypeIsSerialWait(){
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
+        processInstance.setState(ExecutionStatus.SERIAL_WAIT);
         processInstance.setProcessDefinitionCode(1L);
         processInstance.setProcessDefinitionVersion(1);
         Mockito.when(processService.findProcessInstanceById(1)).thenReturn(processInstance);
@@ -146,6 +148,14 @@ public class WorkflowExecuteThreadTest {
         Mockito.when(processService.findProcessDefinitionByCode(1L)).thenReturn(processDefinition);
         boolean isSerialWait = workflowExecuteThread.checkProcessDefinitionTypeIsSerialWait();
         Assert.assertTrue(isSerialWait);
+
+        PowerMockito.doCallRealMethod().when(workflowExecuteThread).endProcess();
+        PowerMockito.doCallRealMethod().when(workflowExecuteThread).checkSerialProcess(processDefinition);
+        try{
+            workflowExecuteThread.endProcess();
+        }catch (Exception e){
+            Assert.assertNotNull(e);
+        }
     }
 
     @Test
