@@ -804,7 +804,7 @@ public class WorkflowExecuteThread {
      */
     private void endProcess() {
         this.stateEvents.clear();
-        if (processDefinition.getExecutionType().typeIsSerialWait()) {
+        if (processService.theLatestVersionOfProcessDefinition(processDefinition.getCode()).getExecutionType().typeIsSerialWait()) {
             checkSerialProcess(processDefinition);
         }
         if (processInstance.getState().typeIsWaitingThread()) {
