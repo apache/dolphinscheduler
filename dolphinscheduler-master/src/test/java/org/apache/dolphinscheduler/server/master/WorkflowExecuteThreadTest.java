@@ -127,7 +127,7 @@ public class WorkflowExecuteThreadTest {
     }
 
     @Test
-    public void testEndProcess(){
+    public void testCheckProcessDefinitionTypeIsSerialWait(){
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setProcessDefinitionCode(1L);
@@ -143,7 +143,7 @@ public class WorkflowExecuteThreadTest {
         workflowExecuteThread.refreshProcessInstance(1);
         Assert.assertNotNull(processDefinition);
 
-        Mockito.when(processService.theLatestVersionOfProcessDefinition(1L)).thenReturn(processDefinition);
+        Mockito.when(processService.findProcessDefinitionByCode(1L)).thenReturn(processDefinition);
         boolean isSerialWait = workflowExecuteThread.checkProcessDefinitionTypeIsSerialWait();
         Assert.assertTrue(isSerialWait);
     }

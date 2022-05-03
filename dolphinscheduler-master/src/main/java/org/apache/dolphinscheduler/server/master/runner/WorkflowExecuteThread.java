@@ -802,7 +802,7 @@ public class WorkflowExecuteThread {
     /**
      * process end handle
      */
-    private void endProcess() {
+    public void endProcess() {
         this.stateEvents.clear();
         if (checkProcessDefinitionTypeIsSerialWait()) {
             checkSerialProcess(processDefinition);
@@ -821,7 +821,7 @@ public class WorkflowExecuteThread {
     }
 
     public boolean checkProcessDefinitionTypeIsSerialWait(){
-        return processService.theLatestVersionOfProcessDefinition(processDefinition.getCode()).getExecutionType().typeIsSerialWait();
+        return processService.findProcessDefinitionByCode(processDefinition.getCode()).getExecutionType().typeIsSerialWait();
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {

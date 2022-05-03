@@ -3035,11 +3035,6 @@ public class ProcessServiceImpl implements ProcessService {
         return this.processInstanceMapper.loadNextProcess4Serial(code, state, id);
     }
 
-    @Override
-    public ProcessDefinition theLatestVersionOfProcessDefinition(long code) {
-        return processDefineMapper.queryByCode(code);
-    }
-
     protected void deleteCommandWithCheck(int commandId) {
         int delete = this.commandMapper.deleteById(commandId);
         if (delete != 1) {
