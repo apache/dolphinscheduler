@@ -398,7 +398,7 @@ public class ProcessServiceTest {
         command6.setCommandParam("{\"ProcessInstanceId\":223}");
         command6.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         command6.setProcessDefinitionVersion(1);
-        Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(11L, Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
+        Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1, Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateNextProcessIdById(223, 222)).thenReturn(true);
         Mockito.when(commandMapper.deleteById(6)).thenReturn(1);
         ProcessInstance processInstance6 = processService.handleCommand(logger, host, command6);
@@ -419,7 +419,7 @@ public class ProcessServiceTest {
         command7.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         command7.setProcessDefinitionVersion(1);
         Mockito.when(commandMapper.deleteById(7)).thenReturn(1);
-        Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(11L, Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
+        Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1, Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
         ProcessInstance processInstance8 = processService.handleCommand(logger, host, command7);
         Assert.assertTrue(processInstance8 == null);
 
@@ -441,7 +441,7 @@ public class ProcessServiceTest {
         command9.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         command9.setProcessDefinitionVersion(1);
         Mockito.when(processInstanceMapper.queryDetailById(225)).thenReturn(processInstance9);
-        Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(12L, Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
+        Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(12L, 1, Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateById(processInstance)).thenReturn(1);
         Mockito.when(commandMapper.deleteById(9)).thenReturn(1);
         ProcessInstance processInstance10 = processService.handleCommand(logger, host, command9);
