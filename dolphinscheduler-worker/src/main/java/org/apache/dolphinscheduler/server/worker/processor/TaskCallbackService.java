@@ -55,7 +55,7 @@ public class TaskCallbackService {
     private static final int[] RETRY_BACKOFF = {1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200};
 
     @Autowired
-    private TaskExecuteResponseAckProcessor taskExecuteRunningProcessor;
+    private TaskExecuteRunningAckProcessor taskExecuteRunningProcessor;
 
     @Autowired
     private TaskExecuteResponseAckProcessor taskExecuteResponseAckProcessor;
