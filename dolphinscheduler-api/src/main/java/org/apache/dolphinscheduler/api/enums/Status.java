@@ -401,7 +401,7 @@ public enum Status {
     QUERY_UNAUTHORIZED_NAMESPACE_ERROR(1300012, "query unauthorized namespace error", "查询未授权命名空间错误"),
     QUERY_AUTHORIZED_NAMESPACE_ERROR(1300013, "query authorized namespace error", "查询授权命名空间错误"),
     QUERY_CAN_USE_K8S_CLUSTER_ERROR(1300014, "login user query can used k8s cluster list error", "查询可用k8s集群错误"),
-    RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource full name too long error", "全限定名过长");
+    RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource's fullname is too long error", "资源文件名过长");
 
     private final int code;
     private final String enMsg;
