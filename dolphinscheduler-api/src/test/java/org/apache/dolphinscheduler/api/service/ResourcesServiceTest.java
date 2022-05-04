@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.io.Files;
-import org.apache.commons.collections.CollectionUtils;
+import static org.mockito.ArgumentMatchers.eq;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -34,8 +32,25 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,10 +66,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.IOException;
-import java.util.*;
-
-import static org.mockito.ArgumentMatchers.eq;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.io.Files;
 
 /**
  * resources service test
@@ -140,6 +154,14 @@ public class ResourcesServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), result.getMsg());
 
+        //FULL_FILE_NAME_TOO_LONG
+        String tooLongFileName = getRandomStringWithLength(Constants.RESOURCE_FULL_NAME_MAX_LENGTH) + ".pdf";
+        mockMultipartFile = new MockMultipartFile(tooLongFileName, tooLongFileName, "pdf", "test".getBytes());
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        PowerMockito.when(Files.getFileExtension(tooLongFileName)).thenReturn("pdf");
+        result = resourcesService.createResource(user, tooLongFileName, tooLongFileName, ResourceType.FILE, mockMultipartFile, -1, "/");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR.getMsg(), result.getMsg());
     }
 
     @Test
@@ -830,5 +852,15 @@ public class ResourcesServiceTest {
         resource.put("resource_ids", "1");
         resources.add(resource);
         return resources;
+    }
+
+    private static String getRandomStringWithLength(int length) {
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length) {
+            char c = (char) (r.nextInt(26) + 'a');
+            sb.append(c);
+        }
+        return sb.toString();
     }
 }

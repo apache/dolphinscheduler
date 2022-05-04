@@ -219,6 +219,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
         }
+        if (fullName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
+            logger.error("resource {}'s full name {}' is longer than the max length {}", RegexUtils.escapeNRT(name), fullName, Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
+            putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
+            return result;
+        }
 
         Date now = new Date();
         Resource resource = new Resource(pid, name, fullName, false, desc, file.getOriginalFilename(), loginUser.getId(), type, file.getSize(), now, now);
