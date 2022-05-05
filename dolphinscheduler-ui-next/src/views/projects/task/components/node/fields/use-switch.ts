@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
+import { findIndex } from 'lodash'
 import type { IJsonItem } from '../types'
 
 export function useSwitch(
@@ -42,6 +43,35 @@ export function useSwitch(
       }
     })
     loading.value = false
+    clearUselessNode(branchFlowOptions.value)
+  }
+
+  const clearUselessNode = (options: { value: number }[]) => {
+    if (!options || !options.length) {
+      model.nextNode = null
+      model.dependTaskList?.forEach((task: { nextNode: number | null }) => {
+        task.nextNode = null
+      })
+      return
+    }
+    if (
+      findIndex(
+        branchFlowOptions.value,
+        (option: { value: number }) => option.value == model.nextNode
+      ) === -1
+    ) {
+      model.nextNode = null
+    }
+    model.dependTaskList?.forEach((task: { nextNode: number | null }) => {
+      if (
+        findIndex(
+          branchFlowOptions.value,
+          (option: { value: number }) => option.value == task.nextNode
+        ) === -1
+      ) {
+        task.nextNode = null
+      }
+    })
   }
 
   watch(
@@ -52,6 +82,11 @@ export function useSwitch(
       }
     }
   )
+
+  onMounted(async () => {
+    await nextTick()
+    clearUselessNode(branchFlowOptions.value)
+  })
 
   return [
     {
