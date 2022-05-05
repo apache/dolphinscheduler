@@ -23,7 +23,8 @@ import {
   NCard,
   NDataTable,
   NPagination,
-  NSelect
+  NSelect,
+  NSpace
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
@@ -160,7 +161,7 @@ const taskGroupQueue = defineComponent({
       <div>
         <NCard>
           <div class={styles.toolbar}>
-            <div class={styles.right}>
+            <NSpace>
               <NSelect
                 size='small'
                 options={taskGroupOptions}
@@ -184,7 +185,7 @@ const taskGroupQueue = defineComponent({
                   <SearchOutlined />
                 </NIcon>
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card
