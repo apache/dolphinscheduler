@@ -241,7 +241,7 @@ public enum Status {
     PROCESS_INSTANCE_NOT_EXIST(50001, "process instance {0} does not exist", "工作流实例[{0}]不存在"),
     PROCESS_INSTANCE_EXIST(50002, "process instance {0} already exists", "工作流实例[{0}]已存在"),
     PROCESS_DEFINE_NOT_EXIST(50003, "process definition {0} does not exist", "工作流定义[{0}]不存在"),
-    PROCESS_DEFINE_NOT_RELEASE(50004, "process definition {0} process version {1} not on line", "工作流定义[{0}] 工作流版本[{1}]不是上线状态"),
+    PROCESS_DEFINE_NOT_RELEASE(50004, "process definition {0},process version {1} not on line", "工作流定义[{0}]，工作流版本[{1}]不是上线状态"),
     SUB_PROCESS_DEFINE_NOT_RELEASE(50004, "exist sub process definition not on line", "存在子工作流定义不是上线状态"),
     PROCESS_INSTANCE_ALREADY_CHANGED(50005, "the status of process instance {0} is already {1}", "工作流实例[{0}]的状态已经是[{1}]"),
     PROCESS_INSTANCE_STATE_OPERATION_ERROR(50006, "the status of process instance {0} is {1},Cannot perform {2} operation", "工作流实例[{0}]的状态是[{1}]，无法执行[{2}]操作"),
