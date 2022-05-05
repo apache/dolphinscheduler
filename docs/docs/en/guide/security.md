@@ -154,10 +154,10 @@ worker.groups=default,test
 
 > Add or update  k8s cluster
 
-- First enter the configuration of the k8s cluster connection into the table t_ds_k8s in the db, which will be configured later by the web page
+- First enter the configuration of the k8s cluster connection into the table t_ds_k8s in the db, which will be configured later by the web page.
 
 > Add or update  namespace
 
-- After creation and authorization, you can select it from the namespace drop down list when edit k8s task 
+- After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is 'ds_null_k8s' means test mode which will not operate the cluster actually.
 
-! [create-environment](/img/new_ui/dev/security/create-namespace.jpg)
+! [create-environment](/img/new_ui/dev/security/create-namespace.png)
