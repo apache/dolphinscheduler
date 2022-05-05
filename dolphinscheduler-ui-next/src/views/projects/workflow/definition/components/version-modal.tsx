@@ -26,6 +26,10 @@ import styles from '../index.module.scss'
 import type { IDefinitionData } from '../types'
 
 const props = {
+  isInstance: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
   show: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -67,13 +71,13 @@ export default defineComponent({
     watch(
       () => props.show,
       () => {
-        createColumns(variables)
+        createColumns(variables, props.isInstance)
         requestData()
       }
     )
 
     watch(useI18n().locale, () => {
-      createColumns(variables)
+      createColumns(variables, props.isInstance)
     })
 
     return {

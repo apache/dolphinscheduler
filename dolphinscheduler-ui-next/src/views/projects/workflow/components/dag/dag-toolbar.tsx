@@ -84,6 +84,7 @@ export default defineComponent({
      * Node search and navigate
      */
     const {
+      searchSelectValue,
       navigateTo,
       toggleSearchInput,
       searchInputVisible,
@@ -167,11 +168,11 @@ export default defineComponent({
       if (graph.value) {
         const cells = graph.value.getSelectedCells()
         if (cells) {
-          graph.value?.removeCells(cells)
           const codes = cells
             .filter((cell) => cell.isNode())
             .map((cell) => +cell.id)
-          context.emit('removeTasks', codes)
+          context.emit('removeTasks', codes, cells)
+          graph.value?.removeCells(cells)
         }
       }
     }
@@ -315,6 +316,7 @@ export default defineComponent({
           >
             <NSelect
               size='small'
+              value={searchSelectValue.value}
               options={nodesDropdown.value}
               onFocus={reQueryNodes}
               onUpdateValue={navigateTo}

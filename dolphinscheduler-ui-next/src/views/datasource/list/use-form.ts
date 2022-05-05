@@ -23,8 +23,10 @@ import type {
   IDataSourceDetail,
   IDataBase,
   IDataBaseOption,
-  IDataBaseOptionKeys
+  IDataBaseOptionKeys,
+  IDataSource
 } from './types'
+import utils from '@/utils'
 
 export function useForm(id?: number) {
   const { t } = useI18n()
@@ -108,6 +110,14 @@ export function useForm(id?: number) {
             return new Error(t('datasource.oracle_connect_type_tips'))
           }
         }
+      },
+      other: {
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.detailForm.other && !utils.isJson(state.detailForm.other)) {
+            return new Error(t('datasource.jdbc_format_tips'))
+          }
+        }
       }
     } as FormRules
   })
@@ -138,9 +148,15 @@ export function useForm(id?: number) {
   const resetFieldsValue = () => {
     state.detailForm = { ...initialValues }
   }
-  const setFieldsValue = (values: object) => {
-    state.detailForm = { ...state.detailForm, ...values }
+
+  const setFieldsValue = (values: IDataSource) => {
+    state.detailForm = {
+      ...state.detailForm,
+      ...values,
+      other: values.other ? JSON.stringify(values.other) : values.other
+    }
   }
+
   const getFieldsValue = () => state.detailForm
 
   return {

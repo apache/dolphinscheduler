@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
@@ -29,9 +26,11 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.security.krb5.Config;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -41,12 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.zaxxer.hikari.HikariDataSource;
-
-import sun.security.krb5.Config;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
@@ -57,6 +51,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     private Configuration hadoopConf;
     protected HikariDataSource oneSessionDataSource;
     private UserGroupInformation ugi;
+    private boolean retryGetConnection = true;
 
     public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -149,6 +144,14 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         try {
             return oneSessionDataSource.getConnection();
         } catch (SQLException e) {
+            boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+            if (retryGetConnection && kerberosStartupState) {
+                retryGetConnection = false;
+                createUserGroupInformation(baseConnectionParam.getUser());
+                Connection connection = getConnection();
+                retryGetConnection = true;
+                return connection;
+            }
             logger.error("get oneSessionDataSource Connection fail SQLException: {}", e.getMessage(), e);
             return null;
         }

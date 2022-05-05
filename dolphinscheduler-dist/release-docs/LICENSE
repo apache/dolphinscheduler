@@ -285,7 +285,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hive-service-rpc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-service-rpc/2.1.0, Apache 2.0
     hive-storage-api 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-storage-api/2.1.0, Apache 2.0
     htrace-core 3.1.0-incubating: https://mvnrepository.com/artifact/org.apache.htrace/htrace-core/3.1.0-incubating, Apache 2.0
-    httpclient 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.4.1, Apache 2.0
+    httpclient 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.13, Apache 2.0
     httpcore 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore/4.4.1, Apache 2.0
     httpmime 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime/4.5.13, Apache 2.0
     jackson-annotations 2.10.5: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.10.5, Apache 2.0
@@ -645,6 +645,7 @@ MIT licenses
     vue-tsc 0.28.10: https://github.com/johnsoncodehk/volar MIT
     date-fns-tz 1.3.0: https://github.com/marnusw/date-fns-tz MIT
     screenfull 6.0.1: https://github.com/sindresorhus/screenfull MIT
+    @types/lodash 4.14.182: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses

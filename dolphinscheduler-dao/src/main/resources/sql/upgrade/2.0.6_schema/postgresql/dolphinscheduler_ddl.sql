@@ -46,3 +46,7 @@ $BODY$;
 select dolphin_update_metadata();
 
 d//
+
+-- add unique key to t_ds_relation_project_user
+CREATE UNIQUE INDEX t_ds_relation_project_user_un
+    on t_ds_relation_project_user (user_id, project_id);

@@ -23,7 +23,8 @@ import {
   NCard,
   NDataTable,
   NPagination,
-  NSelect
+  NSelect,
+  NSpace
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
@@ -48,7 +49,7 @@ const taskGroupQueue = defineComponent({
     const idRef = ref(Number(router.currentRoute.value.params.id))
 
     const searchParamRef = reactive({
-      groupId: ref<number| null>(),
+      groupId: ref<number | null>(),
       processName: '',
       instanceName: '',
       pageSize: 10,
@@ -160,7 +161,7 @@ const taskGroupQueue = defineComponent({
       <div>
         <NCard>
           <div class={styles.toolbar}>
-            <div class={styles.right}>
+            <NSpace>
               <NSelect
                 size='small'
                 options={taskGroupOptions}
@@ -170,21 +171,21 @@ const taskGroupQueue = defineComponent({
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.processName, 'value']}
-                placeholder={t('resource.task_group_queue.workflow_name')}
+                placeholder={t(
+                  'resource.task_group_queue.workflow_instance_name'
+                )}
               ></NInput>
               <NInput
                 size='small'
                 v-model={[this.searchParamRef.instanceName, 'value']}
-                placeholder={t(
-                  'resource.task_group_queue.workflow_instance_name'
-                )}
+                placeholder={t('resource.task_group_queue.task_instance_name')}
               ></NInput>
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>
                   <SearchOutlined />
                 </NIcon>
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card

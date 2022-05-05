@@ -24,9 +24,11 @@ public enum SparkVersion {
     /**
      * 0 SPARK1
      * 1 SPARK2
+     * 2 SPARKSQL
      */
     SPARK1(0, "SPARK1"),
-    SPARK2(1, "SPARK2");
+    SPARK2(1, "SPARK2"),
+    SPARKSQL(2, "SPARKSQL");
 
     SparkVersion(int code, String descp) {
         this.code = code;

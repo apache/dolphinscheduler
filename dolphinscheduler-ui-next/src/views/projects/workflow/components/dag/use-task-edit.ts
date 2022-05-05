@@ -106,9 +106,9 @@ export function useTaskEdit(options: Options) {
 
   /**
    * Remove task
-   * @param {number} code
+   * @param {number} codes
    */
-  function removeTasks(codes: number[]) {
+  function removeTasks(codes: number[], cells: any[]) {
     processDefinition.value.taskDefinitionList =
       processDefinition.value.taskDefinitionList.filter(
         (task) => !codes.includes(task.code)
@@ -119,6 +119,18 @@ export function useTaskEdit(options: Options) {
         (process) =>
           process.postTaskCode === code || process.preTaskCode === code
       )
+    })
+    cells.forEach((cell) => {
+      if (cell.isEdge()) {
+        const preTaskCode = cell.getSourceCellId()
+        const postTaskCode = cell.getTargetCellId()
+        remove(
+          processDefinition.value.processTaskRelationList,
+          (process) =>
+            String(process.postTaskCode) === postTaskCode &&
+            String(process.preTaskCode) === preTaskCode
+        )
+      }
     })
   }
 

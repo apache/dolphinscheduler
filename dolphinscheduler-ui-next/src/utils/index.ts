@@ -22,6 +22,7 @@ import log from './log'
 import downloadFile from './downloadFile'
 import copy from './clipboard'
 import removeUselessChildren from './tree-format'
+import isJson from './json'
 
 const utils = {
   mapping,
@@ -30,7 +31,8 @@ const utils = {
   log,
   downloadFile,
   copy,
-  removeUselessChildren
+  removeUselessChildren,
+  isJson
 }
 
 export default utils

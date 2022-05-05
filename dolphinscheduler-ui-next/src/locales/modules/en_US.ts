@@ -330,7 +330,7 @@ const resource = {
     task_name: 'Task name',
     task_group_name: 'Task group name',
     project_name: 'Project name',
-    workflow_name: 'Workflow name',
+    task_instance_name: 'Task instance',
     workflow_instance_name: 'Workflow instance',
     queue: 'Task group queue',
     priority: 'Priority',
@@ -625,6 +625,7 @@ const project = {
     enter_this_child_node: 'Enter this child node',
     name: 'Node Name',
     task_name: 'Task Name',
+    task_name_tips: 'Please select a task (required)',
     name_tips: 'Please enter name (required)',
     task_type: 'Task Type',
     task_type_tips: 'Please select a task type (required)',
@@ -874,8 +875,12 @@ const project = {
     check_interval: 'Check interval',
     waiting_dependent_complete: 'Waiting Dependent complete',
     project_name: 'Project Name',
-    process_name: 'Wrokflow Name',
+    project_name_tips: 'Please select a project(required)',
+    process_name: 'Workflow Name',
+    process_name_tips: 'Please select a workflow(required)',
     cycle_time: 'Cycle Time',
+    cycle_time_tips: 'Please select a cycle time(required)',
+    date_tips: 'Please select a date(required)',
     rule_name: 'Rule Name',
     null_check: 'NullCheck',
     custom_sql: 'CustomSql',
@@ -920,6 +925,11 @@ const project = {
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    zeppelin_note_id: 'zeppelinNoteId',
+    zeppelin_note_id_tips: 'Please enter the note id of your zeppelin note',
+    zeppelin_paragraph_id: 'zeppelinParagraphId',
+    zeppelin_paragraph_id_tips:
+      'Please enter the paragraph id of your zeppelin paragraph',
     send_email: 'Send Email',
     log_display: 'Log display',
     rows_of_result: 'rows of result',
@@ -1025,7 +1035,7 @@ const security = {
     user: 'User',
     user_tips: 'Please select user',
     token: 'Token',
-    token_tips: 'Please enter your token',
+    token_tips: 'Please click to get token',
     expiration_time: 'Expiration Time',
     expiration_time_tips: 'Please select expiration time',
     create_time: 'Create Time',
@@ -1232,7 +1242,8 @@ const datasource = {
   user_name: 'User Name',
   user_name_tips: 'Please enter your username',
   user_password: 'Password',
-  user_password_tips: 'Please enter your password'
+  user_password_tips: 'Please enter your password',
+  jdbc_format_tips: 'jdbc connection parameters is not a correct JSON format'
 }
 
 const data_quality = {
