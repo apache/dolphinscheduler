@@ -31,7 +31,7 @@ import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { TableColumns, InternalRowData } from './types'
 
 export function useColumns(onCallback: Function) {
@@ -137,7 +137,11 @@ export function useColumns(onCallback: Function) {
                       label: t('security.user.datasource'),
                       key: 'authorize_datasource'
                     },
-                    { label: t('security.user.udf'), key: 'authorize_udf' }
+                    { label: t('security.user.udf'), key: 'authorize_udf' },
+                    {
+                      label: t('security.user.namespace'),
+                      key: 'authorize_namespace'
+                    }
                   ],
                   onSelect: (key) =>
                     void onCallback({ rowData, key }, 'authorize')

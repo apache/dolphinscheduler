@@ -16,15 +16,7 @@
  */
 
 import { useRouter } from 'vue-router'
-import {
-  defineComponent,
-  onMounted,
-  ref,
-  reactive,
-  Ref,
-  watch,
-  inject
-} from 'vue'
+import { defineComponent, onMounted, ref, reactive, Ref } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -56,12 +48,10 @@ import { ResourceFile } from '@/service/modules/resources/types'
 
 export default defineComponent({
   name: 'File',
-  inject: ['reload'],
   setup() {
     const router: Router = useRouter()
     const fileId = ref(Number(router.currentRoute.value.params.id) || -1)
 
-    const reload: any = inject('reload')
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -144,6 +134,12 @@ export default defineComponent({
       handleShowModal(renameShowRef)
     }
 
+    const handleGoRoot = () => {
+      router.push({
+        name: 'file-manage'
+      })
+    }
+
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
@@ -171,24 +167,18 @@ export default defineComponent({
       }
     ])
 
-    watch(
-      () => router.currentRoute.value.params.id,
-      // @ts-ignore
-      () => {
-        reload()
-        const currFileId = Number(router.currentRoute.value.params.id) || -1
-
-        if (currFileId === -1) {
-          fileStore.setCurrentDir('/')
-        } else {
-          queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
-            if (res.fullName) {
-              fileStore.setCurrentDir(res.fullName)
-            }
-          })
-        }
+    onMounted(() => {
+      const currFileId = Number(router.currentRoute.value.params.id) || -1
+      if (currFileId === -1) {
+        fileStore.setCurrentDir('/')
+      } else {
+        queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
+          if (res.fullName) {
+            fileStore.setCurrentDir(res.fullName)
+          }
+        })
       }
-    )
+    })
 
     const initBreadcrumb = async (dirs: string[]) => {
       let index = 0
@@ -242,6 +232,7 @@ export default defineComponent({
       handleRenameFile,
       handleUpdatePage,
       handleUpdatePageSize,
+      handleGoRoot,
       pagination: paginationReactive,
       renameInfo,
       breadcrumbItemsRef
@@ -307,11 +298,19 @@ export default defineComponent({
             'header-extra': () => (
               <NBreadcrumb separator='>' class={styles['breadcrumb']}>
                 {this.breadcrumbItemsRef?.map((item: BreadcrumbItem) => {
-                  return (
-                    <NBreadcrumbItem href={item.id.toString()}>
-                      {item.fullName}
-                    </NBreadcrumbItem>
-                  )
+                  if (item.id === 0) {
+                    return (
+                      <NBreadcrumbItem>
+                        <span onClick={this.handleGoRoot}>{item.fullName}</span>
+                      </NBreadcrumbItem>
+                    )
+                  } else {
+                    return (
+                      <NBreadcrumbItem href={item.id.toString()}>
+                        {item.fullName}
+                      </NBreadcrumbItem>
+                    )
+                  }
                 })}
               </NBreadcrumb>
             ),

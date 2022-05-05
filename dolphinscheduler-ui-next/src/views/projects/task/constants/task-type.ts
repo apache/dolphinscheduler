@@ -33,6 +33,7 @@ export type TaskType =
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'
+  | 'ZEPPELIN'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -42,8 +43,7 @@ export const TASK_TYPES_MAP = {
     alias: 'SUB_PROCESS'
   },
   PROCEDURE: {
-    alias: 'PROCEDURE',
-    helperLinkDisable: true
+    alias: 'PROCEDURE'
   },
   SQL: {
     alias: 'SQL'
@@ -88,11 +88,15 @@ export const TASK_TYPES_MAP = {
     alias: 'SWITCH'
   },
   SEATUNNEL: {
-    alias: 'WATERDROP',
+    alias: 'SeaTunnel',
     helperLinkDisable: true
   },
   EMR: {
     alias: 'AmazonEMR',
+    helperLinkDisable: true
+  },
+  ZEPPELIN: {
+    alias: 'ZEPPELIN',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

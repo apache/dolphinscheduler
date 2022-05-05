@@ -45,7 +45,8 @@ export function useSpark({
     timeout: 30,
     programType: 'SCALA',
     sparkVersion: 'SPARK2',
-    deployMode: 'cluster',
+    rawScript: '',
+    deployMode: 'local',
     driverCores: 1,
     driverMemory: '512M',
     numExecutors: 2,
@@ -69,7 +70,7 @@ export function useSpark({
 
   return {
     json: [
-      Fields.useName(),
+      Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
       Fields.useDescription(),

@@ -39,6 +39,8 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - name: Run Dev Relative Reference
+        run: python img_utils.py -v dev-syntax
       - name: Run Image Check
         run: python img_utils.py -v check
   dead-link:

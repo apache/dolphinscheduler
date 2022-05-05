@@ -34,7 +34,7 @@ import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
-import { stateType } from '@/utils/common'
+import { stateType } from '@/common/common'
 import styles from './index.module.scss'
 
 const TaskInstance = defineComponent({
@@ -70,7 +70,7 @@ const TaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    const getLogs = (row:any) => {
+    const getLogs = (row: any) => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: Number(row.id),
@@ -88,11 +88,11 @@ const TaskInstance = defineComponent({
         }),
         {}
       )
-  
+
       return state
     }
 
-    const refreshLogs = (row:any) => {
+    const refreshLogs = (row: any) => {
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0

@@ -709,7 +709,8 @@ CREATE TABLE t_ds_relation_project_user
     perm        int(11) DEFAULT '1',
     create_time datetime DEFAULT NULL,
     update_time datetime DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_uid_pid(user_id,project_id)
 );
 
 -- ----------------------------
@@ -1898,11 +1899,10 @@ CREATE TABLE t_ds_k8s_namespace (
     limits_memory      int(11) DEFAULT NULL,
     namespace          varchar(100) DEFAULT NULL,
     online_job_num     int(11) DEFAULT NULL,
-    owner              varchar(100) DEFAULT NULL,
+    user_id            int(11) DEFAULT NULL,
     pod_replicas       int(11) DEFAULT NULL,
     pod_request_cpu    decimal(14,3) DEFAULT NULL,
     pod_request_memory int(11) DEFAULT NULL,
-    tag                varchar(100) DEFAULT NULL,
     limits_cpu         decimal(14,3) DEFAULT NULL,
     k8s                varchar(100) DEFAULT NULL,
     create_time        datetime DEFAULT NULL ,
@@ -1914,8 +1914,32 @@ CREATE TABLE t_ds_k8s_namespace (
 -- ----------------------------
 -- Records of t_ds_k8s_namespace
 -- ----------------------------
-INSERT INTO t_ds_k8s_namespace
-VALUES (1, 10000, 'default', 99, 'owner',1,NULL,1,'test',NULL,'default',null,null);
+INSERT INTO `t_ds_k8s_namespace`
+(`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
+VALUES (1, 1000, 'flink_test', 99, 1, 1, 0.1, 1, NULL, 'ds_null_k8s',  '2022-03-03 11:31:24.0', '2022-03-03 11:31:24.0');
+
+INSERT INTO `t_ds_k8s_namespace`
+(`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
+VALUES (2, 500, 'spark_test', 90, 2,1,10000,1, NULL, 'ds_null_k8s', '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+
+INSERT INTO `t_ds_k8s_namespace`
+(`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
+VALUES (3, 200, 'auth_test', 68, 3,1,100,1, 10000, 'ds_null_k8s', '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
+
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_relation_namespace_user;
+CREATE TABLE t_ds_relation_namespace_user (
+    id                int(11) NOT NULL AUTO_INCREMENT ,
+    user_id           int(11) NOT NULL ,
+    namespace_id      int(11) NOT NULL ,
+    perm              int(11) DEFAULT '1' ,
+    create_time       datetime DEFAULT NULL ,
+    update_time       datetime DEFAULT NULL ,
+    PRIMARY KEY (id) ,
+    UNIQUE KEY namespace_user_unique (user_id,namespace_id)
+);
 
 -- ----------------------------
 -- Table structure for t_ds_alert_send_status

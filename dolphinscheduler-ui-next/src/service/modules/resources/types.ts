@@ -66,7 +66,7 @@ interface OnlineCreateReq extends CreateReq, ContentReq {
 }
 
 interface ProgramTypeReq {
-  programType: 'JAVA' | 'SCALA' | 'PYTHON'
+  programType: 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
 }
 
 interface ListReq {

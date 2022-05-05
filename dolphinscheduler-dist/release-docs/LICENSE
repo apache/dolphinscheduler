@@ -232,7 +232,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
     commons-collections 3.2.2: https://mvnrepository.com/artifact/commons-collections/commons-collections/3.2.2, Apache 2.0
     commons-collections4 4.1: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.1, Apache 2.0
-    commons-compress 1.19: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.19, Apache 2.0
+    commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
     commons-configuration 1.10: https://mvnrepository.com/artifact/commons-configuration/commons-configuration/1.10, Apache 2.0
     commons-daemon 1.0.13 https://mvnrepository.com/artifact/commons-daemon/commons-daemon/1.0.13, Apache 2.0
     commons-dbcp 1.4: https://github.com/apache/commons-dbcp, Apache 2.0
@@ -285,7 +285,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hive-service-rpc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-service-rpc/2.1.0, Apache 2.0
     hive-storage-api 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-storage-api/2.1.0, Apache 2.0
     htrace-core 3.1.0-incubating: https://mvnrepository.com/artifact/org.apache.htrace/htrace-core/3.1.0-incubating, Apache 2.0
-    httpclient 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.4.1, Apache 2.0
+    httpclient 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.13, Apache 2.0
     httpcore 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore/4.4.1, Apache 2.0
     httpmime 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime/4.5.13, Apache 2.0
     jackson-annotations 2.10.5: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.10.5, Apache 2.0
@@ -465,7 +465,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jline 0.9.94: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
-    postgresql 42.2.5: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.2.5, BSD 2-clause
+    postgresql 42.3.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.3.4, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
     threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.3.6,  BSD 3-clause
@@ -645,6 +645,7 @@ MIT licenses
     vue-tsc 0.28.10: https://github.com/johnsoncodehk/volar MIT
     date-fns-tz 1.3.0: https://github.com/marnusw/date-fns-tz MIT
     screenfull 6.0.1: https://github.com/sindresorhus/screenfull MIT
+    @types/lodash 4.14.182: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses

@@ -37,8 +37,8 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                logger);
+            taskRequest,
+            logger);
     }
 
     @Override
@@ -73,7 +73,6 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      * create command
      *
      * @return String
-     * @throws Exception exception
      */
     protected abstract String buildCommand();
 
@@ -94,8 +93,8 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
         }
 
         return mainJar.getId() == 0
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst("/", "");
+            ? mainJar.getRes()
+            // when update resource maybe has error
+            : mainJar.getResourceName().replaceFirst("/", "");
     }
 }

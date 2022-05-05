@@ -18,7 +18,13 @@
 import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
 import type { IOption } from '@/components/form/types'
 
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
+type DependentResultType = {
+  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
+}
+type BDependentResultType = {
+  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
+}
 
 interface IResource {
   id: number
@@ -36,6 +42,8 @@ interface TaskNodeState {
   preTasks: number[]
   resources: IResource[]
   mainJars: { [key in ProgramType]?: IMainJar[] }
+  name: string
+  dependentResult: DependentResultType
 }
 export {
   TaskNodeState,
@@ -43,5 +51,7 @@ export {
   IOption,
   IResource,
   ProgramType,
+  DependentResultType,
+  BDependentResultType,
   IMainJar
 }

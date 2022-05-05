@@ -13,24 +13,20 @@
 
 ## Database Upgrade
 
-- Modify the following properties in `conf/datasource.properties`.
+- If using MySQL as the database to run DolphinScheduler, please config it in `./bin/env/dolphinscheduler_env.sh`, change username and password to yours, and add MYSQL connector jar into lib dir `./tools/libs`, here we download `mysql-connector-java-8.0.16.jar`, and then correctly configure database connection information. You can download MYSQL connector jar from [here](https://downloads.MySQL.com/archives/c-j/). Otherwise, PostgreSQL is the default database. 
 
-- If using MySQL as the database to run DolphinScheduler, please comment out PostgreSQL related configurations, and add MYSQL connector jar into lib dir, here we download `mysql-connector-java-8.0.16.jar`, and then correctly configure database connection information. You can download MYSQL connector jar from [here](https://downloads.MySQL.com/archives/c-j/). Alternatively, if you use PostgreSQL as the database, you just need to comment out Mysql related configurations and correctly configure database connect information.
-
-    ```properties
-      # postgre
-      #spring.datasource.driver-class-name=org.postgresql.Driver
-      #spring.datasource.url=jdbc:postgresql://localhost:5432/dolphinscheduler
-      # mysql
-      spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-      spring.datasource.url=jdbc:mysql://xxx:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
-      spring.datasource.username=xxx
-      spring.datasource.password=xxx
+    ```shell
+    export DATABASE=${DATABASE:-mysql}
+    export SPRING_PROFILES_ACTIVE=${DATABASE}
+    export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+    export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    export SPRING_DATASOURCE_USERNAME={user}
+    export SPRING_DATASOURCE_PASSWORD={password}
     ```
 
 - Execute database upgrade script:
 
-    `sh ./script/upgrade-dolphinscheduler.sh`
+    `sh ./tools/bin/upgrade-schema.sh`
 
 ## Backend Service Upgrade
 

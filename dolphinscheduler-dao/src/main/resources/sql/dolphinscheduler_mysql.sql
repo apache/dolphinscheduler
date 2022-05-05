@@ -709,7 +709,7 @@ CREATE TABLE `t_ds_relation_project_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `user_id_index` (`user_id`) USING BTREE
+  UNIQUE KEY uniq_uid_pid(user_id,project_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -1891,11 +1891,10 @@ CREATE TABLE `t_ds_k8s_namespace` (
   `limits_memory` int(11) DEFAULT NULL,
   `namespace` varchar(100) DEFAULT NULL,
   `online_job_num` int(11) DEFAULT NULL,
-  `owner` varchar(100) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `pod_replicas` int(11) DEFAULT NULL,
   `pod_request_cpu` decimal(14,3) DEFAULT NULL,
   `pod_request_memory` int(11) DEFAULT NULL,
-  `tag` varchar(100) DEFAULT NULL,
   `limits_cpu` decimal(14,3) DEFAULT NULL,
   `k8s` varchar(100) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
@@ -1904,6 +1903,20 @@ CREATE TABLE `t_ds_k8s_namespace` (
   UNIQUE KEY `k8s_namespace_unique` (`namespace`,`k8s`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
 
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_namespace_user`;
+CREATE TABLE `t_ds_relation_namespace_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `namespace_id` int(11) DEFAULT NULL COMMENT 'namespace id',
+  `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
 
 -- ----------------------------
 -- Table structure for t_ds_alert_send_status

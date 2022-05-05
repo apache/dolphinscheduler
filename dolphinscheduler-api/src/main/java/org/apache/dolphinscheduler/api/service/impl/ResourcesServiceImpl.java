@@ -66,16 +66,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.rmi.ServerException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -228,6 +219,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
         }
+        if (fullName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
+            logger.error("resource {}'s full name {}' is longer than the max length {}", RegexUtils.escapeNRT(name), fullName, Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
+            putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
+            return result;
+        }
 
         Date now = new Date();
         Resource resource = new Resource(pid, name, fullName, false, desc, file.getOriginalFilename(), loginUser.getId(), type, file.getSize(), now, now);
@@ -324,6 +320,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+
+        if (!PropertyUtils.getResUploadStartupState()){
+            putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
 
@@ -529,7 +530,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             String nameSuffix = Files.getFileExtension(name);
 
             // determine file suffix
-            if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
+            if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
                 // rename file suffix and original suffix must be consistent
                 logger.error("rename file suffix and original suffix must be consistent: {}", RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
@@ -633,7 +634,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String nameSuffix = Files.getFileExtension(fullName);
 
         // determine file suffix
-        if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
+        if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
             return false;
         }
         // query tenant

@@ -18,6 +18,7 @@ byte-buddy-1.9.16.jar
 caffeine-2.9.2.jar
 checker-compat-qual-2.0.0.jar
 checker-qual-3.10.0.jar
+checker-qual-3.5.0.jar
 classmate-1.5.1.jar
 clickhouse-jdbc-0.1.52.jar
 commons-email-1.5.jar
@@ -26,7 +27,7 @@ commons-codec-1.11.jar
 commons-collections-3.2.2.jar
 commons-collections4-4.1.jar
 commons-compiler-3.1.6.jar
-commons-compress-1.19.jar
+commons-compress-1.21.jar
 commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
 commons-beanutils-1.9.4.jar
@@ -83,7 +84,7 @@ hive-service-2.1.0.jar
 hive-service-rpc-2.1.0.jar
 hive-storage-api-2.1.0.jar
 htrace-core-3.1.0-incubating.jar
-httpclient-4.4.1.jar
+httpclient-4.5.13.jar
 httpcore-4.4.1.jar
 httpmime-4.5.13.jar
 j2objc-annotations-1.1.jar
@@ -173,7 +174,7 @@ parquet-hadoop-bundle-1.8.1.jar
 poi-4.1.2.jar
 poi-ooxml-4.1.2.jar
 poi-ooxml-schemas-4.1.2.jar
-postgresql-42.2.5.jar
+postgresql-42.3.4.jar
 presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
 protostuff-core-1.7.2.jar

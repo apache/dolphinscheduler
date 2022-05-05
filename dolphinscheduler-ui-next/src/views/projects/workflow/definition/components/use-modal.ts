@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import _ from 'lodash'
+import _, { cloneDeep } from 'lodash'
 import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -35,7 +35,7 @@ import {
   updateSchedule,
   previewSchedule
 } from '@/service/modules/schedules'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import { EnvironmentItem } from '@/service/modules/environment/types'
 import { ITimingState } from './types'
 
@@ -55,6 +55,10 @@ export function useModal(
     startParamsList: [],
     schedulePreviewList: []
   })
+
+  const cachedStartParams = {} as {
+    [key: string]: { prop: string; value: string }[]
+  }
 
   const resetImportForm = () => {
     state.importForm.name = ''
@@ -91,11 +95,11 @@ export function useModal(
       if (state.startForm.startEndTime) {
         const start = format(
           new Date(state.startForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         const end = format(
           new Date(state.startForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         state.startForm.scheduleTime = `${start},${end}`
       }
@@ -182,11 +186,11 @@ export function useModal(
   const getTimingData = () => {
     const start = format(
       parseTime(state.timingForm.startEndTime[0]),
-      'yyyy-MM-dd hh:mm:ss'
+      'yyyy-MM-dd HH:mm:ss'
     )
     const end = format(
       parseTime(state.timingForm.startEndTime[1]),
-      'yyyy-MM-dd hh:mm:ss'
+      'yyyy-MM-dd HH:mm:ss'
     )
 
     const data = {
@@ -237,9 +241,14 @@ export function useModal(
   }
 
   const getStartParamsList = (code: number) => {
+    if (cachedStartParams[code]) {
+      variables.startParamsList = cloneDeep(cachedStartParams[code])
+      return
+    }
     queryProcessDefinitionByCode(code, variables.projectCode).then(
       (res: any) => {
         variables.startParamsList = res.processDefinition.globalParamList
+        cachedStartParams[code] = cloneDeep(variables.startParamsList)
       }
     )
   }
@@ -251,11 +260,11 @@ export function useModal(
 
         const start = format(
           new Date(state.timingForm.startEndTime[0]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         const end = format(
           new Date(state.timingForm.startEndTime[1]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
 
         const schedule = JSON.stringify({

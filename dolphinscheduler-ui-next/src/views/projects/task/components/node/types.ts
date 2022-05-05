@@ -31,6 +31,7 @@ export type {
   WorkflowInstance
 } from '@/views/projects/workflow/components/dag/types'
 export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
+export type { ITaskState } from '@/common/types'
 
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
@@ -279,6 +280,10 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  zeppelinNoteId?: string
+  zeppelinParagraphId?: string
+  noteId?: string
+  paragraphId?: string
   processDefinitionCode?: number
   conditionResult?: {
     successNode?: number[]

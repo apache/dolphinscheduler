@@ -11,3 +11,7 @@
 - Password: set the password for Spark connection
 - Database name: enter the database name of the Spark connection
 - Jdbc connection parameters: parameter settings for Spark connection, in JSON format
+
+## Native Supported
+
+Yes, could use this datasource by default. 

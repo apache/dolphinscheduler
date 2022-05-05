@@ -26,6 +26,10 @@ import styles from '../index.module.scss'
 import type { IDefinitionData } from '../types'
 
 const props = {
+  isInstance: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
   show: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -41,7 +45,7 @@ export default defineComponent({
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
-    const { variables, getTableData } = useTable(ctx)
+    const { variables, createColumns, getTableData } = useTable(ctx)
     const { importState } = useForm()
     const { handleImportDefinition } = useModal(importState, ctx)
 
@@ -66,8 +70,15 @@ export default defineComponent({
 
     watch(
       () => props.show,
-      () => requestData()
+      () => {
+        createColumns(variables, props.isInstance)
+        requestData()
+      }
     )
+
+    watch(useI18n().locale, () => {
+      createColumns(variables, props.isInstance)
+    })
 
     return {
       hideModal,

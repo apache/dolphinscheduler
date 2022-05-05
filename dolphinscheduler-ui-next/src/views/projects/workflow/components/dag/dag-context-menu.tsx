@@ -21,8 +21,9 @@ import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
-import { uuid } from '@/utils/common'
+import { uuid } from '@/common/common'
 import { IWorkflowTaskInstance } from './types'
+import { NButton } from 'naive-ui'
 
 const props = {
   startReadonly: {
@@ -69,7 +70,7 @@ export default defineComponent({
     }
 
     const startRunning = () => {
-      ctx.emit('start')
+      ctx.emit('start', Number(props.cell?.id))
     }
 
     const handleEdit = () => {
@@ -126,42 +127,41 @@ export default defineComponent({
           class={styles['dag-context-menu']}
           style={{ left: `${this.left}px`, top: `${this.top}px` }}
         >
-          <div
-            class={`${styles['menu-item']} ${
-              this.startReadonly ? styles['disabled'] : ''
-            } `}
+          <NButton
+            class={`${styles['menu-item']}`}
+            disabled={this.startReadonly}
             onClick={this.startRunning}
           >
             {t('project.node.start')}
-          </div>
-          <div
-            class={`${styles['menu-item']} ${
-              this.menuReadonly ? styles['disabled'] : ''
-            } `}
+          </NButton>
+          <NButton
+            class={`${styles['menu-item']}`}
+            disabled={this.menuReadonly}
             onClick={this.handleEdit}
           >
             {t('project.node.edit')}
-          </div>
-          <div
-            class={`${styles['menu-item']} ${
-              this.menuReadonly ? styles['disabled'] : ''
-            } `}
+          </NButton>
+          <NButton
+            class={`${styles['menu-item']}`}
+            disabled={this.menuReadonly}
             onClick={this.handleCopy}
           >
             {t('project.node.copy')}
-          </div>
-          <div
-            class={`${styles['menu-item']} ${
-              this.menuReadonly ? styles['disabled'] : ''
-            } `}
+          </NButton>
+          <NButton
+            class={`${styles['menu-item']}`}
+            disabled={this.menuReadonly}
             onClick={this.handleDelete}
           >
             {t('project.node.delete')}
-          </div>
+          </NButton>
           {this.taskInstance && (
-            <div class={`${styles['menu-item']}`} onClick={this.handleViewLog}>
+            <NButton
+              class={`${styles['menu-item']}`}
+              onClick={this.handleViewLog}
+            >
               {t('project.node.view_log')}
-            </div>
+            </NButton>
           )}
         </div>
       )

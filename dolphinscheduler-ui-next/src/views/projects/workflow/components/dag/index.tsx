@@ -53,7 +53,7 @@ import LogModal from '@/components/log-modal'
 import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
-import { downloadFile } from '@/service/service'
+import utils from '@/utils'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -114,10 +114,9 @@ export default defineComponent({
     } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
 
     // Right click cell
-    const { nodeVariables, menuHide, menuStart, viewLog } =
-      useNodeMenu({
-        graph
-      })
+    const { nodeVariables, menuHide, menuStart, viewLog } = useNodeMenu({
+      graph
+    })
 
     // start button in the dag node menu
     const startReadonly = computed(() => {
@@ -254,7 +253,7 @@ export default defineComponent({
         }),
         {}
       )
-  
+
       return state
     }
 
@@ -266,7 +265,7 @@ export default defineComponent({
     }
 
     const downloadLogs = () => {
-      downloadFile('log/download-log', {
+      utils.downloadFile('log/download-log', {
         taskInstanceId: nodeVariables.logTaskId
       })
     }
@@ -275,12 +274,34 @@ export default defineComponent({
       nodeVariables.showModalRef = false
     }
 
+    const layoutSubmit = () => {
+      submit()
+
+      // Refresh task status in workflow instance
+      if (props.instance) {
+        refreshTaskStatus()
+      }
+    }
+
     watch(
       () => props.definition,
       () => {
         if (props.instance) {
           refreshTaskStatus()
           statusTimerRef.value = setInterval(() => refreshTaskStatus(), 90000)
+        }
+      }
+    )
+
+    watch(
+      () => nodeVariables.showModalRef,
+      () => {
+        if (!nodeVariables.showModalRef) {
+          nodeVariables.row = {}
+          nodeVariables.logRef = ''
+          nodeVariables.logLoadingRef = true
+          nodeVariables.skipLineNum = 0
+          nodeVariables.limit = 1000
         }
       }
     )
@@ -309,13 +330,14 @@ export default defineComponent({
         </div>
         <DagAutoLayoutModal
           visible={layoutVisible.value}
-          submit={submit}
+          submit={layoutSubmit}
           cancel={cancel}
           formValue={formValue}
           formRef={formRef}
         />
         {!!props.definition && (
           <VersionModal
+            isInstance={props.instance ? true : false}
             v-model:row={props.definition.processDefinition}
             v-model:show={versionModalShow.value}
             onUpdateList={refreshDetail}
@@ -352,12 +374,13 @@ export default defineComponent({
           onEdit={editTask}
           onCopyTask={copyTask}
           onRemoveTasks={removeTasks}
-          onViewLog={viewLog}
+          onViewLog={handleViewLog}
         />
         {!!props.definition && (
           <StartModal
             v-model:row={props.definition.processDefinition}
             v-model:show={nodeVariables.startModalShow}
+            taskCode={nodeVariables.taskCode}
           />
         )}
         {!!props.instance && (

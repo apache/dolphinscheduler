@@ -20,7 +20,7 @@ import { defineComponent, onMounted, PropType, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { listAlertGroupById } from '@/service/modules/alert-group'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
-import { runningType, warningTypeList } from '@/utils/common'
+import { runningType, warningTypeList } from '@/common/common'
 import { IStartupParam } from './types'
 import styles from './startup.module.scss'
 

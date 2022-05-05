@@ -45,8 +45,7 @@ export function useSubProcess({
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30,
-    processDefinitionCode: 0
+    timeout: 30
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -65,7 +64,7 @@ export function useSubProcess({
 
   return {
     json: [
-      Fields.useName(),
+      Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
       Fields.useDescription(),

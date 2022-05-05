@@ -27,12 +27,14 @@ type TAuthType =
   | 'authorize_resource'
   | 'authorize_datasource'
   | 'authorize_udf'
+  | 'authorize_namespace'
 
 interface IRecord {
   id: number
   userName: string
   userType: TUserType
   tenantCode: string
+  tenantId: null | number
   queueName: string
   email: string
   phone: string

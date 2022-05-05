@@ -32,12 +32,12 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import { parseTime, tasksState } from '@/utils/common'
+import { parseTime, renderTableTime, tasksState } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
 
 export function useTable() {
@@ -123,17 +123,20 @@ export function useTable() {
       {
         title: t('project.task.submit_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
-        key: 'submitTime'
+        key: 'submitTime',
+        render: (row: IRecord) => renderTableTime(row.submitTime)
       },
       {
         title: t('project.task.start_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
-        key: 'startTime'
+        key: 'startTime',
+        render: (row: IRecord) => renderTableTime(row.startTime)
       },
       {
         title: t('project.task.end_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
-        key: 'endTime'
+        key: 'endTime',
+        render: (row: IRecord) => renderTableTime(row.endTime)
       },
       {
         title: t('project.task.duration'),
@@ -155,7 +158,8 @@ export function useTable() {
       {
         title: t('project.task.host'),
         key: 'host',
-        ...COLUMN_WIDTH_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: IRecord) => row.host || '-'
       },
       {
         title: t('project.task.operation'),
@@ -172,6 +176,7 @@ export function useTable() {
                     h(
                       NButton,
                       {
+                        tag: 'div',
                         circle: true,
                         type: 'info',
                         size: 'small',
@@ -205,6 +210,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        disabled: !row.host,
                         onClick: () => handleLog(row)
                       },
                       {
@@ -295,23 +301,7 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
-          variables.tableData = res.totalList.map((item, unused) => {
-            item.submitTime = format(
-              parseTime(item.submitTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.startTime = format(
-              parseTime(item.startTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.endTime = format(
-              parseTime(item.endTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            return {
-              ...item
-            }
-          }) as any
+          variables.tableData = res.totalList as IRecord[]
           variables.totalPage = res.totalPage
           variables.loadingRef = false
         }

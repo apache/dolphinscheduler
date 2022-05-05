@@ -32,6 +32,7 @@ import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import styles from './index.module.scss'
 import type { TableColumns } from './types'
+import { DefaultTableWidth } from '@/common/column-width-config'
 
 const list = defineComponent({
   name: 'list',
@@ -39,7 +40,10 @@ const list = defineComponent({
     const { t } = useI18n()
     const showDetailModal = ref(false)
     const selectId = ref()
-    const columns = ref({ columns: [] as TableColumns, tableWidth: 0 })
+    const columns = ref({
+      columns: [] as TableColumns,
+      tableWidth: DefaultTableWidth
+    })
     const { data, changePage, changePageSize, deleteRecord, updateList } =
       useTable()
 
@@ -143,6 +147,8 @@ const list = defineComponent({
             page-size={pageSize}
             item-count={itemCount}
             show-quick-jumper
+            show-size-picker
+            page-sizes={[10, 30, 50]}
             class={styles['pagination']}
             on-update:page={changePage}
             on-update:page-size={changePageSize}

@@ -22,12 +22,12 @@ import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { queryAllProjectList } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
-import { parseTime } from '@/utils/common'
+import { parseTime } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
-} from '@/utils/column-width-config'
+} from '@/common/column-width-config'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
 export function useTable(

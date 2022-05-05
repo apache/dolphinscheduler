@@ -47,9 +47,9 @@ export function createProcessDefinition(
   })
 }
 
-export function queryAllByProjectCode(code: number): any {
+export function queryProcessDefinitionList(projectCode: number): any {
   return axios({
-    url: `/projects/${code}/process-definition/all`,
+    url: `/projects/${projectCode}/process-definition/query-process-definition-list`,
     method: 'get'
   })
 }
@@ -186,13 +186,16 @@ export function release(
   })
 }
 
-export function getTasksByDefinitionCode(
-  code: number,
+export function getTasksByDefinitionList(
+  projectCode: number,
   processCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/tasks`,
-    method: 'get'
+    url: `/projects/${projectCode}/process-definition/query-task-definition-list`,
+    method: 'get',
+    params: {
+      processDefinitionCode: processCode
+    }
   })
 }
 

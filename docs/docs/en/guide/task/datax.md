@@ -40,7 +40,7 @@ This example demonstrates how to import data from Hive into MySQL.
 
 ### Configure the DataX environment in DolphinScheduler
 
-If you are using the DataX task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+If you are using the DataX task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `bin/env/dolphinscheduler_env.sh`.
 
 ![datax_task01](/img/tasks/demo/datax_task01.png)
 

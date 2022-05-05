@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.enums.ResUploadType;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -27,5 +29,10 @@ public class PropertyUtilsTest {
     @Test
     public void getString() {
         assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
+    }
+
+    @Test
+    public void getResUploadStartupState(){
+        Assert.assertFalse(PropertyUtils.getResUploadStartupState());
     }
 }

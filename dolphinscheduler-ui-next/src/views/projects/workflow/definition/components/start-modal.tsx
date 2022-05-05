@@ -59,6 +59,9 @@ const props = {
   show: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  taskCode: {
+    type: String
   }
 }
 
@@ -186,8 +189,14 @@ export default defineComponent({
     })
 
     watch(
-      () => props.row,
-      () => getStartParamsList(props.row.code)
+      () => props.show,
+      () => {
+        if (props.show) {
+          getStartParamsList(props.row.code)
+          if (props.taskCode)
+            startState.startForm.startNodeList = props.taskCode
+        }
+      }
     )
 
     return {
@@ -381,7 +390,7 @@ export default defineComponent({
             ) : (
               <NSpace vertical>
                 {this.startParamsList.map((item, index) => (
-                  <NSpace class={styles.startup} key={index}>
+                  <NSpace class={styles.startup} key={Date.now() + index}>
                     <NInput
                       pair
                       separator=':'

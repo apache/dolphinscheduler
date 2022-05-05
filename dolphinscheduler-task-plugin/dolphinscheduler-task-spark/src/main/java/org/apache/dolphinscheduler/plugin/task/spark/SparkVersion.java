@@ -22,10 +22,11 @@ public enum SparkVersion {
     /**
      * 0 SPARK1
      * 1 SPARK2
+     * 2 SPARKSQL
      */
     SPARK1(0, "SPARK1", "${SPARK_HOME1}/bin/spark-submit"),
     SPARK2(1, "SPARK2", "${SPARK_HOME2}/bin/spark-submit"),
-    ;
+    SPARKSQL(2, "SPARKSQL", "${SPARK_HOME2}/bin/spark-sql");
 
     private final int code;
     private final String descp;

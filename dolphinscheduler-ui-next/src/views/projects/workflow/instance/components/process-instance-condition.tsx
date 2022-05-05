@@ -28,7 +28,7 @@ import {
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { stateType } from '@/utils/common'
+import { stateType } from '@/common/common'
 
 export default defineComponent({
   name: 'ProcessInstanceCondition',
@@ -46,11 +46,11 @@ export default defineComponent({
       if (startEndTimeRef.value) {
         startDate = format(
           new Date(startEndTimeRef.value[0]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
         endDate = format(
           new Date(startEndTimeRef.value[1]),
-          'yyyy-MM-dd hh:mm:ss'
+          'yyyy-MM-dd HH:mm:ss'
         )
       }
 

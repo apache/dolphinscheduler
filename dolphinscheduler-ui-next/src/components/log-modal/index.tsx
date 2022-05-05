@@ -28,7 +28,12 @@ import {
 import { useI18n } from 'vue-i18n'
 import { NIcon, NLog } from 'naive-ui'
 import Modal from '../modal'
-import { DownloadOutlined, FullscreenExitOutlined, FullscreenOutlined, SyncOutlined } from '@vicons/antd'
+import {
+  DownloadOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
+  SyncOutlined
+} from '@vicons/antd'
 import screenfull from 'screenfull'
 
 const props = {
@@ -51,7 +56,7 @@ const props = {
   showDownloadLog: {
     type: Boolean as PropType<boolean>,
     default: false
-  },
+  }
 }
 
 export default defineComponent({
@@ -98,10 +103,26 @@ export default defineComponent({
       screenfull.on('change', change)
     })
 
-    return { t, renderIcon, confirmModal, refreshLogs, downloadLogs, handleFullScreen, ...toRefs(variables) }
+    return {
+      t,
+      renderIcon,
+      confirmModal,
+      refreshLogs,
+      downloadLogs,
+      handleFullScreen,
+      ...toRefs(variables)
+    }
   },
   render() {
-    const { t, renderIcon, refreshLogs, downloadLogs, isFullscreen, handleFullScreen, showDownloadLog } = this
+    const {
+      t,
+      renderIcon,
+      refreshLogs,
+      downloadLogs,
+      isFullscreen,
+      handleFullScreen,
+      showDownloadLog
+    } = this
     return (
       <Modal
         class='logModalRef'
@@ -124,14 +145,23 @@ export default defineComponent({
             icon: renderIcon(SyncOutlined)
           },
           {
-            text: isFullscreen ? t('project.task.cancel_full_screen') : t('project.task.enter_full_screen'),
+            text: isFullscreen
+              ? t('project.task.cancel_full_screen')
+              : t('project.task.enter_full_screen'),
             show: true,
             action: handleFullScreen,
-            icon: isFullscreen ? renderIcon(FullscreenExitOutlined) : renderIcon(FullscreenOutlined)
+            icon: isFullscreen
+              ? renderIcon(FullscreenExitOutlined)
+              : renderIcon(FullscreenOutlined)
           }
         ])}
       >
-        <NLog rows={30} log={this.logRef} loading={this.logLoadingRef} />
+        <NLog
+          rows={30}
+          log={this.logRef}
+          loading={this.logLoadingRef}
+          style={{ height: isFullscreen ? 'calc(100vh - 140px)' : '525px' }}
+        />
       </Modal>
     )
   }
