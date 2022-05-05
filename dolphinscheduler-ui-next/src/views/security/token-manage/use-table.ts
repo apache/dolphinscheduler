@@ -149,13 +149,13 @@ export function useTable() {
   })
 
   const handleDelete = (row: any) => {
+    if (variables.tableData.length === 1 && variables.page > 1) {
+      --variables.page
+    }
     deleteToken(row.id).then(() => {
       getTableData({
         pageSize: variables.pageSize,
-        pageNo:
-          variables.tableData.length === 1 && variables.page > 1
-            ? variables.page - 1
-            : variables.page,
+        pageNo: variables.page,
         searchVal: variables.searchVal
       })
     })
