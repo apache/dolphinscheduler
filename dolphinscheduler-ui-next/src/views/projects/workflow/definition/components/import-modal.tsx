@@ -89,7 +89,8 @@ export default defineComponent({
           <NFormItem label={t('project.workflow.file_name')} path='name'>
             <NInput
               v-model={[this.importForm.name, 'value']}
-              placeholder={t('project.workflow.enter_name_tips')}
+              placeholder={''}
+              disabled
             />
           </NFormItem>
         </NForm>
