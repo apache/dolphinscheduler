@@ -26,6 +26,7 @@ import type {
   IDataBaseOptionKeys,
   IDataSource
 } from './types'
+import utils from '@/utils'
 
 export function useForm(id?: number) {
   const { t } = useI18n()
@@ -107,6 +108,14 @@ export function useForm(id?: number) {
         validator() {
           if (!state.detailForm.connectType && state.showConnectType) {
             return new Error(t('datasource.oracle_connect_type_tips'))
+          }
+        }
+      },
+      other: {
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.detailForm.other && !utils.isJson(state.detailForm.other)) {
+            return new Error(t('datasource.jdbc_format_tips'))
           }
         }
       }
