@@ -1242,7 +1242,8 @@ const datasource = {
   user_name: 'User Name',
   user_name_tips: 'Please enter your username',
   user_password: 'Password',
-  user_password_tips: 'Please enter your password'
+  user_password_tips: 'Please enter your password',
+  jdbc_format_tips: 'jdbc connection parameters is not a correct JSON format'
 }
 
 const data_quality = {

@@ -15,24 +15,22 @@
  * limitations under the License.
  */
 
-import mapping from './mapping'
-import regex from './regex'
-import truncateText from './truncate-text'
-import log from './log'
-import downloadFile from './downloadFile'
-import copy from './clipboard'
-import removeUselessChildren from './tree-format'
-import isJson from './json'
-
-const utils = {
-  mapping,
-  regex,
-  truncateText,
-  log,
-  downloadFile,
-  copy,
-  removeUselessChildren,
-  isJson
+/**
+ * Verify if it is in json format
+ */
+const isJson = (str: string) => {
+  if (typeof str === 'string') {
+    try {
+      const obj = JSON.parse(str)
+      if (typeof obj === 'object' && obj) {
+        return true
+      } else {
+        return false
+      }
+    } catch (e) {
+      return false
+    }
+  }
 }
 
-export default utils
+export default isJson

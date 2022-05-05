@@ -1227,7 +1227,8 @@ const datasource = {
   user_name: '用户名',
   user_name_tips: '请输入用户名',
   user_password: '密码',
-  user_password_tips: '请输入密码'
+  user_password_tips: '请输入密码',
+  jdbc_format_tips: 'jdbc连接参数不是一个正确的JSON格式'
 }
 
 const data_quality = {
