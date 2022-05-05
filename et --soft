@@ -1,0 +1,242 @@
+[33mcommit 404f7c8b06c19a3db3b25e161f495f795cdef81b[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: chens616 <chens616@qq.com>
+Date:   Wed May 4 23:43:42 2022 +0800
+
+    msg
+
+[33mcommit 778018dcfb21420516b9194f77c199aaf4b56768[m
+Author: LongJGun <626811615@qq.com>
+Date:   Tue May 3 14:28:19 2022 +0800
+
+    [Bug] [worker] fix CommandType TASK_EXECUTE_RUNNING_ACK don't consumed (#9849) (#9850)
+
+[33mcommit f9f91000fd69caa8f70a9ea12993f7c432d6d30b[m
+Author: songjianet <1778651752@qq.com>
+Date:   Sun May 1 13:19:07 2022 +0800
+
+    [Fix][UI Next][V1.0.0-Beta] Fix the problem that there is no prompt for selecting users. (#9858)
+    
+    * [Fix][UI Next][V1.0.0-Beta] Fix the problem that there is no prompt for selecting users.
+    
+    * [Fix][UI Next][V1.0.0-Beta] Change update user to edit user.
+    
+    * [Fix][UI Next][V1.0.0-Beta] Change update user to edit user.
+
+[33mcommit fcb32e4c3c0363ac820f6bff32d42a3ed7f47f16[m
+Author: Town <62897740+AirToSupply@users.noreply.github.com>
+Date:   Sat Apr 30 11:07:00 2022 +0800
+
+    [fix] fix query access token for specified user failed (#9855)
+
+[33mcommit f747b606e985836c734da23509c74c3b95f542b7[m
+Author: Amy0104 <97265214+Amy0104@users.noreply.github.com>
+Date:   Fri Apr 29 16:00:10 2022 +0800
+
+    [Fix][UI Next][V1.0.0-Beta] Add validation rules to dependency of the dependent task. (#9844)
+
+[33mcommit 31cd1b5e617231d771c71d7b55e3c2dd9ee5ed25[m
+Author: WangJPLeo <103574007+WangJPLeo@users.noreply.github.com>
+Date:   Fri Apr 29 15:44:05 2022 +0800
+
+    Serial wait for subsequent execution (#9847)
+
+[33mcommit 4f2b9ac8863b5ffc275b46d2337254683fdebb66[m
+Author: Kerwin <37063904+zhuangchong@users.noreply.github.com>
+Date:   Fri Apr 29 10:34:03 2022 +0800
+
+    [Improve][common] code clean in the common module (#9435)
+
+[33mcommit 5d5125d50760ac7846d78b12c270143bbbe5a037[m
+Author: caishunfeng <caishunfeng2021@gmail.com>
+Date:   Fri Apr 29 10:17:34 2022 +0800
+
+    [Bug-9829][Api] Fix schedule timezone (#9830)
+
+[33mcommit d1f5bbfcae3659c885a20e4ea9f0e05001f2db42[m
+Author: labbomb <739955946@qq.com>
+Date:   Thu Apr 28 19:49:58 2022 +0800
+
+    [Fix]fix the search bar echoes abnormally (#9835)
+
+[33mcommit 9a568769ebd4135349bfa4ac3a2989ccc55bb74b[m
+Author: songjianet <1778651752@qq.com>
+Date:   Thu Apr 28 19:03:40 2022 +0800
+
+    [Feature][UI Next][V1.0.0-Beta] Rename SeaTunnel. (#9839)
+
+[33mcommit 69810a8a36060ae7e138fd7cdffdf2acc9eedd3b[m
+Author: Tq <tianqitobethefirst@gmail.com>
+Date:   Thu Apr 28 18:16:37 2022 +0800
+
+    [BUG][ALERT-SERVER]validate script before alert script (#9834)
+    
+    * validate script before alert script
+    
+    * fix validate script before alert script
+
+[33mcommit 47b4489452eb8d19660fe7af8f02299540035424[m
+Author: Mr.An <42627702+SnowMoon-Dev@users.noreply.github.com>
+Date:   Thu Apr 28 18:11:02 2022 +0800
+
+    [Fix] json object serialization error (#9828)
+    
+    * fix json object parser error
+    
+    * delete password validator
+    
+    * Update use-form.ts
+    
+    * Update use-form.ts
+    
+    * Update use-detail.ts
+
+[33mcommit 6a2484196ddcb5c87c75e4fe8414d178c2ef4882[m
+Author: songjianet <1778651752@qq.com>
+Date:   Thu Apr 28 16:52:19 2022 +0800
+
+    [Fix][UI][V1.0.0-Beta] Fix the problem of wrong workflow name. (#9833)
+
+[33mcommit 3cea039239a4f4fbe8959228be6f38123f02285c[m
+Author: WangJPLeo <103574007+WangJPLeo@users.noreply.github.com>
+Date:   Thu Apr 28 16:41:00 2022 +0800
+
+    Task queue status update. (#9832)
+
+[33mcommit bbf6c4ed62e0b5ad57d41691a05032e2a613c739[m
+Author: Eric Gao <ericgao.apache@gmail.com>
+Date:   Thu Apr 28 16:06:49 2022 +0800
+
+    [Feature][UI Next] Add front-end for Apache Zeppelin task plugin (#9597) (#9810)
+    
+    * [Feature][UI Next] Add front-end for Apache Zeppelin task plugin (#9597)
+    
+    * Fix minor bugs of zeppelin server endpoint in common.properties
+    
+    * Fix several bugs in zeppelin task plugin front-end
+    
+    * add noteId and paragraphId into ITaskParams
+    
+    * Fix bug in tasks/use-zeppelin.ts
+
+[33mcommit bb2d4d18e9670e1444525d7313870d4a334cd445[m
+Author: Devosend <devosend@gmail.com>
+Date:   Thu Apr 28 15:53:26 2022 +0800
+
+    [Fix][UI] Hide the version control button in workflow instance (#9825)
+
+[33mcommit 4f596f362a976368945d3cce7b6d326d4aecf2a1[m
+Author: Jiajie Zhong <zhongjiajie955@hotmail.com>
+Date:   Thu Apr 28 15:33:03 2022 +0800
+
+    [doc] Fix syntax error cause website not work correctly (#9826)
+
+[33mcommit ab2d535e5451ea05b0da89865176b6612e3d2994[m
+Author: WangJPLeo <103574007+WangJPLeo@users.noreply.github.com>
+Date:   Thu Apr 28 11:00:33 2022 +0800
+
+    The node ID under serial is greater than the current ID. (#9820)
+    
+    Co-authored-by: WangJPLeo <wangjipeng@whaleops.com>
+
+[33mcommit 828034f8b9760ed51cd5657e31b4e4f462c643c0[m
+Author: 陈家名 <13774486042@163.com>
+Date:   Wed Apr 27 22:02:14 2022 +0800
+
+    [improve][python] Specify warning group when deploy process-definition (#9773)
+
+[33mcommit d3c53af100389e30289d577d92d891e005646047[m
+Author: Devosend <devosend@gmail.com>
+Date:   Wed Apr 27 20:49:04 2022 +0800
+
+    [Fix][UI] Fix timing modal start time and end time bug (#9815)
+
+[33mcommit d188f49b0e56758cc2aff14d0518a9fcc0febcc3[m
+Author: Jiajie Zhong <zhongjiajie955@hotmail.com>
+Date:   Wed Apr 27 20:02:34 2022 +0800
+
+    [doc] Dir development should not ref other dirs content (#9812)
+    
+    For now, development dir deploy in other place instead
+    of docs dir https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html
+    so could not ref markdown doc from other docs dir
+
+[33mcommit ed425d2d2d01f5f53f0d55e048d1ddd932c24b6f[m
+Author: sq-q <83269577+sq-q@users.noreply.github.com>
+Date:   Wed Apr 27 17:44:05 2022 +0800
+
+    [Feature-9772][plugin/ui] support SparkSQL Task (#9790)
+    
+    * [refactor] Dolphinscheduler sparkSQL
+    
+    * [refactor] Dolphinscheduler SparkSQL
+    
+    * [refactor] Dolphinscheduler SparkSQL
+    
+    * [refactor] Dolphinscheduler SparkSQL
+    
+    * [refactor] Dolphinscheduler SparkSQL
+    
+    * [refactor] Dolphinscheduler SparkSQL
+    
+    * [refactor] Dolphinscheduler SparkSQL
+    
+    * [refactor] Refactor ui code and add sparksql test cases
+    
+    * [refactor] refactor dolphinscheduler SparkSQL
+    
+    * [refactor] refactor dolphinscheduler plugin-sparkSQL
+    
+    * [refactor] refactor dolphinscheduler plugin-SparkSQL
+    
+    * [refactor] dolphinscheduler plugin-SparkTaskTest
+    
+    * [refactor] dolphinscheduler plugin-SparkTask
+    
+    * [refactor] dolphinscheduler plugin-Spark
+    
+    * [refactor] dolphinscheduler plugin-SparkTask-SparkSQL
+    
+    * [refactor] dolphinscheduler plugin-spark-SparkTask
+    
+    * [refactor] dolphinscheduler plugin-spark-SparkTask redefine code
+
+[33mcommit 7b0b4c126efdb85a076a320749877b4f4ad3ecdc[m
+Author: Tq <tianqitobethefirst@gmail.com>
+Date:   Wed Apr 27 17:26:58 2022 +0800
+
+    [Bug] [Website-9764]add http alert doc and change body param to unnecessary (#9792)
+    
+    * add http alert doc and change body param to unnecessary
+    
+    * submit http en doc and fix doc
+    
+    * fix http doc
+
+[33mcommit d2fe85d7da6b78177db460b8d04c7cb32f967003[m
+Author: WangJPLeo <103574007+WangJPLeo@users.noreply.github.com>
+Date:   Wed Apr 27 17:23:48 2022 +0800
+
+    [Fix-9796] The task queue can be executed normally. (#9797)
+    
+    * Task group queue run manually
+    
+    * Test repetition.
+    
+    * Reference package is not available*.
+    
+    Co-authored-by: WangJPLeo <wangjipeng@whaleops.com>
+
+[33mcommit 1c4b8d1811ea9ac61746371c38a88fe84383fb9e[m
+Author: Amy0104 <97265214+Amy0104@users.noreply.github.com>
+Date:   Wed Apr 27 17:05:27 2022 +0800
+
+    [Fix][UI Next][V1.0.0-Beta] Add a return button and set the form to disabled on the file detail page. (#9802)
+
+[33mcommit d618602aa309b506698a505b008856cfd16cefb6[m
+Author: Amy0104 <97265214+Amy0104@users.noreply.github.com>
+Date:   Wed Apr 27 17:03:37 2022 +0800
+
+    [Fix][Next-UI][V1.0.0-Beta] Fix placeholder error on the task queue page. (#9805)
+
+[33mcommit 206b7c1c51e84f2e937748bc94191b23f95298e9[m
+Author: zhuxt2015 <5947547
