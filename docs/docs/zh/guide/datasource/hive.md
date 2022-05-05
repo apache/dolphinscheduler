@@ -38,3 +38,6 @@ login.user.keytab.username=hdfs-mycluster@ESZ.COM
 login.user.keytab.path=/opt/hdfs.headless.keytab
 ```
 
+## 是否原生支持
+
+是，数据源不需要任务附加操作即可使用。
