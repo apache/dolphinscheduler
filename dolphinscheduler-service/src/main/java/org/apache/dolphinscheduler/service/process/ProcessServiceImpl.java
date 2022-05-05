@@ -313,8 +313,8 @@ public class ProcessServiceImpl implements ProcessService {
         //when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             while (true) {
-                List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                    Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+                List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
                 if (CollectionUtils.isEmpty(runningProcessInstances)) {
                     processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
                     saveProcessInstance(processInstance);
@@ -326,15 +326,15 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             }
         } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
-            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                    processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.STOP);
                 saveProcessInstance(processInstance);
             }
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
-            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                    processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
                 for (ProcessInstance info : runningProcessInstances) {
                     info.setCommandType(CommandType.STOP);

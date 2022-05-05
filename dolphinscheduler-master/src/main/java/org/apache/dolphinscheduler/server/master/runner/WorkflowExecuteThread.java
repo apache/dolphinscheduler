@@ -352,7 +352,7 @@ public class WorkflowExecuteThread {
             TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.DISPATCH);
-            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
             return true;
         }
         if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
@@ -802,7 +802,7 @@ public class WorkflowExecuteThread {
     /**
      * process end handle
      */
-    private void endProcess() {
+    public void endProcess() {
         this.stateEvents.clear();
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             checkSerialProcess(processDefinition);
@@ -837,7 +837,9 @@ public class WorkflowExecuteThread {
         cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, nextInstanceId);
         Command command = new Command();
         command.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
+        command.setProcessInstanceId(nextProcessInstance.getId());
         command.setProcessDefinitionCode(processDefinition.getCode());
+        command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         processService.createCommand(command);
     }

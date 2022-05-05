@@ -281,7 +281,17 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 item.definitionCode = null
               }
             },
-            options: projectList
+            options: projectList,
+            path: `dependTaskList.${i}.dependItemList.${j}.projectCode`,
+            rule: {
+              required: true,
+              trigger: ['input', 'blur'],
+              validator(validate: any, value: string) {
+                if (!value) {
+                  return Error(t('project.node.project_name_tips'))
+                }
+              }
+            }
           }),
           (j = 0) => ({
             type: 'select',
@@ -301,7 +311,17 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             },
             options:
               model.dependTaskList[i]?.dependItemList[j]
-                ?.definitionCodeOptions || []
+                ?.definitionCodeOptions || [],
+            path: `dependTaskList.${i}.dependItemList.${j}.definitionCode`,
+            rule: {
+              required: true,
+              trigger: ['input', 'blur'],
+              validator(validate: any, value: string) {
+                if (!value) {
+                  return Error(t('project.node.process_name_tips'))
+                }
+              }
+            }
           }),
           (j = 0) => ({
             type: 'select',
@@ -313,7 +333,17 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             },
             options:
               model.dependTaskList[i]?.dependItemList[j]?.depTaskCodeOptions ||
-              []
+              [],
+            path: `dependTaskList.${i}.dependItemList.${j}.depTaskCode`,
+            rule: {
+              required: true,
+              trigger: ['input', 'blur'],
+              validator(validate: any, value: string) {
+                if (!value) {
+                  return Error(t('project.node.task_name_tips'))
+                }
+              }
+            }
           }),
           (j = 0) => ({
             type: 'select',
@@ -326,7 +356,17 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                   DATE_LSIT[value]
               }
             },
-            options: CYCLE_LIST
+            options: CYCLE_LIST,
+            path: `dependTaskList.${i}.dependItemList.${j}.cycle`,
+            rule: {
+              required: true,
+              trigger: ['input', 'blur'],
+              validator(validate: any, value: string) {
+                if (!value) {
+                  return Error(t('project.node.cycle_time_tips'))
+                }
+              }
+            }
           }),
           (j = 0) => ({
             type: 'select',
@@ -334,7 +374,16 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 10,
             name: ' ',
             options:
-              model.dependTaskList[i]?.dependItemList[j]?.dateOptions || []
+              model.dependTaskList[i]?.dependItemList[j]?.dateOptions || [],
+            path: `dependTaskList.${i}.dependItemList.${j}.dateValue`,
+            rule: {
+              trigger: ['input', 'blur'],
+              validator(validate: any, value: string) {
+                if (!value) {
+                  return Error(t('project.node.date_tips'))
+                }
+              }
+            }
           }),
           (j = 0) => ({
             type: 'custom',
