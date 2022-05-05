@@ -274,6 +274,15 @@ export default defineComponent({
       nodeVariables.showModalRef = false
     }
 
+    const layoutSubmit = () => {
+      submit()
+
+      // Refresh task status in workflow instance
+      if (props.instance) {
+        refreshTaskStatus()
+      }
+    }
+
     watch(
       () => props.definition,
       () => {
@@ -321,7 +330,7 @@ export default defineComponent({
         </div>
         <DagAutoLayoutModal
           visible={layoutVisible.value}
-          submit={submit}
+          submit={layoutSubmit}
           cancel={cancel}
           formValue={formValue}
           formRef={formRef}
