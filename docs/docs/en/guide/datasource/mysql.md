@@ -12,3 +12,7 @@
 - Database name: enter the database name of the MYSQL connection
 - Jdbc connection parameters: parameter settings for MYSQL connection, in JSON format
 
+## Native Supported
+
+No, read section example in [introduction](introduction.md) to activate this datasource.
+
