@@ -82,7 +82,8 @@ export function useColumns(onCallback: Function) {
       {
         title: t('datasource.description'),
         key: 'note',
-        ...COLUMN_WIDTH_CONFIG['note']
+        ...COLUMN_WIDTH_CONFIG['note'],
+        render: (rowData) => rowData.description || '-'
       },
       {
         title: t('datasource.create_time'),
