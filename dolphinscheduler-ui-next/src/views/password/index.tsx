@@ -24,10 +24,10 @@ import Card from '@/components/card'
 const password = defineComponent({
   name: 'password',
   setup() {
-    const { state, t } = useForm()
+    const { state, rules, t } = useForm()
     const { handleUpdate } = useUpdate(state)
 
-    return { ...toRefs(state), t, handleUpdate }
+    return { ...toRefs(state), t, handleUpdate, rules }
   },
   render() {
     const { t } = this
@@ -37,17 +37,28 @@ const password = defineComponent({
         {{
           default: () => (
             <div>
-              <NForm rules={this.rules} ref='passwordFormRef'>
+              <NForm
+                rules={this.rules}
+                ref='passwordFormRef'
+                model={this.passwordForm}
+              >
                 <NFormItem label={t('password.password')} path='password'>
                   <NInput
                     type='password'
                     placeholder={t('password.password_tips')}
                     v-model={[this.passwordForm.password, 'value']}
+                    onInput={() => {
+                      this.rPasswordFormItemRef.validate({
+                        trigger: 'password-input'
+                      })
+                    }}
                   />
                 </NFormItem>
                 <NFormItem
+                  ref='rPasswordFormItemRef'
                   label={t('password.confirm_password')}
                   path='confirmPassword'
+                  first
                 >
                   <NInput
                     type='password'
