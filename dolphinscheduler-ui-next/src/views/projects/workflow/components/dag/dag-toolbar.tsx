@@ -168,11 +168,11 @@ export default defineComponent({
       if (graph.value) {
         const cells = graph.value.getSelectedCells()
         if (cells) {
-          graph.value?.removeCells(cells)
           const codes = cells
             .filter((cell) => cell.isNode())
             .map((cell) => +cell.id)
-          context.emit('removeTasks', codes)
+          context.emit('removeTasks', codes, cells)
+          graph.value?.removeCells(cells)
         }
       }
     }
