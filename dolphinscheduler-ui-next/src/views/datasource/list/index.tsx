@@ -147,6 +147,8 @@ const list = defineComponent({
             page-size={pageSize}
             item-count={itemCount}
             show-quick-jumper
+            show-size-picker
+            page-sizes={[10, 30, 50]}
             class={styles['pagination']}
             on-update:page={changePage}
             on-update:page-size={changePageSize}
