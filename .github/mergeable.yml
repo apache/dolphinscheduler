@@ -36,3 +36,15 @@ mergeable:
         status: 'success'
       - do: labels
         delete: 'sql not sync'
+
+  - when: pull_request.*, pull_request_review.*
+    name: Verify labels before merging
+    validate:
+      - do: label
+        and:
+          - must_include:
+              regex: 'check:docs|check:tests'
+              message: 'PR can not merge until check docs and unit test.'
+          - must_include:
+              regex: 'miss-docs|miss-tests'
+              message: 'PR can not merge until check docs and unit test.'
