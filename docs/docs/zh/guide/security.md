@@ -157,6 +157,6 @@ worker.groups=default,test
 
 > 创建/更新 namespace
 
-- 创建和授权后，在相关k8s任务选择命名空间时下拉可选，如果k8s集群名字是ds_null_k8s是测试模式，不会真正操作集群.
+- 创建和授权后，在相关k8s任务选择命名空间时下拉可选，如果k8s集群名字是`ds_null_k8s`是测试模式，不会真正操作集群.
 
 ![create-environment](/img/new_ui/dev/security/create-namespace.png)
