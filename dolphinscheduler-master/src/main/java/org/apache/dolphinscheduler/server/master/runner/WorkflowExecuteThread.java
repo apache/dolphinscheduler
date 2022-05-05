@@ -667,7 +667,8 @@ public class WorkflowExecuteThread {
         try {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
 
-            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+            // serial wait execution type needs to wake up the waiting process
+            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP && !processDefinition.getExecutionType().typeIsSerialWait()) {
                 this.updateProcessInstanceState(stateEvent);
                 return true;
             }
