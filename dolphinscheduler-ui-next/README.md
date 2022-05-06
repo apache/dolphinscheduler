@@ -1,7 +1,7 @@
-# Dolphin Scheduler UI Next
+# Dolphin Scheduler UI
 
-> After two and a half months of development cycle, we have brought a brand-new `UI` management system (V1.0.0-Alpha).
->
+> Brand new UI management system (Beta).
+> 
 > Compared with the old `UI`, it will be more standardized, and it will also have a more complete type checking mechanism. At the same time, its speed has made a qualitative leap.
 >
 > We also provide dark mode and light mode to meet the preferences of different developers. It will make your eyes shine.
@@ -42,12 +42,24 @@ When you are ready to package, you need to modify the `VITE_APP_PROD_WEB_URL` pa
 pnpm run build:prod
 ```
 
+---
+
+### Participate Development
+
 #### Code Format
 
 Usually after you modify the code, you need to perform code formatting operations to ensure that the code in the project is the same style.
 
 ```shell
 pnpm run prettier
+```
+
+#### Type Checking
+
+If you are involved in the development of the `UI`, please make sure to perform type checking before submitting the code, and submit it without errors.
+
+```shell
+vue-tsc --noEmit
 ```
 
 ---
