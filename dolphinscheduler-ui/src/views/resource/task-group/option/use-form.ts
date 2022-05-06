@@ -28,8 +28,8 @@ export function useForm() {
     formData: {
       id: 0,
       name: '',
-      projectCode: '',
-      groupSize: '0',
+      projectCode: null as string | null,
+      groupSize: '',
       status: 1,
       description: ''
     } as TaskGroupUpdateReq,
@@ -44,12 +44,25 @@ export function useForm() {
           }
         }
       },
-      description: {
+      groupSize: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.formData.description === '') {
-            return new Error(t('resource.task_group_option.please_enter_desc'))
+          if (!state.formData.groupSize) {
+            return new Error(
+              t('resource.task_group_option.please_enter_resource_pool_size')
+            )
+          }
+        }
+      },
+      projectCode: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (!state.formData.projectCode) {
+            return new Error(
+              t('resource.task_group_option.please_select_project')
+            )
           }
         }
       }
