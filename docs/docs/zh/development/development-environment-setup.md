@@ -52,7 +52,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 安装前端依赖并运行前端组件
 
 ```shell
-cd dolphinscheduler-ui-next
+cd dolphinscheduler-ui
 pnpm install
 pnpm run dev
 ```
@@ -147,7 +147,7 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
 安装前端依赖并运行前端组件
 
 ```shell
-cd dolphinscheduler-ui-next
+cd dolphinscheduler-ui
 pnpm install
 pnpm run dev
 ```
