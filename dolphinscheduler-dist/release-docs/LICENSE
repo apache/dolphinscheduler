@@ -232,7 +232,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
     commons-collections 3.2.2: https://mvnrepository.com/artifact/commons-collections/commons-collections/3.2.2, Apache 2.0
     commons-collections4 4.1: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.1, Apache 2.0
-    commons-compress 1.19: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.19, Apache 2.0
+    commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
     commons-configuration 1.10: https://mvnrepository.com/artifact/commons-configuration/commons-configuration/1.10, Apache 2.0
     commons-daemon 1.0.13 https://mvnrepository.com/artifact/commons-daemon/commons-daemon/1.0.13, Apache 2.0
     commons-dbcp 1.4: https://github.com/apache/commons-dbcp, Apache 2.0
@@ -285,7 +285,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hive-service-rpc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-service-rpc/2.1.0, Apache 2.0
     hive-storage-api 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-storage-api/2.1.0, Apache 2.0
     htrace-core 3.1.0-incubating: https://mvnrepository.com/artifact/org.apache.htrace/htrace-core/3.1.0-incubating, Apache 2.0
-    httpclient 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.4.1, Apache 2.0
+    httpclient 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.13, Apache 2.0
     httpcore 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore/4.4.1, Apache 2.0
     httpmime 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime/4.5.13, Apache 2.0
     jackson-annotations 2.10.5: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.10.5, Apache 2.0
@@ -441,6 +441,15 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-s3 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.12.160  Apache 2.0
     aws-java-sdk-core-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
     aws-java-sdk-kms-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.160  Apache 2.0
+    commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
+    httpasyncclient 4.1.4: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
+    httpcore-nio 4.4.14: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.14, Apache 2.0
+    jetty-client 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-client/9.4.44.v20210927, Apache 2.0
+    websocket-api 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-api/9.4.44.v20210927, Apache 2.0
+    websocket-client 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client/9.4.44.v20210927, Apache 2.0
+    websocket-common 9.4.44.v20210927: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-common/9.4.44.v20210927, Apache 2.0
+    zeppelin-client 0.10.1: https://mvnrepository.com/artifact/org.apache.zeppelin/zeppelin-client/0.10.1, Apache 2.0
+    zeppelin-common 0.10.1: https://mvnrepository.com/artifact/org.apache.zeppelin/zeppelin-common/0.10.1, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -456,7 +465,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jline 0.9.94: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
-    postgresql 42.2.5: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.2.5, BSD 2-clause
+    postgresql 42.3.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.3.4, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
     threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.3.6,  BSD 3-clause
@@ -517,6 +526,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     checker-qual 3.10.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.10.0, MIT + GPLv2
     Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
+    unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
 
 ========================================================================
 MPL 1.1 licenses
@@ -544,58 +554,13 @@ CC0-1.0 licenses
 
 HdrHistogram 2.1.12:	https://github.com/HdrHistogram/HdrHistogram , CC0-1.0 and BSD 2-Clause
 
+
 ========================================================================
 UI related licenses
 ========================================================================
 
 The following components are used in UI.See project link for details.
 The text of each license is also included at licenses/ui-licenses/LICENSE-[project].txt.
-
-========================================
-MIT licenses
-========================================
-    @form-create/element-ui 1.0.18: https://github.com/xaboy/form-create MIT
-    axios 0.16.2: https://github.com/axios/axios MIT
-    bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
-    canvg 1.5.1: https://github.com/canvg/canvg MIT
-    clipboard 2.0.1: https://github.com/zenorocha/clipboard.js MIT
-    codemirror 5.43.0: https://github.com/codemirror/CodeMirror MIT
-    dayjs 1.7.8: https://github.com/iamkun/dayjs MIT
-    element-ui 2.13.2: https://github.com/ElemeFE/element MIT
-    html2canvas 0.5.0-beta4: https://github.com/niklasvh/html2canvas MIT
-    jquery 3.3.1: https://github.com/jquery/jquery MIT
-    jquery-ui 1.12.1: https://github.com/jquery/jquery-ui MIT
-    js-cookie 2.2.1: https://github.com/js-cookie/js-cookie MIT
-    jsplumb 2.8.6: https://github.com/jsplumb/jsplumb MIT and GPLv2
-    lodash 4.17.11: https://github.com/lodash/lodash MIT
-    moment-timezone 0.5.33: https://github.com/moment/moment-timezone MIT
-    vue-treeselect 0.4.0: https://github.com/riophae/vue-treeselect MIT
-    vue	2.5.17:	https://github.com/vuejs/vue	MIT
-    vue-router 2.7.0: https://github.com/vuejs/vue-router MIT
-    vuex 3.0.0: https://github.com/vuejs/vuex MIT
-    vuex-router-sync 4.1.2: https://github.com/vuejs/vuex-router-sync MIT
-    dagre 0.8.5: https://github.com/dagrejs/dagre MIT
-    js-cookie 3.0.1 https://github.com/js-cookie/js-cookie MIT
-    @types/js-cookie 3.0.1 https://github.com/DefinitelyTyped/DefinitelyTyped MIT
-
-========================================
-Apache 2.0 licenses
-========================================
-    echarts	4.1.0: https://github.com/apache/incubator-echarts	Apache-2.0
-    remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
-
-========================================
-BSD licenses
-========================================
-    d3 3.5.17: https://github.com/d3/d3 BSD-3-Clause
-
-
-========================================================================
-UI-Next related licenses
-========================================================================
-
-The following components are used in UI-Next.See project link for details.
-The text of each license is also included at licenses/ui-next-licenses/LICENSE-[project].txt.
 
 ========================================
 MIT licenses
@@ -634,6 +599,8 @@ MIT licenses
     vite-plugin-compression 0.3.6: https://github.com/vbenjs/vite-plugin-compression MIT
     vue-tsc 0.28.10: https://github.com/johnsoncodehk/volar MIT
     date-fns-tz 1.3.0: https://github.com/marnusw/date-fns-tz MIT
+    screenfull 6.0.1: https://github.com/sindresorhus/screenfull MIT
+    @types/lodash 4.14.182: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses
@@ -648,7 +615,7 @@ BSD licenses
 ========================================================================
 
 The following components are provided under a BSD license. See project link for details.
-The text of each license is also included at licenses/ui-next-licenses/LICENSE-[project].txt.
+The text of each license is also included at licenses/ui-licenses/LICENSE-[project].txt.
     qs 6.10.3: https://github.com/ljharb/qs BSD 3-Clause
     @typescript-eslint/eslint-plugin 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
     @typescript-eslint/parser 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause

@@ -61,7 +61,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                     taskInstance.getName(),
                     taskGroupId,
                     taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskInstancePriority().getCode());
+                    taskInstance.getTaskGroupPriority());
             if (!acquireTaskGroup) {
                 logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
                 return true;
@@ -117,6 +117,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                     taskInstance.getId(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
+            if (taskExecutionContext == null) {
+                logger.error("task get taskExecutionContext fail: {}", taskInstance);
+                return false;
+            }
+
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);

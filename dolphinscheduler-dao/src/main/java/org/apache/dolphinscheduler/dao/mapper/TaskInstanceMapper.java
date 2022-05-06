@@ -17,18 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * task instance mapper interface
@@ -58,7 +56,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                       @Param("taskIds") int[] taskIds);
 
     /**
-     * Statistics task instance group by given project codes list
+     * Statistics task instance group by given project codes list by start time
      * <p>
      * We only need project codes to determine whether the task instance belongs to the user or not.
      *
@@ -70,6 +68,21 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     List<ExecuteStatusCount> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
                                                                   @Param("endTime") Date endTime,
                                                                   @Param("projectCodes") Long[] projectCodes);
+
+    /**
+     * Statistics task instance group by given project codes list by submit time
+     * <p>
+     * We only need project codes to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectCodes Project codes list to filter
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(@Param("startTime") Date startTime,
+                                                                                       @Param("endTime") Date endTime,
+                                                                                       @Param("projectCodes") Long[] projectCodes,
+                                                                                       @Param("states") List<ExecutionStatus> states);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,
@@ -84,5 +97,5 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("endTime") Date endTime
     );
 
-    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,@Param("status") int status);
+    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId, @Param("status") int status);
 }

@@ -120,7 +120,7 @@ public final class Constants {
     /**
      * environment properties default path
      */
-    public static final String ENV_PATH = "env/dolphinscheduler_env.sh";
+    public static final String ENV_PATH = "dolphinscheduler_env.sh";
 
     /**
      * resource.view.suffixs
@@ -816,4 +816,11 @@ public final class Constants {
     public static final String K8S = "k8s";
     public static final String LIMITS_CPU = "limitsCpu";
     public static final String LIMITS_MEMORY = "limitsMemory";
+    public static final String K8S_LOCAL_TEST_CLUSTER = "ds_null_k8s";
+
+    /**
+     * schedule timezone
+     */
+    public static final String SCHEDULE_TIMEZONE = "schedule_timezone";
+    public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 128;
 }

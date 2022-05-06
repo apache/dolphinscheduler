@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -59,6 +60,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private ExecutorService executorService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupServiceImpl.class);
 
     /**
@@ -73,9 +77,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
         if (name == null) {
             putMsg(result, Status.NAME_NULL);
             return result;
@@ -116,9 +117,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
         if (name == null) {
             putMsg(result, Status.NAME_NULL);
             return result;
@@ -127,7 +125,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
             return result;
         }
-        Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda().eq(TaskGroup::getName, name).ne(TaskGroup::getId, id));
+        Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda()
+            .eq(TaskGroup::getName, name)
+            .eq(TaskGroup::getUserId, loginUser.getId())
+            .ne(TaskGroup::getId, id));
+
         if (exists > 0) {
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
@@ -262,9 +264,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> closeTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.NO.getCode()) {
             putMsg(result, Status.TASK_GROUP_STATUS_CLOSED);
@@ -286,9 +285,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> startTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
+
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.YES.getCode()) {
             putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
@@ -310,21 +307,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public Map<String, Object> forceStartTask(User loginUser, int queueId) {
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
-        taskGroupQueueService.forceStartTask(queueId, Flag.YES.getCode());
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return executorService.forceStartTaskInstance(loginUser, queueId);
     }
 
     @Override
     public Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
+
         taskGroupQueueService.modifyPriority(queueId, priority);
         putMsg(result, Status.SUCCESS);
         return result;

@@ -17,3 +17,7 @@
 <p align="center">
     <img src="/img/sparksql_kerberos.png" width="80%" />
   </p>
+
+## 是否原生支持
+
+是，数据源不需要任务附加操作即可使用。

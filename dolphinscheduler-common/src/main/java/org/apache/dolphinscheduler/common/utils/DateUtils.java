@@ -536,17 +536,24 @@ public final class DateUtils {
 
     /**
      * transform date to target timezone date
-     * <p>e.g.
-     * <p> if input date is 2020-01-01 00:00:00 current timezone is CST
-     * <p>targetTimezoneId is MST
-     * <p>this method will return 2020-01-01 15:00:00
+     * sourceTimeZoneId is system default timezone
      */
-    public static Date getTimezoneDate(Date date, String targetTimezoneId) {
-        if (StringUtils.isEmpty(targetTimezoneId)) {
+    public static Date transformTimezoneDate(Date date, String targetTimezoneId) {
+        return transformTimezoneDate(date, ZoneId.systemDefault().getId(), targetTimezoneId);
+    }
+
+    /**
+     * transform date from source timezone date to target timezone date
+     * <p>e.g.
+     * <p> if input date is `Thu Apr 28 10:00:00 UTC 2022`, sourceTimezoneId is UTC
+     * <p>targetTimezoneId is Asia/Shanghai
+     * <p>this method will return `Thu Apr 28 02:00:00 UTC 2022`
+     */
+    public static Date transformTimezoneDate(Date date, String sourceTimezoneId, String targetTimezoneId) {
+        if (StringUtils.isEmpty(sourceTimezoneId) || StringUtils.isEmpty(targetTimezoneId)) {
             return date;
         }
-
-        String dateToString = dateToString(date);
+        String dateToString = dateToString(date, sourceTimezoneId);
         LocalDateTime localDateTime = LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
         return Date.from(zonedDateTime.toInstant());

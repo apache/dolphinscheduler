@@ -32,6 +32,10 @@ BEGIN
     --- alter column
     EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
 
+    --- add column
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alert ADD COLUMN IF NOT EXISTS sign varchar(40) NOT NULL DEFAULT ''''  ';
+    EXECUTE 'comment on column ' || quote_ident(v_schema) ||'.t_ds_alert.sign is ''sign=sha1(content)''';
+
     return 'Success!';
     exception when others then
         ---Raise EXCEPTION '(%)',SQLERRM;
@@ -42,3 +46,7 @@ $BODY$;
 select dolphin_update_metadata();
 
 d//
+
+-- add unique key to t_ds_relation_project_user
+CREATE UNIQUE INDEX t_ds_relation_project_user_un
+    on t_ds_relation_project_user (user_id, project_id);

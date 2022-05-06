@@ -17,24 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_COPY_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_MOVE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
-
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -49,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +62,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * process definition controller
@@ -567,6 +552,49 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
+     * get process definition list map by project code
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return process definition list data
+     */
+    @ApiOperation(value = "getProcessListByProjectCode", notes = "GET_PROCESS_LIST_BY_PROCESS_CODE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100")
+    })
+    @GetMapping(value = "/query-process-definition-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
+    public Result getProcessListByProjectCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode
+                                               ) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionListByProjectCode(projectCode);
+        return returnDataList(result);
+    }
+
+    /**
+     * get task definition list by process definition code
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return process definition list data
+     */
+    @ApiOperation(value = "getTaskListByProcessDefinitionCode", notes = "GET_TASK_LIST_BY_PROCESS_CODE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100"),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
+    })
+    @GetMapping(value = "/query-task-definition-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
+    public Result getTaskListByProcessDefinitionCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                     @RequestParam(value = "processDefinitionCode") Long processDefinitionCode) {
+        Map<String, Object> result = processDefinitionService.queryTaskDefinitionListByProcessDefinitionCode(projectCode, processDefinitionCode);
+        return returnDataList(result);
+    }
+
+    /**
      * delete process definition by code
      *
      * @param loginUser login user
@@ -617,17 +645,17 @@ public class ProcessDefinitionController extends BaseController {
                 try {
                     Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedCodeList.add(strProcessDefinitionCode);
+                        deleteFailedCodeList.add((String) deleteResult.get(Constants.MSG));
                         logger.error((String) deleteResult.get(Constants.MSG));
                     }
                 } catch (Exception e) {
-                    deleteFailedCodeList.add(strProcessDefinitionCode);
+                    deleteFailedCodeList.add(MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), strProcessDefinitionCode));
                 }
             }
         }
 
         if (!deleteFailedCodeList.isEmpty()) {
-            putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join(",", deleteFailedCodeList));
+            putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join("\n", deleteFailedCodeList));
         } else {
             putMsg(result, Status.SUCCESS);
         }

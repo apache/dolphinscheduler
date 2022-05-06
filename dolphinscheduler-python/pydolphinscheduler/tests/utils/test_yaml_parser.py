@@ -61,6 +61,7 @@ expects = [
         "default.workflow.queue": ("queuePythonGateway", "SmithEdit"),
         "default.workflow.worker_group": ("default", "SmithEdit"),
         "default.workflow.time_zone": ("Asia/Shanghai", "SmithEdit"),
+        "default.workflow.warning_type": ("NONE", "SmithEdit"),
     },
 ]
 
@@ -251,29 +252,3 @@ def test_yaml_parser_str_repr(src: str, setter: Dict, expect: str):
     # Equal after changed
     assert expect == str(yaml_parser)
     assert f"YamlParser({expect})" == repr(yaml_parser)
-
-
-@pytest.mark.parametrize(
-    "src, key, expect",
-    [
-        (param[1], "java_gateway.port", 25333),
-        (param[1], "default.user.phone", 11111111111),
-        (param[1], "default.user.state", 1),
-    ],
-)
-def test_yaml_parser_get_int(src: str, key: str, expect: int):
-    """Test function :func:`YamlParser.get_int`."""
-    yaml_parser = YamlParser(src)
-    assert expect == yaml_parser.get_int(key)
-
-
-@pytest.mark.parametrize(
-    "src, key, expect",
-    [
-        (param[1], "java_gateway.auto_convert", True),
-    ],
-)
-def test_yaml_parser_get_bool(src: str, key: str, expect: bool):
-    """Test function :func:`YamlParser.get_bool`."""
-    yaml_parser = YamlParser(src)
-    assert expect == yaml_parser.get_bool(key)

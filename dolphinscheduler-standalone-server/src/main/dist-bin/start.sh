@@ -19,7 +19,7 @@
 BIN_DIR=$(dirname $0)
 DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
-source "$BIN_DIR/dolphinscheduler_env.sh"
+source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
 
 JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
@@ -30,7 +30,10 @@ fi
 CP=$DOLPHINSCHEDULER_HOME/libs/standalone-server/*
 for d in alert-server api-server master-server worker-server; do
   for f in $DOLPHINSCHEDULER_HOME/../$d/libs/*.jar; do
-    CP=$CP:$f
+    JAR_FILE_NAME=${f##*/}
+    if [[ ! $CP =~ $JAR_FILE_NAME ]];then
+      CP=$CP:$f
+    fi
   done
 done
 

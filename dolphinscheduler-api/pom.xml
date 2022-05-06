@@ -58,7 +58,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-ui-next</artifactId>
+            <artifactId>dolphinscheduler-ui</artifactId>
         </dependency>
 
         <!--springboot-->

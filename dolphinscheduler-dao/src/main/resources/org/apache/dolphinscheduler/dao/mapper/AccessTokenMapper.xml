@@ -33,9 +33,9 @@
     </select>
 
     <select id="queryAccessTokenByUser" resultType="org.apache.dolphinscheduler.dao.entity.AccessToken">
-        select `id`, `user_id`, `token`, `expire_time`, `create_time`, `update_time`
-        from `t_ds_access_token`
-        where `user_id` = #{userId}
+        select id, user_id, token, expire_time, create_time, update_time
+        from t_ds_access_token
+        where user_id = #{userId}
     </select>
 
     <delete id="deleteAccessTokenByUserId">

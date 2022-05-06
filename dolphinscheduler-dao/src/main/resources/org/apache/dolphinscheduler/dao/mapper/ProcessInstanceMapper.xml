@@ -231,11 +231,12 @@
         </foreach>
         order by id asc
     </select>
-    <select id="queryByProcessDefineCodeAndStatusAndNextId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_code=#{processDefinitionCode}
+          and process_definition_version = #{processDefinitionVersion}
         and state in
         <foreach collection="states" item="i" open="(" close=")" separator=",">
             #{i}
@@ -250,8 +251,8 @@
         from t_ds_process_instance
         where process_definition_code=#{processDefinitionCode}
         and state = #{state}
-        and id <![CDATA[ < ]]> #{id}
-        order by id desc limit 1
+        and id <![CDATA[ > ]]> #{id}
+        order by id asc limit 1
     </select>
     <update id="updateGlobalParamsById">
         update t_ds_process_instance

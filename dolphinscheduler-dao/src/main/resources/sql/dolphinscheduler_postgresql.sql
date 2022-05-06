@@ -208,6 +208,7 @@ DROP TABLE IF EXISTS t_ds_alert;
 CREATE TABLE t_ds_alert (
   id int NOT NULL  ,
   title varchar(64) DEFAULT NULL ,
+  sign varchar(40) NOT NULL DEFAULT '',
   content text ,
   alert_status int DEFAULT '0' ,
   warning_type int DEFAULT '2' ,
@@ -220,9 +221,11 @@ CREATE TABLE t_ds_alert (
   process_instance_id int DEFAULT NULL ,
   alert_type int DEFAULT NULL ,
   PRIMARY KEY (id)
-) ;
+);
+comment on column t_ds_alert.sign is 'sign=sha1(content)';
 
 create index idx_status on t_ds_alert (alert_status);
+create index idx_sign on t_ds_alert (sign);
 
 --
 -- Table structure for table t_ds_alertgroup
@@ -622,7 +625,8 @@ CREATE TABLE t_ds_relation_project_user (
   perm int DEFAULT '1' ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_relation_project_user_un UNIQUE (user_id, project_id)
 ) ;
 create index relation_project_user_id_index on t_ds_relation_project_user (user_id);
 
@@ -1886,17 +1890,32 @@ CREATE TABLE t_ds_k8s_namespace (
    limits_memory      int DEFAULT NULL ,
    namespace          varchar(100) DEFAULT NULL ,
    online_job_num     int DEFAULT '0' ,
-   owner              varchar(100) DEFAULT NULL,
+   user_id            int DEFAULT NULL,
    pod_replicas       int DEFAULT NULL,
    pod_request_cpu    NUMERIC(13,4) NULL,
    pod_request_memory int DEFAULT NULL,
-   tag                varchar(100) DEFAULT NULL,
    limits_cpu         NUMERIC(13,4) NULL,
    k8s                varchar(100) DEFAULT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
    PRIMARY KEY (id) ,
    CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+);
+
+--
+-- Table structure for table t_ds_relation_namespace_user
+--
+
+DROP TABLE IF EXISTS t_ds_relation_namespace_user;
+CREATE TABLE t_ds_relation_namespace_user (
+    id serial NOT NULL,
+    user_id           int DEFAULT NULL ,
+    namespace_id      int DEFAULT NULL ,
+    perm              int DEFAULT NULL ,
+    create_time       timestamp DEFAULT NULL ,
+    update_time       timestamp DEFAULT NULL ,
+    PRIMARY KEY (id) ,
+    CONSTRAINT namespace_user_unique UNIQUE (user_id,namespace_id)
 );
 
 -- ----------------------------

@@ -31,6 +31,8 @@ log.addHandler(logging.StreamHandler())
 root_dir: Path = Path(__file__).parent
 img_dir: Path = root_dir.joinpath("img")
 doc_dir: Path = root_dir.joinpath("docs")
+dev_en_dir: Path = doc_dir.joinpath("en", "development")
+dev_zh_dir: Path = doc_dir.joinpath("zh", "development")
 
 
 def get_files_recurse(path: Path) -> Set:
@@ -61,7 +63,7 @@ def get_paths_rel_path(paths: Set[Path], rel: Path) -> Set:
 def get_docs_img_path(paths: Set[Path]) -> Set:
     """Get all img syntax from given :param:`paths` using the regexp from :param:`pattern`."""
     res = set()
-    pattern = re.compile(r"/img[\w./-]*")
+    pattern = re.compile(r"/img[\w./-]+")
     for path in paths:
         content = path.read_text()
         find = pattern.findall(content)
@@ -122,6 +124,17 @@ def prune() -> None:
     del_empty_dir_recurse(img_dir)
 
 
+def dev_syntax() -> None:
+    """Check temp whether temporary do not support syntax in development."""
+    pattern = re.compile("(\\(\\.\\.[\\w./-]+\\))")
+    dev_files_path = get_files_recurse(dev_en_dir) | get_files_recurse(dev_zh_dir)
+    get_files_recurse(dev_en_dir)
+    for path in dev_files_path:
+        content = path.read_text()
+        find = pattern.findall(content)
+        assert not find, f"File {str(path)} contain temporary not support syntax: {find}."
+
+
 def build_argparse() -> argparse.ArgumentParser:
     """Build argparse.ArgumentParser with specific configuration."""
     parser = argparse.ArgumentParser(prog="img_utils")
@@ -149,6 +162,11 @@ def build_argparse() -> argparse.ArgumentParser:
         "prune", help="Remove img in directory `img` but not use in directory `docs`."
     )
     parser_prune.set_defaults(func=prune)
+
+    parser_prune = subparsers.add_parser(
+        "dev-syntax", help="Check whether temporary does not support syntax in development directory."
+    )
+    parser_prune.set_defaults(func=dev_syntax)
 
     # TODO Add subcommand `reorder`
     return parser

@@ -97,6 +97,10 @@ export default {
                                 title: 'Task Instance',
                                 link: '/en-us/docs/dev/user_doc/guide/project/task-instance.html',
                             },
+                            {
+                                title: 'Task Definition',
+                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
+                            },
                         ]
                     },
                     {
@@ -161,6 +165,10 @@ export default {
                             {
                                 title: 'Amazon EMR',
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
+                            },
+                            {
+                                title: 'Apache Zeppelin',
+                                link: '/en-us/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
                         ],
                     },
@@ -237,7 +245,19 @@ export default {
                                 title: 'Enterprise Webexteams',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: 'Script',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
+                            },
                         ],
+                    },
+                    {
+                        title: 'Data Quality',
+                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: 'Resource',
@@ -250,6 +270,15 @@ export default {
                     {
                         title: 'Security',
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
+                    },
+                    {
+                        title: 'How-To',
+                        children: [
+                            {
+                                title: 'General Setting',
+                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                            }
+                        ],
                     },
                     {
                         title: 'Open API',
@@ -398,6 +427,10 @@ export default {
                                 title: '任务实例',
                                 link: '/zh-cn/docs/dev/user_doc/guide/project/task-instance.html',
                             },
+                            {
+                                title: '任务定义',
+                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
+                            },
                         ]
                     },
                     {
@@ -462,6 +495,10 @@ export default {
                             {
                                 title: 'Amazon EMR',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
+                            },
+                            {
+                                title: 'Apache Zeppelin',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
                         ],
                     },
@@ -538,7 +575,19 @@ export default {
                                 title: 'Webexteams',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: '脚本告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/http.html',
+                            },
                         ],
+                    },
+                    {
+                        title: '数据质量',
+                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: '资源中心',
@@ -551,6 +600,15 @@ export default {
                     {
                         title: '安全中心',
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
+                    },
+                    {
+                        title: '常见操作',
+                        children: [
+                            {
+                                title: '通用设置',
+                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                            }
+                        ],
                     },
                     {
                         title: 'API调用',

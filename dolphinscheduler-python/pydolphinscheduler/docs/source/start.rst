@@ -107,13 +107,48 @@ the server is health if keyword `ApiApplicationServer` in the console.
    yaml config path `python-gateway.enabled : true` in api-server's configuration path in `api-server/conf/application.yaml`.
    The default value is true and Python gateway service start when api server is been started.
 
+Run an Example
+--------------
+
+Before run an example for pydolphinscheduler, you should get the example code from it source code. You could run
+single bash command to get it
+
+.. code-block:: bash
+
+   $ wget https://raw.githubusercontent.com/apache/dolphinscheduler/dev/dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/examples/tutorial.py
+
+or you could copy-paste the content from `tutorial source code`_. And then you could run the example in your
+terminal
+
+.. code-block:: bash
+
+   $ python tutorial.py
+
+If you want to submit your workflow to a remote API server, which means that your workflow script is different
+from the API server, you should first change pydolphinscheduler configuration and then submit the workflow script
+
+.. code-block:: bash
+
+   $ pydolphinscheduler config --init
+   $ pydolphinscheduler config --set java_gateway.address <your-api-server-ip-or-hostname>
+   $ python tutorial.py
+
+.. note::
+
+   You could see more information in :doc:`config` about all the configurations pydolphinscheduler supported.
+
+After that, you could go and see your DolphinScheduler web UI to find out a new workflow created by pydolphinscheduler,
+and the path of web UI is `Project -> Workflow -> Workflow Definition`.
+
+
 What's More
 -----------
 
-If you do not familiar with *PyDolphinScheduler*, you could go to :doc:`tutorial`
-and see how it work. But if you already know the inside of *PyDolphinScheduler*,
-maybe you could go and play with all :doc:`tasks/index` *PyDolphinScheduler* supports.
+If you do not familiar with *PyDolphinScheduler*, you could go to :doc:`tutorial` and see how it works. But
+if you already know the basic usage or concept of *PyDolphinScheduler*, you could go and play with all
+:doc:`tasks/index` *PyDolphinScheduler* supports, or see our :doc:`howto/index` about useful cases.
 
 .. _`instructions for all platforms here`: https://wiki.python.org/moin/BeginnersGuide/Download
 .. _`Apache DolphinScheduler`: https://dolphinscheduler.apache.org
 .. _`install Apache DolphinScheduler`: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/installation/standalone.html
+.. _`tutorial source code`: https://raw.githubusercontent.com/apache/dolphinscheduler/dev/dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/examples/tutorial.py
