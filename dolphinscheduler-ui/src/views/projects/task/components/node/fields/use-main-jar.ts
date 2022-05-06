@@ -26,17 +26,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
-<<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-main-jar.ts
-  const mainJarsSpan = computed(() =>
-      model.programType === 'SQL' ? 0 : 24
-  )
-
   const mainJarSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
-=======
-  const mainJarSpan = computed(() =>
-      model.programType === 'SQL' ? 0 : 24
-  )
->>>>>>> d479ad38a6 ([refactor] flink sql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-main-jar.ts
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {

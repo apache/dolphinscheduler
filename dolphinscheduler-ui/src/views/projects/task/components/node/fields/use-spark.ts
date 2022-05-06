@@ -32,28 +32,14 @@ import type { IJsonItem } from '../types'
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-<<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-spark.ts
-<<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-spark.ts
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
-=======
-<<<<<<< HEAD
-=======
->>>>>>> d479ad38a6 ([refactor] flink sql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-spark.ts
-      (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
->>>>>>> d271cb1677 ([refactor] dolphinscheduler flinksql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-spark.ts
   )
 
   const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
 
   const rawScriptSpan = computed(() => (model.programType === 'SQL' ? 24 : 0))
 
-<<<<<<< HEAD:dolphinscheduler-ui/src/views/projects/task/components/node/fields/use-spark.ts
   const showCluster = computed(() => model.programType !== 'SQL')
-=======
-  const showCluster = computed(() =>
-      model.programType !== 'SQL'
-  )
->>>>>>> d271cb1677 ([refactor] dolphinscheduler flinksql):dolphinscheduler-ui-next/src/views/projects/task/components/node/fields/use-spark.ts
 
   return [
     {
