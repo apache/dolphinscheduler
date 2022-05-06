@@ -913,6 +913,8 @@ const project = {
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    segment_separator: 'Segment Execution Separator',
+    segment_separator_tips: 'Please enter the segment execution separator',
     send_email: 'Send Email',
     log_display: 'Log display',
     rows_of_result: 'rows of result',

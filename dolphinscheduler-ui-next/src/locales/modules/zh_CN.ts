@@ -901,6 +901,8 @@ const project = {
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: '请输入工作流定义',
+    segment_separator: '分段执行符号',
+    segment_separator_tips: '请输入分段执行符号',
     send_email: '发送邮件',
     log_display: '日志显示',
     rows_of_result: '行查询结果',
