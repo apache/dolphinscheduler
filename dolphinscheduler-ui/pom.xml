@@ -29,8 +29,8 @@
   <name>${project.artifactId}</name>
 
   <properties>
-    <node.version>v14.15.1</node.version>
-    <npm.version>6.14.11</npm.version>
+    <node.version>v16.13.1</node.version>
+    <pnpm.version>v6.32.6</pnpm.version>
     <sonar.sources>src</sonar.sources>
   </properties>
 
@@ -45,29 +45,19 @@
             <version>${frontend-maven-plugin.version}</version>
             <executions>
               <execution>
-                <id>install node and npm</id>
+                <id>install node and pnpm</id>
                 <goals>
-                  <goal>install-node-and-npm</goal>
+                  <goal>install-node-and-pnpm</goal>
                 </goals>
                 <configuration>
                   <nodeVersion>${node.version}</nodeVersion>
-                  <npmVersion>${npm.version}</npmVersion>
+                  <pnpmVersion>${pnpm.version}</pnpmVersion>
                 </configuration>
               </execution>
               <execution>
-                <id>npm install node-sass --unsafe-perm</id>
+                <id>pnpm install</id>
                 <goals>
-                  <goal>npm</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <arguments>install node-sass --unsafe-perm</arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>npm install</id>
-                <goals>
-                  <goal>npm</goal>
+                  <goal>pnpm</goal>
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
@@ -75,12 +65,12 @@
                 </configuration>
               </execution>
               <execution>
-                <id>npm run build:release</id>
+                <id>pnpm run build:prod</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>pnpm</goal>
                 </goals>
                 <configuration>
-                  <arguments>run build:release</arguments>
+                  <arguments>run build:prod</arguments>
                 </configuration>
               </execution>
             </executions>

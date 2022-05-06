@@ -668,6 +668,11 @@ public class WorkflowExecuteThread {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
 
             if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+                // serial wait execution type needs to wake up the waiting process
+                if (processDefinition.getExecutionType().typeIsSerialWait()){
+                    endProcess();
+                    return true;
+                }
                 this.updateProcessInstanceState(stateEvent);
                 return true;
             }
@@ -802,7 +807,7 @@ public class WorkflowExecuteThread {
     /**
      * process end handle
      */
-    private void endProcess() {
+    public void endProcess() {
         this.stateEvents.clear();
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             checkSerialProcess(processDefinition);

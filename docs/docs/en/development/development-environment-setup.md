@@ -55,7 +55,7 @@ Find the class `org.apache.dolphinscheduler.server.StandaloneServer` in Intellij
 Install frontend dependencies and run it
 
 ```shell
-cd dolphinscheduler-ui-next
+cd dolphinscheduler-ui
 pnpm install
 pnpm run dev
 ```
@@ -152,7 +152,7 @@ There are three services that need to be started, including MasterServer, Worker
 Install frontend dependencies and run it
 
 ```shell
-cd dolphinscheduler-ui-next
+cd dolphinscheduler-ui
 pnpm install
 pnpm run dev
 ```
