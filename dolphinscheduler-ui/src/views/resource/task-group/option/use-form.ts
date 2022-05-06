@@ -39,7 +39,7 @@ export function useForm() {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.formData.name === '') {
+          if (!state.formData.name) {
             return new Error(t('resource.task_group_option.please_enter_name'))
           }
         }
