@@ -25,13 +25,9 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
   )
 
-  const mainArgsSpan = computed(() =>
-    model.programType === 'SQL' ? 0 : 24
-  )
+  const mainArgsSpan = computed(() => model.programType === 'SQL' ? 0 : 24)
 
-  const scriptSpan = computed(() =>
-    model.programType === 'SQL' ? 24 : 0
-  )
+  const scriptSpan = computed(() => model.programType === 'SQL' ? 24 : 0)
 
   const flinkVersionOptions = computed(() =>
     model.programType === 'SQL' ? [{label: '>=1.13', value: '>=1.13'}] : FLINK_VERSIONS
