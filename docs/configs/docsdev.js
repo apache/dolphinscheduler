@@ -579,7 +579,7 @@ export default {
                     },
                     {
                         title: '数据质量',
-                        link: '/zh-cn/docs/dev/user_doc/guide /data-quality.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: '资源中心',
