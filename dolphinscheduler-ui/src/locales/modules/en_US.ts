@@ -725,6 +725,7 @@ const project = {
     task_manager_number_tips: 'Please enter TaskManager number',
     http_url: 'Http Url',
     http_url_tips: 'Please Enter Http Url',
+    http_url_validator: 'The request address must contain HTTP or HTTPS',
     http_method: 'Http Method',
     http_parameters: 'Http Parameters',
     http_check_condition: 'Http Check Condition',
