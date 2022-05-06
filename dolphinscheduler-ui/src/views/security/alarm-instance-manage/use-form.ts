@@ -29,6 +29,7 @@ import type {
   IJsonItem,
   IRecord
 } from './types'
+import utils from '@/utils'
 
 export function useForm() {
   const { t } = useI18n()
@@ -72,12 +73,17 @@ export function useForm() {
   const getUiPluginsByType = async () => {
     if (state.pluginsLoading) return
     state.pluginsLoading = true
-    const plugins = await queryUiPluginsByType({ pluginType: 'ALERT' })
-    state.uiPlugins = plugins.map((plugin: IPlugin) => ({
-      label: plugin.pluginName,
-      value: plugin.id
-    }))
-    state.pluginsLoading = false
+    try {
+      const plugins = await queryUiPluginsByType({ pluginType: 'ALERT' })
+      state.uiPlugins = plugins.map((plugin: IPlugin) => ({
+        label: plugin.pluginName,
+        value: plugin.id
+      }))
+    } catch (e) {
+      utils.log.error(e)
+    } finally {
+      state.pluginsLoading = false
+    }
   }
 
   const changePlugin = async (pluginId: IPluginId) => {
