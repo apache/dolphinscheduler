@@ -178,7 +178,7 @@ public class LowerWeightHostManager extends CommonHostManager {
             return Optional.of(
                     new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
                             heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
-                            heartBeat.getStartupTime()));
+                            heartBeat.getWorkerWaitingTaskCount(), heartBeat.getStartupTime()));
         }
     }
 

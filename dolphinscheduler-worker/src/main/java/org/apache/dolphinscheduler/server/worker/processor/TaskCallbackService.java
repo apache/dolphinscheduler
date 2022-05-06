@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRecallCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
@@ -222,6 +223,14 @@ public class TaskCallbackService {
         return taskKillResponseCommand;
     }
 
+    private TaskRecallCommand buildRecallCommand(TaskExecutionContext taskExecutionContext) {
+        TaskRecallCommand taskRecallCommand = new TaskRecallCommand();
+        taskRecallCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskRecallCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        taskRecallCommand.setHost(taskExecutionContext.getHost());
+        return taskRecallCommand;
+    }
+
     /**
      * send task execute running command
      * todo unified callback command
@@ -256,5 +265,14 @@ public class TaskCallbackService {
     public void sendTaskKillResponseCommand(TaskExecutionContext taskExecutionContext) {
         TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(taskExecutionContext);
         send(taskExecutionContext.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
+    }
+
+    /**
+     * send task execute response command
+     */
+    public void sendRecallCommand(TaskExecutionContext taskExecutionContext) {
+        TaskRecallCommand taskRecallCommand = buildRecallCommand(taskExecutionContext);
+        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), taskRecallCommand.convert2Command(), Event.WORKER_REJECT);
+        send(taskExecutionContext.getTaskInstanceId(), taskRecallCommand.convert2Command());
     }
 }

@@ -148,8 +148,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             }
         }
 
-        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
+        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
 
         // delay task process
         long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
@@ -163,10 +162,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         // submit task to manager
         boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager));
         if (!offer) {
-            logger.error("submit task to manager error, queue is full, queue size is {}, taskInstanceId: {}",
-                    workerManager.getDelayQueueSize(), taskExecutionContext.getTaskInstanceId());
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-            taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+            logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
+                workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());
+            taskCallbackService.sendRecallCommand(taskExecutionContext);
         }
     }
 

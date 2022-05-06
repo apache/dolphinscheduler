@@ -24,9 +24,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -133,6 +136,9 @@ public class TaskExecuteThread {
             case RESULT:
                 handleResultEvent(taskEvent, taskInstance);
                 break;
+            case WORKER_REJECT:
+                handleWorkerRejectEvent(taskEvent.getChannel(), taskInstance, workflowExecuteThread);
+                break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
@@ -219,6 +225,25 @@ public class TaskExecuteThread {
             logger.error("worker response master error", e);
             TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
             channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
+        }
+    }
+
+    /**
+     * handle result event
+     */
+    private void handleWorkerRejectEvent(Channel channel, TaskInstance taskInstance, WorkflowExecuteThread executeThread) {
+        try {
+            if (executeThread != null) {
+                executeThread.resubmit(taskInstance.getTaskCode());
+            }
+            if (channel != null) {
+                TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.SUCCESS.getCode(), taskInstance.getId());
+                channel.writeAndFlush(taskRecallAckCommand.convert2Command());
+            }
+        } catch (Exception e) {
+            logger.error("worker reject error", e);
+            TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.FAILURE.getCode(), taskInstance.getId());
+            channel.writeAndFlush(taskRecallAckCommand.convert2Command());
         }
     }
 }

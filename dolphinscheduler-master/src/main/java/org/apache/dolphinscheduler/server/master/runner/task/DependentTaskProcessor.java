@@ -100,6 +100,11 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean resubmitTask() {
+        return true;
+    }
+
+    @Override
     protected boolean dispatchTask() {
         return true;
     }

@@ -22,5 +22,5 @@ public enum Event {
     DELAY,
     RUNNING,
     RESULT,
-    ;
+    WORKER_REJECT
 }
