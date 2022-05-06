@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
@@ -36,7 +38,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JupyterTask extends AbstractYarnTask {
+public class JupyterTask extends AbstractTaskExecutor {
 
     /**
      * jupyter parameters
@@ -48,14 +50,18 @@ public class JupyterTask extends AbstractYarnTask {
      */
     private TaskExecutionContext taskExecutionContext;
 
+    private ShellCommandExecutor shellCommandExecutor;
+
     public JupyterTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+                taskExecutionContext,
+                logger);
     }
 
     @Override
     public void init() {
-
         logger.info("jupyter task params {}", taskExecutionContext.getTaskParams());
 
         jupyterParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), JupyterParameters.class);
@@ -70,13 +76,27 @@ public class JupyterTask extends AbstractYarnTask {
         }
     }
 
+    @Override
+    public void handle() throws Exception {
+        try {
+            // SHELL task exit code
+            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            setExitStatusCode(response.getExitStatusCode());
+            setAppIds(response.getAppIds());
+            setProcessId(response.getProcessId());
+        } catch (Exception e) {
+            logger.error("jupyter task execution failure", e);
+            exitStatusCode = -1;
+            throw e;
+        }
+    }
+
     /**
      * create command
      *
      * @return command
      */
-    @Override
-    protected String buildCommand() {
+    protected String buildCommand() throws IOException {
         /**
          * papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
          */
@@ -117,13 +137,12 @@ public class JupyterTask extends AbstractYarnTask {
      *
      * @return argument list
      */
-    private List<String> populateJupyterParameterization() {
+    private List<String> populateJupyterParameterization() throws IOException {
         List<String> args = new ArrayList<>();
         String parameters = jupyterParameters.getParameters();
         if (StringUtils.isNotEmpty(parameters)) {
             ObjectMapper mapper = new ObjectMapper();
             try {
-
                 // convert JSON string to Map
                 Map<String, String> jupyterParamsMap = mapper.readValue(parameters, Map.class);
                 for (String key : jupyterParamsMap.keySet()) {
@@ -134,6 +153,7 @@ public class JupyterTask extends AbstractYarnTask {
 
             } catch (IOException e) {
                 logger.error("fail to parse jupyter parameterization", e);
+                throw e;
             }
         }
         return args;
@@ -181,12 +201,14 @@ public class JupyterTask extends AbstractYarnTask {
     }
 
     @Override
-    protected void setMainJarName() {
-        return;
+    public void cancelApplication(boolean cancelApplication) throws Exception {
+        // cancel process
+        shellCommandExecutor.cancelApplication();
     }
 
     @Override
     public AbstractParameters getParameters() {
         return jupyterParameters;
     }
+
 }
