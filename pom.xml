@@ -416,7 +416,7 @@
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-ui-next</artifactId>
+                <artifactId>dolphinscheduler-ui</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1246,6 +1246,6 @@
         <module>dolphinscheduler-worker</module>
         <module>dolphinscheduler-log-server</module>
         <module>dolphinscheduler-tools</module>
-        <module>dolphinscheduler-ui-next</module>
+        <module>dolphinscheduler-ui</module>
     </modules>
 </project>

@@ -23,15 +23,15 @@ on:
       - dev
     paths:
       - '.github/workflows/frontend.yml'
-      - 'dolphinscheduler-ui-next/**'
+      - 'dolphinscheduler-ui/**'
   pull_request:
     paths:
       - '.github/workflows/frontend.yml'
-      - 'dolphinscheduler-ui-next/**'
+      - 'dolphinscheduler-ui/**'
 
 defaults:
   run:
-    working-directory: dolphinscheduler-ui-next
+    working-directory: dolphinscheduler-ui
 
 concurrency:
   group: frontend-${{ github.event.pull_request.number || github.ref }}

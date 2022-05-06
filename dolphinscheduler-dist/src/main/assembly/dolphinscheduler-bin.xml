@@ -75,7 +75,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui-next/dist</directory>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
 
