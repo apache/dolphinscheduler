@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.ExecutorManag
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 

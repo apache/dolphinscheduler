@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.plugin.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -279,10 +278,10 @@ public class TaskDefinitionServiceImplTest {
         String taskParams = "{\"resourceList\":[],\"localParams\":[{\"prop\":\"datetime\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
             + "\"value\":\"${system.datetime}\"}],\"rawScript\":\"echo ${datetime}\",\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
             + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":{}}";
-        ShellParameters parameters = JSONUtils.parseObject(taskParams, ShellParameters.class);
+        Map parameters = JSONUtils.parseObject(taskParams, Map.class);
         Assert.assertNotNull(parameters);
         String params = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
-        ShellParameters parameters1 = JSONUtils.parseObject(params, ShellParameters.class);
+        Map parameters1 = JSONUtils.parseObject(params, Map.class);
         Assert.assertNotNull(parameters1);
     }
 

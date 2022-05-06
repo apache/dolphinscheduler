@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.test.TestingServer;
 
 import java.text.MessageFormat;

@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Strings;
 
 /**
  * task definition
@@ -307,7 +307,7 @@ public class TaskDefinition {
     }
 
     public Map<String, String> getTaskParamMap() {
-        if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
+        if (taskParamMap == null && !Strings.isNullOrEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
 
             //If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
@@ -477,8 +477,8 @@ public class TaskDefinition {
             && timeoutFlag == that.timeoutFlag
             && timeoutNotifyStrategy == that.timeoutNotifyStrategy
             && (Objects.equals(resourceIds, that.resourceIds)
-            || (StringUtils.EMPTY.equals(resourceIds) && that.resourceIds == null)
-            || (StringUtils.EMPTY.equals(that.resourceIds) && resourceIds == null))
+            || ("".equals(resourceIds) && that.resourceIds == null)
+            || ("".equals(that.resourceIds) && resourceIds == null))
             && environmentCode == that.environmentCode
             && taskGroupId == that.taskGroupId
             && taskGroupPriority == that.taskGroupPriority;

@@ -135,8 +135,6 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -160,6 +158,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
@@ -602,7 +602,7 @@ public class ProcessServiceImpl implements ProcessService {
         try (LogClientService logClient = new LogClientService()) {
             for (TaskInstance taskInstance : taskInstanceList) {
                 String taskLogPath = taskInstance.getLogPath();
-                if (StringUtils.isEmpty(taskInstance.getHost())) {
+                if (Strings.isNullOrEmpty(taskInstance.getHost())) {
                     continue;
                 }
                 Host host = Host.of(taskInstance.getHost());
@@ -799,7 +799,7 @@ public class ProcessServiceImpl implements ProcessService {
 
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
-        String workerGroup = StringUtils.isBlank(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
+        String workerGroup = Strings.isNullOrEmpty(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
         processInstance.setWorkerGroup(workerGroup);
         processInstance.setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
@@ -1144,7 +1144,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void setSubProcessParam(ProcessInstance subProcessInstance) {
         String cmdParam = subProcessInstance.getCommandParam();
-        if (StringUtils.isEmpty(cmdParam)) {
+        if (Strings.isNullOrEmpty(cmdParam)) {
             return;
         }
         Map<String, String> paramMap = JSONUtils.toMap(cmdParam);
@@ -1159,7 +1159,7 @@ public class ProcessServiceImpl implements ProcessService {
         }
         // copy parent instance user def params to sub process..
         String parentInstanceId = paramMap.get(CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID);
-        if (StringUtils.isNotEmpty(parentInstanceId)) {
+        if (!Strings.isNullOrEmpty(parentInstanceId)) {
             ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId));
             if (parentInstance != null) {
                 subProcessInstance.setGlobalParams(joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
@@ -1410,7 +1410,7 @@ public class ProcessServiceImpl implements ProcessService {
     public Map<String, String> getGlobalParamMap(String globalParams) {
         List<Property> propList;
         Map<String, String> globalParamMap = new HashMap<>();
-        if (StringUtils.isNotEmpty(globalParams)) {
+        if (!Strings.isNullOrEmpty(globalParams)) {
             propList = JSONUtils.toList(globalParams, Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
@@ -1430,7 +1430,7 @@ public class ProcessServiceImpl implements ProcessService {
         Map<String, Object> subProcessParam = JSONUtils.toMap(task.getTaskParams(), String.class, Object.class);
         long childDefineCode = 0L;
         if (subProcessParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
-            childDefineCode = NumberUtils.toLong(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
+            childDefineCode = Long.parseLong(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
         }
         ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 
@@ -1917,7 +1917,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public void changeOutParam(TaskInstance taskInstance) {
-        if (StringUtils.isEmpty(taskInstance.getVarPool())) {
+        if (Strings.isNullOrEmpty(taskInstance.getVarPool())) {
             return;
         }
         List<Property> properties = JSONUtils.toList(taskInstance.getVarPool(), Property.class);
@@ -2130,16 +2130,16 @@ public class ProcessServiceImpl implements ProcessService {
 
         List<Resource> resourceList = resourceMapper.queryResource(fullName, resourceType.ordinal());
         if (CollectionUtils.isEmpty(resourceList)) {
-            return StringUtils.EMPTY;
+            return "";
         }
         int userId = resourceList.get(0).getUserId();
         User user = userMapper.selectById(userId);
         if (Objects.isNull(user)) {
-            return StringUtils.EMPTY;
+            return "";
         }
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (Objects.isNull(tenant)) {
-            return StringUtils.EMPTY;
+            return "";
         }
         return tenant.getTenantCode();
     }
@@ -2240,7 +2240,7 @@ public class ProcessServiceImpl implements ProcessService {
     public String getTaskWorkerGroup(TaskInstance taskInstance) {
         String workerGroup = taskInstance.getWorkerGroup();
 
-        if (StringUtils.isNotBlank(workerGroup)) {
+        if (!Strings.isNullOrEmpty(workerGroup)) {
             return workerGroup;
         }
         int processInstanceId = taskInstance.getProcessInstanceId();
@@ -2450,9 +2450,9 @@ public class ProcessServiceImpl implements ProcessService {
                 .collect(toSet());
         }
         if (CollectionUtils.isEmpty(resourceIds)) {
-            return StringUtils.EMPTY;
+            return "";
         }
-        return StringUtils.join(resourceIds, ",");
+        return Joiner.on(",").join(resourceIds);
     }
 
     @Override
@@ -3056,7 +3056,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public String findConfigYamlByName(String clusterName) {
-        if (StringUtils.isEmpty(clusterName)) {
+        if (Strings.isNullOrEmpty(clusterName)) {
             return null;
         }
         QueryWrapper<K8s> nodeWrapper = new QueryWrapper<>();

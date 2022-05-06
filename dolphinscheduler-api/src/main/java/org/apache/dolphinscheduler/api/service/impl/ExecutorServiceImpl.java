@@ -71,7 +71,7 @@ import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -737,7 +737,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
-                    
+
                     // Distribute the number of tasks equally to each command.
                     // The last command with insufficient quantity will be assigned to the remaining tasks.
                     int itemsPerCommand = (listDateSize / createCount);
