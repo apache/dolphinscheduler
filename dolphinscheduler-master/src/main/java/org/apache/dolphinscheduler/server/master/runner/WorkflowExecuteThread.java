@@ -672,10 +672,9 @@ public class WorkflowExecuteThread {
                 if (processDefinition.getExecutionType().typeIsSerialWait()){
                     endProcess();
                     return true;
-                } else {
-                    this.updateProcessInstanceState(stateEvent);
-                    return true;
                 }
+                this.updateProcessInstanceState(stateEvent);
+                return true;
             }
 
             if (processComplementData()) {
