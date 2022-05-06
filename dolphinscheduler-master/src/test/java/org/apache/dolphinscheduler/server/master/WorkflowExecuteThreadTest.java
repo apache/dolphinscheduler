@@ -164,7 +164,7 @@ public class WorkflowExecuteThreadTest {
             List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
 
-            cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "");
+            cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1");
             List<TaskInstance> taskInstanceEmpty = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertTrue(taskInstanceEmpty.isEmpty());
 
