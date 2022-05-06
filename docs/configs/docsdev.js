@@ -166,6 +166,10 @@ export default {
                                 title: 'Amazon EMR',
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
                             },
+                            {
+                                title: 'Apache Zeppelin',
+                                link: '/en-us/docs/dev/user_doc/guide/task/zeppelin.html',
+                            },
                         ],
                     },
                     {
@@ -491,6 +495,10 @@ export default {
                             {
                                 title: 'Amazon EMR',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
+                            },
+                            {
+                                title: 'Apache Zeppelin',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
                         ],
                     },
