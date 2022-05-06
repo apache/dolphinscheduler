@@ -33,6 +33,3 @@ This example illustrates how to create a zeppelin paragraph task node.
 
 ![demo-get-zeppelin-id](/img/tasks/demo/zeppelin_id.png)
 
-
-
-
