@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   queryRuleList,
@@ -41,6 +41,8 @@ export function useRules(
   const targetTableOptions = ref([] as { label: string; value: string }[])
   const targetTableColumnOptions = ref([] as { label: string; value: number }[])
   const writerDatasourceOptions = ref([] as { label: string; value: number }[])
+
+  const fixValueSpan = computed(() => model.comparison_type === 1 ? 24 : 0)
 
   let preItemLen = 0
 
@@ -223,6 +225,15 @@ export function useRules(
         onUpdateValue: getRuleById
       },
       options: rules
+    },
+    {
+      type: 'input',
+      field: 'comparison_name',
+      name: t('project.node.fix_value'),
+      props: {
+        placeholder: t('project.node.fix_value')
+      },
+      span: fixValueSpan
     }
   ]
 }
