@@ -180,9 +180,7 @@ const monitor = {
   statistics: {
     command_number_of_waiting_for_running:
       'Command Number Of Waiting For Running',
-    failure_command_number: 'Failure Command Number',
-    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
-    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+    failure_command_number: 'Failure Command Number'
   },
   audit_log: {
     user_name: 'User Name',
