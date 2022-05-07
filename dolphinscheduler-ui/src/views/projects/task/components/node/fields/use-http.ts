@@ -55,7 +55,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
           if (!value) {
             return new Error(t('project.node.http_url_tips'))
           }
-          if (value.search(new RegExp('http[s]{0,1}:\/\/([\w.]+\/?)\S*', 'i'))) {
+          if (value.search(new RegExp('http[s]{0,1}://([w.]+/?)S*', 'i'))) {
             return new Error(t('project.node.http_url_validator'))
           }
         }

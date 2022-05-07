@@ -36,7 +36,7 @@ const statistics = defineComponent({
     const { t, statisticsRef } = this
 
     return (
-      <NGrid x-gap='12' y-gap='8' cols='2 xl:4' responsive='screen'>
+      <NGrid x-gap='12' y-gap='8' cols='2' responsive='screen'>
         <NGi>
           <Card
             title={t(
@@ -64,30 +64,6 @@ const statistics = defineComponent({
                   to={statisticsRef.command
                     .map((item) => item.errorCount)
                     .reduce((prev, next) => prev + next)}
-                />
-              )}
-            </div>
-          </Card>
-        </NGi>
-        <NGi>
-          <Card title={t('monitor.statistics.tasks_number_of_waiting_running')}>
-            <div class={styles.connections}>
-              {Object.keys(statisticsRef.task).length > 0 && (
-                <NNumberAnimation
-                  from={0}
-                  to={(statisticsRef.task as TaskQueueRes).taskQueue}
-                />
-              )}
-            </div>
-          </Card>
-        </NGi>
-        <NGi>
-          <Card title={t('monitor.statistics.task_number_of_ready_to_kill')}>
-            <div class={styles.connections}>
-              {Object.keys(statisticsRef.task).length > 0 && (
-                <NNumberAnimation
-                  from={0}
-                  to={(statisticsRef.task as TaskQueueRes).taskKill}
                 />
               )}
             </div>
