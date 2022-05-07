@@ -23,7 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -86,7 +86,7 @@ export function useTable() {
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        ...COLUMN_WIDTH_CONFIG['name'],
+        width: 200,
         render: (row: {
           processInstanceId: number
           processInstanceName: string
@@ -101,7 +101,14 @@ export function useTable() {
                   query: { code: projectCode }
                 })
             },
-            { default: () => row.processInstanceName }
+            {
+              default: () =>
+                h(
+                  NEllipsis,
+                  { style: 'max-width: 180px;line-height: 1.5' },
+                  () => row.processInstanceName
+                )
+            }
           )
       },
       {

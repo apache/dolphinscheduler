@@ -76,23 +76,22 @@ export function useTable() {
         title: t('project.list.project_name'),
         key: 'name',
         className: 'project-name',
-        ...COLUMN_WIDTH_CONFIG['name'],
+        width: 200,
         render: (row: { code: string; name: any }) =>
           h(
-            NEllipsis,
-            { style: 'max-width: 200px; color: #2080f0' },
+            ButtonLink,
+            {
+              onClick: () => {
+                router.push({ path: `/projects/${row.code}` })
+              }
+            },
             {
               default: () =>
                 h(
-                  ButtonLink,
-                  {
-                    onClick: () => {
-                      router.push({ path: `/projects/${row.code}` })
-                    }
-                  },
-                  { default: () => row.name }
-                ),
-              tooltip: () => row.name
+                  NEllipsis,
+                  { style: 'max-width: 180px;line-height: 1.5' },
+                  () => row.name
+                )
             }
           )
       },
