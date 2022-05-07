@@ -688,7 +688,7 @@ update t_ds_version set version='2.0.1';
 如果您不想在 api server 启动的时候启动 Python gateway server，您可以修改 api server 中的配置文件 `api-server/conf/application.yaml`
 并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
 
-## 如果构建自定义的 Docker 镜像
+## 如何构建自定义的 Docker 镜像
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 docker hub 中找到这些镜像，如果你因为个性化需求想要自己打包 docker 镜像，最佳实践是基于 DolphinScheduler 对应镜像编写 Dockerfile 文件
 
@@ -698,10 +698,10 @@ RUN apt update ; \
     apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
 ```
 
-如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行
+如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行。当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
 
 ```shell
-./mvnw -B clean deploy \
+./mvnw -B clean install \
   -Dmaven.test.skip \
   -Dmaven.javadoc.skip \
   -Dmaven.checkstyle.skip \
@@ -715,5 +715,7 @@ RUN apt update ; \
 ```shell
 find . -iname 'Dockerfile'
 ```
+
+之后再运行上面的 `./mvnw -B clean install` 命令，当命令运行完成后，你可以通过命令 `docker images` 查看刚刚创建的 docker 镜像
 
 我们会持续收集更多的 FAQ。
