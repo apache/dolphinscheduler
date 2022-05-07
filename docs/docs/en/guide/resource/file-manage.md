@@ -19,7 +19,7 @@ When third party jars are used in the scheduling process or user defined scripts
 
 > For the files that can be viewed, click the file name to view the file details.
 
-![file_detail](/img/file_detail_en.png)
+![file_detail](/img/tasks/demo/file_detail.png)
 
 - Download file
 

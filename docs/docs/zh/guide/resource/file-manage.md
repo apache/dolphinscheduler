@@ -19,7 +19,7 @@
 
   > 对可查看的文件类型，点击文件名称，可查看文件详情
 
-![file_detail](/img/file_detail_en.png)
+![file_detail](/img/tasks/demo/file_detail.png)
 
 * 下载文件
 
