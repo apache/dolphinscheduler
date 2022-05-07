@@ -60,7 +60,7 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 
 #### 上传主程序包
 
-在使用 MapReduce 任务节点时，需要利用资源中心上传执行程序的 jar 包。可参考[资源中心](../resource.md)。
+在使用 MapReduce 任务节点时，需要利用资源中心上传执行程序的 jar 包。可参考[资源中心](../resource/configuration.md)。
 
 当配置完成资源中心之后，直接使用拖拽的方式，即可上传所需目标文件。
 

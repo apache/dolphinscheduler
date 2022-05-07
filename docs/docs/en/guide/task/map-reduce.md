@@ -60,7 +60,7 @@ If you are using the MapReduce task type in a production environment, it is nece
 
 #### Upload the Main Package
 
-When using the MapReduce task node, you need to use the Resource Centre to upload the jar package for the execution. Refer to the [resource centre](../resource.md).
+When using the MapReduce task node, you need to use the Resource Centre to upload the jar package for the execution. Refer to the [resource centre](../resource/configuration.md).
 
 After finish the Resource Centre configuration, upload the required target files directly by dragging and dropping.
 
