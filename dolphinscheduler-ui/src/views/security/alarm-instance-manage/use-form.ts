@@ -80,8 +80,6 @@ export function useForm() {
         value: plugin.id
       }))
     } catch (e) {
-      utils.log.error(e)
-    } finally {
       state.pluginsLoading = false
     }
   }
