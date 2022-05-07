@@ -717,8 +717,6 @@ RUN apt update ; \
     apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
 ```
 
-如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行
-
 If you want to modify DolphinScheduler source code, then build and distribute your own images, you can run below command
 to build Docker images and install them locally, which you could find them by command `docker imaegs`.
 
