@@ -178,9 +178,7 @@ const monitor = {
   },
   statistics: {
     command_number_of_waiting_for_running: '待执行的命令数',
-    failure_command_number: '执行失败的命令数',
-    tasks_number_of_waiting_running: '待运行任务数',
-    task_number_of_ready_to_kill: '待杀死任务数'
+    failure_command_number: '执行失败的命令数'
   },
   audit_log: {
     user_name: '用户名称',
