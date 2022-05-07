@@ -101,7 +101,7 @@ export function useRules(
       responseItem.emit.forEach((emit) => {
         if (emit === 'change') {
           item.props.onUpdateValue = (value: string | number) => {
-            onFieldChange(value, item.field)
+            onFieldChange(value, item.field, true)
           }
         }
       })
@@ -127,45 +127,64 @@ export function useRules(
     if (item.field === 'target_field') {
       item.options = targetTableColumnOptions
     }
+
+    if (model[item.field] !== void 0) {
+      onFieldChange(model[item.field], item.field, false)
+      item.value = model[item.field]
+    }
+
     return item
   }
-
-  const onFieldChange = async (value: string | number, field: string) => {
+  const onFieldChange = async (
+    value: string | number,
+    field: string,
+    reset: boolean
+  ) => {
     if (field === 'src_connector_type' && typeof value === 'number') {
       const result = await getDatasourceOptionsById(value)
       srcDatasourceOptions.value = result || []
-      srcTableOptions.value = []
-      model.src_datasource_id = null
-      model.src_table = null
-      model.src_field = null
+      if (reset) {
+        srcTableOptions.value = []
+        model.src_datasource_id = null
+        model.src_table = null
+        model.src_field = null
+      }
       return
     }
     if (field === 'target_connector_type' && typeof value === 'number') {
       const result = await getDatasourceOptionsById(value)
       targetDatasourceOptions.value = result || []
-      targetTableOptions.value = []
-      model.target_datasource_id = null
-      model.target_table = null
-      model.target_field = null
+      if (reset) {
+        targetTableOptions.value = []
+        model.target_datasource_id = null
+        model.target_table = null
+        model.target_field = null
+      }
       return
     }
     if (field === 'writer_connector_type' && typeof value === 'number') {
       const result = await getDatasourceOptionsById(value)
       writerDatasourceOptions.value = result || []
-      model.writer_datasource_id = null
+      if (reset) {
+        model.writer_datasource_id = null
+      }
       return
     }
     if (field === 'src_datasource_id' && typeof value === 'number') {
       const result = await getDatasourceTablesById(value)
       srcTableOptions.value = result || []
-      model.src_table = null
-      model.src_field = null
+      if (reset) {
+        model.src_table = null
+        model.src_field = null
+      }
     }
     if (field === 'target_datasource_id' && typeof value === 'number') {
       const result = await getDatasourceTablesById(value)
       targetTableOptions.value = result || []
-      model.target_table = null
-      model.target_field = null
+      if (reset) {
+        model.target_table = null
+        model.target_field = null
+      }
     }
     if (field === 'src_table' && typeof value === 'string') {
       const result = await getDatasourceTableColumnsById(
@@ -173,7 +192,9 @@ export function useRules(
         value
       )
       srcTableColumnOptions.value = result || []
-      model.src_field = null
+      if (reset) {
+        model.src_field = null
+      }
     }
     if (field === 'target_table' && typeof value === 'string') {
       const result = await getDatasourceTableColumnsById(
@@ -181,7 +202,9 @@ export function useRules(
         value
       )
       targetTableColumnOptions.value = result || []
-      model.target_field = null
+      if (reset) {
+        model.target_field = null
+      }
     }
   }
 

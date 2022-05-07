@@ -272,11 +272,14 @@ export function formatParams(data: INodeData): {
     taskParams.ruleInputParameter = {
       check_type: data.check_type,
       comparison_execute_sql: data.comparison_execute_sql,
+      comparison_type: data.comparison_type,
       comparison_name: data.comparison_name,
       failure_strategy: data.failure_strategy,
       operator: data.operator,
       src_connector_type: data.src_connector_type,
       src_datasource_id: data.src_datasource_id,
+      src_filter: data.src_filter,
+      src_field: data.src_field,
       src_table: data.src_table,
       statistics_execute_sql: data.statistics_execute_sql,
       statistics_name: data.statistics_name,
@@ -477,29 +480,39 @@ export function formatModel(data: ITaskData) {
     params.relation = data.taskParams?.dependence.relation
   }
   if (data.taskParams?.ruleInputParameter) {
-    params.check_type = data.check_type
-    params.comparison_execute_sql = data.comparison_execute_sql
-    params.comparison_name = data.comparison_name
-    params.failure_strategy = data.failure_strategy
-    params.operator = data.operator
-    params.src_connector_type = data.src_connector_type
-    params.src_datasource_id = data.src_datasource_id
-    params.src_table = data.src_table
-    params.statistics_execute_sql = data.statistics_execute_sql
-    params.statistics_name = data.statistics_name
-    params.target_connector_type = data.target_connector_type
-    params.target_datasource_id = data.target_datasource_id
-    params.target_table = data.target_table
-    params.threshold = data.threshold
+    params.check_type = data.taskParams.ruleInputParameter.check_type
+    params.comparison_execute_sql =
+      data.taskParams.ruleInputParameter.comparison_execute_sql
+    params.comparison_type = data.taskParams.ruleInputParameter.comparison_type
+    params.comparison_name = data.taskParams.ruleInputParameter.comparison_name
+    params.failure_strategy =
+      data.taskParams.ruleInputParameter.failure_strategy
+    params.operator = data.taskParams.ruleInputParameter.operator
+    params.src_connector_type =
+      data.taskParams.ruleInputParameter.src_connector_type
+    params.src_datasource_id =
+      data.taskParams.ruleInputParameter.src_datasource_id
+    params.src_table = data.taskParams.ruleInputParameter.src_table
+    params.src_filter = data.taskParams.ruleInputParameter.src_filter
+    params.src_field = data.taskParams.ruleInputParameter.src_field
+    params.statistics_execute_sql =
+      data.taskParams.ruleInputParameter.statistics_execute_sql
+    params.statistics_name = data.taskParams.ruleInputParameter.statistics_name
+    params.target_connector_type =
+      data.taskParams.ruleInputParameter.target_connector_type
+    params.target_datasource_id =
+      data.taskParams.ruleInputParameter.target_datasource_id
+    params.target_table = data.taskParams.ruleInputParameter.target_table
+    params.threshold = data.taskParams.ruleInputParameter.threshold
   }
   if (data.taskParams?.sparkParameters) {
-    params.deployMode = data.deployMode
-    params.driverCores = data.driverCores
-    params.driverMemory = data.driverMemory
-    params.executorCores = data.executorCores
-    params.executorMemory = data.executorMemory
-    params.numExecutors = data.numExecutors
-    params.others = data.others
+    params.deployMode = data.taskParams.sparkParameters.deployMode
+    params.driverCores = data.taskParams.sparkParameters.driverCores
+    params.driverMemory = data.taskParams.sparkParameters.driverMemory
+    params.executorCores = data.taskParams.sparkParameters.executorCores
+    params.executorMemory = data.taskParams.sparkParameters.executorMemory
+    params.numExecutors = data.taskParams.sparkParameters.numExecutors
+    params.others = data.taskParams.sparkParameters.others
   }
 
   if (data.taskParams?.jobFlowDefineJson) {
