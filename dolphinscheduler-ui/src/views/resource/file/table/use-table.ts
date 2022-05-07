@@ -23,6 +23,7 @@ import { useFileStore } from '@/store/file/file'
 import TableAction from './table-action'
 import { IRenameFile } from '../types'
 import ButtonLink from '@/components/button-link'
+import { NEllipsis } from 'naive-ui'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -57,14 +58,21 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
     {
       title: t('resource.file.name'),
       key: 'name',
-      ...COLUMN_WIDTH_CONFIG['name'],
+      width: 200,
       render: (row) =>
         h(
           ButtonLink,
           {
             onClick: () => void goSubFolder(router, row)
           },
-          { default: () => row.name }
+          {
+            default: () =>
+              h(
+                NEllipsis,
+                { style: 'max-width: 180px;line-height: 1.5' },
+                () => row.name
+              )
+          }
         )
     },
     {

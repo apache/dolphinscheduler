@@ -21,6 +21,7 @@ import { useRouter } from 'vue-router'
 import { bytesToSize } from '@/common/common'
 import { useFileStore } from '@/store/file/file'
 import type { Router } from 'vue-router'
+import { NEllipsis } from 'naive-ui'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@vicons/antd'
@@ -90,7 +91,14 @@ export function useTable() {
                 {
                   onClick: () => void goSubFolder(router, row)
                 },
-                { default: () => row.alias }
+                {
+                  default: () =>
+                    h(
+                      NEllipsis,
+                      { style: 'max-width: 200px;line-height: 1.5' },
+                      () => row.alias
+                    )
+                }
               )
         }
       },
