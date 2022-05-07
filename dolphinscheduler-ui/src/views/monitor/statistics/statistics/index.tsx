@@ -21,7 +21,6 @@ import { useStatistics } from './use-statistics'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import styles from './index.module.scss'
-import type { TaskQueueRes } from '@/service/modules/projects-analysis/types'
 
 const statistics = defineComponent({
   name: 'statistics',
