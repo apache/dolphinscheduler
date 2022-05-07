@@ -120,7 +120,7 @@ export function useTaskEdit(options: Options) {
           process.postTaskCode === code || process.preTaskCode === code
       )
     })
-    cells.forEach((cell) => {
+    cells?.forEach((cell) => {
       if (cell.isEdge()) {
         const preTaskCode = cell.getSourceCellId()
         const postTaskCode = cell.getTargetCellId()
