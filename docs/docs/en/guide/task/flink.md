@@ -6,7 +6,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 
 (1) When the program type is Java, Scala or Python, the worker submits the task `flink run` using the Flink command. See [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) for more details.
 
-(2) When the program type is Sql, the worker submits the task `sql-client.sh` using Flink Sql. See [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/) for more details.
+(2) When the program type is Sql, the worker submit tasks using `sql-client.sh`. See [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/) for more details.
 
 ## Create Task
 
