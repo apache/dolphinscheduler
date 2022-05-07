@@ -6,7 +6,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 
 (1) When the program type is Java, Scala or Python, the worker submits the task `flink run` using the Flink command. See [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) for more details.
 
-(2) When the program type is Sql, the worker submit tasks using `sql-client.sh`. See [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/) for more details.
+(2) When the program type is SQL, the worker submit tasks using `sql-client.sh`. See [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/) for more details.
 
 ## Create Task
 
@@ -25,7 +25,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 - **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
 - **Delayed execution time**: The time (unit minute) that a task delays in execution.
 - **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- **Program type**: Supports Java, Scala and Python.
+- **Program type**: Support Java, Scala, Python and SQL four languages.
 - **The class of main function**: The **full path** of Main Class, the entry point of the Flink program.
 - **Main jar package**: The jar package of the Flink program (upload by Resource Center).
 - **Deployment mode**: Support 2 deployment modes: cluster and local.
@@ -80,4 +80,4 @@ Configure the required content according to the parameter descriptions above.
 
 - JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
 
-- Use sql to execute flink sql tasks, currently only flink 1.13 and above are supported.
+- Use SQL to execute Flink SQL tasks, currently only Flink 1.13 and above are supported.
