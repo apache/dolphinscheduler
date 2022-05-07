@@ -52,6 +52,5 @@ When the task that has occupied the task group resource is finished, the task gr
 
 #### Task Group Flowchart 
 
-<p align="center">
-    <img src="/img/task_group_process.png" width="80%" />
-</p>        
+![task_group](/img/task_group_process.png)
+      

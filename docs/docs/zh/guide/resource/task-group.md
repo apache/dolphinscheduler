@@ -54,7 +54,4 @@ Master 在分发任务时判断该任务是否配置了任务组，如果任务�
 
 #### 任务组流程图
 
-<p align="center">
-    <img src="/img/task_group_process.png" width="80%" />
-</p>        
-
+![task_group](/img/task_group_process.png)

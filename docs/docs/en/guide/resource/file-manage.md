@@ -19,9 +19,7 @@ When third party jars are used in the scheduling process or user defined scripts
 
 > For the files that can be viewed, click the file name to view the file details.
 
-<p align="center">
-   <img src="/img/file_detail_en.png" width="80%" />
- </p>
+![file_detail](/img/file_detail_en.png)
 
 - Download file
 
@@ -38,9 +36,7 @@ When third party jars are used in the scheduling process or user defined scripts
 
   > Re-upload file: Click the "Re-upload File" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
 
-    <p align="center">
-      <img src="/img/reupload_file_en.png" width="80%" />
-    </p>
+![reuplod_file](/img/reupload_file_en.png)
 
 ## Example
 

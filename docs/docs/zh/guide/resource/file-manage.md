@@ -19,9 +19,7 @@
 
   > 对可查看的文件类型，点击文件名称，可查看文件详情
 
-    <p align="center">
-        <img src="/img/file_detail.png" width="80%" />
-    </p>
+![file_detail](/img/file_detail_en.png)
 
 * 下载文件
 
@@ -39,9 +37,7 @@
 
   > 点击文件列表中的”重新上传文件“按钮进行重新上传文件，将文件拖拽到上传区域，文件名会自动以上传的文件名称补全
 
-    <p align="center">
-      <img src="/img/reupload_file_en.png" width="80%" />
-    </p>
+![reuplod_file](/img/reupload_file_en.png)
 
 ## 任务样例
 
