@@ -913,6 +913,8 @@ const project = {
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: '请输入工作流定义',
+    segment_separator: '分段执行符号',
+    segment_separator_tips: '请输入分段执行符号',
     zeppelin_note_id: 'zeppelin_note_id',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelin_paragraph_id',
