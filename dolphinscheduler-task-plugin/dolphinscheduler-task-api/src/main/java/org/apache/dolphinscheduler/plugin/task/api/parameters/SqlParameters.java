@@ -113,6 +113,15 @@ public class SqlParameters extends AbstractParameters {
 
     private int limit;
 
+    /**
+     * segment separator
+     *
+     * <p>The segment separator is used
+     * when the data source does not support multi-segment SQL execution,
+     * and the client needs to split the SQL and execute it multiple times.</p>
+     */
+    private String segmentSeparator;
+
     public int getLimit() {
         return limit;
     }
@@ -225,6 +234,14 @@ public class SqlParameters extends AbstractParameters {
         this.groupId = groupId;
     }
 
+    public String getSegmentSeparator() {
+        return segmentSeparator;
+    }
+
+    public void setSegmentSeparator(String segmentSeparator) {
+        this.segmentSeparator = segmentSeparator;
+    }
+
     @Override
     public boolean checkParameters() {
         return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
@@ -292,6 +309,7 @@ public class SqlParameters extends AbstractParameters {
                 + ", sendEmail=" + sendEmail
                 + ", displayRows=" + displayRows
                 + ", limit=" + limit
+                + ", segmentSeparator=" + segmentSeparator
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
