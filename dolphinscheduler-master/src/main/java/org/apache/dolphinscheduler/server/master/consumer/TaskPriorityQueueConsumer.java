@@ -172,6 +172,8 @@ public class TaskPriorityQueueConsumer extends Thread {
             if (canRetry(dispatchFailedTaskPriority)){
                 dispatchFailedTaskPriority.setDispatchFailedRetryTimes(dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
                 taskPriorityQueue.put(dispatchFailedTaskPriority);
+            } else {
+                taskPriorityDispatchFailedQueue.put(dispatchFailedTaskPriority);
             }
         }
 
