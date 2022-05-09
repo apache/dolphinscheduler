@@ -107,11 +107,21 @@
        * verification
        */
       _verification () {
-        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/
+        let regPassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])/
 
         // password
         if (!regPassword.test(this.userPassword)) {
-          this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
+          this.$message.warning(`${i18n.$t('Password must consists of at least one uppercase alphabet, one lowercase alphabet, and one digit')}`)
+          return false
+        }
+
+        if (this.userPassword.length < 8) {
+          this.$message.warning(`${i18n.$t("Password length must be at least 8 characters")}`)
+          return false
+        }
+
+        if (this.userPassword.length > 23) {
+          this.$message.warning(`${i18n.$t("Password length must smaller than 23 characters")}`)
           return false
         }
 
