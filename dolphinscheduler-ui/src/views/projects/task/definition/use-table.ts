@@ -17,7 +17,15 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NIcon, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
+import {
+  NButton,
+  NIcon,
+  NPopconfirm,
+  NSpace,
+  NTag,
+  NTooltip,
+  NEllipsis
+} from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { useI18n } from 'vue-i18n'
 import {
@@ -58,15 +66,22 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.task_name'),
         key: 'taskName',
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         render: (row: IRecord) =>
           h(
             ButtonLink,
             {
               onClick: () => void onEdit(row, true)
             },
-            { default: () => row.taskName }
-          ),
-        ...COLUMN_WIDTH_CONFIG['name']
+            {
+              default: () =>
+                h(
+                  NEllipsis,
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                  () => row.taskName
+                )
+            }
+          )
       },
       {
         title: t('project.task.workflow_name'),

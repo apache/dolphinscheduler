@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
+import { NEllipsis } from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,
@@ -79,7 +80,7 @@ export function useTable() {
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
-        ...COLUMN_WIDTH_CONFIG['name'],
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         className: 'workflow-name',
         render: (row: IWorkflowInstance) =>
           h(
@@ -92,7 +93,14 @@ export function useTable() {
                   query: { code: row.processDefinitionCode }
                 })
             },
-            { default: () => row.name }
+            {
+              default: () =>
+                h(
+                  NEllipsis,
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                  () => row.name
+                )
+            }
           )
       },
       {
