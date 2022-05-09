@@ -76,7 +76,7 @@ export function useTable() {
         title: t('project.list.project_name'),
         key: 'name',
         className: 'project-name',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         render: (row: { code: string; name: any }) =>
           h(
             ButtonLink,
@@ -89,7 +89,7 @@ export function useTable() {
               default: () =>
                 h(
                   NEllipsis,
-                  { style: 'max-width: 180px;line-height: 1.5' },
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
                   () => row.name
                 )
             }

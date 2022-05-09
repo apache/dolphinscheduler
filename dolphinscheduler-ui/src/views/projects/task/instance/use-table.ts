@@ -86,7 +86,7 @@ export function useTable() {
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         render: (row: {
           processInstanceId: number
           processInstanceName: string
@@ -105,7 +105,7 @@ export function useTable() {
               default: () =>
                 h(
                   NEllipsis,
-                  { style: 'max-width: 180px;line-height: 1.5' },
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
                   () => row.processInstanceName
                 )
             }

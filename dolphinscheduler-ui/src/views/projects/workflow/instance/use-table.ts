@@ -80,7 +80,7 @@ export function useTable() {
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         className: 'workflow-name',
         render: (row: IWorkflowInstance) =>
           h(
@@ -97,7 +97,7 @@ export function useTable() {
               default: () =>
                 h(
                   NEllipsis,
-                  { style: 'max-width: 180px;line-height: 1.5' },
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
                   () => row.name
                 )
             }

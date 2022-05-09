@@ -58,7 +58,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
     {
       title: t('resource.file.name'),
       key: 'name',
-      width: 200,
+      ...COLUMN_WIDTH_CONFIG['linkName'],
       render: (row) =>
         h(
           ButtonLink,
@@ -67,11 +67,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
           },
           {
             default: () =>
-              h(
-                NEllipsis,
-                { style: 'max-width: 180px;line-height: 1.5' },
-                () => row.name
-              )
+              h(NEllipsis, COLUMN_WIDTH_CONFIG['linkEllipsis'], () => row.name)
           }
         )
     },

@@ -66,7 +66,7 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.task_name'),
         key: 'taskName',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         render: (row: IRecord) =>
           h(
             ButtonLink,
@@ -77,7 +77,7 @@ export function useTable(onEdit: Function) {
               default: () =>
                 h(
                   NEllipsis,
-                  { style: 'max-width: 180px;line-height: 1.5' },
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
                   () => row.taskName
                 )
             }

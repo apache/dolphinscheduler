@@ -82,7 +82,7 @@ export function useTable() {
       {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
-        width: 220,
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         render: (row) => {
           return !row.directory
             ? row.alias
@@ -95,7 +95,7 @@ export function useTable() {
                   default: () =>
                     h(
                       NEllipsis,
-                      { style: 'max-width: 200px;line-height: 1.5' },
+                      COLUMN_WIDTH_CONFIG['linkEllipsis'],
                       () => row.alias
                     )
                 }
