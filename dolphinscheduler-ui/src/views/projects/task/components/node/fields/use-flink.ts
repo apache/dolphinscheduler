@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref, watchEffect} from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDeployMode, useMainJar, useResources } from '.'
 import type { IJsonItem } from '../types'
@@ -22,15 +22,17 @@ import type { IJsonItem } from '../types'
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-    (model.programType === 'PYTHON' || model.programType === 'SQL') ? 0 : 24
+    model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
 
-  const mainArgsSpan = computed(() => model.programType === 'SQL' ? 0 : 24)
+  const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
 
-  const scriptSpan = computed(() => model.programType === 'SQL' ? 24 : 0)
+  const scriptSpan = computed(() => (model.programType === 'SQL' ? 24 : 0))
 
   const flinkVersionOptions = computed(() =>
-    model.programType === 'SQL' ? [{label: '>=1.13', value: '>=1.13'}] : FLINK_VERSIONS
+    model.programType === 'SQL'
+      ? [{ label: '>=1.13', value: '>=1.13' }]
+      : FLINK_VERSIONS
   )
 
   const taskManagerNumberSpan = computed(() =>
@@ -73,7 +75,11 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'blur'],
         required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
-          if (model.programType !== 'PYTHON' && !value && model.programType !== 'SQL') {
+          if (
+            model.programType !== 'PYTHON' &&
+            !value &&
+            model.programType !== 'SQL'
+          ) {
             return new Error(t('project.node.main_class_tips'))
           }
         }
