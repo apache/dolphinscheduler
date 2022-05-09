@@ -28,6 +28,12 @@ export const COLUMN_WIDTH_CONFIG = {
   index: {
     width: 50
   },
+  linkName: {
+    width: 200
+  },
+  linkEllipsis: {
+    style: 'max-width: 180px;line-height: 1.5'
+  },
   name: {
     width: 200,
     ellipsis: {
