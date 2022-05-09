@@ -24,6 +24,8 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PRO
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -935,6 +937,9 @@ public class WorkflowExecuteThread {
         if (processInstance.isComplementData() && complementListDate.size() == 0) {
             Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
             if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+                // reset global params while there are start parameters
+                setGlobalParamIfCommanded(processDefinition, cmdParam);
+
                 Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
                 Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
                 List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
@@ -1953,4 +1958,36 @@ public class WorkflowExecuteThread {
         }
     }
 
+    private void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam) {
+        // get start params from command param
+        Map<String, String> startParamMap = new HashMap<>();
+        if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
+            String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
+            startParamMap = JSONUtils.toMap(startParamJson);
+        }
+        Map<String, String> fatherParamMap = new HashMap<>();
+        if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_FATHER_PARAMS)) {
+            String fatherParamJson = cmdParam.get(Constants.CMD_PARAM_FATHER_PARAMS);
+            fatherParamMap = JSONUtils.toMap(fatherParamJson);
+        }
+        startParamMap.putAll(fatherParamMap);
+        // set start param into global params
+        Map<String, String> globalMap = processDefinition.getGlobalParamMap();
+        List<Property> globalParamList = processDefinition.getGlobalParamList();
+        if (startParamMap.size() > 0
+                && globalMap != null) {
+            for (Map.Entry<String, String> param : globalMap.entrySet()) {
+                String val = startParamMap.get(param.getKey());
+                if (val != null) {
+                    param.setValue(val);
+                }
+            }
+            for (Map.Entry<String, String> startParam : startParamMap.entrySet()) {
+                if (!globalMap.containsKey(startParam.getKey())) {
+                    globalMap.put(startParam.getKey(), startParam.getValue());
+                    globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
+                }
+            }
+        }
+    }
 }
