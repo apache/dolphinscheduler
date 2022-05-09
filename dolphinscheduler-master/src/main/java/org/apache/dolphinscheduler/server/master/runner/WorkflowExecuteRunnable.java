@@ -1115,6 +1115,12 @@ public class WorkflowExecuteRunnable implements Runnable {
     private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
         TaskInstance taskInstance = findTaskIfExists(taskNode.getCode(), taskNode.getVersion());
         if (taskInstance != null) {
+            if (!taskInstance.getEnvironmentCode().equals(-1L)) {
+                Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
+                if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
+                    taskInstance.setEnvironmentConfig(environment.getConfig());
+                }
+            }
             return taskInstance;
         }
 
