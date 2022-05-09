@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDeployMode, useMainJar, useResources } from '.'
 import type { IJsonItem } from '../types'
@@ -22,7 +22,17 @@ import type { IJsonItem } from '../types'
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
-    model.programType === 'PYTHON' ? 0 : 24
+    model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
+  )
+
+  const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
+
+  const scriptSpan = computed(() => (model.programType === 'SQL' ? 24 : 0))
+
+  const flinkVersionOptions = computed(() =>
+    model.programType === 'SQL'
+      ? [{ label: '>=1.13', value: '>=1.13' }]
+      : FLINK_VERSIONS
   )
 
   const taskManagerNumberSpan = computed(() =>
@@ -34,6 +44,10 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   )
 
   const appNameSpan = computed(() => (model.deployMode === 'cluster' ? 24 : 0))
+
+  watchEffect(() => {
+    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : '<1.10'
+  })
 
   return [
     {
@@ -59,9 +73,13 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: model.programType !== 'PYTHON',
+        required: model.programType !== 'PYTHON' && model.programType !== 'SQL',
         validator(validate: any, value: string) {
-          if (model.programType !== 'PYTHON' && !value) {
+          if (
+            model.programType !== 'PYTHON' &&
+            !value &&
+            model.programType !== 'SQL'
+          ) {
             return new Error(t('project.node.main_class_tips'))
           }
         }
@@ -70,10 +88,32 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     useMainJar(model),
     useDeployMode(24, ref(false)),
     {
+      type: 'editor',
+      field: 'initScript',
+      span: scriptSpan,
+      name: t('project.node.init_script'),
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: false,
+        message: t('project.node.init_script_tips')
+      }
+    },
+    {
+      type: 'editor',
+      field: 'rawScript',
+      span: scriptSpan,
+      name: t('project.node.script'),
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: t('project.node.script_tips')
+      }
+    },
+    {
       type: 'select',
       field: 'flinkVersion',
       name: t('project.node.flink_version'),
-      options: FLINK_VERSIONS,
+      options: flinkVersionOptions,
       value: model.flinkVersion,
       span: deployModeSpan
     },
@@ -178,6 +218,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'mainArgs',
+      span: mainArgsSpan,
       name: t('project.node.main_arguments'),
       props: {
         type: 'textarea',
@@ -214,6 +255,10 @@ const PROGRAM_TYPES = [
   {
     label: 'PYTHON',
     value: 'PYTHON'
+  },
+  {
+    label: 'SQL',
+    value: 'SQL'
   }
 ]
 

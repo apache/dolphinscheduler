@@ -661,6 +661,8 @@ const project = {
     timeout_period_tips: '超时时长必须为正整数',
     script: '脚本',
     script_tips: '请输入脚本（必填）',
+    init_script: '初始化脚本',
+    init_script_tips: '请输入初始化脚本',
     resources: '资源',
     resources_tips: '请选择资源',
     no_resources_tips: '请删除所有未授权或已删除资源',
