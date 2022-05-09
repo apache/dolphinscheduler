@@ -153,7 +153,7 @@ public class TaskExecuteThread {
             logger.error("taskInstance is null");
             return;
         }
-        if (taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
+        if (taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS && taskInstance.getState() != ExecutionStatus.PENDING) {
             return;
         }
         taskInstance.setState(ExecutionStatus.DISPATCH);

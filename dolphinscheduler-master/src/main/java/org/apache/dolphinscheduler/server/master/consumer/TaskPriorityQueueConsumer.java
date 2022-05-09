@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -48,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,9 @@ public class TaskPriorityQueueConsumer extends Thread {
      */
     @Autowired
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+
+    @Autowired
+    private TaskPriorityQueue<TaskPriority> taskPriorityDispatchFailedQueue;
 
     /**
      * processService
@@ -105,6 +110,22 @@ public class TaskPriorityQueueConsumer extends Thread {
      */
     private ThreadPoolExecutor consumerThreadPoolExecutor;
 
+    /**
+     * delay time for retries
+     */
+    private static final Long[] TIME_DELAY;
+
+    /**
+     * initialization failure retry delay rule
+     */
+    static {
+        TIME_DELAY = new Long[Constants.DEFAULT_MAX_RETRY_COUNT];
+        for (int i = 0; i < Constants.DEFAULT_MAX_RETRY_COUNT; i++) {
+            int delayTime = (i + 1) * 1000;
+            TIME_DELAY[i] = (long) delayTime;
+        }
+    }
+
     @PostConstruct
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
@@ -120,12 +141,13 @@ public class TaskPriorityQueueConsumer extends Thread {
 
                 if (!failedDispatchTasks.isEmpty()) {
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
-                        taskPriorityQueue.put(dispatchFailedTask);
-                    }
-                    // If there are tasks in a cycle that cannot find the worker group,
-                    // sleep for 1 second
-                    if (taskPriorityQueue.size() <= failedDispatchTasks.size()) {
-                        TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                        if (dispatchFailedTask.getDispatchFailedRetryTimes() >= Constants.DEFAULT_MAX_RETRY_COUNT){
+                            logger.error("the number of retries for dispatch failure has exceeded the maximum limit, taskId: {} processInstanceId: {}", dispatchFailedTask.getTaskId(), dispatchFailedTask.getProcessInstanceId());
+                            // business alarm
+                            continue;
+                        }
+                        // differentiate the queue to prevent high priority from affecting the execution of other tasks
+                        taskPriorityDispatchFailedQueue.put(dispatchFailedTask);
                     }
                 }
             } catch (Exception e) {
@@ -141,6 +163,18 @@ public class TaskPriorityQueueConsumer extends Thread {
         List<TaskPriority> failedDispatchTasks = Collections.synchronizedList(new ArrayList<>());
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
+        // put the failed dispatch task into the dispatch queue again
+        for (int i = 0; i < fetchTaskNum; i++) {
+            TaskPriority dispatchFailedTaskPriority = taskPriorityDispatchFailedQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+            if (Objects.isNull(dispatchFailedTaskPriority)){
+                continue;
+            }
+            if (canRetry(dispatchFailedTaskPriority)){
+                dispatchFailedTaskPriority.setDispatchFailedRetryTimes(dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
+                taskPriorityQueue.put(dispatchFailedTaskPriority);
+            }
+        }
+
         for (int i = 0; i < fetchTaskNum; i++) {
             TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
             if (Objects.isNull(taskPriority)) {
@@ -151,6 +185,7 @@ public class TaskPriorityQueueConsumer extends Thread {
             consumerThreadPoolExecutor.submit(() -> {
                 boolean dispatchResult = this.dispatchTask(taskPriority);
                 if (!dispatchResult) {
+                    taskPriority.setLastDispatchTime(System.currentTimeMillis());
                     failedDispatchTasks.add(taskPriority);
                 }
                 latch.countDown();
@@ -160,6 +195,17 @@ public class TaskPriorityQueueConsumer extends Thread {
         latch.await();
 
         return failedDispatchTasks;
+    }
+
+    /**
+     * the time interval is adjusted according to the number of retries
+     * @param taskPriority
+     * @return
+     */
+    private boolean canRetry (TaskPriority taskPriority){
+        int dispatchFailedRetryTimes = taskPriority.getDispatchFailedRetryTimes();
+        long now = System.currentTimeMillis();
+        return now - taskPriority.getDispatchFailedRetryTimes() >= TIME_DELAY[dispatchFailedRetryTimes];
     }
 
     /**
@@ -185,6 +231,8 @@ public class TaskPriorityQueueConsumer extends Thread {
 
             if (result) {
                 addDispatchEvent(context, executionContext);
+            } else {
+                dispatchFailedTaskInstanceState2Pending(context, executionContext);
             }
         } catch (RuntimeException e) {
             logger.error("dispatch error: ", e);
@@ -202,6 +250,31 @@ public class TaskPriorityQueueConsumer extends Thread {
         taskEventService.addEvent(taskEvent);
     }
 
+    /**
+     * dispatch failed task instance state to pending
+     */
+    private void dispatchFailedTaskInstanceState2Pending(TaskExecutionContext context, ExecutionContext executionContext) {
+        int taskInstanceId = context.getTaskInstanceId();
+        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        if (taskInstance == null) {
+            logger.error("taskInstance is null");
+            return;
+        }
+        if (taskInstance.getState() != ExecutionStatus.PENDING && taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS){
+            logger.error("taskInstance status illegal");
+            return;
+        }
+        if (taskInstance.getState() == ExecutionStatus.SUBMITTED_SUCCESS){
+            String firstDispatchFailedErrorLog = String.format("fail to execute : %s due to no suitable worker, current task needs worker group %s to execute", executionContext.getCommand(), executionContext.getWorkerGroup());
+            logger.error(firstDispatchFailedErrorLog);
+        }
+        taskInstance.setState(ExecutionStatus.PENDING);
+        if (executionContext.getHost() != null){
+            taskInstance.setHost(executionContext.getHost().getAddress());
+        }
+        processService.saveTaskInstance(taskInstance);
+    }
+
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
         requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
@@ -215,7 +288,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * @param taskInstanceId taskInstanceId
      * @return taskInstance is final state
      */
-    public Boolean taskInstanceIsFinalState(int taskInstanceId) {
+    public boolean taskInstanceIsFinalState(int taskInstanceId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().typeIsFinished();
     }

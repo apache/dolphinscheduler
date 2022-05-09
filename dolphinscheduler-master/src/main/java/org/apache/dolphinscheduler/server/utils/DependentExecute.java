@@ -232,6 +232,7 @@ public class DependentExecute {
         if (state.typeIsRunning()
                 || state == ExecutionStatus.SUBMITTED_SUCCESS
                 || state == ExecutionStatus.DISPATCH
+                || state == ExecutionStatus.PENDING
                 || state == ExecutionStatus.WAITING_THREAD) {
             return DependResult.WAITING;
         } else {

@@ -65,6 +65,7 @@ public enum ExecutionStatus {
     READY_BLOCK(15, "ready block"),
     BLOCK(16, "block"),
     DISPATCH(17, "dispatch"),
+    PENDING(18, "pending"),
     ;
 
     ExecutionStatus(int code, String descp) {
@@ -155,6 +156,10 @@ public enum ExecutionStatus {
      */
     public boolean typeIsBlock() {
         return this == BLOCK;
+    }
+
+    public boolean typeIsPending() {
+        return this == PENDING;
     }
 
     /**

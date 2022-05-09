@@ -417,8 +417,12 @@ public class WorkflowExecuteThread {
         }
         if (activeTaskProcessorMaps.containsKey(task.getTaskCode())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(task.getTaskCode());
-            iTaskProcessor.action(TaskAction.RUN);
-
+            // pending task needs to be dispatched
+            if (task.getState().typeIsPending()){
+                iTaskProcessor.action(TaskAction.DISPATCH);
+            } else {
+                iTaskProcessor.action(TaskAction.RUN);
+            }
             if (iTaskProcessor.taskInstance().getState().typeIsFinished()) {
                 if (iTaskProcessor.taskInstance().getState() != task.getState()) {
                     task.setState(iTaskProcessor.taskInstance().getState());

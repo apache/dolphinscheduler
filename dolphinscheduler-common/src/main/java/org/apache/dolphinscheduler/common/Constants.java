@@ -383,6 +383,11 @@ public final class Constants {
     public static final int SECOND_TIME_MILLIS = 1000;
 
     /**
+     * maximum number of retries for delivery failure
+     */
+    public static final int DEFAULT_MAX_RETRY_COUNT = 100;
+
+    /**
      * master task instance cache-database refresh interval
      */
     public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
@@ -643,6 +648,7 @@ public final class Constants {
     public static final int[] NOT_TERMINATED_STATES = new int[]{
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.DISPATCH.ordinal(),
+            ExecutionStatus.PENDING.ordinal(),
             ExecutionStatus.RUNNING_EXECUTION.ordinal(),
             ExecutionStatus.DELAY_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
@@ -654,6 +660,7 @@ public final class Constants {
 
     public static final int[] RUNNING_PROCESS_STATE = new int[]{
             ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.PENDING.ordinal(),
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.DISPATCH.ordinal(),
             ExecutionStatus.SERIAL_WAIT.ordinal()

@@ -22,5 +22,6 @@ public enum Event {
     DELAY,
     RUNNING,
     RESULT,
+    PENDING,
     ;
 }

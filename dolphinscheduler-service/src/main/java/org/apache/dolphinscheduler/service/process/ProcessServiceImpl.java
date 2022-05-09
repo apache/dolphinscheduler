@@ -170,6 +170,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     private final int[] stateArray = new int[] {ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
         ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.PENDING.ordinal(),
         ExecutionStatus.RUNNING_EXECUTION.ordinal(),
         ExecutionStatus.DELAY_EXECUTION.ordinal(),
         ExecutionStatus.READY_PAUSE.ordinal(),
@@ -1557,6 +1558,7 @@ public class ProcessServiceImpl implements ProcessService {
                 || state == ExecutionStatus.DELAY_EXECUTION
                 || state == ExecutionStatus.KILL
                 || state == ExecutionStatus.DISPATCH
+                || state == ExecutionStatus.PENDING
         ) {
             return state;
         }

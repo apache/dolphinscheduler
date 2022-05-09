@@ -43,6 +43,16 @@ public class TaskPriority implements Comparable<TaskPriority> {
     private int taskInstancePriority;
 
     /**
+     * last dispatch time
+     */
+    private long lastDispatchTime;
+
+    /**
+     * dispatch failed retry times
+     */
+    private int dispatchFailedRetryTimes = 0;
+
+    /**
      * taskId
      */
     private int taskId;
@@ -105,6 +115,22 @@ public class TaskPriority implements Comparable<TaskPriority> {
 
     public void setTaskInstancePriority(int taskInstancePriority) {
         this.taskInstancePriority = taskInstancePriority;
+    }
+
+    public long getLastDispatchTime() {
+        return lastDispatchTime;
+    }
+
+    public void setLastDispatchTime(long lastDispatchTime) {
+        this.lastDispatchTime = lastDispatchTime;
+    }
+
+    public int getDispatchFailedRetryTimes() {
+        return dispatchFailedRetryTimes;
+    }
+
+    public void setDispatchFailedRetryTimes(int dispatchFailedRetryTimes) {
+        this.dispatchFailedRetryTimes = dispatchFailedRetryTimes;
     }
 
     public int getTaskId() {

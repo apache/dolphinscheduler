@@ -85,9 +85,7 @@ public class ExecutorDispatcher implements InitializingBean {
 
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
-            throw new ExecuteException(String.format("fail to execute : %s due to no suitable worker, "
-                            + "current task needs worker group %s to execute",
-                    context.getCommand(),context.getWorkerGroup()));
+            return false;
         }
         context.setHost(host);
         executorManager.beforeExecute(context);
