@@ -288,6 +288,14 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   noteId?: string
   paragraphId?: string
+  condaEnvName?: string
+  inputNotePath?: string
+  outputNotePath?: string
+  parameters?: string
+  kernel?: string
+  engine?: string
+  executionTimeout?: string
+  startTimeout?: string
   processDefinitionCode?: number
   conditionResult?: {
     successNode?: number[]

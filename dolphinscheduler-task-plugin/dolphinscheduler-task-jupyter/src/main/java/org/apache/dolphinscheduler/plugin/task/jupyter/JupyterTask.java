@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.jupyter;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
@@ -101,7 +103,10 @@ public class JupyterTask extends AbstractTaskExecutor {
          * papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
          */
         List<String> args = new ArrayList<>();
-
+        final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
+        args.add(JupyterConstants.CONDA_INIT);
+        args.add(condaPath);
+        args.add(JupyterConstants.JOINTER);
         args.add(JupyterConstants.CONDA_ACTIVATE);
         args.add(jupyterParameters.getCondaEnvName());
         args.add(JupyterConstants.JOINTER);

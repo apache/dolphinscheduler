@@ -24,6 +24,11 @@ public class JupyterConstants {
     }
 
     /**
+     * conda init
+     */
+    public static final String CONDA_INIT = "source";
+
+    /**
      * conda activate
      */
     public static final String CONDA_ACTIVATE = "conda activate";

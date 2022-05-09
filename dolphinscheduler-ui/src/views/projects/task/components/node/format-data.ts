@@ -310,6 +310,18 @@ export function formatParams(data: INodeData): {
     taskParams.paragraphId = data.zeppelinParagraphId
   }
 
+  if (data.taskType === 'JUPYTER') {
+    taskParams.condaEnvName = data.condaEnvName
+    taskParams.inputNotePath = data.inputNotePath
+    taskParams.outputNotePath = data.outputNotePath
+    taskParams.parameters = data.parameters
+    taskParams.kernel = data.kernel
+    taskParams.engine = data.engine
+    taskParams.executionTimeout = data.executionTimeout
+    taskParams.startTimeout = data.startTimeout
+    taskParams.others = data.others
+  }
+
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
@@ -526,6 +538,42 @@ export function formatModel(data: ITaskData) {
 
   if (data.taskParams?.zeppelinParagraphId) {
     params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
+  }
+
+  if (data.taskParams?.condaEnvName) {
+    params.condaEnvName = data.taskParams.condaEnvName
+  }
+
+  if (data.taskParams?.inputNotePath) {
+    params.inputNotePath = data.taskParams.inputNotePath
+  }
+
+  if (data.taskParams?.outputNotePath) {
+    params.outputNotePath = data.taskParams.outputNotePath
+  }
+
+  if (data.taskParams?.parameters) {
+    params.parameters = data.taskParams.parameters
+  }
+
+  if (data.taskParams?.kernel) {
+    params.kernel = data.taskParams.kernel
+  }
+
+  if (data.taskParams?.engine) {
+    params.engine = data.taskParams.engine
+  }
+
+  if (data.taskParams?.executionTimeout) {
+    params.executionTimeout = data.taskParams.executionTimeout
+  }
+
+  if (data.taskParams?.startTimeout) {
+    params.startTimeout = data.taskParams.startTimeout
+  }
+
+  if (data.taskParams?.others) {
+    params.others = data.taskParams.others
   }
 
   if (data.taskParams?.processDefinitionCode) {
