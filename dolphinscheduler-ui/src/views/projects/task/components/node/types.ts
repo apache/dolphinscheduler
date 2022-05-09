@@ -212,6 +212,7 @@ interface ITaskParams {
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
   rawScript?: string
+  initScript?: string
   programType?: string
   sparkVersion?: string
   flinkVersion?: string
