@@ -100,9 +100,19 @@ public class FlinkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
     private ProgramType programType;
+
+    /**
+     * flink sql initialization file
+     */
+    private String initScript;
+
+    /**
+     * flink sql script file
+     */
+    private String rawScript;
 
     public ResourceInfo getMainJar() {
         return mainJar;
@@ -224,9 +234,30 @@ public class FlinkParameters extends AbstractParameters {
         this.flinkVersion = flinkVersion;
     }
 
+    public String getInitScript() {
+        return initScript;
+    }
+
+    public void setInitScript(String initScript) {
+        this.initScript = initScript;
+    }
+
+    public String getRawScript() {
+        return rawScript;
+    }
+
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
+    }
+
     @Override
     public boolean checkParameters() {
-        return mainJar != null && programType != null;
+        /**
+         * When saving a task, the parameter cannot be empty. There are two judgments:
+         * (1) When ProgramType is SQL, rawScript cannot be empty.
+         * (2) When ProgramType is Java/Scala/Python, mainJar cannot be empty.
+         */
+        return programType != null && (rawScript != null || mainJar != null);
     }
 
     @Override
@@ -236,5 +267,4 @@ public class FlinkParameters extends AbstractParameters {
         }
         return resourceList;
     }
-
 }

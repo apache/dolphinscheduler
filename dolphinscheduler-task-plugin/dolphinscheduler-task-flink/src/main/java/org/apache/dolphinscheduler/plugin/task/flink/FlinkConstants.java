@@ -24,7 +24,20 @@ public class FlinkConstants {
     }
 
     /**
-     * flink
+     * flink command
+     * usage: flink run [OPTIONS] <jar-file> <arguments>
+     */
+    public static final String FLINK_COMMAND = "flink";
+    public static final String FLINK_RUN = "run";
+
+    /**
+     * flink sql command
+     * usage: sql-client.sh -i <initialization file>, -f <script file>
+     */
+    public static final String FLINK_SQL_COMMAND = "sql-client.sh";
+
+    /**
+     * flink run options
      */
     public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
     public static final String FLINK_RUN_MODE = "-m";
@@ -32,11 +45,28 @@ public class FlinkConstants {
     public static final String FLINK_APP_NAME = "-ynm";
     public static final String FLINK_QUEUE = "-yqu";
     public static final String FLINK_TASK_MANAGE = "-yn";
-
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
 
+    public static final String FLINK_FORMAT_EXECUTION_TARGET = "set execution.target=%s";
+    public static final String FLINK_FORMAT_YARN_APPLICATION_NAME = "set yarn.application.name=%s";
+    public static final String FLINK_FORMAT_YARN_APPLICATION_QUEUE = "set yarn.application.queue=%s";
+    public static final String FLINK_FORMAT_JOBMANAGER_MEMORY_PROCESS_SIZE = "set jobmanager.memory.process.size=%s";
+    public static final String FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE = "set taskmanager.memory.process.size=%s";
+    public static final String FLINK_FORMAT_TASKMANAGER_NUMBEROFTASKSLOTS = "set taskmanager.numberOfTaskSlots=%d";
+    public static final String FLINK_FORMAT_PARALLELISM_DEFAULT = "set parallelism.default=%d";
+    public static final String FLINK_SQL_SCRIPT_FILE = "-f";
+    public static final String FLINK_SQL_INIT_FILE = "-i";
+    public static final String FLINK_SQL_NEWLINE = ";\n";
+
+    // execution.target options
+    public static final String EXECUTION_TARGET_YARN_PER_JOB = "yarn-per-job";
+    public static final String EXECUTION_TARGET_LOACL = "local";
+
+    public static final String DEPLOY_MODE_CLUSTER = "cluster";
+    public static final String DEPLOY_MODE_LOCAL = "local";
+    public static final String FLINK_VERSION_BEFORE_1_10 = "<1.10";
 }
