@@ -191,11 +191,14 @@ interface IRuleParameters {
   check_type?: string
   comparison_execute_sql?: string
   comparison_name?: string
+  comparison_type?: number
   failure_strategy?: string
   operator?: string
   src_connector_type?: number
   src_datasource_id?: number
   src_table?: string
+  src_filter?: string
+  src_field?: string
   statistics_execute_sql?: string
   statistics_name?: string
   target_connector_type?: number
@@ -209,6 +212,7 @@ interface ITaskParams {
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
   rawScript?: string
+  initScript?: string
   programType?: string
   sparkVersion?: string
   flinkVersion?: string
@@ -238,6 +242,7 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
+  segmentSeparator?: string
   sendEmail?: boolean
   displayRows?: number
   title?: string

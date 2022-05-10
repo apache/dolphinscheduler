@@ -180,9 +180,7 @@ const monitor = {
   statistics: {
     command_number_of_waiting_for_running:
       'Command Number Of Waiting For Running',
-    failure_command_number: 'Failure Command Number',
-    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
-    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+    failure_command_number: 'Failure Command Number'
   },
   audit_log: {
     user_name: 'User Name',
@@ -671,6 +669,8 @@ const project = {
     timeout_period_tips: 'Timeout must be a positive integer',
     script: 'Script',
     script_tips: 'Please enter script(required)',
+    init_script: 'Initialization script',
+    init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
     resources_tips: 'Please select resources',
     non_resources_tips: 'Please delete all non-existent resources',
@@ -926,6 +926,8 @@ const project = {
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    segment_separator: 'Segment Execution Separator',
+    segment_separator_tips: 'Please enter the segment execution separator',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: 'Please enter the note id of your zeppelin note',
     zeppelin_paragraph_id: 'zeppelinParagraphId',

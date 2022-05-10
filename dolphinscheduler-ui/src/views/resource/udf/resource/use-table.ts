@@ -21,6 +21,7 @@ import { useRouter } from 'vue-router'
 import { bytesToSize } from '@/common/common'
 import { useFileStore } from '@/store/file/file'
 import type { Router } from 'vue-router'
+import { NEllipsis } from 'naive-ui'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@vicons/antd'
@@ -81,7 +82,7 @@ export function useTable() {
       {
         title: t('resource.udf.udf_source_name'),
         key: 'alias',
-        width: 220,
+        ...COLUMN_WIDTH_CONFIG['linkName'],
         render: (row) => {
           return !row.directory
             ? row.alias
@@ -90,7 +91,14 @@ export function useTable() {
                 {
                   onClick: () => void goSubFolder(router, row)
                 },
-                { default: () => row.alias }
+                {
+                  default: () =>
+                    h(
+                      NEllipsis,
+                      COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                      () => row.alias
+                    )
+                }
               )
         }
       },
