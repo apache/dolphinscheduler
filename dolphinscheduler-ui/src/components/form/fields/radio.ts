@@ -39,7 +39,6 @@ export function renderRadio(item: IJsonItem, fields: { [field: string]: any }) {
     () =>
       h(NSpace, null, () =>
         unref(options).map((option: IOption) =>
-          // @ts-ignore
           h(NRadio, option, () => option.label)
         )
       )
