@@ -15,6 +15,52 @@
  * limitations under the License.
 */
 
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
+-- uc_dolphin_T_t_ds_resources_R_full_name
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_resources_R_full_name;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name()
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_NAME='t_ds_resources'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME ='full_name')
+    THEN
+ALTER TABLE t_ds_resources MODIFY COLUMN `full_name` varchar(128);
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_resources_R_full_name;
+DROP PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name;
+
+-- uc_dolphin_T_t_ds_alert_R_sign
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_alert_R_sign;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_alert_R_sign()
+BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+            WHERE TABLE_NAME='t_ds_alert'
+            AND TABLE_SCHEMA=(SELECT DATABASE())
+            AND COLUMN_NAME='sign')
+    THEN
+ALTER TABLE `t_ds_alert` ADD COLUMN `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)' after `id`;
+ALTER TABLE `t_ds_alert` ADD INDEX `idx_sign` (`sign`) USING BTREE;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_alert_R_sign;
+DROP PROCEDURE uc_dolphin_T_t_ds_alert_R_sign;
+
+-- add unique key to t_ds_relation_project_user
+ALTER TABLE t_ds_relation_project_user ADD UNIQUE KEY uniq_uid_pid(user_id,project_id);
+
 ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;
