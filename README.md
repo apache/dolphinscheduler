@@ -54,14 +54,11 @@ Overload processing: By using the task queue mechanism, the number of schedulabl
 
 ## User Interface Screenshots
 
-![home page](https://user-images.githubusercontent.com/15833811/75218288-bf286400-57d4-11ea-8263-d639c6511d5f.jpg)
-![dag](https://user-images.githubusercontent.com/15833811/75236750-3374fe80-57f9-11ea-857d-62a66a5a559d.png)
-![process definition list page](https://user-images.githubusercontent.com/15833811/75216886-6f479e00-57d0-11ea-92dd-66e7640a186f.png)
-![view task log online](https://user-images.githubusercontent.com/15833811/75216924-9900c500-57d0-11ea-91dc-3522a76bdbbe.png)
-![resource management](https://user-images.githubusercontent.com/15833811/75216984-be8dce80-57d0-11ea-840d-58546edc8788.png)
-![monitor](https://user-images.githubusercontent.com/59273635/75625839-c698a480-5bfc-11ea-8bbe-895b561b337f.png)
-![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
-![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
+![dag](https://github.com/apache/dolphinscheduler/tree/dev/images/en_US/dag.png)
+![data-source](https://github.com/apache/dolphinscheduler/tree/dev/images/en_US/data-source.png)
+![home](https://github.com/apache/dolphinscheduler/tree/dev/images/en_US/home.png)
+![master](https://github.com/apache/dolphinscheduler/tree/dev/images/en_US/master.png)
+![workflow-tree](https://github.com/apache/dolphinscheduler/tree/dev/images/en_US/workflow-tree.png)
 
 ## QuickStart in Docker
 
