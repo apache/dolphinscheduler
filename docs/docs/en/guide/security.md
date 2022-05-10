@@ -154,7 +154,7 @@ worker.groups=default,test
 
 > Add or update  k8s cluster
 
-- First enter the configuration of the k8s cluster connection into the table t_ds_k8s in the db, which will be configured later by the web page.
+- First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database, which will be configured later by the web page.
 
 > Add or update  namespace
 
