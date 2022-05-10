@@ -15,14 +15,7 @@
  * limitations under the License.
  */
 import { Ref } from 'vue'
-import type {
-  GridProps,
-  FormProps,
-  FormItemRule,
-  FormRules,
-  SelectOption,
-  TreeSelectOption
-} from 'naive-ui'
+import type { GridProps, FormProps, FormItemRule, FormRules } from 'naive-ui'
 
 type IType =
   | 'input'
@@ -38,7 +31,9 @@ type IType =
   | 'custom'
   | 'multi-condition'
 
-type IOption = SelectOption | TreeSelectOption
+interface IOption {
+  [key: string]: any
+}
 
 interface IFormItem {
   showLabel?: boolean
