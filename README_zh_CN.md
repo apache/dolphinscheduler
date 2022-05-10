@@ -36,11 +36,11 @@ Dolphin Scheduler Official Website
 
 ## 系统部分截图
 
-![dag](https://github.com/apache/dolphinscheduler/tree/dev/images/zh_CN/dag.png)
-![data-source](https://github.com/apache/dolphinscheduler/tree/dev/images/zh_CN/data-source.png)
-![home](https://github.com/apache/dolphinscheduler/tree/dev/images/zh_CN/home.png)
-![master](https://github.com/apache/dolphinscheduler/tree/dev/images/zh_CN/master.png)
-![workflow-tree](https://github.com/apache/dolphinscheduler/tree/dev/images/zh_CN/workflow-tree.png)
+![dag](https://github.com/apache/dolphinscheduler/blob/dev/images/zh_CN/dag.png)
+![data-source](https://github.com/apache/dolphinscheduler/blob/dev/images/zh_CN/data-source.png)
+![home](https://github.com/apache/dolphinscheduler/blob/dev/images/zh_CN/home.png)
+![master](https://github.com/apache/dolphinscheduler/blob/dev/images/zh_CN/master.png)
+![workflow-tree](https://github.com/apache/dolphinscheduler/blob/dev/images/zh_CN/workflow-tree.png)
 
 ## 近期研发计划
 
