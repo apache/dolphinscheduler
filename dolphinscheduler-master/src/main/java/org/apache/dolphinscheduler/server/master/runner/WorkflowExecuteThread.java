@@ -1953,10 +1953,10 @@ public class WorkflowExecuteThread {
      * is new process instance
      */
     private boolean isNewProcessInstance() {
-        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
-            return true;
-        } else {
+        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() >= 1) {
             return false;
+        } else {
+            return true;
         }
     }
 
