@@ -152,7 +152,7 @@ worker.groups=default,test
 
 ## Namespace Management
 
-> Add or update  k8s cluster
+> Add or update k8s cluster
 
 - First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database, which will be configured later by the web page.
 
