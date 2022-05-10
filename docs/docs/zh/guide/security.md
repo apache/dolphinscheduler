@@ -153,7 +153,7 @@ worker.groups=default,test
 
 > 创建/更新 k8s集群
 
-- 先把k8s集群连接的配置录入db的表 t_ds_k8s，后续会通过页面配置.
+- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`，后续会通过页面配置.
 
 > 创建/更新 namespace
 
