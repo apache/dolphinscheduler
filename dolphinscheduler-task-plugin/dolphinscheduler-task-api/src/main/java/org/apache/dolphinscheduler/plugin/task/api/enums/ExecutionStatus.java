@@ -158,10 +158,6 @@ public enum ExecutionStatus {
         return this == BLOCK;
     }
 
-    public boolean typeIsPending() {
-        return this == PENDING;
-    }
-
     /**
      * status is cancel
      *
