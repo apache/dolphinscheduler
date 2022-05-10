@@ -55,10 +55,10 @@ Overload processing: By using the task queue mechanism, the number of schedulabl
 ## User Interface Screenshots
 
 ![dag](./images/en_US/dag.png)
-![data-source](https://github.com/apache/dolphinscheduler/blob/dev/images/en_US/data-source.png)
-![home](https://github.com/apache/dolphinscheduler/blob/dev/images/en_US/home.png)
-![master](https://github.com/apache/dolphinscheduler/blob/dev/images/en_US/master.png)
-![workflow-tree](https://github.com/apache/dolphinscheduler/blob/dev/images/en_US/workflow-tree.png)
+![data-source](./images/en_US/data-source.png)
+![home](./images/en_US/home.png)
+![master](./images/en_US/master.png)
+![workflow-tree](./images/en_US/workflow-tree.png)
 
 ## QuickStart in Docker
 
