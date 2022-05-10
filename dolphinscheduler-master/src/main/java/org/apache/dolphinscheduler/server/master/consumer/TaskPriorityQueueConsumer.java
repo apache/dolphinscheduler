@@ -49,7 +49,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,7 +158,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * batch dispatch with thread pool
      */
-    private List<TaskPriority> batchDispatch(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
+    public List<TaskPriority> batchDispatch(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
         List<TaskPriority> failedDispatchTasks = Collections.synchronizedList(new ArrayList<>());
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
@@ -207,7 +206,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     private boolean canRetry (TaskPriority taskPriority){
         int dispatchFailedRetryTimes = taskPriority.getDispatchFailedRetryTimes();
         long now = System.currentTimeMillis();
-        return now - taskPriority.getDispatchFailedRetryTimes() >= TIME_DELAY[dispatchFailedRetryTimes];
+        return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[dispatchFailedRetryTimes];
     }
 
     /**
@@ -255,7 +254,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * dispatch failed task instance state to pending
      */
-    private void dispatchFailedTaskInstanceState2Pending(TaskExecutionContext context, ExecutionContext executionContext) {
+    public void dispatchFailedTaskInstanceState2Pending(TaskExecutionContext context, ExecutionContext executionContext) {
         int taskInstanceId = context.getTaskInstanceId();
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         if (taskInstance == null) {
