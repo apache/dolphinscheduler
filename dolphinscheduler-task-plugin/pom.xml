@@ -52,5 +52,6 @@
         <module>dolphinscheduler-task-blocking</module>
         <module>dolphinscheduler-task-zeppelin</module>
         <module>dolphinscheduler-task-jupyter</module>
+        <module>dolphinscheduler-task-mlflow</module>
     </modules>
 </project>
