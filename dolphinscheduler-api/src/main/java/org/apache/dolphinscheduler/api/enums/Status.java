@@ -300,7 +300,7 @@ public enum Status {
     DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
     NOT_SUPPORT_UPDATE_TASK_DEFINITION(50056, "task state does not support modification", "当前任务不支持修改"),
     NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
-    BATCH_EXECUTE_PROCESS_INSTANCE_ERROR(50058, "batch execute process instance error", "批量操作工作流实例错误"),
+    BATCH_EXECUTE_PROCESS_INSTANCE_ERROR(50058, "change process instance {0} status error", "修改工作实例 {0}状态错误"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
     S3_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
