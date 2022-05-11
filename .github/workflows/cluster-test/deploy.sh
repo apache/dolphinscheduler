@@ -57,4 +57,71 @@ sudo sed -i 's|export SPRING_DATASOURCE_PASSWORD=.*|export SPRING_DATASOURCE_PAS
 #Start Cluster
 sudo $DOLPHINSCHEDULER_HOME/bin/start-all.sh
 
-#Healthcheck
+#Cluster start health check
+MASTER_PROCESS_NUM=$(ps -ef | grep -c MasterServer)
+if [[ $MASTER_PROCESS_NUM -gt 0 ]];then
+  echo "master health check success"
+else
+  echo "master health check failed"
+  exit 1
+fi
+
+WORKER_PROCESS_NUM=$(ps -ef | grep -c WorkerServer)
+if [[ $WORKER_PROCESS_NUM -gt 0 ]];then
+  echo "worker health check success"
+else
+  echo "worker health check failed"
+  exit 1
+fi
+
+ALERT_PROCESS_NUM=$(ps -ef | grep -c AlertServer)
+if [[ $ALERT_PROCESS_NUM -gt 0 ]];then
+  echo "alert health check success"
+else
+  echo "alert health check failed"
+  exit 1
+fi
+
+API_PROCESS_NUM=$(ps -ef | grep -c ApiApplicationServer)
+if [[ $API_PROCESS_NUM -gt 0 ]];then
+  echo "api health check success"
+else
+  echo "api health check failed"
+  exit 1
+fi
+
+#Stop Cluster
+sudo $DOLPHINSCHEDULER_HOME/bin/stop-all.sh
+
+#Cluster stop health check
+MASTER_PROCESS_NUM=$(ps -ef | grep -c MasterServer)
+if [[ $MASTER_PROCESS_NUM -eq 0 ]];then
+  echo "master health check success"
+else
+  echo "master health check failed"
+  exit 1
+fi
+
+WORKER_PROCESS_NUM=$(ps -ef | grep -c WorkerServer)
+if [[ $WORKER_PROCESS_NUM -eq 0 ]];then
+  echo "worker health check success"
+else
+  echo "worker health check failed"
+  exit 1
+fi
+
+ALERT_PROCESS_NUM=$(ps -ef | grep -c AlertServer)
+if [[ $ALERT_PROCESS_NUM -eq 0 ]];then
+  echo "alert health check success"
+else
+  echo "alert health check failed"
+  exit 1
+fi
+
+API_PROCESS_NUM=$(ps -ef | grep -c ApiApplicationServer)
+if [[ $API_PROCESS_NUM -eq 0 ]];then
+  echo "api health check success"
+else
+  echo "api health check failed"
+  exit 1
+fi
