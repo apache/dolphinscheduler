@@ -22,18 +22,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @SpringBootApplication
-@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = UpgradeDolphinScheduler.class))
 public class CreateDolphinScheduler {
     public static void main(String[] args) {
         SpringApplication.run(CreateDolphinScheduler.class, args);
     }
 
     @Component
+    @Profile("create")
     static class CreateRunner implements CommandLineRunner {
         private static final Logger logger = LoggerFactory.getLogger(CreateRunner.class);
 

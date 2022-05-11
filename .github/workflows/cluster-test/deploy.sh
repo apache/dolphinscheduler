@@ -18,7 +18,11 @@
 set -euox pipefail
 
 
-DOLPHINSCHEDULER_HOME=/xxx
+DOLPHINSCHEDULER_HOME=/tmp/apache-dolphinscheduler-dev-SNAPSHOT-bin
+
+#Docker
+apt install -y docker docker-compose
+docker-compose -f .github/workflows/cluster-test/docker-compose.yaml up -d
 
 #Download mysql jar
 MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
@@ -31,3 +35,26 @@ cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME
 
 #Create database
 mysql -uroot -p123456 -e "CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
+mysql -uroot -p123456 -e "source ${DOLPHINSCHEDULER_HOME}/tools/sql/sql/dolphinscheduler_mysql.sql"
+
+#Setting install.sh
+sudo sed -i '$aroot  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sodu sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+sudo sed -i 's|ips=.*|ips=${ips:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sudo sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sudo sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sudo sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sudo sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sudo sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME}|g" /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+
+#Setting dolphinscheduler_env.sh
+sudo sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sudo sed -i 's|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=.*|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sudo sed -i 's|export SPRING_DATASOURCE_URL=.*|export SPRING_DATASOURCE_URL="jdbc:mysql://0.0.0.0:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sudo sed -i 's|export SPRING_DATASOURCE_USERNAME=.*|export SPRING_DATASOURCE_USERNAME=root|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sudo sed -i 's|export SPRING_DATASOURCE_PASSWORD=.*|export SPRING_DATASOURCE_PASSWORD=123456|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+
+#Start Cluster
+sudo $DOLPHINSCHEDULER_HOME/bin/start-all.sh
+
+#Healthcheck
