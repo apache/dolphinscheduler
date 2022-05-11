@@ -18,7 +18,8 @@
 set -euox pipefail
 
 
-DOLPHINSCHEDULER_HOME=/tmp/apache-dolphinscheduler-dev-SNAPSHOT-bin
+USER=$(whoami)
+DOLPHINSCHEDULER_HOME=/home/$USER/apache-dolphinscheduler-dev-SNAPSHOT-bin
 
 #Docker
 apt install -y docker docker-compose
@@ -34,31 +35,39 @@ cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME
 cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/tools/libs/$MYSQL_DRIVER
 
 #Create database
+apt install -y mycli
 mysql -uroot -p123456 -e "CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
 mysql -uroot -p123456 -e "source ${DOLPHINSCHEDULER_HOME}/tools/sql/sql/dolphinscheduler_mysql.sql"
 
-#Setting install.sh
-sudo sed -i '$aroot  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+#Sudo
+sudo sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
 sodu sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
-sudo sed -i 's|ips=.*|ips=${ips:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sudo sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sudo sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sudo sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sudo sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sudo sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME}|g" /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+
+#SSH
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+
+#Setting install.sh
+sed -i 's|ips=.*|ips=${ips:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME}|g" /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 
 #Setting dolphinscheduler_env.sh
-sudo sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sudo sed -i 's|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=.*|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sudo sed -i 's|export SPRING_DATASOURCE_URL=.*|export SPRING_DATASOURCE_URL="jdbc:mysql://0.0.0.0:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sudo sed -i 's|export SPRING_DATASOURCE_USERNAME=.*|export SPRING_DATASOURCE_USERNAME=root|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sudo sed -i 's|export SPRING_DATASOURCE_PASSWORD=.*|export SPRING_DATASOURCE_PASSWORD=123456|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=.*|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_URL=.*|export SPRING_DATASOURCE_URL="jdbc:mysql://0.0.0.0:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_USERNAME=.*|export SPRING_DATASOURCE_USERNAME=root|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_PASSWORD=.*|export SPRING_DATASOURCE_PASSWORD=123456|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
 #Init schema
-sudo /bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/create-schema.sh
+/bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/create-schema.sh
 
 #Start Cluster
-sudo $DOLPHINSCHEDULER_HOME/bin/start-all.sh
+$DOLPHINSCHEDULER_HOME/bin/start-all.sh
 
 #Cluster start health check
 MASTER_PROCESS_NUM=$(ps -ef | grep -c MasterServer)
