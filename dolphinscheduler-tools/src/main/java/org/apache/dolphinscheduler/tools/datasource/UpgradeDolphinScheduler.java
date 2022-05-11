@@ -22,9 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Component;
 
 @SpringBootApplication
+@ComponentScan(
+    includeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = UpgradeDolphinScheduler.UpgradeRunner.class)
+    }, useDefaultFilters = false
+)
 public class UpgradeDolphinScheduler {
     public static void main(String[] args) {
         SpringApplication.run(UpgradeDolphinScheduler.class, args);
