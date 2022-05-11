@@ -44,4 +44,5 @@ jobs:
           path: /tmp
       - name: running tests
         run: |
+          tar -zxvf /tmp/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz -C /tmp
           .github/workflows/cluster-test/deploy.sh
