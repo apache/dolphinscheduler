@@ -160,4 +160,4 @@ worker.groups=default,test
 
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
-! [create-environment](/img/new_ui/dev/security/create-namespace.png)
+![create-environment](/img/new_ui/dev/security/create-namespace.png)
