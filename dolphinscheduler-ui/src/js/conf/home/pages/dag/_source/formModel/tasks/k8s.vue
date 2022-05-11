@@ -1,66 +1,63 @@
-/*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+/* * Licensed to the Apache Software Foundation (ASF) under one or more *
+contributor license agreements. See the NOTICE file distributed with * this work
+for additional information regarding copyright ownership. * The ASF licenses
+this file to You under the Apache License, Version 2.0 * (the "License"); you
+may not use this file except in compliance with * the License. You may obtain a
+copy of the License at * * http://www.apache.org/licenses/LICENSE-2.0 * * Unless
+required by applicable law or agreed to in writing, software * distributed under
+the License is distributed on an "AS IS" BASIS, * WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. * See the License for the
+specific language governing permissions and * limitations under the License. */
 <template>
   <div>
     <m-list-box>
-      <div slot="text">{{$t('Namespace')}}</div>
+      <div slot="text">{{ $t('Namespace') }}</div>
       <div slot="content">
         <el-select
           size="small"
           v-model="namespace"
           :loading="namespacesLoading"
-          style="width: 300px;"
+          style="width: 300px"
           :disabled="isDetails"
         >
           <el-option-group>
             <div class="select-title">
-              <span>{{$t('Namespace')}}</span>
-              <span>{{$t('Cluster')}}</span>
+              <span>{{ $t('Namespace') }}</span>
+              <span>{{ $t('Cluster') }}</span>
             </div>
             <el-option
               v-for="item in namespaces"
               :key="item.id"
               :label="item.namespace + ' (' + item.k8s + ')'"
-              :value="item.id">
-              <span style="float: left; margin-right: 30px;">{{item.namespace}}</span>
-              <span style="float: right;">{{item.k8s}}</span>
+              :value="item.id"
+            >
+              <span style="float: left; margin-right: 30px">{{
+                item.namespace
+              }}</span>
+              <span style="float: right">{{ item.k8s }}</span>
             </el-option>
           </el-option-group>
         </el-select>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Min cpu')}}</div>
+      <div slot="text">{{ $t('Min cpu') }}</div>
       <div slot="content">
         <el-input
           v-model="minCpuCores"
           size="small"
           :placeholder="$t('Please enter min cpu')"
-          style="width: 160px;"
+          style="width: 160px"
           :disabled="isDetails"
         >
         </el-input>
         <span>(Core)</span>
-        <span class="text-b">{{ $t("Min memory") }}</span>
+        <span class="text-b">{{ $t('Min memory') }}</span>
         <el-input
           size="small"
           v-model="minMemorySpace"
           :placeholder="$t('Please enter min memory')"
-          style="width: 160px;"
+          style="width: 160px"
           :disabled="isDetails"
         >
         </el-input>
@@ -68,7 +65,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Image')}}</div>
+      <div slot="text">{{ $t('Image') }}</div>
       <div slot="content">
         <el-input
           type="input"
@@ -81,13 +78,14 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Custom Parameters')}}</div>
+      <div slot="text">{{ $t('Custom Parameters') }}</div>
       <div slot="content">
         <m-local-params
           ref="refLocalParams"
           @on-local-params="_onLocalParams"
           :udp-list="localParams"
-          :hide="false">
+          :hide="false"
+        >
         </m-local-params>
       </div>
     </m-list-box>
@@ -102,7 +100,7 @@
 
   export default {
     name: 'k8s',
-    data () {
+    data() {
       return {
         namespace: '',
         minCpuCores: '',
@@ -126,13 +124,13 @@
       /**
        * return localParams
        */
-      _onLocalParams (a) {
+      _onLocalParams(a) {
         this.localParams = a
       },
       /**
        * verification
        */
-      _verification () {
+      _verification() {
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
@@ -149,7 +147,7 @@
         })
         return true
       },
-      _cacheParams () {
+      _cacheParams() {
         const nsAndCluster = this._getNamespaceAndCluster()
         this.$emit('on-cache-params', {
           namespace: nsAndCluster.namespace,
@@ -161,30 +159,35 @@
           mainClass: this.mainClass
         })
       },
-      _getNamespaces () {
-        return this.getAvailableNamespaceListP().then(options => {
-          this.namespaces = options
-        })
-          .catch(() => { this.namespaces = [] })
+      _getNamespaces() {
+        return this.getAvailableNamespaceListP()
+          .then((options) => {
+            this.namespaces = options
+          })
+          .catch(() => {
+            this.namespaces = []
+          })
           .finally(() => {
             this.namespacesLoading = false
           })
       },
-      _getNamespaceAndCluster () {
-        const res = this.namespaces.find(item => item.id === this.namespace)
-        return res ? {
-          namespace: res.namespace,
-          clusterName: res.k8s
-        } : {}
+      _getNamespaceAndCluster() {
+        const res = this.namespaces.find((item) => item.id === this.namespace)
+        return res
+          ? {
+              namespace: res.namespace,
+              clusterName: res.k8s
+            }
+          : {}
       }
     },
     watch: {
       // Watch the cacheParams
-      cacheParams () {
+      cacheParams() {
         this._cacheParams()
       }
     },
-    created () {
+    created() {
       let o = this.backfillItem
       const promise = this._getNamespaces()
       // Non-null objects represent backfill
@@ -192,7 +195,11 @@
         const params = _.cloneDeep(o.params)
         if (params.namespace && params.clusterName) {
           promise.then(() => {
-            const ns = this.namespaces.find(item => item.namespace === params.namespace && item.k8s === params.clusterName)
+            const ns = this.namespaces.find(
+              (item) =>
+                item.namespace === params.namespace &&
+                item.k8s === params.clusterName
+            )
             ns && (this.namespace = ns.id)
           })
         }
@@ -204,7 +211,7 @@
       }
     },
     computed: {
-      cacheParams () {
+      cacheParams() {
         const nsAndCluster = this._getNamespaceAndCluster()
         return {
           namespace: nsAndCluster.namespace,

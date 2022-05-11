@@ -310,6 +310,13 @@ export function formatParams(data: INodeData): {
     taskParams.paragraphId = data.zeppelinParagraphId
   }
 
+  if (data.taskType === 'K8S') {
+    taskParams.namespace = data.namespace
+    taskParams.minCpuCores = data.minCpuCores
+    taskParams.minMemorySpace = data.minMemorySpace
+    taskParams.image = data.image
+  }
+
   if (data.taskType === 'JUPYTER') {
     taskParams.condaEnvName = data.condaEnvName
     taskParams.inputNotePath = data.inputNotePath
@@ -531,6 +538,38 @@ export function formatModel(data: ITaskData) {
     params.executorMemory = data.taskParams.sparkParameters.executorMemory
     params.numExecutors = data.taskParams.sparkParameters.numExecutors
     params.others = data.taskParams.sparkParameters.others
+  }
+
+  if (data.taskParams?.namespace) {
+    params.namespace = data.taskParams.namespace
+  }
+
+  if (data.taskParams?.minCpuCores) {
+    params.minCpuCores = data.taskParams.minCpuCores
+  }
+
+  if (data.taskParams?.minMemorySpace) {
+    params.minMemorySpace = data.taskParams.minMemorySpace
+  }
+
+  if (data.taskParams?.image) {
+    params.image = data.taskParams.image
+  }
+
+  if (data.taskParams?.jobFlowDefineJson) {
+    params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
+  if (data.taskParams?.zeppelinNoteId) {
+    params.zeppelinNoteId = data.taskParams.zeppelinNoteId
+  }
+
+  if (data.taskParams?.zeppelinParagraphId) {
+    params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
+  }
+
+  if (data.taskParams?.processDefinitionCode) {
+    params.processDefinitionCode = data.taskParams.processDefinitionCode
   }
 
   if (data.taskParams?.conditionResult?.successNode?.length) {
