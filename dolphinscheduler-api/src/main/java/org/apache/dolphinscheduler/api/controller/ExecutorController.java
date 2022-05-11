@@ -325,7 +325,7 @@ public class ExecutorController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> singleResult = execService.execute(loginUser, projectCode, processInstanceId, ExecuteType.PAUSE);
+                    Map<String, Object> singleResult = execService.execute(loginUser, projectCode, processInstanceId, executeType);
                     if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
                         logger.error((String) singleResult.get(Constants.MSG));
