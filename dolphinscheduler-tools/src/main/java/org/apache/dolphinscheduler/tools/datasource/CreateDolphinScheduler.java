@@ -27,7 +27,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Component;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.apache.dolphinscheduler.tools.datasource"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {UpgradeDolphinScheduler.class}))
+@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = UpgradeDolphinScheduler.class))
 public class CreateDolphinScheduler {
     public static void main(String[] args) {
         SpringApplication.run(CreateDolphinScheduler.class, args);
