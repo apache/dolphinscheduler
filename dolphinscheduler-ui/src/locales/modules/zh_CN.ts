@@ -178,9 +178,7 @@ const monitor = {
   },
   statistics: {
     command_number_of_waiting_for_running: '待执行的命令数',
-    failure_command_number: '执行失败的命令数',
-    tasks_number_of_waiting_running: '待运行任务数',
-    task_number_of_ready_to_kill: '待杀死任务数'
+    failure_command_number: '执行失败的命令数'
   },
   audit_log: {
     user_name: '用户名称',
@@ -663,6 +661,8 @@ const project = {
     timeout_period_tips: '超时时长必须为正整数',
     script: '脚本',
     script_tips: '请输入脚本（必填）',
+    init_script: '初始化脚本',
+    init_script_tips: '请输入初始化脚本',
     resources: '资源',
     resources_tips: '请选择资源',
     no_resources_tips: '请删除所有未授权或已删除资源',
@@ -915,6 +915,8 @@ const project = {
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: '请输入工作流定义',
+    segment_separator: '分段执行符号',
+    segment_separator_tips: '请输入分段执行符号',
     zeppelin_note_id: 'zeppelin_note_id',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelin_paragraph_id',
@@ -1170,8 +1172,6 @@ const security = {
     k8s_cluster_tips: '请输入k8s集群',
     owner: '负责人',
     owner_tips: '请输入负责人',
-    tag: '标签',
-    tag_tips: '请输入标签',
     limit_cpu: '最大CPU',
     limit_cpu_tips: '请输入最大CPU',
     limit_memory: '最大内存',

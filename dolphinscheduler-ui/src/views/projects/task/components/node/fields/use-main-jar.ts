@@ -49,7 +49,9 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   watch(
     () => model.programType,
     (value) => {
-      getMainJars(value)
+      if (value !== 'SQL') {
+        getMainJars(value)
+      }
     }
   )
 
@@ -70,7 +72,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
       trigger: ['input', 'blur'],
       required: model.programType !== 'SQL',
       validator(validate: any, value: string) {
-        if (!value) {
+        if (!value && model.programType !== 'SQL') {
           return new Error(t('project.node.main_package_tips'))
         }
       }

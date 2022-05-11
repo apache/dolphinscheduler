@@ -149,3 +149,15 @@ worker.groups=default,test
 - Create a task node in the workflow definition, select the worker group and the environment corresponding to the worker group. When executing the task, the Worker will execute the environment first before executing the task.
 
 ![use-environment](/img/new_ui/dev/security/use-environment.png)
+
+## Namespace Management
+
+> Add or update k8s cluster
+
+- First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database, which will be configured later by the web page.
+
+> Add or update namespace
+
+- After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
+
+![create-environment](/img/new_ui/dev/security/create-namespace.png)

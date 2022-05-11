@@ -212,6 +212,7 @@ interface ITaskParams {
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
   rawScript?: string
+  initScript?: string
   programType?: string
   sparkVersion?: string
   flinkVersion?: string
@@ -241,6 +242,7 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
+  segmentSeparator?: string
   sendEmail?: boolean
   displayRows?: number
   title?: string
