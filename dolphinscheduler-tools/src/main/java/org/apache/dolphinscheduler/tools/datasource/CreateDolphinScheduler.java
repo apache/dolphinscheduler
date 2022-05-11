@@ -24,7 +24,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {UpgradeDolphinScheduler.class})
 public class CreateDolphinScheduler {
     public static void main(String[] args) {
         SpringApplication.run(CreateDolphinScheduler.class, args);
@@ -42,7 +42,13 @@ public class CreateDolphinScheduler {
 
         @Override
         public void run(String... args) throws Exception {
-            dolphinSchedulerManager.initDolphinScheduler();
+            if (dolphinSchedulerManager.schemaIsInitialized()) {
+                dolphinSchedulerManager.upgradeDolphinScheduler();
+                logger.info("upgrade DolphinScheduler finished");
+            } else {
+                dolphinSchedulerManager.initDolphinScheduler();
+                logger.info("init DolphinScheduler finished");
+            }
             logger.info("create DolphinScheduler success");
         }
     }
