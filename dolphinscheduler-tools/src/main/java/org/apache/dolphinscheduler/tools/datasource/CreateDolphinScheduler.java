@@ -22,9 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Component;
 
-@SpringBootApplication(exclude = {UpgradeDolphinScheduler.class})
+@SpringBootApplication
+@ComponentScan(basePackages = {"org.apache.dolphinscheduler.tools.datasource"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {UpgradeDolphinScheduler.class}))
 public class CreateDolphinScheduler {
     public static void main(String[] args) {
         SpringApplication.run(CreateDolphinScheduler.class, args);
