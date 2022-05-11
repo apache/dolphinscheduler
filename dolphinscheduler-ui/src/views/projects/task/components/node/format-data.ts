@@ -528,58 +528,6 @@ export function formatModel(data: ITaskData) {
     params.others = data.taskParams.sparkParameters.others
   }
 
-  if (data.taskParams?.jobFlowDefineJson) {
-    params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
-  }
-
-  if (data.taskParams?.zeppelinNoteId) {
-    params.zeppelinNoteId = data.taskParams.zeppelinNoteId
-  }
-
-  if (data.taskParams?.zeppelinParagraphId) {
-    params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
-  }
-
-  if (data.taskParams?.condaEnvName) {
-    params.condaEnvName = data.taskParams.condaEnvName
-  }
-
-  if (data.taskParams?.inputNotePath) {
-    params.inputNotePath = data.taskParams.inputNotePath
-  }
-
-  if (data.taskParams?.outputNotePath) {
-    params.outputNotePath = data.taskParams.outputNotePath
-  }
-
-  if (data.taskParams?.parameters) {
-    params.parameters = data.taskParams.parameters
-  }
-
-  if (data.taskParams?.kernel) {
-    params.kernel = data.taskParams.kernel
-  }
-
-  if (data.taskParams?.engine) {
-    params.engine = data.taskParams.engine
-  }
-
-  if (data.taskParams?.executionTimeout) {
-    params.executionTimeout = data.taskParams.executionTimeout
-  }
-
-  if (data.taskParams?.startTimeout) {
-    params.startTimeout = data.taskParams.startTimeout
-  }
-
-  if (data.taskParams?.others) {
-    params.others = data.taskParams.others
-  }
-
-  if (data.taskParams?.processDefinitionCode) {
-    params.processDefinitionCode = data.taskParams.processDefinitionCode
-  }
-
   if (data.taskParams?.conditionResult?.successNode?.length) {
     params.successBranch = data.taskParams.conditionResult.successNode[0]
   }
