@@ -3,9 +3,9 @@
 ## Create workflow definition
 
 - Click Project Management -> Workflow -> Workflow Definition, enter the workflow definition page, and click the "Create Workflow" button to enter the **workflow DAG edit** page, as shown in the following figure:
-  <p align="center">
-      <img src="/img/dag5.png" width="80%" />
-  </p>
+
+  ![workflow-dag](/img/new_ui/dev/project/workflow-dag.png)
+
 - Drag from the toolbar <img src="/img/tasks/icons/shell.png" width="15"/> to the canvas, to add a shell task to the canvas, as shown in the figure below:
 
   ![demo-shell-simple](/img/tasks/demo/shell.jpg)
@@ -20,30 +20,26 @@
 6. Customize parameters (optional);
 7. Click the "Confirm Add" button to save the task settings.
 
-- **Set dependencies between tasks:** Click the icon in the upper right corner <img src="/img/line.png" width="35"/> to connect the task; as shown in the figure below, task 2 and task 3 execute in parallel, When task 1 finished execution, tasks 2 and 3 will execute simultaneously.
+- **Set dependencies between tasks:** Click the plus sign on the right of the task node to connect the task; as shown in the figure below, task Node_B and task Node_C execute in parallel, When task Node_A finished execution, tasks Node_B and Node_C will execute simultaneously.
 
-  <p align="center">
-     <img src="/img/dag6.png" width="80%" />
-  </p>
+  ![workflow-dependent](/img/new_ui/dev/project/workflow-dependent.png)
 
 - **Delete dependencies:** Click the "arrow" icon in the upper right corner <img src="/img/arrow.png" width="35"/>, select the connection line, and click the "Delete" icon in the upper right corner <img src= "/img/delete.png" width="35"/>, delete dependencies between tasks.
-  <p align="center">
-     <img src="/img/dag7.png" width="80%" />
-  </p>
+
+  ![workflow-delete](/img/new_ui/dev/project/workflow-delete.png)
 
 - **Save workflow definition:** Click the "Save" button, and the "Set DAG chart name" window pops up, as shown in the figure below. Enter the workflow definition name, workflow definition description, and set global parameters (optional, refer to [global parameters](../parameter/global.md)), click the "Add" button to finish workflow definition creation.
-  <p align="center">
-     <img src="/img/dag8.png" width="80%" />
-   </p>
+
+  ![workflow-save](/img/new_ui/dev/project/workflow-save.png)
+
 > For other types of tasks, please refer to [Task Node Type and Parameter Settings](#TaskParamers). <!-- markdown-link-check-disable-line -->
 
 ## Workflow Definition Operation Function
 
 Click Project Management -> Workflow -> Workflow Definition to enter the workflow definition page, as shown below:
 
-<p align="center">
-<img src="/img/work_list_en.png" width="80%" />
-</p>
+![workflow-list](/img/new_ui/dev/project/workflow-list.png)
+
 The following are the operation functions of the workflow definition list:
 
 - **Edit:** Only "Offline" workflow definitions can be edited. Workflow DAG editing is the same as [Create Workflow Definition](#creatDag) <!-- markdown-link-check-disable-line -->
@@ -55,21 +51,19 @@ The following are the operation functions of the workflow definition list:
 - **Delete:** Delete the workflow definition
 - **Download:** Download workflow definition to local
 - **Tree Diagram:** Display the task node type and task status in a tree structure, as shown in the figure below:
-  <p align="center">
-      <img src="/img/tree_en.png" width="80%" />
-  </p>
+
+![workflow-tree](/img/new_ui/dev/project/workflow-tree.png)
 
 ## Run the Workflow
 
 - Click Project Management -> Workflow -> Workflow Definition to enter the workflow definition page, as shown in the figure below, click the "Go Online" button <img src="/img/online.png" width="35"/>to make workflow online.
-  <p align="center">
-      <img src="/img/work_list_en.png" width="80%" />
-  </p>
+
+![workflow-online](/img/new_ui/dev/project/workflow-online.png)
 
 - Click the "Run" button to pop up the startup parameter setting window, as shown in the figure below, set the startup parameters, click the "Run" button in the pop-up box, the workflow starts running, and the workflow instance page generates a workflow instance.
-     <p align="center">
-       <img src="/img/run_work_en.png" width="80%" />
-     </p>  
+
+![workflow-run](/img/new_ui/dev/project/workflow-run.png)
+ 
   Description of workflow operating parameters: 
        
       * Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process
@@ -83,31 +77,28 @@ The following are the operation functions of the workflow definition list:
       * Complement: two modes including serial complement and parallel complement. Serial complement: within the specified time range, the complements are executed from the start date to the end date and N process instances are generated in turn; parallel complement: within the specified time range, multiple days are complemented at the same time to generate N process instances.
     * You can select complement time range (only support continuous date) when executing a timing workflow definition. For example, need to fill in the data from 1st May to 10th May, as shown in the figure below:
 
-    <p align="center">
-        <img src="/img/complement_en1.png" width="80%" />
-    </p>
+    ![workflow-date](/img/new_ui/dev/project/workflow-date.png)
 
-  > Serial mode: the complement execute sequentially from 1st May to 10th May, and the process instance page generates 10 process instances;
+  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 10 process instances;
 
-  > Parallel mode: The tasks from 1st May to 10th May execute simultaneously, and the process instance page generates 10 process instances;
+  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 10 process instances;
 
 ## Workflow Timing
 
 - Create timing: Click Project Management->Workflow->Workflow Definition, enter the workflow definition page, make the workflow online, click the "timing" button <img src="/img/timing.png" width="35"/> , the timing parameter setting dialog box pops up, as shown in the figure below:
-  <p align="center">
-      <img src="/img/time_schedule_en.png" width="80%" />
-  </p>
+
+  ![workflow-time01](/img/new_ui/dev/project/workflow-time01.png)
+
 - Choose the start and end time. In the time range, the workflow runs at regular intervals; If not in the time range, no regular workflow instances generate.
-- Add a timing that execute once a day at 5 AM, as shown in the following figure:
-  <p align="center">
-      <img src="/img/timer-en.png" width="80%" />
-  </p>
+- Add a timing that execute 5 minutes once, as shown in the following figure:
+
+  ![workflow-time02](/img/new_ui/dev/project/workflow-time02.png)
+
 - Failure strategy, notification strategy, process priority, worker group, notification group, recipient, and CC are the same as workflow running parameters.
 - Click the "Create" button to create the timing. Now the timing status is "**Offline**" and the timing needs to be **Online** to make effect.
 - Timing online: Click the "Timing Management" button <img src="/img/timeManagement.png" width="35"/>, enter the timing management page, click the "online" button, the timing status will change to "online", as shown in the below figure, the workflow makes effect regularly.
-  <p align="center">
-      <img src="/img/time-manage-list-en.png" width="80%" />
-  </p>
+
+  ![workflow-time03](/img/new_ui/dev/project/workflow-time03.png)
 
 ## Import Workflow
 
