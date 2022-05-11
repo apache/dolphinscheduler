@@ -81,7 +81,7 @@ jobs:
       - name: running cluster test
         run: |
           tar -zxvf ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz -C ~
-          .github/workflows/cluster-test/deploy.sh
+          /bin/bash .github/workflows/cluster-test/deploy.sh
 #      - uses: actions/upload-artifact@v2
 #        name: Upload Binary Package
 #        with:

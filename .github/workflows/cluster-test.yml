@@ -18,7 +18,6 @@
 on:
   workflow_run:
     workflows: ["Backend"]
-    branches: [dev]
     types:
       - completed
 
