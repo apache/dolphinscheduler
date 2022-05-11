@@ -1172,8 +1172,6 @@ const security = {
     k8s_cluster_tips: '请输入k8s集群',
     owner: '负责人',
     owner_tips: '请输入负责人',
-    tag: '标签',
-    tag_tips: '请输入标签',
     limit_cpu: '最大CPU',
     limit_cpu_tips: '请输入最大CPU',
     limit_memory: '最大内存',
