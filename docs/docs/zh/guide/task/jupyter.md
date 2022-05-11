@@ -5,6 +5,13 @@
 `Jupyter`任务类型，用于创建并执行`Jupyter`类型任务。worker 执行该任务的时候，会通过`papermill`执行`jupyter note`。
 点击[这里](https://papermill.readthedocs.io/en/latest/) 获取更多关于`papermill`的信息。
 
+## Conda Configuration
+ 
+- 在`common.properties`配置`conda.path`，将其指向您的`conda.sh`。这里的`conda`应该是您用来管理您的 `papermill`和`jupyter`所在python环境的相同`conda`。
+点击 [这里](https://docs.conda.io/en/latest/) 获取更多关于`conda`的信息.
+- `conda.path`默认设置为`/opt/anaconda3/etc/profile.d/conda.sh`。 如果您不清楚您的`conda`环境在哪里，只需要在命令行执行`conda info | grep -i 'base environment'`即可获得。
+
+
 ## Create Task
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入DAG编辑页面。
