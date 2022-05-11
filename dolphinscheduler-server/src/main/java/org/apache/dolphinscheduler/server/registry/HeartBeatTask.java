@@ -67,6 +67,15 @@ public class HeartBeatTask implements Runnable {
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
     }
 
+    public void setWorkerWaitingTaskCount(int count){
+        this.workerWaitingTaskCount  = count;
+    }
+
+    public void incrementWorkerWaitingTaskCount(){
+        this.workerWaitingTaskCount++;
+    }
+
+
     public String getHeartBeatInfo() {
         return this.heartBeat.encodeHeartBeat();
     }
@@ -82,6 +91,7 @@ public class HeartBeatTask implements Runnable {
                 }
             }
 
+            this.incrementWorkerWaitingTaskCount();
             // update waiting task count
             heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
 
