@@ -54,6 +54,9 @@ sudo sed -i 's|export SPRING_DATASOURCE_URL=.*|export SPRING_DATASOURCE_URL="jdb
 sudo sed -i 's|export SPRING_DATASOURCE_USERNAME=.*|export SPRING_DATASOURCE_USERNAME=root|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 sudo sed -i 's|export SPRING_DATASOURCE_PASSWORD=.*|export SPRING_DATASOURCE_PASSWORD=123456|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
+#Init schema
+sudo /bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/create-schema.sh
+
 #Start Cluster
 sudo $DOLPHINSCHEDULER_HOME/bin/start-all.sh
 
