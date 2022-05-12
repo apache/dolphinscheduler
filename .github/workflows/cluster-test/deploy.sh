@@ -42,7 +42,7 @@ mysql -h0.0.0.0 -P3306 -uroot -p123456 -e "use dolphinscheduler; source ${DOLPHI
 
 #Sudo
 sudo sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
-sodu sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+sudo sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 #SSH
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
