@@ -19,7 +19,8 @@ version: "3"
 
 services:
   mysql:
-    image: mysql:5.7.37
+    container_name: mysql
+    image: mysql:5.7.36
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
@@ -33,7 +34,7 @@ services:
       retries: 120
 
   zoo1:
-    image: zookeeper
+    image: zookeeper:3.8.0
     restart: always
     hostname: zoo1
     ports:
@@ -43,7 +44,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
 
   zoo2:
-    image: zookeeper
+    image: zookeeper:3.8.0
     restart: always
     hostname: zoo2
     ports:
@@ -53,7 +54,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
 
   zoo3:
-    image: zookeeper
+    image: zookeeper:3.8.0
     restart: always
     hostname: zoo3
     ports:
