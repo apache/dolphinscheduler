@@ -180,6 +180,7 @@ public class SqlTask extends AbstractTaskExecutor {
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
         ResultSet resultSet = null;
+        PreparedStatement statement = null;
         try {
 
             // create connection
@@ -196,8 +197,10 @@ public class SqlTask extends AbstractTaskExecutor {
             String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
-                // query statements need to be convert to JsonArray and inserted into Alert to send
-                resultSet = executeQuery(connection, mainStatementsBinds.get(0), "main");
+                // query statements need to be converted to JsonArray and inserted into Alert to send
+                // statement must close after resultProcess
+                statement = prepareStatementAndBind(connection, mainStatementsBinds.get(0));
+                resultSet = executeQuery(mainStatementsBinds.get(0), "main", statement);
                 result = resultProcess(resultSet);
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
@@ -213,7 +216,7 @@ public class SqlTask extends AbstractTaskExecutor {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
         } finally {
-            close(resultSet, connection);
+            close(resultSet, statement, connection);
         }
     }
 
@@ -292,11 +295,9 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    private ResultSet executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
-        try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
-            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            return statement.executeQuery();
-        }
+    private ResultSet executeQuery(SqlBinds sqlBinds, String handlerType, PreparedStatement statement) throws Exception {
+        logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
+        return statement.executeQuery();
     }
 
     private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
@@ -332,12 +333,20 @@ public class SqlTask extends AbstractTaskExecutor {
      * @param resultSet resultSet
      * @param connection connection
      */
-    private void close(ResultSet resultSet, Connection connection) {
+    private void close(ResultSet resultSet, PreparedStatement pstmt, Connection connection) {
         if (resultSet != null) {
             try {
                 resultSet.close();
             } catch (SQLException e) {
                 logger.error("close result set error : {}", e.getMessage(), e);
+            }
+        }
+
+        if (pstmt != null) {
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                logger.error("close prepared statement error : {}", e.getMessage(), e);
             }
         }
 
