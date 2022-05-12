@@ -199,7 +199,8 @@ public class SqlTask extends AbstractTaskExecutor {
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
                 statement = prepareStatementAndBind(connection, mainStatementsBinds.get(0));
-                resultSet = executeQuery(statement, mainStatementsBinds.get(0), "main");
+                logger.info("main statement execute query, for sql: {}", mainStatementsBinds.get(0).getSql());
+                resultSet = statement.executeQuery();
                 result = resultProcess(resultSet);
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
