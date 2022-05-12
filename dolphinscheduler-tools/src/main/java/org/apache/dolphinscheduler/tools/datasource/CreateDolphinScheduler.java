@@ -30,7 +30,8 @@ import org.springframework.stereotype.Component;
 @ComponentScan(
     includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = CreateDolphinScheduler.CreateRunner.class)
-    }, useDefaultFilters = false
+    },
+    useDefaultFilters = false
 )
 public class CreateDolphinScheduler {
     public static void main(String[] args) {
