@@ -26,7 +26,7 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 
 The Dependent node provides a logical judgment function, which can detect the execution of the dependent node according to the logic.
 
-For example, process A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B and C to be successfully executed every day of the last week, as shown in the figure:
+For example, process A is a weekly task, processes B and C are daily tasks, and task A requires tasks B and C to be successfully executed every day of the last week.
 
 ![dependent_task01](/img/tasks/demo/dependent_task01.png)
 
