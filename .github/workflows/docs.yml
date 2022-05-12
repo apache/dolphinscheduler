@@ -52,7 +52,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo npm install -g markdown-link-check@3.10.0
-      # NOTE: Change command to ` find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"` if you want to run check locally
+      # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
+      # if you want to run check locally
       - run: |
           for file in $(find . -name "*.md"); do
             markdown-link-check -c .dlc.json -q "$file"
