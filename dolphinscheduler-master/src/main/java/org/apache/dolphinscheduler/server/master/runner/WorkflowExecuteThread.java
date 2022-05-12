@@ -1960,6 +1960,9 @@ public class WorkflowExecuteThread {
     private boolean isNewProcessInstance() {
         if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
             return true;
+        } else if (processInstance.getRecovery().equals(Flag.YES)) {
+            // host is empty use old task instance
+            return false;
         } else {
             return false;
         }
