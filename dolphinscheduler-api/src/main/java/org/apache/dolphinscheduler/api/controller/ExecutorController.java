@@ -311,7 +311,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
