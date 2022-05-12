@@ -158,6 +158,9 @@ $bgLight: #ffffff;
     &.icon-zeppelin {
       background-image: url('/images/task-icons/zeppelin.png');
     }
+    &.icon-jupyter {
+      background-image: url('/images/task-icons/jupyter.png');
+    }
   }
 
   &:hover {
@@ -218,6 +221,9 @@ $bgLight: #ffffff;
       }
       &.icon-zeppelin {
         background-image: url('/images/task-icons/zeppelin_hover.png');
+      }
+      &.icon-jupyter {
+        background-image: url('/images/task-icons/jupyter_hover.png');
       }
     }
   }
