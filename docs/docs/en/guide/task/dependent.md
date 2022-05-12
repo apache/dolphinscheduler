@@ -30,7 +30,7 @@ For example, process A is a weekly task, processes B and C are daily tasks, and 
 
 ![dependent_task01](/img/tasks/demo/dependent_task01.png)
 
-For example, process A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B or C to be successfully executed every day of the last week, as shown in the figure:
+And another example is that process A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B or C to be successfully executed every day of the last week:
 
 ![dependent_task02](/img/tasks/demo/dependent_task02.png)
 
