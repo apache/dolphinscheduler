@@ -78,11 +78,11 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
-      - name: Running cluster test
+      - name: Running cluster test(Mysql)
         run: |
-          docker-compose -f .github/workflows/cluster-test/docker-compose-base.yaml up -d
+          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
           docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
-          docker-compose -f .github/workflows/cluster-test/docker-compose-cluster.yaml up -d
+          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
           /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
   result:
     name: Build
