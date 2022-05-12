@@ -54,7 +54,7 @@ sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/b
 sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME}|g" $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME|g" $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 
 #Setting dolphinscheduler_env.sh
 sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
