@@ -50,19 +50,19 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 
 #Setting install.sh
-sed -i 's|ips=.*|ips=${ips:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME}|g" /$DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|ips=.*|ips=${ips:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME}|g" $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 
 #Setting dolphinscheduler_env.sh
-sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=.*|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_URL=.*|export SPRING_DATASOURCE_URL="jdbc:mysql://0.0.0.0:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_USERNAME=.*|export SPRING_DATASOURCE_USERNAME=root|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_PASSWORD=.*|export SPRING_DATASOURCE_PASSWORD=123456|g' /$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_DRIVER_CLASS_NAME.*|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_URL.*|export SPRING_DATASOURCE_URL="jdbc:mysql://0.0.0.0:3306/dolphinscheduler?useUnicode=true\&characterEncoding=UTF-8\&useSSL=false"|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_USERNAME.*|export SPRING_DATASOURCE_USERNAME=root|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+sed -i 's|export SPRING_DATASOURCE_PASSWORD.*|export SPRING_DATASOURCE_PASSWORD=123456|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
 #Init schema
 /bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/create-schema.sh
