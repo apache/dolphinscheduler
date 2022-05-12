@@ -38,7 +38,6 @@ cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME
 sudo apt install -y mycli
 sleep 10
 mysql -h0.0.0.0 -P3306 -uroot -p123456 -e "CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
-mysql -h0.0.0.0 -P3306 -uroot -p123456 -e "use dolphinscheduler; source ${DOLPHINSCHEDULER_HOME}/tools/sql/sql/dolphinscheduler_mysql.sql;"
 
 #Sudo
 sudo sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
