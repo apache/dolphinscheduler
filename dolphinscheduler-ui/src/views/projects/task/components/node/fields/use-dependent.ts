@@ -31,7 +31,8 @@ import type {
   IJsonItem,
   IDependpendItem,
   IDependTask,
-  ITaskState
+  ITaskState,
+  IDateType
 } from '../types'
 
 export function useDependent(model: { [field: string]: any }): IJsonItem[] {
@@ -172,7 +173,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         label: t('project.node.last_month_end')
       }
     ]
-  }
+  } as { [key in IDateType]: { value: string; label: string }[] }
 
   const getProjectList = async () => {
     const result = await queryAllProjectList()
@@ -338,8 +339,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             rule: {
               required: true,
               trigger: ['input', 'blur'],
-              validator(validate: any, value: string) {
-                if (!value) {
+              validator(validate: any, value: number) {
+                if (!value && value !== 0) {
                   return Error(t('project.node.task_name_tips'))
                 }
               }
@@ -351,9 +352,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 10,
             name: t('project.node.cycle_time'),
             props: {
-              onUpdateValue: (value: 'month') => {
+              onUpdateValue: (value: IDateType) => {
                 model.dependTaskList[i].dependItemList[j].dateOptions =
                   DATE_LSIT[value]
+                model.dependTaskList[i].dependItemList[j].dateValue = null
               }
             },
             options: CYCLE_LIST,
