@@ -56,9 +56,13 @@ const syntaxHighlight = (json: string) => {
     lines.push(
       <NText tag='div' class={styles['line']}>
         <NText type='error'>"{key}": </NText>
-        <NText type={type}>
-          "{value}"{i !== len - 1 ? ',' : ''}
-        </NText>
+        {isPlainObject(value) ? (
+          syntaxHighlight(JSON.stringify(value))
+        ) : (
+          <NText type={type}>
+            "{value}"{i !== len - 1 ? ',' : ''}
+          </NText>
+        )}
       </NText>
     )
   }
