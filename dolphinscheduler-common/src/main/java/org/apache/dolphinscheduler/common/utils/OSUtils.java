@@ -38,6 +38,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.io.File;
 
 /**
  * os utils
@@ -76,6 +77,24 @@ public class OSUtils {
     public static double memoryUsage() {
         GlobalMemory memory = hal.getMemory();
         double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 1.0 / memory.getTotal();
+
+        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return Double.parseDouble(df.format(memoryUsage));
+    }
+
+    /**
+     * get disk usage
+     * Keep 2 decimal
+     *
+     * @return percent %
+     */
+    public static double diskAvailable() {
+        File file = new File(".");
+        long totalSpace = file.getTotalSpace(); //total disk space in bytes.
+        long freeSpace = file.getFreeSpace(); //unallocated / free disk space in bytes.
+
+        double memoryUsage = freeSpace / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
