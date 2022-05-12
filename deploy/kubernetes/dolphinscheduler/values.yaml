@@ -23,7 +23,7 @@ timezone: "Asia/Shanghai"
 
 image:
   registry: "dolphinscheduler.docker.scarf.sh/apache"
-  tag: "dev-SNAPSHOT"
+  tag: "3.0.0-beta-1"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
 
