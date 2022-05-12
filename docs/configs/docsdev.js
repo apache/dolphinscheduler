@@ -170,6 +170,10 @@ export default {
                                 title: 'Apache Zeppelin',
                                 link: '/en-us/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
+                            {
+                                title: 'Jupyter',
+                                link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
+                            },
                         ],
                     },
                     {
@@ -516,6 +520,10 @@ export default {
                             {
                                 title: 'Apache Zeppelin',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/zeppelin.html',
+                            },
+                            {
+                                title: 'Jupyter',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                         ],
                     },

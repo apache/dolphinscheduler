@@ -403,5 +403,9 @@ public class TaskConstants {
      */
     public static final String ZEPPELIN_REST_URL= "zeppelin.rest.url";
 
+    /**
+     * conda config used by jupyter task plugin
+     */
+    public static final String CONDA_PATH = "conda.path";
 
 }
