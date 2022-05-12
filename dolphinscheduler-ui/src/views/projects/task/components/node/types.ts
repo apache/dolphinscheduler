@@ -37,6 +37,7 @@ type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
 type RelationType = 'AND' | 'OR'
 type ITaskType = TaskType
+type IDateType = 'hour' | 'day' | 'week' | 'month'
 
 interface IOption {
   label: string
@@ -383,5 +384,6 @@ export {
   IJsonItem,
   FormRules,
   IJsonItemParams,
-  IResponseJsonItem
+  IResponseJsonItem,
+  IDateType
 }
