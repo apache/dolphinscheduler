@@ -22,8 +22,8 @@ USER=$(whoami)
 DOLPHINSCHEDULER_HOME=/home/$USER/apache-dolphinscheduler-dev-SNAPSHOT-bin
 
 #Docker
-apt install -y docker docker-compose
-docker-compose -f .github/workflows/cluster-test/docker-compose.yaml up -d
+sudo apt install -y docker docker-compose
+sudo docker-compose -f .github/workflows/cluster-test/docker-compose.yaml up -d
 
 #Download mysql jar
 MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
@@ -35,7 +35,7 @@ cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME
 cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/tools/libs/$MYSQL_DRIVER
 
 #Create database
-apt install -y mycli
+sudo apt install -y mycli
 mysql -uroot -p123456 -e "CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
 mysql -uroot -p123456 -e "source ${DOLPHINSCHEDULER_HOME}/tools/sql/sql/dolphinscheduler_mysql.sql"
 
