@@ -25,5 +25,5 @@ JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms
 
 java $JAVA_OPTS \
   -cp "$DOLPHINSCHEDULER_HOME/tools/conf":"$DOLPHINSCHEDULER_HOME/tools/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
-  -Dspring.profiles.active=create \
+#  -Dspring.profiles.active=create \
   org.apache.dolphinscheduler.tools.datasource.CreateDolphinScheduler

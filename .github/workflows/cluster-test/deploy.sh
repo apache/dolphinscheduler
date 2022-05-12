@@ -22,7 +22,7 @@ USER=$(whoami)
 DOLPHINSCHEDULER_HOME=/home/$USER/apache-dolphinscheduler-dev-SNAPSHOT-bin
 
 #Docker
-sudo apt install -y docker docker-compose
+#sudo apt install -y docker docker-compose
 sudo docker-compose -f .github/workflows/cluster-test/docker-compose.yaml up -d
 
 #Download mysql jar
