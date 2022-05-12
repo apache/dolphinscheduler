@@ -62,7 +62,7 @@ Overload processing: By using the task queue mechanism, the number of schedulabl
 
 ## QuickStart in Docker
 
-Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/installation/docker.html)
+Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/start/docker.html)
 
 ## QuickStart in Kubernetes
 
