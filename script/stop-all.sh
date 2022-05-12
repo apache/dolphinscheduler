@@ -33,21 +33,21 @@ mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
   echo "$master master server is stopping"
-	ssh -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop master-server;"
+	ssh -o StrictHostKeyChecking=no -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop master-server;"
 
 done
 
 for worker in ${workerNames[@]}
 do
   echo "$worker worker server is stopping"
-  ssh -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop worker-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop worker-server;"
 done
 
-ssh -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop alert-server;"
+ssh -o StrictHostKeyChecking=no -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop alert-server;"
 
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
   echo "$apiServer api server is stopping"
-  ssh -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop api-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop api-server;"
 done
