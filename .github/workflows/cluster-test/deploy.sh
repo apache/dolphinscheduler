@@ -107,7 +107,7 @@ $DOLPHINSCHEDULER_HOME/bin/stop-all.sh
 
 #Cluster stop health check
 sleep 5
-#MASTER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c MasterServer)
+MASTER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c MasterServer)
 if [[ $MASTER_PROCESS_NUM -eq 0 ]];then
   echo "master health check success"
 else
