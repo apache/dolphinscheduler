@@ -19,6 +19,8 @@ name: Docs
 on:
   pull_request:
     paths:
+      - '.github/workflows/docs.yml'
+      - '**/*.md'
       - 'docs/**'
 
 concurrency:
