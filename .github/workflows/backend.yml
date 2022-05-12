@@ -82,12 +82,6 @@ jobs:
         run: |
           tar -zxvf ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz -C ~
           /bin/bash .github/workflows/cluster-test/deploy.sh
-      - uses: actions/upload-artifact@v2
-        name: Upload Binary Package
-        with:
-          name: binary-package
-          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
-          retention-days: 1
   result:
     name: Build
     runs-on: ubuntu-latest
