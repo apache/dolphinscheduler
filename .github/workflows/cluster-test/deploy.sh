@@ -48,19 +48,10 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 
 #Setting install.sh
-sed -i 's|ips=.*|ips=${ips:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|masters=.*|masters=${masters:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|workers=.*|workers=${workers:-"localhost:default"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|alertServer=.*|alertServer=${alertServer:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i 's|apiServers=.*|apiServers=${apiServers:-"localhost"}|g' $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-sed -i "s|installPath=.*|installPath=$DOLPHINSCHEDULER_HOME|g" $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+cp .github/workflows/cluster-test/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 
 #Setting dolphinscheduler_env.sh
-sed -i 's|export DATABASE=.*|export DATABASE=mysql|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_DRIVER_CLASS_NAME.*|export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_URL.*|export SPRING_DATASOURCE_URL="jdbc:mysql://0.0.0.0:3306/dolphinscheduler?useUnicode=true\&characterEncoding=UTF-8\&useSSL=false"|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_USERNAME.*|export SPRING_DATASOURCE_USERNAME=root|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-sed -i 's|export SPRING_DATASOURCE_PASSWORD.*|export SPRING_DATASOURCE_PASSWORD=123456|g' $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+cp .github/workflows/cluster-test/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
 #Init schema
 /bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/create-schema.sh
@@ -75,7 +66,7 @@ if [[ $MASTER_PROCESS_NUM -gt 0 ]];then
   echo "master health check success"
 else
   echo "master health check failed"
-  exit 1
+  exit 2
 fi
 
 WORKER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c WorkerServer)
@@ -83,7 +74,7 @@ if [[ $WORKER_PROCESS_NUM -gt 0 ]];then
   echo "worker health check success"
 else
   echo "worker health check failed"
-  exit 1
+  exit 2
 fi
 
 ALERT_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c AlertServer)
@@ -91,7 +82,7 @@ if [[ $ALERT_PROCESS_NUM -gt 0 ]];then
   echo "alert health check success"
 else
   echo "alert health check failed"
-  exit 1
+  exit 2
 fi
 
 API_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c ApiApplicationServer)
@@ -99,7 +90,7 @@ if [[ $API_PROCESS_NUM -gt 0 ]];then
   echo "api health check success"
 else
   echo "api health check failed"
-  exit 1
+  exit 2
 fi
 
 #Stop Cluster
@@ -107,34 +98,34 @@ $DOLPHINSCHEDULER_HOME/bin/stop-all.sh
 
 #Cluster stop health check
 sleep 5
-MASTER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c MasterServer)
+MASTER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c MasterServer || true)
 if [[ $MASTER_PROCESS_NUM -eq 0 ]];then
   echo "master health check success"
 else
   echo "master health check failed"
+  exit 10
+fi
+
+WORKER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c WorkerServer || true)
+if [[ $WORKER_PROCESS_NUM -eq 0 ]];then
+  echo "worker health check success"
+else
+  echo "worker health check failed"
   exit 1
 fi
-#
-#WORKER_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c WorkerServer)
-#if [[ $WORKER_PROCESS_NUM -eq 0 ]];then
-#  echo "worker health check success"
-#else
-#  echo "worker health check failed"
-#  exit 1
-#fi
-#
-#ALERT_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c AlertServer)
-#if [[ $ALERT_PROCESS_NUM -eq 0 ]];then
-#  echo "alert health check success"
-#else
-#  echo "alert health check failed"
-#  exit 1
-#fi
-#
-#API_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c ApiApplicationServer)
-#if [[ $API_PROCESS_NUM -eq 0 ]];then
-#  echo "api health check success"
-#else
-#  echo "api health check failed"
-#  exit 1
-#fi
+
+ALERT_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c AlertServer || true)
+if [[ $ALERT_PROCESS_NUM -eq 0 ]];then
+  echo "alert health check success"
+else
+  echo "alert health check failed"
+  exit 1
+fi
+
+API_PROCESS_NUM=$(ps -ef | grep -v grep | grep -c ApiApplicationServer || true)
+if [[ $API_PROCESS_NUM -eq 0 ]];then
+  echo "api health check success"
+else
+  echo "api health check failed"
+  exit 1
+fi
