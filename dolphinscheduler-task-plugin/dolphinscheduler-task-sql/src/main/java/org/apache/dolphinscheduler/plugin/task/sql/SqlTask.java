@@ -295,11 +295,6 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    private ResultSet executeQuery(PreparedStatement statement, SqlBinds sqlBinds, String handlerType) throws Exception {
-        logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-        return statement.executeQuery();
-    }
-
     private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
