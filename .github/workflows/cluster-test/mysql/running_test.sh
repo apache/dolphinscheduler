@@ -28,6 +28,7 @@ API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
 sleep 40
 docker logs ds
 docker exec -u root ds bash -c "ps -ef"
+cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log
 eval "$MASTER_PORT_COMMAND"
 if [[ $? -eq 0 ]];then
   echo "master start health check success"
