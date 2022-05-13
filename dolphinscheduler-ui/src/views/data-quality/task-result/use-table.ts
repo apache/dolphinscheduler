@@ -166,7 +166,7 @@ export function useTable() {
         title: t('data_quality.task_result.error_output_path'),
         key: 'errorOutputPath',
         render: (row: ResultItem) => {
-          return row.errorOutputPath ? row : '-'
+          return row.errorOutputPath ? row.errorOutputPath : '-'
         },
         width: 200
       },
