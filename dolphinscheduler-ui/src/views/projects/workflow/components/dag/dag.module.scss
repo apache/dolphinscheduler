@@ -161,6 +161,9 @@ $bgLight: #ffffff;
     &.icon-jupyter {
       background-image: url('/images/task-icons/jupyter.png');
     }
+    &.icon-mlflow {
+      background-image: url('/images/task-icons/mlflow.png');
+    }
   }
 
   &:hover {
@@ -224,6 +227,9 @@ $bgLight: #ffffff;
       }
       &.icon-jupyter {
         background-image: url('/images/task-icons/jupyter_hover.png');
+      }
+      &.icon-mlflow {
+        background-image: url('/images/task-icons/mlflow.png');
       }
     }
   }

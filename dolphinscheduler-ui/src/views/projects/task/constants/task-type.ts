@@ -35,6 +35,7 @@ export type TaskType =
   | 'EMR'
   | 'ZEPPELIN'
   | 'JUPYTER'
+  | 'MLFLOW'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -102,6 +103,10 @@ export const TASK_TYPES_MAP = {
   },
   JUPYTER: {
     alias: 'JUPYTER',
+    helperLinkDisable: true
+  },
+  MLFLOW: {
+    alias: 'MLFLOW',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

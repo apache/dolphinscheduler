@@ -35,6 +35,7 @@ import { useDataQuality } from './use-data-quality'
 import { useEmr } from './use-emr'
 import { useZeppelin } from './use-zeppelin'
 import { useJupyter } from './use-jupyter'
+import { useMlflow } from './use-mlflow'
 
 export default {
   SHELL: useShell,
@@ -56,5 +57,6 @@ export default {
   DATA_QUALITY: useDataQuality,
   EMR: useEmr,
   ZEPPELIN: useZeppelin,
-  JUPYTER: useJupyter
+  JUPYTER: useJupyter,
+  MLFLOW: useMlflow
 }
