@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinler.plugin.task.mlflow;
 
 import java.io.IOException;
@@ -17,8 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.COMMON_PROPERTIES_PATH;
-
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.junit.runner.RunWith;
@@ -28,10 +43,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({
-        JSONUtils.class,
-        PropertyUtils.class,
-})
+@PrepareForTest({JSONUtils.class, PropertyUtils.class,})
 @PowerMockIgnore({"javax.*"})
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
 public class MlflowTaskTest {
@@ -69,8 +81,7 @@ public class MlflowTaskTest {
     }
 
     @Test
-    public void testInit()
-            throws Exception {
+    public void testInit() throws Exception {
         try {
             mlflowTask.init();
         } catch (Exception e) {
@@ -78,24 +89,11 @@ public class MlflowTaskTest {
         }
     }
 
-
-    @Test
-    public void testGetParamsMap() {
-        MlflowParameters mlflowParameters = createParameters();
-        HashMap<String, String> paramsMap = mlflowParameters.getParamsMap();
-    }
-
     @Test
     public void testLoadRunScript() throws IOException {
         String scriptPath = MlflowTask.class.getClassLoader().getResource(MlflowConstants.RUN_PROJECT_SCRIPT).getPath();
         String script = MlflowTask.loadRunScript(scriptPath);
         logger.info(script);
-
-    }
-
-    @Test
-    public void testbuildCommand() throws Exception {
-        String command = mlflowTask.buildCommand();
 
     }
 

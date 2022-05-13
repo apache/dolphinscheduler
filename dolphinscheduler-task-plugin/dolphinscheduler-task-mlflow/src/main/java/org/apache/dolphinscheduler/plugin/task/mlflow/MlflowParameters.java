@@ -17,25 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.mlflow;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 public class MlflowParameters extends AbstractParameters {
-
-    /**
-     * shell script
-     */
-    private String rawScript;
-
-    /**
-     * resource list
-     */
-    private List<ResourceInfo> resourceList;
 
     private String algorithm = "lightgbm";
 
@@ -51,10 +37,6 @@ public class MlflowParameters extends AbstractParameters {
 
     private String mlflowTrackingUri = "http://127.0.0.1:5000";
 
-
-    public String getAlgorithm() {
-        return this.algorithm;
-    }
 
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;

@@ -23,15 +23,11 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.commons.collections4.MapUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -40,8 +36,6 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import java.io.*;
@@ -121,7 +115,7 @@ public class MlflowTask extends AbstractTaskExecutor {
      * @return file name
      * @throws Exception exception
      */
-    public String buildCommand() throws Exception {
+    private String buildCommand() throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
@@ -134,6 +128,9 @@ public class MlflowTask extends AbstractTaskExecutor {
             return fileName;
         }
 
+        /**
+         * load script template from resource folder
+         */
         String scriptPath = MlflowTask.class.getClassLoader().getResource(MlflowConstants.RUN_PROJECT_SCRIPT).getPath();
         String script = loadRunScript(scriptPath);
         script = parseScript(script);
