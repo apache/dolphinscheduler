@@ -78,6 +78,32 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
+      - uses: actions/upload-artifact@v2
+        name: Upload Binary Package
+        with:
+          name: binary-package
+          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
+          retention-days: 1
+#      - name: Running cluster test(Mysql)
+#        run: |
+#          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
+#          docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
+#          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
+#          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
+  cluster-test:
+    name: cluster-test
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v2
+        name: Download Binary Package
+        with:
+          name: binary-package
+          path: ./
       - name: Running cluster test(Mysql)
         run: |
           docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
@@ -88,7 +114,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ build, paths-filter ]
+    needs: [ build, paths-filter, cluster-test ]
     if: always()
     steps:
       - name: Status
