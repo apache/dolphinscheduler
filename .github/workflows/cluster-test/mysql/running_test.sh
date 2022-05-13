@@ -18,43 +18,30 @@
 set -x
 
 
-TIME_OUT=5
-MASTER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 5678\""
-WORKER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 1234\""
-ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
-API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
+MASTER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://localhost:12345/dolphinscheduler/actuator/health"
+WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://localhost:5679/actuator/health"
+API_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://localhost:1235/actuator/health"
 
 #Cluster start health check
-sleep 40
-docker logs ds
-docker exec -u root ds bash -c "ps -ef"
-cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log
-eval "$MASTER_PORT_COMMAND"
-if [[ $? -eq 0 ]];then
+sleep 30
+MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
+if [[ $MASTER_HTTP_STATUS -eq 200 ]];then
   echo "master start health check success"
 else
   echo "master start health check failed"
   exit 2
 fi
 
-eval "$WORKER_PORT_COMMAND"
-if [[ $? -eq 0 ]];then
+WORKER_HTTP_STATUS=$(eval "$WORKER_HEALTHCHECK_COMMAND")
+if [[ $WORKER_HTTP_STATUS -eq 200 ]];then
   echo "worker start health check success"
 else
   echo "worker start health check failed"
   exit 2
 fi
 
-eval "$ALERT_PORT_COMMAND"
-if [[ $? -eq 0 ]];then
-  echo "alert start health check success"
-else
-  echo "alert start health check failed"
-  exit 2
-fi
-
-eval "$API_PORT_COMMAND"
-if [[ $? -eq 0 ]];then
+API_HTTP_STATUS=$(eval "$API_HEALTHCHECK_COMMAND")
+if [[ $API_HTTP_STATUS -eq 200 ]];then
   echo "api start health check success"
 else
   echo "api start health check failed"
@@ -65,33 +52,25 @@ fi
 docker exec -u root ds bash -c "/root/apache-dolphinscheduler-dev-SNAPSHOT-bin/bin/stop-all.sh"
 
 #Cluster stop health check
-sleep $TIME_OUT
-eval "$MASTER_PORT_COMMAND"
-if [[ $? -ne 0 ]];then
+sleep 5
+MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
+if [[ $MASTER_HTTP_STATUS -ne 200 ]];then
   echo "master stop health check success"
 else
   echo "master stop health check failed"
   exit 3
 fi
 
-eval "$WORKER_PORT_COMMAND"
-if [[ $? -ne 0 ]];then
+WORKER_HTTP_STATUS=$(eval "$WORKER_HEALTHCHECK_COMMAND")
+if [[ $WORKER_HTTP_STATUS -ne 200 ]];then
   echo "worker stop health check success"
 else
   echo "worker stop health check failed"
   exit 3
 fi
 
-eval "$ALERT_PORT_COMMAND"
-if [[ $? -ne 0 ]];then
-  echo "alert stop health check success"
-else
-  echo "alert stop health check failed"
-  exit 3
-fi
-
-eval "$API_PORT_COMMAND"
-if [[ $? -ne 0 ]];then
+API_HTTP_STATUS=$(eval "$API_HEALTHCHECK_COMMAND")
+if [[ $API_HTTP_STATUS -ne 200 ]];then
   echo "api stop health check success"
 else
   echo "api stop health check failed"
