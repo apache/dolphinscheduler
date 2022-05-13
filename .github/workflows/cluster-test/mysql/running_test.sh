@@ -18,14 +18,15 @@
 set -x
 
 
-API_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://localhost:12345/dolphinscheduler/actuator/health"
-MASTER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://localhost:5679/actuator/health"
-WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://localhost:1235/actuator/health"
+API_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:12345/dolphinscheduler/actuator/health"
+MASTER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:5679/actuator/health"
+WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:1235/actuator/health"
 
 #Cluster start health check
 sleep 30
 docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/master-server*.out"
 docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
+netstat -apn
 MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
 if [[ $MASTER_HTTP_STATUS -eq 200 ]];then
   echo "master start health check success"
