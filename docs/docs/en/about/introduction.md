@@ -6,7 +6,7 @@ Apache DolphinScheduler aims to solve complex big data task dependencies and to 
 
 
 <p align="center">
-  <img src="/img/introduction_ui.png" alt="Apache DolphinScheduler DAG"  width="60%" />
+  <img src="/img/introduction.gif" alt="Apache DolphinScheduler"  width="60%" />
   <p align="center">
         <en>Apache DolphinScheduler</em>
   </p>
