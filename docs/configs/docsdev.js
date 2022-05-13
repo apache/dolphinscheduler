@@ -28,6 +28,10 @@ export default {
                         link: '/en-us/docs/dev/user_doc/about/introduction.html',
                     },
                     {
+                        title: 'Features',
+                        link: '/en-us/docs/dev/user_doc/about/features.html',
+                    },
+                    {
                         title: 'Hardware Environment',
                         link: '/en-us/docs/dev/user_doc/about/hardware.html',
                     },
