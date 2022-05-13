@@ -15,17 +15,16 @@
   * limitations under the License.
   */
 
-import { reactive } from 'vue'
+import {reactive} from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData, ITaskData } from '../types'
-import {useI18n} from "vue-i18n";
+import type {IJsonItem, INodeData, ITaskData} from '../types'
 
 export function useMlflow({
-                               projectCode,
-                               from = 0,
-                               readonly,
-                               data
-                           }: {
+                              projectCode,
+                              from = 0,
+                              readonly,
+                              data
+                          }: {
     projectCode: number
     from?: number
     readonly?: boolean
@@ -44,6 +43,8 @@ export function useMlflow({
         workerGroup: 'default',
         mlflowTrackingUri: 'http://127.0.0.1:5000',
         algorithm: 'svm',
+        mlflowJobType: "AutoML",
+        automlTool: "flaml",
         delayTime: 0,
         timeout: 30
     } as INodeData)

@@ -131,8 +131,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         /**
          * load script template from resource folder
          */
-        String scriptPath = MlflowTask.class.getClassLoader().getResource(MlflowConstants.RUN_PROJECT_SCRIPT).getPath();
-        String script = loadRunScript(scriptPath);
+        String script = loadRunScript(mlflowParameters.getScriptPath());
         script = parseScript(script);
 
         logger.info("raw script : \n{}", script);

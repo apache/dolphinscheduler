@@ -43,25 +43,23 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({JSONUtils.class, PropertyUtils.class,})
+@PrepareForTest({
+        JSONUtils.class,
+        PropertyUtils.class,
+})
 @PowerMockIgnore({"javax.*"})
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
 public class MlflowTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(MlflowTask.class);
 
-    private MlflowTask mlflowTask;
-
-    private TaskExecutionContext taskExecutionContext;
-
-
     @Before
     public void before() throws Exception {
-
-        MlflowParameters mlflowParameters = createParameters();
-        String parameters = JSONUtils.toJsonString(mlflowParameters);
-        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         PowerMockito.mockStatic(PropertyUtils.class);
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+    }
+
+    public TaskExecutionContext createContext(MlflowParameters mlflowParameters){
+        String parameters = JSONUtils.toJsonString(mlflowParameters);
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("MLflowTest");
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/dolphinscheduler_test");
@@ -75,43 +73,58 @@ public class MlflowTaskTest {
         String userName = System.getenv().get("USER");
         Mockito.when(taskExecutionContext.getTenantCode()).thenReturn(userName);
 
-        mlflowTask = new MlflowTask(taskExecutionContext);
-        this.mlflowTask.init();
-        this.mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+        return taskExecutionContext;
     }
 
     @Test
-    public void testInit() throws Exception {
+    public void testInitBasicAlgorithmTask()
+            throws Exception {
         try {
+            MlflowParameters mlflowParameters = createBasicAlgorithmParameters();
+            TaskExecutionContext taskExecutionContext = createContext(mlflowParameters);
+            MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
             mlflowTask.init();
+            mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
+//            mlflowTask.handle();
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
 
     @Test
-    public void testLoadRunScript() throws IOException {
-        String scriptPath = MlflowTask.class.getClassLoader().getResource(MlflowConstants.RUN_PROJECT_SCRIPT).getPath();
-        String script = MlflowTask.loadRunScript(scriptPath);
-        logger.info(script);
-
+    public void testInitAutoMLTask()
+            throws Exception {
+        try {
+            MlflowParameters mlflowParameters = createAutoMLParameters();
+            TaskExecutionContext taskExecutionContext = createContext(mlflowParameters);
+            MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
+            mlflowTask.init();
+            mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
+//            mlflowTask.handle();
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
-// Must have conda env
-
-//    @Test
-//    public void testHandle() throws Exception {
-//        mlflowTask.handle();
-//    }
-
-    private MlflowParameters createParameters() {
+    private MlflowParameters createBasicAlgorithmParameters() {
         MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowJobType("BasicAlgorithm");
         mlflowParameters.setAlgorithm("xgboost");
-        mlflowParameters.setParams("");
-        mlflowParameters.setSearchParams("");
-        mlflowParameters.setDataPaths("xxx");
-        mlflowParameters.setExperimentNames("DsTaskTest");
-        mlflowParameters.setModelNames("DsTaskTest");
+        mlflowParameters.setDataPaths("xxxxxxxxxx");
+        mlflowParameters.setExperimentNames("asbbb");
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        return mlflowParameters;
+    }
+
+    private MlflowParameters createAutoMLParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowJobType("AutoML");
+        mlflowParameters.setAutomlTool("autosklearn");
+        mlflowParameters.setParams("time_left_for_this_task=30");
+        mlflowParameters.setDataPaths("xxxxxxxxxxx");
+        mlflowParameters.setExperimentNames("asbbb");
+        mlflowParameters.setModelNames("asbbb");
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
         return mlflowParameters;
     }

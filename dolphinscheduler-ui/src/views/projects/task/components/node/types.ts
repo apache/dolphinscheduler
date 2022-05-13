@@ -306,6 +306,7 @@ interface ITaskParams {
   udfs?: string
   connParams?: string
   targetJobName?: string
+
   algorithm?:string
   params?:string
   searchParams?:string
@@ -313,6 +314,9 @@ interface ITaskParams {
   experimentName?:string
   modelName?:string
   mlflowTrackingUri?:string
+  mlflowJobType?:string
+  automlTool?:string
+  registerModel?:boolean
 }
 
 interface INodeData

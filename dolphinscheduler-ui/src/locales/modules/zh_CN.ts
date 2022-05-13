@@ -957,6 +957,8 @@ const project = {
     mlflow_mlflowTrackingUri: 'mlflow server tracking uri',
     mlflow_mlflowTrackingUri_tips: 'http://127.0.0.1:5000',
     mlflow_mlflowTrackingUri_error_tips: ' mlflow server tracking uri 不能为空',
+    mlflow_jobType: '任务类型',
+    mlflow_automlTool: 'AutoML工具',
     send_email: '发送邮件',
     log_display: '日志显示',
     rows_of_result: '行查询结果',

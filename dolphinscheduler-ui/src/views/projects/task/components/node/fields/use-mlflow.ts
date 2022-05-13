@@ -19,10 +19,54 @@ import {useCustomParams} from '.'
 import type {IJsonItem} from '../types'
 import {computed} from "vue";
 
+
+export const MLFLOW_JOB_TYPE = [
+    {
+        label: 'BasicAlgorithm',
+        value: 'BasicAlgorithm'
+    },
+    {
+        label: 'AutoML',
+        value: 'AutoML'
+    },
+]
+export const ALGORITHM = [
+    {
+        label: 'svm',
+        value: 'svm'
+    },
+    {
+        label: 'lr',
+        value: 'lr'
+    },
+    {
+        label: 'lightgbm',
+        value: 'lightgbm'
+    },
+    {
+        label: 'xgboost',
+        value: 'xgboost'
+    }
+]
+export const AutoMLTOOL = [
+    {
+        label: 'autosklearn',
+        value: 'autosklearn'
+    },
+    {
+        label: 'flaml',
+        value: 'flaml',
+    },
+]
+
 export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
     const {t} = useI18n()
-    const registerModelSpan = computed(() => (model.registerModel ? 12 : 0))
-    const isSearchParamsSpan = computed(() => (model.isSearchParams ? 24 : 0))
+    const registerModelSpan = computed(() => (model.registerModel ? 12 : 24))
+    const modelNameSpan = computed(() => (model.registerModel ? 12 : 0))
+    const algorithmSpan = computed(() => (model.mlflowJobType === 'BasicAlgorithm' ? 12 : 0))
+    const automlToolSpan = computed(() => (model.mlflowJobType === 'AutoML' ? 12 : 0))
+    const searchParamsSpan = computed(() => (model.mlflowJobType === 'BasicAlgorithm' ? 24 : 0))
+
 
     return [
         {
@@ -44,11 +88,57 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
             }
         },
         {
+            type: 'input',
+            field: 'experimentName',
+            name: t('project.node.mlflow_experimentName'),
+            span: 12,
+            props: {
+                placeholder: t('project.node.mlflow_experimentName_tips')
+            },
+            validate: {
+                trigger: ['input', 'blur'],
+                required: false,
+            }
+        },
+        {
+            type: 'switch',
+            field: 'registerModel',
+            name: t('project.node.mlflow_registerModel'),
+            span: registerModelSpan,
+        },
+        {
+            type: 'input',
+            field: 'modelName',
+            name: t('project.node.mlflow_modelName'),
+            span: modelNameSpan,
+            props: {
+                placeholder: t('project.node.mlflow_modelName_tips')
+            },
+            validate: {
+                trigger: ['input', 'blur'],
+                required: false,
+            }
+        },
+        {
+            type: 'select',
+            field: 'mlflowJobType',
+            name: t('project.node.mlflow_jobType'),
+            span: 12,
+            options: MLFLOW_JOB_TYPE,
+        },
+        {
             type: 'select',
             field: 'algorithm',
             name: t('project.node.mlflow_algorithm'),
-            span: 12,
+            span: algorithmSpan,
             options: ALGORITHM,
+        },
+        {
+            type: 'select',
+            field: 'automlTool',
+            name: t('project.node.mlflow_automlTool'),
+            span: automlToolSpan,
+            options: AutoMLTOOL,
         },
         {
             type: 'input',
@@ -60,49 +150,6 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
         },
         {
             type: 'input',
-            field: 'experimentName',
-            name: t('project.node.mlflow_experimentName'),
-            span: 24,
-            props: {
-                placeholder: t('project.node.mlflow_experimentName_tips')
-            },
-            validate: {
-                trigger: ['input', 'blur'],
-                required: false,
-                // validator(validate: any, value: string) {
-                //     if (!value) {
-                //         return new Error(t('project.node.mlflow_experimentName_tips'))
-                //     }
-                // }
-            }
-        },
-        {
-            type: 'switch',
-            field: 'registerModel',
-            name: t('project.node.mlflow_registerModel'),
-            span: 4,
-        },
-        {
-            type: 'input',
-            field: 'modelName',
-            name: t('project.node.mlflow_modelName'),
-            span: registerModelSpan,
-            props: {
-                placeholder: t('project.node.mlflow_modelName_tips')
-            },
-            validate: {
-                trigger: ['input', 'blur'],
-                required: false,
-                // validator(validate: any, value: string) {
-                //     if (!value) {
-                //         return new Error(t('project.node.mlflow_modelName_tips'))
-                //     }
-                // }
-            }
-        },
-
-        {
-            type: 'input',
             field: 'params',
             name: t('project.node.mlflow_params'),
             props: {
@@ -111,18 +158,7 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
             validate: {
                 trigger: ['input', 'blur'],
                 required: false,
-                // validator(validate: any, value: string) {
-                //     if (!value) {
-                //         return new Error(t('project.node.mlflow_params_tips'))
-                //     }
-                // }
             }
-        },
-        {
-            type: 'switch',
-            field: 'isSearchParams',
-            name: t('project.node.mlflow_isSearchParams'),
-            span: 6,
         },
         {
             type: 'input',
@@ -131,7 +167,7 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
             props: {
                 placeholder: t('project.node.mlflow_searchParams_tips')
             },
-            span: isSearchParamsSpan,
+            span: searchParamsSpan,
             validate: {
                 trigger: ['input', 'blur'],
                 required: false,
@@ -141,21 +177,3 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
     ]
 }
 
-export const ALGORITHM = [
-    {
-        label: 'svm',
-        value: 'svm'
-    },
-    {
-        label: 'lr',
-        value: 'lr'
-    },
-    {
-        label: 'lightgbm',
-        value: 'lightgbm'
-    },
-    {
-        label: 'xgboost',
-        value: 'xgboost'
-    }
-]
