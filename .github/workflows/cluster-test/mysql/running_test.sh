@@ -17,6 +17,10 @@
 #
 set -x
 
+docker ps -a
+
+docker logs ds
+
 MASTER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 5678\""
 WORKER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 1234\""
 ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
