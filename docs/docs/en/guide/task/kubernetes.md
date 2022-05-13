@@ -10,6 +10,7 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 - Drag from the toolbar <img src="/img/tasks/icons/k8s.png" width="15"/> to the canvas.
 
 ## Task Parameter
+
 - **Node name**: The node name in a workflow definition is unique.
 - **Run flag**: Identifies whether this node schedules normally, if it does not need to execute, select the `prohibition execution`.
 - **Descriptive information**: Describe the function of the node.
