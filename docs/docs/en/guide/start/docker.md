@@ -56,7 +56,15 @@ $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
 # For Windows users
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker
-$ docker-compose up -d
+
+# Initialize the database, use profile schema-init
+$ docker-compose --profile schema-init up -d
+
+# start api-server
+$ docker-compose  up dolphinscheduler-postgresql dolphinscheduler-zookeeper dolphinscheduler-api
+
+# start all dolphinscheduler server, use profile all
+$ docker-compose --profile all up -d
 ```
 
 > NOTES: It will not only start DolphinScheduler servers but also some others necessary services like PostgreSQL(with `root`
@@ -78,6 +86,7 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    --net host \
     apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" bin/create-schema.sh
 # Starting DolphinScheduler service
 $ docker run -d --name dolphinscheduler-master \
@@ -87,6 +96,7 @@ $ docker run -d --name dolphinscheduler-master \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-worker \
     -e DATABASE="postgresql" \
@@ -95,6 +105,7 @@ $ docker run -d --name dolphinscheduler-worker \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-api \
     -e DATABASE="postgresql" \
@@ -103,6 +114,7 @@ $ docker run -d --name dolphinscheduler-api \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-alert-server \
     -e DATABASE="postgresql" \
@@ -111,6 +123,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
