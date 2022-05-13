@@ -191,7 +191,7 @@ public class TaskExecuteThread {
             TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
             channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
         } catch (Exception e) {
-            logger.error("worker ack master error", e);
+            logger.error("handle worker ack master error", e);
             TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
             channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
         }
@@ -222,7 +222,7 @@ public class TaskExecuteThread {
             TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
             channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
         } catch (Exception e) {
-            logger.error("worker response master error", e);
+            logger.error("handle worker response master error", e);
             TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
             channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
         }
@@ -241,7 +241,7 @@ public class TaskExecuteThread {
                 channel.writeAndFlush(taskRecallAckCommand.convert2Command());
             }
         } catch (Exception e) {
-            logger.error("worker reject error", e);
+            logger.error("handle worker reject error", e);
             TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.FAILURE.getCode(), taskInstance.getId());
             channel.writeAndFlush(taskRecallAckCommand.convert2Command());
         }
