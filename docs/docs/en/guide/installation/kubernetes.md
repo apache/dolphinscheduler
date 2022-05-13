@@ -18,7 +18,7 @@ To publish the release name `dolphinscheduler` version, please execute the follo
 
 ```
 $ tar -zxvf apache-dolphinscheduler-3.0.0-beta-1-src.tar.gz
-$ cd apache-dolphinscheduler-3.0.0-beta-1-src/docker/kubernetes/dolphinscheduler
+$ cd apache-dolphinscheduler-3.0.0-beta-1-src/deploy/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
 $ helm install dolphinscheduler . --set image.tag=3.0.0-beta-1
