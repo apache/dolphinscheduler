@@ -17,16 +17,14 @@
 #
 set -x
 
-docker ps -a
-
-docker logs ds
-
+TIME_OUT=5
 MASTER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 5678\""
 WORKER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 1234\""
 ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
 API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
 
 #Cluster start health check
+sleep $TIME_OUT
 eval "$MASTER_PORT_COMMAND"
 if [[ $? -eq 0 ]];then
   echo "master start health check success"
@@ -63,7 +61,7 @@ fi
 docker exec -u root ds bash -c "/root/apache-dolphinscheduler-dev-SNAPSHOT-bin/bin/stop-all.sh"
 
 #Cluster stop health check
-sleep 5
+sleep $TIME_OUT
 eval "$MASTER_PORT_COMMAND"
 if [[ $? -ne 0 ]];then
   echo "master stop health check success"
