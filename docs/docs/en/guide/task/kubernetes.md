@@ -29,7 +29,7 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 - **Predecessor task**: Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task.
 ## Task Example
 
-#### Configure the K8S Environment in DolphinScheduler
+### Configure the K8S Environment in DolphinScheduler
 
 If you are using the K8S task type in a production environment, the K8S cluster environment is required.
 
