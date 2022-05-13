@@ -24,10 +24,9 @@ WORKER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 1234\""
 ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
 API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
 
-docker logs ds
-
 #Cluster start health check
 sleep 30
+docker logs ds
 eval "$MASTER_PORT_COMMAND"
 if [[ $? -eq 0 ]];then
   echo "master start health check success"
