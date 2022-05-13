@@ -18,7 +18,7 @@
 set -x
 
 
-TIME_OUT=10
+TIME_OUT=5
 MASTER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 5678\""
 WORKER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 1234\""
 ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
@@ -27,7 +27,7 @@ API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
 docker logs ds
 
 #Cluster start health check
-sleep $TIME_OUT
+sleep 30
 eval "$MASTER_PORT_COMMAND"
 if [[ $? -eq 0 ]];then
   echo "master start health check success"
