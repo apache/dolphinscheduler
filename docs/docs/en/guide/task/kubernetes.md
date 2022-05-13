@@ -1,13 +1,13 @@
-# Kubernetes Node
+# K8S Node
 
 ## Overview
 
-kubernetes task type used to execute a batch task. In this task, the worker submits the task by using a kubernetes client.
+K8S task type used to execute a batch task. In this task, the worker submits the task by using a k8s client.
 
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/kubernetes.png" width="15"/> to the canvas.
+- Drag from the toolbar <img src="/img/tasks/icons/k8s.png" width="15"/> to the canvas.
 
 ## Task Parameter
 - **Node name**: The node name in a workflow definition is unique.
@@ -20,23 +20,23 @@ kubernetes task type used to execute a batch task. In this task, the worker subm
 - **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
 - **Delayed execution time**: The time (unit minute) that a task delays in execution.
 - **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- **Namespace**:：the namespace for running kubernetes task
-- **Min CPU**：min CPU requirement for running kubernetes task
-- **Min Memory**：min memory requirement for running kubernetes task
+- **Namespace**:：the namespace for running k8s task
+- **Min CPU**：min CPU requirement for running k8s task
+- **Min Memory**：min memory requirement for running k8s task
 - **Image**：the registry url for image 
-- **Custom parameter**: It is a local user-defined parameter for kubernetes task, these params will pass to container as environment variables.
+- **Custom parameter**: It is a local user-defined parameter for K8S task, these params will pass to container as environment variables.
 - **Predecessor task**: Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task.
 ## Task Example
 
-#### Configure the kubernetes Environment in DolphinScheduler
+#### Configure the K8S Environment in DolphinScheduler
 
-If you are using the kubernetes task type in a production environment, the kubernetes cluster environment is required.
+If you are using the K8S task type in a production environment, the K8S cluster environment is required.
 
-#### Configure kubernetes Nodes
+### Configure K8S Nodes
 
 Configure the required content according to the parameter descriptions above.
 
-![kubernetes](/img/tasks/demo/kubernetes-task-en.png)
+![K8S](/img/tasks/demo/k8s-task-en.png)
 
 ## Notice
 
