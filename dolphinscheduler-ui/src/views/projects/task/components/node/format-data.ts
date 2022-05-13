@@ -389,73 +389,6 @@ export function formatParams(data: INodeData): {
     params.taskDefinitionJsonObj.timeout = 0
     params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
   }
-    if (data.taskType === 'MLFLOW') {
-        taskParams.algorithm = data.algorithm
-        taskParams.algorithm = data.algorithm
-        taskParams.params = data.params
-        taskParams.searchParams = data.searchParams
-        taskParams.dataPath = data.dataPath
-        taskParams.experimentName = data.experimentName
-        taskParams.modelName = data.modelName
-        taskParams.mlflowTrackingUri = data.mlflowTrackingUri
-    }
-
-    if (data.taskType === 'PIGEON') {
-        taskParams.targetJobName = data.targetJobName
-    }
-    let timeoutNotifyStrategy = ''
-    if (data.timeoutNotifyStrategy) {
-        if (data.timeoutNotifyStrategy.length === 1) {
-            timeoutNotifyStrategy = data.timeoutNotifyStrategy[0]
-        }
-        if (data.timeoutNotifyStrategy.length === 2) {
-            timeoutNotifyStrategy = 'WARNFAILED'
-        }
-    }
-    const params = {
-        processDefinitionCode: data.processName ? String(data.processName) : '',
-        upstreamCodes: data?.preTasks?.join(','),
-        taskDefinitionJsonObj: {
-            code: data.code,
-            delayTime: data.delayTime ? String(data.delayTime) : '0',
-            description: data.description,
-            environmentCode: data.environmentCode || -1,
-            failRetryInterval: data.failRetryInterval
-                ? String(data.failRetryInterval)
-                : '0',
-            failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
-            flag: data.flag,
-            name: data.name,
-            taskGroupId: data.taskGroupId,
-            taskGroupPriority: data.taskGroupPriority,
-            taskParams: {
-                localParams: data.localParams?.map((item: any) => {
-                    item.value = item.value || ''
-                    return item
-                }),
-                initScript: data.initScript,
-                rawScript: data.rawScript,
-                resourceList: data.resourceList?.length
-                    ? data.resourceList.map((id: number) => ({id}))
-                    : [],
-                ...taskParams
-            },
-            taskPriority: data.taskPriority,
-            taskType: data.taskType,
-            timeout: data.timeoutFlag ? data.timeout : 0,
-            timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
-            timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
-            workerGroup: data.workerGroup
-        }
-    } as {
-        processDefinitionCode: string
-        upstreamCodes: string
-        taskDefinitionJsonObj: { timeout: number; timeoutNotifyStrategy: string }
-    }
-    if (!data.timeoutFlag) {
-        params.taskDefinitionJsonObj.timeout = 0
-        params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
-    }
 
   return params
 }
@@ -609,6 +542,22 @@ export function formatModel(data: ITaskData) {
     params.executorMemory = data.taskParams.sparkParameters.executorMemory
     params.numExecutors = data.taskParams.sparkParameters.numExecutors
     params.others = data.taskParams.sparkParameters.others
+  }
+
+  if (data.taskParams?.jobFlowDefineJson) {
+    params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
+  }
+
+  if (data.taskParams?.zeppelinNoteId) {
+    params.zeppelinNoteId = data.taskParams.zeppelinNoteId
+  }
+
+  if (data.taskParams?.zeppelinParagraphId) {
+    params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
+  }
+
+  if (data.taskParams?.processDefinitionCode) {
+    params.processDefinitionCode = data.taskParams.processDefinitionCode
   }
 
   if (data.taskParams?.conditionResult?.successNode?.length) {
