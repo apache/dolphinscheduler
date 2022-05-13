@@ -17,7 +17,7 @@
 #
 set -x
 
-BASE_COMMAND="docker exec -u root -it ds bash -c"
+BASE_COMMAND="docker exec -u root ds bash -c"
 MASTER_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c MasterServer\""
 WORKER_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c WorkerServer\""
 ALERT_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c AlertServer\""

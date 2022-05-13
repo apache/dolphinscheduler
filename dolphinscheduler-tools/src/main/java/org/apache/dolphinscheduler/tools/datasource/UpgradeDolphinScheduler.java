@@ -44,8 +44,13 @@ public class UpgradeDolphinScheduler {
 
         @Override
         public void run(String... args) throws Exception {
-            dolphinSchedulerManager.upgradeDolphinScheduler();
-            logger.info("upgrade DolphinScheduler success");
+            if (dolphinSchedulerManager.schemaIsInitialized()) {
+                dolphinSchedulerManager.upgradeDolphinScheduler();
+                logger.info("upgrade DolphinScheduler finished");
+            } else {
+                dolphinSchedulerManager.initDolphinScheduler();
+                logger.info("init DolphinScheduler finished");
+            }
         }
     }
 }
