@@ -22,8 +22,6 @@ services:
     container_name: ds
     image: jdk8:ds_cluster
     restart: always
-    tty: true
-    stdin_open: true
     ports:
       - "12345:12345"
       - "5678:5678"

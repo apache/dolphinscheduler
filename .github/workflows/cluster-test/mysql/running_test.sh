@@ -25,8 +25,9 @@ ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
 API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
 
 #Cluster start health check
-sleep 30
+sleep 40
 docker logs ds
+docker exec -u root ds bash -c "ps -ef"
 eval "$MASTER_PORT_COMMAND"
 if [[ $? -eq 0 ]];then
   echo "master start health check success"

@@ -33,7 +33,7 @@ export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
 
 # Registry center configuration, determines the type and link of the registry center
 export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
-export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-zoo1:2181}
+export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-zoo1:2181,zoo2:2182,zoo3:2183}
 
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
