@@ -17,78 +17,77 @@
 #
 set -x
 
-BASE_COMMAND="docker exec -u root ds bash -c"
-MASTER_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c MasterServer\""
-WORKER_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c WorkerServer\""
-ALERT_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c AlertServer\""
-API_PROCESS_COMMAND="$BASE_COMMAND \"ps -ef | grep -v grep | grep -c ApiApplicationServer\""
+MASTER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 5678\""
+WORKER_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 1234\""
+ALERT_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 50052\""
+API_PORT_COMMAND="docker exec -u root ds bash -c \"nc -zv localhost 12345\""
 
 #Cluster start health check
-MASTER_PROCESS_NUM=$(eval "$MASTER_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $MASTER_PROCESS_NUM -gt 0 ]];then
-  echo "master health check success"
+eval "$MASTER_PORT_COMMAND"
+if [[ $? -eq 0 ]];then
+  echo "master start health check success"
 else
-  echo "master health check failed"
+  echo "master start health check failed"
   exit 2
 fi
 
-WORKER_PROCESS_NUM=$(eval "$WORKER_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $WORKER_PROCESS_NUM -gt 0 ]];then
-  echo "worker health check success"
+eval "$WORKER_PORT_COMMAND"
+if [[ $? -eq 0 ]];then
+  echo "worker start health check success"
 else
-  echo "worker health check failed"
+  echo "worker start health check failed"
   exit 2
 fi
 
-ALERT_PROCESS_NUM=$(eval "$ALERT_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $ALERT_PROCESS_NUM -gt 0 ]];then
-  echo "alert health check success"
+eval "$ALERT_PORT_COMMAND"
+if [[ $? -eq 0 ]];then
+  echo "alert start health check success"
 else
-  echo "alert health check failed"
+  echo "alert start health check failed"
   exit 2
 fi
 
-API_PROCESS_NUM=$(eval "$API_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $API_PROCESS_NUM -gt 0 ]];then
-  echo "api health check success"
+eval "$API_PORT_COMMAND"
+if [[ $? -eq 0 ]];then
+  echo "api start health check success"
 else
-  echo "api health check failed"
+  echo "api start health check failed"
   exit 2
 fi
 
 #Stop Cluster
-$BASE_COMMAND "/root/apache-dolphinscheduler-dev-SNAPSHOT-bin/bin/stop-all.sh"
+docker exec -u root ds bash -c "/root/apache-dolphinscheduler-dev-SNAPSHOT-bin/bin/stop-all.sh"
 
 #Cluster stop health check
 sleep 5
-MASTER_PROCESS_NUM=$(eval "$MASTER_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $MASTER_PROCESS_NUM -eq 0 ]];then
-  echo "master health check success"
+eval "$MASTER_PORT_COMMAND"
+if [[ $? -ne 0 ]];then
+  echo "master stop health check success"
 else
-  echo "master health check failed"
-  exit 10
+  echo "master stop health check failed"
+  exit 3
 fi
 
-WORKER_PROCESS_NUM=$(eval "$WORKER_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $WORKER_PROCESS_NUM -eq 0 ]];then
-  echo "worker health check success"
+eval "$WORKER_PORT_COMMAND"
+if [[ $? -ne 0 ]];then
+  echo "worker stop health check success"
 else
-  echo "worker health check failed"
-  exit 1
+  echo "worker stop health check failed"
+  exit 3
 fi
 
-ALERT_PROCESS_NUM=$(eval "$ALERT_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $ALERT_PROCESS_NUM -eq 0 ]];then
-  echo "alert health check success"
+eval "$ALERT_PORT_COMMAND"
+if [[ $? -ne 0 ]];then
+  echo "alert stop health check success"
 else
-  echo "alert health check failed"
-  exit 1
+  echo "alert stop health check failed"
+  exit 3
 fi
 
-API_PROCESS_NUM=$(eval "$API_PROCESS_COMMAND" | tr -cd "[0-9]")
-if [[ $API_PROCESS_NUM -eq 0 ]];then
-  echo "api health check success"
+eval "$API_PORT_COMMAND"
+if [[ $? -ne 0 ]];then
+  echo "api stop health check success"
 else
-  echo "api health check failed"
-  exit 1
+  echo "api stop health check failed"
+  exit 3
 fi
