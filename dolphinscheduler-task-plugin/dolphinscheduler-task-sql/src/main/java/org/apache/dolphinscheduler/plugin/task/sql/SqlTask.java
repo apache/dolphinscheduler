@@ -179,7 +179,6 @@ public class SqlTask extends AbstractTaskExecutor {
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
-        ResultSet resultSet = null;
         try {
 
             // create connection
@@ -212,7 +211,7 @@ public class SqlTask extends AbstractTaskExecutor {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
         } finally {
-            close(resultSet, connection);
+            close(connection);
         }
     }
 
@@ -329,18 +328,9 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * close jdbc resource
      *
-     * @param resultSet resultSet
      * @param connection connection
      */
-    private void close(ResultSet resultSet, Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                logger.error("close result set error : {}", e.getMessage(), e);
-            }
-        }
-
+    private void close(Connection connection) {
         if (connection != null) {
             try {
                 connection.close();
