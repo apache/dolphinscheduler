@@ -15,9 +15,12 @@
 # limitations under the License.
 #
 
-dolphinscheduler/dolphinscheduler-alert @kezhenxu94
-dolphinscheduler/dolphinscheduler-e2e @kezhenxu94
-dolphinscheduler/dolphinscheduler-registry @kezhenxu94
-dolphinscheduler/dolphinscheduler-standalone-server @kezhenxu94
-dolphinscheduler/dolphinscheduler-python @zhongjiajie
-dolphinscheduler/docs @zhongjiajie @Tianqi-Dotes
+/dolphinscheduler-alert/ @kezhenxu94
+/dolphinscheduler-e2e/ @kezhenxu94
+/dolphinscheduler-registry/ @kezhenxu94
+/dolphinscheduler-standalone-server/ @kezhenxu94
+/dolphinscheduler-python/ @zhongjiajie
+/docs/ @zhongjiajie @Tianqi-Dotes
+
+# All pom files
+pom.xml @kezhenxu94

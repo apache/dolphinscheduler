@@ -2,7 +2,11 @@
 
 ## 综述
 
-Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点，worker 会通过使用 flink 命令 `flink run` 的方式提交任务。更多详情查看 [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/)。
+Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点：
+
+1. 当程序类型为 Java、Scala 或 Python 时，worker 使用 Flink 命令提交任务 `flink run`。更多详情查看 [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) 。
+
+2. 当程序类型为 SQL 时，worker 使用`sql-client.sh` 提交任务。更多详情查看 [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/) 。
 
 ## 创建任务
 
@@ -21,10 +25,12 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点，worker �
 - 失败重试间隔：任务失败重新提交任务的时间间隔，以分钟为单位。
 - 延迟执行时间：任务延迟执行的时间，以分钟为单位。
 - 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败。
-- 程序类型：支持 Java、Scala 和 Python 三种语言。
+- 程序类型：支持 Java、Scala、 Python 和 SQL 四种语言。
 - 主函数的 Class：Flink 程序的入口 Main Class 的**全路径**。
 - 主程序包：执行 Flink 程序的 jar 包（通过资源中心上传）。
 - 部署方式：支持 cluster 和 local 两种模式的部署。
+- 初始化脚本：用于初始化会话上下文的脚本文件。
+- 脚本：用户开发的应该执行的 SQL 脚本文件。
 - Flink 版本：根据所需环境选择对应的版本即可。
 - 任务名称（选填）：Flink 程序的名称。
 - jobManager 内存数：用于设置 jobManager 内存数，可根据实际生产环境设置对应的内存数。
@@ -52,7 +58,7 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点，worker �
 
 ####  上传主程序包
 
-在使用 Flink 任务节点时，需要利用资源中心上传执行程序的 jar 包，可参考[资源中心](../resource.md)。
+在使用 Flink 任务节点时，需要利用资源中心上传执行程序的 jar 包，可参考[资源中心](../resource/configuration.md)。
 
 当配置完成资源中心之后，直接使用拖拽的方式，即可上传所需目标文件。
 
@@ -64,6 +70,14 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点，worker �
 
 ![demo-flink-simple](/img/tasks/demo/flink_task02.png)
 
+### 执行 FlinkSQL 程序
+
+根据上述参数说明，配置所需的内容即可。
+
+![demo-flink-sql-simple](/img/tasks/demo/flink_sql_test.png)
+
 ## 注意事项：
 
-Java 和 Scala 只是用来标识，没有区别，如果是 Python 开发的 Flink 则没有主函数的 class，其余的都一样。
+- Java 和 Scala 只是用来标识，没有区别，如果是 Python 开发的 Flink 则没有主函数的 class，其余的都一样。
+
+- 使用 SQL 执行 Flink SQL 任务，目前只支持 Flink 1.13及以上版本。

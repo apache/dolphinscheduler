@@ -706,20 +706,22 @@ After version 3.0.0-alpha, Python gateway server integrate into API server, and 
 start API server. If you want disabled when Python gateway service you could change API server configuration in path
 `api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
 
-## 如果构建自定义的 Docker 镜像
+## How to Build Custom Docker Image
 
-DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 docker hub 中找到这些镜像，如果你因为个性化需求想要自己打包 docker 镜像，最佳实践是基于 DolphinScheduler 对应镜像编写 Dockerfile 文件
+DolphinScheduler will release new Docker images after it released, you could find them in DockerHub. You could create
+custom Docker images base on those images if you want to change image like add some dependencies or upgrade package.
 
 ```Dockerfile
-FROM dolphinscheduler-standalone-server
+FROM apache/dolphinscheduler-standalone-server
 RUN apt update ; \
     apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
 ```
 
-如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行
+If you want to modify DolphinScheduler source code, then build and distribute your own images, you can run below command
+to build Docker images and install them locally, which you could find them by command `docker imaegs`.
 
 ```shell
-./mvnw -B clean deploy \
+./mvnw -B clean install \
   -Dmaven.test.skip \
   -Dmaven.javadoc.skip \
   -Dmaven.checkstyle.skip \
@@ -728,11 +730,16 @@ RUN apt update ; \
   -Pdocker,release
 ```
 
-如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义，你可以在源码项目根目录中运行以下命令找到所有的 Dockerfile 文件
+If you want to modify DolphinScheduler source code, but also want to add customize dependencies of Docker image, you can
+modify the definition of Dockerfile after modifying the source code. You can run the following command in root source code
+directory to find all Dockerfile files.
 
 ```shell
 find . -iname 'Dockerfile'
 ```
+
+Then run the command above start with `./mvnw -B clean install`. You can see all docker images you just created with
+command `docker images` after finish commnand `mvnw`.
 
 ---
 

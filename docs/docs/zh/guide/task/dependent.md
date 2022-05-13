@@ -1,27 +1,40 @@
-# 依赖节点
+# Dependent 节点
 
-- 依赖节点，就是**依赖检查节点**。比如A流程依赖昨天的B流程执行成功，依赖节点会去检查B流程在昨天是否有执行成功的实例。
+## 综述
 
-> 拖动工具栏中的![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_DEPENDENT.png)任务节点到画板中，如下图所示：
+Dependent 节点，就是**依赖检查节点**。比如 A 流程依赖昨天的 B 流程执行成功，依赖节点会去检查 B 流程在昨天是否有执行成功的实例。
 
-<p align="center">
-   <img src="/img/dependent_edit.png" width="80%" />
- </p>
+## 创建任务
 
-  > 依赖节点提供了逻辑判断功能，比如检查昨天的B流程是否成功，或者C流程是否执行成功。
+- 点击项目管理 -> 项目名称 -> 工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
+- 拖动工具栏的<img src="/img/tasks/icons/dependent.png" width="15"/> 任务节点到画板中。
 
-  <p align="center">
-   <img src="/img/depend-node.png" width="80%" />
- </p>
+## 任务参数
 
-  > 例如，A流程为周报任务，B、C流程为天任务，A任务需要B、C任务在上周的每一天都执行成功，如图示：
+- 节点名称：设置任务节点的名称。一个工作流定义中的节点名称是唯一的。
+- 运行标志：标识这个结点是否能正常调度，如果不需要执行，可以打开禁止执行开关。
+- 描述：描述该节点的功能。
+- 任务优先级：worker 线程数不足时，根据优先级从高到低依次执行，优先级一样时根据先进先出原则执行。
+- Worker 分组：任务分配给 worker 组的机器执行，选择 Default ，会随机选择一台 worker 机执行。
+- 环境名称：配置运行脚本的环境。
+- 失败重试次数：任务失败重新提交的次数。
+- 失败重试间隔：任务失败重新提交任务的时间间隔，以分为单位。
+- 超时警告：勾选超时警告、超时失败，当任务超过“超时时长”后，会发送告警邮件并且任务执行失败。
+- 添加依赖：需要判断的依赖任务，可以是某一个项目中的工作流具体的任务执行情况。
+- 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 
- <p align="center">
-   <img src="/img/depend-node2.png" width="80%" />
- </p>
+## 任务样例
 
-  > 假如，周报A同时还需要自身在上周二执行成功：
+Dependent 节点提供了逻辑判断功能，可以按照逻辑来检测所依赖节点的执行情况。
 
- <p align="center">
-   <img src="/img/depend-node3.png" width="80%" />
- </p>
+例如，A 流程为周报任务，B、C 流程为天任务，A 任务需要 B、C 任务在上周的每一天都执行成功，如图示：
+
+![dependent_task01](/img/tasks/demo/dependent_task01.png)
+
+例如，A 流程为周报任务，B、C 流程为天任务，A 任务需要 B 或 C 任务在上周的每一天都执行成功，如图示：
+
+![dependent_task02](/img/tasks/demo/dependent_task02.png)
+
+假如，周报 A 同时还需要自身在上周二执行成功：
+
+![dependent_task03](/img/tasks/demo/dependent_task03.png)
