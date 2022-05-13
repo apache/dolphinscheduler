@@ -197,8 +197,7 @@ public class SqlTask extends AbstractTaskExecutor {
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
-                resultSet = executeQuery(connection, mainStatementsBinds.get(0), "main");
-                result = resultProcess(resultSet);
+                result = executeQuery(connection, mainStatementsBinds.get(0), "main");
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
                 String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
@@ -292,10 +291,11 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    private ResultSet executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
             logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            return statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
+            return resultProcess(resultSet);
         }
     }
 
