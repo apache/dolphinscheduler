@@ -24,7 +24,7 @@ WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http:/
 
 #Cluster start health check
 sleep 30
-docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/api-server*.out"
+docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/master-server*.out"
 docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
 MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
 if [[ $MASTER_HTTP_STATUS -eq 200 ]];then
