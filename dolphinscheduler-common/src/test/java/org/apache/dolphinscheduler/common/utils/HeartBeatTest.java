@@ -55,12 +55,13 @@ public class HeartBeatTest {
 
     @Test
     public void testDecodeHeartBeat() throws Exception {
-        String heartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,1,199,200";
+        String heartBeatInfo = "0.35,0.58,5.8,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,1,199,200";
         HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
 
         double delta = 0.001;
         assertEquals(0.35, heartBeat.getCpuUsage(), delta);
         assertEquals(0.58, heartBeat.getMemoryUsage(), delta);
+        assertEquals(5.8, heartBeat.getDiskAvailable(), delta);
         assertEquals(3.09, heartBeat.getLoadAverage(), delta);
         assertEquals(6.47, heartBeat.getAvailablePhysicalMemorySize(), delta);
         assertEquals(5.0, heartBeat.getMaxCpuloadAvg(), delta);
