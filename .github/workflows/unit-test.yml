@@ -37,6 +37,7 @@ concurrency:
 jobs:
   paths-filter:
     name: Unit-Test-Path-Filter
+    if: false
     runs-on: ubuntu-latest
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}

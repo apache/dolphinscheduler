@@ -91,7 +91,7 @@ jobs:
 #          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
 #          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
   cluster-test:
-    name: cluster-test
+    name: Cluster-Test
     needs: build
     runs-on: macos-latest
     timeout-minutes: 20
@@ -106,6 +106,8 @@ jobs:
           path: ./
       - name: Running cluster test(Mysql)
         run: |
+          brew install --cask docker
+          brew install docker-compose
           docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
           docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
           docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
