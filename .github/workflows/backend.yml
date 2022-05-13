@@ -106,11 +106,11 @@ jobs:
           path: ./
       - name: Running cluster test(Mysql)
         run: |
-          apt-get install docker-compose-plugin docker -y
-          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
-          docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
-          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
-          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
+          sudo apt-get install docker-compose-plugin docker -y
+          sudo docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
+          sudo docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
+          sudo docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
+          sudo /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
   result:
     name: Build
     runs-on: ubuntu-latest
