@@ -5,7 +5,7 @@
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
 * [Git](https://git-scm.com/downloads): DolphinScheduler version control system
-* [JDK1.8](https://www.oracle.com/technetwork/java/javase/downloads/index.html): DolphinScheduler backend language
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): DolphinScheduler backend language, have to use version after JDK 1.8
 * [Maven](http://maven.apache.org/download.cgi): Java Package Management System
 * [Node12.20.2](https://nodejs.org/en/download): DolphinScheduler frontend
 
@@ -49,7 +49,8 @@ Find the class `org.apache.dolphinscheduler.server.StandaloneServer` in Intellij
 
 ### Start frontend server
 
-Install frontend dependencies and run it, you can see frontend-development.md
+Install frontend dependencies and run it.
+> Note: You can see more detail about the frontend setting in [frontend development](./frontend-development.md).
 
 ```shell
 cd dolphinscheduler-ui

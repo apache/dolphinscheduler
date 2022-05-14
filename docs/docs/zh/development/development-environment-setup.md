@@ -5,7 +5,7 @@
 在搭建 DolphinScheduler 开发环境之前请确保你已经安装一下软件
 
 * [Git](https://git-scm.com/downloads): 版本控制系统
-* [JDK1.8](https://www.oracle.com/technetwork/java/javase/downloads/index.html): 后端开发
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): 后端开发，必须使用JDK1.8及以后的版本
 * [Maven](http://maven.apache.org/download.cgi): Java包管理系统
 * [Node12.20.2](https://nodejs.org/en/download): 前端开发
 
@@ -48,7 +48,8 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 ### 启动前端
 
-安装前端依赖并运行前端组件，参考 frontend-development.md
+安装前端依赖并运行前端组件
+> 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
 
 ```shell
 cd dolphinscheduler-ui
