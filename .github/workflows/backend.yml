@@ -69,7 +69,13 @@ jobs:
           key: ${{ runner.os }}-maven
       - name: Build and Package
         run: |
-          ./mvnw -Dmaven.test.skip=true clean install -Prelease
+          ./mvnw -B clean install \
+                 -Prelease,docker \
+                 -Dmaven.test.skip=true \
+                 -Dcheckstyle.skip=true \
+                 -Dhttp.keepAlive=false \
+                 -Dmaven.wagon.http.pool=false \
+                 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v2
