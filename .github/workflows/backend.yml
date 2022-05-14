@@ -78,11 +78,38 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
+      - uses: actions/upload-artifact@v2
+        name: Upload Binary Package
+        with:
+          name: binary-package
+          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
+          retention-days: 1
+  cluster-test:
+    name: Cluster-Test
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v2
+        name: Download Binary Package
+        with:
+          name: binary-package
+          path: ./
+      - name: Running cluster test(Mysql)
+        run: |
+          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
+          docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
+          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
+          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
+          docker rm -f $(docker ps -aq)
   result:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ build, paths-filter ]
+    needs: [ build, paths-filter, cluster-test ]
     if: always()
     steps:
       - name: Status
@@ -91,7 +118,7 @@ jobs:
             echo "Skip Build!"
             exit 0
           fi
-          if [[ ${{ needs.build.result }} != 'success' ]]; then
+          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' ]]; then
             echo "Build Failed!"
             exit -1
           fi
