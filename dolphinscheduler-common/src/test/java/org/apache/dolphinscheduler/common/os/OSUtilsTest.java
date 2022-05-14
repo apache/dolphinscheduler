@@ -40,6 +40,13 @@ public class OSUtilsTest {
     }
 
     @Test
+    public void diskAvailable() {
+        double diskAvailable = OSUtils.diskAvailable();
+        logger.info("diskAvailable : {}", diskAvailable);
+        Assert.assertTrue(diskAvailable >= 0.0);
+    }
+
+    @Test
     public void loadAverage() {
         double loadAverage = OSUtils.loadAverage();
         logger.info("loadAverage : {}", loadAverage);
