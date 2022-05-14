@@ -30,21 +30,31 @@
             </div>
           </div>
           <div class="row-cont">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <m-gauge
                       :value="(item.resInfo.cpuUsage * 100).toFixed(2)"
                       :name="'cpuUsage'"
                       :id="'gauge-cpu-' + item.id">
               </m-gauge>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <m-gauge
                       :value="(item.resInfo.memoryUsage * 100).toFixed(2)"
                       :name="'memoryUsage'"
                       :id="'gauge-memory-' + item.id">
               </m-gauge>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+              <div class="text-num-model">
+                <div class="value-p">
+                  <strong :style="{color:color[$index]}">{{item.resInfo.diskAvailable.toFixed(2)}}</strong>
+                </div>
+                <div class="text-1">
+                  diskAvailable(GB)
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
               <div class="text-num-model">
                 <div class="value-p">
                   <strong :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</strong>

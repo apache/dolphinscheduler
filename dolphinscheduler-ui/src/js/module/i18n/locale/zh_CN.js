@@ -196,6 +196,7 @@ export default {
   'Zk registration directory': 'zk注册目录',
   cpuUsage: 'cpuUsage',
   memoryUsage: 'memoryUsage',
+  diskAvailable: 'diskAvailable',
   'Last heartbeat time': '最后心跳时间',
   'Edit Tenant': '编辑租户',
   'OS Tenant Code': '操作系统租户',
