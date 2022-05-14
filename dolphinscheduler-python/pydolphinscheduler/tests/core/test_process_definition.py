@@ -257,7 +257,7 @@ def test__pre_submit_check_switch_with_local_params(mock_code_version):
             name="parent",
             task_type=TEST_TASK_TYPE,
             local_params=[
-                {"prop": "trans", "direct": "OUT", "type": "VARCHAR", "value": ""}
+                {"prop": "var", "direct": "OUT", "type": "VARCHAR", "value": ""}
             ],
         )
         switch_child_1 = Task(name="switch_child_1", task_type=TEST_TASK_TYPE)
