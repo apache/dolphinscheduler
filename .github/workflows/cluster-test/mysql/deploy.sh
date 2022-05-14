@@ -15,15 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -euox pipefail
 
-BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/../..; pwd)}
 
-source "$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh"
+USER=root
+DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-dev-SNAPSHOT-bin
 
-JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
+#Create database
+mysql -hmysql -P3306 -uroot -p123456 -e "CREATE DATABASE IF NOT EXISTS dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
 
-java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/tools/conf":"$DOLPHINSCHEDULER_HOME/tools/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
-  -Dspring.profiles.active=upgrade \
-  org.apache.dolphinscheduler.tools.datasource.UpgradeDolphinScheduler
+#Sudo
+sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+
+#SSH
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+service ssh start
+
+#Init schema
+/bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/upgrade-schema.sh
+
+#Start Cluster
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/start-all.sh
+
+#Keep running
+tail -f /dev/null
