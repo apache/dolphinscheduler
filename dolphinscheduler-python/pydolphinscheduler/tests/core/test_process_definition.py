@@ -245,6 +245,32 @@ def test__pre_submit_check_switch_without_param(mock_code_version):
             pd._pre_submit_check()
 
 
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test__pre_submit_check_switch_with_local_params(mock_code_version):
+    """Test :func:`_pre_submit_check` if process definition with switch with local params of task."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        parent = Task(
+            name="parent",
+            task_type=TEST_TASK_TYPE,
+            local_params=[
+                {"prop": "trans", "direct": "OUT", "type": "VARCHAR", "value": ""}
+            ],
+        )
+        switch_child_1 = Task(name="switch_child_1", task_type=TEST_TASK_TYPE)
+        switch_child_2 = Task(name="switch_child_2", task_type=TEST_TASK_TYPE)
+        switch_condition = SwitchCondition(
+            Branch(condition="${var} > 1", task=switch_child_1),
+            Default(task=switch_child_2),
+        )
+
+        switch = Switch(name="switch", condition=switch_condition)
+        parent >> switch
+        pd._pre_submit_check()
+
+
 def test_process_definition_get_define_without_task():
     """Test process definition function get_define without task."""
     expect = {
