@@ -37,14 +37,15 @@ do
     START_HEALTHCHECK_EXITCODE=2
   fi
 
+  if [[ $START_HEALTHCHECK_EXITCODE -eq 0 ]];then
+    echo "cluster start health check success"
+    break
+  fi
+
   if [[ $i -eq $TIMEOUT ]];then
-    if [[ $START_HEALTHCHECK_EXITCODE -eq 0 ]];then
-      echo "cluster start health check success"
-    else
-      docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
-      echo "cluster start health check failed"
-      exit $START_HEALTHCHECK_EXITCODE
-    fi
+    docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
+    echo "cluster start health check failed"
+    exit $START_HEALTHCHECK_EXITCODE
   fi
 
   sleep 1
