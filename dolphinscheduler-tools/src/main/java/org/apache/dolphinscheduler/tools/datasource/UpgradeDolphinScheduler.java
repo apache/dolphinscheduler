@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @SpringBootApplication
@@ -31,6 +32,7 @@ public class UpgradeDolphinScheduler {
     }
 
     @Component
+    @Profile("upgrade")
     static class UpgradeRunner implements CommandLineRunner {
         private static final Logger logger = LoggerFactory.getLogger(UpgradeRunner.class);
 
@@ -42,8 +44,13 @@ public class UpgradeDolphinScheduler {
 
         @Override
         public void run(String... args) throws Exception {
-            dolphinSchedulerManager.upgradeDolphinScheduler();
-            logger.info("upgrade DolphinScheduler success");
+            if (dolphinSchedulerManager.schemaIsInitialized()) {
+                dolphinSchedulerManager.upgradeDolphinScheduler();
+                logger.info("upgrade DolphinScheduler finished");
+            } else {
+                dolphinSchedulerManager.initDolphinScheduler();
+                logger.info("init DolphinScheduler finished");
+            }
         }
     }
 }

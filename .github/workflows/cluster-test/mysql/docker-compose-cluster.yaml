@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,13 +15,15 @@
 # limitations under the License.
 #
 
-BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/../..; pwd)}
+version: "3"
 
-source "$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh"
-
-JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
-
-java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/tools/conf":"$DOLPHINSCHEDULER_HOME/tools/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
-  org.apache.dolphinscheduler.tools.datasource.CreateDolphinScheduler
+services:
+  ds:
+    container_name: ds
+    image: jdk8:ds_cluster
+    restart: always
+    ports:
+      - "12345:12345"
+      - "5679:5679"
+      - "1235:1235"
+      - "50053:50053"
