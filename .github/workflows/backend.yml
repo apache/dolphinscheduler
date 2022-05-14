@@ -84,16 +84,10 @@ jobs:
           name: binary-package
           path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
           retention-days: 1
-#      - name: Running cluster test(Mysql)
-#        run: |
-#          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
-#          docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
-#          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
-#          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
   cluster-test:
     name: Cluster-Test
     needs: build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
@@ -106,10 +100,11 @@ jobs:
           path: ./
       - name: Running cluster test(Mysql)
         run: |
-          sudo docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
-          sudo docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
-          sudo docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
-          sudo /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
+          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
+          docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
+          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
+          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
+          docker rm $(docker ps -aq)
   result:
     name: Build
     runs-on: ubuntu-latest
