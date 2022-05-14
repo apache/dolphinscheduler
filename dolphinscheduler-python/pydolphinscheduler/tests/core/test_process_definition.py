@@ -240,7 +240,8 @@ def test__pre_submit_check_switch_without_param(mock_code_version):
         parent >> switch
         with pytest.raises(
             PyDSParamException,
-            match="Parameter param or any local params of task must be provider if task Switch in process definition.",
+            match="Parameter param or at least one local_param of task must "
+            "be provider if task Switch in process definition.",
         ):
             pd._pre_submit_check()
 
