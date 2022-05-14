@@ -23,31 +23,38 @@ MASTER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http:/
 WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:1235/actuator/health"
 
 #Cluster start health check
-sleep 80
-docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
-MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
-if [[ $MASTER_HTTP_STATUS -eq 200 ]];then
-  echo "master start health check success"
-else
-  echo "master start health check failed"
-  exit 2
-fi
+TIMEOUT=120
+START_HEALTHCHECK_EXITCODE=0
 
-WORKER_HTTP_STATUS=$(eval "$WORKER_HEALTHCHECK_COMMAND")
-if [[ $WORKER_HTTP_STATUS -eq 200 ]];then
-  echo "worker start health check success"
-else
-  echo "worker start health check failed"
-  exit 2
-fi
+for ((i=1; i<=TIMEOUT; i++))
+do
+  MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
+  if [[ $MASTER_HTTP_STATUS -ne 200 ]];then
+    START_HEALTHCHECK_EXITCODE=2
+  fi
 
-API_HTTP_STATUS=$(eval "$API_HEALTHCHECK_COMMAND")
-if [[ $API_HTTP_STATUS -eq 200 ]];then
-  echo "api start health check success"
-else
-  echo "api start health check failed"
-  exit 2
-fi
+  WORKER_HTTP_STATUS=$(eval "$WORKER_HEALTHCHECK_COMMAND")
+  if [[ $WORKER_HTTP_STATUS -ne 200 ]];then
+    START_HEALTHCHECK_EXITCODE=2
+  fi
+
+  API_HTTP_STATUS=$(eval "$API_HEALTHCHECK_COMMAND")
+  if [[ $API_HTTP_STATUS -eq 200 ]];then
+    START_HEALTHCHECK_EXITCODE=2
+  fi
+
+  if [[ $i -eq $TIMEOUT ]];then
+    if [[ $START_HEALTHCHECK_EXITCODE -eq 0 ]];then
+      echo "cluster start health check success"
+    else
+      docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
+      echo "cluster start health check failed"
+      exit $START_HEALTHCHECK_EXITCODE
+    fi
+  fi
+
+  sleep 1
+done
 
 #Stop Cluster
 docker exec -u root ds bash -c "/root/apache-dolphinscheduler-dev-SNAPSHOT-bin/bin/stop-all.sh"
