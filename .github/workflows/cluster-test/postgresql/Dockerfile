@@ -18,7 +18,7 @@
 FROM openjdk:8-jre-slim-buster
 
 RUN apt update ; \
-    apt install -y curl wget default-mysql-client sudo openssh-server netcat-traditional ;
+    apt install -y curl wget sudo openssh-server netcat-traditional ;
 
 #COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz /root/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
 COPY ./apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz /root/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
@@ -27,21 +27,12 @@ RUN tar -zxvf /root/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz -C ~
 ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-dev-SNAPSHOT-bin
 
 #Setting install.sh
-COPY .github/workflows/cluster-test/mysql/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+COPY .github/workflows/cluster-test/postgresql/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 
 #Setting dolphinscheduler_env.sh
-COPY .github/workflows/cluster-test/mysql/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
-
-#Download mysql jar
-ENV MYSQL_URL "https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
-ENV MYSQL_DRIVER "mysql-connector-java-8.0.16.jar"
-RUN wget -O $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $MYSQL_URL ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/api-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/master-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/worker-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/tools/libs/$MYSQL_DRIVER
+COPY .github/workflows/cluster-test/postgresql/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
 #Deploy
-COPY .github/workflows/cluster-test/mysql/deploy.sh /root/deploy.sh
+COPY .github/workflows/cluster-test/postgresql/deploy.sh /root/deploy.sh
 
 CMD [ "/bin/bash", "/root/deploy.sh" ]

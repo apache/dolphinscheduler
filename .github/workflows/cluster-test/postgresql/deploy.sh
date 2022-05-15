@@ -21,9 +21,6 @@ set -euox pipefail
 USER=root
 DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-dev-SNAPSHOT-bin
 
-#Create database
-mysql -hmysql -P3306 -uroot -p123456 -e "CREATE DATABASE IF NOT EXISTS dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
-
 #Sudo
 sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
 sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers

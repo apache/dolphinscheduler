@@ -20,7 +20,7 @@ version: "3"
 services:
   ds:
     container_name: ds
-    image: jdk8:ds_cluster
+    image: jdk8:ds_postgresql_cluster
     restart: always
     ports:
       - "12345:12345"

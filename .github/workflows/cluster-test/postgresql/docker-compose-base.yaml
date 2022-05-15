@@ -18,17 +18,17 @@
 version: "3"
 
 services:
-  mysql:
-    container_name: mysql
-    image: mysql:5.7.36
-    command: --default-authentication-plugin=mysql_native_password
+  postgres:
+    container_name: postgres
+    image: postgres:14.1
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dolphinscheduler
     ports:
-      - "3306:3306"
+      - "5432:5432"
     healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 60s
       retries: 120
