@@ -7,7 +7,7 @@
 * [Git](https://git-scm.com/downloads): 版本控制系统
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): 后端开发，必须使用JDK1.8及以后的版本
 * [Maven](http://maven.apache.org/download.cgi): Java包管理系统
-* [Node12.20.2](https://nodejs.org/en/download): 前端开发
+* [Node](https://nodejs.org/en/download): 前端开发，必须使用Node12.20.2及以后的版本
 
 ### 克隆代码库
 

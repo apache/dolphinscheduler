@@ -7,7 +7,7 @@ Before setting up the DolphinScheduler development environment, please make sure
 * [Git](https://git-scm.com/downloads): DolphinScheduler version control system
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): DolphinScheduler backend language, have to use version after JDK 1.8
 * [Maven](http://maven.apache.org/download.cgi): Java Package Management System
-* [Node12.20.2](https://nodejs.org/en/download): DolphinScheduler frontend
+* [Node](https://nodejs.org/en/download): DolphinScheduler frontend, have to use version after Node 12.20.2
 
 ### Clone Git Repository
 
