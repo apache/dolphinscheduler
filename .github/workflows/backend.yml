@@ -85,7 +85,7 @@ jobs:
           path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
           retention-days: 1
   cluster-test:
-    name: Cluster-Test
+    name: ${{ matrix.case.name }}
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
