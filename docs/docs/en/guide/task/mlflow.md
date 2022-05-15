@@ -110,7 +110,7 @@ The following example shows how to create an MLflow BasicAlgorithm task.
 
 After this, you can visit the MLFlow service ([127.0.0.1:5000](127.0.0.1:5000)) page to view the experiments and models.
 
-![mlflow-server](/img/tasks/demo/mlflow-erver.png)
+![mlflow-server](/img/tasks/demo/mlflow-server.png)
 
 ### Run AutoML task
 

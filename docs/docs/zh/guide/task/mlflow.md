@@ -90,7 +90,7 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 
 执行完后可以通过访问 mlflow service ([127.0.0.1:5000](127.0.0.1:5000)) 页面查看实验与模型
 
-![mlflow-server](/img/tasks/demo/mlflow-erver.png)
+![mlflow-server](/img/tasks/demo/mlflow-server.png)
 
 ### 执行 AutoML 任务
 
