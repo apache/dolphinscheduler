@@ -74,7 +74,7 @@ MLflow 任务用于执行 MLflow Project 任务，其中包含了阈值的基础
 
 在你想保存实验和模型的地方建立一个文件夹，然后启动 mlflow service
 
-```
+```sh
 mkdir mlflow
 cd mlflow
 mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite:///mlflow.db
