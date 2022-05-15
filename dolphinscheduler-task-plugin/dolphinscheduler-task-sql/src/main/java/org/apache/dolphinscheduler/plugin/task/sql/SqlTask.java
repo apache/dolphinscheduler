@@ -179,7 +179,6 @@ public class SqlTask extends AbstractTaskExecutor {
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
-        ResultSet resultSet = null;
         try {
 
             // create connection
@@ -197,8 +196,7 @@ public class SqlTask extends AbstractTaskExecutor {
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
-                resultSet = executeQuery(connection, mainStatementsBinds.get(0), "main");
-                result = resultProcess(resultSet);
+                result = executeQuery(connection, mainStatementsBinds.get(0), "main");
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
                 String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
@@ -213,7 +211,7 @@ public class SqlTask extends AbstractTaskExecutor {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
         } finally {
-            close(resultSet, connection);
+            close(connection);
         }
     }
 
@@ -292,10 +290,11 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    private ResultSet executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
             logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            return statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
+            return resultProcess(resultSet);
         }
     }
 
@@ -329,18 +328,9 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * close jdbc resource
      *
-     * @param resultSet resultSet
      * @param connection connection
      */
-    private void close(ResultSet resultSet, Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                logger.error("close result set error : {}", e.getMessage(), e);
-            }
-        }
-
+    private void close(Connection connection) {
         if (connection != null) {
             try {
                 connection.close();
