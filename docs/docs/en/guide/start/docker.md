@@ -57,8 +57,8 @@ $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
 # For Windows users
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker
 
-# Initialize the database, use profile schema-init
-$ docker-compose --profile schema-init up -d
+# Initialize the database, use profile schema
+$ docker-compose --profile schema up -d
 
 # start all dolphinscheduler server, use profile all
 $ docker-compose --profile all up -d

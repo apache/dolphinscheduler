@@ -50,8 +50,8 @@ $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
 # Windows 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker
 
-# 如果需要初始化或者升级数据库结构，需要指定profile为schema-init
-$ docker-compose --profile schema-init up -d
+# 如果需要初始化或者升级数据库结构，需要指定profile为schema
+$ docker-compose --profile schema up -d
 
 # 启动dolphinscheduler所有服务，指定profile为all
 $ docker-compose --profile all up -d
