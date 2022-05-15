@@ -108,7 +108,7 @@ The following example shows how to create an MLflow BasicAlgorithm task.
 
 ![mlflow-basic-algorithm](/img/tasks/demo/mlflow-basic-algorithm.png)
 
-After this, you can visit the MLFlow service ([http://localhost:5000](http://localhost:5000)) page to view the experiments and models.
+After this, you can visit the MLFlow service (`http://localhost:5000`) page to view the experiments and models.
 
 ![mlflow-server](/img/tasks/demo/mlflow-server.png)
 
