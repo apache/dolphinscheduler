@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -14,16 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -euox pipefail
 
-version: "3"
 
-services:
-  ds:
-    container_name: ds
-    image: jdk8:ds_mysql_cluster
-    restart: always
-    ports:
-      - "12345:12345"
-      - "5679:5679"
-      - "1235:1235"
-      - "50053:50053"
+USER=root
+DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-dev-SNAPSHOT-bin
+
+#Sudo
+sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+
+#SSH
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+service ssh start
+
+#Init schema
+/bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/upgrade-schema.sh
+
+#Start Cluster
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/start-all.sh
+
+#Keep running
+tail -f /dev/null

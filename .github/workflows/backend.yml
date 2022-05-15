@@ -85,10 +85,17 @@ jobs:
           path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
           retention-days: 1
   cluster-test:
-    name: Cluster-Test
+    name: ${{ matrix.case.name }}
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        case:
+          - name: cluster-test-mysql
+            script: .github/workflows/cluster-test/mysql/start-job.sh
+          - name: cluster-test-postgresql
+            script: .github/workflows/cluster-test/postgresql/start-job.sh
     steps:
       - uses: actions/checkout@v2
         with:
@@ -98,13 +105,9 @@ jobs:
         with:
           name: binary-package
           path: ./
-      - name: Running cluster test(Mysql)
+      - name: Running cluster test
         run: |
-          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
-          docker build -t jdk8:ds_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
-          docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
-          /bin/bash .github/workflows/cluster-test/mysql/running_test.sh
-          docker rm -f $(docker ps -aq)
+          /bin/bash ${{ matrix.case.script }}
   result:
     name: Build
     runs-on: ubuntu-latest
