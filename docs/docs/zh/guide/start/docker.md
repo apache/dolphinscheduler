@@ -7,7 +7,7 @@
 ## 前置条件
 
 - [Docker](https://docs.docker.com/engine/install/) 1.13.1+
-- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+- [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
 
 ## 启动服务
 
@@ -52,9 +52,6 @@ $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker
 
 # 如果需要初始化或者升级数据库结构，需要指定profile为schema-init
 $ docker-compose --profile schema-init up -d
-
-# 启动api-server
-$ docker-compose  up dolphinscheduler-postgresql dolphinscheduler-zookeeper dolphinscheduler-api
 
 # 启动dolphinscheduler所有服务，指定profile为all
 $ docker-compose --profile all up -d

@@ -21,7 +21,7 @@ services:
     image: bitnami/postgresql:11.11.0
     ports:
       - "5432:5432"
-    profiles: ["all", "schema-init"]
+    profiles: ["all", "schema"]
     environment:
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
@@ -55,8 +55,8 @@ services:
   dolphinscheduler-schema-initializer:
     image: ${HUB}/dolphinscheduler-tools:${TAG}
     env_file: .env
-    profiles: ["schema-init"]
-    command: [ bin/create-schema.sh ]
+    profiles: ["schema"]
+    command: [ tools/bin/upgrade-schema.sh ]
     depends_on:
       dolphinscheduler-postgresql:
         condition: service_healthy
@@ -74,7 +74,7 @@ services:
     profiles: ["all"]
     env_file: .env
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 30s
       timeout: 5s
       retries: 3

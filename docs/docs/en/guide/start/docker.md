@@ -9,7 +9,7 @@ or zookeeper server already exists.
 ## Prepare
 
 - [Docker](https://docs.docker.com/engine/install/) 1.13.1+
-- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+- [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
 
 ## Start Server
 
@@ -59,9 +59,6 @@ $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker
 
 # Initialize the database, use profile schema-init
 $ docker-compose --profile schema-init up -d
-
-# start api-server
-$ docker-compose  up dolphinscheduler-postgresql dolphinscheduler-zookeeper dolphinscheduler-api
 
 # start all dolphinscheduler server, use profile all
 $ docker-compose --profile all up -d
