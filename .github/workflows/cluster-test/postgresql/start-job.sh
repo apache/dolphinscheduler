@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -15,15 +16,17 @@
 # limitations under the License.
 #
 
-version: "3"
+#Start base service containers
+docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-base.yaml up -d
 
-services:
-  ds:
-    container_name: ds
-    image: jdk8:ds_mysql_cluster
-    restart: always
-    ports:
-      - "12345:12345"
-      - "5679:5679"
-      - "1235:1235"
-      - "50053:50053"
+#Build ds postgresql cluster image
+docker build -t jdk8:ds_postgresql_cluster -f .github/workflows/cluster-test/postgresql/Dockerfile .
+
+#Start ds postgresql cluster container
+docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-cluster.yaml up -d
+
+#Running tests
+/bin/bash .github/workflows/cluster-test/postgresql/running_test.sh
+
+#Cleanup
+docker rm -f $(docker ps -aq)
