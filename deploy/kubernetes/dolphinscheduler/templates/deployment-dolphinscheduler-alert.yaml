@@ -67,6 +67,8 @@ spec:
           env:
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: SPRING_JACKSON_TIME_ZONE
+              value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.alert.env }}
             - name: {{ $key }}
