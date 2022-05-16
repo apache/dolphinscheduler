@@ -42,7 +42,7 @@ export function useRules(
   const targetTableColumnOptions = ref([] as { label: string; value: number }[])
   const writerDatasourceOptions = ref([] as { label: string; value: number }[])
 
-  const fixValueSpan = computed(() => (model.comparison_type === 1 ? 24 : 0))
+  const fixValueSpan = computed(() => model.comparison_type === 1 ? 24 : 0)
 
   let preItemLen = 0
 
