@@ -19,7 +19,7 @@
 BIN_DIR=$(dirname $0)
 DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/../..; pwd)}
 
-if [ "$DOCKER" != "TRUE" ]; then
+if [ "$DOCKER" != "true" ]; then
   source "$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh"
 fi
 
