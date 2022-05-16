@@ -149,6 +149,10 @@ public class FlinkTask extends AbstractYarnTask {
 
         ResourceInfo mainJar = flinkParameters.getMainJar();
         if (mainJar != null) {
+            // -py
+            if(ProgramType.PYTHON == programType) {
+                args.add(FlinkConstants.FLINK_PYTHON);
+            }
             args.add(mainJar.getRes());
         }
 
