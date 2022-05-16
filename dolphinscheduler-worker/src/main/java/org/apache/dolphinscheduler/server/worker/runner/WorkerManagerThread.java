@@ -26,14 +26,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +72,7 @@ public class WorkerManagerThread implements Runnable {
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
         workerExecThreads = workerConfig.getExecThreads();
-        this.waitSubmitQueue = new ArrayBlockingQueue<>(workerExecThreads);
+        this.waitSubmitQueue = new DelayQueue<>();
         workerExecService = new WorkerExecService(
             ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
             taskExecuteThreadMap
@@ -135,13 +131,14 @@ public class WorkerManagerThread implements Runnable {
      * @return submit result
      */
     public boolean offer(TaskExecuteThread taskExecuteThread) {
-        boolean offer = waitSubmitQueue.offer(taskExecuteThread);
-        // if waitSubmitQueue is full, it will wait 1s, then try add
-        if (!offer) {
+        if (waitSubmitQueue.size() > workerExecThreads) {
+            // if waitSubmitQueue is full, it will wait 1s, then try add
             ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            offer = waitSubmitQueue.offer(taskExecuteThread);
+            if (waitSubmitQueue.size() > workerExecThreads) {
+                return false;
+            }
         }
-        return offer;
+        return waitSubmitQueue.offer(taskExecuteThread);
     }
 
     public void start() {
