@@ -14,65 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useCustomParams } from '.'
+import { useCustomParams, useNamespace } from '.'
 import type { IJsonItem } from '../types'
 import { useI18n } from 'vue-i18n'
-import { onMounted, ref, VNodeChild } from 'vue'
-import { queryNamespaceListPaging } from '@/service/modules/k8s-namespace'
-import { SelectOption } from 'naive-ui'
 
 export function useK8s(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
-  const options = ref([])
-  const loading = ref(false)
-
-  const getNamespaceList = async () => {
-    if (loading.value) return
-    loading.value = true
-    const { totalList = [] } = await queryNamespaceListPaging({
-      pageNo: 1,
-      pageSize: 2147483647
-    })
-    options.value = totalList.map(
-      (item: { id: string; namespace: string; k8s: string }) => ({
-        label: `${item.namespace}(${item.k8s})`,
-        value: JSON.stringify({
-          name: item.namespace,
-          cluster: item.k8s
-        })
-      })
-    )
-    loading.value = false
-  }
-
-  onMounted(() => {
-    getNamespaceList()
-  })
-
-  const renderLabel = (option: SelectOption): VNodeChild => {
-    if (option.type === 'group') return option.label as string
-    return [option.label as string]
-  }
-
   return [
-    {
-      type: 'select',
-      field: 'namespace',
-      name: t('project.node.namespace_cluster'),
-      props: {
-        loading,
-        'render-label': renderLabel
-      },
-      options: [
-        {
-          type: 'group',
-          label: t('project.node.namespace_cluster'),
-          key: t('project.node.namespace_cluster'),
-          children: options as any
-        }
-      ]
-    },
+    useNamespace(),
     {
       type: 'input-number',
       field: 'minCpuCores',

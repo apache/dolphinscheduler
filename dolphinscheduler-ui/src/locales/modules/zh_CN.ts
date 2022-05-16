@@ -650,6 +650,7 @@ const project = {
     mb: 'MB',
     image: '镜像',
     image_tips: '请输入镜像',
+    min_memory_tips: '请输入最小内存',
     state: '状态',
     branch_flow: '分支流转',
     cancel: '取消',

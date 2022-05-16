@@ -540,38 +540,6 @@ export function formatModel(data: ITaskData) {
     params.others = data.taskParams.sparkParameters.others
   }
 
-  if (data.taskParams?.namespace) {
-    params.namespace = data.taskParams.namespace
-  }
-
-  if (data.taskParams?.minCpuCores) {
-    params.minCpuCores = data.taskParams.minCpuCores
-  }
-
-  if (data.taskParams?.minMemorySpace) {
-    params.minMemorySpace = data.taskParams.minMemorySpace
-  }
-
-  if (data.taskParams?.image) {
-    params.image = data.taskParams.image
-  }
-
-  if (data.taskParams?.jobFlowDefineJson) {
-    params.jobFlowDefineJson = data.taskParams.jobFlowDefineJson
-  }
-
-  if (data.taskParams?.zeppelinNoteId) {
-    params.zeppelinNoteId = data.taskParams.zeppelinNoteId
-  }
-
-  if (data.taskParams?.zeppelinParagraphId) {
-    params.zeppelinParagraphId = data.taskParams.zeppelinParagraphId
-  }
-
-  if (data.taskParams?.processDefinitionCode) {
-    params.processDefinitionCode = data.taskParams.processDefinitionCode
-  }
-
   if (data.taskParams?.conditionResult?.successNode?.length) {
     params.successBranch = data.taskParams.conditionResult.successNode[0]
   }

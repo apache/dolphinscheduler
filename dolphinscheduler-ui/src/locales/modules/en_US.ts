@@ -655,6 +655,7 @@ const project = {
     mb: 'MB',
     image: 'Image',
     image_tips: 'Please enter image',
+    min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
     cancel: 'Cancel',
