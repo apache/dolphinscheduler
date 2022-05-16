@@ -65,6 +65,8 @@ spec:
           env:
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: SPRING_JACKSON_TIME_ZONE
+              value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
@@ -82,7 +84,7 @@ spec:
           {{- if .Values.api.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:12345/actuator/health/liveness"]
+              command: ["curl", "-s", "http://localhost:12345/dolphinscheduler/actuator/health/liveness"]
             initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
@@ -92,7 +94,7 @@ spec:
           {{- if .Values.api.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:12345/actuator/health/readiness"]
+              command: ["curl", "-s", "http://localhost:12345/dolphinscheduler/actuator/health/readiness"]
             initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}

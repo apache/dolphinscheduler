@@ -62,6 +62,8 @@ spec:
           env:
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: SPRING_JACKSON_TIME_ZONE
+              value: {{ .Values.timezone }}
             - name: ALERT_LISTEN_HOST
               value: {{ include "dolphinscheduler.fullname" . }}-alert
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
