@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
@@ -38,6 +39,8 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,6 +58,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,6 +75,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("projects/{projectCode}/executors")
 public class ExecutorController extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
     @Autowired
     private ExecutorService execService;
@@ -259,7 +267,7 @@ public class ExecutorController extends BaseController {
     }
 
     /**
-     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
+     * do action to process instance: pause, stop, repeat, recover from pause, recover from stop
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -282,6 +290,56 @@ public class ExecutorController extends BaseController {
                           @RequestParam("executeType") ExecuteType executeType
     ) {
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
+        return returnDataList(result);
+    }
+
+    /**
+     * batch execute and do action to process instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processInstanceIds process instance ids, delimiter by "," if more than one id
+     * @param executeType execute type
+     * @return execute result code
+     */
+    @ApiOperation(value = "batchExecute", notes = "BATCH_EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
+        @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
+    })
+    @PostMapping(value = "/batch-execute")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                               @PathVariable long projectCode,
+                               @RequestParam("processInstanceIds") String processInstanceIds,
+                               @RequestParam("executeType") ExecuteType executeType
+    ) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> executeFailedIdList = new ArrayList<>();
+        if (!StringUtils.isEmpty(processInstanceIds)) {
+            String[] processInstanceIdArray = processInstanceIds.split(Constants.COMMA);
+
+            for (String strProcessInstanceId : processInstanceIdArray) {
+                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                try {
+                    Map<String, Object> singleResult = execService.execute(loginUser, projectCode, processInstanceId, executeType);
+                    if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
+                        executeFailedIdList.add((String) singleResult.get(Constants.MSG));
+                        logger.error((String) singleResult.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    executeFailedIdList.add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                }
+            }
+        }
+        if (!executeFailedIdList.isEmpty()) {
+            putMsg(result, Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
         return returnDataList(result);
     }
 
