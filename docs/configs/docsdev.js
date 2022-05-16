@@ -120,7 +120,7 @@ export default {
                             },
                             {
                                 title: 'PROCEDURE',
-                                link: '/en-us/docs/dev/user_doc/guide/task/stored-procedure.html',
+                                link: '/en-us/docs/dev/user_doc/guide/task/procedure.html',
                             },
                             {
                                 title: 'SQL',
@@ -471,7 +471,7 @@ export default {
                             },
                             {
                                 title: 'PROCEDURE',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/stored-procedure.html',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/procedure.html',
                             },
                             {
                                 title: 'SQL',

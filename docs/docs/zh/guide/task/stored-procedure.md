@@ -45,3 +45,7 @@
 根据上述参数说明，配置所需的内容即可。
 
 ![demo-mr-simple](/img/tasks/demo/procedure_task02.png)
+
+## Notice
+
+存储函数需要使用 sql 任务

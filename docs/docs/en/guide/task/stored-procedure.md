@@ -11,7 +11,7 @@
 > Drag from the toolbar ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PROCEDURE.png) task node into the canvas, as shown in the figure below:
 
 <p align="center">
-   <img src="/img/procedure-en.png" width="80%" />
+   <img src="/img/procedure_en.png" width="80%" />
  </p>
 
 ## Task Parameter
@@ -45,3 +45,7 @@ This sample is a common entry type in MySQL data sources, mainly for calling sto
 Configure the required content according to the parameter descriptions above.
 
 ![demo-mr-simple](/img/tasks/demo/proceduce_task01.png)
+
+## Notice
+
+Storing functions requires SQL tasks
