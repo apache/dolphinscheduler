@@ -17,12 +17,11 @@
 
 package org.apache.dolphinler.plugin.task.mlflow;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowConstants;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowParameters;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowTask;
 import org.junit.Assert;
@@ -86,7 +85,6 @@ public class MlflowTaskTest {
             MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
             mlflowTask.init();
             mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
-//            mlflowTask.handle();
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
@@ -101,7 +99,6 @@ public class MlflowTaskTest {
             MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
             mlflowTask.init();
             mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
-//            mlflowTask.handle();
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
