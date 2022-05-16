@@ -19,29 +19,25 @@ Dolphin Scheduler Official Website
 
 ## Design Features
 
-DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
+DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interface . Dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
 
 Its main objectives are as follows:
- -  Highly Reliable, 
-DolphinScheduler adopts a decentralized multi-master and multi-worker architecture design, which naturally supports easy expansion and high availability (not restricted by a single point of bottleneck), and its performance increases linearly with the increase of machines
- - High performance, supporting tens of millions of tasks every day
- - Support multi-tenant.
- - Cloud Native, DolphinScheduler supports multi-cloud/data center workflow management, also
-supports Kubernetes, Docker deployment and custom task types, distributed
-scheduling, with overall scheduling capability increased linearly with the
-scale of the cluster
- - Support various task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Sub_Process, Procedure, etc.
- - Support scheduling of workflows and dependencies, manual scheduling to pause/stop/recover task, support failure task retry/alarm, recover specified nodes from failure, kill task, etc.
- - Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
- - WYSIWYG online editing tasks
- - Support the priority of workflows & tasks, task failover, and task timeout alarm or failure.
- - Support workflow global parameters and node customized parameter settings.
- - Support online upload/download/management of resource files, etc. Support online file creation and editing.
- - Support task log online viewing and scrolling and downloading, etc.
- - Support the viewing of Master/Worker CPU load, memory, and CPU usage metrics.
+
+ - DolphinScheduler adopts a decentralized multi-master and multi-worker architecture design
+ - Support multi-tenant,supporting tens of millions of tasks every day
+ - Support multi-cloud/data center workflow management and deployment
+ - Support various task types
+ - Support scheduling of workflows and dependencies, manual scheduling to pause/stop/recover task
+ - Support failure task retry/alarm, recover specified nodes from failure, kill task, etc
+ - Support ssociate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
+ - Support the priority of workflows & tasks, task failover, and task timeout alarm or failure
+ - Support workflow global parameters and node customized parameter settings
+ - Support online upload/download/management of resource files, etc
+ - Support online file creation and editing
+ - Support task log online viewing and scrolling and downloading, etc
+ - Support the viewing of Master/Worker CPU load, memory, and CPU usage metrics
  - Support displaying workflow history in tree/Gantt chart, as well as statistical analysis on the task status & process status in each workflow.
- - Support back-filling data.
- - Support internationalization.
+ - Support back-filling data
  - More features waiting for partners to explore...
 
 ## What's in DolphinScheduler
