@@ -1,14 +1,14 @@
-# K8S
+# Kubernetes
 
 ## 综述
 
-K8S任务类型，用于在K8S上执行一个短时和批处理的任务。worker最终会通过使用K8S client提交任务。
+kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的任务。worker最终会通过使用kubernetes client提交任务。
 
 
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入DAG编辑页面。
-- 工具栏中拖动 <img src="/img/tasks/icons/k8s.png" width="25"/> 到画板中，选择需要连接的数据源，即可完成创建。
+- 工具栏中拖动 <img src="/img/tasks/icons/kubernetes.png" width="25"/> 到画板中，选择需要连接的数据源，即可完成创建。
 
 ## 任务参数
 
@@ -22,24 +22,24 @@ K8S任务类型，用于在K8S上执行一个短时和批处理的任务。worke
 - 失败重试间隔：任务失败重新提交任务的时间间隔，以分为单位。
 - 延迟执行时间：任务延迟执行的时间，以分为单位。
 - 超时警告：勾选超时警告、超时失败，当任务超过“超时时长”后，会发送告警邮件并且任务执行失败。
-- 命名空间：选择K8S集群上存在的命名空间
-- 最小CPU：任务在K8S上运行所需的最小CPU
-- 最小内存：任务在K8S上运行所需的最小内存
+- 命名空间：选择kubernetes集群上存在的命名空间
+- 最小CPU：任务在kubernetes上运行所需的最小CPU
+- 最小内存：任务在kubernetes上运行所需的最小内存
 - 镜像：镜像地址
-- 自定义参数：K8S任务局部的用户自定义参数,自定义参数最终会通过环境变量形式存在于容器中,提供给K8S任务使用
-- 前置任务:在当前K8S任务之前需要执行的任务
+- 自定义参数：kubernetes任务局部的用户自定义参数,自定义参数最终会通过环境变量形式存在于容器中,提供给kubernetes任务使用
+- 前置任务:在当前kubernetes任务之前需要执行的任务
 
 ## 任务样例
 
-### 在 DolphinScheduler 中配置 K8S 集群环境
+### 在 DolphinScheduler 中配置 kubernetes 集群环境
 
-若生产环境中要是使用到 K8s 任务类型，则需要预先配置好所需的K8S集群环境
+若生产环境中要是使用到 kubernetes 任务类型，则需要预先配置好所需的kubernetes集群环境
 
-### 配置 K8S 任务节点
+### 配置 kubernetes 任务节点
 
 根据上述参数说明，配置所需的内容即可。
 
-![K8S](/img/tasks/demo/k8s-task-zh.png)
+![kubernetes](/img/tasks/demo/kubernetes-task-en.png)
 
 ## 注意事项
 
