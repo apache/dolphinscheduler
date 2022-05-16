@@ -147,6 +147,7 @@ const monitor = {
   master: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
+    disk_available: '磁盘可用容量',
     load_average: '平均负载量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
@@ -160,6 +161,7 @@ const monitor = {
   worker: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
+    disk_available: '磁盘可用容量',
     load_average: '平均负载量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
