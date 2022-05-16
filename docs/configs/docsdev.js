@@ -470,7 +470,7 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dependent.html',
                             },
                             {
-                                title: 'PROCEDURE',
+                                title: 'Procedure,
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/stored-procedure.html',
                             },
                             {
