@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.ScheduleVo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -47,7 +48,6 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
-import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -150,7 +150,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        result = executorService.checkProcessDefinitionValid(projectCode,processDefinition, processDefineCode);
+        result = executorService.checkProcessDefinitionValid(projectCode,processDefinition, processDefineCode, processDefinition.getVersion());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -173,6 +173,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
             return result;
         }
+
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
@@ -414,9 +415,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode,
             searchVal);
 
-        PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);
+        List<ScheduleVo> scheduleList = new ArrayList<>();
+        for (Schedule schedule : scheduleIPage.getRecords()) {
+            scheduleList.add(new ScheduleVo(schedule));
+        }
+
+        PageInfo<ScheduleVo> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) scheduleIPage.getTotal());
-        pageInfo.setTotalList(scheduleIPage.getRecords());
+        pageInfo.setTotalList(scheduleList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -441,8 +447,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(project.getName());
+        List<ScheduleVo> scheduleList = new ArrayList<>();
+        for (Schedule schedule : schedules) {
+            scheduleList.add(new ScheduleVo(schedule));
+        }
 
-        result.put(Constants.DATA_LIST, schedules);
+        result.put(Constants.DATA_LIST, scheduleList);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -561,8 +571,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         Date now = new Date();
 
-        Date startTime = now.after(scheduleParam.getStartTime()) ? now : scheduleParam.getStartTime();
-        Date endTime = scheduleParam.getEndTime();
+        Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
+        Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
+        startTime =  now.after(startTime) ? now : startTime;
+
         try {
             cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
         } catch (ParseException e) {

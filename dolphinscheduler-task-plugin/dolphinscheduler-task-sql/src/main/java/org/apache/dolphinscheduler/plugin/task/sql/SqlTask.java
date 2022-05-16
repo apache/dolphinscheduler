@@ -136,7 +136,11 @@ public class SqlTask extends AbstractTaskExecutor {
                     sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
-            SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
+            List<SqlBinds> mainStatementSqlBinds = SqlSplitter.split(sqlParameters.getSql(), sqlParameters.getSegmentSeparator())
+                    .stream()
+                    .map(this::getSqlAndSqlParamsMap)
+                    .collect(Collectors.toList());
+
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
                     .orElse(new ArrayList<>())
                     .stream()
@@ -151,7 +155,7 @@ public class SqlTask extends AbstractTaskExecutor {
             List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncParametersList(), logger);
 
             // execute sql task
-            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
 
@@ -165,18 +169,16 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * execute function and sql
      *
-     * @param mainSqlBinds main sql binds
+     * @param mainStatementsBinds main statements binds
      * @param preStatementsBinds pre statements binds
      * @param postStatementsBinds post statements binds
      * @param createFuncs create functions
      */
-    public void executeFuncAndSql(SqlBinds mainSqlBinds,
+    public void executeFuncAndSql(List<SqlBinds> mainStatementsBinds,
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
-        PreparedStatement stmt = null;
-        ResultSet resultSet = null;
         try {
 
             // create connection
@@ -186,30 +188,30 @@ public class SqlTask extends AbstractTaskExecutor {
                 createTempFunction(connection, createFuncs);
             }
 
-            // pre sql
-            preSql(connection, preStatementsBinds);
-            stmt = prepareStatementAndBind(connection, mainSqlBinds);
+            // pre execute
+            executeUpdate(connection, preStatementsBinds, "pre");
 
+            // main execute
             String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
-                resultSet = stmt.executeQuery();
-                result = resultProcess(resultSet);
-
+                result = executeQuery(connection, mainStatementsBinds.get(0), "main");
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
-                String updateResult = String.valueOf(stmt.executeUpdate());
+                String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
             //deal out params
             sqlParameters.dealOutParam(result);
-            postSql(connection, postStatementsBinds);
+
+            // post execute
+            executeUpdate(connection, postStatementsBinds, "post");
         } catch (Exception e) {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
         } finally {
-            close(resultSet, stmt, connection);
+            close(connection);
         }
     }
 
@@ -288,37 +290,23 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    /**
-     * pre sql
-     *
-     * @param connection connection
-     * @param preStatementsBinds preStatementsBinds
-     */
-    private void preSql(Connection connection,
-                        List<SqlBinds> preStatementsBinds) throws Exception {
-        for (SqlBinds sqlBind : preStatementsBinds) {
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
-                int result = pstmt.executeUpdate();
-                logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
-
-            }
+    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+        try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
+            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
+            ResultSet resultSet = statement.executeQuery();
+            return resultProcess(resultSet);
         }
     }
 
-    /**
-     * post sql
-     *
-     * @param connection connection
-     * @param postStatementsBinds postStatementsBinds
-     */
-    private void postSql(Connection connection,
-                         List<SqlBinds> postStatementsBinds) throws Exception {
-        for (SqlBinds sqlBind : postStatementsBinds) {
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
-                int result = pstmt.executeUpdate();
-                logger.info("post statement execute result: {},for sql: {}", result, sqlBind.getSql());
+    private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
+        int result = 0;
+        for (SqlBinds sqlBind : statementsBinds) {
+            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
+                result = statement.executeUpdate();
+                logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sqlBind.getSql());
             }
         }
+        return String.valueOf(result);
     }
 
     /**
@@ -340,29 +328,9 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * close jdbc resource
      *
-     * @param resultSet resultSet
-     * @param pstmt pstmt
      * @param connection connection
      */
-    private void close(ResultSet resultSet,
-                       PreparedStatement pstmt,
-                       Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                logger.error("close result set error : {}", e.getMessage(), e);
-            }
-        }
-
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                logger.error("close prepared statement error : {}", e.getMessage(), e);
-            }
-        }
-
+    private void close(Connection connection) {
         if (connection != null) {
             try {
                 connection.close();

@@ -108,6 +108,8 @@ All environment variables as below, and you could modify their value via `Bash <
 |                  | ``PYDS_WORKFLOW_WORKER_GROUP``     | Default workflow worker group, will use its value when workflow does not specify the attribute ``worker_group``. |
 +                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
 |                  | ``PYDS_WORKFLOW_TIME_ZONE``        | Default workflow worker group, will use its value when workflow does not specify the attribute ``timezone``.     |
++                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_WARNING_TYPE``     | Default workflow warning type, will use its value when workflow does not specify the attribute ``warning_type``. |
 +------------------+------------------------------------+------------------------------------------------------------------------------------------------------------------+
 
 .. note::

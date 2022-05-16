@@ -41,10 +41,6 @@
             <directory>${basedir}/../dolphinscheduler-worker/target/worker-server/libs</directory>
             <outputDirectory>libs/worker-server</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-log-server/target/logger-server/libs</directory>
-            <outputDirectory>libs/logger-server</outputDirectory>
-        </fileSet>
 
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
@@ -91,7 +87,7 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui-next/dist</directory>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
     </fileSets>

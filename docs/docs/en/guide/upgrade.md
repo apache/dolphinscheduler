@@ -13,12 +13,15 @@
 
 ## Database Upgrade
 
-- Change `username` and `password` in `./tools/conf/application.yaml` to yours.
-
-- If using MySQL as the database to run DolphinScheduler, please config it in `./tools/bin/dolphinscheduler_env.sh`, and add MYSQL connector jar into lib dir `./tools/lib`, here we download `mysql-connector-java-8.0.16.jar`, and then correctly configure database connection information. You can download MYSQL connector jar from [here](https://downloads.MySQL.com/archives/c-j/). Otherwise, PostgreSQL is the default database. 
+- If using MySQL as the database to run DolphinScheduler, please config it in `./bin/env/dolphinscheduler_env.sh`, change username and password to yours, and add MYSQL connector jar into lib dir `./tools/libs`, here we download `mysql-connector-java-8.0.16.jar`, and then correctly configure database connection information. You can download MYSQL connector jar from [here](https://downloads.MySQL.com/archives/c-j/). Otherwise, PostgreSQL is the default database. 
 
     ```shell
     export DATABASE=${DATABASE:-mysql}
+    export SPRING_PROFILES_ACTIVE=${DATABASE}
+    export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+    export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    export SPRING_DATASOURCE_USERNAME={user}
+    export SPRING_DATASOURCE_PASSWORD={password}
     ```
 
 - Execute database upgrade script:

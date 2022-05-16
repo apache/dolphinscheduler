@@ -19,6 +19,8 @@ name: Docs
 on:
   pull_request:
     paths:
+      - '.github/workflows/docs.yml'
+      - '**/*.md'
       - 'docs/**'
 
 concurrency:
@@ -39,6 +41,8 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - name: Run Dev Relative Reference
+        run: python img_utils.py -v dev-syntax
       - name: Run Image Check
         run: python img_utils.py -v check
   dead-link:
@@ -48,7 +52,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo npm install -g markdown-link-check@3.10.0
+      # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
+      # if you want to run check locally
       - run: |
-          for file in $(find ./docs -name "*.md"); do
+          for file in $(find . -name "*.md"); do
             markdown-link-check -c .dlc.json -q "$file"
           done

@@ -23,7 +23,6 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'dolphinscheduler-ui'
-      - 'dolphinscheduler-ui-next'
       - 'dolphinscheduler-python/pydolphinscheduler'
     branches:
       - dev
@@ -93,7 +92,7 @@ jobs:
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
-          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-ui-next/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
+          -Dsonar.exclusions=,dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

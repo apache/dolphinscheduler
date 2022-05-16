@@ -51,5 +51,6 @@
         <module>dolphinscheduler-task-emr</module>
         <module>dolphinscheduler-task-blocking</module>
         <module>dolphinscheduler-task-zeppelin</module>
+        <module>dolphinscheduler-task-jupyter</module>
     </modules>
 </project>
