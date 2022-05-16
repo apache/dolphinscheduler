@@ -130,7 +130,7 @@ const worker = defineComponent({
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.master.disk_available')}>
+                    <Card title={t('monitor.worker.disk_available')}>
                       <div class={[styles.card, styles['load-average']]}>
                         {item && (
                             <NNumberAnimation
