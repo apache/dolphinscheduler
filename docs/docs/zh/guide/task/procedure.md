@@ -7,11 +7,8 @@
 ## 创建任务
 
 - 根据选择的数据源，执行存储过程。
-> 拖动工具栏中的![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PROCEDURE.png)任务节点到画板中，如下图所示：
 
-<p align="center">
-   <img src="/img/procedure_edit.png" width="80%" />
- </p>
+- Drag from the toolbar <img src="/img/tasks/icons/procedure.png" width="15"/>task node to canvas.
 
 ## 任务参数
 
@@ -48,4 +45,4 @@
 
 ## Notice
 
-存储函数需要使用 sql 任务
+当前节点只支持存储过程，如果要使用存储函数，建议使用sql节点进行操作

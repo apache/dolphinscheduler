@@ -16,7 +16,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 
 * [Shell](../task/shell.md)
 * [SQL](../task/sql.md)
-* [Procedure](../task/stored-procedure.md)
+* [PROCEDURE](../task/procedure.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。目前我们主要针对 SQL 和 SHELL 节点做了可以向下传递参数的功能。
 
