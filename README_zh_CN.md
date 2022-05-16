@@ -36,19 +36,11 @@ Dolphin Scheduler Official Website
 
 ## 系统部分截图
 
-![home page](https://user-images.githubusercontent.com/15833811/75208819-abbad000-57b7-11ea-8d3c-67e7c270671f.jpg)
-
-![dag](https://user-images.githubusercontent.com/15833811/75209584-93e44b80-57b9-11ea-952e-537fb24ec72d.jpg)
-
-![log](https://user-images.githubusercontent.com/15833811/75209645-c55d1700-57b9-11ea-94d4-e3fa91ab5218.jpg)
-
-![gantt](https://user-images.githubusercontent.com/15833811/75209640-c0986300-57b9-11ea-878e-a2098533ad44.jpg)
-
-![resources](https://user-images.githubusercontent.com/15833811/75209403-11f42280-57b9-11ea-9b59-d4be77063553.jpg)
-
-![monitor](https://user-images.githubusercontent.com/15833811/75209631-b5ddce00-57b9-11ea-8d22-cdf15cf0ee25.jpg)
-
-![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
+![dag](./images/zh_CN/dag.png)
+![data-source](./images/zh_CN/data-source.png)
+![home](./images/zh_CN/home.png)
+![master](./images/zh_CN/master.png)
+![workflow-tree](./images/zh_CN/workflow-tree.png)
 
 ## 近期研发计划
 
@@ -61,7 +53,7 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/dolphinsche
 
 ## 快速试用 Docker
 
-请参考官方文档: [快速试用 Docker 部署](http://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/installation/docker.html)
+请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/start/docker.html)
 
 ## 快速试用 Kubernetes
 

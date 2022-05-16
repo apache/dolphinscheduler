@@ -78,11 +78,41 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
+      - uses: actions/upload-artifact@v2
+        name: Upload Binary Package
+        with:
+          name: binary-package
+          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
+          retention-days: 1
+  cluster-test:
+    name: ${{ matrix.case.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        case:
+          - name: cluster-test-mysql
+            script: .github/workflows/cluster-test/mysql/start-job.sh
+          - name: cluster-test-postgresql
+            script: .github/workflows/cluster-test/postgresql/start-job.sh
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v2
+        name: Download Binary Package
+        with:
+          name: binary-package
+          path: ./
+      - name: Running cluster test
+        run: |
+          /bin/bash ${{ matrix.case.script }}
   result:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ build, paths-filter ]
+    needs: [ build, paths-filter, cluster-test ]
     if: always()
     steps:
       - name: Status
@@ -91,7 +121,7 @@ jobs:
             echo "Skip Build!"
             exit 0
           fi
-          if [[ ${{ needs.build.result }} != 'success' ]]; then
+          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' ]]; then
             echo "Build Failed!"
             exit -1
           fi

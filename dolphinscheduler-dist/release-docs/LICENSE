@@ -554,6 +554,7 @@ CC0-1.0 licenses
 
 HdrHistogram 2.1.12:	https://github.com/HdrHistogram/HdrHistogram , CC0-1.0 and BSD 2-Clause
 
+
 ========================================================================
 UI related licenses
 ========================================================================
@@ -564,94 +565,49 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
-    @form-create/element-ui 1.0.18: https://github.com/xaboy/form-create MIT
-    axios 0.16.2: https://github.com/axios/axios MIT
-    bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
-    canvg 1.5.1: https://github.com/canvg/canvg MIT
-    clipboard 2.0.1: https://github.com/zenorocha/clipboard.js MIT
-    codemirror 5.43.0: https://github.com/codemirror/CodeMirror MIT
-    dayjs 1.7.8: https://github.com/iamkun/dayjs MIT
-    element-ui 2.13.2: https://github.com/ElemeFE/element MIT
-    html2canvas 0.5.0-beta4: https://github.com/niklasvh/html2canvas MIT
-    jquery 3.3.1: https://github.com/jquery/jquery MIT
-    jquery-ui 1.12.1: https://github.com/jquery/jquery-ui MIT
-    js-cookie 2.2.1: https://github.com/js-cookie/js-cookie MIT
-    jsplumb 2.8.6: https://github.com/jsplumb/jsplumb MIT and GPLv2
-    lodash 4.17.11: https://github.com/lodash/lodash MIT
-    moment-timezone 0.5.33: https://github.com/moment/moment-timezone MIT
-    vue-treeselect 0.4.0: https://github.com/riophae/vue-treeselect MIT
-    vue	2.5.17:	https://github.com/vuejs/vue	MIT
-    vue-router 2.7.0: https://github.com/vuejs/vue-router MIT
-    vuex 3.0.0: https://github.com/vuejs/vuex MIT
-    vuex-router-sync 4.1.2: https://github.com/vuejs/vuex-router-sync MIT
-    dagre 0.8.5: https://github.com/dagrejs/dagre MIT
-    js-cookie 3.0.1 https://github.com/js-cookie/js-cookie MIT
-    @types/js-cookie 3.0.1 https://github.com/DefinitelyTyped/DefinitelyTyped MIT
-
-========================================
-Apache 2.0 licenses
-========================================
-    echarts	4.1.0: https://github.com/apache/incubator-echarts	Apache-2.0
-    remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
-
-========================================
-BSD licenses
-========================================
-    d3 3.5.17: https://github.com/d3/d3 BSD-3-Clause
-
-
-========================================================================
-UI-Next related licenses
-========================================================================
-
-The following components are used in UI-Next.See project link for details.
-The text of each license is also included at licenses/ui-next-licenses/LICENSE-[project].txt.
-
-========================================
-MIT licenses
-========================================
-    @antv/layout 0.1.31: https://github.com/antvis/layout MIT
-    @antv/x6 1.30.1: https://github.com/antvis/x6 MIT
-    @vueuse/core 7.6.2: https://github.com/vueuse/vueuse MIT
-    axios 0.24.0: https://github.com/axios/axios MIT
+    @antv/layout 0.2.2: https://github.com/antvis/layout MIT
+    @types/js-cookie 3.0.2: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
+    @antv/x6 1.31.5: https://github.com/antvis/x6 MIT
+    @vueuse/core 8.4.2: https://github.com/vueuse/vueuse MIT
+    axios 0.27.2: https://github.com/axios/axios MIT
     date-fns 2.28.0: https://github.com/date-fns/date-fns MIT
     lodash 4.17.21: https://github.com/lodash/lodash MIT
-    monaco-editor 0.31.1: https://github.com/microsoft/monaco-editor MIT
-    naive-ui 2.27.0: https://github.com/TuSimple/naive-ui MIT
+    monaco-editor 0.33.0: https://github.com/microsoft/monaco-editor MIT
+    naive-ui 2.28.2: https://github.com/TuSimple/naive-ui MIT
     nprogress 0.2.0: https://github.com/rstacruz/nprogress MIT
-    pinia 2.0.11: https://github.com/vuejs/pinia MIT
-    pinia-plugin-persistedstate 1.2.2: https://github.com/prazdevs/pinia-plugin-persistedstate MIT
-    vfonts 0.1.0: https://www.npmjs.com/package/vfonts MIT
-    vue 3.2.31: https://github.com/vuejs/core MIT
-    vue-i18n 9.2.0-beta.30: https://github.com/kazupon/vue-i18n MIT
-    vue-router 4.0.12: https://github.com/vuejs/router MIT
-    @types/node 16.11.25: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
+    pinia 2.0.14: https://github.com/vuejs/pinia MIT
+    pinia-plugin-persistedstate 1.5.1: https://github.com/prazdevs/pinia-plugin-persistedstate MIT
+    vfonts 0.0.3: https://www.npmjs.com/package/vfonts MIT
+    vue 3.2.33: https://github.com/vuejs/core MIT
+    vue-i18n 9.1.10: https://github.com/kazupon/vue-i18n MIT
+    vue-router 4.0.15: https://github.com/vuejs/router MIT
+    @types/node 17.0.31: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @types/nprogress 0.2.0: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @types/qs 6.9.7: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
-    @vicons/antd 0.11.0: https://www.npmjs.com/package/@vicons/antd MIT
-    @vitejs/plugin-vue 1.10.2: https://github.com/vitejs/vite MIT
-    @vitejs/plugin-vue-jsx 1.3.7: https://github.com/vitejs/vite MIT
+    @vicons/antd 0.12.0: https://www.npmjs.com/package/@vicons/antd MIT
+    @vitejs/plugin-vue 2.3.2: https://github.com/vitejs/vite MIT
+    @vitejs/plugin-vue-jsx 1.3.10: https://github.com/vitejs/vite MIT
     dart-sass 1.25.0: https://github.com/sass/dart-sass MIT
-    eslint 8.9.0: https://github.com/eslint/eslint MIT
-    eslint-config-prettier 8.4.0: https://github.com/prettier/eslint-config-prettier MIT
+    eslint 8.15.0: https://github.com/eslint/eslint MIT
+    eslint-config-prettier 8.5.0: https://github.com/prettier/eslint-config-prettier MIT
     eslint-plugin-prettier 4.0.0: https://github.com/prettier/eslint-plugin-prettier MIT
-    eslint-plugin-vue 8.5.0: https://github.com/vuejs/eslint-plugin-vue MIT
-    prettier 2.5.1: https://github.com/prettier/prettier MIT
-    sass 1.49.8: https://github.com/sass/dart-sass MIT
+    eslint-plugin-vue 8.7.1: https://github.com/vuejs/eslint-plugin-vue MIT
+    prettier 2.6.2: https://github.com/prettier/prettier MIT
+    sass 1.51.0: https://github.com/sass/dart-sass MIT
     sass-loader 12.6.0: https://github.com/webpack-contrib/sass-loader MIT
     typescript-plugin-css-modules 3.4.0: https://github.com/mrmckeb/typescript-plugin-css-modules MIT
-    vite 2.8.4: https://github.com/vitejs/vite MIT
-    vite-plugin-compression 0.3.6: https://github.com/vbenjs/vite-plugin-compression MIT
-    vue-tsc 0.28.10: https://github.com/johnsoncodehk/volar MIT
-    date-fns-tz 1.3.0: https://github.com/marnusw/date-fns-tz MIT
+    vite 2.9.8: https://github.com/vitejs/vite MIT
+    vite-plugin-compression 0.5.1: https://github.com/vbenjs/vite-plugin-compression MIT
+    vue-tsc 0.34.11: https://github.com/johnsoncodehk/volar MIT
+    date-fns-tz 1.3.4: https://github.com/marnusw/date-fns-tz MIT
     screenfull 6.0.1: https://github.com/sindresorhus/screenfull MIT
     @types/lodash 4.14.182: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses
 ========================================
-    echarts	5.3.0: https://github.com/apache/echarts Apache-2.0
-    typescript 4.5.5: https://github.com/Microsoft/TypeScript Apache-2.0
+    echarts	5.3.2: https://github.com/apache/echarts Apache-2.0
+    typescript 4.6.4: https://github.com/Microsoft/TypeScript Apache-2.0
     open-sans: Apache-2.0
     roboto: Apache-2.0
 
@@ -660,10 +616,10 @@ BSD licenses
 ========================================================================
 
 The following components are provided under a BSD license. See project link for details.
-The text of each license is also included at licenses/ui-next-licenses/LICENSE-[project].txt.
+The text of each license is also included at licenses/ui-licenses/LICENSE-[project].txt.
     qs 6.10.3: https://github.com/ljharb/qs BSD 3-Clause
-    @typescript-eslint/eslint-plugin 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
-    @typescript-eslint/parser 5.12.1: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+    @typescript-eslint/eslint-plugin 5.22.0: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+    @typescript-eslint/parser 5.22.0: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
 
 ========================================
 SIL licenses
