@@ -28,7 +28,7 @@ MLflow 任务用于执行 MLflow Project 任务，其中包含了阈值的基础
     - **前置任务** ：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 
 - MLflow任务特定参数
-    - **mlflow server tracking uri** ：MLflow server 的连接, 默认 http://127.0.0.1:5000。
+    - **mlflow server tracking uri** ：MLflow server 的连接, 默认 http://localhost:5000。
     - **实验名称** ：任务运行时所在的实验，若无则创建。
     - **注册模型** ：是否注册模型，若选择注册，则会展开以下参数。
         - **注册的模型名称** : 注册的模型名称，会在原来的基础上加上一个模型版本，并注册为Production。
@@ -74,7 +74,7 @@ MLflow 任务用于执行 MLflow Project 任务，其中包含了阈值的基础
 
 在你想保存实验和模型的地方建立一个文件夹，然后启动 mlflow service
 
-```sh
+```
 mkdir mlflow
 cd mlflow
 mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite:///mlflow.db

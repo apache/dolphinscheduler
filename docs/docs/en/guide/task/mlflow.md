@@ -37,7 +37,7 @@ User-defined MLFlow project task execution will be supported in the near future)
       upstream of the current task.
 
 - MLflow task specific parameters
-    - **mlflow server tracking uri** ：MLflow server uri, default http://127.0.0.1:5000.
+    - **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
     - **experiment name** ：The experiment in which the task is running, if none, is created.
     - **register model** ：Register the model or not. If register is selected, the following parameters are expanded.
         - **model name** : The registered model name is added to the original model version and registered as
