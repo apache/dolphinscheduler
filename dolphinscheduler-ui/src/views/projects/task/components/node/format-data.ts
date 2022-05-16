@@ -332,7 +332,7 @@ export function formatParams(data: INodeData): {
     taskParams.modelName = data.modelName
     taskParams.mlflowTrackingUri = data.mlflowTrackingUri
     taskParams.mlflowJobType = data.mlflowJobType
-    taskParams.automlTool  = data.automlTool
+    taskParams.automlTool = data.automlTool
     taskParams.registerModel = data.registerModel
   }
 

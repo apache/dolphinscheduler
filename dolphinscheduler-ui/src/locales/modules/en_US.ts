@@ -934,23 +934,28 @@ const project = {
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
     jupyter_conda_env_name: 'condaEnvName',
-    jupyter_conda_env_name_tips: 'Please enter the conda environment name of papermill',
+    jupyter_conda_env_name_tips:
+      'Please enter the conda environment name of papermill',
     jupyter_input_note_path: 'inputNotePath',
     jupyter_input_note_path_tips: 'Please enter the input jupyter note path',
     jupyter_output_note_path: 'outputNotePath',
     jupyter_output_note_path_tips: 'Please enter the output jupyter note path',
     jupyter_parameters: 'parameters',
-    jupyter_parameters_tips: 'Please enter the parameters for jupyter parameterization',
+    jupyter_parameters_tips:
+      'Please enter the parameters for jupyter parameterization',
     jupyter_kernel: 'kernel',
     jupyter_kernel_tips: 'Please enter the jupyter kernel name',
     jupyter_engine: 'engine',
     jupyter_engine_tips: 'Please enter the engine name',
     jupyter_execution_timeout: 'executionTimeout',
-    jupyter_execution_timeout_tips: 'Please enter the execution timeout for each jupyter note cell',
+    jupyter_execution_timeout_tips:
+      'Please enter the execution timeout for each jupyter note cell',
     jupyter_start_timeout: 'startTimeout',
-    jupyter_start_timeout_tips: 'Please enter the start timeout for jupyter kernel',
+    jupyter_start_timeout_tips:
+      'Please enter the start timeout for jupyter kernel',
     jupyter_others: 'others',
-    jupyter_others_tips: 'Please enter the other options you need for papermill',
+    jupyter_others_tips:
+      'Please enter the other options you need for papermill',
     mlflow_algorithm: 'algorithm',
     mlflow_algorithm_tips: 'svm',
     mlflow_params: 'parameters',
@@ -959,7 +964,8 @@ const project = {
     mlflow_searchParams_tips: ' ',
     mlflow_isSearchParams: 'Search parameters',
     mlflow_dataPath: 'data path',
-    mlflow_dataPath_tips: ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
+    mlflow_dataPath_tips:
+      ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
     mlflow_dataPath_error_tips: ' data data can not be empty ',
     mlflow_experimentName: 'experiment name',
     mlflow_experimentName_tips: 'experiment_001',
@@ -968,7 +974,8 @@ const project = {
     mlflow_modelName_tips: 'model_001',
     mlflow_mlflowTrackingUri: 'mlflow server tracking uri',
     mlflow_mlflowTrackingUri_tips: 'http://127.0.0.1:5000',
-    mlflow_mlflowTrackingUri_error_tips: ' mlflow server tracking uri cant not be empty',
+    mlflow_mlflowTrackingUri_error_tips:
+      ' mlflow server tracking uri cant not be empty',
     mlflow_jobType: 'job type',
     mlflow_automlTool: 'AutoML tool',
     send_email: 'Send Email',

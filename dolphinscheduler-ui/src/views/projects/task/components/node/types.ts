@@ -307,16 +307,16 @@ interface ITaskParams {
   connParams?: string
   targetJobName?: string
 
-  algorithm?:string
-  params?:string
-  searchParams?:string
-  dataPath?:string
-  experimentName?:string
-  modelName?:string
-  mlflowTrackingUri?:string
-  mlflowJobType?:string
-  automlTool?:string
-  registerModel?:boolean
+  algorithm?: string
+  params?: string
+  searchParams?: string
+  dataPath?: string
+  experimentName?: string
+  modelName?: string
+  mlflowTrackingUri?: string
+  mlflowJobType?: string
+  automlTool?: string
+  registerModel?: boolean
 }
 
 interface INodeData

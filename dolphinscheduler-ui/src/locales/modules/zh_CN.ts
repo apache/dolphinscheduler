@@ -947,7 +947,8 @@ const project = {
     mlflow_searchParams_tips: ' ',
     mlflow_isSearchParams: '是否搜索参数',
     mlflow_dataPath: '数据路径',
-    mlflow_dataPath_tips: ' 文件/文件夹的绝对路径, 若文件需以.csv结尾, 文件夹需包含train.csv和test.csv ',
+    mlflow_dataPath_tips:
+      ' 文件/文件夹的绝对路径, 若文件需以.csv结尾, 文件夹需包含train.csv和test.csv ',
     mlflow_dataPath_error_tips: ' 数据路径不能为空 ',
     mlflow_experimentName: '实验名称',
     mlflow_experimentName_tips: 'experiment_001',
