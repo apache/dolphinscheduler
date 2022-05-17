@@ -95,6 +95,7 @@ interface ResourceFile {
   id: number
   pid: number
   alias: string
+  userName: string
   userId: number
   type: string
   directory: boolean
