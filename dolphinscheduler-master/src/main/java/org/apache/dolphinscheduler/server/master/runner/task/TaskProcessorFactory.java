@@ -52,4 +52,13 @@ public class TaskProcessorFactory {
 
         return iTaskProcessor.getClass().newInstance();
     }
+
+    /**
+     * if match master processor, then this task type is processed on the master
+     * @param type
+     * @return
+     */
+    public static boolean isMasterTask(String type) {
+        return PROCESS_MAP.containsKey(type);
+    }
 }
