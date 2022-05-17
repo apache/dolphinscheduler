@@ -40,7 +40,7 @@ cd dolphinscheduler
 
 When the command is finished you could find them by command `docker imaegs`.
 
-* If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can be run when finished the modification
+* If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can run when finished the modification
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean deploy \
