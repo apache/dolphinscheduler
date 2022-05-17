@@ -478,7 +478,7 @@ const project = {
     recovery_waiting_thread: 'Recovery waiting thread',
     recover_serial_wait: 'Recover serial wait',
     recovery_suspend: 'Recovery Suspend',
-    failed_to_retry: 'Failed to retry',
+    recovery_failed: 'Recovery Failed',
     gantt: 'Gantt',
     name: 'Name',
     all_status: 'AllStatus',
@@ -934,23 +934,28 @@ const project = {
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
     jupyter_conda_env_name: 'condaEnvName',
-    jupyter_conda_env_name_tips: 'Please enter the conda environment name of papermill',
+    jupyter_conda_env_name_tips:
+      'Please enter the conda environment name of papermill',
     jupyter_input_note_path: 'inputNotePath',
     jupyter_input_note_path_tips: 'Please enter the input jupyter note path',
     jupyter_output_note_path: 'outputNotePath',
     jupyter_output_note_path_tips: 'Please enter the output jupyter note path',
     jupyter_parameters: 'parameters',
-    jupyter_parameters_tips: 'Please enter the parameters for jupyter parameterization',
+    jupyter_parameters_tips:
+      'Please enter the parameters for jupyter parameterization',
     jupyter_kernel: 'kernel',
     jupyter_kernel_tips: 'Please enter the jupyter kernel name',
     jupyter_engine: 'engine',
     jupyter_engine_tips: 'Please enter the engine name',
     jupyter_execution_timeout: 'executionTimeout',
-    jupyter_execution_timeout_tips: 'Please enter the execution timeout for each jupyter note cell',
+    jupyter_execution_timeout_tips:
+      'Please enter the execution timeout for each jupyter note cell',
     jupyter_start_timeout: 'startTimeout',
-    jupyter_start_timeout_tips: 'Please enter the start timeout for jupyter kernel',
+    jupyter_start_timeout_tips:
+      'Please enter the start timeout for jupyter kernel',
     jupyter_others: 'others',
-    jupyter_others_tips: 'Please enter the other options you need for papermill',
+    jupyter_others_tips:
+      'Please enter the other options you need for papermill',
     send_email: 'Send Email',
     log_display: 'Log display',
     rows_of_result: 'rows of result',
