@@ -255,6 +255,7 @@ public class Resource {
             ", size=" + size +
             ", createTime=" + createTime +
             ", updateTime=" + updateTime +
+            ",userName=" + userName +
             '}';
     }
 
