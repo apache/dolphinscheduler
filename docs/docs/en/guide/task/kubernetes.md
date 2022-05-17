@@ -7,7 +7,7 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/k8s.png" width="15"/> to the canvas.
+- Drag from the toolbar <img src="/img/tasks/icons/kubernetes.png" width="15"/> to the canvas.
 
 ## Task Parameter
 
@@ -37,7 +37,7 @@ If you are using the K8S task type in a production environment, the K8S cluster 
 
 Configure the required content according to the parameter descriptions above.
 
-![K8S](/img/tasks/demo/k8s-task-en.png)
+![K8S](/img/tasks/demo/kubernetes-task-en.png)
 
 ## Notice
 
