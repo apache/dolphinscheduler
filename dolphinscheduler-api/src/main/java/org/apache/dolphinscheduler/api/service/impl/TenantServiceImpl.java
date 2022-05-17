@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -87,6 +89,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+
+        if(StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH){
+            putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
             return result;
         }
 

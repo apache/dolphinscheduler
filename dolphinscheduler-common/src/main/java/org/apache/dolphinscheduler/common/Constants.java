@@ -1092,4 +1092,9 @@ public final class Constants {
     public static final int DRY_RUN_FLAG_YES = 1;
 
     public static final String CACHE_KEY_VALUE_ALL = "'all'";
+
+    /**
+     * tenant
+     */
+    public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
 }
