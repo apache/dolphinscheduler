@@ -17,7 +17,7 @@
 import type { IJsonItem } from '../types'
 import { useI18n } from 'vue-i18n'
 import { onMounted, ref, VNodeChild } from 'vue'
-import { queryNamespaceListPaging } from '@/service/modules/k8s-namespace'
+import { getAllNamespaces } from '@/service/modules/k8s-namespace'
 import { SelectOption } from 'naive-ui'
 
 export function useNamespace(): IJsonItem {
@@ -29,11 +29,8 @@ export function useNamespace(): IJsonItem {
   const getNamespaceList = async () => {
     if (loading.value) return
     loading.value = true
-    const { totalList = [] } = await queryNamespaceListPaging({
-      pageNo: 1,
-      pageSize: 2147483647
-    })
-    options.value = totalList.map(
+    const totalList = await getAllNamespaces()
+    options.value = (totalList || []).map(
       (item: { id: string; namespace: string; k8s: string }) => ({
         label: `${item.namespace}(${item.k8s})`,
         value: JSON.stringify({
