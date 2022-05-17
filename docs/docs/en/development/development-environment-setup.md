@@ -37,7 +37,7 @@ $ ./mvnw -B clean deploy \
           -Pdocker,release          
 ```
 
-> **_Note：_** Docker will build linux/amd64,linux/arm64 multi-architecture images by defult
+> **_Note：_** Docker will build and push linux/amd64,linux/arm64 multi-architecture images by default
 >
 > Have to use version after Docker 19.03, because after 19.03 docker contains buildx
 
