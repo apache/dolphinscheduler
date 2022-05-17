@@ -24,7 +24,18 @@ git clone git@github.com:apache/dolphinscheduler.git
 ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ### Docker image build
-* Run
+* To build Docker images locally, run
+```shell
+$ cd dolphinscheduler
+$ ./mvnw -B clean package \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Ddocker.tag=<TAG> \
+          -Pdocker,release              
+```
+
+* To build and push Docker images to your registry <HUB_URL>, run
 ```shell
 $ cd dolphinscheduler
 $ ./mvnw -B clean deploy \
@@ -34,7 +45,7 @@ $ ./mvnw -B clean deploy \
           -Dmaven.deploy.skip \
           -Ddocker.tag=<TAG> \
           -Ddocker.hub=<HUB_URL> \
-          -Pdocker,release          
+          -Pdocker,release           
 ```
 
 > **_Note：_** Docker will build and push linux/amd64,linux/arm64 multi-architecture images by default

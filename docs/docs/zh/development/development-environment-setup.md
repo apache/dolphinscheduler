@@ -24,7 +24,18 @@ git clone git@github.com:apache/dolphinscheduler.git
 * 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ### Docker镜像打包
-* 运行
+* 要在本地构建Docker镜像，运行
+```shell
+$ cd dolphinscheduler
+$ ./mvnw -B clean package \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Ddocker.tag=<TAG> \
+          -Pdocker,release              
+```
+
+* 要构建Docker镜像并推送到 <HUB_URL>，运行
 ```shell
 $ cd dolphinscheduler
 $ ./mvnw -B clean deploy \
@@ -34,10 +45,10 @@ $ ./mvnw -B clean deploy \
           -Dmaven.deploy.skip \
           -Ddocker.tag=<TAG> \
           -Ddocker.hub=<HUB_URL> \
-          -Pdocker,release          
+          -Pdocker,release           
 ```
 
-> **_注意：_** Docker默认会构建 linux/amd64,linux/arm64 多架构镜像
+> **_注意：_** Docker默认会构建并推送 linux/amd64,linux/arm64 多架构镜像
 >
 > 必须使用Docker 19.03及以后的版本，因为19.03及以后的版本包含 buildx
 
