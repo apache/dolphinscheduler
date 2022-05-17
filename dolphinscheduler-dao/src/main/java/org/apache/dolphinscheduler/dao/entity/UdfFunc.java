@@ -108,6 +108,7 @@ public class UdfFunc {
     /**
      * user name
      */
+    @TableField(exist = false)
     private String userName;
 
     public int getId() {
