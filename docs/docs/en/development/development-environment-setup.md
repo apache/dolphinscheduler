@@ -23,6 +23,24 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
+### Docker image build
+* Run
+```shell
+$ cd dolphinscheduler
+$ ./mvnw -B clean deploy \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Dmaven.deploy.skip \
+          -Ddocker.tag=<TAG> \
+          -Ddocker.hub=<HUB_URL> \
+          -Pdocker,release          
+```
+
+> **_Note：_** Docker will build linux/amd64,linux/arm64 multi-architecture images by defult
+>
+> Have to use version after Docker 19.03, because after 19.03 docker contains buildx
+
 ## Notice
 
 There are two ways to configure the DolphinScheduler development environment, standalone mode and normal mode
@@ -33,7 +51,9 @@ There are two ways to configure the DolphinScheduler development environment, st
 ## DolphinScheduler Standalone Quick Start
 
 > **_Note:_** Use standalone server only for development and debugging, because it uses H2 Database as default database and Zookeeper Testing Server which may not be stable in production.
+> 
 > Standalone is only supported in DolphinScheduler 1.3.9 and later versions.
+> 
 > Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/installation/standalone.html) for instructions.
 
 ### Git Branch Choose

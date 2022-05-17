@@ -23,6 +23,24 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 * 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
+### Docker镜像打包
+* 运行
+```shell
+$ cd dolphinscheduler
+$ ./mvnw -B clean deploy \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Dmaven.deploy.skip \
+          -Ddocker.tag=<TAG> \
+          -Ddocker.hub=<HUB_URL> \
+          -Pdocker,release          
+```
+
+> **_注意：_** Docker默认会构建 linux/amd64,linux/arm64 多架构镜像
+>
+> 必须使用Docker 19.03及以后的版本，因为19.03及以后的版本包含 buildx
+
 ## 开发者须知
 
 DolphinScheduler 开发环境配置有两个方式，分别是standalone模式，以及普通模式
@@ -33,6 +51,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 ## DolphinScheduler Standalone快速开发模式
 
 > **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database,Zookeeper Testing Server
+> 
 > Standalone 仅在 DolphinScheduler 1.3.9 及以后的版本支持
 
 ### 分支选择
