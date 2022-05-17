@@ -29,28 +29,28 @@ DolphinScheduler will release new Docker images after it released, you could fin
 
 * If you want to modify DolphinScheduler source code, and build Docker images locally, you can be run when finished the modification
 ```shell
-$ cd dolphinscheduler
-$ ./mvnw -B clean package \
-          -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
-          -Dmaven.checkstyle.skip \
-          -Ddocker.tag=<TAG> \
-          -Pdocker,release              
+cd dolphinscheduler
+./mvnw -B clean package \
+       -Dmaven.test.skip \
+       -Dmaven.javadoc.skip \
+       -Dmaven.checkstyle.skip \
+       -Ddocker.tag=<TAG> \
+       -Pdocker,release              
 ```
 
 When the command is finished you could find them by command `docker imaegs`.
 
 * If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can be run when finished the modification
 ```shell
-$ cd dolphinscheduler
-$ ./mvnw -B clean deploy \
-          -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
-          -Dmaven.checkstyle.skip \
-          -Dmaven.deploy.skip \
-          -Ddocker.tag=<TAG> \
-          -Ddocker.hub=<HUB_URL> \
-          -Pdocker,release           
+cd dolphinscheduler
+./mvnw -B clean deploy \
+       -Dmaven.test.skip \
+       -Dmaven.javadoc.skip \
+       -Dmaven.checkstyle.skip \
+       -Dmaven.deploy.skip \
+       -Ddocker.tag=<TAG> \
+       -Ddocker.hub=<HUB_URL> \
+       -Pdocker,release           
 ```
 
 * If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command in root source code directory to find all Dockerfile files.
