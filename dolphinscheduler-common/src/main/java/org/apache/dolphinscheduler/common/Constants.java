@@ -428,8 +428,6 @@ public final class Constants {
      */
     public static final int DEFINITION_FAILURE = -1;
 
-    public static final int OPPOSITE_VALUE = -1;
-
     /**
      * process or task definition first version
      */
@@ -782,7 +780,7 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag
