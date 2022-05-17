@@ -23,8 +23,11 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
-### Docker image build
-* To build Docker images locally, run
+## Docker image build
+
+DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).
+
+* If you want to modify DolphinScheduler source code, and build Docker images locally, you can be run when finished the modification
 ```shell
 $ cd dolphinscheduler
 $ ./mvnw -B clean package \
@@ -35,7 +38,9 @@ $ ./mvnw -B clean package \
           -Pdocker,release              
 ```
 
-* To build and push Docker images to your registry <HUB_URL>, run
+When the command is finished you could find them by command `docker imaegs`.
+
+* If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can be run when finished the modification
 ```shell
 $ cd dolphinscheduler
 $ ./mvnw -B clean deploy \
@@ -48,9 +53,26 @@ $ ./mvnw -B clean deploy \
           -Pdocker,release           
 ```
 
+* If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command in root source code directory to find all Dockerfile files.
+
+```shell
+find . -iname 'Dockerfile'
+```
+
+Then run the Docker build command above
+
+* You could create custom Docker images base on those images if you want to change image like add some dependencies or upgrade package.
+
+```Dockerfile
+FROM dolphinscheduler-standalone-server
+RUN apt update ; \
+    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
+```
+
 > **_Note：_** Docker will build and push linux/amd64,linux/arm64 multi-architecture images by default
 >
 > Have to use version after Docker 19.03, because after 19.03 docker contains buildx
+
 
 ## Notice
 
