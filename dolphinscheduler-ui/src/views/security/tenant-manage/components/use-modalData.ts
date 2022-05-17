@@ -23,13 +23,11 @@ import {
   createTenant,
   updateTenant
 } from '@/service/modules/tenants'
-import { useI18n } from 'vue-i18n'
 
 export function useModalData(
   props: any,
   ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
 ) {
-  const { t } = useI18n()
   const variables = reactive({
     tenantFormRef: ref(),
     model: {
@@ -42,12 +40,7 @@ export function useModalData(
     saving: false,
     rules: {
       tenantCode: {
-        required: true,
-        validator() {
-          if (!variables.model.tenantCode) {
-            return new Error(t('security.tenant.tenant_code_tips'))
-          }
-        }
+        required: true
       },
       queueId: {
         required: true
