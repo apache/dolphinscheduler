@@ -167,11 +167,13 @@ public class MlflowParameters extends AbstractParameters {
         paramsMap.put("algorithm", algorithm);
         paramsMap.put("search_params", searchParams);
         paramsMap.put("repo", MlflowConstants.PRESET_BASIC_ALGORITHM_PROJECT);
+        paramsMap.put("repo_version", MlflowConstants.PRESET_REPOSITORY_VERSION);
     }
 
     private void getParamsMapForAutoML(HashMap<String, String> paramsMap) {
         paramsMap.put("automl_tool", automlTool);
         paramsMap.put("repo", MlflowConstants.PRESET_AUTOML_PROJECT);
+        paramsMap.put("repo_version", MlflowConstants.PRESET_REPOSITORY_VERSION);
     }
 
     public String getScriptPath() {
@@ -180,7 +182,6 @@ public class MlflowParameters extends AbstractParameters {
             projectScript = MlflowConstants.RUN_PROJECT_BASIC_ALGORITHM_SCRIPT;
         } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
             projectScript = MlflowConstants.RUN_PROJECT_AUTOML_SCRIPT;
-            System.out.println(projectScript);
         } else {
             throw new IllegalArgumentException();
         }

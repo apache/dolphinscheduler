@@ -26,9 +26,13 @@ public class MlflowConstants {
 
     public static final String JOB_TYPE_BASIC_ALGORITHM = "BasicAlgorithm";
 
-    public static final String PRESET_AUTOML_PROJECT = "https://github.com/jieguangzhou/MLflow-AutoML";
+    public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
 
-    public static final String PRESET_BASIC_ALGORITHM_PROJECT = "https://github.com/jieguangzhou/mlflow_sklearn_gallery";
+    public static final String PRESET_REPOSITORY_VERSION = "main";
+
+    public static final String PRESET_AUTOML_PROJECT = PRESET_REPOSITORY + "#Project-AutoML";
+
+    public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_REPOSITORY + "#Project-BasicAlgorithm";
 
     public static final String RUN_PROJECT_BASIC_ALGORITHM_SCRIPT = "run_mlflow_basic_algorithm_project.sh";
 
