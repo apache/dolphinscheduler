@@ -475,7 +475,7 @@ const project = {
     recovery_waiting_thread: '恢复等待线程',
     recover_serial_wait: '串行恢复',
     recovery_suspend: '恢复运行',
-    failed_to_retry: '重跑失败任务',
+    recovery_failed: '重跑失败任务',
     gantt: '甘特图',
     name: '名称',
     all_status: '全部状态',
