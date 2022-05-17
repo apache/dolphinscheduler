@@ -688,6 +688,6 @@ A：在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server �
 如果您不想在 api server 启动的时候启动 Python gateway server，您可以修改 api server 中的配置文件 `api-server/conf/application.yaml`
 并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
 
----
+--- 
 
 我们会持续收集更多的 FAQ。
