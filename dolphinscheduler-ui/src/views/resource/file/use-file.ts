@@ -49,6 +49,7 @@ export function useFileState(
             alias: item.alias,
             fullName: item.fullName,
             type: item.type,
+            user_name: item.userName,
             directory: item.directory,
             file_name: item.fileName,
             description: item.description,
