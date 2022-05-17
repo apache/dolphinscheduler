@@ -52,9 +52,10 @@ cd dolphinscheduler
        -Pdocker,release               
 ```
 
-* 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以在源码项目根目录中运行以下命令找到所有的 Dockerfile 文件
+* 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件
 
 ```shell
+cd dolphinscheduler
 find . -iname 'Dockerfile'
 ```
 

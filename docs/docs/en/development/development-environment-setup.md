@@ -53,9 +53,10 @@ cd dolphinscheduler
        -Pdocker,release           
 ```
 
-* If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command in root source code directory to find all Dockerfile files.
+* If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.
 
 ```shell
+cd dolphinscheduler
 find . -iname 'Dockerfile'
 ```
 
