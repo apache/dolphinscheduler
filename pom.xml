@@ -986,6 +986,9 @@
                     <version>${owasp-dependency-check-maven.version}</version>
                     <configuration>
                         <skip>${skipDepCheck}</skip>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipRuntimeScope>true</skipRuntimeScope>
+                        <skipSystemScope>true</skipSystemScope>
                         <failBuildOnCVSS>7</failBuildOnCVSS>
                     </configuration>
                     <executions>
