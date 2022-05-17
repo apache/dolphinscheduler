@@ -27,7 +27,7 @@ ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).
 
-* If you want to modify DolphinScheduler source code, and build Docker images locally, you can be run when finished the modification
+* If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
