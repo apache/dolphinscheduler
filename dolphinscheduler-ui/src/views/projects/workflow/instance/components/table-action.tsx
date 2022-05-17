@@ -167,7 +167,7 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.workflow.failed_to_retry'),
+            default: () => t('project.workflow.recovery_failed'),
             trigger: () => (
               <NButton
                 tag='div'
