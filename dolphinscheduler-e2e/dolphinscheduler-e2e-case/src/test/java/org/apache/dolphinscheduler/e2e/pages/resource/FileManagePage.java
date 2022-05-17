@@ -28,12 +28,14 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -70,6 +72,12 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
+
+    @FindBys({
+            @FindBy(className = "monaco-editor"),
+            @FindBy(className = "view-line"),
+    })
+    private WebElement editor;
 
     public FileManagePage(RemoteWebDriver driver) {
         super(driver);
@@ -177,6 +185,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             .click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.urlContains("/edit"));
+
+        new WebDriverWait(driver, 5).until((ExpectedCondition<Object>) webDriver -> editor.getText().length() > 0);
 
         editFileBox().codeEditor().content(scripts);
         editFileBox().buttonSubmit().click();
