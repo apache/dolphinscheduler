@@ -4,39 +4,46 @@ When third party jars are used in the scheduling process or user defined scripts
 
 ![file-manage](/img/new_ui/dev/resource/file-manage.png)
 
-- Create a file
-  > The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
+## Basic Operator
+
+### Create a File
+
+The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
 
 ![create-file](/img/new_ui/dev/resource/create-file.png)
 
-- upload files
+### Upload Files
 
-> Upload file: Click the "Upload File" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
+Click the "Upload File" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
 
 ![upload-file](/img/new_ui/dev/resource/upload-file.png)
 
-- File View
+### View File Content
 
-> For the files that can be viewed, click the file name to view the file details.
+ For the files that can be viewed, click the file name to view the file details.
 
 ![file_detail](/img/tasks/demo/file_detail.png)
 
-- Download file
+### Download file
 
 > Click the "Download" button in the file list to download the file or click the "Download" button in the upper right corner of the file details to download the file.
 
-- File rename
+### Rename File
 
 ![rename-file](/img/new_ui/dev/resource/rename-file.png)
 
-- delete
-  > File list -> Click the "Delete" button to delete the specified file.
+### Delete File
 
-- Re-upload file
+File list -> Click the "Delete" button to delete the specified file.
 
-  > Re-upload file: Click the "Re-upload File" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
+### Re-upload file
+
+Click the "Re-upload File" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
 
 ![reuplod_file](/img/reupload_file_en.png)
+
+> Note: File name or source name of your local file can not contain specific characters like `.` or `/` when you trying to
+> upload, create or rename file in resource center.
 
 ## Example
 
