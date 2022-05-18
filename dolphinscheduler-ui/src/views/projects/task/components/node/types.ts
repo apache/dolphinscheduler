@@ -198,6 +198,13 @@ interface IRuleParameters {
   src_connector_type?: number
   src_datasource_id?: number
   src_table?: string
+  field_length?: number
+  begin_time?: string
+  deadline?: string
+  datetime_format?: string
+  target_filter?: string
+  regexp_pattern?: string
+  enum_list?: string
   src_filter?: string
   src_field?: string
   statistics_execute_sql?: string
