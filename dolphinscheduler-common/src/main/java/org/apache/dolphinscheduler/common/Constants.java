@@ -66,6 +66,8 @@ public final class Constants {
 
     public static final String BUCKET_NAME = "dolphinscheduler-test";
 
+    public static final String EMPTY_STRING = "";
+
     /**
      * fs.defaultFS
      */

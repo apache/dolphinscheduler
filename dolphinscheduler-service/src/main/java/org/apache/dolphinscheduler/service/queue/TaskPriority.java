@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -192,7 +193,11 @@ public class TaskPriority implements Comparable<TaskPriority> {
         if (this.getTaskId() < other.getTaskId()) {
             return -1;
         }
-
+        String thisGroupName = StringUtils.isNotBlank(this.getGroupName()) ? this.getGroupName() : Constants.EMPTY_STRING;
+        String otherGroupName = StringUtils.isNotBlank(other.getGroupName()) ? other.getGroupName() : Constants.EMPTY_STRING;
+        if(!thisGroupName.equals(otherGroupName)){
+            return thisGroupName.compareTo(otherGroupName);
+        }
         return Long.compare(this.getCheckpoint(), other.getCheckpoint());
     }
 
