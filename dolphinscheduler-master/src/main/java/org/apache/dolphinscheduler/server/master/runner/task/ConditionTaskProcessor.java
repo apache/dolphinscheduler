@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -169,7 +170,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
             logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(), item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
-        logger.info("dependent item complete, dependentTaskCode: {}, dependentResult: {}", item.getDepTaskCode(), dependResult);
+        logger.info("dependent item complete, dependentTaskCode: {}, dependResult: {}", item.getDepTaskCode(), dependResult);
         return dependResult;
     }
 
