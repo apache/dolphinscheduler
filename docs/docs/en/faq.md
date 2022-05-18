@@ -700,47 +700,14 @@ A：The repair can be completed by executing the following SQL in the database:
 update t_ds_version set version='2.0.1';
 ```
 
-## Can not find python-gateway-server in distribute package
+---
 
-After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
+## Q：Can not find python-gateway-server in distribute package
+
+A：After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
 start API server. If you want disabled when Python gateway service you could change API server configuration in path
 `api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
 
-## How to Build Custom Docker Image
-
-DolphinScheduler will release new Docker images after it released, you could find them in DockerHub. You could create
-custom Docker images base on those images if you want to change image like add some dependencies or upgrade package.
-
-```Dockerfile
-FROM apache/dolphinscheduler-standalone-server
-RUN apt update ; \
-    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
-```
-
-If you want to modify DolphinScheduler source code, then build and distribute your own images, you can run below command
-to build Docker images and install them locally, which you could find them by command `docker imaegs`.
-
-```shell
-./mvnw -B clean install \
-  -Dmaven.test.skip \
-  -Dmaven.javadoc.skip \
-  -Dmaven.checkstyle.skip \
-  -Dmaven.deploy.skip \
-  -Ddocker.tag=latest \
-  -Pdocker,release
-```
-
-If you want to modify DolphinScheduler source code, but also want to add customize dependencies of Docker image, you can
-modify the definition of Dockerfile after modifying the source code. You can run the following command in root source code
-directory to find all Dockerfile files.
-
-```shell
-find . -iname 'Dockerfile'
-```
-
-Then run the command above start with `./mvnw -B clean install`. You can see all docker images you just created with
-command `docker images` after finish commnand `mvnw`.
-
 ---
 
-## We will collect more FAQ later
+We will collect more FAQ later

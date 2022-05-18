@@ -682,40 +682,12 @@ update t_ds_version set version='2.0.1';
 
 ---
 
-## 在二进制分发包中找不到 python-gateway-server 文件夹
+## Q：在二进制分发包中找不到 python-gateway-server 文件夹
 
-在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server 中，当您启动 api server 后，Python gateway server 将启动。
+A：在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server 中，当您启动 api server 后，Python gateway server 将启动。
 如果您不想在 api server 启动的时候启动 Python gateway server，您可以修改 api server 中的配置文件 `api-server/conf/application.yaml`
 并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
 
-## 如何构建自定义的 Docker 镜像
-
-DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 docker hub 中找到这些镜像，如果你因为个性化需求想要自己打包 docker 镜像，最佳实践是基于 DolphinScheduler 对应镜像编写 Dockerfile 文件
-
-```Dockerfile
-FROM dolphinscheduler-standalone-server
-RUN apt update ; \
-    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
-```
-
-如果你想基于源码进行改造，打包并分发你的镜像，可以在代码改造完成后运行。当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
-
-```shell
-./mvnw -B clean install \
-  -Dmaven.test.skip \
-  -Dmaven.javadoc.skip \
-  -Dmaven.checkstyle.skip \
-  -Dmaven.deploy.skip \
-  -Ddocker.tag=latest \
-  -Pdocker,release
-```
-
-如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义，你可以在源码项目根目录中运行以下命令找到所有的 Dockerfile 文件
-
-```shell
-find . -iname 'Dockerfile'
-```
-
-之后再运行上面的 `./mvnw -B clean install` 命令，当命令运行完成后，你可以通过命令 `docker images` 查看刚刚创建的 docker 镜像
+--- 
 
 我们会持续收集更多的 FAQ。
