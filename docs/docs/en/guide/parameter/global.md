@@ -14,7 +14,7 @@ Create a shell task and enter `echo ${dt}` in the script content. In this case, 
 
 ![global-parameter01](/img/new_ui/dev/parameter/global_parameter01.png)
 
-### 2. Save the workflow and set global parameters
+### Save the workflow and set global parameters
 
 The global parameter configuration method is as follows: On the workflow definition page, click the plus sign to the right of "Set Global", fill in the corresponding variable name and corresponding value, and save it. As shown below:
 
