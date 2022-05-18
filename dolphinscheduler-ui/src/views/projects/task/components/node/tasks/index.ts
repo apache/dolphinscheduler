@@ -34,6 +34,7 @@ import { useDependent } from './use-dependent'
 import { useDataQuality } from './use-data-quality'
 import { useEmr } from './use-emr'
 import { useZeppelin } from './use-zeppelin'
+import { useK8s } from './use-k8s'
 import { useJupyter } from './use-jupyter'
 
 export default {
@@ -56,5 +57,6 @@ export default {
   DATA_QUALITY: useDataQuality,
   EMR: useEmr,
   ZEPPELIN: useZeppelin,
+  K8S: useK8s,
   JUPYTER: useJupyter
 }

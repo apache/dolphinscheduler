@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -70,7 +71,7 @@ public class TaskExecutionContextBuilder {
         if (taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN) {
             taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
             if (taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.FAILED
-                    || taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.WARNFAILED) {
+                || taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.WARNFAILED) {
                 taskExecutionContext.setTaskTimeout(Math.min(taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT, Integer.MAX_VALUE));
             }
         }
@@ -117,12 +118,23 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setResourceParametersHelper(parametersHelper);
         return this;
     }
+    /**
+     * build k8sTask related info
+     *
+     * @param k8sTaskExecutionContext sqoopTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
 
+    public TaskExecutionContextBuilder buildK8sTaskRelatedInfo(K8sTaskExecutionContext k8sTaskExecutionContext) {
+        taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
+        return this;
+    }
     /**
      * create
      *
      * @return taskExecutionContext
      */
+
     public TaskExecutionContext create() {
         return taskExecutionContext;
     }
