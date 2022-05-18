@@ -422,6 +422,8 @@ public final class Constants {
      */
     public static final int DEFINITION_FAILURE = -1;
 
+    public static final int OPPOSITE_VALUE = -1;
+
     /**
      * process or task definition first version
      */
