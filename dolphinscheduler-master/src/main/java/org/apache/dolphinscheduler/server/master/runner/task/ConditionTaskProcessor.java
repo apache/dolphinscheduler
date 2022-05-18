@@ -68,7 +68,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         }
         this.setTaskExecutionLogger();
         initTaskParameters();
-        logger.info("dependent task start");
+        logger.info("condition task start");
         return true;
     }
 
@@ -170,8 +170,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
             logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(), item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
-        logger.info("dependent item complete {} {},{}",
-                Constants.DEPENDENT_SPLIT, item.getDepTaskCode(), dependResult);
+        logger.info("dependent item complete, dependentTaskCode: {}, dependResult: {}", item.getDepTaskCode(), dependResult);
         return dependResult;
     }
 

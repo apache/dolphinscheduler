@@ -822,6 +822,7 @@ const project = {
     sea_tunnel_queue: 'Queue',
     sea_tunnel_master_url_tips:
       'Please enter the master url, e.g., 127.0.0.1:7077',
+    add_pre_task_check_condition: 'Add pre task check condition',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
     and: 'and',
