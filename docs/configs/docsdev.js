@@ -529,6 +529,10 @@ export default {
                                 title: 'Jupyter',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
+                            {
+                                title: 'Kubernetes',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
                         ],
                     },
                     {
