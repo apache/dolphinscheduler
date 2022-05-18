@@ -312,12 +312,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (FileUtils.directoryTraversal(name) || FileUtils.directoryTraversal(file.getOriginalFilename())) {
-            logger.error("file alia name {} or original name {} verify failed", name, file.getOriginalFilename());
-            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
-            return result;
-        }
-
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
@@ -524,8 +518,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
 
-        if (FileUtils.directoryTraversal(name) || FileUtils.directoryTraversal(file.getOriginalFilename())) {
-            logger.error("file alia name {} or original name {} verify failed", name, file.getOriginalFilename());
+        if (FileUtils.directoryTraversal(name)) {
+            logger.error("file alias name {} verify failed", name);
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+
+        if (file != null && FileUtils.directoryTraversal(Objects.requireNonNull(file.getOriginalFilename()))) {
+            logger.error("file original name {} verify failed", file.getOriginalFilename());
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
