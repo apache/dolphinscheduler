@@ -8,7 +8,7 @@ Global parameters are parameters that are valid for all task nodes of the entire
 
 The specific use method can be determined according to the actual production situation. This example uses a shell task to print out the date value of yesterday.
 
-### 1. Create a Shell task
+### Create a Shell task
 
 Create a shell task and enter `echo ${dt}` in the script content. In this case, dt is the global parameter we need to declare. As shown below:
 
