@@ -47,7 +47,7 @@ Go to the workflow definition page, and then create the following task nodes:
 
 After you finish creating the workflow, you can run the workflow online. You can view the execution status of each task on the workflow instance page. As shown below:
 
-![condition_task01](/img/tasks/demo/condition_task02.png)
+![condition_task02](/img/tasks/demo/condition_task02.png)
 
 In the above figure, the task status marked with a green check mark is the successfully executed task node.
 
@@ -58,3 +58,4 @@ In the above figure, the task status marked with a green check mark is the succe
 - The predecessor task of Conditions cannot connect to its branch nodes, which will cause logical confusion and does not conform to DAG scheduling. The situation shown below is **wrong**.
 
 ![condition_task03](/img/tasks/demo/condition_task03.png)
+![condition_task04](/img/tasks/demo/condition_task04.png)
