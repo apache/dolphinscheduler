@@ -129,8 +129,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        if (name.endsWith(FOLDER_SEPARATOR)) {
-            result.setCode(Status.VERIFY_PARAMETER_NAME_FAILED.getCode());
+        if (FileUtils.directoryTraversal(name)) {
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
         String fullName = getFullName(currentDir, name);
@@ -517,6 +517,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private Result<Object> verifyFile(String name, ResourceType type, MultipartFile file) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
+
+        if (FileUtils.directoryTraversal(name) || FileUtils.directoryTraversal(file.getOriginalFilename())) {
+            logger.error("file alia name {} or original name {} verify failed", name, file.getOriginalFilename());
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+
         if (file != null) {
             // file is empty
             if (file.isEmpty()) {

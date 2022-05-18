@@ -204,4 +204,25 @@ public class FileUtils {
         }
     }
 
+    /**
+     * Check whether the given string type of path can be traversal or not, return true if path could
+     * traversal, and return false if it is not.
+     *
+     * @param path String type of file path
+     * @return whether file path could be traversal or not
+     */
+    public static boolean directoryTraversal(String path){
+        if (path.contains(FOLDER_SEPARATOR)) {
+            return true;
+        }
+        File file = new File(path);
+        try {
+            File canonical = file.getCanonicalFile();
+            File absolute = file.getAbsoluteFile();
+            return !canonical.equals(absolute);
+        } catch (IOException e) {
+            return true;
+        }
+    }
+
 }
