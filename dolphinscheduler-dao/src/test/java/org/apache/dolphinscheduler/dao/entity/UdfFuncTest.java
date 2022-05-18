@@ -37,7 +37,7 @@ public class UdfFuncTest {
     udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
 
     Assert.assertEquals("{\"id\":0,\"userId\":0,\"resourceType\":\"UDF\",\"funcName\":null,\"className\":\"org.apache.dolphinscheduler.test.mrUpdate\",\"argTypes\":null,\"database\":null,"
-                    + "\"description\":null,\"resourceId\":2,\"resourceName\":\"dolphin_resource_update\",\"type\":null,\"createTime\":null,\"updateTime\":null}"
+                    + "\"description\":null,\"resourceId\":2,\"resourceName\":\"dolphin_resource_update\",\"type\":null,\"createTime\":null,\"updateTime\":null,\"userName\":null}"
             , udfFunc.toString());
   }
 
