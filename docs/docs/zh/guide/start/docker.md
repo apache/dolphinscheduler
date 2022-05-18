@@ -75,7 +75,7 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     --net host \
-    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" bin/create-schema.sh
+    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # 启动 DolphinScheduler 对应的服务
 $ docker run -d --name dolphinscheduler-master \
     -e DATABASE="postgresql" \
