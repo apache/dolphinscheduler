@@ -1377,13 +1377,13 @@ public class WorkflowExecuteThread {
                     return DependResult.NON_EXEC;
                 }
                 // ignore task state if current task is block
-                if (taskNode.isConditionsTask() || taskNode.isBlockingTask()) {
+                if (taskNode.isBlockingTask()) {
                     continue;
                 }
 
                 // always return success if current task is condition
                 if (taskNode.isConditionsTask()) {
-                    return DependResult.SUCCESS;
+                    continue;
                 }
 
                 if (!dependTaskSuccess(depsNode, taskCode)) {
