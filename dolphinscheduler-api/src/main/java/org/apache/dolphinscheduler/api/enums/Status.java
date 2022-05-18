@@ -410,9 +410,6 @@ public enum Status {
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     SCHEDULE_TIME_REPEAT(1400004, "There is a repetition in the supplement date.", "补数日期有重复"),
     ;
-    RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource's fullname is too long error", "资源文件名过长"),
-    TENANT_FULL_NAME_TOO_LONG_ERROR(1300016, "tenant's fullname is too long error", "租户名过长");
-
     private final int code;
     private final String enMsg;
     private final String zhMsg;
