@@ -122,7 +122,9 @@ const taskGroupQueue = defineComponent({
         }
       )
 
-      resetTableData()
+      if (searchParamRef.groupId) {
+        resetTableData()
+      }
     })
 
     return {
