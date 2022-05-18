@@ -38,9 +38,11 @@ spec:
           image: {{ include "dolphinscheduler.image.fullname.tools" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            - bin/create-schema.sh
+            - tools/bin/upgrade-schema.sh
           env:
             - name: TZ
+              value: {{ .Values.timezone }}
+            - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}

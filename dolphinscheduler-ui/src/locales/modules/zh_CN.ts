@@ -240,6 +240,7 @@ const resource = {
     create_folder: '创建文件夹',
     upload_udf_resources: '上传UDF资源',
     udf_source_name: 'UDF资源名称',
+    user_name: '所属用户',
     whether_directory: '是否文件夹',
     file_name: '文件名称',
     file_size: '文件大小',
@@ -267,6 +268,7 @@ const resource = {
     create_udf_function: '创建UDF函数',
     edit_udf_function: '编辑UDF函数',
     udf_function_name: 'UDF函数名称',
+    user_name: '所属用户',
     class_name: '类名',
     type: '类型',
     description: '描述',
@@ -477,7 +479,7 @@ const project = {
     recovery_waiting_thread: '恢复等待线程',
     recover_serial_wait: '串行恢复',
     recovery_suspend: '恢复运行',
-    failed_to_retry: '重跑失败任务',
+    recovery_failed: '重跑失败任务',
     gantt: '甘特图',
     name: '名称',
     all_status: '全部状态',
@@ -813,6 +815,7 @@ const project = {
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: '队列',
     sea_tunnel_master_url_tips: '请直接填写地址,例如:127.0.0.1:7077',
+    add_pre_task_check_condition: '添加前置检查条件',
     switch_condition: '条件',
     switch_branch_flow: '分支流转',
     and: '且',
@@ -1173,7 +1176,7 @@ const security = {
     ToPersonEmail: '用户邮箱',
     // eslint-disable-next-line quotes
     AtSomeoneInRoom: "{'@'}房间中的成员",
-    Destination: '描述',
+    Destination: '目的地',
     // eslint-disable-next-line quotes
     AtMobiles: "被{'@'}人的手机号",
     // eslint-disable-next-line quotes

@@ -51,7 +51,7 @@
     <insert id="batchInsert">
         insert into t_ds_task_definition_log (code, name, version, description, project_code, user_id,
         task_type, task_params, flag, task_priority, worker_group, environment_code, fail_retry_times, fail_retry_interval,
-        timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, operator, operate_time, create_time, update_time,task_group_id)
+        timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, operator, operate_time, create_time, update_time,task_group_id,task_group_priority)
         values
         <foreach collection="taskDefinitionLogs" item="taskDefinitionLog" separator=",">
             (#{taskDefinitionLog.code},#{taskDefinitionLog.name},#{taskDefinitionLog.version},#{taskDefinitionLog.description},
@@ -59,7 +59,7 @@
             #{taskDefinitionLog.flag},#{taskDefinitionLog.taskPriority},#{taskDefinitionLog.workerGroup},#{taskDefinitionLog.environmentCode},
             #{taskDefinitionLog.failRetryTimes},#{taskDefinitionLog.failRetryInterval},#{taskDefinitionLog.timeoutFlag},#{taskDefinitionLog.timeoutNotifyStrategy},
             #{taskDefinitionLog.timeout},#{taskDefinitionLog.delayTime},#{taskDefinitionLog.resourceIds},#{taskDefinitionLog.operator},#{taskDefinitionLog.operateTime},
-            #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime}, #{taskDefinitionLog.taskGroupId})
+            #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime}, #{taskDefinitionLog.taskGroupId},#{taskDefinitionLog.taskGroupPriority})
         </foreach>
     </insert>
     <delete id="deleteByCodeAndVersion">

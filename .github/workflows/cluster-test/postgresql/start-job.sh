@@ -16,16 +16,17 @@
 # limitations under the License.
 #
 
-BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/../..; pwd)}
+#Start base service containers
+docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-base.yaml up -d
 
-if [ "$DOCKER" != "true" ]; then
-  source "$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh"
-fi
+#Build ds postgresql cluster image
+docker build -t jdk8:ds_postgresql_cluster -f .github/workflows/cluster-test/postgresql/Dockerfile .
 
-JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
+#Start ds postgresql cluster container
+docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-cluster.yaml up -d
 
-java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/tools/conf":"$DOLPHINSCHEDULER_HOME/tools/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
-  -Dspring.profiles.active=upgrade \
-  org.apache.dolphinscheduler.tools.datasource.UpgradeDolphinScheduler
+#Running tests
+/bin/bash .github/workflows/cluster-test/postgresql/running_test.sh
+
+#Cleanup
+docker rm -f $(docker ps -aq)

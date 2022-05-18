@@ -40,11 +40,12 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
 
 /**
  * tenant service impl
@@ -89,10 +90,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
+        if(StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH){
+            putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
+            return result;
+        }
+
         if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
             putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
             return result;
         }
+
 
         if (checkTenantExists(tenantCode)) {
             putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
