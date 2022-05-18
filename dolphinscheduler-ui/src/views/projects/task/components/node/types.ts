@@ -306,7 +306,12 @@ interface ITaskParams {
   udfs?: string
   connParams?: string
   targetJobName?: string
-
+  cluster?: string
+  namespace?: string
+  clusterNamespace?: string
+  minCpuCores?: string
+  minMemorySpace?: string
+  image?: string
   algorithm?: string
   params?: string
   searchParams?: string
