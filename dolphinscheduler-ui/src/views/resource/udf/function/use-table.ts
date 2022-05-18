@@ -66,6 +66,11 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
+        title: t('resource.function.user_name'),
+        ...COLUMN_WIDTH_CONFIG['userName'],
+        key: 'userName'
+      },
+      {
         title: t('resource.function.class_name'),
         key: 'className',
         ...COLUMN_WIDTH_CONFIG['name']
