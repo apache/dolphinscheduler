@@ -1174,7 +1174,7 @@ const security = {
     ToPersonEmail: '用户邮箱',
     // eslint-disable-next-line quotes
     AtSomeoneInRoom: "{'@'}房间中的成员",
-    Destination: '描述',
+    Destination: '目的地',
     // eslint-disable-next-line quotes
     AtMobiles: "被{'@'}人的手机号",
     // eslint-disable-next-line quotes
