@@ -77,6 +77,56 @@ RUN apt update ; \
 >
 > 必须使用Docker 19.03及以后的版本，因为19.03及以后的版本包含 buildx
 
+## Docker镜像构建
+
+DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
+
+* 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
+```shell
+cd dolphinscheduler
+./mvnw -B clean package \
+       -Dmaven.test.skip \
+       -Dmaven.javadoc.skip \
+       -Dmaven.checkstyle.skip \
+       -Ddocker.tag=<TAG> \
+       -Pdocker,release             
+```
+当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
+
+* 如果你想基于源码进行改造，然后构建Docker镜像并推送到 <HUB_URL>，可以在代码改造完成后运行
+```shell
+cd dolphinscheduler
+./mvnw -B clean deploy \
+       -Dmaven.test.skip \
+       -Dmaven.javadoc.skip \
+       -Dmaven.checkstyle.skip \
+       -Dmaven.deploy.skip \
+       -Ddocker.tag=<TAG> \
+       -Ddocker.hub=<HUB_URL> \
+       -Pdocker,release               
+```
+
+* 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件
+
+```shell
+cd dolphinscheduler
+find . -iname 'Dockerfile'
+```
+
+之后再运行上面的构建镜像命令
+
+* 如果你因为个性化需求想要自己打包 Docker 镜像，最佳实践是基于 DolphinScheduler 对应镜像编写 Dockerfile 文件
+
+```Dockerfile
+FROM dolphinscheduler-standalone-server
+RUN apt update ; \
+    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
+```
+
+> **_注意：_** Docker默认会构建并推送 linux/amd64,linux/arm64 多架构镜像
+>
+> 必须使用Docker 19.03及以后的版本，因为19.03及以后的版本包含 buildx
+
 ## 开发者须知
 
 DolphinScheduler 开发环境配置有两个方式，分别是standalone模式，以及普通模式
