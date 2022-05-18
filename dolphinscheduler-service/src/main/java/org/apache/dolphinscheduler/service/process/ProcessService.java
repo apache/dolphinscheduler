@@ -296,4 +296,6 @@ public interface ProcessService {
                               org.apache.dolphinscheduler.remote.command.CommandType taskType);
 
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
+
+    public String findConfigYamlByName(String clusterName) ;
 }

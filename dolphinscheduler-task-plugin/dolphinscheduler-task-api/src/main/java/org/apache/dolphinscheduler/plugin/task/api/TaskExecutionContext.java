@@ -216,7 +216,10 @@ public class TaskExecutionContext {
      * sql TaskExecutionContext
      */
     private SQLTaskExecutionContext sqlTaskExecutionContext;
-
+    /**
+     * k8s TaskExecutionContext
+     */
+    private K8sTaskExecutionContext k8sTaskExecutionContext;
     /**
      * resources full name and tenant code
      */
@@ -564,6 +567,14 @@ public class TaskExecutionContext {
         this.endTime = endTime;
     }
 
+    public K8sTaskExecutionContext getK8sTaskExecutionContext() {
+        return k8sTaskExecutionContext;
+    }
+
+    public void setK8sTaskExecutionContext(K8sTaskExecutionContext k8sTaskExecutionContext) {
+        this.k8sTaskExecutionContext = k8sTaskExecutionContext;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{"
@@ -601,6 +612,7 @@ public class TaskExecutionContext {
                 + ", delayTime=" + delayTime
                 + ", resources=" + resources
                 + ", sqlTaskExecutionContext=" + sqlTaskExecutionContext
+                + ", k8sTaskExecutionContext=" + k8sTaskExecutionContext
                 + ", dataQualityTaskExecutionContext=" + dataQualityTaskExecutionContext
                 + '}';
     }

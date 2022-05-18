@@ -310,6 +310,13 @@ export function formatParams(data: INodeData): {
     taskParams.paragraphId = data.zeppelinParagraphId
   }
 
+  if (data.taskType === 'K8S') {
+    taskParams.namespace = data.namespace
+    taskParams.minCpuCores = data.minCpuCores
+    taskParams.minMemorySpace = data.minMemorySpace
+    taskParams.image = data.image
+  }
+
   if (data.taskType === 'JUPYTER') {
     taskParams.condaEnvName = data.condaEnvName
     taskParams.inputNotePath = data.inputNotePath
