@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
@@ -87,6 +88,13 @@ public class Resource {
      * update time
      */
     private Date updateTime;
+
+    /**
+     * user name
+     */
+    @TableField(exist = false)
+    private String userName;
+
 
     public Resource() {
     }
@@ -224,6 +232,14 @@ public class Resource {
         this.updateTime = updateTime;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
         return "Resource{" +
@@ -239,6 +255,7 @@ public class Resource {
             ", size=" + size +
             ", createTime=" + createTime +
             ", updateTime=" + updateTime +
+            ",userName=" + userName +
             '}';
     }
 

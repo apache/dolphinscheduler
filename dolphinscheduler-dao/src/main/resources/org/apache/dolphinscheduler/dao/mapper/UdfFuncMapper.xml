@@ -56,8 +56,9 @@
         <include refid="baseSql">
             <property name="alias" value="udf"/>
         </include>
-        from t_ds_udfs udf
-        where 1=1
+        ,u.user_name
+        from t_ds_udfs udf,t_ds_user u
+        where 1=1 and udf.user_id=u.id
         <if test="searchVal!= null and searchVal != ''">
             and udf.func_name like concat('%', #{searchVal}, '%')
         </if>

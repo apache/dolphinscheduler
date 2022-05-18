@@ -105,6 +105,12 @@ public class UdfFunc {
      */
     private Date updateTime;
 
+    /**
+     * user name
+     */
+    @TableField(exist = false)
+    private String userName;
+
     public int getId() {
         return id;
     }
@@ -200,6 +206,14 @@ public class UdfFunc {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Override
