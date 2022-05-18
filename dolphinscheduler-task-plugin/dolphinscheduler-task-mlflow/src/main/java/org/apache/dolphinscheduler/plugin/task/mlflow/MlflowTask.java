@@ -116,17 +116,6 @@ public class MlflowTask extends AbstractTaskExecutor {
      * @throws Exception exception
      */
     private String buildCommand() throws Exception {
-        // generate scripts
-        String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
-
-        File file = new File(fileName);
-        Path path = file.toPath();
-
-        if (Files.exists(path)) {
-            return fileName;
-        }
 
         /**
          * load script template from resource folder
@@ -137,21 +126,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         logger.info("raw script : \n{}", script);
         logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
-        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
-        if (OSUtils.isWindows()) {
-            Files.createFile(path);
-        } else {
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            Files.createFile(path, attr);
-        }
-
-        Files.write(path, script.getBytes(), StandardOpenOption.APPEND);
-
-        return fileName;
+        return script;
     }
 
     @Override
