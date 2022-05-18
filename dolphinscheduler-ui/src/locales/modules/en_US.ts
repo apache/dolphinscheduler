@@ -240,6 +240,7 @@ const resource = {
     create_folder: 'Create Folder',
     upload_udf_resources: 'Upload UDF Resources',
     udf_source_name: 'UDF Resource Name',
+    user_name: 'Resource userName',
     whether_directory: 'Whether directory',
     file_name: 'File Name',
     file_size: 'File Size',
@@ -267,6 +268,7 @@ const resource = {
     create_udf_function: 'Create UDF Function',
     edit_udf_function: 'Create UDF Function',
     udf_function_name: 'UDF Function Name',
+    user_name: 'Resource userName',
     class_name: 'Class Name',
     type: 'Type',
     description: 'Description',
@@ -823,6 +825,7 @@ const project = {
     sea_tunnel_queue: 'Queue',
     sea_tunnel_master_url_tips:
       'Please enter the master url, e.g., 127.0.0.1:7077',
+    add_pre_task_check_condition: 'Add pre task check condition',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
     and: 'and',
