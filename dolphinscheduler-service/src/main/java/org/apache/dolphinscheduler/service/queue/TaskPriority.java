@@ -192,9 +192,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         if (this.getTaskId() < other.getTaskId()) {
             return -1;
         }
-        if(!this.getGroupName().equals(other.getGroupName())){
-            return this.getGroupName().compareTo(other.getGroupName());
-        }
+
         return Long.compare(this.getCheckpoint(), other.getCheckpoint());
     }
 
