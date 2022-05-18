@@ -280,7 +280,7 @@ export default {
                             },
                             {
                                 title: 'Task Group Manage',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/task-manage.html'
+                                link: '/en-us/docs/dev/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },
@@ -631,7 +631,7 @@ export default {
                             },
                             {
                                 title: '任务组管理',
-                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-manage.html'
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },
