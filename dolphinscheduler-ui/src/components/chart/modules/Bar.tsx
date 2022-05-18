@@ -75,7 +75,7 @@ const BarChart = defineComponent({
       series: [
         {
           type: 'bar',
-          barWidth: '60%',
+          barWidth: '20%',
           data: props.seriesData
         }
       ]
