@@ -62,6 +62,7 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
+import org.apache.dolphinscheduler.dao.entity.K8s;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -90,6 +91,7 @@ import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
@@ -268,6 +270,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private TaskPluginManager taskPluginManager;
+
+    @Autowired
+    private K8sMapper k8sMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -3041,5 +3046,22 @@ public class ProcessServiceImpl implements ProcessService {
         if (delete != 1) {
             throw new ServiceException("delete command fail, id:" + commandId);
         }
+    }
+    /**
+     * find k8s config yaml by clusterName
+     *
+     * @param clusterName clusterName
+     * @return datasource
+     */
+
+    @Override
+    public String findConfigYamlByName(String clusterName) {
+        if (StringUtils.isEmpty(clusterName)) {
+            return null;
+        }
+        QueryWrapper<K8s> nodeWrapper = new QueryWrapper<>();
+        nodeWrapper.eq("k8s_name", clusterName);
+        K8s k8s = k8sMapper.selectOne(nodeWrapper);
+        return k8s.getK8sConfig();
     }
 }
