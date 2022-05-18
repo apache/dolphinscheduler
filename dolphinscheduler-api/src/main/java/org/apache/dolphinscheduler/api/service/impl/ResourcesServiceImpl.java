@@ -312,6 +312,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = checkResourceUploadStartupState();
+        if (FileUtils.directoryTraversal(name) || FileUtils.directoryTraversal(file.getOriginalFilename())) {
+            logger.error("file alia name {} or original name {} verify failed", name, file.getOriginalFilename());
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
@@ -978,6 +984,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content, int pid, String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
+        if (FileUtils.directoryTraversal(fileName)) {
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 
