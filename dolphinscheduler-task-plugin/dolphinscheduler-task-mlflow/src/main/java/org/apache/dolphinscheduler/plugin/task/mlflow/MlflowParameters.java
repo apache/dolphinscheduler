@@ -147,13 +147,12 @@ public class MlflowParameters extends AbstractParameters {
 
     public HashMap<String, String> getParamsMap() {
 
-        HashMap<String, String> paramsMap = new HashMap<String, String>() {{
-            put("params", params);
-            put("data_path", dataPath);
-            put("experiment_name", experimentName);
-            put("model_name", modelName);
-            put("MLFLOW_TRACKING_URI", mlflowTrackingUri);
-        }};
+        HashMap<String, String> paramsMap = new HashMap<String, String>();
+        paramsMap.put("params", params);
+        paramsMap.put("data_path", dataPath);
+        paramsMap.put("experiment_name", experimentName);
+        paramsMap.put("model_name", modelName);
+        paramsMap.put("MLFLOW_TRACKING_URI", mlflowTrackingUri);
         if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
             addParamsMapForBasicAlgorithm(paramsMap);
         } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
