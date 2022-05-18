@@ -140,10 +140,10 @@ public class TaskPriorityQueueConsumer extends Thread {
 
                 if (!failedDispatchTasks.isEmpty()) {
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
-                        if (dispatchFailedTask.getDispatchFailedRetryTimes() >= Constants.DEFAULT_MAX_RETRY_COUNT){
+                        // service alarm when retries 100 times
+                        if (dispatchFailedTask.getDispatchFailedRetryTimes() == Constants.DEFAULT_MAX_RETRY_COUNT){
                             logger.error("the number of retries for dispatch failure has exceeded the maximum limit, taskId: {} processInstanceId: {}", dispatchFailedTask.getTaskId(), dispatchFailedTask.getProcessInstanceId());
                             // business alarm
-                            continue;
                         }
                         // differentiate the queue to prevent high priority from affecting the execution of other tasks
                         taskPriorityDispatchFailedQueue.put(dispatchFailedTask);
@@ -206,6 +206,10 @@ public class TaskPriorityQueueConsumer extends Thread {
     private boolean canRetry (TaskPriority taskPriority){
         int dispatchFailedRetryTimes = taskPriority.getDispatchFailedRetryTimes();
         long now = System.currentTimeMillis();
+        // retry more than 100 times with 100 seconds delay each time
+        if (dispatchFailedRetryTimes >= Constants.DEFAULT_MAX_RETRY_COUNT){
+            return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[Constants.DEFAULT_MAX_RETRY_COUNT];
+        }
         return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[dispatchFailedRetryTimes];
     }
 
