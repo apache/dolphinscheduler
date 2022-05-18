@@ -14,7 +14,7 @@
  
 2. 选择 "失效时间" (Token 有效期)，选择 "用户" (以指定的用户执行接口操作)，点击 "生成令牌" ，拷贝 Token 字符串，然后点击 "提交" 。
 
-![token-expiration](/img/new_ui/dev/open-api/token-expiration.png)
+![token-expiration](/img/new_ui/dev/open-api/token_expiration.png)
 
 ### 使用案例
 
@@ -60,8 +60,8 @@
 
 ### 附:创建项目源码
 
-![api-source01](/img/new_ui/dev/open-api/api-source01.png)
+![api-source01](/img/new_ui/dev/open-api/api_source01.png)
 
-![api-source02](/img/new_ui/dev/open-api/api-source02.png)
+![api-source02](/img/new_ui/dev/open-api/api_source02.png)
 
 

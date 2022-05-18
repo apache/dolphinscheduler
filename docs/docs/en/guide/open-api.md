@@ -14,7 +14,7 @@ Generally, projects and processes are created through pages, but considering the
 
 2. Select the "Expiration time" (Token validity time), select "User" (choose the specified user to perform the API operation), click "Generate token", copy the `Token` string, and click "Submit".
 
-![token-expiration](/img/new_ui/dev/open-api/token-expiration.png)
+![token-expiration](/img/new_ui/dev/open-api/token_expiration.png)
 
 ### Examples
 
@@ -60,9 +60,9 @@ If you are interested in the source code of creating a project, please continue 
 
 ### Appendix： The Source Code of Creating a Project
 
-![api-source01](/img/new_ui/dev/open-api/api-source01.png)
+![api-source01](/img/new_ui/dev/open-api/api_source01.png)
 
-![api-source02](/img/new_ui/dev/open-api/api-source02.png)
+![api-source02](/img/new_ui/dev/open-api/api_source02.png)
 
 
 
