@@ -22,7 +22,7 @@ The global parameter configuration method is as follows: On the workflow definit
 
 > Note: The dt parameter defined here can be referenced by the local parameters of any other node.
 
-### 3. In task instance view execution result
+### In task instance view execution result
 
 On the task instance page, you can check the log to verify the execution result of the task and determine whether the parameters are valid.
 
