@@ -713,6 +713,8 @@ public class TaskInstance implements Serializable {
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime
                 + ", dryRun=" + dryRun
+                + ", taskGroupId=" + taskGroupId
+                + ", taskGroupPriority=" + taskGroupPriority
                 + '}';
     }
 

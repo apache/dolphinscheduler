@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
@@ -168,6 +169,10 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
          */
         @Override
         public int compare(TaskInstance o1, TaskInstance o2) {
+            if(o1.getTaskInstancePriority().equals(o2.getTaskInstancePriority())){
+                // larger number, higher priority
+                return Constants.OPPOSITE_VALUE * Integer.compare(o1.getTaskGroupPriority(),o2.getTaskGroupPriority());
+            }
             return o1.getTaskInstancePriority().compareTo(o2.getTaskInstancePriority());
         }
     }
