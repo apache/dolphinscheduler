@@ -94,14 +94,12 @@ public class MlflowTaskTest {
     public void testModelsDeployMlflow() throws Exception {
         MlflowTask mlflowTask = initTask(createModelDeplyMlflowParameters());
         String command = mlflowTask.buildCommand();
-//        mlflowTask.handle();
     }
 
     @Test
     public void testModelsDeployDocker() throws Exception {
         MlflowTask mlflowTask = initTask(createModelDeplyDockerParameters());
         String command = mlflowTask.buildCommand();
-//        mlflowTask.handle();
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {
