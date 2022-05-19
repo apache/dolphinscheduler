@@ -277,10 +277,6 @@ export default {
                         link: '/en-us/docs/3.0.0/user_doc/guide/data-quality.html',
                     },
                     {
-                        title: 'Flink',
-                        link: '/en-us/docs/3.0.0/user_doc/guide/flink-call.html',
-                    },
-                    {
                         title: 'Upgrade',
                         link: '/en-us/docs/3.0.0/user_doc/guide/upgrade.html',
                     },
@@ -631,10 +627,6 @@ export default {
                     {
                         title: '数据质量',
                         link: '/zh-cn/docs/3.0.0/user_doc/guide/data-quality.html',
-                    },
-                    {
-                        title: 'Flink调用',
-                        link: '/zh-cn/docs/3.0.0/user_doc/guide/flink-call.html',
                     },
                     {
                         title: '升级',
