@@ -174,6 +174,14 @@ export default {
                                 title: 'Jupyter',
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
+                            {
+                                title: 'Kubernetes',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
                         ],
                     },
                     {
@@ -280,7 +288,7 @@ export default {
                             },
                             {
                                 title: 'Task Group Manage',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/task-manage.html'
+                                link: '/en-us/docs/dev/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },
@@ -525,6 +533,14 @@ export default {
                                 title: 'Jupyter',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
+                            {
+                                title: 'Kubernetes',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
                         ],
                     },
                     {
@@ -631,7 +647,7 @@ export default {
                             },
                             {
                                 title: '任务组管理',
-                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-manage.html'
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },

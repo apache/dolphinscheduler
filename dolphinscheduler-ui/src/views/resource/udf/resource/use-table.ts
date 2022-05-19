@@ -103,6 +103,11 @@ export function useTable() {
         }
       },
       {
+        title: t('resource.udf.user_name'),
+        ...COLUMN_WIDTH_CONFIG['userName'],
+        key: 'userName'
+      },
+      {
         title: t('resource.udf.whether_directory'),
         key: 'whether_directory',
         ...COLUMN_WIDTH_CONFIG['yesOrNo'],

@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
@@ -127,7 +128,11 @@ public class FailoverService {
         long startTime = System.currentTimeMillis();
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
         LOGGER.info("start master[{}] failover, process list size:{}", masterHost, needFailoverProcessInstanceList.size());
-        List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
+
+        // servers need to contains master hosts and worker hosts, otherwise the logic task will failover fail.
+        List<Server> servers = registryClient.getServerList(NodeType.WORKER);
+        servers.addAll(registryClient.getServerList(NodeType.MASTER));
+
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             if (Constants.NULL.equals(processInstance.getHost())) {
                 continue;
@@ -136,7 +141,7 @@ public class FailoverService {
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance taskInstance : validTaskInstanceList) {
                 LOGGER.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
-                failoverTaskInstance(processInstance, taskInstance, workerServers);
+                failoverTaskInstance(processInstance, taskInstance, servers);
             }
 
             if (serverStartupTime != null && processInstance.getRestartTime() != null
@@ -198,29 +203,37 @@ public class FailoverService {
     /**
      * failover task instance
      * <p>
-     * 1. kill yarn job if there are yarn jobs in tasks.
+     * 1. kill yarn job if run on worker and there are yarn jobs in tasks.
      * 2. change task state from running to need failover.
      * 3. try to notify local master
+     * @param processInstance
+     * @param taskInstance
+     * @param servers if failover master, servers container master servers and worker servers; if failover worker, servers contain worker servers.
      */
-    private void failoverTaskInstance(ProcessInstance processInstance, TaskInstance taskInstance, List<Server> workerServers) {
+    private void failoverTaskInstance(ProcessInstance processInstance, TaskInstance taskInstance, List<Server> servers) {
         if (processInstance == null) {
             LOGGER.error("failover task instance error, processInstance {} of taskInstance {} is null",
                 taskInstance.getProcessInstanceId(), taskInstance.getId());
             return;
         }
-        if (!checkTaskInstanceNeedFailover(workerServers, taskInstance)) {
+        if (!checkTaskInstanceNeedFailover(servers, taskInstance)) {
             return;
         }
 
-        taskInstance.setProcessInstance(processInstance);
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-            .buildTaskInstanceRelatedInfo(taskInstance)
-            .buildProcessInstanceRelatedInfo(processInstance)
-            .create();
+        boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
 
-        if (masterConfig.isKillYarnJobWhenTaskFailover()) {
-            // only kill yarn job if exists , the local thread has exited
-            ProcessUtils.killYarnJob(taskExecutionContext);
+        taskInstance.setProcessInstance(processInstance);
+
+        if (!isMasterTask) {
+            TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .create();
+
+            if (masterConfig.isKillYarnJobWhenTaskFailover()) {
+                // only kill yarn job if exists , the local thread has exited
+                ProcessUtils.killYarnJob(taskExecutionContext);
+            }
         }
 
         taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
@@ -256,13 +269,13 @@ public class FailoverService {
     }
 
     /**
-     * task needs failover if task start before worker starts
+     * task needs failover if task start before server starts
      *
-     * @param workerServers worker servers
+     * @param servers servers, can container master servers or worker servers
      * @param taskInstance  task instance
      * @return true if task instance need fail over
      */
-    private boolean checkTaskInstanceNeedFailover(List<Server> workerServers, TaskInstance taskInstance) {
+    private boolean checkTaskInstanceNeedFailover(List<Server> servers, TaskInstance taskInstance) {
 
         boolean taskNeedFailover = true;
 
@@ -279,14 +292,13 @@ public class FailoverService {
             return false;
         }
 
-
         //now no host will execute this task instance,so no need to failover the task
         if (taskInstance.getHost() == null) {
             return false;
         }
 
-        //if task start after worker starts, there is no need to failover the task.
-        if (checkTaskAfterWorkerStart(workerServers, taskInstance)) {
+        //if task start after server starts, there is no need to failover the task.
+        if (checkTaskAfterServerStart(servers, taskInstance)) {
             taskNeedFailover = false;
         }
 
@@ -296,19 +308,20 @@ public class FailoverService {
     /**
      * check task start after the worker server starts.
      *
+     * @param servers servers, can contain master servers or worker servers
      * @param taskInstance task instance
-     * @return true if task instance start time after worker server start date
+     * @return true if task instance start time after server start date
      */
-    private boolean checkTaskAfterWorkerStart(List<Server> workerServers, TaskInstance taskInstance) {
+    private boolean checkTaskAfterServerStart(List<Server> servers, TaskInstance taskInstance) {
         if (StringUtils.isEmpty(taskInstance.getHost())) {
             return false;
         }
-        Date workerServerStartDate = getServerStartupTime(workerServers, taskInstance.getHost());
-        if (workerServerStartDate != null) {
+        Date serverStartDate = getServerStartupTime(servers, taskInstance.getHost());
+        if (serverStartDate != null) {
             if (taskInstance.getStartTime() == null) {
-                return taskInstance.getSubmitTime().after(workerServerStartDate);
+                return taskInstance.getSubmitTime().after(serverStartDate);
             } else {
-                return taskInstance.getStartTime().after(workerServerStartDate);
+                return taskInstance.getStartTime().after(serverStartDate);
             }
         }
         return false;
