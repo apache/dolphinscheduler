@@ -58,16 +58,6 @@ export default {
             text: 'Older Versions',
             link: '/en-us/docs/release/history-versions.html',
           },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/en-us/docs/dev/user_doc/about/introduction.html',
-          },
         ],
       },
       {
