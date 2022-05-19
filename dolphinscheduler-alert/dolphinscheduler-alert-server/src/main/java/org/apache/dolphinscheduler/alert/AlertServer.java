@@ -63,7 +63,7 @@ public class AlertServer implements Closeable {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
-        new SpringApplicationBuilder(AlertServer.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(AlertServer.class).run(args);
     }
 
     @EventListener

@@ -178,6 +178,10 @@ export default {
                                 title: 'Kubernetes',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
+                            {
+                                title: 'MLflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
                         ],
                     },
                     {
@@ -532,6 +536,10 @@ export default {
                             {
                                 title: 'Kubernetes',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/mlflow.html',
                             },
                         ],
                     },
