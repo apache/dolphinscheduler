@@ -21,6 +21,7 @@ set -x
 API_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:12345/dolphinscheduler/actuator/health"
 MASTER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:5679/actuator/health"
 WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:1235/actuator/health"
+ALERT_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:50053/actuator/health"
 
 #Cluster start health check
 TIMEOUT=120
@@ -31,7 +32,8 @@ do
   MASTER_HTTP_STATUS=$(eval "$MASTER_HEALTHCHECK_COMMAND")
   WORKER_HTTP_STATUS=$(eval "$WORKER_HEALTHCHECK_COMMAND")
   API_HTTP_STATUS=$(eval "$API_HEALTHCHECK_COMMAND")
-  if [[ $MASTER_HTTP_STATUS -eq 200 && $WORKER_HTTP_STATUS -eq 200 && $API_HTTP_STATUS -eq 200 ]];then
+  ALERT_HTTP_STATUS=$(eval "$ALERT_HEALTHCHECK_COMMAND")
+  if [[ $MASTER_HTTP_STATUS -eq 200 && $WORKER_HTTP_STATUS -eq 200 && $API_HTTP_STATUS -eq 200 && $ALERT_HTTP_STATUS -eq 200 ]];then
     START_HEALTHCHECK_EXITCODE=0
   else
     START_HEALTHCHECK_EXITCODE=2
@@ -77,5 +79,13 @@ if [[ $API_HTTP_STATUS -ne 200 ]];then
   echo "api stop health check success"
 else
   echo "api stop health check failed"
+  exit 3
+fi
+
+ALERT_HTTP_STATUS=$(eval "$ALERT_HEALTHCHECK_COMMAND")
+if [[ $ALERT_HTTP_STATUS -ne 200 ]];then
+  echo "alert stop health check success"
+else
+  echo "alert stop health check failed"
   exit 3
 fi
