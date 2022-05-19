@@ -295,5 +295,5 @@ public interface ProcessService {
     void sendStartTask2Master(ProcessInstance processInstance, int taskId,
                               org.apache.dolphinscheduler.remote.command.CommandType taskType);
 
-    ProcessInstance loadNextProcess4Serial(long code, int state);
+    ProcessInstance loadNextProcess4Serial(long code, int state, int id);
 }
