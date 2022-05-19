@@ -33,7 +33,7 @@ jar package and add it to the `./tools/libs` directory, then change `./bin/ env/
     ```
 
 Execute database upgrade script: `sh ./tools/bin/upgrade-schema.sh`
-
+K
 ### Upgrade Service
 
 #### Change Configuration `bin/env/install_config.conf`
@@ -47,9 +47,7 @@ And them run command `sh ./bin/start-all.sh` to start all services.
 
 ### Differences of worker group (before or after version 1.3.1 of dolphinscheduler)
 
-The architecture of worker group is different between version
-
-before or after 1.3.1 
+The architecture of worker group is different between version before or after 1.3.1 
 
 - Before version 1.3.1(include itself) worker group can be created through UI interface.
 - Since version 1.3.1 worker group can be created by modifying the worker configuration. 
