@@ -36,6 +36,7 @@ export type TaskType =
   | 'ZEPPELIN'
   | 'K8S'
   | 'JUPYTER'
+  | 'MLFLOW'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -107,6 +108,10 @@ export const TASK_TYPES_MAP = {
   },
   K8S: {
     alias: 'K8S',
+    helperLinkDisable: true
+  },
+  MLFLOW: {
+    alias: 'MLFLOW',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }
