@@ -1,19 +1,28 @@
-# DolphinScheduler Upgrade Documentation
+# DolphinScheduler Upgrade
 
-## Back-Up Previous Version's Files and Database
+## Prepare
 
-## Stop All Services of DolphinScheduler
+### Backup Previous Version's Files and Database
 
- `sh ./script/stop-all.sh`
+To prevent data loss by some miss-operation, it is recommended to back up data before upgrading. The backup way according to your environment.
 
-## Download the Latest Version Installation Package
+### Download the Latest Version Installation Package
 
-- [download](/en-us/download/download.html) the latest version of the installation packages.
-- The following upgrade operations need to be performed in the new version's directory.
+Download the latest binary distribute package from [download](/en-us/download/download.html) and then put it in the different
+directory where current service running. And all below command is running in this directory.
 
-## Database Upgrade
+## Upgrade
 
-- If using MySQL as the database to run DolphinScheduler, please config it in `./bin/env/dolphinscheduler_env.sh`, change username and password to yours, and add MYSQL connector jar into lib dir `./tools/libs`, here we download `mysql-connector-java-8.0.16.jar`, and then correctly configure database connection information. You can download MYSQL connector jar from [here](https://downloads.MySQL.com/archives/c-j/). Otherwise, PostgreSQL is the default database. 
+### Stop All Services of DolphinScheduler
+
+Stop all services of dolphinscheduler according to your deployment method. If you deploy your dolphinscheduler according to [cluster deployment](./installation/cluster.md), you can stop all services by command `sh ./script/stop-all.sh`.
+
+### Upgrade Database
+
+Change configuration in `./bin/env/dolphinscheduler_env.sh` ({user} and {password} are changed to your database username and password), and then run the upgrade script.
+
+Using MySQL as an example, change the value if you use other databases. Please manually download the [mysql-connector-java driver jar](https://downloads.MySQL.com/archives/c-j/)
+jar package and add it to the `./tools/libs` directory, then change `./bin/ env/dolphinscheduler_env.sh` file
 
     ```shell
     export DATABASE=${DATABASE:-mysql}
@@ -23,36 +32,41 @@
     export SPRING_DATASOURCE_PASSWORD={password}
     ```
 
-- Execute database upgrade script:
+Execute database upgrade script: `sh ./tools/bin/upgrade-schema.sh`
 
-    `sh ./tools/bin/upgrade-schema.sh`
+### Upgrade Service
 
-## Backend Service Upgrade
+#### Change Configuration `bin/env/install_config.conf`
 
-### Modify the Content in `conf/config/install_config.conf` File
+- If you deploy with Pseudo-Cluster deployment, change it according to [Pseudo-Cluster](./installation/pseudo-cluster.md) section "Modify Configuration".
+- If you deploy with Cluster deployment, change it according to [Cluster](./installation/cluster.md) section "Modify Configuration".
 
-- Standalone Deployment please refer to the [Standalone-Deployment](./installation/standalone.md).
-- Cluster Deployment please refer to the [Cluster-Deployment](./installation/cluster.md).
+And them run command `sh ./bin/start-all.sh` to start all services. 
 
-#### Masters Need Attentions
+## Notice
 
-Create worker group in 1.3.1 version has a different design: 
+### Differences of worker group (before or after version 1.3.1 of dolphinscheduler)
 
-- Before version 1.3.1 worker group can be created through UI interface.
+The architecture of worker group is different between version
+
+before or after 1.3.1 
+
+- Before version 1.3.1(include itself) worker group can be created through UI interface.
 - Since version 1.3.1 worker group can be created by modifying the worker configuration. 
 
-#### When Upgrade from Version Before 1.3.1 to 1.3.2, the Below Operations are What We Need to Do to Keep Worker Group Configuration Consist with Previous
+#### How Can I Do When I Upgrade from 1.3.1
 
-1. Go to the backup database, search records in `t_ds_worker_group table`, mainly focus `id, name and IP` three columns.
+* Check the backup database, search records in table `t_ds_worker_group table` and mainly focus on three columns: `id, name and IP`.
 
 | id | name | ip_list    |
 | :---         |     :---:      |          ---: |
 | 1   | service1     | 192.168.xx.10    |
 | 2   | service2     | 192.168.xx.11,192.168.xx.12      |
 
-2. Modify the worker configuration in `conf/config/install_config.conf` file.
+* Modify worker related configuration in `bin/env/install_config.conf`.
 
 Assume bellow are the machine worker service to be deployed:
+
 | hostname | ip |
 | :---  | :---:  |
 | ds1   | 192.168.xx.10     |
@@ -68,12 +82,8 @@ workers="ds1:service1,ds2:service2,ds3:service2"
 
 #### The Worker Group has Been Enhanced in Version 1.3.2
 
-Workers in 1.3.1 can't belong to more than one worker group, but in 1.3.2 it's supported. So in 1.3.1 it's not supported when `workers="ds1:service1,ds1:service2"`, and in 1.3.2 it's supported. 
+Workers in 1.3.1 can only belong to one worker group, but after version 1.3.2 worker support more than one worker group. 
 
-### Execute Deploy Script
-
-```shell
-`sh install.sh`
+```sh
+workers="ds1:service1,ds1:service2"
 ```
-
-

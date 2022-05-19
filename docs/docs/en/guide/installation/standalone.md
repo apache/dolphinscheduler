@@ -20,9 +20,8 @@ There is a standalone startup script in the binary compressed package, which can
 
 ```shell
 # Extract and start Standalone Server
-DOLPHINSCHEDULER_VERSION=<version>
-tar -xvzf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-bin.tar.gz
-cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-bin
+tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
+cd apache-dolphinscheduler-*-bin
 sh ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```
 
