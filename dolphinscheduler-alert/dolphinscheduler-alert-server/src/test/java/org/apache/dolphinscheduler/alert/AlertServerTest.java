@@ -56,8 +56,8 @@ public class AlertServerTest extends TestCase {
     public void testStart() {
 
         Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
-        
-        Mockito.when(alertConfig.getPort()).thenReturn(50053);
+
+        Mockito.when(alertConfig.getPort()).thenReturn(50052);
 
         Mockito.doNothing().when(alertSenderService).start();
 
@@ -67,7 +67,7 @@ public class AlertServerTest extends TestCase {
     
         NettyServerConfig nettyServerConfig = Whitebox.getInternalState(nettyRemotingServer, "serverConfig");
         
-        Assert.assertEquals(50053, nettyServerConfig.getListenPort());
+        Assert.assertEquals(50052, nettyServerConfig.getListenPort());
 
     }
 }
