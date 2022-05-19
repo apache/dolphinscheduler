@@ -314,10 +314,6 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/open-api.html',
                     },
                     {
-                        title: 'Flink',
-                        link: '/en-us/docs/dev/user_doc/guide/flink-call.html',
-                    },
-                    {
                         title: 'Upgrade',
                         link: '/en-us/docs/dev/user_doc/guide/upgrade.html',
                     },
@@ -671,10 +667,6 @@ export default {
                     {
                         title: 'API调用',
                         link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
-                    },
-                    {
-                        title: 'Flink调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/flink-call.html',
                     },
                     {
                         title: '升级',
