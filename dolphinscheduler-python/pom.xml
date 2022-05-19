@@ -104,7 +104,7 @@
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mv apache-dolphinscheduler-*.tar.gz apache-dolphinscheduler-python-${project.version}.tar.gz</argument>
+                                        <argument>mv dist/apache-dolphinscheduler-*.tar.gz dist/apache-dolphinscheduler-python-${project.version}.tar.gz</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -119,7 +119,7 @@
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mv apache_dolphinscheduler-*py3-none-any.whl apache_dolphinscheduler-python-${project.version}-py3-none-any.whl</argument>
+                                        <argument>mv dist/apache_dolphinscheduler-*py3-none-any.whl dist/apache_dolphinscheduler-python-${project.version}-py3-none-any.whl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
