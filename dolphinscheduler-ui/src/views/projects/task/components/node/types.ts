@@ -306,6 +306,9 @@ interface ITaskParams {
   udfs?: string
   connParams?: string
   targetJobName?: string
+  zk?: string
+  zkPath?: string
+  executeMode?: string
 }
 
 interface INodeData
