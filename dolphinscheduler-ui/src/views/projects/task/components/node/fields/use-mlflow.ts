@@ -15,62 +15,22 @@
  * limitations under the License.
  */
 import { useI18n } from 'vue-i18n'
-import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
-import { computed } from 'vue'
+import { useMlflowProjects, useMlflowModels } from '.'
 
-export const MLFLOW_JOB_TYPE = [
+export const MLFLOW_TASK_TYPE = [
   {
-    label: 'BasicAlgorithm',
-    value: 'BasicAlgorithm'
+    label: 'MLflow Models',
+    value: 'MLflow Models'
   },
   {
-    label: 'AutoML',
-    value: 'AutoML'
-  }
-]
-export const ALGORITHM = [
-  {
-    label: 'svm',
-    value: 'svm'
-  },
-  {
-    label: 'lr',
-    value: 'lr'
-  },
-  {
-    label: 'lightgbm',
-    value: 'lightgbm'
-  },
-  {
-    label: 'xgboost',
-    value: 'xgboost'
-  }
-]
-export const AutoMLTOOL = [
-  {
-    label: 'autosklearn',
-    value: 'autosklearn'
-  },
-  {
-    label: 'flaml',
-    value: 'flaml'
+    label: 'MLflow Projects',
+    value: 'MLflow Projects'
   }
 ]
 
 export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-  const registerModelSpan = computed(() => (model.registerModel ? 12 : 24))
-  const modelNameSpan = computed(() => (model.registerModel ? 12 : 0))
-  const algorithmSpan = computed(() =>
-    model.mlflowJobType === 'BasicAlgorithm' ? 12 : 0
-  )
-  const automlToolSpan = computed(() =>
-    model.mlflowJobType === 'AutoML' ? 12 : 0
-  )
-  const searchParamsSpan = computed(() =>
-    model.mlflowJobType === 'BasicAlgorithm' ? 24 : 0
-  )
 
   return [
     {
@@ -94,91 +54,13 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
-      type: 'input',
-      field: 'experimentName',
-      name: t('project.node.mlflow_experimentName'),
+      type: 'select',
+      field: 'mlflowTaskType',
+      name: t('project.node.mlflow_taskType'),
       span: 12,
-      props: {
-        placeholder: t('project.node.mlflow_experimentName_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: false
-      }
+      options: MLFLOW_TASK_TYPE
     },
-    {
-      type: 'switch',
-      field: 'registerModel',
-      name: t('project.node.mlflow_registerModel'),
-      span: registerModelSpan
-    },
-    {
-      type: 'input',
-      field: 'modelName',
-      name: t('project.node.mlflow_modelName'),
-      span: modelNameSpan,
-      props: {
-        placeholder: t('project.node.mlflow_modelName_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: false
-      }
-    },
-    {
-      type: 'select',
-      field: 'mlflowJobType',
-      name: t('project.node.mlflow_jobType'),
-      span: 12,
-      options: MLFLOW_JOB_TYPE
-    },
-    {
-      type: 'select',
-      field: 'algorithm',
-      name: t('project.node.mlflow_algorithm'),
-      span: algorithmSpan,
-      options: ALGORITHM
-    },
-    {
-      type: 'select',
-      field: 'automlTool',
-      name: t('project.node.mlflow_automlTool'),
-      span: automlToolSpan,
-      options: AutoMLTOOL
-    },
-    {
-      type: 'input',
-      field: 'dataPath',
-      name: t('project.node.mlflow_dataPath'),
-      props: {
-        placeholder: t('project.node.mlflow_dataPath_tips')
-      }
-    },
-    {
-      type: 'input',
-      field: 'params',
-      name: t('project.node.mlflow_params'),
-      props: {
-        placeholder: t('project.node.mlflow_params_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: false
-      }
-    },
-    {
-      type: 'input',
-      field: 'searchParams',
-      name: t('project.node.mlflow_searchParams'),
-      props: {
-        placeholder: t('project.node.mlflow_searchParams_tips')
-      },
-      span: searchParamsSpan,
-      validate: {
-        trigger: ['input', 'blur'],
-        required: false
-      }
-    },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useMlflowProjects(model),
+    ...useMlflowModels(model)
   ]
 }

@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowConstants;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowParameters;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowTask;
 import org.junit.Assert;
@@ -56,7 +57,7 @@ public class MlflowTaskTest {
         PowerMockito.mockStatic(PropertyUtils.class);
     }
 
-    public TaskExecutionContext createContext(MlflowParameters mlflowParameters){
+    public TaskExecutionContext createContext(MlflowParameters mlflowParameters) {
         String parameters = JSONUtils.toJsonString(mlflowParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
@@ -77,36 +78,43 @@ public class MlflowTaskTest {
     }
 
     @Test
-    public void testInitBasicAlgorithmTask()
-            throws Exception {
-        try {
-            MlflowParameters mlflowParameters = createBasicAlgorithmParameters();
-            TaskExecutionContext taskExecutionContext = createContext(mlflowParameters);
-            MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
-            mlflowTask.init();
-            mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
+    public void testInitBasicAlgorithmTask() throws Exception {
+        MlflowTask mlflowTask = initTask(createBasicAlgorithmParameters());
+        String command = mlflowTask.buildCommand();
+
     }
 
     @Test
-    public void testInitAutoMLTask()
-            throws Exception {
-        try {
-            MlflowParameters mlflowParameters = createAutoMLParameters();
-            TaskExecutionContext taskExecutionContext = createContext(mlflowParameters);
-            MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
-            mlflowTask.init();
-            mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
+    public void testInitAutoMLTask() throws Exception {
+        MlflowTask mlflowTask = initTask(createAutoMLParameters());
+        String command = mlflowTask.buildCommand();
+    }
+
+    @Test
+    public void testModelsDeployMlflow() throws Exception {
+        MlflowTask mlflowTask = initTask(createModelDeplyMlflowParameters());
+        String command = mlflowTask.buildCommand();
+    }
+
+    @Test
+    public void testModelsDeployDocker() throws Exception {
+        MlflowTask mlflowTask = initTask(createModelDeplyDockerParameters());
+        String command = mlflowTask.buildCommand();
+    }
+
+    private MlflowTask initTask(MlflowParameters mlflowParameters) {
+        TaskExecutionContext taskExecutionContext = createContext(mlflowParameters);
+        MlflowTask mlflowTask = new MlflowTask(taskExecutionContext);
+        mlflowTask.init();
+        mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
+        return mlflowTask;
+
     }
 
     private MlflowParameters createBasicAlgorithmParameters() {
         MlflowParameters mlflowParameters = new MlflowParameters();
-        mlflowParameters.setMlflowJobType("BasicAlgorithm");
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS);
+        mlflowParameters.setMlflowJobType(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM);
         mlflowParameters.setAlgorithm("xgboost");
         mlflowParameters.setDataPaths("xxxxxxxxxx");
         mlflowParameters.setExperimentNames("asbbb");
@@ -116,7 +124,8 @@ public class MlflowTaskTest {
 
     private MlflowParameters createAutoMLParameters() {
         MlflowParameters mlflowParameters = new MlflowParameters();
-        mlflowParameters.setMlflowJobType("AutoML");
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS);
+        mlflowParameters.setMlflowJobType(MlflowConstants.JOB_TYPE_AUTOML);
         mlflowParameters.setAutomlTool("autosklearn");
         mlflowParameters.setParams("time_left_for_this_task=30");
         mlflowParameters.setDataPaths("xxxxxxxxxxx");
@@ -126,4 +135,23 @@ public class MlflowTaskTest {
         return mlflowParameters;
     }
 
+    private MlflowParameters createModelDeplyMlflowParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
+        mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_MLFLOW);
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        mlflowParameters.setDeployModelKey("runs:/a272ec279fc34a8995121ae04281585f/model");
+        mlflowParameters.setDeployPort("7000");
+        return mlflowParameters;
+    }
+
+    private MlflowParameters createModelDeplyDockerParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
+        mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER);
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        mlflowParameters.setDeployModelKey("runs:/a272ec279fc34a8995121ae04281585f/model");
+        mlflowParameters.setDeployPort("7000");
+        return mlflowParameters;
+    }
 }
