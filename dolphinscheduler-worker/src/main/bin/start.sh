@@ -26,8 +26,11 @@ export DOLPHINSCHEDULER_WORK_HOME=${DOLPHINSCHEDULER_HOME}
 JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms4g -Xmx4g -Xmn2g -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
 if [[ "$DOCKER" == "true" ]]; then
-  source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
   JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
+fi
+
+if [[ "$DOCKER" != "true" ]]; then
+  source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
 fi
 
 java $JAVA_OPTS \
