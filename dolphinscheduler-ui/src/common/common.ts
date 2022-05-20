@@ -31,7 +31,8 @@ import {
   StopOutlined,
   GlobalOutlined,
   IssuesCloseOutlined,
-  SendOutlined
+  SendOutlined,
+  HistoryOutlined
 } from '@vicons/antd'
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
@@ -275,6 +276,14 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     icon: SendOutlined,
     isSpin: false,
     classNames: 'dispatch'
+  },
+  PENDING: {
+    id: 18,
+    desc: `${t('project.workflow.pending')}`,
+    color: '#5101be',
+    icon: HistoryOutlined,
+    isSpin: false,
+    classNames: 'pending'
   }
 })
 

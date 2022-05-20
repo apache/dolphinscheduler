@@ -112,7 +112,7 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-export SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 
@@ -177,7 +177,7 @@ mysql> FLUSH PRIVILEGES;
 export DATABASE=${DATABASE:-mysql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```  
@@ -185,7 +185,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
 
 ```shell
-sh tools/bin/create-schema.sh
+sh tools/bin/upgrade-schema.sh
 ```
 
 ## 启动 DolphinScheduler
