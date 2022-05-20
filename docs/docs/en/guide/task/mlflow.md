@@ -77,7 +77,7 @@ First, introduce some general parameters of DolphinScheduler
   parameters `"time_budget=30;estimator_list=['lgbm']"` for flaml 。The convention will be passed with '; 'shards
   each parameter, using the name before the equal sign as the parameter name, and using the name after the equal
   sign to get the corresponding parameter value through `python eval()`.
-    - [lr](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression)
+    - [Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression)
     - [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html?highlight=svc#sklearn.svm.SVC)
     - [lightgbm](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier)
     - [xgboost](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBClassifier)
