@@ -113,7 +113,7 @@ def test_set_release_state(value, expect):
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, release_state=value) as pd:
         assert (
             getattr(pd, "release_state") == expect
-        ), f"ProcessDefinition set attribute release_state do not return expect value."
+        ), "ProcessDefinition set attribute release_state do not return expect value."
 
 
 @pytest.mark.parametrize(
@@ -133,7 +133,7 @@ def test_set_release_state_error(value):
         PyDSParamException,
         match="Parameter release_state only support `online` or `offline` but get.*",
     ):
-        rs = pd.release_state
+        pd.release_state
 
 
 @pytest.mark.parametrize(
