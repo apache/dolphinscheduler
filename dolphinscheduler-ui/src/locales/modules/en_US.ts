@@ -500,6 +500,7 @@ const project = {
     forced_success: 'Forced success',
     serial_wait: 'Serial wait',
     dispatch: 'Dispatch',
+    pending: 'Pending',
     executing: 'Executing',
     startup_type: 'Startup Type',
     complement_range: 'Complement Range',
