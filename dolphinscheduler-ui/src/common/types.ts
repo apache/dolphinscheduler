@@ -33,6 +33,7 @@ export type ITaskState =
   | 'FORCED_SUCCESS'
   | 'SERIAL_WAIT'
   | 'DISPATCH'
+  | 'PENDING'
 
 export type ITaskStateConfig = {
   [key in ITaskState]: {
