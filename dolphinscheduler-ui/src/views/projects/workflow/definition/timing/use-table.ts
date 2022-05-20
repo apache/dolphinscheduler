@@ -106,6 +106,13 @@ export function useTable() {
       {
         title: t('project.workflow.failure_strategy'),
         key: 'failureStrategy',
+        render: (row: any) => {
+          if (row.failureStrategy === 'CONTINUE') {
+            return t('project.workflow.continue')
+          } else if (row.failureStrategy === 'END') {
+            return t('project.workflow.end')
+          }
+        },
         width: 140
       },
       {
