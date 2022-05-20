@@ -43,7 +43,7 @@ postgresql:
 ## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
   type: "postgresql"
-  # Use "com.mysql.cj.jdbc.driver" if you use MySQL
+  # Use "com.mysql.cj.jdbc.Driver" if you use MySQL
   driver: org.postgresql.Driver
   host: "localhost"
   port: "5432"
