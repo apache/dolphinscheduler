@@ -58,10 +58,11 @@ expects = [
         "default.workflow.project": ("project-pydolphin", "project-pydolphinEdit"),
         "default.workflow.tenant": ("tenant_pydolphin", "SmithEdit"),
         "default.workflow.user": ("userPythonGateway", "SmithEdit"),
-        "default.workflow.queue": ("queuePythonGateway", "SmithEdit"),
-        "default.workflow.worker_group": ("default", "SmithEdit"),
-        "default.workflow.time_zone": ("Asia/Shanghai", "SmithEdit"),
-        "default.workflow.warning_type": ("NONE", "SmithEdit"),
+        "default.workflow.queue": ("queuePythonGateway", "queueEdit"),
+        "default.workflow.worker_group": ("default", "wgEdit"),
+        "default.workflow.release_state": ("online", "offline"),
+        "default.workflow.time_zone": ("Asia/Shanghai", "Europe/Amsterdam"),
+        "default.workflow.warning_type": ("NONE", "SUCCESS"),
     },
 ]
 
