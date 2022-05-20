@@ -74,6 +74,7 @@ sed -i ${txt} "s@^#*registry.plugin.dir=.*@registry.plugin.dir=${installPath}/${
 sed -i ${txt} "s@^#*registry.plugin.name=.*@registry.plugin.name=${registryPluginName}@g" conf/registry.properties
 sed -i ${txt} "s@^#*registry.servers=.*@registry.servers=${registryServers}@g" conf/registry.properties
 sed -i ${txt} "s@^#*registry.namespace=.*@registry.namespace=${registryNamespace}@g" conf/registry.properties
+sed -i ${txt} "s@^#*registry.block.until.connected.wait=.*@registry.block.until.connected.wait=${registryBlockUntilConnectedWait}@g" conf/registry.properties
 
 # 2.create directory
 echo "2.create directory"
