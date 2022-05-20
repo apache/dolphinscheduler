@@ -329,6 +329,10 @@ interface ITaskParams {
   mlflowJobType?: string
   automlTool?: string
   registerModel?: boolean
+  mlflowTaskType?: string
+  deployType?: string
+  deployPort?: string
+  deployModelKey?: string
 }
 
 interface INodeData
