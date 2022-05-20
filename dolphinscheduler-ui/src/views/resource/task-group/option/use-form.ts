@@ -53,6 +53,12 @@ export function useForm() {
               t('resource.task_group_option.please_enter_resource_pool_size')
             )
           }
+          if (!/^[1-9]\d*$/.test(state.formData.groupSize)) {
+            return new Error(
+              t('resource.task_group_option.resource_pool_size') +
+                t('resource.task_group_option.positive_integer_tips')
+            )
+          }
         }
       },
       projectCode: {
