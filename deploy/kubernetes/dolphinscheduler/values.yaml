@@ -30,6 +30,7 @@ image:
 ## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
   enabled: true
+  driver: org.postgresql.Driver
   postgresqlUsername: "root"
   postgresqlPassword: "root"
   postgresqlDatabase: "dolphinscheduler"
@@ -42,6 +43,8 @@ postgresql:
 ## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
   type: "postgresql"
+  # Use "com.mysql.cj.jdbc.driver" if you use MySQL
+  driver: org.postgresql.Driver
   host: "localhost"
   port: "5432"
   username: "root"
