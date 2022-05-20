@@ -130,7 +130,8 @@ def test_set_release_state_error(value):
     """Test process definition set release_state attributes with error."""
     pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, release_state=value)
     with pytest.raises(
-            PyDSParamException, match="Parameter release_state only support `online` or `offline` but get.*"
+        PyDSParamException,
+        match="Parameter release_state only support `online` or `offline` but get.*",
     ):
         rs = pd.release_state
 

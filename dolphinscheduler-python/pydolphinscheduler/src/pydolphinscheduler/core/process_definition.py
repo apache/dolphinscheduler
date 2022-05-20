@@ -206,7 +206,8 @@ class ProcessDefinition(Base):
         }
         if self._release_state not in rs_ref:
             raise PyDSParamException(
-                "Parameter release_state only support `online` or `offline` but get %", self._release_state
+                "Parameter release_state only support `online` or `offline` but get %",
+                self._release_state,
             )
         return rs_ref[self._release_state]
 
