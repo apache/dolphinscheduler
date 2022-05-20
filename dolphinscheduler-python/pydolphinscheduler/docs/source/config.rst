@@ -88,7 +88,7 @@ All environment variables as below, and you could modify their value via `Bash <
 |                  | ``PYDS_JAVA_GATEWAY_AUTO_CONVERT`` | Default boolean Java gateway auto convert, will use its value when it is set.                                      |
 +------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 |                  | ``PYDS_USER_NAME``                 | Default user name, will use when user's ``name`` when does not specify.                                            |
-+                  +------------------------------------+-------------------------------------------------------------------------------------------------------------- -----+
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 |                  | ``PYDS_USER_PASSWORD``             | Default user password, will use when user's ``password`` when does not specify.                                    |
 +                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 |   Default User   | ``PYDS_USER_EMAIL``                | Default user email, will use when user's ``email`` when does not specify.                                          |
