@@ -91,6 +91,13 @@ public class MlflowTaskTest {
     }
 
     @Test
+    public void testInitCustomProjectTask() throws Exception {
+        MlflowTask mlflowTask = initTask(createCustomProjectParameters());
+        String command = mlflowTask.buildCommand();
+        mlflowTask.handle();
+    }
+
+    @Test
     public void testModelsDeployMlflow() throws Exception {
         MlflowTask mlflowTask = initTask(createModelDeplyMlflowParameters());
         String command = mlflowTask.buildCommand();
@@ -132,6 +139,18 @@ public class MlflowTaskTest {
         mlflowParameters.setExperimentNames("asbbb");
         mlflowParameters.setModelNames("asbbb");
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        return mlflowParameters;
+    }
+
+    private MlflowParameters createCustomProjectParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS);
+        mlflowParameters.setMlflowJobType(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT);
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        mlflowParameters.setExperimentNames("custom_project");
+        mlflowParameters.setParams("-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9");
+        mlflowParameters.setMlflowProjectRepository("https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native");
+
         return mlflowParameters;
     }
 

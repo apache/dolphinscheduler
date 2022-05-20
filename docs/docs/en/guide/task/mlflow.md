@@ -13,10 +13,10 @@ MLflow task plugin used to execute MLflow tasks，Currently contains Mlflow Proj
 
 The Mlflow plugin currently supports and will support the following:
 
-- [ ] MLflow Projects
-    - [x] BasicAlgorithm: contains lr, svm, lightgbm, xgboost
+- [x] MLflow Projects
+    - [x] BasicAlgorithm: contains LogisticRegression, svm, lightgbm, xgboost
     - [x] AutoML: AutoML tool，contains autosklean, flaml
-    - [ ] Custom projects: Support for running your own MLflow projects
+    - [x] Custom projects: Support for running your own MLflow projects
 - [ ] MLflow Models
     - [x] MLFLOW: Use `MLflow models serve` to deploy a model service
     - [x] Docker: Run the container after packaging the docker image
@@ -65,8 +65,6 @@ First, introduce some general parameters of DolphinScheduler
 **Task Parameter**
 
 - **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
-- **job type** : The type of task to run, currently including the underlying algorithm and AutoML. (User-defined
-  MLFlow project task execution will be supported in the near future)
 - **experiment name** ：The experiment in which the task is running, if none, is created.
 - **register model** ：Register the model or not. If register is selected, the following parameters are expanded.
     - **model name** : The registered model name is added to the original model version and registered as
@@ -95,8 +93,6 @@ First, introduce some general parameters of DolphinScheduler
 **Task Parameter**
 
 - **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
-- **job type** : The type of task to run, currently including the underlying algorithm and AutoML. (User-defined
-  MLFlow project task execution will be supported in the near future)
 - **experiment name** ：The experiment in which the task is running, if none, is created.
 - **register model** ：Register the model or not. If register is selected, the following parameters are expanded.
     - **model name** : The registered model name is added to the original model version and registered as
@@ -113,6 +109,24 @@ First, introduce some general parameters of DolphinScheduler
   supports [autosklearn](https://github.com/automl/auto-sklearn)
   and [flaml](https://github.com/microsoft/FLAML)
 
+
+#### Custom projects
+
+![mlflow-custom-project-template.png](/img/tasks/demo/mlflow-custom-project-template.png)
+
+**Task Parameter**
+
+- **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
+- **experiment name** ：The experiment in which the task is running, if none, is created.
+- **parameters** : `--param-list` in `mlflow run`. For example `-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9`
+- **Repository** : Repository url of MLflow Project，Support git address and directory on worker. If it's in a subdirectory，We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`
+- **Project Version** : Version of the project，default master
+
+You can now use this feature to run all mlFlow projects on Github (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) )了。You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
+
+The actual interface is as follows
+
+![mlflow-custom-project.png](/img/tasks/demo/mlflow-custom-project.png)
 
 ### MLflow Models
 

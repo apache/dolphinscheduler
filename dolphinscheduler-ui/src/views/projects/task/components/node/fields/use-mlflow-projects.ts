@@ -17,6 +17,7 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 import { watch, ref } from 'vue'
+import { useCustomParams } from '.'
 
 export function useMlflowProjects(model: {
   [field: string]: any
@@ -36,14 +37,16 @@ export function useMlflowProjects(model: {
 
   const resetSpan = () => {
     experimentNameSpan.value = model.isProjects ? 12 : 0
-    registerModelSpan.value = model.isProjects ? 6 : 0
     mlflowJobTypeSpan.value = model.isProjects ? 12 : 0
     paramsSpan.value = model.isProjects ? 24 : 0
-    dataPathSpan.value = model.isProjects ? 24 : 0
+    registerModelSpan.value =
+      model.isProjects && model.mlflowJobType != 'CustomProject' ? 6 : 0
+    dataPathSpan.value =
+      model.isProjects && model.mlflowJobType != 'CustomProject' ? 24 : 0
   }
 
   watch(
-    () => [model.mlflowTaskType, model.registerModel],
+    () => [model.mlflowTaskType, model.mlflowJobType],
     () => {
       setFlag()
       resetSpan()
@@ -123,7 +126,8 @@ export function useMlflowProjects(model: {
       }
     },
     ...useBasicAlgorithm(model),
-    ...useAutoML(model)
+    ...useAutoML(model),
+    ...useCustomProject(model)
   ]
 }
 
@@ -144,7 +148,7 @@ export function useBasicAlgorithm(model: {
   }
 
   const resetSpan = () => {
-    algorithmSpan.value = model.isBasicAlgorithm ? 12 : 0
+    algorithmSpan.value = model.isBasicAlgorithm ? 24 : 0
     searchParamsSpan.value = model.isBasicAlgorithm ? 24 : 0
   }
 
@@ -155,6 +159,8 @@ export function useBasicAlgorithm(model: {
       resetSpan()
     }
   )
+  setFlag()
+  resetSpan()
 
   return [
     {
@@ -204,6 +210,10 @@ export function useAutoML(model: { [field: string]: any }): IJsonItem[] {
       resetSpan()
     }
   )
+
+  setFlag()
+  resetSpan()
+
   return [
     {
       type: 'select',
@@ -211,6 +221,60 @@ export function useAutoML(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.mlflow_automlTool'),
       span: automlToolSpan,
       options: AutoMLTOOL
+    }
+  ]
+}
+
+export function useCustomProject(model: { [field: string]: any }): IJsonItem[] {
+  const { t } = useI18n()
+
+  const mlflowProjectRepositorySpan = ref(0)
+  const mlflowProjectVersionSpan = ref(0)
+  const customParamsSpan = ref(0)
+
+  const setFlag = () => {
+    model.isCustomProject =
+      model.mlflowJobType === 'CustomProject' &&
+      model.mlflowTaskType === 'MLflow Projects'
+        ? true
+        : false
+  }
+
+  const resetSpan = () => {
+    mlflowProjectRepositorySpan.value = model.isCustomProject ? 24 : 0
+    mlflowProjectVersionSpan.value = model.isCustomProject ? 12 : 0
+    customParamsSpan.value = model.isCustomProject ? 24 : 0
+  }
+
+  watch(
+    () => [model.mlflowTaskType, model.mlflowJobType],
+    () => {
+      setFlag()
+      resetSpan()
+    }
+  )
+
+  setFlag()
+  resetSpan()
+
+  return [
+    {
+      type: 'input',
+      field: 'mlflowProjectRepository',
+      name: t('project.node.mlflowProjectRepository'),
+      span: mlflowProjectRepositorySpan,
+      props: {
+        placeholder: t('project.node.mlflowProjectRepository_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'mlflowProjectVersion',
+      name: t('project.node.mlflowProjectVersion'),
+      span: mlflowProjectVersionSpan,
+      props: {
+        placeholder: t('project.node.mlflowProjectVersion_tips')
+      }
     }
   ]
 }
@@ -223,6 +287,10 @@ export const MLFLOW_JOB_TYPE = [
   {
     label: 'AutoML',
     value: 'AutoML'
+  },
+  {
+    label: 'Custom Project',
+    value: 'CustomProject'
   }
 ]
 export const ALGORITHM = [

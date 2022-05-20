@@ -2,6 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
+    mlflowProjectRepository: '运行仓库',
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -976,6 +977,10 @@ const project = {
     mlflow_deployType: '部署类型',
     mlflow_deployModelKey: '部署的模型uri',
     mlflow_deployPort: '监听端口',
+    mlflowProjectRepository: '运行仓库',
+    mlflowProjectRepository_tips: '可以为github仓库或worker上的路径',
+    mlflowProjectVersion: '项目版本',
+    mlflowProjectVersion_tips: '项目git版本',
     send_email: '发送邮件',
     log_display: '日志显示',
     rows_of_result: '行查询结果',

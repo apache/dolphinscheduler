@@ -26,6 +26,8 @@ public class MlflowConstants {
 
     public static final String JOB_TYPE_BASIC_ALGORITHM = "BasicAlgorithm";
 
+    public static final String JOB_TYPE_CUSTOM_PROJECT = "CustomProject";
+
     public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
 
     public static final String PRESET_REPOSITORY_VERSION = "main";
@@ -74,6 +76,11 @@ public class MlflowConstants {
             "-P model_name=\"%s\" " +
             "--experiment-name=\"%s\" " +
             "--version=main ";
+
+    public static final String MLFLOW_RUN_CUSTOM_PROJECT = "mlflow run $repo " +
+            "%s " +
+            "--experiment-name=\"%s\" " +
+            "--version=\"%s\" ";
 
     public static final String MLFLOW_MODELS_SERVE = "mlflow models serve -m %s --port %s -h 0.0.0.0";
 
