@@ -103,7 +103,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 #### Docker
 
-![mlflow-models-docker](/img/tasks/demo/mlflow-models-mlflow/mlflow-models-docker.png)
+![mlflow-models-docker](/img/tasks/demo/mlflow-models-docker.png)
 
 - **mlflow server tracking uri** ：MLflow server 的连接, 默认 http://localhost:5000。
 - **部署模型的uri** ：mlflow 服务里面模型对应的uri, 支持 `models:/<model_name>/suffix` 格式 和 `runs:/` 格式。

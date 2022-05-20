@@ -128,7 +128,7 @@ First, introduce some general parameters of DolphinScheduler
 
 #### Docker
 
-![mlflow-models-docker](/img/tasks/demo/mlflow-models-mlflow/mlflow-models-docker.png)
+![mlflow-models-docker](/img/tasks/demo/mlflow-models-docker.png)
 
 **Task Parameter**
 
