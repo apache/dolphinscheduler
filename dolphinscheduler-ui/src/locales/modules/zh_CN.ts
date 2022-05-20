@@ -312,7 +312,7 @@ const resource = {
     please_enter_name: '请输入任务组名称',
     please_enter_desc: '请输入任务组描述',
     please_enter_resource_pool_size: '请输入资源容量大小',
-    resource_pool_size_be_a_number: '资源容量大小必须大于等于1的数值',
+    positive_integer_tips: '应为正整数',
     please_select_project: '请选择项目',
     create_time: '创建时间',
     update_time: '更新时间',
