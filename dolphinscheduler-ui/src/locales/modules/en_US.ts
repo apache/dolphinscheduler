@@ -306,8 +306,6 @@ const resource = {
     name: 'Task group name',
     project_name: 'Project name',
     resource_pool_size: 'Resource pool size',
-    resource_pool_size_be_a_number:
-      'The size of the task group resource pool should be more than 1',
     resource_used_pool_size: 'Used resource',
     desc: 'Task group desc',
     status: 'Task group status',
@@ -317,6 +315,7 @@ const resource = {
     please_enter_desc: 'Please enter task group description',
     please_enter_resource_pool_size:
       'Please enter task group resource pool size',
+    positive_integer_tips: 'should be a positive integer',
     please_select_project: 'Please select a project',
     create_time: 'Create time',
     update_time: 'Update time',
