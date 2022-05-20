@@ -50,24 +50,14 @@ export default {
           },
           {
             key: 'docs1',
-            text: '2.0.5',
-            link: '/en-us/docs/2.0.5/user_doc/guide/quick-start.html',
+            text: '1.3.9',
+            link: '/en-us/docs/1.3.9/user_doc/quick-start.html',
           },
           {
             key: 'docsHistory',
             text: 'Older Versions',
             link: '/en-us/docs/release/history-versions.html',
-          },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/en-us/docs/dev/user_doc/about/introduction.html',
-          },
+          }
         ],
       },
       {
@@ -236,24 +226,14 @@ export default {
           },
           {
             key: 'docs1',
-            text: '2.0.5',
-            link: '/zh-cn/docs/2.0.5/user_doc/guide/quick-start.html',
+            text: '1.3.9',
+            link: '/zh-cn/docs/1.3.9/user_doc/quick-start.html',
           },
           {
             key: 'docsHistory',
             text: '历史版本',
             link: '/zh-cn/docs/release/history-versions.html',
-          },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/zh-cn/docs/dev/user_doc/about/introduction.html',
-          },
+          }
         ],
       },
       {
