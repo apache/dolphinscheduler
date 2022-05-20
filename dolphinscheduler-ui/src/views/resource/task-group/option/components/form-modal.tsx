@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, PropType, toRefs, onMounted, ref, Ref } from 'vue'
-import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
+import { NForm, NFormItem, NInput, NSelect, NInputNumber } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createTaskGroup, updateTaskGroup } from '@/service/modules/task-group'
@@ -133,8 +133,10 @@ const FormModal = defineComponent({
             label={t('resource.task_group_option.resource_pool_size')}
             path='groupSize'
           >
-            <NInput
+            <NInputNumber
               v-model:value={this.formData.groupSize}
+              style={{width: '100%'}}
+              min={1}
               placeholder={t(
                 'resource.task_group_option.please_enter_resource_pool_size'
               )}
