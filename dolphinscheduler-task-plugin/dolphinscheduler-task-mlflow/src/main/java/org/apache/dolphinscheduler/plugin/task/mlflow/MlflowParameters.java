@@ -29,7 +29,7 @@ public class MlflowParameters extends AbstractParameters {
 
     private String params = "";
 
-    private String mlflowJobType = "BasicAlgorithm";
+    private String mlflowJobType = "";
 
     /**
      * AutoML parameters
@@ -51,12 +51,23 @@ public class MlflowParameters extends AbstractParameters {
      * mlflow parameters
      */
 
+    private String mlflowTaskType = "";
+
     private String experimentName;
 
     private String modelName = "";
 
     private String mlflowTrackingUri = "http://127.0.0.1:5000";
 
+    /**
+     * mlflow models deploy parameters
+     */
+
+    private String deployType;
+
+    private String deployModelKey;
+
+    private String deployPort;
 
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
@@ -90,6 +101,13 @@ public class MlflowParameters extends AbstractParameters {
         return dataPath;
     }
 
+    public void setMlflowTaskType(String mlflowTaskType) {
+        this.mlflowTaskType = mlflowTaskType;
+    }
+
+    public String getMlflowTaskType() {
+        return mlflowTaskType;
+    }
 
     public void setExperimentNames(String experimentName) {
         this.experimentName = experimentName;
@@ -131,17 +149,43 @@ public class MlflowParameters extends AbstractParameters {
         return automlTool;
     }
 
+    public void setDeployType(String deployType) {
+        this.deployType = deployType;
+    }
+
+    public String getDeployType() {
+        return deployType;
+    }
+
+    public void setDeployModelKey(String deployModelKey) {
+        this.deployModelKey = deployModelKey;
+    }
+
+    public String getDeployModelKey() {
+        return deployModelKey;
+    }
+
+    public void setDeployPort(String deployPort) {
+        this.deployPort = deployPort;
+    }
+
+    public String getDeployPort() {
+        return deployPort;
+    }
+
     @Override
     public boolean checkParameters() {
-
-        Boolean checkResult = experimentName != null && mlflowTrackingUri != null;
-        if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
-            checkResult &= dataPath != null;
-        } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
-            checkResult &= dataPath != null;
-            checkResult &= automlTool != null;
-        } else {
-        }
+        Boolean checkResult = true;
+//        Boolean checkResult = mlflowTrackingUri != null;
+//        if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
+//            checkResult &= dataPath != null;
+//            checkResult &= experimentName != null;
+//        } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
+//            checkResult &= dataPath != null;
+//            checkResult &= automlTool != null;
+//            checkResult &= experimentName != null;
+//        } else {
+//        }
         return checkResult;
     }
 
@@ -186,6 +230,19 @@ public class MlflowParameters extends AbstractParameters {
         }
         String scriptPath = MlflowTask.class.getClassLoader().getResource(projectScript).getPath();
         return scriptPath;
+    }
+
+    public String getModelKeyName(String tag) throws IllegalArgumentException{
+        String imageName;
+        if (deployModelKey.startsWith("runs:")) {
+            imageName = deployModelKey.replace("runs:/", "");
+        } else if (deployModelKey.startsWith("models:")) {
+            imageName = deployModelKey.replace("models:/", "");
+        } else {
+            throw new IllegalArgumentException("model key must start with runs:/ or models:/ ");
+        }
+        imageName = imageName.replace("/", tag);
+        return imageName;
     }
 
 };
