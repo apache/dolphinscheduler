@@ -21,21 +21,21 @@ This document only describes DolphinScheduler configurations and other topics ar
 │
 ├── licenses                                    directory of licenses
 │
-├── bin                                         directory of DS application commands, configrations scripts 
-│   ├── dolphinscheduler-daemon.sh              script to start or shut down DS application
+├── bin                                         directory of DolphinScheduler application commands, configrations scripts 
+│   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
 │   ├── env                                     directory of scripts to load environment variables
-│   │   ├── dolphinscheduler_env.sh             script to load environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-│   │   └── install_env.sh                      script to load environment variables for DS installation
-│   ├── install.sh                              script to auto-setup DS services 
+│   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
+│   │   └── install_env.sh                      script to export environment variables for DolphinScheduler installation when you use scripts `install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`
+│   ├── install.sh                              script to auto-setup services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches 
 │   ├── scp-hosts.sh                            script to copy installation files to target hosts 
-│   ├── start-all.sh                            script to start all DS services
-│   ├── status-all.sh                           script to check the status of all DS services 
-│   └── stop-all.sh                             script to shut down all DS services
+│   ├── start-all.sh                            script to start all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
+│   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
+│   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │
-├── alert-server                                directory of DS alert-server commands, configrations scripts and libs
+├── alert-server                                directory of DolphinScheduler alert-server commands, configrations scripts and libs
 │   ├── bin
-│   │   └── start.sh                            script to start DS alert-server
+│   │   └── start.sh                            script to start DolphinScheduler alert-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of alert-server
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc. 
@@ -43,20 +43,20 @@ This document only describes DolphinScheduler configurations and other topics ar
 │   │   └── logback-spring.xml                  configurations of alert-service log
 │   └── libs                                    directory of alert-server libs
 │
-├── api-server                                  directory of DS api-server commands, configrations scripts and libs
+├── api-server                                  directory of DolphinScheduler api-server commands, configrations scripts and libs
 │   ├── bin
-│   │   └── start.sh                            script to start DS api-server
+│   │   └── start.sh                            script to start DolphinScheduler api-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of api-server
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for api-server
 │   │   └── logback-spring.xml                  configurations of api-service log
 │   ├── libs                                    directory of api-server libs
-│   └── ui    
+│   └── ui                                      directory of api-server related front-end web resources 
 │
-├── master-server                               directory of DS master-server commands, configrations scripts and libs
+├── master-server                               directory of DolphinScheduler master-server commands, configrations scripts and libs
 │   ├── bin                                
-│   │   └── start.sh                            script to start DS master-server
+│   │   └── start.sh                            script to start DolphinScheduler master-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of master-server
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
@@ -64,30 +64,30 @@ This document only describes DolphinScheduler configurations and other topics ar
 │   │   └── logback-spring.xml                  configurations of master-service log
 │   └── libs                                    directory of master-server libs
 │
-├── standalone-server                                       directory of DS standalone-server commands, configrations scripts and libs
+├── standalone-server                           directory of DolphinScheduler standalone-server commands, configrations scripts and libs
 │   ├── bin
-│   │   └── start.sh                            script to start DS standalone-server
+│   │   └── start.sh                            script to start DolphinScheduler standalone-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of standalone-server
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for standalone-server
 │   │   ├── logback-spring.xml                  configurations of standalone-service log
-│   │   └── sql                                 .sql files to create or upgrade DS metadata
+│   │   └── sql                                 .sql files to create or upgrade DolphinScheduler metadata
 │   ├── libs                                    directory of standalone-server libs
-│   └── ui
+│   └── ui                                      directory of standalone-server related front-end web resources
 │       
-├── tools                                                       directory of DS metadata tools commands, configrations scripts and libs
+├── tools                                       directory of DolphinScheduler metadata tools commands, configrations scripts and libs
 │   ├── bin
-│   │   └── upgrade-schema.sh                   script to initialize or upgrade DS metadata
+│   │   └── upgrade-schema.sh                   script to initialize or upgrade DolphinScheduler metadata
 │   ├── conf
 │   │   ├── application.yaml                    configurations of tools
 │   │   └── common.properties                   configurations of common-service like storage, credentials, etc.
 │   ├── libs                                    directory of tool libs
-│   └── sql                                     .sql files to create or upgrade DS metadata
+│   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
 │     
-├── worker-server                               directory of DS worker-server commands, configrations scripts and libs
+├── worker-server                               directory of DolphinScheduler worker-server commands, configrations scripts and libs
 │       ├── bin
-│       │   └── start.sh                        script to start DS worker-server
+│       │   └── start.sh                        script to start DolphinScheduler worker-server
 │       ├── conf
 │       │   ├── application.yaml                configurations of worker-server
 │       │   ├── common.properties               configurations of common-service like storage, credentials, etc.
