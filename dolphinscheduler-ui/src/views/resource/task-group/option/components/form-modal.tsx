@@ -101,11 +101,7 @@ const FormModal = defineComponent({
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        confirmDisabled={
-          !this.formData.name ||
-          !this.formData.groupSize ||
-          !this.formData.description
-        }
+        confirmDisabled={!this.formData.name || !this.formData.groupSize}
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
