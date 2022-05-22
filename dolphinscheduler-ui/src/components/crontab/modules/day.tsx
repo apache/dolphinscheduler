@@ -62,7 +62,7 @@ export default defineComponent({
     const intervalDayStartRef = ref(1)
     const intervalDayPerformRef = ref(1)
     const WkspecificDayRef = ref<Array<number>>([])
-    const WkspecificWeekRef = ref<Array<number>>([])
+    const WkspecificWeekRef = ref<Array<string>>([])
     const monthLastDaysRef = ref('L')
     const monthLastWorkingDaysRef = ref('LW')
     const monthLastWeeksRef = ref('?')
@@ -108,9 +108,7 @@ export default defineComponent({
         }
 
         const hanleWeekTwo = () => {
-          WkspecificWeekRef.value = $weekVal
-            .split(',')
-            .map((item) => parseInt(item))
+          WkspecificWeekRef.value = $weekVal.split(',')
           radioRef.value = 'WkspecificWeek'
         }
 
@@ -244,7 +242,7 @@ export default defineComponent({
     }
 
     // Specific day of the week (multiple choice)
-    const onWkspecificWeek = (arr: Array<number>) => {
+    const onWkspecificWeek = (arr: Array<string>) => {
       WkspecificWeekRef.value = arr
       if (radioRef.value === 'WkspecificWeek') {
         dayRef.value = '?'
