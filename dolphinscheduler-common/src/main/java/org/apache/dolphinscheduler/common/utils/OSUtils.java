@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
-
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -33,10 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
@@ -180,16 +176,22 @@ public class OSUtils {
      * @return boolean
      */
     private static boolean existTenantCodeInLinux(String tenantCode) throws IOException {
-        String result = exeCmd("id "+ tenantCode);
-        if (!StringUtils.isEmpty(result)){
-            if (result.contains("no such user")){
-                return false;
-            }else if (result.contains("uid=")){
-                return true;
+        try{
+            String result = exeCmd("id "+ tenantCode);
+            if (!StringUtils.isEmpty(result)){
+                return result.contains("uid=");
             }
+        }catch (IOException el){
+            String message = el.getMessage();
+            //Because ShellExecutor method throws  exception to the linux return status is not 0
+            //not exist user return status is 1
+            if (message.contains("no such user")){
+                logger.warn(message);
+                return false;
+            }
+            throw el;
 
         }
-
         return false;
     }
 
