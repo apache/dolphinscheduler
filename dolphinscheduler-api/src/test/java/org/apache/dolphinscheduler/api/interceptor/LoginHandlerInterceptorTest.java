@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
@@ -83,7 +85,7 @@ public class LoginHandlerInterceptorTest {
         // test token
         String token = "123456";
         when(request.getHeader("token")).thenReturn(token);
-        when(userMapper.queryUserByToken(token, new Date())).thenReturn(mockUser);
+        when(userMapper.queryUserByToken(eq(token), any(Date.class))).thenReturn(mockUser);
         Assert.assertTrue(interceptor.preHandle(request, response, null));
 
         // test disable user
