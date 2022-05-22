@@ -192,7 +192,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
     ...useCustomParams({
       model,
       field: 'localParams',
-      isSimple: true
+      isSimple: false
     })
   ]
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -201,4 +202,27 @@ public abstract class AbstractParameters implements IParameters {
         varPool.removeIf(p -> p.getProp().equals(property.getProp()));
         varPool.add(property);
     }
+    /**
+     * Convert the body result returned from HTTP to a map
+     * @param result
+     * @return
+     */
+    public static Map<String, String> getHttpMapByString(String result) {
+        //Store conversion results
+        Map<String, String> format = new HashMap<>();
+        //Convert result to a collection
+        List<Map<String, String>> list = JSONUtils.parseObject(result, new TypeReference<List<Map<String, String>>>() {});
+        //Determine whether the converted result is null
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        //Get the value with key body and put it into the new Map object
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, String> map = list.get(i);
+            format.put("body", map.get("body"));
+        }
+        //Returns the result
+        return format;
+    }
+
 }

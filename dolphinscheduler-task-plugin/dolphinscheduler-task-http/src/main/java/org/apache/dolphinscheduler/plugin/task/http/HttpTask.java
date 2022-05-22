@@ -104,6 +104,8 @@ public class HttpTask extends AbstractTaskExecutor {
             logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
                     formatTimeStamp, httpParameters.getUrl(),
                     httpParameters.getHttpMethod(), costTime, statusCode, body, output);
+            String result = httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
+            httpParameters.dealOutParam(result);
         } catch (Exception e) {
             appendMessage(e.toString());
             exitStatusCode = -1;
@@ -135,8 +137,9 @@ public class HttpTask extends AbstractTaskExecutor {
         List<HttpProperty> httpPropertyList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(httpParameters.getHttpParams())) {
             for (HttpProperty httpProperty : httpParameters.getHttpParams()) {
-                String jsonObject = JSONUtils.toJsonString(httpProperty);
-                String params = ParameterUtils.convertParameterPlaceholders(jsonObject, ParamUtils.convert(paramsMap));
+                String value = httpProperty.getValue();
+                String params = ParameterUtils.convertParameterPlaceholders(value, ParamUtils.convert(paramsMap));
+                httpProperty.setValue(params);
                 logger.info("http request params：{}", params);
                 httpPropertyList.add(JSONUtils.parseObject(params, HttpProperty.class));
             }

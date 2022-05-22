@@ -17,12 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * http parameter
@@ -130,4 +136,44 @@ public class HttpParameters extends AbstractParameters {
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
     }
+    @Override
+    public void dealOutParam(String result) {
+        if (CollectionUtils.isEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        if (StringUtils.isEmpty(result)) {
+            varPool.addAll(outProperty);
+            return;
+        }
+        Map<String, String> httpMapByString = getHttpMapByString(result);
+        //判断是否为空
+        if (httpMapByString == null || httpMapByString.size() == 0) {
+            return;
+        }
+
+        for (Property info : outProperty) {
+            info.setValue(httpMapByString.get(info.getProp()));
+            varPool.add(info);
+        }
+    }
+
+    protected String setBodyReturn(String updateResult, List<Property> properties) {
+        String result = null;
+        List<Map<String, String>> updateRL = new ArrayList<>();
+        Map<String, String> updateRM = new HashMap<>();
+        for (Property info : properties) {
+            if (Direct.OUT == info.getDirect()) {
+                updateRM.put(info.getProp(), updateResult);
+                updateRL.add(updateRM);
+                result = JSONUtils.toJsonString(updateRL);
+                // break;
+            }
+        }
+        return result;
+    }
+
 }
