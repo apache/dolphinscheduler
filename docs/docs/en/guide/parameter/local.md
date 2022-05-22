@@ -2,7 +2,7 @@
 
 ## Scope
 
-Local parameters are used only for a single task node. Parameters configured on the task definition page, the scope of this parameter is inside this task only. But if you configure according to [Refer to Parameter Context](context.md), it could pass to downstream tasks.
+Parameters configured on the task definition page, the scope of this parameter is inside this task only. But if you configure according to [Refer to Parameter Context](context.md), it could pass to downstream tasks.
 
 ## Usage
 
@@ -10,7 +10,7 @@ Usage of local parameters is: at the task define page, click the '+' beside the 
 
 ## Examples
 
-This example uses local parameters to print the current date. Create a Shell task and write a script with the content 'echo ${dt}'. Click ** custom parameter ** in the configuration bar, and the configuration is as follows:
+This example shows how to use local parameters to print the current date. Create a Shell task and write a script with the content 'echo ${dt}'. Click ** custom parameter ** in the configuration bar, and the configuration is as follows:
 
 ![local-parameter01](/img/new_ui/dev/parameter/local_parameter01.png)
 
