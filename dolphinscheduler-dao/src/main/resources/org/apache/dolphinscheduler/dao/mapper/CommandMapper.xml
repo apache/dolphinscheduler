@@ -18,20 +18,16 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
-    <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-        select command.* from t_ds_command command
-        join t_ds_process_definition definition on command.process_definition_id = definition.id
-        where definition.release_state = 1 AND definition.flag = 1
-        order by command.update_time asc
-        limit 1
-    </select>
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
         select cmd.command_type as command_type, count(1) as count
         from t_ds_command cmd, t_ds_process_definition process
-        where cmd.process_definition_id = process.id
-        <if test="projectIdArray != null and projectIdArray.length != 0">
-            and process.project_id in 
-            <foreach collection="projectIdArray" index="index" item="i" open="(" close=")" separator=",">
+        where cmd.process_definition_code = process.code
+        <if test="userId != 0 ">
+            and process.user_id= #{userId}
+        </if>
+        <if test="projectCodeArray != null and projectCodeArray.length != 0">
+            and process.project_code in
+            <foreach collection="projectCodeArray" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
@@ -39,5 +35,19 @@
             and cmd.start_time <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
         </if>
         group by cmd.command_type
+    </select>
+    <select id="queryCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select *
+        from t_ds_command
+        order by process_instance_priority, id asc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="queryCommandPageBySlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select *
+        from t_ds_command
+        where id % #{masterCount} = #{thisMasterSlot}
+        order by process_instance_priority, id asc
+            limit #{limit} offset #{offset}
     </select>
 </mapper>

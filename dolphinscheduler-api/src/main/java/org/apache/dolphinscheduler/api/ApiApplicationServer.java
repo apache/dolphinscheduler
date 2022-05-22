@@ -14,26 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api;
 
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.event.EventListener;
 
-@SpringBootApplication
 @ServletComponentScan
-@ComponentScan(basePackages = {"org.apache.dolphinscheduler"},
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-                pattern = "org.apache.dolphinscheduler.server.*"))
+@SpringBootApplication
+@ComponentScan("org.apache.dolphinscheduler")
+public class ApiApplicationServer {
 
-public class ApiApplicationServer extends SpringBootServletInitializer {
+    @Autowired
+    private TaskPluginManager taskPluginManager;
 
-  public static void main(String[] args) {
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(ApiApplicationServer.class);
+    }
 
-
+    @EventListener
+    public void run(ApplicationReadyEvent readyEvent) {
+        // install task plugin
+        taskPluginManager.installPlugin();
+    }
 }

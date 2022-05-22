@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.utils;
 
+package org.apache.dolphinscheduler.dao.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
  *  bean context
  */
 @Component
- public class BeanContext implements ApplicationContextAware {
+public class BeanContext implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
-    public static ApplicationContext getApplicationContext(){
+    public static ApplicationContext getApplicationContext() {
         return applicationContext;
     }
 

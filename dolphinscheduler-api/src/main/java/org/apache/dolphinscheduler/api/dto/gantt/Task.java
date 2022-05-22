@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto.gantt;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -34,28 +33,25 @@ public class Task {
     /**
      * task start date
      */
-    private List<Long> startDate = new ArrayList<>();
+    private List<Long> startDate = new LinkedList<>();
     /**
      * task end date
      */
-    private List<Long> endDate = new ArrayList<>();
+    private List<Long> endDate = new LinkedList<>();
 
     /**
      * task execution date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date executionDate;
 
     /**
      * task iso start
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date isoStart;
 
     /**
      * task iso end
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date isoEnd;
 
     /**

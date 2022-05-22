@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.commons.lang.SystemUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,7 +32,7 @@ public class ConstantsTest {
      */
     @Test
     public void testPID() {
-        if (OSUtils.isWindows()) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             Assert.assertEquals(Constants.PID, "handle");
         } else {
             Assert.assertEquals(Constants.PID, "pid");

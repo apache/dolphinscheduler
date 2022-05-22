@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 package org.apache.dolphinscheduler.common.utils;
+
+import java.io.StringReader;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import java.io.StringReader;
-import java.sql.*;
 
 public class ScriptRunnerTest {
     @Test
@@ -33,38 +33,5 @@ public class ScriptRunnerTest {
             exception = e;
         }
         Assert.assertNotNull(exception);
-
-        //connect is not null
-        runScript("");
-    }
-
-    private void runScript(String dbName) {
-        try {
-            Connection conn = Mockito.mock(Connection.class);
-            Mockito.when(conn.getAutoCommit()).thenReturn(true);
-            PreparedStatement st = Mockito.mock(PreparedStatement.class);
-            Mockito.when(conn.createStatement()).thenReturn(st);
-            ResultSet rs = Mockito.mock(ResultSet.class);
-            Mockito.when(st.getResultSet()).thenReturn(rs);
-            ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
-            Mockito.when(rs.getMetaData()).thenReturn(md);
-            Mockito.when(md.getColumnCount()).thenReturn(2);
-            Mockito.when(rs.next()).thenReturn(true, false);
-            ScriptRunner s = new ScriptRunner(conn, true, true);
-            if (dbName.isEmpty()) {
-                s.runScript(new StringReader("select 1;"));
-            } else {
-                s.runScript(new StringReader("select 1;"), dbName);
-            }
-            Mockito.verify(md).getColumnLabel(1);
-        } catch(Exception e) {
-            Assert.assertNotNull(e);
-        }
-    }
-
-    @Test
-    public void testRunScriptWithDbName() {
-        //connect is not null
-        runScript("db_test");
     }
 }

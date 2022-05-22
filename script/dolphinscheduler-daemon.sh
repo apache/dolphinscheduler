@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <command> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -29,88 +29,76 @@ shift
 command=$1
 shift
 
+echo "Begin $startStop $command......"
 
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
-DOLPHINSCHEDULER_HOME=$BIN_DIR/..
+DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
+BIN_ENV_FILE="${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
 
-source /etc/profile
+# Overwrite server dolphinscheduler_env.sh in path `<server>/conf/dolphinscheduler_env.sh` when exists
+# `bin/env/dolphinscheduler_env.sh` file. User could only change `bin/env/dolphinscheduler_env.sh` instead
+# of each server's dolphinscheduler_env.sh when they want to start the server
+function overwrite_server_env() {
+  local server=$1
+  local server_env_file="${DOLPHINSCHEDULER_HOME}/${server}/conf/dolphinscheduler_env.sh"
+  if [ -f "${BIN_ENV_FILE}" ]; then
+    echo "Overwrite ${server}/conf/dolphinscheduler_env.sh using bin/env/dolphinscheduler_env.sh."
+    cp "${BIN_ENV_FILE}" "${server_env_file}"
+  else
+    echo "Start server ${server} using env config path ${server_env_file}, because file ${BIN_ENV_FILE} not exists."
+  fi
+}
 
-export JAVA_HOME=$JAVA_HOME
-#export JAVA_HOME=/opt/soft/jdk
+source "${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
+
 export HOSTNAME=`hostname`
 
-export DOLPHINSCHEDULER_PID_DIR=$DOLPHINSCHEDULER_HOME/pid
-export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
-export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
-export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
+export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/$command/logs
 
-export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-"-server -Xmx16g -Xms1g -Xss512k -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=10m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"}
 export STOP_TIMEOUT=5
 
 if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
   mkdir $DOLPHINSCHEDULER_LOG_DIR
 fi
 
-log=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command-$HOSTNAME.out
-pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
+pid=$DOLPHINSCHEDULER_HOME/$command/pid
 
-cd $DOLPHINSCHEDULER_HOME
+cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
-  CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
+  log=$DOLPHINSCHEDULER_HOME/api-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
-  CLASS=org.apache.dolphinscheduler.server.master.MasterServer
+  log=$DOLPHINSCHEDULER_HOME/master-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
-  CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
+  log=$DOLPHINSCHEDULER_HOME/worker-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
-  CLASS=org.apache.dolphinscheduler.alert.AlertServer
-elif [ "$command" = "logger-server" ]; then
-  CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
-elif [ "$command" = "zookeeper-server" ]; then
-  #note: this command just for getting a quick experience，not recommended for production. this operation will start a standalone zookeeper server
-  LOG_FILE="-Dlogback.configurationFile=classpath:logback-zookeeper.xml"
-  CLASS=org.apache.dolphinscheduler.service.zk.ZKServer
+  log=$DOLPHINSCHEDULER_HOME/alert-server/logs/$command-$HOSTNAME.out
+elif [ "$command" = "standalone-server" ]; then
+  log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
 else
-  echo "Error: No command named \`$command' was found."
+  echo "Error: No command named '$command' was found."
   exit 1
 fi
 
 case $startStop in
   (start)
-    [ -w "$DOLPHINSCHEDULER_PID_DIR" ] ||  mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
-
-    if [ -f $pid ]; then
-      if kill -0 `cat $pid` > /dev/null 2>&1; then
-        echo $command running as process `cat $pid`.  Stop it first.
-        exit 1
-      fi
-    fi
-
-    echo starting $command, logging to $log
-
-    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
-
-    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
-    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
+    echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
+    overwrite_server_env "${command}"
+    nohup /bin/bash "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
     echo $! > $pid
     ;;
 
   (stop)
-
       if [ -f $pid ]; then
         TARGET_PID=`cat $pid`
         if kill -0 $TARGET_PID > /dev/null 2>&1; then
           echo stopping $command
-          kill $TARGET_PID
+          pkill -P $TARGET_PID
           sleep $STOP_TIMEOUT
           if kill -0 $TARGET_PID > /dev/null 2>&1; then
             echo "$command did not stop gracefully after $STOP_TIMEOUT seconds: killing with kill -9"
-            kill -9 $TARGET_PID
+            pkill -P -9 $TARGET_PID
           fi
         else
           echo no $command to stop
@@ -123,7 +111,7 @@ case $startStop in
 
   (status)
     # more details about the status can be added later
-    serverCount=`ps -ef |grep "$CLASS" |grep -v "grep" |wc -l`
+    serverCount=`ps -ef | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
     state="STOP"
     #  font color - red
     state="[ \033[1;31m $state \033[0m ]"
@@ -141,3 +129,5 @@ case $startStop in
     ;;
 
 esac
+
+echo "End $startStop $command."

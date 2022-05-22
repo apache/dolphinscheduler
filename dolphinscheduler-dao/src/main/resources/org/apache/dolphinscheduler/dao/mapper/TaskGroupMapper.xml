@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper">
+
+    <resultMap type="org.apache.dolphinscheduler.dao.entity.TaskGroup" id="TaskGroupMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="groupSize" column="group_size" jdbcType="INTEGER"/>
+        <result property="useSize" column="use_size" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="projectCode" column="project_code" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id = "baseSql">
+        id,name,description,project_code,group_size,use_size,status,create_time,update_time
+    </sql>
+
+    <select id="queryTaskGroupPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql">
+        </include>
+        from t_ds_task_group
+        <where>
+            <if test="userId != 0">
+                and user_id = #{userId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="name != null and name != '' ">
+                and name like concat('%', #{name}, '%')
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+
+    <select id="queryTaskGroupPagingByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql">
+        </include>
+        from t_ds_task_group
+        where project_code in ( #{projectCode} ,  0)
+        order by update_time desc
+    </select>
+
+    <!--modify data by id-->
+    <update id="updateTaskGroupResource">
+        update t_ds_task_group
+           set use_size = use_size+1
+        where id = #{id} and use_size  &lt; group_size and
+         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+    </update>
+
+    <!--modify data by id-->
+    <update id="releaseTaskGroupResource">
+        update t_ds_task_group
+          set use_size = use_size-1
+        where id = #{id} and use_size > 0 and
+         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+    </update>
+
+    <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group
+        where
+        user_id = #{userId} and name =  #{name}
+    </select>
+
+    <select id="selectAvailableCountById" resultType="java.lang.Integer">
+        select
+        count(1)
+        from t_ds_task_group
+        where
+        id = #{groupId} and use_size &lt; group_size
+    </select>
+
+    <select id="selectCountByIdStatus" resultType="java.lang.Integer">
+        select
+        count(1)
+        from t_ds_task_group
+        where
+        id = #{id} and status = #{status}
+    </select>
+
+</mapper>

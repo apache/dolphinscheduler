@@ -200,9 +200,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 =======================================================================
-Apache DolphinScheduler (incubating) Subcomponents:
+Apache DolphinScheduler Subcomponents:
 
-The Apache DolphinScheduler (incubating) project contains subcomponents with separate copyright
+The Apache DolphinScheduler project contains subcomponents with separate copyright
 notices and license terms. Your use of the source code for the these
 subcomponents is subject to the terms and conditions of the following
 licenses.
@@ -214,5 +214,9 @@ Apache 2.0 licenses
 The following components are provided under the Apache License. See project link for details.
 The text of each license is the standard Apache 2.0 license.
     ScriptRunner from https://github.com/mybatis/mybatis-3 Apache 2.0
-    mvnw files from https://github.com/takari/maven-wrapper Apache 2.0
+    mvnw files from https://github.com/apache/maven-wrapper Apache 2.0
     PropertyPlaceholderHelper from https://github.com/spring-projects/spring-framework Apache 2.0
+    DolphinPluginClassLoader from https://github.com/prestosql/presto Apache 2.0
+    DolphinPluginDiscovery from https://github.com/prestosql/presto Apache 2.0
+    DolphinPluginLoader from https://github.com/prestosql/presto Apache 2.0
+    CodeGenerateUtils from https://github.com/twitter-archive/snowflake/tree/snowflake-2010 Apache 2.0

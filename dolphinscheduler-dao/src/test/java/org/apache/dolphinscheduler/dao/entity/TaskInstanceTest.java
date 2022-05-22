@@ -14,10 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +43,7 @@ public class TaskInstanceTest {
         TaskInstance taskInstance = new TaskInstance();
 
         //sub process
-        taskInstance.setTaskType("SUB_PROCESS");
+        taskInstance.setTaskType(TASK_TYPE_SUB_PROCESS);
         Assert.assertTrue(taskInstance.isSubProcess());
 
         //not sub process
@@ -40,11 +51,11 @@ public class TaskInstanceTest {
         Assert.assertFalse(taskInstance.isSubProcess());
 
         //sub process
-        taskInstance.setTaskType("CONDITIONS");
+        taskInstance.setTaskType(TASK_TYPE_CONDITIONS);
         Assert.assertTrue(taskInstance.isConditionsTask());
 
         //sub process
-        taskInstance.setTaskType("DEPENDENT");
+        taskInstance.setTaskType(TASK_TYPE_DEPENDENT);
         Assert.assertTrue(taskInstance.isDependTask());
     }
 
@@ -53,29 +64,26 @@ public class TaskInstanceTest {
      */
     @Test
     public void testTaskInstanceGetDependence() {
-        TaskInstance taskInstance;
-        TaskNode taskNode;
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskParams(JSONUtils.toJsonString(getDependentParameters()));
+        taskInstance.getDependency();
+    }
 
-        taskInstance = new TaskInstance();
-        taskInstance.setTaskJson(null);
-        Assert.assertNull(taskInstance.getDependency());
-
-        taskInstance = new TaskInstance();
-        taskNode = new TaskNode();
-        taskNode.setDependence(null);
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
-        Assert.assertNull(taskInstance.getDependency());
-
-        taskInstance = new TaskInstance();
-        taskNode = new TaskNode();
-        // expect a JSON here, and will be unwrap when toJsonString
-        taskNode.setDependence("\"A\"");
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
-        Assert.assertEquals("A", taskInstance.getDependency());
-
-        taskInstance = new TaskInstance();
-        taskInstance.setTaskJson(null);
-        taskInstance.setDependency("{}");
-        Assert.assertEquals("{}", taskInstance.getDependency());
+    /**
+     *
+     * @return
+     */
+    private DependentParameters getDependentParameters() {
+        DependentParameters dependentParameters = new DependentParameters();
+        List<DependentTaskModel> dependTaskList = new ArrayList<>();
+        List<DependentItem> dependentItems = new ArrayList<>();
+        DependentItem dependentItem = new DependentItem();
+        dependentItem.setDepTaskCode(111L);
+        dependentItem.setDefinitionCode(222L);
+        dependentItem.setCycle("today");
+        dependentItems.add(dependentItem);
+        dependentParameters.setDependTaskList(dependTaskList);
+        dependentParameters.setRelation(DependentRelation.AND);
+        return dependentParameters;
     }
 }

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper">
+    <select id="queryResultListPaging" resultType="org.apache.dolphinscheduler.dao.entity.DqExecuteResult">
+        SELECT a.id,
+               a.process_definition_id,
+               b.name as process_definition_name,
+               b.code as process_definition_code,
+               a.process_instance_id,
+               e.name as process_instance_name,
+               b.project_code,
+               a.task_instance_id,
+               c.name as task_name,
+               a.rule_type,
+               a.rule_name,
+               a.statistics_value,
+               a.comparison_value,
+               a.check_type,
+               a.threshold,
+               cp.type as comparison_type_name,
+               a.operator,
+               a.failure_strategy,
+               a.state,
+               a.user_id,
+               d.user_name,
+               a.error_output_path,
+               a.create_time,
+               a.update_time
+        FROM t_ds_dq_execute_result a
+        left join t_ds_process_definition b on a.process_definition_id = b.id
+        left join t_ds_task_instance c on a.task_instance_id = c.id
+        left join t_ds_process_instance e on a.process_instance_id = e.id
+        left join t_ds_user d on d.id = a.user_id
+        left join t_ds_dq_comparison_type cp on cp.id = a.comparison_type
+        <where>
+            <if test=" searchVal != null and searchVal != ''">
+                and c.name like concat('%', #{searchVal}, '%')
+            </if>
+            <if test="startTime != null ">
+                and a.update_time > #{startTime} and a.update_time <![CDATA[ <=]]> #{endTime}
+            </if>
+            <if test="states != null and states != ''">
+                and a.state in
+                <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+                    #{i}
+                </foreach>
+            </if>
+            <if test=" userId != 1">
+                and a.user_id = #{userId}
+            </if>
+            <if test=" ruleType != -1">
+                and a.rule_type = #{ruleType}
+            </if>
+        </where>
+        order by a.update_time desc
+    </select>
+
+    <select id="getExecuteResultById" resultType="org.apache.dolphinscheduler.dao.entity.DqExecuteResult">
+        SELECT a.id,
+               a.process_definition_id,
+               a.process_instance_id,
+               a.task_instance_id,
+               a.rule_type,
+               a.rule_name,
+               a.statistics_value,
+               a.comparison_value,
+               a.check_type,
+               a.threshold,
+               a.operator,
+               a.failure_strategy,
+               a.state,
+               a.user_id,
+               a.comparison_type,
+               a.error_output_path,
+               b.name as process_definition_name,
+               e.name as process_instance_name,
+               c.name as task_name,
+               cp.type as comparison_type_name,
+               d.user_name
+        FROM t_ds_dq_execute_result a
+        left join t_ds_process_definition b on a.process_definition_id = b.id
+        left join t_ds_task_instance c on a.task_instance_id = c.id
+        left join t_ds_process_instance e on a.process_instance_id = e.id
+        left join t_ds_user d on d.id = a.user_id
+        left join t_ds_dq_comparison_type cp on cp.id = a.comparison_type
+        where  task_instance_id = #{taskInstanceId}
+    </select>
+</mapper>

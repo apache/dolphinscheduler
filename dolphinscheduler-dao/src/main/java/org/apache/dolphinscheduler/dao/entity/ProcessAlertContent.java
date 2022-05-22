@@ -20,21 +20,31 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(Include.NON_NULL)
 public class ProcessAlertContent implements Serializable {
+
+    @JsonProperty("projectId")
+    private Integer projectId;
+    @JsonProperty("projectCode")
+    private Long projectCode;
+    @JsonProperty("projectName")
+    private String projectName;
+    @JsonProperty("owner")
+    private String owner;
     @JsonProperty("processId")
-    private int processId;
+    private Integer processId;
+    @JsonProperty("processDefinitionCode")
+    private Long processDefinitionCode;
     @JsonProperty("processName")
     private String processName;
     @JsonProperty("processType")
@@ -44,17 +54,15 @@ public class ProcessAlertContent implements Serializable {
     @JsonProperty("recovery")
     private Flag recovery;
     @JsonProperty("runTimes")
-    private int runTimes;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Integer runTimes;
     @JsonProperty("processStartTime")
     private Date processStartTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("processEndTime")
     private Date processEndTime;
     @JsonProperty("processHost")
     private String processHost;
-    @JsonProperty("taskId")
-    private int taskId;
+    @JsonProperty("taskCode")
+    private Long taskCode;
     @JsonProperty("taskName")
     private String taskName;
     @JsonProperty("event")
@@ -64,13 +72,11 @@ public class ProcessAlertContent implements Serializable {
     @JsonProperty("taskType")
     private String taskType;
     @JsonProperty("retryTimes")
-    private int retryTimes;
+    private Integer retryTimes;
     @JsonProperty("taskState")
     private ExecutionStatus taskState;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("taskStartTime")
     private Date taskStartTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonProperty("taskEndTime")
     private Date taskEndTime;
     @JsonProperty("taskHost")
@@ -79,7 +85,12 @@ public class ProcessAlertContent implements Serializable {
     private String logPath;
 
     private ProcessAlertContent(Builder builder) {
+        this.projectId = builder.projectId;
+        this.projectCode = builder.projectCode;
+        this.projectName = builder.projectName;
+        this.owner = builder.owner;
         this.processId = builder.processId;
+        this.processDefinitionCode = builder.processDefinitionCode;
         this.processName = builder.processName;
         this.processType = builder.processType;
         this.recovery = builder.recovery;
@@ -88,7 +99,7 @@ public class ProcessAlertContent implements Serializable {
         this.processStartTime = builder.processStartTime;
         this.processEndTime = builder.processEndTime;
         this.processHost = builder.processHost;
-        this.taskId = builder.taskId;
+        this.taskCode = builder.taskCode;
         this.taskName = builder.taskName;
         this.event = builder.event;
         this.warnLevel = builder.warnLevel;
@@ -107,30 +118,59 @@ public class ProcessAlertContent implements Serializable {
     }
 
     public static class Builder {
-
-        private int processId;
+        private Integer projectId;
+        private Long projectCode;
+        private String projectName;
+        private String owner;
+        private Integer processId;
+        private Long processDefinitionCode;
         private String processName;
         private CommandType processType;
         private Flag recovery;
         private ExecutionStatus processState;
-        private int runTimes;
+        private Integer runTimes;
         private Date processStartTime;
         private Date processEndTime;
         private String processHost;
-        private int taskId;
+        private Long taskCode;
         private String taskName;
         private AlertEvent event;
         private AlertWarnLevel warnLevel;
         private String taskType;
-        private int retryTimes;
+        private Integer retryTimes;
         private ExecutionStatus taskState;
         private Date taskStartTime;
         private Date taskEndTime;
         private String taskHost;
         private String logPath;
 
-        public Builder processId(int processId) {
+        public Builder projectId(Integer projectId) {
+            this.projectId = projectId;
+            return this;
+        }
+
+        public Builder projectCode(Long projectCode) {
+            this.projectCode = projectCode;
+            return this;
+        }
+
+        public Builder projectName(String projectName) {
+            this.projectName = projectName;
+            return this;
+        }
+
+        public Builder owner(String owner) {
+            this.owner = owner;
+            return this;
+        }
+
+        public Builder processId(Integer processId) {
             this.processId = processId;
+            return this;
+        }
+
+        public Builder processDefinitionCode(Long processDefinitionCode) {
+            this.processDefinitionCode = processDefinitionCode;
             return this;
         }
 
@@ -154,7 +194,7 @@ public class ProcessAlertContent implements Serializable {
             return this;
         }
 
-        public Builder runTimes(int runTimes) {
+        public Builder runTimes(Integer runTimes) {
             this.runTimes = runTimes;
             return this;
         }
@@ -174,8 +214,8 @@ public class ProcessAlertContent implements Serializable {
             return this;
         }
 
-        public Builder taskId(int taskId) {
-            this.taskId = taskId;
+        public Builder taskCode(Long taskCode) {
+            this.taskCode = taskCode;
             return this;
         }
 
@@ -199,7 +239,7 @@ public class ProcessAlertContent implements Serializable {
             return this;
         }
 
-        public Builder retryTimes(int retryTimes) {
+        public Builder retryTimes(Integer retryTimes) {
             this.retryTimes = retryTimes;
             return this;
         }

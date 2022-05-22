@@ -14,21 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.Constants.HTTP_HEADER_UNKNOWN;
+import static org.apache.dolphinscheduler.common.Constants.HTTP_X_FORWARDED_FOR;
+import static org.apache.dolphinscheduler.common.Constants.HTTP_X_REAL_IP;
+
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 
-import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * base controller
@@ -42,8 +46,8 @@ public class BaseController {
      * @param pageSize page size
      * @return check result code
      */
-    public Map<String, Object> checkPageParams(int pageNo, int pageSize) {
-        Map<String, Object> result = new HashMap<>(2);
+    public Result checkPageParams(int pageNo, int pageSize) {
+        Result result = new Result();
         Status resultEnum = Status.SUCCESS;
         String msg = Status.SUCCESS.getMsg();
         if (pageNo <= 0) {
@@ -53,8 +57,8 @@ public class BaseController {
             resultEnum = Status.REQUEST_PARAMS_NOT_VALID_ERROR;
             msg = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.PAGE_SIZE);
         }
-        result.put(Constants.STATUS, resultEnum);
-        result.put(Constants.MSG, msg);
+        result.setCode(resultEnum.getCode());
+        result.setMsg(msg);
         return result;
     }
 
@@ -96,25 +100,6 @@ public class BaseController {
             String msg = Status.SUCCESS.getMsg();
             Object datalist = result.get(Constants.DATA_LIST);
             return success(msg, datalist);
-        } else {
-            Integer code = status.getCode();
-            String msg = (String) result.get(Constants.MSG);
-            return error(code, msg);
-        }
-    }
-
-    /**
-     * return data list with paging
-     * @param result result code
-     * @return result code
-     */
-    public Result returnDataListPaging(Map<String, Object> result) {
-        Status status = (Status) result.get(Constants.STATUS);
-        if (status == Status.SUCCESS) {
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            PageInfo<Resource> pageInfo = (PageInfo<Resource>) result.get(Constants.DATA_LIST);
-            return success(pageInfo.getLists(), pageInfo.getCurrentPage(), pageInfo.getTotalCount(),
-                    pageInfo.getTotalPage());
         } else {
             Integer code = status.getCode();
             String msg = (String) result.get(Constants.MSG);
@@ -188,16 +173,16 @@ public class BaseController {
      * @param totalList success object list
      * @param currentPage current page
      * @param total total
-     * @param totalPage  total page
+     * @param totalPage total page
      * @return success result code
      */
     public Result success(Object totalList, Integer currentPage,
-                                                  Integer total, Integer totalPage) {
+                          Integer total, Integer totalPage) {
         Result result = new Result();
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        Map<String, Object> map = new HashMap<>(4);
+        Map<String, Object> map = new HashMap<>(8);
         map.put(Constants.TOTAL_LIST, totalList);
         map.put(Constants.CURRENT_PAGE, currentPage);
         map.put(Constants.TOTAL_PAGE, totalPage);
@@ -256,6 +241,7 @@ public class BaseController {
 
     /**
      * get result
+     *
      * @param msg message
      * @param list object list
      * @return result code

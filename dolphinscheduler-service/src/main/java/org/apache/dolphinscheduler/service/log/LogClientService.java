@@ -14,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.log;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
@@ -28,16 +32,14 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * log client
  */
-public class LogClientService {
+public class LogClientService implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
 
@@ -65,6 +67,7 @@ public class LogClientService {
     /**
      * close
      */
+    @Override
     public void close() {
         this.client.close();
         this.isRunning = false;
@@ -90,7 +93,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RollViewLogResponseCommand rollReviewLog = JsonSerializer.deserialize(
+                RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(
                         response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
@@ -116,12 +119,16 @@ public class LogClientService {
         String result = "";
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                ViewLogResponseCommand viewLog = JsonSerializer.deserialize(
-                        response.getBody(), ViewLogResponseCommand.class);
-                return viewLog.getMsg();
+            if (NetUtils.getHost().equals(host)) {
+                result = LoggerUtils.readWholeFileContent(request.getPath());
+            } else {
+                Command command = request.convert2Command();
+                Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+                if (response != null) {
+                    ViewLogResponseCommand viewLog = JSONUtils.parseObject(
+                            response.getBody(), ViewLogResponseCommand.class);
+                    result = viewLog.getMsg();
+                }
             }
         } catch (Exception e) {
             logger.error("view log error", e);
@@ -142,24 +149,22 @@ public class LogClientService {
     public byte[] getLogBytes(String host, int port, String path) {
         logger.info("log path {}", path);
         GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
-        byte[] result = null;
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetLogBytesResponseCommand getLog = JsonSerializer.deserialize(
+                GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
                         response.getBody(), GetLogBytesResponseCommand.class);
-                return getLog.getData();
+                return getLog.getData() == null ? new byte[0] : getLog.getData();
             }
         } catch (Exception e) {
             logger.error("get log size error", e);
         } finally {
             this.client.closeChannel(address);
         }
-        return result;
+        return new byte[0];
     }
-
 
     /**
      * remove task log
@@ -178,7 +183,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse = JsonSerializer.deserialize(
+                RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(
                         response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }

@@ -14,51 +14,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
-
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
+import org.apache.dolphinscheduler.dao.entity.AccessToken;
+import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * AccessToken mapper test
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback
-public class AccessTokenMapperTest {
+public class AccessTokenMapperTest extends BaseDaoTest {
 
     @Autowired
-    AccessTokenMapper accessTokenMapper;
+    private AccessTokenMapper accessTokenMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     /**
      * test insert
-     *
-     * @throws Exception
      */
     @Test
     public void testInsert() throws Exception {
@@ -66,6 +61,27 @@ public class AccessTokenMapperTest {
 
         AccessToken accessToken = createAccessToken(userId);
         assertThat(accessToken.getId(), greaterThan(0));
+    }
+
+    /**
+     * test delete AccessToken By UserId
+     */
+    @Test
+    public void testDeleteAccessTokenByUserId() {
+        Integer userId = 1;
+        int insertCount = 0;
+
+        for (int i = 0; i < 10; i++) {
+            try {
+                createAccessToken(userId);
+                insertCount++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        int deleteCount = accessTokenMapper.deleteAccessTokenByUserId(userId);
+        Assert.assertEquals(insertCount, deleteCount);
     }
 
 
@@ -171,7 +187,6 @@ public class AccessTokenMapperTest {
         assertNull(resultAccessToken);
     }
 
-
     /**
      * create accessTokens
      *
@@ -200,9 +215,8 @@ public class AccessTokenMapperTest {
      *
      * @param userName userName
      * @return user
-     * @throws Exception
      */
-    private User createUser(String userName) throws Exception {
+    private User createUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("123");
@@ -229,9 +243,8 @@ public class AccessTokenMapperTest {
      * @param userId   userId
      * @param userName userName
      * @return accessToken
-     * @throws Exception
      */
-    private AccessToken createAccessToken(Integer userId, String userName) throws Exception {
+    private AccessToken createAccessToken(Integer userId, String userName) {
         //insertOne
         AccessToken accessToken = new AccessToken();
         accessToken.setUserName(userName);

@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -35,28 +37,21 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
 
 /**
- * tenant service
+ * tenant service impl
  */
 @Service
-public class TenantServiceImpl extends BaseService implements TenantService {
-
-    private static final Logger logger = LoggerFactory.getLogger(TenantServiceImpl.class);
+public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -70,57 +65,63 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
     /**
      * create tenant
      *
      * @param loginUser login user
      * @param tenantCode tenant code
-     * @param tenantName tenant name
      * @param queueId queue id
      * @param desc description
      * @return create result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
-                                            String tenantName,
                                             int queueId,
                                             String desc) throws Exception {
-
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
+        if(StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH){
+            putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
+            return result;
+        }
+
+        if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
+            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
+            return result;
+        }
+
+
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
+            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
             return result;
         }
 
         Tenant tenant = new Tenant();
         Date now = new Date();
-
-        if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")) {
-            putMsg(result, Status.VERIFY_TENANT_CODE_ERROR);
-            return result;
-        }
         tenant.setTenantCode(tenantCode);
-        tenant.setTenantName(tenantName);
         tenant.setQueueId(queueId);
         tenant.setDescription(desc);
         tenant.setCreateTime(now);
         tenant.setUpdateTime(now);
-
         // save
         tenantMapper.insert(tenant);
 
-        // if hdfs startup
+        // if storage startup
         if (PropertyUtils.getResUploadStartupState()) {
-            createTenantDirIfNotExists(tenantCode);
+            storageOperate.createTenantDirIfNotExists(tenantCode);
         }
 
+        result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -131,26 +132,26 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
-    public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+    @Override
+    public Result<Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)) {
+        Result<Object> result = new Result<>();
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         Page<Tenant> page = new Page<>(pageNo, pageSize);
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) tenantIPage.getTotal());
-        pageInfo.setLists(tenantIPage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
-
+        pageInfo.setTotal((int) tenantIPage.getTotal());
+        pageInfo.setTotalList(tenantIPage.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -158,21 +159,21 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * updateProcessInstance tenant
      *
      * @param loginUser login user
-     * @param id tennat id
-     * @param tenantCode tennat code
-     * @param tenantName tennat name
+     * @param id tenant id
+     * @param tenantCode tenant code
      * @param queueId queue id
      * @param desc description
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, String tenantName, int queueId,
+    @Override
+    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -191,26 +192,18 @@ public class TenantServiceImpl extends BaseService implements TenantService {
             if (checkTenantExists(tenantCode)) {
                 // if hdfs startup
                 if (PropertyUtils.getResUploadStartupState()) {
-                    String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
-                    String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-                    //init hdfs resource
-                    HadoopUtils.getInstance().mkdir(resourcePath);
-                    HadoopUtils.getInstance().mkdir(udfsPath);
+                    storageOperate.createTenantDirIfNotExists(tenantCode);
                 }
             } else {
-                putMsg(result, Status.TENANT_CODE_HAS_ALREADY_EXISTS);
+                putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
                 return result;
             }
         }
 
         Date now = new Date();
 
-        if (StringUtils.isNotEmpty(tenantCode)) {
+        if (!StringUtils.isEmpty(tenantCode)) {
             tenant.setTenantCode(tenantCode);
-        }
-
-        if (StringUtils.isNotEmpty(tenantName)) {
-            tenant.setTenantName(tenantName);
         }
 
         if (queueId != 0) {
@@ -233,11 +226,12 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @return delete result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -268,15 +262,12 @@ public class TenantServiceImpl extends BaseService implements TenantService {
 
         // if resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
-            String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
-
-            if (HadoopUtils.getInstance().exists(tenantPath)) {
-                HadoopUtils.getInstance().delete(tenantPath, true);
-            }
+          storageOperate.deleteTenant(tenant.getTenantCode());
         }
 
         tenantMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -291,9 +282,10 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param loginUser login user
      * @return tenant list
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         List<Tenant> resourceList = tenantMapper.selectList(null);
         result.put(Constants.DATA_LIST, resourceList);
@@ -308,10 +300,11 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
-    public Result verifyTenantCode(String tenantCode) {
-        Result result = new Result();
+    @Override
+    public Result<Object> verifyTenantCode(String tenantCode) {
+        Result<Object> result = new Result<>();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
+            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }
@@ -324,8 +317,26 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param tenantCode tenant code
      * @return ture if the tenant code exists, otherwise return false
      */
-    private boolean checkTenantExists(String tenantCode) {
-        List<Tenant> tenants = tenantMapper.queryByTenantCode(tenantCode);
-        return CollectionUtils.isNotEmpty(tenants);
+    @Override
+    public boolean checkTenantExists(String tenantCode) {
+        Boolean existTenant = tenantMapper.existTenant(tenantCode);
+        return Boolean.TRUE.equals(existTenant);
+    }
+
+    /**
+     * query tenant by tenant code
+     *
+     * @param tenantCode tenant code
+     * @return tenant detail information
+     */
+    @Override
+    public Map<String, Object> queryByTenantCode(String tenantCode) {
+        Map<String, Object> result = new HashMap<>();
+        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+        if (tenant != null) {
+            result.put(Constants.DATA_LIST, tenant);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
     }
 }

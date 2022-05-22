@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 import java.util.Objects;
@@ -41,11 +40,6 @@ public class Tenant {
      * tenant code
      */
     private String tenantCode;
-
-    /**
-     * tenant name
-     */
-    private String tenantName;
 
     /**
      * description
@@ -72,12 +66,10 @@ public class Tenant {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
 
@@ -95,14 +87,6 @@ public class Tenant {
 
     public void setTenantCode(String tenantCode) {
         this.tenantCode = tenantCode;
-    }
-
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
     }
 
     public int getQueueId() {
@@ -150,7 +134,6 @@ public class Tenant {
         return "Tenant{" +
                 "id=" + id +
                 ", tenantCode='" + tenantCode + '\'' +
-                ", tenantName='" + tenantName + '\'' +
                 ", queueId=" + queueId +
                 ", queueName='" + queueName + '\'' +
                 ", queue='" + queue + '\'' +

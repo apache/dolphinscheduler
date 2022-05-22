@@ -14,19 +14,93 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
-import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+
 import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
-import java.util.Set;
 
 public interface WorkFlowLineageMapper {
 
-    public List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectId") int projectId);
+    /**
+     * queryByName
+     *
+     * @param projectCode projectCode
+     * @param workFlowName workFlowName
+     * @return WorkFlowLineage list
+     */
+    List<WorkFlowLineage> queryWorkFlowLineageByName(@Param("projectCode") long projectCode, @Param("workFlowName") String workFlowName);
 
-    public List<WorkFlowLineage> queryByIds(@Param("ids") Set<Integer> ids, @Param("projectId") int projectId);
+    /**
+     * queryWorkFlowLineageByCode
+     *
+     * @param projectCode projectCode
+     * @param workFlowCode workFlowCode
+     * @return WorkFlowLineage
+     */
+    WorkFlowLineage queryWorkFlowLineageByCode(@Param("projectCode") long projectCode, @Param("workFlowCode") long workFlowCode);
 
-    public List<WorkFlowRelation> querySourceTarget(@Param("id") int id);
+    /**
+     * queryWorkFlowLineageByProcessDefinitionCodes
+     *
+     * @param workFlowCodes workFlowCodes
+     * @return WorkFlowLineage
+     */
+    List<WorkFlowLineage> queryWorkFlowLineageByProcessDefinitionCodes(@Param("workFlowCodes") List<Long> workFlowCodes);
+
+    /**
+     * queryWorkFlowLineageByCode
+     *
+     * @param processLineages processLineages
+     * @return WorkFlowLineage list
+     */
+    List<WorkFlowLineage> queryWorkFlowLineageByLineage(@Param("processLineages") List<ProcessLineage> processLineages);
+
+    /**
+     * queryProcessLineage
+     *
+     * @param projectCode projectCode
+     * @return ProcessLineage list
+     */
+    List<ProcessLineage> queryProcessLineage(@Param("projectCode") long projectCode);
+
+    /**
+     * queryCodeRelation
+     *
+     * @param projectCode projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @return ProcessLineage list
+     */
+    List<ProcessLineage> queryProcessLineageByCode(@Param("projectCode") long projectCode,
+                                                   @Param("processDefinitionCode") long processDefinitionCode);
+
+    /**
+     * query process definition by name
+     *
+     * @return dependent process definition
+     */
+    List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(@Param("code") long code);
+
+    /**
+     * query downstream work flow lineage by process definition code
+     *
+     * @return dependent process definition
+     */
+    List<WorkFlowLineage> queryDownstreamLineageByProcessDefinitionCode(@Param("code") long code,
+                                                                        @Param("taskType") String taskType);
+
+
+    /**
+     * query upstream work flow dependent task params by process definition code
+     *
+     * @return task_params
+     */
+    List<DependentProcessDefinition> queryUpstreamDependentParamsByProcessDefinitionCode(@Param("code") long code,
+                                                                                         @Param("taskType") String taskType);
+
 }

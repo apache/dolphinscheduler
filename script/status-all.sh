@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -18,9 +18,10 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/install_config.conf
 
-# install_config.conf info
+source ${workDir}/env/install_env.sh
+
+# install_env.sh info
 echo -e '\n'
 echo "====================== dolphinscheduler server config ============================="
 echo -e "1.dolphinscheduler server node config hosts:[ \033[1;32m ${ips} \033[0m ]"
@@ -36,14 +37,11 @@ firstColumn="node  server  state"
 echo $firstColumn
 echo -e '\n'
 
-declare -A workersGroupMap=()
-
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupName)
+  workerNames+=($worker)
 done
 
 StateRunning="Running"
@@ -51,28 +49,25 @@ StateRunning="Running"
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
-  masterState=`ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status master-server;"`
+  masterState=`ssh -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status master-server;"`
   echo "$master  $masterState"
 done
 
-# 2.worker server and logger-server check state
-for worker in ${!workersGroupMap[*]}
+# 2.worker server check state
+for worker in ${workerNames[@]}
 do
-  workerState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status worker-server;"`
+  workerState=`ssh -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status worker-server;"`
   echo "$worker  $workerState"
-
-  masterState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status logger-server;"`
-  echo "$worker  $masterState"
 done
 
 # 3.alter server check state
-alertState=`ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status alert-server;"`
+alertState=`ssh -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status alert-server;"`
 echo "$alertServer  $alertState"
 
 # 4.api server check state
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-  apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status api-server;"`
+  apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
 done

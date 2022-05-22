@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
 
@@ -57,7 +57,6 @@ public class MonitorRecord {
     /**
      * start date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date date;
 
     public Flag getState() {
@@ -110,15 +109,15 @@ public class MonitorRecord {
 
     @Override
     public String toString() {
-        return "MonitorRecord{" +
-                "state=" + state +
-                ", dbType=" + dbType +
-                ", maxConnections=" + maxConnections +
-                ", maxUsedConnections=" + maxUsedConnections +
-                ", threadsConnections=" + threadsConnections +
-                ", threadsRunningConnections=" + threadsRunningConnections +
-                ", date=" + date +
-                '}';
+        return "MonitorRecord{"
+                + "state=" + state
+                + ", dbType=" + dbType
+                + ", maxConnections=" + maxConnections
+                + ", maxUsedConnections=" + maxUsedConnections
+                + ", threadsConnections=" + threadsConnections
+                + ", threadsRunningConnections=" + threadsRunningConnections
+                + ", date=" + date
+                + '}';
     }
 
     public DbType getDbType() {

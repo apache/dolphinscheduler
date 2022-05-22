@@ -14,25 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import java.util.Date;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * alert mapper interface
  */
+@Mapper
 public interface AlertMapper extends BaseMapper<Alert> {
 
     /**
-     * list alert by status
-     * @param alertStatus alertStatus
-     * @return alert list
+     * Insert server crash alert
+     * <p>This method will ensure that there is at most one unsent alert which has the same content in the database.
      */
-    List<Alert> listAlertByStatus(@Param("alertStatus") AlertStatus alertStatus);
+    void insertAlertWhenServerCrash(@Param("alert") Alert alert, @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
 
 }

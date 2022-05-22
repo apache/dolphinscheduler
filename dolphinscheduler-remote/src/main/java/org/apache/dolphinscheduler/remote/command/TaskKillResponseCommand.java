@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- *  kill task response command
+ * kill task response command
  */
 public class TaskKillResponseCommand implements Serializable {
 
@@ -50,8 +51,7 @@ public class TaskKillResponseCommand implements Serializable {
     /**
      * other resource manager appId , for example : YARN etc
      */
-    protected List<String> appIds;
-
+    private List<String> appIds;
 
     public int getTaskInstanceId() {
         return taskInstanceId;
@@ -94,26 +94,26 @@ public class TaskKillResponseCommand implements Serializable {
     }
 
     /**
-     *  package request command
+     * package request command
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_KILL_RESPONSE);
-        byte[] body = JsonSerializer.serialize(this);
+        byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
 
     @Override
     public String toString() {
-        return "TaskKillResponseCommand{" +
-                "taskInstanceId=" + taskInstanceId +
-                ", host='" + host + '\'' +
-                ", status=" + status +
-                ", processId=" + processId +
-                ", appIds=" + appIds +
-                '}';
+        return "TaskKillResponseCommand{"
+                + "taskInstanceId=" + taskInstanceId
+                + ", host='" + host + '\''
+                + ", status=" + status
+                + ", processId=" + processId
+                + ", appIds=" + appIds
+                + '}';
     }
 }

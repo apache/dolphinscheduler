@@ -16,35 +16,28 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Session;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class SessionMapperTest {
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class SessionMapperTest extends BaseDaoTest {
 
     @Autowired
-    SessionMapper sessionMapper;
+    private SessionMapper sessionMapper;
 
     /**
      * insert
+     *
      * @return Session
      */
-    private Session insertOne(){
+    private Session insertOne() {
         //insertOne
         Session session = new Session();
         session.setId(UUID.randomUUID().toString());

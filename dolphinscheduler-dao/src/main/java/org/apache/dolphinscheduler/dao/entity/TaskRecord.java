@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
@@ -48,13 +47,11 @@ public class TaskRecord {
     /**
      * start date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
      * end date
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date endTime;
 
     /**
@@ -237,9 +234,9 @@ public class TaskRecord {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "task record, id:" + id
-                +" proc id:" + procId
+                + " proc id:" + procId
                 + " proc name:" + procName
                 + " proc date: " + procDate
                 + " start date:" + startTime

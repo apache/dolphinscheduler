@@ -14,47 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProjectMapperTest {
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+public class ProjectMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProjectMapper projectMapper;
+    private ProjectMapper projectMapper;
 
     @Autowired
-    UserMapper userMapper;
-
+    private UserMapper userMapper;
 
     /**
      * insert
+     *
      * @return Project
      */
-    private Project insertOne(){
+    private Project insertOne() {
         //insertOne
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(111);
+        project.setCode(1L);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
         projectMapper.insert(project);
         return project;
     }
@@ -63,7 +60,7 @@ public class ProjectMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         Project project = insertOne();
         project.setCreateTime(new Date());
@@ -76,7 +73,7 @@ public class ProjectMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Project projectMap = insertOne();
         int delete = projectMapper.deleteById(projectMap.getId());
         Assert.assertEquals(delete, 1);
@@ -135,7 +132,6 @@ public class ProjectMapperTest {
     @Test
     public void testQueryProjectListPaging() {
         Project project = insertOne();
-        Project project1 = insertOne();
 
         User user = new User();
         user.setUserName("ut user");
@@ -143,7 +139,7 @@ public class ProjectMapperTest {
         project.setUserId(user.getId());
         projectMapper.updateById(project);
 
-        Page<Project> page = new Page(1,3);
+        Page<Project> page = new Page(1, 3);
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(
                 page,
                 project.getUserId(),
@@ -154,8 +150,8 @@ public class ProjectMapperTest {
                 project.getUserId(),
                 project.getName()
         );
-        Assert.assertNotEquals(projectIPage.getTotal(), 0);
-        Assert.assertNotEquals(projectIPage1.getTotal(), 0);
+        Assert.assertEquals(projectIPage.getTotal(), 1);
+        Assert.assertEquals(projectIPage1.getTotal(), 1);
     }
 
     /**

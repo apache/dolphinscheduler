@@ -1,0 +1,129 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Test
+
+on:
+  pull_request:
+  push:
+    paths-ignore:
+      - '**/*.md'
+      - 'dolphinscheduler-ui'
+      - 'dolphinscheduler-python/pydolphinscheduler'
+    branches:
+      - dev
+
+env:
+  LOG_DIR: /tmp/dolphinscheduler
+
+concurrency:
+  group: unit-test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paths-filter:
+    name: Unit-Test-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
+  unit-test:
+    name: Unit-Test
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'adopt'
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven
+
+      - name: Run Unit tests
+        run: ./mvnw clean verify -B -Dmaven.test.skip=false
+      - name: Upload coverage report to codecov
+        run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
+
+      # Set up JDK 11 for SonarCloud.
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+      - name: Run SonarCloud Analysis
+        run: >
+          ./mvnw --batch-mode verify sonar:sonar
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          -Dmaven.test.skip=true
+          -Dcheckstyle.skip=true
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=apache
+          -Dsonar.core.codeCoveragePlugin=jacoco
+          -Dsonar.projectKey=apache-dolphinscheduler
+          -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
+          -Dsonar.exclusions=,dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
+          -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Collect logs
+        continue-on-error: true
+        run: |
+          mkdir -p ${LOG_DIR}
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml logs dolphinscheduler-postgresql > ${LOG_DIR}/db.txt
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v2
+        continue-on-error: true
+        with:
+          name: unit-test-logs
+          path: ${LOG_DIR}
+  result:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ unit-test, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip Unit Test!"
+            exit 0
+          fi
+          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+            echo "Unit Test Failed!"
+            exit -1
+          fi

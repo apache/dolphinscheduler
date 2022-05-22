@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,41 +14,72 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class WorkerGroupControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+/**
+ * worker group controller test
+ */
+public class WorkerGroupControllerTest extends AbstractControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
+
+    @MockBean(name = "workerGroupMapper")
+    private WorkerGroupMapper workerGroupMapper;
+
+    @MockBean(name = "processInstanceMapper")
+    private ProcessInstanceMapper processInstanceMapper;
+
+    @MockBean(name = "registryClient")
+    private RegistryClient registryClient;
 
     @Test
     public void testSaveWorkerGroup() throws Exception {
+        Map<String, String> serverMaps = new HashMap<>();
+        serverMaps.put("192.168.0.1", "192.168.0.1");
+        serverMaps.put("192.168.0.2", "192.168.0.2");
+        PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","cxc_work_group");
-        paramsMap.add("ipList","192.16.12,192.168,10,12");
-        MvcResult mvcResult = mockMvc.perform(post("/worker-group/save")
+        paramsMap.add("addrList","192.168.0.1,192.168.0.2");
+        MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -59,43 +89,60 @@ public class WorkerGroupControllerTest extends AbstractControllerTest{
         paramsMap.add("pageNo","2");
         paramsMap.add("searchVal","cxc");
         paramsMap.add("pageSize","2");
-        MvcResult mvcResult = mockMvc.perform(get("/worker-group/list-paging")
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryAllWorkerGroups() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        MvcResult mvcResult = mockMvc.perform(get("/worker-group/all-groups")
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups/all")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void queryWorkerAddressList() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
+                        .header("sessionId", sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testDeleteById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","12");
-        MvcResult mvcResult = mockMvc.perform(get("/worker-group/delete-by-id")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setId(12);
+        workerGroup.setName("测试");
+        Mockito.when(workerGroupMapper.selectById(12)).thenReturn(workerGroup);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES)).thenReturn(null);
+        Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
+        Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
+
+        MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

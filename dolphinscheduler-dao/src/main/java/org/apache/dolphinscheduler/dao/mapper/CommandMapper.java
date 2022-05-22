@@ -14,42 +14,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * command mapper interface
  */
 public interface CommandMapper extends BaseMapper<Command> {
 
-
-    /**
-     * get one command
-     * @return command
-     */
-    Command getOneToRun();
-
     /**
      * count command state
      * @param userId userId
      * @param startTime startTime
      * @param endTime endTime
-     * @param projectIdArray projectIdArray
+     * @param projectCodeArray projectCodeArray
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
             @Param("userId") int userId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
-            @Param("projectIdArray") Integer[] projectIdArray);
+            @Param("projectCodeArray") Long[] projectCodeArray);
+
+    /**
+     * query command page
+     * @return
+     */
+    List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
 
 
-
+    /**
+     * query command page by slot
+     * @return command list
+     */
+    List<Command> queryCommandPageBySlot(@Param("limit") int limit, @Param("offset") int offset, @Param("masterCount") int masterCount, @Param("thisMasterSlot") int thisMasterSlot);
 }

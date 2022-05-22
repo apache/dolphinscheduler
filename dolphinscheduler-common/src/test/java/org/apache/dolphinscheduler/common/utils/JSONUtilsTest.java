@@ -14,26 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
+
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class JSONUtilsTest {
 
@@ -78,8 +82,8 @@ public class JSONUtilsTest {
         String jsonStr = "{\"a\":\"b\",\"b\":\"d\"}";
 
         ObjectNode objectNode = JSONUtils.createObjectNode();
-        objectNode.put("a","b");
-        objectNode.put("b","d");
+        objectNode.put("a", "b");
+        objectNode.put("b", "d");
         String s = JSONUtils.toJsonString(objectNode);
         Assert.assertEquals(s, jsonStr);
     }
@@ -108,9 +112,8 @@ public class JSONUtilsTest {
         Assert.assertEquals(Direct.IN, direct);
     }
 
-
     @Test
-    public void String2MapTest() {
+    public void string2MapTest() {
         String str = list2String();
 
         List<LinkedHashMap> maps = JSONUtils.toList(str,
@@ -146,6 +149,28 @@ public class JSONUtilsTest {
     }
 
     @Test
+    public void testNodeString() {
+        Assert.assertEquals("", JSONUtils.getNodeString("", "key"));
+        Assert.assertEquals("", JSONUtils.getNodeString("abc", "key"));
+        Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
+        Assert.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
+        Assert.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
+    }
+
+    @Test
+    public void testJsonByteArray() {
+        String str = "foo";
+        byte[] serializeByte = JSONUtils.toJsonByteArray(str);
+        String deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assert.assertEquals(str, deserialize);
+        str = null;
+        serializeByte = JSONUtils.toJsonByteArray(str);
+        deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assert.assertNull(deserialize);
+    }
+
+    @Test
     public void testToList() {
         Assert.assertEquals(new ArrayList(),
                 JSONUtils.toList("A1B2C3", null));
@@ -178,8 +203,6 @@ public class JSONUtilsTest {
 
         Assert.assertNull(JSONUtils.toMap("3"));
         Assert.assertNull(JSONUtils.toMap(null));
-        Assert.assertNull(JSONUtils.toMap("3", null, null));
-        Assert.assertNull(JSONUtils.toMap(null, null, null));
 
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);
@@ -235,6 +258,26 @@ public class JSONUtilsTest {
         TaskNode taskNode = JSONUtils.parseObject(a, TaskNode.class);
 
         Assert.assertTrue(true);
+    }
+
+    @Test
+    public void dateToString() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+        String time = "2022-02-22 13:38:24";
+        Date date = DateUtils.stringToDate(time);
+        String json = JSONUtils.toJsonString(date);
+        Assert.assertEquals(json, "\"" + time + "\"");
+
+        String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
+        Assert.assertNull(DateUtils.stringToDate(errorFormatTime));
+    }
+
+    @Test
+    public void stringToDate() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+        String json = "\"2022-02-22 13:38:24\"";
+        Date date = JSONUtils.parseObject(json, Date.class);
+        Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
     }
 
 }

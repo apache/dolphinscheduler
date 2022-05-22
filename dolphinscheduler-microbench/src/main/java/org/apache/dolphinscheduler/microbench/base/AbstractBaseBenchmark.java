@@ -14,19 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.microbench.base;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Test;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * BaseBenchMark
@@ -45,7 +50,6 @@ public abstract class AbstractBaseBenchmark {
     static final int DEFAULT_FORKS = 2;
 
     private static Logger logger = LoggerFactory.getLogger(AbstractBaseBenchmark.class);
-
 
     private ChainedOptionsBuilder newOptionsBuilder() {
 
@@ -75,7 +79,6 @@ public abstract class AbstractBaseBenchmark {
 
             if (file.exists()) {
                 writeFileStatus = file.delete();
-
 
             } else {
                 writeFileStatus = file.getParentFile().mkdirs();
@@ -117,7 +120,6 @@ public abstract class AbstractBaseBenchmark {
         String value = System.getProperty("forkCount");
         return null != value ? Integer.parseInt(value) : -1;
     }
-
 
 }
 

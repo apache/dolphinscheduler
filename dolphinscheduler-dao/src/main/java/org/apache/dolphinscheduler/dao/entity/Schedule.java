@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * schedule
@@ -35,278 +36,296 @@ import java.util.Date;
 @TableName("t_ds_schedules")
 public class Schedule {
 
-  @TableId(value="id", type=IdType.AUTO)
-  private int id;
-  /**
-   * process definition id
-   */
-  private int processDefinitionId;
+    @TableId(value = "id", type = IdType.AUTO)
+    private int id;
 
-  /**
-   * process definition name
-   */
-  @TableField(exist = false)
-  private String processDefinitionName;
+    /**
+     * process definition code
+     */
+    private long processDefinitionCode;
 
-  /**
-   * project name
-   */
-  @TableField(exist = false)
-  private String projectName;
+    /**
+     * process definition name
+     */
+    @TableField(exist = false)
+    private String processDefinitionName;
 
-  /**
-   * schedule description
-   */
-  @TableField(exist = false)
-  private String definitionDescription;
+    /**
+     * project name
+     */
+    @TableField(exist = false)
+    private String projectName;
 
-  /**
-   * schedule start time
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-  private Date startTime;
+    /**
+     * schedule description
+     */
+    @TableField(exist = false)
+    private String definitionDescription;
 
-  /**
-   * schedule end time
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-  private Date endTime;
+    /**
+     * schedule start time
+     */
+    private Date startTime;
 
-  /**
-   * crontab expression
-   */
-  private String crontab;
+    /**
+     * schedule end time
+     */
+    private Date endTime;
 
-  /**
-   * failure strategy
-   */
-  private FailureStrategy failureStrategy;
+    /**
+     * timezoneId
+     * <p>see {@link java.util.TimeZone#getTimeZone(String)}
+     */
+    private String timezoneId;
 
-  /**
-   * warning type
-   */
-  private WarningType warningType;
+    /**
+     * crontab expression
+     */
+    private String crontab;
 
-  /**
-   * create time
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-  private Date createTime;
+    /**
+     * failure strategy
+     */
+    private FailureStrategy failureStrategy;
 
-  /**
-   * update time
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-  private Date updateTime;
+    /**
+     * warning type
+     */
+    private WarningType warningType;
 
-  /**
-   * created user id
-   */
-  private int userId;
+    /**
+     * create time
+     */
+    private Date createTime;
 
-  /**
-   * created user name
-   */
-  @TableField(exist = false)
-  private String userName;
+    /**
+     * update time
+     */
+    private Date updateTime;
 
-  /**
-   * release state
-   */
-  private ReleaseState releaseState;
+    /**
+     * created user id
+     */
+    private int userId;
 
-  /**
-   * warning group id
-   */
-  private int warningGroupId;
+    /**
+     * created user name
+     */
+    @TableField(exist = false)
+    private String userName;
 
+    /**
+     * release state
+     */
+    private ReleaseState releaseState;
 
-  /**
-   * process instance priority
-   */
-  private Priority processInstancePriority;
-
-  /**
-   *  worker group
-   */
-  private String workerGroup;
-
-  public int getWarningGroupId() {
-    return warningGroupId;
-  }
-
-  public void setWarningGroupId(int warningGroupId) {
-    this.warningGroupId = warningGroupId;
-  }
+    /**
+     * warning group id
+     */
+    private int warningGroupId;
 
 
+    /**
+     * process instance priority
+     */
+    private Priority processInstancePriority;
 
-  public Schedule() {
-  }
+    /**
+     *  worker group
+     */
+    private String workerGroup;
 
-  public String getProjectName() {
-    return projectName;
-  }
+    /**
+     * environment code
+     */
+    private Long environmentCode;
 
-  public void setProjectName(String projectName) {
-    this.projectName = projectName;
-  }
+    public int getWarningGroupId() {
+        return warningGroupId;
+    }
 
+    public void setWarningGroupId(int warningGroupId) {
+        this.warningGroupId = warningGroupId;
+    }
 
+    public Schedule() {
+    }
 
-  public Date getStartTime() {
+    public String getProjectName() {
+        return projectName;
+    }
 
-    return startTime;
-  }
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
 
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
+    public Date getStartTime() {
+        return startTime;
+    }
 
-  public Date getEndTime() {
-    return endTime;
-  }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
+    public Date getEndTime() {
+        return endTime;
+    }
 
-  public String getCrontab() {
-    return crontab;
-  }
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
-  public void setCrontab(String crontab) {
-    this.crontab = crontab;
-  }
+    public String getTimezoneId() {
+        return timezoneId;
+    }
 
-  public FailureStrategy getFailureStrategy() {
-    return failureStrategy;
-  }
+    public void setTimezoneId(String timezoneId) {
+        this.timezoneId = timezoneId;
+    }
 
-  public void setFailureStrategy(FailureStrategy failureStrategy) {
-    this.failureStrategy = failureStrategy;
-  }
+    public String getCrontab() {
+        return crontab;
+    }
 
-  public WarningType getWarningType() {
-    return warningType;
-  }
+    public void setCrontab(String crontab) {
+        this.crontab = crontab;
+    }
 
-  public void setWarningType(WarningType warningType) {
-    this.warningType = warningType;
-  }
+    public FailureStrategy getFailureStrategy() {
+        return failureStrategy;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public void setFailureStrategy(FailureStrategy failureStrategy) {
+        this.failureStrategy = failureStrategy;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public WarningType getWarningType() {
+        return warningType;
+    }
 
+    public void setWarningType(WarningType warningType) {
+        this.warningType = warningType;
+    }
 
-  public ReleaseState getReleaseState() {
-    return releaseState;
-  }
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public void setReleaseState(ReleaseState releaseState) {
-    this.releaseState = releaseState;
-  }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
+    public ReleaseState getReleaseState() {
+        return releaseState;
+    }
 
+    public void setReleaseState(ReleaseState releaseState) {
+        this.releaseState = releaseState;
+    }
 
-  public int getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
+    }
 
-  public void setProcessDefinitionId(int processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
+    }
 
-  public String getProcessDefinitionName() {
-    return processDefinitionName;
-  }
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
 
-  public void setProcessDefinitionName(String processDefinitionName) {
-    this.processDefinitionName = processDefinitionName;
-  }
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-  public int getUserId() {
-    return userId;
-  }
+    public int getUserId() {
+        return userId;
+    }
 
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-  public String getUserName() {
-    return userName;
-  }
+    public String getUserName() {
+        return userName;
+    }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-  public int getId() {
-    return id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public Priority getProcessInstancePriority() {
-    return processInstancePriority;
-  }
+    public Priority getProcessInstancePriority() {
+        return processInstancePriority;
+    }
 
-  public void setProcessInstancePriority(Priority processInstancePriority) {
-    this.processInstancePriority = processInstancePriority;
-  }
+    public void setProcessInstancePriority(Priority processInstancePriority) {
+        this.processInstancePriority = processInstancePriority;
+    }
 
-  public String getWorkerGroup() {
-    return workerGroup;
-  }
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
 
-  public void setWorkerGroup(String workerGroup) {
-    this.workerGroup = workerGroup;
-  }
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
 
-  @Override
-  public String toString() {
-    return "Schedule{" +
-            "id=" + id +
-            ", processDefinitionId=" + processDefinitionId +
-            ", processDefinitionName='" + processDefinitionName + '\'' +
-            ", projectName='" + projectName + '\'' +
-            ", description='" + definitionDescription + '\'' +
-            ", startTime=" + startTime +
-            ", endTime=" + endTime +
-            ", crontab='" + crontab + '\'' +
-            ", failureStrategy=" + failureStrategy +
-            ", warningType=" + warningType +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            ", userId=" + userId +
-            ", userName='" + userName + '\'' +
-            ", releaseState=" + releaseState +
-            ", warningGroupId=" + warningGroupId +
-            ", processInstancePriority=" + processInstancePriority +
-            ", workerGroup='" + workerGroup + '\'' +
-            '}';
-  }
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
 
-  public String getDefinitionDescription() {
-    return definitionDescription;
-  }
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
 
-  public void setDefinitionDescription(String definitionDescription) {
-    this.definitionDescription = definitionDescription;
-  }
+    @Override
+    public String toString() {
+        return "Schedule{"
+                + "id=" + id
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", processDefinitionName='" + processDefinitionName + '\''
+                + ", projectName='" + projectName + '\''
+                + ", description='" + definitionDescription + '\''
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", timezoneId='" + timezoneId + +'\''
+                + ", crontab='" + crontab + '\''
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", releaseState=" + releaseState
+                + ", warningGroupId=" + warningGroupId
+                + ", processInstancePriority=" + processInstancePriority
+                + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
+                + '}';
+    }
+
+    public String getDefinitionDescription() {
+        return definitionDescription;
+    }
+
+    public void setDefinitionDescription(String definitionDescription) {
+        this.definitionDescription = definitionDescription;
+    }
 }

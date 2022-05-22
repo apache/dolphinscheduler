@@ -14,21 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service.impl;
 
+package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
+import org.apache.dolphinscheduler.api.dto.TaskStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TriFunction;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
@@ -41,18 +40,23 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.text.MessageFormat;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,9 +64,7 @@ import org.springframework.stereotype.Service;
  * data analysis service impl
  */
 @Service
-public class DataAnalysisServiceImpl extends BaseService implements DataAnalysisService {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
+public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -88,68 +90,88 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
     @Autowired
     private ProcessService processService;
 
-    private static final String COMMAND_STATE = "commandState";
-
-    private static final String ERROR_COMMAND_STATE = "errorCommandState";
-
     /**
      * statistical task instance status data
      *
-     * @param loginUser login user
-     * @param projectId project id
-     * @param startDate start date
-     * @param endDate end date
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param startDate   start date
+     * @param endDate     end date
      * @return task state count data
      */
-    public Map<String, Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
+    @Override
+    public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
 
         return countStateByProject(
                 loginUser,
-                projectId,
+                projectCode,
                 startDate,
                 endDate,
-                (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
+                this::countTaskInstanceAllStatesByProjectCodes);
     }
 
     /**
      * statistical process instance status data
      *
-     * @param loginUser login user
-     * @param projectId project id
-     * @param startDate start date
-     * @param endDate end date
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param startDate   start date
+     * @param endDate     end date
      * @return process instance state count data
      */
-    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
-        return this.countStateByProject(
+    @Override
+    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
+        Map<String, Object> result = this.countStateByProject(
                 loginUser,
-                projectId,
+                projectCode,
                 startDate,
                 endDate,
-                (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+                (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
+        // process state count needs to remove state of forced success
+        if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
+            ((TaskCountDto) result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
+        }
+        return result;
     }
 
-    private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
-            , TriFunction<Date, Date, Integer[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>(5);
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
+    /**
+     * Wrapper function of counting process instance state and task state
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param startDate   start date
+     * @param endDate     end date
+     */
+    private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate
+            , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
 
-        Date start;
-        Date end;
-        try {
+        Date start = null;
+        Date end = null;
+        if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            putErrorRequestParamsMsg(result);
-            return result;
+            if (Objects.isNull(start) || Objects.isNull(end)) {
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
+            }
         }
-        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
-        List<ExecuteStatusCount> processInstanceStateCounts =
-                instanceStateCounter.apply(start, end, projectIdArray);
+
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[]{projectCode};
+        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
+
+        if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
+            processInstanceStateCounts = instanceStateCounter.apply(start, end, projectCodeArray);
+        }
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
@@ -161,19 +183,32 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
 
 
     /**
-     * statistics the process definition quantities of certain person
+     * statistics the process definition quantities of a certain person
+     * <p>
+     * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
      *
-     * @param loginUser login user
-     * @param projectId project id
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return definition count data
      */
-    public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
+    @Override
+    public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
 
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
+        }
 
-        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
-        List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
-                loginUser.getId(), projectIdArray, isAdmin(loginUser));
+        List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[]{projectCode};
+        if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
+            defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
+        }
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
         result.put(Constants.DATA_LIST, dto);
@@ -186,18 +221,11 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * statistical command status data
      *
      * @param loginUser login user
-     * @param projectId project id
-     * @param startDate start date
-     * @param endDate end date
      * @return command state count data
      */
-    public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
-
-        Map<String, Object> result = new HashMap<>(5);
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
-        }
+    @Override
+    public Map<String, Object> countCommandState(User loginUser) {
+        Map<String, Object> result = new HashMap<>();
 
         /**
          * find all the task lists in the project under the user
@@ -205,180 +233,86 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
          */
         Date start = null;
         Date end = null;
+        Long[] projectCodeArray = getProjectCodesArrays(loginUser);
 
-        if (startDate != null && endDate != null) {
-            try {
-                start = DateUtils.getScheduleDate(startDate);
-                end = DateUtils.getScheduleDate(endDate);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-                putErrorRequestParamsMsg(result);
-                return result;
-            }
-        }
+        // admin can view all
+        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
 
-
-        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
-        // count command state
-        List<CommandCount> commandStateCounts =
-                commandMapper.countCommandState(
-                        loginUser.getId(),
-                        start,
-                        end,
-                        projectIdArray);
+        // count normal command state
+        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(userId, start, end, projectCodeArray)
+                .stream()
+                .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
-        List<CommandCount> errorCommandStateCounts =
-                errorCommandMapper.countCommandState(
-                        start, end, projectIdArray);
+        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(userId, start, end, projectCodeArray)
+                .stream()
+                .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
-        // enumMap
-        Map<CommandType, Map<String, Integer>> dataMap = new EnumMap<>(CommandType.class);
-
-        Map<String, Integer> commonCommand = new HashMap<>();
-        commonCommand.put(COMMAND_STATE, 0);
-        commonCommand.put(ERROR_COMMAND_STATE, 0);
-
-
-        // init data map
-        /**
-         * START_PROCESS, START_CURRENT_TASK_PROCESS, RECOVER_TOLERANCE_FAULT_PROCESS, RECOVER_SUSPENDED_PROCESS,
-         START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD;
-         */
-        dataMap.put(CommandType.START_PROCESS, commonCommand);
-        dataMap.put(CommandType.START_CURRENT_TASK_PROCESS, commonCommand);
-        dataMap.put(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS, commonCommand);
-        dataMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, commonCommand);
-        dataMap.put(CommandType.START_FAILURE_TASK_PROCESS, commonCommand);
-        dataMap.put(CommandType.COMPLEMENT_DATA, commonCommand);
-        dataMap.put(CommandType.SCHEDULER, commonCommand);
-        dataMap.put(CommandType.REPEAT_RUNNING, commonCommand);
-        dataMap.put(CommandType.PAUSE, commonCommand);
-        dataMap.put(CommandType.STOP, commonCommand);
-        dataMap.put(CommandType.RECOVER_WAITTING_THREAD, commonCommand);
-
-        // put command state
-        for (CommandCount executeStatusCount : commandStateCounts) {
-            Map<String, Integer> commandStateCountsMap = new HashMap<>(dataMap.get(executeStatusCount.getCommandType()));
-            commandStateCountsMap.put(COMMAND_STATE, executeStatusCount.getCount());
-            dataMap.put(executeStatusCount.getCommandType(), commandStateCountsMap);
-        }
-
-        // put error command state
-        for (CommandCount errorExecutionStatus : errorCommandStateCounts) {
-            Map<String, Integer> errorCommandStateCountsMap = new HashMap<>(dataMap.get(errorExecutionStatus.getCommandType()));
-            errorCommandStateCountsMap.put(ERROR_COMMAND_STATE, errorExecutionStatus.getCount());
-            dataMap.put(errorExecutionStatus.getCommandType(), errorCommandStateCountsMap);
-        }
-
-        List<CommandStateCount> list = new ArrayList<>();
-        for (Map.Entry<CommandType, Map<String, Integer>> next : dataMap.entrySet()) {
-            CommandStateCount commandStateCount = new CommandStateCount(next.getValue().get(ERROR_COMMAND_STATE),
-                    next.getValue().get(COMMAND_STATE), next.getKey());
-            list.add(commandStateCount);
-        }
+        List<CommandStateCount> list = Arrays.stream(CommandType.values())
+                .map(commandType -> new CommandStateCount(
+                        errorCommandCounts.getOrDefault(commandType, 0),
+                        normalCountCommandCounts.getOrDefault(commandType, 0),
+                        commandType)
+                ).collect(Collectors.toList());
 
         result.put(Constants.DATA_LIST, list);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    private Integer[] getProjectIdsArrays(User loginUser, int projectId) {
-        List<Integer> projectIds = new ArrayList<>();
-        if (projectId != 0) {
-            projectIds.add(projectId);
-        } else if (loginUser.getUserType() == UserType.GENERAL_USER) {
-            projectIds = processService.getProjectIdListHavePerm(loginUser.getId());
-            if (projectIds.isEmpty()) {
-                projectIds.add(0);
-            }
+    private Long[] getProjectCodesArrays(User loginUser) {
+        List<Project> projectList = projectMapper.queryRelationProjectListByUserId(
+                loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId());
+        Set<Long> projectCodes = new HashSet<>();
+        projectList.forEach(project -> projectCodes.add(project.getCode()));
+        if (loginUser.getUserType() == UserType.GENERAL_USER) {
+            List<Project> createProjects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
+            createProjects.forEach(project -> projectCodes.add(project.getCode()));
         }
-        return projectIds.toArray(new Integer[0]);
+        return projectCodes.toArray(new Long[0]);
     }
 
     /**
      * count queue state
      *
-     * @param loginUser login user
-     * @param projectId project id
      * @return queue state count data
      */
-    public Map<String, Object> countQueueState(User loginUser, int projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+    @Override
+    public Map<String, Object> countQueueState(User loginUser) {
+        Map<String, Object> result = new HashMap<>();
 
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
-        }
-
-        // TODO tasksQueueList and tasksKillList is never updated.
-        List<String> tasksQueueList = new ArrayList<>();
-        List<String> tasksKillList = new ArrayList<>();
-
+        //TODO need to add detail data info
         Map<String, Integer> dataMap = new HashMap<>();
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            dataMap.put("taskQueue", tasksQueueList.size());
-            dataMap.put("taskKill", tasksKillList.size());
-
-            result.put(Constants.DATA_LIST, dataMap);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-
-        int[] tasksQueueIds = new int[tasksQueueList.size()];
-        int[] tasksKillIds = new int[tasksKillList.size()];
-
-        int i = 0;
-        for (String taskQueueStr : tasksQueueList) {
-            if (StringUtils.isNotEmpty(taskQueueStr)) {
-                String[] splits = taskQueueStr.split("_");
-                if (splits.length >= 4) {
-                    tasksQueueIds[i++] = Integer.parseInt(splits[3]);
-                }
-            }
-        }
-
-        i = 0;
-        for (String taskKillStr : tasksKillList) {
-            if (StringUtils.isNotEmpty(taskKillStr)) {
-                String[] splits = taskKillStr.split("-");
-                if (splits.length == 2) {
-                    tasksKillIds[i++] = Integer.parseInt(splits[1]);
-                }
-            }
-        }
-        Integer taskQueueCount = 0;
-        Integer taskKillCount = 0;
-
-        Integer[] projectIds = getProjectIdsArrays(loginUser, projectId);
-        if (tasksQueueIds.length != 0) {
-            taskQueueCount = taskInstanceMapper.countTask(
-                    projectIds,
-                    tasksQueueIds);
-        }
-
-        if (tasksKillIds.length != 0) {
-            taskKillCount = taskInstanceMapper.countTask(projectIds, tasksKillIds);
-        }
-
-        dataMap.put("taskQueue", taskQueueCount);
-        dataMap.put("taskKill", taskKillCount);
-
+        dataMap.put("taskQueue", 0);
+        dataMap.put("taskKill", 0);
         result.put(Constants.DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    private boolean checkProject(User loginUser, int projectId, Map<String, Object> result) {
-        if (projectId != 0) {
-            Project project = projectMapper.selectById(projectId);
-            return projectService.hasProjectAndPerm(loginUser, project, result);
-        }
-        return true;
-    }
+    @Override
+    public List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(Date startTime, Date endTime, Long[] projectCodes) {
+        Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(startTime, endTime, projectCodes));
 
-    private void putErrorRequestParamsMsg(Map<String, Object> result) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
+        List<ExecutionStatus> allState = Arrays.stream(ExecutionStatus.values()).collect(Collectors.toList());
+        List<ExecutionStatus> needRecountState;
+        if (startTimeStates.isPresent() && startTimeStates.get().size() != 0) {
+            List<ExecutionStatus> instanceState = startTimeStates.get().stream().map(ExecuteStatusCount::getExecutionStatus).collect(Collectors.toList());
+            //value 0 state need to recount by submit time
+            needRecountState = allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
+            if (needRecountState.size() == 0) {
+                return startTimeStates.get();
+            }
+        } else {
+            needRecountState = allState;
+        }
+
+        //use submit time to recount when 0
+        //if have any issues with this code, should change to specified states 0 8 9 17 not state count is 0
+        List<ExecuteStatusCount> recounts = this.taskInstanceMapper
+                .countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(startTime, endTime, projectCodes, needRecountState);
+        startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
+
+        return startTimeStates.orElse(null);
     }
 }

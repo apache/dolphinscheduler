@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -34,17 +36,27 @@ public interface AccessTokenService {
      * @param pageSize page size
      * @return token list for page number and page size
      */
-    Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+
+    /**
+     * query access token for specified user
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return token list for specified user
+     */
+    Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId);
 
     /**
      * create token
      *
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
-    Map<String, Object> createToken(int userId, String expireTime, String token);
+    Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token);
+
 
     /**
      * generate token
@@ -53,7 +65,7 @@ public interface AccessTokenService {
      * @param expireTime token expire time
      * @return token string
      */
-    Map<String, Object> generateToken(int userId, String expireTime);
+    Map<String, Object> generateToken(User loginUser, int userId, String expireTime);
 
     /**
      * delete access token
@@ -70,8 +82,8 @@ public interface AccessTokenService {
      * @param id token id
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
-     * @return update result code
+     * @param token token string (if it is absent, it will be automatically generated)
+     * @return updated access token entity
      */
-    Map<String, Object> updateToken(int id, int userId, String expireTime, String token);
+    Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token);
 }

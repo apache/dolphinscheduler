@@ -14,45 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+
+import org.apache.hadoop.security.UserGroupInformation;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * configuration test
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
 public class CommonUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
     @Test
     public void getSystemEnvPath() {
-        logger.info(CommonUtils.getSystemEnvPath());
-        Assert.assertTrue(true);
+        String envPath;
+        envPath = CommonUtils.getSystemEnvPath();
+        Assert.assertEquals("/etc/profile", envPath);
     }
+
     @Test
     public void isDevelopMode() {
         logger.info("develop mode: {}",CommonUtils.isDevelopMode());
         Assert.assertTrue(true);
-    }
-    @Test
-    public void getKerberosStartupState(){
-        logger.info("kerberos startup state: {}",CommonUtils.getKerberosStartupState());
-        Assert.assertTrue(true);
-    }
-    @Test
-    public void loadKerberosConf(){
-        try {
-            CommonUtils.loadKerberosConf();
-            Assert.assertTrue(true);
-        } catch (Exception e) {
-            Assert.fail("load Kerberos Conf failed");
-        }
     }
 
     @Test
@@ -80,52 +77,15 @@ public class CommonUtilsTest {
     }
 
     @Test
-    public void test(){
-        InetAddress IP = null;
+    public void test() {
+        InetAddress ip;
         try {
-            IP = InetAddress.getLocalHost();
-            logger.info(IP.getHostAddress());
+            ip = InetAddress.getLocalHost();
+            logger.info(ip.getHostAddress());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
         Assert.assertTrue(true);
-    }
-
-    @Test
-    public void encodePassword() {
-
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
-
-        Assert.assertEquals("",CommonUtils.encodePassword(""));
-        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==",CommonUtils.encodePassword("123456"));
-        Assert.assertEquals("IUAjJCVeJipJVkZCV2xoVFYwQT0=",CommonUtils.encodePassword("!QAZXSW@"));
-        Assert.assertEquals("IUAjJCVeJipOV1JtWjJWeUtFQT0=",CommonUtils.encodePassword("5dfger(@"));
-
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
-
-        Assert.assertEquals("",CommonUtils.encodePassword(""));
-        Assert.assertEquals("123456",CommonUtils.encodePassword("123456"));
-        Assert.assertEquals("!QAZXSW@",CommonUtils.encodePassword("!QAZXSW@"));
-        Assert.assertEquals("5dfger(@",CommonUtils.encodePassword("5dfger(@"));
-
-    }
-
-    @Test
-    public void decodePassword() {
-
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
-
-        Assert.assertEquals("", CommonUtils.decodePassword(""));
-        Assert.assertEquals("123456", CommonUtils.decodePassword("IUAjJCVeJipNVEl6TkRVMg=="));
-        Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("IUAjJCVeJipJVkZCV2xoVFYwQT0="));
-        Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("IUAjJCVeJipOV1JtWjJWeUtFQT0="));
-
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
-
-        Assert.assertEquals("", CommonUtils.decodePassword(""));
-        Assert.assertEquals("123456", CommonUtils.decodePassword("123456"));
-        Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("!QAZXSW@"));
-        Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("5dfger(@"));
     }
 
 }

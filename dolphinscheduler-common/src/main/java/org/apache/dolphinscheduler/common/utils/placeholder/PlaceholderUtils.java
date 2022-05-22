@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils.placeholder;
+
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * placeholder utils
@@ -38,7 +39,6 @@ public class PlaceholderUtils {
      */
 
     public static final String PLACEHOLDER_SUFFIX = "}";
-
 
     /**
      * Replaces all placeholders of format {@code ${name}} with the value returned
@@ -94,11 +94,10 @@ public class PlaceholderUtils {
             try {
                 return paramsMap.get(placeholderName);
             } catch (Exception ex) {
-                logger.error("resolve placeholder '{}' in [ {} ]" , placeholderName, value, ex);
+                logger.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
                 return null;
             }
         }
     }
-
 
 }

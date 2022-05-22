@@ -14,43 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ErrorCommandMapperTest {
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class ErrorCommandMapperTest extends BaseDaoTest {
 
     @Autowired
-    ErrorCommandMapper errorCommandMapper;
+    private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
-
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * insert
      * @return ErrorCommand
      */
-    private ErrorCommand insertOne(){
+    private ErrorCommand insertOne() {
         //insertOne
         ErrorCommand errorCommand = new ErrorCommand();
         errorCommand.setId(10101);
@@ -73,30 +65,32 @@ public class ErrorCommandMapperTest {
         ErrorCommand errorCommand = insertOne();
 
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
         processDefinition.setName("def 1");
-        processDefinition.setProjectId(1010);
+        processDefinition.setProjectCode(1010L);
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
 
-        errorCommand.setProcessDefinitionId(processDefinition.getId());
+        errorCommand.setProcessDefinitionCode(processDefinition.getCode());
         errorCommandMapper.updateById(errorCommand);
 
-
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
+                0,
                 null,
                 null,
-                new Integer[0]
+                new Long[0]
         );
 
-        Integer[] projectIdArray = new Integer[2];
-        projectIdArray[0] = processDefinition.getProjectId();
-        projectIdArray[1] = 200;
+        Long[] projectCodeArray = new Long[2];
+        projectCodeArray[0] = processDefinition.getProjectCode();
+        projectCodeArray[1] = 200L;
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
+                0,
                 null,
                 null,
-                projectIdArray
+                projectCodeArray
         );
 
         Assert.assertNotEquals(commandCounts.size(), 0);

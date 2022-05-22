@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.model;
 
+package org.apache.dolphinscheduler.common.model;
 
 import java.util.Date;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * server
@@ -55,13 +53,11 @@ public class WorkerServerModel {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * last heart beat time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastHeartbeatTime;
 
     public int getId() {

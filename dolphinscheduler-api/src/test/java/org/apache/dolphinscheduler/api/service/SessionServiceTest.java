@@ -14,21 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
+
+import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Session;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.Session;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +46,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-
+/**
+ * session service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class SessionServiceTest {
 
@@ -55,12 +60,11 @@ public class SessionServiceTest {
     @Mock
     private SessionMapper sessionMapper;
 
-    private String sessionId ="aaaaaaaaaaaaaaaaaa";
+    private String sessionId = "aaaaaaaaaaaaaaaaaa";
 
     @Before
     public void setUp() {
     }
-
 
     @After
     public void after(){
@@ -70,8 +74,7 @@ public class SessionServiceTest {
      * create session
      */
     @Test
-    public void testGetSession(){
-
+    public void testGetSession() {
 
         Mockito.when(sessionMapper.selectById(sessionId)).thenReturn(getSession());
         // get sessionId from  header
@@ -93,32 +96,29 @@ public class SessionServiceTest {
         Assert.assertNotNull(session);
         logger.info("session ip {}",session.getIp());
         Assert.assertEquals(session.getIp(),"127.0.0.1");
-
-
     }
 
     /**
      * create session
      */
     @Test
-    public void testCreateSession(){
-
+    public void testCreateSession() {
         String ip = "127.0.0.1";
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
         user.setId(1);
         Mockito.when(sessionMapper.queryByUserId(1)).thenReturn(getSessions());
         String sessionId = sessionService.createSession(user, ip);
-        logger.info("createSessionId is "+sessionId);
-        Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
+        logger.info("createSessionId is " + sessionId);
+        Assert.assertTrue(!StringUtils.isEmpty(sessionId));
     }
+
     /**
      * sign out
      * remove ip restrictions
      */
     @Test
-    public void testSignOut(){
-
+    public void testSignOut() {
         int userId = 88888888;
         String ip = "127.0.0.1";
         User user = new User();
@@ -126,12 +126,11 @@ public class SessionServiceTest {
 
         Mockito.when(sessionMapper.queryByUserIdAndIp(userId,ip)).thenReturn(getSession());
 
-        sessionService.signOut(ip ,user);
+        sessionService.signOut(ip,user);
 
     }
 
-    private Session getSession(){
-
+    private Session getSession() {
         Session session = new Session();
         session.setId(sessionId);
         session.setIp("127.0.0.1");
@@ -140,11 +139,9 @@ public class SessionServiceTest {
         return session;
     }
 
-    private List<Session> getSessions(){
+    private List<Session> getSessions() {
         List<Session> sessionList = new ArrayList<>();
-       sessionList.add(getSession());
+        sessionList.add(getSession());
         return sessionList;
     }
-
-
 }

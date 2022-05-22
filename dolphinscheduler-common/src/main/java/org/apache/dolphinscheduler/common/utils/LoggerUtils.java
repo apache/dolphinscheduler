@@ -18,14 +18,20 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * logger utils
@@ -36,44 +42,27 @@ public class LoggerUtils {
         throw new UnsupportedOperationException("Construct LoggerUtils");
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
+
     /**
      * rules for extracting application ID
      */
     private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
-     * Task Logger's prefix
-     */
-    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_APPID_LOG_FORMAT = "[taskAppId=";
-
-    /**
      * build job id
      *
-     * @param affix Task Logger's prefix
-     * @param processDefId process define id
-     * @param processInstId process instance id
-     * @param taskId task id
      * @return task id format
      */
-    public static String buildTaskId(String affix,
-                                     int processDefId,
+    public static String buildTaskId(Date firstSubmitTime,
+                                     Long processDefineCode,
+                                     int processDefineVersion,
                                      int processInstId,
                                      int taskId) {
-        // - [taskAppId=TASK_79_4084_15210]
-        return String.format(" - %s%s-%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix,
-                processDefId,
-                processInstId,
-                taskId);
+        // like TaskAppId=TASK-20211107-798_1-4084-15210
+        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null);
+        return String.format("%s=%s-%s-%s_%s-%s-%s",
+                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**
@@ -101,23 +90,23 @@ public class LoggerUtils {
         return appIds;
     }
 
-    public static void logError(Optional<Logger> optionalLogger
-            , String error) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(error));
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , Throwable e) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(e.getMessage(), e));
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , String error, Throwable e) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(error, e));
-    }
-
-    public static void logInfo(Optional<Logger> optionalLogger
-            , String info) {
-        optionalLogger.ifPresent((Logger logger) -> logger.info(info));
+    /**
+     * read whole file content
+     *
+     * @param filePath file path
+     * @return whole file content
+     */
+    public static String readWholeFileContent(String filePath) {
+        String line;
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
+            while ((line = br.readLine()) != null) {
+                sb.append(line + "\r\n");
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            logger.error("read file error", e);
+        }
+        return "";
     }
 }

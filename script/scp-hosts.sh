@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -18,25 +18,18 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/install_config.conf
 
-txt=""
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
-    txt="''"
-fi
-
-declare -A workersGroupMap=()
+source ${workDir}/env/install_env.sh
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
   echo $workerGroup;
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupsName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupsName)
+  group=`echo $workerGroup|awk -F':' '{print $2}'`
+  workerNames+=($worker)
+  groupNames+=(${group:-default})
 done
-
 
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
@@ -47,18 +40,25 @@ do
   fi
 
   echo "scp dirs to $host/$installPath starting"
-	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
+	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ master-server/ worker-server/ alert-server/ api-server/ ui/ tools/"
 
-  for dsDir in bin conf lib script sql ui install.sh
-  do
-    # if worker in workersGroupMap
-    if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
-      sed -i ${txt} "s:.*worker.groups.*:worker.groups=${workersGroupMap[${host}]}:g" ${dsDir}/worker.properties
+  for i in ${!workerNames[@]}; do
+    if [[ ${workerNames[$i]} == $host ]]; then
+      workerIndex=$i
+      break
     fi
-
-    echo "start to scp $dsDir to $host/$installPath"
-    scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
   done
+  # set worker groups in application.yaml
+  [[ -n ${workerIndex} ]] && sed -i "s/- default/- ${groupNames[$workerIndex]}/" worker-server/conf/application.yaml
+
+  for dsDir in bin master-server worker-server alert-server api-server ui tools
+  do
+    echo "start to scp $dsDir to $host/$installPath"
+    # Use quiet mode to reduce command line output
+    scp -q -P $sshPort -r $workDir/../$dsDir  $host:$installPath
+  done
+  # restore worker groups to default
+  [[ -n ${workerIndex} ]] && sed -i "s/- ${groupNames[$workerIndex]}/- default/" worker-server/conf/application.yaml
 
   echo "scp dirs to $host/$installPath complete"
 done

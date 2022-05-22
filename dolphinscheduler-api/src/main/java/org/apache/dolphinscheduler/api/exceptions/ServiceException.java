@@ -46,6 +46,10 @@ public class ServiceException extends RuntimeException {
         super(message);
     }
 
+    public ServiceException(String message, Exception cause) {
+        super(message, cause);
+    }
+
     public Integer getCode() {
         return this.code;
     }

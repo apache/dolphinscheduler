@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
@@ -46,6 +47,11 @@ public class Project {
      */
     @TableField(exist = false)
     private String userName;
+
+    /**
+     * project code
+     */
+    private long code;
 
     /**
      * project name
@@ -84,6 +90,14 @@ public class Project {
      */
     @TableField(exist = false)
     private int instRunningCount;
+
+    public long getCode() {
+        return code;
+    }
+
+    public void setCode(long code) {
+        this.code = code;
+    }
 
     public int getDefCount() {
         return defCount;
@@ -167,15 +181,19 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "Project{"
+                + "id=" + id
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", perm=" + perm
+                + ", defCount=" + defCount
+                + ", instRunningCount=" + instRunningCount
+                + '}';
     }
 
     @Override
@@ -211,6 +229,7 @@ public class Project {
         private int id;
         private int userId;
         private String userName;
+        private long code;
         private String name;
         private String description;
         private Date createTime;
@@ -220,6 +239,11 @@ public class Project {
         private int instRunningCount;
 
         private Builder() {
+        }
+
+        public Builder code(long code) {
+            this.code = code;
+            return this;
         }
 
         public Builder id(int id) {
@@ -276,6 +300,7 @@ public class Project {
             Project project = new Project();
             project.setId(id);
             project.setUserId(userId);
+            project.setCode(code);
             project.setUserName(userName);
             project.setName(name);
             project.setDescription(description);

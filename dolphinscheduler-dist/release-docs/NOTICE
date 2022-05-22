@@ -1,5 +1,5 @@
-Apache DolphinScheduler (incubating)
-Copyright 2019-2020 The Apache Software Foundation
+Apache DolphinScheduler
+Copyright 2019-2022 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -30,6 +30,7 @@ Jetty is dual licensed under both
 Jetty may be distributed under either license.
 
 ------
+
 Eclipse
 
 The following artifacts are EPL.
@@ -110,11 +111,6 @@ org.mortbay.jasper:apache-jsp
   org.apache.tomcat:tomcat-api
   org.apache.tomcat:tomcat-util-scan
   org.apache.tomcat:tomcat-util
-
-org.mortbay.jasper:apache-el
-  org.apache.tomcat:tomcat-jasper-el
-  org.apache.tomcat:tomcat-el-api
-
 
 ------
 Mortbay
@@ -346,14 +342,6 @@ can be obtained at:
   * HOMEPAGE:
     * http://logging.apache.org/log4j/
 
-This product optionally depends on 'Aalto XML', an ultra-high performance
-non-blocking XML processor, which can be obtained at:
-
-  * LICENSE:
-    * license/LICENSE.aalto-xml.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * http://wiki.fasterxml.com/AaltoHome
-
 This product contains a modified version of 'HPACK', a Java implementation of
 the HTTP/2 HPACK algorithm written by Twitter. It can be obtained at:
 
@@ -384,8 +372,8 @@ This product contains the Maven wrapper scripts from 'Maven Wrapper', that provi
 Spring Framework NOTICE
 
 ========================================================================
-Spring Framework 5.1.5.RELEASE
-Copyright (c) 2002-2019 Pivotal, Inc.
+Spring Framework 5.1.18.RELEASE
+Copyright (c) 2002-2020 Pivotal, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0
 (the "License"). You may not use this product except in compliance with
@@ -442,12 +430,6 @@ Copyright 2009-2014 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
-
-This product includes software components originally
-developed for Airlift (https://github.com/airlift/airlift),
-licensed under the Apache 2.0 license. The licensing terms
-for Airlift code can be found at:
-https://github.com/airlift/airlift/blob/master/LICENSE
 
 ========================================================================
 
@@ -543,6 +525,34 @@ The Apache Software Foundation (http://www.apache.org/).
 
 --------------------------------------------------------------------------------
 
+==============================================================
+ protostuff
+ Copyright 2009 David Yu dyuproject@gmail.com
+==============================================================
+
+protobuf is copyright Google inc unless otherwise noted.
+It is licensed under the BSD license.
+
+jackson-core-asl is copyright FasterXml unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
+antlr is copyright Terence Parr unless otherwise noted.
+It is licensed under the BSD license.
+
+stringtemplate is copyright Terence Parr unless otherwise noted.
+It is licensed under the BSD license.
+
+velocity is licensed under the apache 2.0 license.
+
+B64Code.java is copyright Mort Bay Consulting Pty Ltd unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
+jarjar is copyright Google inc unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
+guava is copyright Google inc unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
 This product includes parquet-tools, initially developed at ARRIS, Inc. with
 the following copyright notice:
 
@@ -582,13 +592,10 @@ with the following copyright notice:
 ========================================================================
 
 
-Apache POI NOTICE
-
-========================================================================
 Apache POI
-Copyright 2003-2017 The Apache Software Foundation
+Copyright 2003-2020 The Apache Software Foundation
 
-This product includes software developed by
+This product includes software developed at
 The Apache Software Foundation (https://www.apache.org/).
 
 This product contains parts that were originally based on software from BEA.
@@ -601,13 +608,10 @@ This product contains W3C XML Schema documents. Copyright 2001-2003 (c)
 World Wide Web Consortium (Massachusetts Institute of Technology, European
 Research Consortium for Informatics and Mathematics, Keio University)
 
-This product contains the Piccolo XML Parser for Java
-(http://piccolo.sourceforge.net/). Copyright 2002 Yuval Oren.
-
 This product contains the chunks_parse_cmds.tbl file from the vsdump program.
 Copyright (C) 2006-2007 Valek Filippov (frob@df.ru)
 
-This product contains parts of the eID Applet project 
+This product contains parts of the eID Applet project
 <http://eid-applet.googlecode.com> and <https://github.com/e-Contract/eid-applet>.
 Copyright (c) 2009-2014
 FedICT (federal ICT department of Belgium), e-Contract.be BVBA (https://www.e-contract.be),
@@ -634,6 +638,14 @@ http://gcc.gnu.org/onlinedocs/libstdc++/manual/license.html
 
 ========================================================================
 
+Alibaba Druid NOTICE
+
+========================================================================
+
+Alibaba Druid
+Copyright 1999-2021 Alibaba Group Holding Ltd.
+
+========================================================================
 
 AWS SDK for Java NOTICE
 
@@ -1647,14 +1659,6 @@ can be obtained at:
   * HOMEPAGE:
     * http://logging.apache.org/log4j/
 
-This product optionally depends on 'Aalto XML', an ultra-high performance
-non-blocking XML processor, which can be obtained at:
-
-  * LICENSE:
-    * license/LICENSE.aalto-xml.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * http://wiki.fasterxml.com/AaltoHome
-
 This product contains a modified version of 'HPACK', a Java implementation of
 the HTTP/2 HPACK algorithm written by Twitter. It can be obtained at:
 
@@ -1918,25 +1922,91 @@ ANT NOTICE
    Please read the different LICENSE files present in the root directory of
    this distribution.
 
+=========================================================================
 
+Commons Compress NOTICE
 
+=========================================================================
 
+Apache Commons Compress
+Copyright 2002-2020 The Apache Software Foundation
 
+This product includes software developed at
+The Apache Software Foundation (https://www.apache.org/).
 
+---
 
+The files in the package org.apache.commons.compress.archivers.sevenz
+were derived from the LZMA SDK, version 9.20 (C/ and CPP/7zip/),
+which has been placed in the public domain:
 
+"LZMA SDK is placed in the public domain." (http://www.7-zip.org/sdk.html)
 
+---
 
+The test file lbzip2_32767.bz2 has been copied from libbzip2's source
+repository:
 
+This program, "bzip2", the associated library "libbzip2", and all
+documentation, are copyright (C) 1996-2019 Julian R Seward.  All
+rights reserved.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
 
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
 
+2. The origin of this software must not be misrepresented; you must
+   not claim that you wrote the original software.  If you use this
+   software in a product, an acknowledgment in the product
+   documentation would be appreciated but is not required.
 
+3. Altered source versions must be plainly marked as such, and must
+   not be misrepresented as being the original software.
 
+4. The name of the author may not be used to endorse or promote
+   products derived from this software without specific prior written
+   permission.
 
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+Julian Seward, jseward@acm.org
 
+=========================================================================
 
+Xmlbeans NOTICE
 
+=========================================================================
 
+   =========================================================================
+   ==  NOTICE file corresponding to section 4(d) of the Apache License,   ==
+   ==  Version 2.0, in this case for the Apache XmlBeans distribution.    ==
+   =========================================================================
 
+   This product includes software developed at
+   The Apache Software Foundation (http://www.apache.org/).
+
+   Portions of this software were originally based on the following:
+     - software copyright (c) 2000-2003, BEA Systems, <http://www.bea.com/>.
+
+   Aside from contributions to the Apache XMLBeans project, this
+   software also includes:
+
+    - one or more source files from the Apache Xerces-J and Apache Axis
+      products, Copyright (c) 1999-2003 Apache Software Foundation
+
+    - W3C XML Schema documents Copyright 2001-2003 (c) World Wide Web
+      Consortium (Massachusetts Institute of Technology, European Research
+      Consortium for Informatics and Mathematics, Keio University)

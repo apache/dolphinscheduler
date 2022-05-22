@@ -14,14 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
+
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -31,7 +41,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * task instance
@@ -57,14 +67,19 @@ public class TaskInstance implements Serializable {
     private String taskType;
 
     /**
-     * process definition id
-     */
-    private int processDefinitionId;
-
-    /**
      * process instance id
      */
     private int processInstanceId;
+
+    /**
+     * task code
+     */
+    private long taskCode;
+
+    /**
+     * task definition version
+     */
+    private int taskDefinitionVersion;
 
     /**
      * process instance name
@@ -73,9 +88,10 @@ public class TaskInstance implements Serializable {
     private String processInstanceName;
 
     /**
-     * task json
+     * process instance name
      */
-    private String taskJson;
+    @TableField(exist = false)
+    private int taskGroupPriority;
 
     /**
      * state
@@ -85,25 +101,21 @@ public class TaskInstance implements Serializable {
     /**
      * task first submit time.
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date firstSubmitTime;
 
     /**
      * task submit time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submitTime;
 
     /**
      * task start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * task end time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**
@@ -146,6 +158,12 @@ public class TaskInstance implements Serializable {
     private ProcessDefinition processDefine;
 
     /**
+     * task definition
+     */
+    @TableField(exist = false)
+    private TaskDefinition taskDefine;
+
+    /**
      * process id
      */
     private int pid;
@@ -164,13 +182,19 @@ public class TaskInstance implements Serializable {
      * dependency
      */
     @TableField(exist = false)
-    private String dependency;
+    private DependentParameters dependency;
+
+    /**
+     * switch dependency
+     */
+    @TableField(exist = false)
+    private SwitchParameters switchDependency;
 
     /**
      * duration
      */
     @TableField(exist = false)
-    private Long duration;
+    private String duration;
 
     /**
      * max retry times
@@ -205,11 +229,25 @@ public class TaskInstance implements Serializable {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
+     * environment config
+     */
+    private String environmentConfig;
 
     /**
      * executor id
      */
     private int executorId;
+
+    /**
+     * varPool string
+     */
+    private String varPool;
 
     /**
      * executor name
@@ -226,12 +264,42 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
+
+    /**
+     * task params
+     */
+    private String taskParams;
+
+    /**
+     * dry run flag
+     */
+    private int dryRun;
+    /**
+     * task group id
+     */
+    private int taskGroupId;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
     }
 
+    public String getVarPool() {
+        return varPool;
+    }
+
+    public void setVarPool(String varPool) {
+        this.varPool = varPool;
+    }
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
+    }
 
     public ProcessInstance getProcessInstance() {
         return processInstance;
@@ -247,6 +315,14 @@ public class TaskInstance implements Serializable {
 
     public void setProcessDefine(ProcessDefinition processDefine) {
         this.processDefine = processDefine;
+    }
+
+    public TaskDefinition getTaskDefine() {
+        return taskDefine;
+    }
+
+    public void setTaskDefine(TaskDefinition taskDefine) {
+        this.taskDefine = taskDefine;
     }
 
     public int getId() {
@@ -273,28 +349,12 @@ public class TaskInstance implements Serializable {
         this.taskType = taskType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
     public int getProcessInstanceId() {
         return processInstanceId;
     }
 
     public void setProcessInstanceId(int processInstanceId) {
         this.processInstanceId = processInstanceId;
-    }
-
-    public String getTaskJson() {
-        return taskJson;
-    }
-
-    public void setTaskJson(String taskJson) {
-        this.taskJson = taskJson;
     }
 
     public ExecutionStatus getState() {
@@ -397,16 +457,49 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-    public String getDependency() {
-        if (this.dependency != null) {
-            return this.dependency;
-        }
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        return taskNode == null ? null : taskNode.getDependence();
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
     }
 
-    public void setDependency(String dependency) {
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public String getEnvironmentConfig() {
+        return this.environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String environmentConfig) {
+        this.environmentConfig = environmentConfig;
+    }
+
+    public DependentParameters getDependency() {
+        if (this.dependency == null) {
+            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
+        }
+        return this.dependency;
+    }
+
+    public void setDependency(DependentParameters dependency) {
         this.dependency = dependency;
+    }
+
+    public SwitchParameters getSwitchDependency() {
+        if (this.switchDependency == null) {
+            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
+        }
+        return this.switchDependency;
+    }
+
+    public void setSwitchDependency(SwitchParameters switchDependency) {
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+        });
+        taskParamsMap.put(Constants.SWITCH_RESULT, JSONUtils.toJsonString(switchDependency));
+        this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 
     public Flag getFlag() {
@@ -425,11 +518,11 @@ public class TaskInstance implements Serializable {
         this.processInstanceName = processInstanceName;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -465,6 +558,14 @@ public class TaskInstance implements Serializable {
         this.executorName = executorName;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
@@ -482,20 +583,28 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isSubProcess() {
-        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+        return TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isDependTask() {
-        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+        return TASK_TYPE_DEPENDENT.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
+        return TASK_TYPE_CONDITIONS.equalsIgnoreCase(this.taskType);
     }
 
+    public boolean isSwitchTask() {
+        return TASK_TYPE_SWITCH.equalsIgnoreCase(this.taskType);
+    }
+
+    public boolean isBlockingTask() {
+        return TASK_TYPE_BLOCKING.equalsIgnoreCase(this.taskType);
+    }
 
     /**
-     * determine if you can try again
+     * determine if a task instance can retry
+     * if subProcess,
      *
      * @return can try result
      */
@@ -505,10 +614,26 @@ public class TaskInstance implements Serializable {
         }
         if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        } else {
-            return (this.getState().typeIsFailure()
-                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+        return this.getState() == ExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
+    }
+
+    /**
+     * whether the retry interval is timed out
+     *
+     * @return Boolean
+     */
+    public boolean retryTaskIntervalOverTime() {
+        if (getState() != ExecutionStatus.FAILURE) {
+            return true;
+        }
+        if (getMaxRetryTimes() == 0 || getRetryInterval() == 0) {
+            return true;
+        }
+        Date now = new Date();
+        long failedTimeInterval = DateUtils.differSec(now, getEndTime());
+        // task retry does not over time, return false
+        return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
     public Priority getTaskInstancePriority() {
@@ -557,10 +682,8 @@ public class TaskInstance implements Serializable {
                 + "id=" + id
                 + ", name='" + name + '\''
                 + ", taskType='" + taskType + '\''
-                + ", processDefinitionId=" + processDefinitionId
                 + ", processInstanceId=" + processInstanceId
                 + ", processInstanceName='" + processInstanceName + '\''
-                + ", taskJson='" + taskJson + '\''
                 + ", state=" + state
                 + ", firstSubmitTime=" + firstSubmitTime
                 + ", submitTime=" + submitTime
@@ -584,9 +707,50 @@ public class TaskInstance implements Serializable {
                 + ", processInstancePriority=" + processInstancePriority
                 + ", dependentResult='" + dependentResult + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
+                + ", environmentConfig='" + environmentConfig + '\''
                 + ", executorId=" + executorId
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime
+                + ", dryRun=" + dryRun
+                + ", taskGroupId=" + taskGroupId
+                + ", taskGroupPriority=" + taskGroupPriority
                 + '}';
+    }
+
+    public long getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(long taskCode) {
+        this.taskCode = taskCode;
+    }
+
+    public int getTaskDefinitionVersion() {
+        return taskDefinitionVersion;
+    }
+
+    public void setTaskDefinitionVersion(int taskDefinitionVersion) {
+        this.taskDefinitionVersion = taskDefinitionVersion;
+    }
+
+    public String getTaskParams() {
+        return taskParams;
+    }
+
+    public void setTaskParams(String taskParams) {
+        this.taskParams = taskParams;
+    }
+
+    public boolean isFirstRun() {
+        return endTime == null;
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

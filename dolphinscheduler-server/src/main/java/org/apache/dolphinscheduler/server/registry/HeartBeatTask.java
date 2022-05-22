@@ -17,68 +17,76 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import java.util.Date;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HeartBeatTask extends Thread {
+/**
+ * Heart beat task
+ */
+public class HeartBeatTask implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
 
-    private String startTime;
-    private double reservedMemory;
-    private double maxCpuloadAvg;
-    private Set<String> heartBeatPaths;
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    private final Set<String> heartBeatPaths;
+    private final RegistryClient registryClient;
+    private int workerWaitingTaskCount;
+    private final String serverType;
+    private final HeartBeat heartBeat;
 
-    public HeartBeatTask(String startTime,
-                         double reservedMemory,
+    public HeartBeatTask(long startupTime,
                          double maxCpuloadAvg,
+                         double reservedMemory,
                          Set<String> heartBeatPaths,
-                         ZookeeperRegistryCenter zookeeperRegistryCenter) {
-        this.startTime = startTime;
-        this.reservedMemory = reservedMemory;
-        this.maxCpuloadAvg = maxCpuloadAvg;
+                         String serverType,
+                         RegistryClient registryClient) {
         this.heartBeatPaths = heartBeatPaths;
-        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
+        this.registryClient = registryClient;
+        this.serverType = serverType;
+        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
+    }
+
+    public HeartBeatTask(long startupTime,
+                         double maxCpuloadAvg,
+                         double reservedMemory,
+                         int hostWeight,
+                         Set<String> heartBeatPaths,
+                         String serverType,
+                         RegistryClient registryClient,
+                         int workerThreadCount,
+                         int workerWaitingTaskCount
+    ) {
+        this.heartBeatPaths = heartBeatPaths;
+        this.registryClient = registryClient;
+        this.workerWaitingTaskCount = workerWaitingTaskCount;
+        this.serverType = serverType;
+        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
+    }
+
+    public String getHeartBeatInfo() {
+        return this.heartBeat.encodeHeartBeat();
     }
 
     @Override
     public void run() {
         try {
-            double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
-            double loadAverage = OSUtils.loadAverage();
-
-            int status = Constants.NORAML_NODE_STATUS;
-
-            if (availablePhysicalMemorySize < reservedMemory
-                    || loadAverage > maxCpuloadAvg) {
-                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize, loadAverage);
-                status = Constants.ABNORMAL_NODE_STATUS;
+            // check dead or not in zookeeper
+            for (String heartBeatPath : heartBeatPaths) {
+                if (registryClient.checkIsDeadServer(heartBeatPath, serverType)) {
+                    registryClient.getStoppable().stop("i was judged to death, release resources and stop myself");
+                    return;
+                }
             }
 
-            StringBuilder builder = new StringBuilder(100);
-            builder.append(OSUtils.cpuUsage()).append(COMMA);
-            builder.append(OSUtils.memoryUsage()).append(COMMA);
-            builder.append(OSUtils.loadAverage()).append(COMMA);
-            builder.append(OSUtils.availablePhysicalMemorySize()).append(Constants.COMMA);
-            builder.append(maxCpuloadAvg).append(Constants.COMMA);
-            builder.append(reservedMemory).append(Constants.COMMA);
-            builder.append(startTime).append(Constants.COMMA);
-            builder.append(DateUtils.dateToString(new Date())).append(Constants.COMMA);
-            builder.append(status).append(COMMA);
-            //save process id
-            builder.append(OSUtils.getProcessID());
+            // update waiting task count
+            heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
 
             for (String heartBeatPath : heartBeatPaths) {
-                zookeeperRegistryCenter.getZookeeperCachedOperator().update(heartBeatPath, builder.toString());
+                registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
         } catch (Throwable ex) {
             logger.error("error write heartbeat info", ex);

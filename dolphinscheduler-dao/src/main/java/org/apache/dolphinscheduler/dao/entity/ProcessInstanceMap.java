@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -29,7 +30,7 @@ public class ProcessInstanceMap {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -81,12 +82,12 @@ public class ProcessInstanceMap {
 
     @Override
     public String toString() {
-        return "ProcessInstanceMap{" +
-                "id=" + id +
-                ", parentProcessInstanceId=" + parentProcessInstanceId +
-                ", parentTaskInstanceId=" + parentTaskInstanceId +
-                ", processInstanceId=" + processInstanceId +
-                '}';
+        return "ProcessInstanceMap{"
+                + "id=" + id
+                + ", parentProcessInstanceId=" + parentProcessInstanceId
+                + ", parentTaskInstanceId=" + parentTaskInstanceId
+                + ", processInstanceId=" + processInstanceId
+                + '}';
     }
 
     @Override

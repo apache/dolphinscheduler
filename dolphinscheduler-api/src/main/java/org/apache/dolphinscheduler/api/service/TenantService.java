@@ -32,7 +32,6 @@ public interface TenantService {
      *
      * @param loginUser login user
      * @param tenantCode tenant code
-     * @param tenantName tenant name
      * @param queueId queue id
      * @param desc description
      * @return create result code
@@ -40,7 +39,6 @@ public interface TenantService {
      */
     Map<String, Object> createTenant(User loginUser,
                                      String tenantCode,
-                                     String tenantName,
                                      int queueId,
                                      String desc) throws Exception;
 
@@ -53,7 +51,7 @@ public interface TenantService {
      * @param pageSize page size
      * @return tenant list page
      */
-    Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * updateProcessInstance tenant
@@ -61,13 +59,12 @@ public interface TenantService {
      * @param loginUser login user
      * @param id tennat id
      * @param tenantCode tennat code
-     * @param tenantName tennat name
      * @param queueId queue id
      * @param desc description
      * @return update result code
      * @throws Exception exception
      */
-    Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, String tenantName, int queueId,
+    Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
             String desc) throws Exception;
 
     /**
@@ -95,4 +92,20 @@ public interface TenantService {
      * @return true if tenant code can user, otherwise return false
      */
     Result verifyTenantCode(String tenantCode);
+
+    /**
+     * check if provide tenant code object exists
+     *
+     * @param tenantCode tenant code
+     * @return true if tenant code exists, false if not
+     */
+    boolean checkTenantExists(String tenantCode);
+
+    /**
+     * query tenant by tenant code
+     *
+     * @param tenantCode tenant code
+     * @return tenant list
+     */
+    Map<String, Object> queryByTenantCode(String tenantCode);
 }
