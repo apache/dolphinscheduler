@@ -21,7 +21,11 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### 编译源码
 
-* 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
+支持的系统:
+* MacOS
+* Linux
+
+运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ## Docker镜像构建
 
