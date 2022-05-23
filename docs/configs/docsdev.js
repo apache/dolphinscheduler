@@ -161,6 +161,10 @@ export default {
                                 title: 'MLflow',
                                 link: '/en-us/docs/dev/user_doc/guide/task/mlflow.html',
                             },
+                            {
+                                title: 'Openmldb',
+                                link: '/en-us/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
                         ],
                     },
                     {
