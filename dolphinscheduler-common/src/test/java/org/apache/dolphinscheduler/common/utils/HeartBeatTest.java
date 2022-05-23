@@ -71,7 +71,7 @@ public class HeartBeatTest {
         assertEquals(29732, heartBeat.getProcessId());
         assertEquals(199, heartBeat.getWorkerExecThreadCount());
         assertEquals(200, heartBeat.getWorkerWaitingTaskCount());
-        assertEquals(5.86, heartBeat.getDiskAvailable(), delta);
+        assertEquals(65.86, heartBeat.getDiskAvailable(), delta);
     }
 
 }
