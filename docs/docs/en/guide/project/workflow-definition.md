@@ -48,7 +48,7 @@ The following are the operation functions of the workflow definition list:
 - **Run:** Only workflow in the online state can run. See [2.3.3 Run Workflow](#run-the-workflow) for the operation steps.
 - **Timing:** Timing can only set to online workflows, and the system automatically schedules to run the workflow on time. The status after creating a timing setting is "offline", and the timing must set online on the timing management page to make effect. See [2.3.4 Workflow Timing](#workflow-timing) for timing operation steps
 - **Timing Management:** The timing management page can edit, online or offline and delete timing
-- **Delete:** Delete the workflow definition
+- **Delete:** Delete the workflow definition. In the same project, only the workflow definition created by yourself can be deleted, and the workflow definition of other users cannot be deleted. If you need to delete it, please contact the user who created it or the administrator.
 - **Download:** Download workflow definition to local
 - **Tree Diagram:** Display the task node type and task status in a tree structure, as shown in the figure below:
 
