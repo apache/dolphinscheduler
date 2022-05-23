@@ -243,7 +243,6 @@ public class HeartBeat {
             return null;
         }
         HeartBeat heartBeat = new HeartBeat();
-        HeartBeat heartBeat = new HeartBeat();
         heartBeat.cpuUsage = Double.parseDouble(parts[0]);
         heartBeat.memoryUsage = Double.parseDouble(parts[1]);
         heartBeat.loadAverage = Double.parseDouble(parts[2]);
