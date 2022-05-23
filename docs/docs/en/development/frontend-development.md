@@ -23,11 +23,11 @@ Node package download (recommended version v16.13+)
 - #### Front-end project construction
 Use the command line mode `cd`  enter the `dolphinscheduler-ui` project directory and execute `pnpm install` to pull the project dependency package.
 
-- Modify `API_BASE` in the file `dolphinscheduler-ui/.env` to interact with the backend:
+- Modify `VITE_APP_DEV_WEB_URL` in the file `dolphinscheduler-ui/.env.development` to interact with the backend:
 
 ```
 # back end interface address
-API_BASE = http://127.0.0.1:12345
+VITE_APP_DEV_WEB_URL='http://127.0.0.1:12345'
 ```
 
 - #### Development environment operation
@@ -41,7 +41,7 @@ Run the `pnpm run build:prod` command to generate a package file (dist) package
 
 Copy it to the corresponding directory of the server (front-end service static page storage directory)
 
-Visit address` http://localhost:8888`
+Visit address **http://localhost:8888**
 
 #### Start with node and daemon under Linux
 

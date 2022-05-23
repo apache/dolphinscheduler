@@ -24,10 +24,10 @@ Node包下载 (建议版本 v16.13+)
 用命令行模式 `cd`  进入 `dolphinscheduler-ui`项目目录并执行 `pnpm install` 拉取项目依赖包
 
 ```
-- 修改 `dolphinscheduler-ui/.env` 文件中的 `API_BASE`，用于跟后端交互：
+- 修改 `dolphinscheduler-ui/.env.development` 文件中的 `VITE_APP_DEV_WEB_URL`，用于跟后端交互：
 ```
 # 代理的接口地址（自行修改）
-API_BASE = http://127.0.0.1:12345
+VITE_APP_DEV_WEB_URL='http://127.0.0.1:12345'
 ```
 
 - #### 开发环境运行
