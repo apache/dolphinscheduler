@@ -84,7 +84,7 @@ public class MlflowConstants {
 
     public static final String MLFLOW_MODELS_SERVE = "mlflow models serve -m %s --port %s -h 0.0.0.0";
 
-    public static final String MLFLOW_BUILD_DOCKER = "mlflow models build-docker -m  %s -n %s --enable-mlserver";
+    public static final String MLFLOW_BUILD_DOCKER = "mlflow models build-docker -m %s -n %s --enable-mlserver";
 
 
     public static final String DOCKER_RREMOVE_CONTAINER = "docker rm -f %s";
