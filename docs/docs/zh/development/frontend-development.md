@@ -18,38 +18,26 @@ Lodash 高性能的 JavaScript 实用工具库
 ### 开发环境搭建
    
 - #### Node安装
-Node包下载 (注意版本 v12.20.2) `https://nodejs.org/download/release/v12.20.2/` 
+Node包下载 (注意版本 v16.13.1) `https://nodejs.org/download/release/v16.13.1`
 
 - #### 前端项目构建
-用命令行模式 `cd`  进入 `dolphinscheduler-ui`项目目录并执行 `npm install` 拉取项目依赖包
-
-> 如果 `npm install` 速度非常慢，你可以设置淘宝镜像
+用命令行模式 `cd`  进入 `dolphinscheduler-ui`项目目录并执行 `pnpm install` 拉取项目依赖包
 
 ```
-npm config set registry http://registry.npm.taobao.org/
-```
-
 - 修改 `dolphinscheduler-ui/.env` 文件中的 `API_BASE`，用于跟后端交互：
-
 ```
 # 代理的接口地址（自行修改）
 API_BASE = http://127.0.0.1:12345
 ```
 
-> #####  ！！！这里特别注意 项目如果在拉取依赖包的过程中报 " node-sass error " 错误，请在执行完后再次执行以下命令
-
-```bash
-npm install node-sass --unsafe-perm #单独安装node-sass依赖
-```
-
 - #### 开发环境运行
-- `npm start` 项目开发环境 (启动后访问地址 http://localhost:8888)
+- `pnpm run dev` 项目开发环境 (启动后访问地址 http://localhost:8888)
 
 #### 前端项目发布
 
-- `npm run build` 项目打包 (打包后根目录会创建一个名为dist文件夹，用于发布线上Nginx)
+- `pnpm run build:prod` 项目打包 (打包后根目录会创建一个名为dist文件夹，用于发布线上Nginx)
 
-运行 `npm run build` 命令，生成打包文件（dist）包
+运行 `pnpm run build:prod` 命令，生成打包文件（dist）包
 
 再拷贝到服务器对应的目录下（前端服务静态页面存放目录）
 

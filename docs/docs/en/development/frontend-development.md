@@ -18,16 +18,10 @@ Lodash high performance JavaScript utility library
 ### Development environment
 
 - #### Node installation
-Node package download (note version v12.20.2) `https://nodejs.org/download/release/v12.20.2/` 
+Node package download (note version v16.13.1) `https://nodejs.org/download/release/v16.13.1` 
 
 - #### Front-end project construction
-Use the command line mode `cd`  enter the `dolphinscheduler-ui` project directory and execute `npm install` to pull the project dependency package.
-
-> If `npm install` is very slow, you can set the taobao mirror
-
-```
-npm config set registry http://registry.npm.taobao.org/
-```
+Use the command line mode `cd`  enter the `dolphinscheduler-ui` project directory and execute `pnpm install` to pull the project dependency package.
 
 - Modify `API_BASE` in the file `dolphinscheduler-ui/.env` to interact with the backend:
 
@@ -36,20 +30,14 @@ npm config set registry http://registry.npm.taobao.org/
 API_BASE = http://127.0.0.1:12345
 ```
 
-> #####  ! ! ! Special attention here. If the project reports a "node-sass error" error while pulling the dependency package, execute the following command again after execution.
-
-```bash
-npm install node-sass --unsafe-perm #Install node-sass dependency separately
-```
-
 - #### Development environment operation
-- `npm start` project development environment (after startup address http://localhost:8888)
+- `pnpm run dev` project development environment (after startup address http://localhost:8888)
 
 #### Front-end project release
 
-- `npm run build` project packaging (after packaging, the root directory will create a folder called dist for publishing Nginx online)
+- `pnpm run build:prod` project packaging (after packaging, the root directory will create a folder called dist for publishing Nginx online)
 
-Run the `npm run build` command to generate a package file (dist) package
+Run the `pnpm run build:prod` command to generate a package file (dist) package
 
 Copy it to the corresponding directory of the server (front-end service static page storage directory)
 

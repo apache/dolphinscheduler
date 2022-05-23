@@ -1,17 +1,14 @@
 # DolphinScheduler 开发手册
 
-## 前置条件
+## Requirements
 
-在搭建 DolphinScheduler 开发环境之前请确保你已经安装一下软件
-
-* [Git](https://git-scm.com/downloads): 版本控制系统
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): 后端开发，必须使用JDK1.8及以后的版本
-* [Maven](http://maven.apache.org/download.cgi): Java包管理系统
-* [Node](https://nodejs.org/en/download): 前端开发，必须使用Node12.20.2及以后的版本
+* [Git](https://git-scm.com/downloads)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (暂不支持 jdk 11)
+* [Maven](http://maven.apache.org/download.cgi): v3.5+
+* [Node](https://nodejs.org/en/download): v16.13+
+* [Pnpm](https://pnpm.io/installation): v6.x
 
 ### 克隆代码库
-
-通过你 git 管理工具下载 git 代码，下面以 git-core 为例
 
 ```shell
 mkdir dolphinscheduler
