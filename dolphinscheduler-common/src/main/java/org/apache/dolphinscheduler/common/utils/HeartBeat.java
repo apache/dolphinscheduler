@@ -218,7 +218,6 @@ public class HeartBeat {
         StringBuilder builder = new StringBuilder(100);
         builder.append(cpuUsage).append(COMMA);
         builder.append(memoryUsage).append(COMMA);
-        builder.append(diskAvailable).append(COMMA);
         builder.append(loadAverage).append(COMMA);
         builder.append(availablePhysicalMemorySize).append(Constants.COMMA);
         builder.append(maxCpuloadAvg).append(Constants.COMMA);
@@ -230,6 +229,7 @@ public class HeartBeat {
         builder.append(workerHostWeight).append(COMMA);
         builder.append(workerExecThreadCount).append(COMMA);
         builder.append(workerWaitingTaskCount);
+        builder.append(diskAvailable).append(COMMA);
 
         return builder.toString();
     }
