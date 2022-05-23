@@ -67,10 +67,7 @@ export function useRules(
     if (ruleLoading.value) return
     ruleLoading.value = true
     const result = await getRuleFormCreateJson(ruleId)
-    const items = JSON.parse(result).map((item: IResponseJsonItem) => {
-      item.props.placeholder = t('project.node.' + item.props.placeholder.split(' ').join('_').split(',').join('').toLowerCase())
-      return formatResponseJson(item)
-    })
+    const items = JSON.parse(result).map((item: IResponseJsonItem) => formatResponseJson(item))
     updateRules(items, preItemLen)
     preItemLen = items.length
     ruleLoading.value = false
@@ -79,6 +76,7 @@ export function useRules(
   const formatResponseJson = (
     responseItem: IResponseJsonItem
   ): IJsonItemParams => {
+    responseItem.props.placeholder = t('project.node.' + responseItem.props.placeholder.split(' ').join('_').split(',').join('').toLowerCase())
     const item: IJsonItemParams = {
       field: responseItem.field,
       options: responseItem.options,
