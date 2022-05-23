@@ -21,7 +21,11 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### compile source code
 
-ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+Supporting system:
+* MacOS
+* Liunx
+
+Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ## Docker image build
 
