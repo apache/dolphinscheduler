@@ -987,7 +987,14 @@ const project = {
     sql_parameter: 'sql参数',
     format_tips: '请输入格式为',
     udf_function: 'UDF函数',
-    unlimited: '不限制'
+    unlimited: '不限制',
+    please_select_source_connector_type: '请选择源数据类型',
+    please_select_source_datasource_id: '请选择源数据源',
+    please_enter_source_table_name: '请选择源数据表',
+    please_enter_filter_expression: '请输入源表过滤条件',
+    please_enter_column_only_single_column_is_supported: '请选择源表检测列',
+    please_enter_threshold_number_is_needed: '请输入阈值',
+    please_enter_comparison_title: '请选择期望值类型'
   }
 }
 
