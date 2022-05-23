@@ -17,7 +17,6 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 import { watch, ref } from 'vue'
-import { useCustomParams } from '.'
 
 export function useMlflowProjects(model: {
   [field: string]: any
