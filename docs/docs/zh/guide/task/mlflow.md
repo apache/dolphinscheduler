@@ -57,7 +57,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 **任务参数**
 
 - **mlflow server tracking uri** ：MLflow server 的连接, 默认 http://localhost:5000。
-- **实验名称** ：任务运行时所在的实验，若无则创建。
+- **实验名称** ：任务运行时所在的实验，若实验不存在，则创建。若实验名称为空，则设置为`Default`, 与 MLflow 一样。
 - **注册模型** ：是否注册模型，若选择注册，则会展开以下参数。
     - **注册的模型名称** : 注册的模型名称，会在原来的基础上加上一个模型版本，并注册为Production。
 - **数据路径** : 文件/文件夹的绝对路径, 若文件需以.csv结尾（自动切分训练集与测试集）, 文件夹需包含train.csv和test.csv（建议方式，用户应自行构建测试集用于模型评估）。
@@ -76,7 +76,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 **任务参数**
 
 - **mlflow server tracking uri** ：MLflow server 的连接, 默认 http://localhost:5000。
-- **实验名称** ：任务运行时所在的实验，若无则创建。
+- **实验名称** ：任务运行时所在的实验，若实验不存在，则创建。若实验名称为空，则设置为`Default`, 与 MLflow 一样。
 - **注册模型** ：是否注册模型，若选择注册，则会展开以下参数。
     - **注册的模型名称** : 注册的模型名称，会在原来的基础上加上一个模型版本，并注册为Production。
 - **数据路径** : 文件/文件夹的绝对路径, 若文件需以.csv结尾（自动切分训练集与测试集）, 文件夹需包含train.csv和test.csv（建议方式，用户应自行构建测试集用于模型评估）。
@@ -93,7 +93,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 **任务参数**
 
 - **mlflow server tracking uri** ：MLflow server 的连接, 默认 http://localhost:5000。
-- **实验名称** ：任务运行时所在的实验，若无则创建。
+- **实验名称** ：任务运行时所在的实验，若实验不存在，则创建。若实验名称为空，则设置为`Default`, 与 MLflow 一样。
 - **参数** : `mlflow run`中的 --param-list 如 `-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9`
 - **运行仓库** : MLflow Project的仓库地址，可以为github地址，或者worker上的目录, 如Mlflow project位于子目录，可以添加 `#` 隔开, 如 `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`
 - **项目版本** : 对应项目中git版本管理中的版本，默认 master

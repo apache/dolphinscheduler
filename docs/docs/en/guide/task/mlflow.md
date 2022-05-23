@@ -65,7 +65,7 @@ First, introduce some general parameters of DolphinScheduler
 **Task Parameter**
 
 - **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
-- **experiment name** ：The experiment in which the task is running, if none, is created.
+- **experiment name** ：Create the experiment where the task is running, if the experiment does not exist. If the name is empty, it is set to ` Default `, same as mlflow.
 - **register model** ：Register the model or not. If register is selected, the following parameters are expanded.
     - **model name** : The registered model name is added to the original model version and registered as
       Production.
@@ -93,7 +93,7 @@ First, introduce some general parameters of DolphinScheduler
 **Task Parameter**
 
 - **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
-- **experiment name** ：The experiment in which the task is running, if none, is created.
+- **experiment name** ：Create the experiment where the task is running, if the experiment does not exist. If the name is empty, it is set to ` Default `, same as mlflow.
 - **register model** ：Register the model or not. If register is selected, the following parameters are expanded.
     - **model name** : The registered model name is added to the original model version and registered as
       Production.
@@ -117,7 +117,7 @@ First, introduce some general parameters of DolphinScheduler
 **Task Parameter**
 
 - **mlflow server tracking uri** ：MLflow server uri, default http://localhost:5000.
-- **experiment name** ：The experiment in which the task is running, if none, is created.
+- **experiment name** ：Create the experiment where the task is running, if the experiment does not exist. If the name is empty, it is set to ` Default `, same as mlflow.
 - **parameters** : `--param-list` in `mlflow run`. For example `-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9`
 - **Repository** : Repository url of MLflow Project，Support git address and directory on worker. If it's in a subdirectory，We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`
 - **Project Version** : Version of the project，default master
