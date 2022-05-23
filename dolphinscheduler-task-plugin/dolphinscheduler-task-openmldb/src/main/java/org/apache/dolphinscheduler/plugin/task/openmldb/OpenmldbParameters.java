@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.openmldb;
 
-import lombok.EqualsAndHashCode;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import lombok.Data;
+
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class OpenmldbParameters extends AbstractParameters {
 
     private String zk;
@@ -41,6 +38,47 @@ public class OpenmldbParameters extends AbstractParameters {
      * resource list
      */
     private List<ResourceInfo> resourceList;
+
+    public String getZk() {
+        return zk;
+    }
+
+    public void setZk(String zk) {
+        this.zk = zk;
+    }
+
+    public String getZkPath() {
+        return zkPath;
+    }
+
+    public void setZkPath(String zkPath) {
+        this.zkPath = zkPath;
+    }
+
+    public String getExecuteMode() {
+        return executeMode;
+    }
+
+    public void setExecuteMode(String executeMode) {
+        this.executeMode = executeMode;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
+
 
     @Override
     public boolean checkParameters() {
