@@ -9,50 +9,90 @@
 本文主要讲述dolphinscheduler的配置文件.其他部分先不做赘述.
 
 [注:以下 dolphinscheduler 简称为DS.]
-```
-
-├─bin                               DS命令存放目录
-│  ├─dolphinscheduler-daemon.sh         启动/关闭DS服务脚本
-│  ├─start-all.sh                       根据配置文件启动所有DS服务
-│  ├─stop-all.sh                        根据配置文件关闭所有DS服务
-├─conf                              配置文件目录
-│  ├─application-api.properties         api服务配置文件
-│  ├─datasource.properties              数据库配置文件
-│  ├─zookeeper.properties               zookeeper配置文件
-│  ├─master.properties                  master服务配置文件
-│  ├─worker.properties                  worker服务配置文件
-│  ├─quartz.properties                  quartz服务配置文件
-│  ├─common.properties                  公共服务[存储]配置文件
-│  ├─alert.properties                   alert服务配置文件
-│  ├─config                             环境变量配置文件夹
-│      ├─install_config.conf                DS环境变量配置脚本[用于DS安装/启动]
-│  ├─env                                运行脚本环境变量配置目录
-│      ├─dolphinscheduler_env.sh            运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-│  ├─org                                mybatis mapper文件目录
-│  ├─i18n                               i18n配置文件目录
-│  ├─logback-api.xml                    api服务日志配置文件
-│  ├─logback-master.xml                 master服务日志配置文件
-│  ├─logback-worker.xml                 worker服务日志配置文件
-│  ├─logback-alert.xml                  alert服务日志配置文件
-├─sql                               DS的元数据创建升级sql文件
-│  ├─create                             创建SQL脚本目录
-│  ├─upgrade                            升级SQL脚本目录
-│  ├─dolphinscheduler_postgre.sql       postgre数据库初始化脚本
-│  ├─dolphinscheduler_mysql.sql         mysql数据库初始化脚本
-│  ├─soft_version                       当前DS版本标识文件
-├─script                            DS服务部署,数据库创建/升级脚本目录
-│  ├─create-dolphinscheduler.sh         DS数据库初始化脚本      
-│  ├─upgrade-dolphinscheduler.sh        DS数据库升级脚本                
-│  ├─monitor-server.sh                  DS服务监控启动脚本               
-│  ├─scp-hosts.sh                       安装文件传输脚本                                                    
-│  ├─remove-zk-node.sh                  清理zookeeper缓存文件脚本       
-├─ui                                前端WEB资源目录
-├─lib                               DS依赖的jar存放目录
-├─install.sh                        自动安装DS服务脚本
-
 
 ```
-
+├── LICENSE
+│
+├── NOTICE
+│
+├── licenses                                    licenses存放目录
+│
+├── bin                                         DolphinScheduler命令和环境变量配置存放目录 
+│   ├── dolphinscheduler-daemon.sh              启动/关闭DolphinScheduler服务脚本
+│   ├── env                                     环境变量配置存放目录
+│   │   ├── dolphinscheduler_env.sh             当使用`dolphinscheduler-daemon.sh`脚本起停服务时，运行此脚本加载环境变量配置文件 [如：JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] 
+│   │   └── install_env.sh                      当使用`install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`脚本时，运行此脚本为DolphinScheduler安装加载环境变量配置 
+│   ├── install.sh                              当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本自动安装服务  
+│   ├── remove-zk-node.sh                       清理zookeeper缓存文件脚本 
+│   ├── scp-hosts.sh                            安装文件传输脚本
+│   ├── start-all.sh                            当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本启动所有服务
+│   ├── status-all.sh                           当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本获取所有服务状态
+│   └── stop-all.sh                             当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本终止所有服务
+│
+├── alert-server                                DolphinScheduler alert-server命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── start.sh                            DolphinScheduler alert-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    alert-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件 
+│   │   ├── dolphinscheduler_env.sh             alert-server环境变量配置加载脚本
+│   │   └── logback-spring.xml                  alert-service日志配置文件
+│   └── libs                                    alert-server依赖jar包存放目录
+│
+├── api-server                                  DolphinScheduler api-server命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── start.sh                            DolphinScheduler api-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    api-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh             api-server环境变量配置加载脚本
+│   │   └── logback-spring.xml                  api-service日志配置文件
+│   ├── libs                                    api-server依赖jar包存放目录
+│   └── ui                                      api-server相关前端WEB资源存放目录 
+│
+├── master-server                               DolphinScheduler master-server命令、配置和依赖存放目录
+│   ├── bin                                
+│   │   └── start.sh                            DolphinScheduler master-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    master-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh             master-server环境变量配置加载脚本
+│   │   └── logback-spring.xml                  master-service日志配置文件
+│   └── libs                                    master-server依赖jar包存放目录
+│
+├── standalone-server                           DolphinScheduler standalone-server命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── start.sh                            DolphinScheduler standalone-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    standalone-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh             standalone-server环境变量配置加载脚本
+│   │   ├── logback-spring.xml                  standalone-service日志配置文件
+│   │   └── sql                                 DolphinScheduler元数据创建/升级sql文件
+│   ├── libs                                    standalone-server依赖jar包存放目录
+│   └── ui                                      standalone-server相关前端WEB资源存放目录
+│       
+├── tools                                       DolphinScheduler元数据工具命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── upgrade-schema.sh                   DolphinScheduler元数据创建/升级脚本
+│   ├── conf
+│   │   ├── application.yaml                    元数据工具配置文件
+│   │   └── common.properties                   公共服务（存储等信息）配置文件
+│   ├── libs                                    元数据工具依赖jar包存放目录
+│   └── sql                                     DolphinScheduler元数据创建/升级sql文件
+│     
+├── worker-server                               DolphinScheduler worker-server命令、配置和依赖存放目录
+│       ├── bin
+│       │   └── start.sh                        DolphinScheduler worker-server启动脚本
+│       ├── conf
+│       │   ├── application.yaml                worker-server配置文件
+│       │   ├── common.properties               公共服务（存储等信息）配置文件
+│       │   ├── dolphinscheduler_env.sh         worker-server环境变量配置加载脚本
+│       │   └── logback-spring.xml              worker-service日志配置文件
+│       └── libs                                worker-server依赖jar包存放目录
+│
+└── ui                                          前端WEB资源目录
+```
 
 # 配置文件详解
 
