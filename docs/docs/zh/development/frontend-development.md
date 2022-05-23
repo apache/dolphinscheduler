@@ -18,7 +18,7 @@ Lodash 高性能的 JavaScript 实用工具库
 ### 开发环境搭建
    
 - #### Node安装
-Node包下载 (注意版本 v16.13.1) `https://nodejs.org/download/release/v16.13.1`
+Node包下载 (建议版本 v16.13+) 
 
 - #### 前端项目构建
 用命令行模式 `cd`  进入 `dolphinscheduler-ui`项目目录并执行 `pnpm install` 拉取项目依赖包
