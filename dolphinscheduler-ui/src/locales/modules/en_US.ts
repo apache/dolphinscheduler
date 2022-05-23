@@ -1006,7 +1006,14 @@ const project = {
     sql_parameter: 'SQL Parameter',
     format_tips: 'Please enter format',
     udf_function: 'UDF Function',
-    unlimited: 'unlimited'
+    unlimited: 'unlimited',
+    please_select_source_connector_type: 'Please select source connector type',
+    please_select_source_datasource_id: 'Please select source datasource id',
+    please_enter_source_table_name: 'Please select source table name',
+    please_enter_filter_expression: 'Please enter filter expression',
+    please_enter_column_only_single_column_is_supported: 'Please select column, only single column is supported',
+    please_enter_threshold_number_is_needed: 'Please enter threshold number is needed',
+    please_enter_comparison_title: 'please select comparison title'
   }
 }
 
