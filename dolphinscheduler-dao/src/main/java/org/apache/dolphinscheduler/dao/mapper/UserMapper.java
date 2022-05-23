@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheConfig;
@@ -83,7 +84,7 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * user page
      *
-     * @param page page
+     * @param page     page
      * @param userName userName
      * @return user IPage
      */
@@ -126,9 +127,10 @@ public interface UserMapper extends BaseMapper<User> {
      * query user by token
      *
      * @param token token
+     * @param now   now date
      * @return user
      */
-    User queryUserByToken(@Param("token") String token);
+    User queryUserByToken(@Param("token") String token, @Param("now") Date now);
 
     /**
      * query user by queue name
