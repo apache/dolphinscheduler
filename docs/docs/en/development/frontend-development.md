@@ -18,7 +18,7 @@ Lodash high performance JavaScript utility library
 ### Development environment
 
 - #### Node installation
-Node package download (recommended version v16.13.1) 
+Node package download (recommended version v16.13+) 
 
 - #### Front-end project construction
 Use the command line mode `cd`  enter the `dolphinscheduler-ui` project directory and execute `pnpm install` to pull the project dependency package.
