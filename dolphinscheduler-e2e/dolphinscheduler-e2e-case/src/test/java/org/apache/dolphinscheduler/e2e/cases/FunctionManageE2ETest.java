@@ -123,6 +123,7 @@ public class FunctionManageE2ETest {
     }
 
     static void downloadFile(String downloadUrl, String filePath) throws Exception {
+        System.out.printf("filePath: %s", filePath);
         int byteRead;
 
         URL url = new URL(downloadUrl);
