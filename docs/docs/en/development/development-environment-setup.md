@@ -3,7 +3,7 @@
 ## Requirements
 
 * [Git](https://git-scm.com/downloads)
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (暂不支持 jdk 11)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
 * [Node](https://nodejs.org/en/download): v16.13+
 * [Pnpm](https://pnpm.io/installation): v6.x
