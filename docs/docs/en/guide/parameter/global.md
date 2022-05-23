@@ -2,18 +2,28 @@
 
 ## Scope
 
-The parameters defined on the process definition page can apply to all the scope of the process tasks.
+Global parameters are parameters that are valid for all task nodes of the entire workflow. It can be configured on the workflow definition page.
 
 ## Usage
 
-Usage of global parameters is: at the process define page, click the '+' beside the 'Set global' and fill in the key and value to save:
+The specific use method can be determined according to the actual production situation. This example uses a shell task to print out the date value of yesterday.
 
-<p align="center">
-   <img src="/img/supplement_global_parameter_en.png" width="80%" />
- </p>
+### Create a Shell task
 
-<p align="center">
-   <img src="/img/local_parameter_en.png" width="80%" />
- </p>
+Create a shell task and enter `echo ${dt}` in the script content. In this case, dt is the global parameter we need to declare. As shown below:
 
-The `global_bizdate` parameter defined here can be referenced by local parameters of any other task node, and set the value of `global_bizdate` by referencing the system parameter `system.biz.date`.
+![global-parameter01](/img/new_ui/dev/parameter/global_parameter01.png)
+
+### Save the workflow and set global parameters
+
+You could follow this guide to set global parameter: On the workflow definition page, click the plus sign to the right of "Set Global", after filling in the variable name and value, then save it
+
+![global-parameter02](/img/new_ui/dev/parameter/global_parameter02.png)
+
+> Note: The dt parameter defined here can be referenced by the local parameters of any other node.
+
+### In task instance view execution result
+
+On the task instance page, you can check the log to verify the execution result of the task and determine whether the parameters are valid.
+
+![global-parameter03](/img/new_ui/dev/parameter/global_parameter03.png)
