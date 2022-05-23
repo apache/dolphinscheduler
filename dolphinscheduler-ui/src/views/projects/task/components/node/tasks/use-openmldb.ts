@@ -44,7 +44,6 @@ export function useOpenmldb({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: '',
 	zk: '',
 	zkPath: '',
 	executeMode: 'offline'

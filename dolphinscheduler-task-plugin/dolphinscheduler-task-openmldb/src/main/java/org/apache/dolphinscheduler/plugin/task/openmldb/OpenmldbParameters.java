@@ -28,13 +28,13 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OpenmldbParameters extends AbstractParameters {
-    /**
-     * origin sql script
-     */
 
     private String zk;
     private String zkPath;
     private String executeMode;
+    /**
+     * origin sql script
+     */
     private String sql;
 
     /**
