@@ -228,8 +228,8 @@ public class HeartBeat {
         builder.append(processId).append(COMMA);
         builder.append(workerHostWeight).append(COMMA);
         builder.append(workerExecThreadCount).append(COMMA);
-        builder.append(workerWaitingTaskCount);
-        builder.append(diskAvailable).append(COMMA);
+        builder.append(workerWaitingTaskCount).append(COMMA);
+        builder.append(diskAvailable);
 
         return builder.toString();
     }
