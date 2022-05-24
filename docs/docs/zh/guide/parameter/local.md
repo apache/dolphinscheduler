@@ -6,14 +6,23 @@
 
 ## 使用方式
 
-本地参数配置方式如下：在任务定义页面，点击“自定义参数”右边的加号，填写对应的变量名称和对应的值，保存即可
+本地参数配置方式如下：在任务定义页面，点击“自定义参数”右边的加号，填写对应的变量名称和对应的值，保存即可。
 
-<p align="center">
-   <img src="/img/supplement_local_parameter.png" width="80%" />
- </p>
+## 任务样例
 
-<p align="center">
-   <img src="/img/global_parameter.png" width="80%" />
-</p>
+本样例展示了如何使用本地参数，打印输出当前日期。创建一个 Shell 任务，并编写脚本内容为 `echo ${dt}`。点击配置栏中的**自定义参数**，配置如下图所示：
 
-如果想要在本地参数中调用系统内置参数，将内置参数对应的值填到`value`中，如上图中的`${biz_date}`以及`${curdate}`
+![local-parameter01](/img/new_ui/dev/parameter/local_parameter01.png)
+
+参数说明：
+
+- dt：参数名
+- IN：IN 表示局部参数仅能在当前节点使用，OUT 表示局部参数可以向下游传递
+- DATE：数据类型，日期
+- $[yyyy-MM-dd]：自定义格式的衍生内置参数
+
+保存工作流并运行，查看 Shell 任务输出日志。
+
+![local-parameter02](/img/new_ui/dev/parameter/local_parameter02.png)
+
+> 注：本地参数可以在当前任务节点的工作流中，设置其为 OUT 则可以传递给下游的工作流使用，可以参考：[参数传递](context.md)
