@@ -49,7 +49,7 @@ do
     fi
   done
   # set worker groups in application.yaml
-  [[ -n ${workerIndex} ]] && sed -i "s/- default/- ${groupNames[$workerIndex]}/" worker-server/conf/application.yaml
+  [[ -n ${workerIndex} ]] && sed -i "s/- default/- ${groupNames[$workerIndex]}/" ../worker-server/conf/application.yaml
 
   for dsDir in bin master-server worker-server alert-server api-server ui tools
   do
@@ -58,7 +58,7 @@ do
     scp -q -P $sshPort -r $workDir/../$dsDir  $host:$installPath
   done
   # restore worker groups to default
-  [[ -n ${workerIndex} ]] && sed -i "s/- ${groupNames[$workerIndex]}/- default/" worker-server/conf/application.yaml
+  [[ -n ${workerIndex} ]] && sed -i "s/- ${groupNames[$workerIndex]}/- default/" ../worker-server/conf/application.yaml
 
   echo "scp dirs to $host/$installPath complete"
 done
