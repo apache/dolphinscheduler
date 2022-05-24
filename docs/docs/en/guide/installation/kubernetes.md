@@ -188,9 +188,7 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 >
 > If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler-<service>` image follow the following instructions:
 > 
-> Since version 3.0.0, dolphinscheduler has been microserviced and the change of metadata storage requires replacing all services with MySQL driver.
->
-> dolphinscheduler-tools dolphinscheduler-master dolphinscheduler-worker dolphinscheduler-api dolphinscheduler-alert-server
+> Since version 3.0.0, dolphinscheduler has been microserviced and the change of metadata storage requires replacing all services with MySQL driver, which including dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server
 
 1. Download the MySQL driver [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar).
 
