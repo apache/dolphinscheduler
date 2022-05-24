@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.openmldb;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
@@ -78,7 +77,6 @@ public class OpenmldbParameters extends AbstractParameters {
     public void setResourceList(List<ResourceInfo> resourceList) {
         this.resourceList = resourceList;
     }
-
 
     @Override
     public boolean checkParameters() {

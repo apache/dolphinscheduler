@@ -17,53 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.task.openmldb;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.python.PythonTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 /**
  * openmldb task
  */
-public class OpenmldbTask extends AbstractTaskExecutor {
+public class OpenmldbTask extends PythonTask {
 
     /**
      * openmldb parameters
      */
     private OpenmldbParameters openmldbParameters;
-
-    /**
-     * shell command executor
-     */
-    private final ShellCommandExecutor shellCommandExecutor;
-
-    private final TaskExecutionContext taskRequest;
-
-    private static final String PYTHON_HOME = "PYTHON_HOME";
 
     /**
      * python process(openmldb only supports version 3 by default)
@@ -78,11 +58,6 @@ public class OpenmldbTask extends AbstractTaskExecutor {
      */
     public OpenmldbTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.taskRequest = taskRequest;
-
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                logger);
     }
 
     @Override
@@ -91,40 +66,15 @@ public class OpenmldbTask extends AbstractTaskExecutor {
 
         openmldbParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), OpenmldbParameters.class);
 
-        assert openmldbParameters != null;
-        if (!openmldbParameters.checkParameters()) {
+        if (openmldbParameters == null || !openmldbParameters.checkParameters()) {
             throw new TaskException("openmldb task params is not valid");
         }
     }
 
     @Override
-    public void handle() throws Exception {
-        try {
-            // generate the content of this python script
-            String pythonScriptContent = buildPythonScriptContent();
-            // generate the file path of this python script
-            String pythonScriptFile = buildPythonCommandFilePath();
-
-            // create this file
-            createPythonCommandFileIfNotExists(pythonScriptContent, pythonScriptFile);
-            String command = buildPythonExecuteCommand(pythonScriptFile);
-
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
-            setExitStatusCode(taskResponse.getExitStatusCode());
-            setAppIds(taskResponse.getAppIds());
-            setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
-        } catch (Exception e) {
-            logger.error("openmldb task failure", e);
-            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("run openmldb task error", e);
-        }
-    }
-
-    @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
-        // cancel process
-        shellCommandExecutor.cancelApplication();
+    @Deprecated
+    public String getPreScript() {
+        return "";
     }
 
     @Override
@@ -133,65 +83,31 @@ public class OpenmldbTask extends AbstractTaskExecutor {
     }
 
     /**
-     * create python command file if not exists
-     *
-     * @param pythonScript     exec python script
-     * @param pythonScriptFile python script file
-     * @throws IOException io exception
-     */
-    protected void createPythonCommandFileIfNotExists(String pythonScript, String pythonScriptFile) throws IOException {
-        logger.info("tenantCode :{}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
-
-        if (!Files.exists(Paths.get(pythonScriptFile))) {
-            logger.info("generate python script file:{}", pythonScriptFile);
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("#-*- encoding=utf8 -*-\n");
-
-            sb.append("\n\n");
-            sb.append(pythonScript);
-            logger.info(sb.toString());
-
-            // write data to file
-            FileUtils.writeStringToFile(new File(pythonScriptFile),
-                    sb.toString(),
-                    StandardCharsets.UTF_8);
-        }
-    }
-
-    /**
      * build python command file path
      *
      * @return python command file path
      */
+    @Override
     protected String buildPythonCommandFilePath() {
         return String.format("%s/openmldb_%s.py", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
     }
 
     /**
-     * build python script content
+     * build python script content from sql
      *
      * @return raw python script
      */
-    private String buildPythonScriptContent() {
-        // sqls doesn't need \n, use ; to split
-        String rawSqlScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", " ");
+    @Override
+    protected String buildPythonScriptContent() {
+        logger.info("raw sql script : {}", openmldbParameters.getSql());
 
-        // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, openmldbParameters);
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
-            paramsMap.putAll(taskRequest.getParamsMap());
-        }
-        rawSqlScript = ParameterUtils.convertParameterPlaceholders(rawSqlScript, ParamUtils.convert(paramsMap));
-        logger.info("raw sql script : {}", rawSqlScript);
+        String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\\\\n");
+        Map<String, Property> paramsMap = mergeParamsWithContext(openmldbParameters);
+        rawSQLScript = ParameterUtils.convertParameterPlaceholders(rawSQLScript, ParamUtils.convert(paramsMap));
 
         // convert sql to python script
-        String pythonScript = buildPythonScriptsFromSql(rawSqlScript);
+        String pythonScript = buildPythonScriptsFromSql(rawSQLScript);
         logger.info("rendered python script : {}", pythonScript);
-
         return pythonScript;
     }
 
@@ -206,8 +122,7 @@ public class OpenmldbTask extends AbstractTaskExecutor {
 
         // execute mode
         String executeMode = openmldbParameters.getExecuteMode().toLowerCase(Locale.ROOT);
-        builder.append("con.execute(\"set @@execute_mode='").append(executeMode).append("';" +
-                "\")\n");
+        builder.append("con.execute(\"set @@execute_mode='").append(executeMode).append("';\")\n");
         // offline job should be sync, and set job_timeout to 30min(==server.channel_keep_alive_time).
         // You can set it longer in sqls.
         if (executeMode.equals("offline")) {
@@ -234,17 +149,18 @@ public class OpenmldbTask extends AbstractTaskExecutor {
      * @param pythonFile Python file, cannot be empty.
      * @return Python execute command, e.g. 'python test.py'.
      */
-    private String buildPythonExecuteCommand(String pythonFile) {
+    @Override
+    protected String buildPythonExecuteCommand(String pythonFile) {
         Preconditions.checkNotNull(pythonFile, "Python file cannot be null");
         return getPythonCommand() + " " + pythonFile;
     }
 
-    public String getPythonCommand() {
+    private String getPythonCommand() {
         String pythonHome = System.getenv(PYTHON_HOME);
         return getPythonCommand(pythonHome);
     }
 
-    public String getPythonCommand(String pythonHome) {
+    private String getPythonCommand(String pythonHome) {
         if (StringUtils.isEmpty(pythonHome)) {
             return OPENMLDB_PYTHON;
         }

@@ -1,4 +1,4 @@
-# MLflow节点
+# OpenMLDB 节点
 
 ## 综述
 
@@ -29,8 +29,6 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 - **前置任务** ：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 
 ### OpenMLDB 参数
-
-#### BasicAlgorithm
 
 **任务参数**
 
