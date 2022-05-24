@@ -172,7 +172,6 @@ public class HttpParameters extends AbstractParameters {
                 updateRM.put(info.getProp(), updateResult);
                 updateRL.add(updateRM);
                 result = JSONUtils.toJsonString(updateRL);
-                break;
             }
         }
         return result;
