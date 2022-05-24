@@ -126,12 +126,6 @@ Create a database environment variables.
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
-- name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
-  {{- if .Values.postgresql.enabled }}
-  value: {{ .Values.postgresql.driver }}
-  {{- else }}
-  value: {{ .Values.externalDatabase.driver }}
-  {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
   value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?characterEncoding=utf8
