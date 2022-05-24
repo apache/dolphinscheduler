@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -136,6 +137,7 @@ public class HttpParameters extends AbstractParameters {
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
     }
+
     @Override
     public void dealOutParam(String result) {
         if (CollectionUtils.isEmpty(localParams)) {
@@ -150,7 +152,7 @@ public class HttpParameters extends AbstractParameters {
             return;
         }
         Map<String, String> httpMapByString = getHttpMapByString(result);
-        //判断是否为空
+        //Check whether it is empty
         if (httpMapByString == null || httpMapByString.size() == 0) {
             return;
         }
@@ -170,10 +172,32 @@ public class HttpParameters extends AbstractParameters {
                 updateRM.put(info.getProp(), updateResult);
                 updateRL.add(updateRM);
                 result = JSONUtils.toJsonString(updateRL);
-                // break;
+                break;
             }
         }
         return result;
     }
 
+    /**
+     * Convert the body result returned from HTTP to a map
+     * @param result
+     * @return
+     */
+    public static Map<String, String> getHttpMapByString(String result) {
+        //Store conversion results
+        Map<String, String> format = new HashMap<>();
+        //Convert result to a collection
+        List<Map<String, String>> list = JSONUtils.parseObject(result, new TypeReference<List<Map<String, String>>>() {});
+        //Determine whether the converted result is null
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        //Get the value with key body and put it into the new Map object
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, String> map = list.get(i);
+            format.put("body", map.get("body"));
+        }
+        //Returns the result
+        return format;
+    }
 }
