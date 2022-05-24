@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.os;
 
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import org.junit.Assert;
@@ -52,4 +53,17 @@ public class OSUtilsTest {
         logger.info("cpuUsage : {}", cpuUsage);
         Assert.assertTrue(cpuUsage >= 0.0);
     }
+
+    @Test
+    public void existTenantCodeInLinux(){
+        if (SystemUtils.IS_OS_LINUX){
+            boolean test = OSUtils.existTenantCodeInLinux("root");
+            Assert.assertTrue(test);
+        }else{
+            Assert.assertFalse("system must be linux",false);
+        }
+
+    }
+
+
 }

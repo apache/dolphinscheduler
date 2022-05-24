@@ -18,9 +18,14 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
@@ -28,11 +33,14 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
@@ -148,75 +156,65 @@ public class OSUtils {
         return Double.parseDouble(df.format(cpuUsage));
     }
 
-    /**
-     * Determine if the tenantCode exists in the system
-     * @return boolean
-     **/
-    public static boolean isExistTenantCode(String tenantCode){
-
+    public static List<String> getUserList() {
         try {
             if (SystemUtils.IS_OS_MAC) {
-                return existTenantCodeInMac(tenantCode);
+                return getUserListFromMac();
             } else if (SystemUtils.IS_OS_WINDOWS) {
-                return existTenantCodeInWindows(tenantCode);
+                return getUserListFromWindows();
             } else {
-                return existTenantCodeInLinux(tenantCode);
+                return getUserListFromLinux();
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
-        return false;
-
+        return Collections.emptyList();
     }
 
     /**
-     * whether the user exists in linux
+     * get user list from linux
      *
-     * @return boolean
+     * @return user list
      */
-    private static boolean existTenantCodeInLinux(String tenantCode) throws IOException {
-        try{
-            String result = exeCmd("id "+ tenantCode);
-            if (!StringUtils.isEmpty(result)){
-                return result.contains("uid=");
-            }
-        }catch (IOException el){
-            String message = el.getMessage();
-            //Because ShellExecutor method throws  exception to the linux return status is not 0
-            //not exist user return status is 1
-            if (message.contains("no such user")){
-                logger.warn(message);
-                return false;
-            }
-            throw el;
+    private static List<String> getUserListFromLinux() throws IOException {
+        List<String> userList = new ArrayList<>();
 
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(new FileInputStream("/etc/passwd")))) {
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains(":")) {
+                    String[] userInfo = line.split(":");
+                    userList.add(userInfo[0]);
+                }
+            }
         }
-        return false;
+
+        return userList;
     }
 
     /**
-     * whether the user exists in mac
+     * get user list from mac
      *
-     * @return boolean
+     * @return user list
      */
-    private static boolean existTenantCodeInMac(String tenantCode) throws IOException {
+    private static List<String> getUserListFromMac() throws IOException {
         String result = exeCmd("dscl . list /users");
         if (!StringUtils.isEmpty(result)) {
-            List<String> userMacs = Arrays.asList(result.split("\n"));
-            if (userMacs.contains(tenantCode)) {
-                return true;
-            }
+            return Arrays.asList(result.split("\n"));
         }
-        return false;
+
+        return Collections.emptyList();
     }
 
     /**
-     * whether the user exists in windows
+     * get user list from windows
      *
-     * @return boolean
+     * @return user list
      */
-    private static boolean existTenantCodeInWindows(String tenantCode) throws IOException {
+    private static List<String> getUserListFromWindows() throws IOException {
         String result = exeCmd("net user");
         String[] lines = result.split("\n");
 
@@ -248,8 +246,38 @@ public class OSUtils {
             startPos++;
         }
 
-        return users.contains(tenantCode);
+        return users;
     }
+
+
+
+    /**
+     * whether the user exists in linux
+     *
+     * @return boolean
+     */
+    public static boolean existTenantCodeInLinux(String tenantCode) {
+        try{
+            String result = exeCmd("id "+ tenantCode);
+            if (!StringUtils.isEmpty(result)){
+                return result.contains("uid=");
+            }
+        }catch (Exception e){
+            String message = e.getMessage();
+            //Because ShellExecutor method throws  exception to the linux return status is not 0
+            //not exist user return status is 1
+            if (message.contains("no such user")){
+                logger.warn(message);
+                return false;
+            }
+            // Abnormal caused by other reasons
+            logger.error(message, e);
+
+        }
+        return false;
+    }
+
+
 
     /**
      * create user
@@ -258,7 +286,7 @@ public class OSUtils {
      */
     public static void createUserIfAbsent(String userName) {
         // if not exists this user, then create
-        if (!isExistTenantCode(userName)) {
+        if (!getUserList().contains(userName)) {
             boolean isSuccess = createUser(userName);
             logger.info("create user {} {}", userName, isSuccess ? "success" : "fail");
         }
