@@ -97,7 +97,7 @@ public class OSUtils {
      * get disk usage
      * Keep 2 decimal
      *
-     * @return disk free space  (GB)
+     * @return disk free size, unit: GB
      */
     public static double diskAvailable() {
         File file = new File(".");
