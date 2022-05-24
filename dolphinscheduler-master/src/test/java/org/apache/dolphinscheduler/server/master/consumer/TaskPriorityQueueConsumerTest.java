@@ -98,7 +98,7 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
@@ -125,7 +125,7 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
@@ -166,7 +166,7 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
@@ -205,7 +205,7 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
@@ -266,7 +266,7 @@ public class TaskPriorityQueueConsumerTest {
 
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "NoWorkGroup");
         taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
@@ -335,7 +335,7 @@ public class TaskPriorityQueueConsumerTest {
 
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "NoWorkGroup");
         taskPriorityQueue.put(taskPriority);
 
         taskPriorityQueueConsumer.run();

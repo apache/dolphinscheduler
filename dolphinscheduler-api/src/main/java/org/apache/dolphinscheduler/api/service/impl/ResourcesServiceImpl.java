@@ -129,8 +129,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        if (name.endsWith(FOLDER_SEPARATOR)) {
-            result.setCode(Status.VERIFY_PARAMETER_NAME_FAILED.getCode());
+        if (FileUtils.directoryTraversal(name)) {
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
         String fullName = getFullName(currentDir, name);
@@ -517,6 +517,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private Result<Object> verifyFile(String name, ResourceType type, MultipartFile file) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
+
+        if (FileUtils.directoryTraversal(name)) {
+            logger.error("file alias name {} verify failed", name);
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+
+        if (file != null && FileUtils.directoryTraversal(Objects.requireNonNull(file.getOriginalFilename()))) {
+            logger.error("file original name {} verify failed", file.getOriginalFilename());
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+
         if (file != null) {
             // file is empty
             if (file.isEmpty()) {
@@ -971,6 +984,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content, int pid, String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
+        if (FileUtils.directoryTraversal(fileName)) {
+            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 

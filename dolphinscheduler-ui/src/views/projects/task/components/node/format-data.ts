@@ -279,6 +279,13 @@ export function formatParams(data: INodeData): {
       operator: data.operator,
       src_connector_type: data.src_connector_type,
       src_datasource_id: data.src_datasource_id,
+      field_length: data.field_length,
+      begin_time: data.begin_time,
+      deadline: data.deadline,
+      datetime_format: data.datetime_format,
+      enum_list: data.enum_list,
+      regexp_pattern: data.regexp_pattern,
+      target_filter: data.target_filter,
       src_filter: data.src_filter,
       src_field: data.src_field,
       src_table: data.src_table,
@@ -310,6 +317,13 @@ export function formatParams(data: INodeData): {
     taskParams.paragraphId = data.zeppelinParagraphId
   }
 
+  if (data.taskType === 'K8S') {
+    taskParams.namespace = data.namespace
+    taskParams.minCpuCores = data.minCpuCores
+    taskParams.minMemorySpace = data.minMemorySpace
+    taskParams.image = data.image
+  }
+
   if (data.taskType === 'JUPYTER') {
     taskParams.condaEnvName = data.condaEnvName
     taskParams.inputNotePath = data.inputNotePath
@@ -320,6 +334,25 @@ export function formatParams(data: INodeData): {
     taskParams.executionTimeout = data.executionTimeout
     taskParams.startTimeout = data.startTimeout
     taskParams.others = data.others
+  }
+
+  if (data.taskType === 'MLFLOW') {
+    taskParams.algorithm = data.algorithm
+    taskParams.params = data.params
+    taskParams.searchParams = data.searchParams
+    taskParams.dataPath = data.dataPath
+    taskParams.experimentName = data.experimentName
+    taskParams.modelName = data.modelName
+    taskParams.mlflowTrackingUri = data.mlflowTrackingUri
+    taskParams.mlflowJobType = data.mlflowJobType
+    taskParams.automlTool = data.automlTool
+    taskParams.registerModel = data.registerModel
+    taskParams.mlflowTaskType = data.mlflowTaskType
+    taskParams.deployType = data.deployType
+    taskParams.deployPort = data.deployPort
+    taskParams.deployModelKey = data.deployModelKey
+    taskParams.mlflowProjectRepository = data.mlflowProjectRepository
+    taskParams.mlflowProjectVersion = data.mlflowProjectVersion
   }
 
   if (data.taskType === 'PIGEON') {
@@ -511,6 +544,13 @@ export function formatModel(data: ITaskData) {
     params.src_datasource_id =
       data.taskParams.ruleInputParameter.src_datasource_id
     params.src_table = data.taskParams.ruleInputParameter.src_table
+    params.field_length = data.taskParams.ruleInputParameter.field_length
+    params.begin_time = data.taskParams.ruleInputParameter.begin_time
+    params.deadline = data.taskParams.ruleInputParameter.deadline
+    params.datetime_format = data.taskParams.ruleInputParameter.datetime_format
+    params.target_filter = data.taskParams.ruleInputParameter.target_filter
+    params.regexp_pattern = data.taskParams.ruleInputParameter.regexp_pattern
+    params.enum_list = data.taskParams.ruleInputParameter.enum_list
     params.src_filter = data.taskParams.ruleInputParameter.src_filter
     params.src_field = data.taskParams.ruleInputParameter.src_field
     params.statistics_execute_sql =
