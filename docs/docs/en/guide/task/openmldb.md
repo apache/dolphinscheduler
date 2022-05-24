@@ -73,4 +73,4 @@ The OpenMLDB task will use OpenMLDB Python SDK to connect OpenMLDB cluster. So y
 
 We will use `python3` by default. You can set `PYTHON_HOME` to use your custom python env.
 
-Make sure you have installed OpenMLDB Python SDK, using 'pip install openmldb'.
+Make sure you have installed OpenMLDB Python SDK, using `pip install openmldb`.

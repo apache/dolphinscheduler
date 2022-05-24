@@ -68,4 +68,4 @@ OpenMLDB任务组件将使用OpenMLDB Python SDK来连接OpenMLDB。所以你需
 
 我们默认使用`python3`，你可以通过配置`PYTHON_HOME`来设置自己的Python环境。
 
-请确保已通过'pip install openmldb'，在Python环境中安装了OpenMLDB Python SDK。
+请确保已通过`pip install openmldb`，在Python环境中安装了OpenMLDB Python SDK。
