@@ -34,8 +34,8 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 
 **任务参数**
 
-- **zk地址** ：OpenMLDB集群连接地址中的zk地址, e.g. 127.0.0.1:2181。
-- **zk路径** : OpenMLDB集群连接地址中的zk路径, e.g. /openmldb。
+- **zookeeper地址** ：OpenMLDB集群连接地址中的zookeeper地址, e.g. 127.0.0.1:2181。
+- **zookeeper路径** : OpenMLDB集群连接地址中的zookeeper路径, e.g. /openmldb。
 - **执行模式** ：初始执行模式（离线/在线），你可以在sql语句中随时切换。
 - **SQL语句** ：SQL语句。
 - 自定义参数：是PYTHON局部的用户自定义参数，会替换脚本中以${变量}的内容。

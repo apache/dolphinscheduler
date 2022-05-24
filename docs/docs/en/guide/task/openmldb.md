@@ -38,8 +38,8 @@ First, introduce some general parameters of DolphinScheduler
 
 **Task Parameter**
 
-- **zk** ：OpenMLDB cluster address, e.g. 127.0.0.1:2181.
-- **zk path** : OpenMLDB cluster address, e.g. /openmldb.
+- **zookeeper** ：OpenMLDB cluster zookeeper address, e.g. 127.0.0.1:2181.
+- **zookeeper path** : OpenMLDB cluster zookeeper path, e.g. /openmldb.
 - **Execute Mode** ：determine the init mode, offline or online. You can switch it in sql statement.
 - **SQL statement** ：SQL statement.
 - Custom parameters: It is the user-defined parameters of Python, which will replace the content with \${variable} in the script.
