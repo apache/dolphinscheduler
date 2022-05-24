@@ -88,6 +88,7 @@ export function useTable() {
 
     const { state } = useAsyncState(
       queryAuditLogListPaging(data).then((res: AuditListRes) => {
+        variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           return {
             ...item

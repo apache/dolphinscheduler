@@ -110,6 +110,7 @@ export function useTable(viewRuleEntry = (unusedRuleJson: string): void => {}) {
 
     const { state } = useAsyncState(
       queryRuleListPaging(data).then((res: RuleRes) => {
+        variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           const ruleName =
             'data_quality.rule.' + item.name.substring(3, item.name.length - 1)
