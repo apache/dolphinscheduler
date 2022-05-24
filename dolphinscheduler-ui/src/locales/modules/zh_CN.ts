@@ -466,7 +466,7 @@ const project = {
     fault_tolerant_sign: '容错标识',
     dry_run_flag: '空跑标识',
     executor: '执行用户',
-    host: 'Host',
+    host: '主机',
     start_process: '启动工作流',
     execute_from_the_current_node: '从当前节点开始执行',
     recover_tolerance_fault_process: '恢复被容错的工作流',
