@@ -32,10 +32,10 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -637,7 +637,7 @@ public class ProcessDefinitionController extends BaseController {
                                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
         Map<String, Object> result = new HashMap<>();
-        List<String> deleteFailedCodeList = new ArrayList<>();
+        Set<String> deleteFailedCodeSet = new HashSet<>();
         if (!StringUtils.isEmpty(codes)) {
             String[] processDefinitionCodeArray = codes.split(",");
             for (String strProcessDefinitionCode : processDefinitionCodeArray) {
@@ -645,17 +645,17 @@ public class ProcessDefinitionController extends BaseController {
                 try {
                     Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedCodeList.add((String) deleteResult.get(Constants.MSG));
+                        deleteFailedCodeSet.add((String) deleteResult.get(Constants.MSG));
                         logger.error((String) deleteResult.get(Constants.MSG));
                     }
                 } catch (Exception e) {
-                    deleteFailedCodeList.add(MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), strProcessDefinitionCode));
+                    deleteFailedCodeSet.add(MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), strProcessDefinitionCode));
                 }
             }
         }
 
-        if (!deleteFailedCodeList.isEmpty()) {
-            putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join("\n", deleteFailedCodeList));
+        if (!deleteFailedCodeSet.isEmpty()) {
+            putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join("\n", deleteFailedCodeSet));
         } else {
             putMsg(result, Status.SUCCESS);
         }
