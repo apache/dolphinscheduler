@@ -127,4 +127,25 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return projectList
      */
     List<Project> queryAllProject(@Param("userId") int userId);
+
+    /**
+     * project page
+     * @param page page
+     * @param userId userId
+     * @param searchName searchName
+     * @param projectsIds projectsIds
+     * @return project Ipage
+     */
+    <T> IPage<Project> listAuthorizedProjectsPaging(IPage<Project> page,
+                                                    @Param("userId") int userId,
+                                                    @Param("searchName") String searchName, @Param("projectsIds")T[] projectsIds);
+
+    /**
+     * list authorized Projects
+     * @param userId
+     * @param projectsIds
+     * @param <T>
+     * @return
+     */
+    <T> List<Project> listAuthorizedProjects (@Param("userId") int userId, @Param("projectsIds")T[] projectsIds);
 }

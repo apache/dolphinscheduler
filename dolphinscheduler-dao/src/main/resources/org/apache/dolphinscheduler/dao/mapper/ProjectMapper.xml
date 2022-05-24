@@ -169,4 +169,50 @@
             and user_id = #{userId}
         </if>
     </select>
+
+    <select id="listAuthorizedProjects" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        *
+        from t_ds_project dp
+        where  1=1
+        <if test="userId != 0">
+            and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+            union select id as project_id  from t_ds_project where user_id=#{userId})
+        </if>
+    </select>
+
+    <select id="listAuthorizedProjectsPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
+        from t_ds_project p
+        left join t_ds_user u on u.id=p.user_id
+        left join  t_ds_relation_project_user drp
+        on p.id = drp.project_id
+        where  1=1
+        <if test="userId != 0">
+            and  p.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+            union select id as project_id  from t_ds_project where user_id=#{userId})
+        </if>
+        <if test="searchName!=null and searchName != ''">
+            AND (p.name LIKE concat('%', #{searchName}, '%')
+            OR p.description LIKE concat('%', #{searchName}, '%')
+            )
+        </if>
+        <if test="projectsIds != null and projectsIds.length > 0">
+            and p.id  in
+            <foreach item="id" index="index" collection="projectsIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        order by p.create_time desc
+    </select>
+
 </mapper>
