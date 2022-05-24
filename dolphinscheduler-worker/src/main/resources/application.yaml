@@ -89,3 +89,13 @@ management:
 
 metrics:
   enabled: true
+
+# Override by profile
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
