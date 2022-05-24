@@ -711,7 +711,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, String.valueOf(code));
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
             return result;
         }
         // check process instances is already running
