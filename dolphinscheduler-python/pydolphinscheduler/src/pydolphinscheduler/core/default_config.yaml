@@ -48,5 +48,11 @@ default:
     user: userPythonGateway
     queue: queuePythonGateway
     worker_group: default
+    # Release state of workflow, default value is ``online`` which mean setting workflow online when it submits
+    # to Java gateway, if you want to set workflow offline set its value to ``offline``
+    release_state: online
     time_zone: Asia/Shanghai
+    # Warning type of the workflow, default value is ``NONE`` mean do not warn user in any cases of workflow state,
+    # change to ``FAILURE`` if you want to warn users when workflow failed. All available enum value are
+    # ``NONE``, ``SUCCESS``, ``FAILURE``, ``ALL`` 
     warning_type: NONE

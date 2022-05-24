@@ -18,13 +18,6 @@
 """Constants for pydolphinscheduler."""
 
 
-class ProcessDefinitionReleaseState:
-    """Constants for :class:`pydolphinscheduler.core.process_definition.ProcessDefinition` release state."""
-
-    ONLINE: str = "ONLINE"
-    OFFLINE: str = "OFFLINE"
-
-
 class TaskPriority(str):
     """Constants for task priority."""
 

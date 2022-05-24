@@ -221,6 +221,7 @@ public class PythonGateway {
                                                 int timeout,
                                                 String workerGroup,
                                                 String tenantCode,
+                                                int releaseState,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType) {
@@ -248,7 +249,7 @@ public class PythonGateway {
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.getEnum(releaseState));
         return processDefinitionCode;
     }
 
