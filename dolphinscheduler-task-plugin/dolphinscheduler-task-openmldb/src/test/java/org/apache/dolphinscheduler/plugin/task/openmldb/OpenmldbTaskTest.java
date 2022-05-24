@@ -64,7 +64,8 @@ public class OpenmldbTaskTest {
         openmldbParameters.setExecuteMode("offline");
         String rawSQLScript = "select * from users\r\n"
                 + "-- some comment\n"
-                + "inner join order on users.order_id = order.id;";
+                + "inner join order on users.order_id = order.id; \n\n;"
+                + "select * from users;";
         openmldbParameters.setSql(rawSQLScript);
         Whitebox.setInternalState(openmldbTask, "openmldbParameters", openmldbParameters);
         OpenmldbParameters internal = (OpenmldbParameters) openmldbTask.getParameters();
@@ -81,6 +82,7 @@ public class OpenmldbTaskTest {
                         + "con.execute(\"set @@job_timeout=1800000\")\n"
                         + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
                         + "order.id\")\n"
+                        + "con.execute(\"select * from users\")\n"
                 , result1);
     }
 

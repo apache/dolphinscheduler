@@ -101,7 +101,7 @@ public class OpenmldbTask extends PythonTask {
     protected String buildPythonScriptContent() {
         logger.info("raw sql script : {}", openmldbParameters.getSql());
 
-        String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\\\\n");
+        String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\n");
         Map<String, Property> paramsMap = mergeParamsWithContext(openmldbParameters);
         rawSQLScript = ParameterUtils.convertParameterPlaceholders(rawSQLScript, ParamUtils.convert(paramsMap));
 
@@ -130,13 +130,14 @@ public class OpenmldbTask extends PythonTask {
             builder.append("con.execute(\"set @@job_timeout=1800000\")\n");
         }
 
-        // split sqls to list
+        // split sql to list
+        // skip the sql only has space characters
+        Pattern pattern = Pattern.compile("\\S");
         for (String sql : rawSqlScript.split(";")) {
-            sql = sql.trim();
-            if (sql.isEmpty()) {
-                continue;
+            if (pattern.matcher(sql).find()) {
+                sql = sql.replaceAll("\\n", "\\\\n");
+                builder.append("con.execute(\"").append(sql).append("\")\n");
             }
-            builder.append("con.execute(\"").append(sql).append("\")\n");
         }
         return builder.toString();
     }
