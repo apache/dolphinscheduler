@@ -330,6 +330,8 @@ interface ITaskParams {
   automlTool?: string
   registerModel?: boolean
   mlflowTaskType?: string
+  mlflowProjectRepository?: string
+  mlflowProjectVersion?: string
   deployType?: string
   deployPort?: string
   deployModelKey?: string

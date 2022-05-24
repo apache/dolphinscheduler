@@ -32,6 +32,13 @@ public class MlflowParameters extends AbstractParameters {
     private String mlflowJobType = "";
 
     /**
+     * CustomProject parameters
+     */
+    private String mlflowProjectRepository;
+
+    private String mlflowProjectVersion = "master";
+
+    /**
      * AutoML parameters
      */
     private String automlTool = "FLAML";
@@ -53,7 +60,7 @@ public class MlflowParameters extends AbstractParameters {
 
     private String mlflowTaskType = "";
 
-    private String experimentName;
+    private String experimentName = "Default";
 
     private String modelName = "";
 
@@ -145,6 +152,22 @@ public class MlflowParameters extends AbstractParameters {
         this.automlTool = automlTool;
     }
 
+    public String getMlflowProjectRepository() {
+        return mlflowProjectRepository;
+    }
+
+    public void setMlflowProjectRepository(String mlflowProjectRepository) {
+        this.mlflowProjectRepository = mlflowProjectRepository;
+    }
+
+    public String getMlflowProjectVersion() {
+        return mlflowProjectVersion;
+    }
+
+    public void setMlflowProjectVersion(String mlflowProjectVersion) {
+        this.mlflowProjectVersion = mlflowProjectVersion;
+    }
+
     public String getAutomlTool() {
         return automlTool;
     }
@@ -232,7 +255,7 @@ public class MlflowParameters extends AbstractParameters {
         return scriptPath;
     }
 
-    public String getModelKeyName(String tag) throws IllegalArgumentException{
+    public String getModelKeyName(String tag) throws IllegalArgumentException {
         String imageName;
         if (deployModelKey.startsWith("runs:")) {
             imageName = deployModelKey.replace("runs:/", "");
