@@ -141,8 +141,14 @@ public class MlflowTask extends AbstractTaskExecutor {
             runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
 
 
-        } else {
-            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowTaskType());
+        } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT)) {
+            args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));
+
+            runCommand = MlflowConstants.MLFLOW_RUN_CUSTOM_PROJECT;
+            runCommand = String.format(runCommand, mlflowParameters.getParams(), mlflowParameters.getExperimentName(), mlflowParameters.getMlflowProjectVersion());
+        }
+        else {
+            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowJobType());
 
         }
         args.add(runCommand);
