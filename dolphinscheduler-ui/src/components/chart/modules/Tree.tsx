@@ -40,8 +40,6 @@ const TreeChart = defineComponent({
   setup(props) {
     const treeChartRef: Ref<HTMLDivElement | null> = ref(null)
 
-    console.log(props.data)
-
     const option = reactive({
       tooltip: {
         trigger: 'item',
