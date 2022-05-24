@@ -101,7 +101,6 @@ public class OSUtils {
      */
     public static double diskAvailable() {
         File file = new File(".");
-        long totalSpace = file.getTotalSpace(); //total disk space in bytes.
         long freeSpace = file.getFreeSpace(); //unallocated / free disk space in bytes.
 
         double diskAvailable = freeSpace / 1024.0 / 1024 / 1024;
