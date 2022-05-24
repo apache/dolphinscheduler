@@ -351,6 +351,8 @@ export function formatParams(data: INodeData): {
     taskParams.deployType = data.deployType
     taskParams.deployPort = data.deployPort
     taskParams.deployModelKey = data.deployModelKey
+    taskParams.mlflowProjectRepository = data.mlflowProjectRepository
+    taskParams.mlflowProjectVersion = data.mlflowProjectVersion
   }
 
   if (data.taskType === 'OPENMLDB') {

@@ -993,6 +993,10 @@ const project = {
     mlflow_deployType: 'Deploy Mode',
     mlflow_deployModelKey: 'model-uri',
     mlflow_deployPort: 'Port',
+    mlflowProjectRepository: 'Repository',
+    mlflowProjectRepository_tips: 'github respository or path on worker',
+    mlflowProjectVersion: 'Project Version',
+    mlflowProjectVersion_tips: 'git version',
     openmldb_zk_address: 'zookeeper address',
     openmldb_zk_address_tips: 'Please enter the zookeeper address',
     openmldb_zk_path: 'zookeeper path',
@@ -1012,7 +1016,14 @@ const project = {
     sql_parameter: 'SQL Parameter',
     format_tips: 'Please enter format',
     udf_function: 'UDF Function',
-    unlimited: 'unlimited'
+    unlimited: 'unlimited',
+    please_select_source_connector_type: 'Please select source connector type',
+    please_select_source_datasource_id: 'Please select source datasource id',
+    please_enter_source_table_name: 'Please select source table name',
+    please_enter_filter_expression: 'Please enter filter expression',
+    please_enter_column_only_single_column_is_supported: 'Please select column, only single column is supported',
+    please_enter_threshold_number_is_needed: 'Please enter threshold number is needed',
+    please_enter_comparison_title: 'please select comparison title'
   }
 }
 
