@@ -235,7 +235,7 @@ externalDatabase:
 >
 > If you want to add MySQL datasource, you can build a new image based on the `apache/dolphinscheduler-<service>` image follow the following instructions:
 > 
-> You needs to change the two images of dolphinscheduler-worker dolphinscheduler-api service.
+> You need to change the two service images including dolphinscheduler-worker, dolphinscheduler-api.
 
 1. Download the MySQL driver [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar).
 
