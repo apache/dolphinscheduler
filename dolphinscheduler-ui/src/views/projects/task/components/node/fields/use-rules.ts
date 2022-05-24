@@ -42,7 +42,7 @@ export function useRules(
   const targetTableColumnOptions = ref([] as { label: string; value: number }[])
   const writerDatasourceOptions = ref([] as { label: string; value: number }[])
 
-  const fixValueSpan = computed(() => (model.comparison_type === 1 ? 24 : 0))
+  const fixValueSpan = computed(() => model.comparison_type === 1 ? 24 : 0)
 
   let preItemLen = 0
 
@@ -67,9 +67,7 @@ export function useRules(
     if (ruleLoading.value) return
     ruleLoading.value = true
     const result = await getRuleFormCreateJson(ruleId)
-    const items = JSON.parse(result).map((item: IResponseJsonItem) =>
-      formatResponseJson(item)
-    )
+    const items = JSON.parse(result).map((item: IResponseJsonItem) => formatResponseJson(item))
     updateRules(items, preItemLen)
     preItemLen = items.length
     ruleLoading.value = false
@@ -78,6 +76,7 @@ export function useRules(
   const formatResponseJson = (
     responseItem: IResponseJsonItem
   ): IJsonItemParams => {
+    responseItem.props.placeholder = t('project.node.' + responseItem.props.placeholder.split(' ').join('_').split(',').join('').toLowerCase())
     const item: IJsonItemParams = {
       field: responseItem.field,
       options: responseItem.options,

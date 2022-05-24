@@ -51,27 +51,6 @@ export default {
                 ],
             },
             {
-                title: 'Installation',
-                children: [
-                    {
-                        title: 'Standalone Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/standalone.html',
-                    },
-                    {
-                        title: 'Pseudo Cluster Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
-                    },
-                    {
-                        title: 'Cluster Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/cluster.html',
-                    },
-                    {
-                        title: 'Kubernetes Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
-                    },
-                ],
-            },
-            {
                 title: 'Introduction to Functions',
                 children: [
                     {
@@ -174,6 +153,14 @@ export default {
                                 title: 'Jupyter',
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
+                            {
+                                title: 'Kubernetes',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
                         ],
                     },
                     {
@@ -260,10 +247,6 @@ export default {
                         ],
                     },
                     {
-                        title: 'Data Quality',
-                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
-                    },
-                    {
                         title: 'Resource',
                         children: [
                             {
@@ -280,7 +263,7 @@ export default {
                             },
                             {
                                 title: 'Task Group Manage',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/task-manage.html'
+                                link: '/en-us/docs/dev/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },
@@ -302,12 +285,8 @@ export default {
                         ],
                     },
                     {
-                        title: 'Open API',
-                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
-                    },
-                    {
-                        title: 'Flink',
-                        link: '/en-us/docs/dev/user_doc/guide/flink-call.html',
+                        title: 'Data Quality',
+                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: 'Upgrade',
@@ -316,6 +295,27 @@ export default {
                     {
                         title: 'Expansion and Reduction',
                         link: '/en-us/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                ],
+            },
+            {
+                title: 'Installation',
+                children: [
+                    {
+                        title: 'Standalone Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/standalone.html',
+                    },
+                    {
+                        title: 'Pseudo Cluster Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
+                    },
+                    {
+                        title: 'Cluster Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/cluster.html',
+                    },
+                    {
+                        title: 'Kubernetes Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -345,6 +345,19 @@ export default {
                     {
                         title: 'Cache',
                         link: '/en-us/docs/dev/user_doc/architecture/cache.html',
+                    },
+                ],
+            },
+            {
+                title: 'API',
+                children: [
+                    {
+                        title: 'Open API',
+                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
+                    },
+                    {
+                        title: 'PyDolphinScheduler',
+                        link: '/python/index.html',
                     },
                 ],
             },
@@ -398,27 +411,6 @@ export default {
                     {
                         title: 'Docker部署(Docker)',
                         link: '/zh-cn/docs/dev/user_doc/guide/start/docker.html',
-                    },
-                ],
-            },
-            {
-                title: '部署指南',
-                children: [
-                    {
-                        title: '单机部署(Standalone)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/standalone.html',
-                    },
-                    {
-                        title: '伪集群部署(Pseudo-Cluster)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
-                    },
-                    {
-                        title: '集群部署(Cluster)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/cluster.html',
-                    },
-                    {
-                        title: 'Kubernetes部署(Kubernetes)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -525,6 +517,14 @@ export default {
                                 title: 'Jupyter',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
+                            {
+                                title: 'Kubernetes',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
                         ],
                     },
                     {
@@ -611,10 +611,6 @@ export default {
                         ],
                     },
                     {
-                        title: '数据质量',
-                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
-                    },
-                    {
                         title: '资源中心',
                         children: [
                             {
@@ -631,7 +627,7 @@ export default {
                             },
                             {
                                 title: '任务组管理',
-                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-manage.html'
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },
@@ -644,7 +640,7 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: '常见操作',
+                        title: '常用指引',
                         children: [
                             {
                                 title: '通用设置',
@@ -653,12 +649,8 @@ export default {
                         ],
                     },
                     {
-                        title: 'API调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
-                    },
-                    {
-                        title: 'Flink调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/flink-call.html',
+                        title: '数据质量',
+                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: '升级',
@@ -667,6 +659,27 @@ export default {
                     {
                         title: '扩/缩容',
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                ],
+            },
+            {
+                title: '部署指南',
+                children: [
+                    {
+                        title: '单机部署(Standalone)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/standalone.html',
+                    },
+                    {
+                        title: '伪集群部署(Pseudo-Cluster)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
+                    },
+                    {
+                        title: '集群部署(Cluster)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/cluster.html',
+                    },
+                    {
+                        title: 'Kubernetes部署(Kubernetes)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -696,6 +709,19 @@ export default {
                     {
                         title: '缓存',
                         link: '/zh-cn/docs/dev/user_doc/architecture/cache.html',
+                    },
+                ],
+            },
+            {
+                title: 'API',
+                children: [
+                    {
+                        title: 'API调用',
+                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
+                    },
+                    {
+                        title: 'PyDolphinScheduler',
+                        link: '/python/index.html',
                     },
                 ],
             },

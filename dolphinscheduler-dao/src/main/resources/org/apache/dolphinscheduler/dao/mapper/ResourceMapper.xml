@@ -58,8 +58,9 @@
         <include refid="baseSqlV2">
             <property name="alias" value="d"/>
         </include>
-        from t_ds_resources d
-        where d.type=#{type} and d.pid=#{id}
+        ,u.user_name
+        from t_ds_resources d,t_ds_user u
+        where d.type=#{type} and d.pid=#{id} and d.user_id=u.id
         <if test="userId != 0">
             and (
                     d.user_id=#{userId}
