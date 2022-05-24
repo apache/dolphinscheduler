@@ -27,7 +27,12 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * job params related class
