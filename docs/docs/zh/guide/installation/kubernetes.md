@@ -187,24 +187,29 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 
 > 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包.
 >
-> 如果你要使用 MySQL, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
+> 如果你要使用 MySQL, 你可以基于官方镜像 `apache/dolphinscheduler-<service>` 进行构建.
+> 
+> 从3.0.0版本起，dolphinscheduler已经微服务化，更改元数据存储需要对把所有的服务都替换为 MySQL 驱动包，包括 dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server .
 
 1. 下载 MySQL 驱动包 [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)
 
 2. 创建一个新的 `Dockerfile`，用于添加 MySQL 的驱动包:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+# For example
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
 ```
 
 3. 构建一个包含 MySQL 驱动包的新镜像:
 
 ```
-docker build -t apache/dolphinscheduler:mysql-driver .
+docker build -t apache/dolphinscheduler-<service>:mysql-driver .
 ```
 
-4. 推送 docker 镜像 `apache/dolphinscheduler:mysql-driver` 到一个 docker registry 中
+4. 推送 docker 镜像 `apache/dolphinscheduler-<service>:mysql-driver` 到一个 docker registry 中
 
 5. 修改 `values.yaml` 文件中 image 的 `repository` 字段，并更新 `tag` 为 `mysql-driver`
 
@@ -215,7 +220,6 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 ```yaml
 externalDatabase:
   type: "mysql"
-  driver: "com.mysql.jdbc.Driver"
   host: "localhost"
   port: "3306"
   username: "root"
@@ -226,70 +230,53 @@ externalDatabase:
 
 8. 部署 dolphinscheduler (详见**安装 dolphinscheduler**)
 
-### 如何在数据源中心支持 MySQL 数据源？
+### 如何在数据源中心支持 MySQL 或者 Oracle 数据源？
 
-> 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包.
+> 由于商业许可证的原因，我们不能直接使用 MySQL 或者 Oracle 的驱动包.
 >
-> 如果你要添加 MySQL 数据源, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
+> 如果你要添加 MySQL 或者 Oracle, 你可以基于官方镜像 `apache/dolphinscheduler-<service>` 进行构建.
+> 
+> 需要更改 dolphinscheduler-worker, dolphinscheduler-api 两个服务的镜像.
 
-1. 下载 MySQL 驱动包 [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)
+1. 下载 MySQL 驱动包 [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar) 
+或者 Oracle 驱动包 [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (例如 `ojdbc8-19.9.0.0.jar`)
 
-2. 创建一个新的 `Dockerfile`，用于添加 MySQL 驱动包:
+3. 创建一个新的 `Dockerfile`，用于添加 MySQL 或者 Oracle 驱动包:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+# For example
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+
+# If you want to support MySQL Datasource
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
-```
 
-3. 构建一个包含 MySQL 驱动包的新镜像:
-
-```
-docker build -t apache/dolphinscheduler:mysql-driver .
-```
-
-4. 推送 docker 镜像 `apache/dolphinscheduler:mysql-driver` 到一个 docker registry 中
-
-5. 修改 `values.yaml` 文件中 image 的 `repository` 字段，并更新 `tag` 为 `mysql-driver`
-
-6. 部署 dolphinscheduler (详见**安装 dolphinscheduler**)
-
-7. 在数据源中心添加一个 MySQL 数据源
-
-### 如何在数据源中心支持 Oracle 数据源？
-
-> 由于商业许可证的原因，我们不能直接使用 Oracle 的驱动包.
->
-> 如果你要添加 Oracle 数据源, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
-
-1. 下载 Oracle 驱动包 [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (例如 `ojdbc8-19.9.0.0.jar`)
-
-2. 创建一个新的 `Dockerfile`，用于添加 Oracle 驱动包:
-
-```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+# If you want to support Oracle Datasource
 COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
 ```
 
-3. 构建一个包含 Oracle 驱动包的新镜像:
+3. 构建一个包含 MySQL 或者 Oracle 驱动包的新镜像:
 
 ```
-docker build -t apache/dolphinscheduler:oracle-driver .
+docker build -t apache/dolphinscheduler-<service>:new-driver .
 ```
 
-4. 推送 docker 镜像 `apache/dolphinscheduler:oracle-driver` 到一个 docker registry 中
+4. 推送 docker 镜像 `apache/dolphinscheduler-<service>:new-driver` 到一个 docker registry 中
 
-5. 修改 `values.yaml` 文件中 image 的 `repository` 字段，并更新 `tag` 为 `oracle-driver`
+5. 修改 `values.yaml` 文件中 image 的 `repository` 字段，并更新 `tag` 为 `new-driver`
 
 6. 部署 dolphinscheduler (详见**安装 dolphinscheduler**)
 
-7. 在数据源中心添加一个 Oracle 数据源
+7. 在数据源中心添加一个 MySQL 或者 Oracle 数据源
 
 ### 如何支持 Python 2 pip 以及自定义 requirements.txt？
+
+> 只需要更改 dolphinscheduler-worker 服务的镜像.
 
 1. 创建一个新的 `Dockerfile`，用于安装 pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -300,16 +287,16 @@ RUN apt-get update && \
 这个命令会安装默认的 **pip 18.1**. 如果你想升级 pip, 只需添加一行
 
 ```
-    pip install --no-cache-dir -U pip && \
+pip install --no-cache-dir -U pip && \
 ```
 
 2. 构建一个包含 pip 的新镜像:
 
 ```
-docker build -t apache/dolphinscheduler:pip .
+docker build -t apache/dolphinscheduler-worker:pip .
 ```
 
-3. 推送 docker 镜像 `apache/dolphinscheduler:pip` 到一个 docker registry 中
+3. 推送 docker 镜像 `apache/dolphinscheduler-worker:pip` 到一个 docker registry 中
 
 4. 修改 `values.yaml` 文件中 image 的 `repository` 字段，并更新 `tag` 为 `pip`
 
@@ -319,10 +306,12 @@ docker build -t apache/dolphinscheduler:pip .
 
 ### 如何支持 Python 3？
 
+> 只需要更改 dolphinscheduler-worker 服务的镜像.
+
 1. 创建一个新的 `Dockerfile`，用于安装 Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*
@@ -331,16 +320,16 @@ RUN apt-get update && \
 这个命令会安装默认的 **Python 3.7.3**. 如果你也想安装 **pip3**, 将 `python3` 替换为 `python3-pip` 即可
 
 ```
-    apt-get install -y --no-install-recommends python3-pip && \
+apt-get install -y --no-install-recommends python3-pip && \
 ```
 
 2. 构建一个包含 Python 3 的新镜像:
 
 ```
-docker build -t apache/dolphinscheduler:python3 .
+docker build -t apache/dolphinscheduler-worker:python3 .
 ```
 
-3. 推送 docker 镜像 `apache/dolphinscheduler:python3` 到一个 docker registry 中
+3. 推送 docker 镜像 `apache/dolphinscheduler-worker:python3` 到一个 docker registry 中
 
 4. 修改 `values.yaml` 文件中 image 的 `repository` 字段，并更新 `tag` 为 `python3`
 
