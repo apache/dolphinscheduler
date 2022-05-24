@@ -78,39 +78,41 @@ All Configurations in Environment Variables
 
 All environment variables as below, and you could modify their value via `Bash <by bash>`_ or `Python OS Module <by python os module>`_
 
-+------------------+------------------------------------+------------------------------------------------------------------------------------------------------------------+
-| Variable Section | Variable Name                      | description                                                                                                      |
-+==================+====================================+==================================================================================================================+
-|                  | ``PYDS_JAVA_GATEWAY_ADDRESS``      | Default Java gateway address, will use its value when it is set.                                                 |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|   Java Gateway   | ``PYDS_JAVA_GATEWAY_PORT``         | Default Java gateway port, will use its value when it is set.                                                    |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_JAVA_GATEWAY_AUTO_CONVERT`` | Default boolean Java gateway auto convert, will use its value when it is set.                                    |
-+------------------+------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_USER_NAME``                 | Default user name, will use when user's ``name`` when does not specify.                                          |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_USER_PASSWORD``             | Default user password, will use when user's ``password`` when does not specify.                                  |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|   Default User   | ``PYDS_USER_EMAIL``                | Default user email, will use when user's ``email`` when does not specify.                                        |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_USER_PHONE``                | Default user phone, will use when user's ``phone`` when does not specify.                                        |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_USER_STATE``                | Default user state, will use when user's ``state`` when does not specify.                                        |
-+------------------+------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_WORKFLOW_PROJECT``          | Default workflow project name, will use its value when workflow does not specify the attribute ``project``.      |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_WORKFLOW_TENANT``           | Default workflow tenant, will use its value when workflow does not specify the attribute ``tenant``.             |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-| Default Workflow | ``PYDS_WORKFLOW_USER``             | Default workflow user, will use its value when workflow does not specify the attribute ``user``.                 |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_WORKFLOW_QUEUE``            | Default workflow queue, will use its value when workflow does not specify the attribute ``queue``.               |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_WORKFLOW_WORKER_GROUP``     | Default workflow worker group, will use its value when workflow does not specify the attribute ``worker_group``. |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_WORKFLOW_TIME_ZONE``        | Default workflow worker group, will use its value when workflow does not specify the attribute ``timezone``.     |
-+                  +------------------------------------+------------------------------------------------------------------------------------------------------------------+
-|                  | ``PYDS_WORKFLOW_WARNING_TYPE``     | Default workflow warning type, will use its value when workflow does not specify the attribute ``warning_type``. |
-+------------------+------------------------------------+------------------------------------------------------------------------------------------------------------------+
++------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+| Variable Section | Variable Name                      | description                                                                                                        |
++==================+====================================+====================================================================================================================+
+|                  | ``PYDS_JAVA_GATEWAY_ADDRESS``      | Default Java gateway address, will use its value when it is set.                                                   |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|   Java Gateway   | ``PYDS_JAVA_GATEWAY_PORT``         | Default Java gateway port, will use its value when it is set.                                                      |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_JAVA_GATEWAY_AUTO_CONVERT`` | Default boolean Java gateway auto convert, will use its value when it is set.                                      |
++------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_USER_NAME``                 | Default user name, will use when user's ``name`` when does not specify.                                            |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_USER_PASSWORD``             | Default user password, will use when user's ``password`` when does not specify.                                    |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|   Default User   | ``PYDS_USER_EMAIL``                | Default user email, will use when user's ``email`` when does not specify.                                          |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_USER_PHONE``                | Default user phone, will use when user's ``phone`` when does not specify.                                          |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_USER_STATE``                | Default user state, will use when user's ``state`` when does not specify.                                          |
++------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_PROJECT``          | Default workflow project name, will use its value when workflow does not specify the attribute ``project``.        |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_TENANT``           | Default workflow tenant, will use its value when workflow does not specify the attribute ``tenant``.               |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+| Default Workflow | ``PYDS_WORKFLOW_USER``             | Default workflow user, will use its value when workflow does not specify the attribute ``user``.                   |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_QUEUE``            | Default workflow queue, will use its value when workflow does not specify the attribute ``queue``.                 |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_WORKER_GROUP``     | Default workflow worker group, will use its value when workflow does not specify the attribute ``worker_group``.   |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_RELEASE_STATE``    | Default workflow release state, will use its value when workflow does not specify the attribute ``release_state``. |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_TIME_ZONE``        | Default workflow worker group, will use its value when workflow does not specify the attribute ``timezone``.       |
++                  +------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+|                  | ``PYDS_WORKFLOW_WARNING_TYPE``     | Default workflow warning type, will use its value when workflow does not specify the attribute ``warning_type``.   |
++------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 
 .. note::
 
