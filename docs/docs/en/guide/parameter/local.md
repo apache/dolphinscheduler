@@ -16,8 +16,8 @@ This example shows how to use local parameters to print the current date. Create
 
 Parameters:
 
--dt: indicates the parameter name
--in: IN indicates that local parameters can only be used on the current node, and OUT indicates that local parameters can be transmitted to the downstream
+- dt: indicates the parameter name
+- in: IN indicates that local parameters can only be used on the current node, and OUT indicates that local parameters can be transmitted to the downstream
 - DATE: indicates the DATE of the data type
 - $[YYYY-MM-DD] : indicates a built-in parameter derived from a user-defined format
 
