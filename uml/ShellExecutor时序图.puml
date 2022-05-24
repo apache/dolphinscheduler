@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+JavaTask -> ShellCommandExecutor: run(String command)
+
+ShellCommandExecutor->ShellCommandExecutor: buildCommandFilePath()
+ShellCommandExecutor->ShellCommandExecutor: createCommandFileIfNotExists(String execCommand, String commandFilePath);
+ShellCommandExecutor->ShellCommandExecutor: buildProcess(String commandFilePath)
+ShellCommandExecutor->ProcessBuilder:new ProcessBuilder()
+ShellCommandExecutor->ProcessBuilder:directory(File file)
+ShellCommandExecutor->ProcessBuilder:command(List<String> command)
+ShellCommandExecutor->ProcessBuilder:stard()
+ProcessBuilder-->ShellCommandExecutor:return Process
+ShellCommandExecutor->ShellCommandExecutor:parseProcessOutput(process)
+ShellCommandExecutor-->JavaTask:return TaskResponse
+
+@enduml

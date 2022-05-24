@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+
+:创建线程
+new TaskExecuteThread();
+:启动线程run();
+if (DryRun空跑) then (否)
+  :taskPluginManager
+  通过TaskType
+  获取Channel实例;
+  :taskChannel.createTask
+  创建Task实例;
+  :task.init()
+  初始化Task;
+  :Task.setVarPool()
+  为Task的接收
+  上个任务的参数;
+  :task.handle()
+  执行Task的处理逻辑;
+  :task.getNeedAlert()
+  任务告警处理逻辑;
+  :kill()->task.cancelApplication(true)
+  若在执行过程中出现异常则取消任务;
+else (是)
+
+endif
+
+stop
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:构建TaskPluginManager();
+:installPlugin()
+通过SPI安装插件;
+while ()
+  :factory = ServiceLoader.load()
+  SPI加载TaskChannelFactory实现类;
+  :loadTaskChannel(factory)
+  构建TaskChannel实例;
+  :taskChannel = taskChannelFactory.create();
+  :taskChannelMap.put(factory.getName(), taskChannel)
+  缓存TaskChannel实例，以便在TaskExecuteThread.run中调用;
+endwhile
+
+stop
+
+@enduml

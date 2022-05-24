@@ -1,0 +1,24 @@
+@startuml
+class JavaTask {
+- JavaParameters javaParameters
+- ShellCommandExecutor shellCommandExecutor
+- TaskExecutionContext taskRequest
++ void init()
++ String getPreScript()
++ void handle()
+- String buildJavaCommand()
+- String buildJarCommand()
++ void cancelApplication(boolean)
++ AbstractParameters getParameters()
+- {static} String convertJavaSourceCodePlaceholders(String)
+# void createJavaSourceFileIfNotExists(String,String)
+# String buildJavaSourceCodeFileFullName()
+- String buildResourcePath()
+# String compilerRawScript(String)
+- String buildJavaSourceContent()
+- String buildJavaExecuteCommand(String)
+}
+
+
+org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor <|-- JavaTask
+@enduml
