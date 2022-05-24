@@ -64,3 +64,25 @@ For example, in the figure below:
 When the log detects the `${setValue(key=value1)}` format in the shell node definition, it will assign value1 to the key, and downstream nodes can use the variable key directly. Similarly, you can find the corresponding node instance on the [Workflow Instance] page to see the value of the variable.
 
 ![png10](/img/globalParam/image-20210723102522383.png)
+
+### HTTP
+
+Step 1: Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
+
+<img src="/img/httpParam/1-1.png" alt="1-1" style="zoom:50%;" />
+
+
+Step 2: After adding an HTTP task type node, accept the parameters passed upstream. This time just add it in the Request Parameters section,
+
+It can be a task, it can be a body, it can be anything else, so parameter,value, make sure you say ${body}
+
+<img src="/img/httpParam/1-2.png" alt="1-2" style="zoom:50%;" />
+
+The configuration is complete
+
+<img src="/img/httpParam/1-3.png" alt="1-3" style="zoom:50%;" />
+
+
+Step 3, this step you can write a test interface, call this interface on the node that receives the upstream parameter to test whether an upstream parameter is passed
+
+<img src="/img/httpParam/1-4.png" alt="1-3" style="zoom:50%;" />
