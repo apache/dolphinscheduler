@@ -214,7 +214,7 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 ```yaml
 externalDatabase:
   type: "mysql"
-  driver: "com.mysql.jdbc.Driver"
+  driver: "com.mysql.cj.jdbc.Driver"
   host: "localhost"
   port: "3306"
   username: "root"
