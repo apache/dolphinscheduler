@@ -21,7 +21,6 @@ export JAVA_HOME=${JAVA_HOME:-/usr/local/openjdk-8}
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
 export SPRING_DATASOURCE_URL="jdbc:postgresql://postgres:5432/dolphinscheduler"
 export SPRING_DATASOURCE_USERNAME=postgres
 export SPRING_DATASOURCE_PASSWORD=postgres

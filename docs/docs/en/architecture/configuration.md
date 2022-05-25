@@ -450,7 +450,6 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME
 export SPRING_DATASOURCE_URL
 export SPRING_DATASOURCE_USERNAME
 export SPRING_DATASOURCE_PASSWORD
