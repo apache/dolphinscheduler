@@ -331,11 +331,11 @@
                     })
                     if (this.type === 'instance') {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/instance/list/${methodParam}`
+                        path: `/projects/${this.projectCode}/instance/list`
                       })
                     } else {
                       this.$router.push({
-                        path: `/projects/${this.projectCode}/definition/list/${methodParam}`
+                        path: `/projects/${this.projectCode}/definition/list`
                       })
                     }
                   })

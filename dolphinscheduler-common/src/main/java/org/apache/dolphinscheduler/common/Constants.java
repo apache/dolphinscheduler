@@ -514,7 +514,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 13;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 14;
 
     /**
      * jar

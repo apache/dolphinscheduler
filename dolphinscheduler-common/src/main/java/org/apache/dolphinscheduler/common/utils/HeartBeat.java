@@ -42,6 +42,16 @@ public class HeartBeat {
     private int workerWaitingTaskCount; // worker waiting task count
     private int workerExecThreadCount; // worker thread pool thread count
 
+    private double diskAvailable;
+
+    public double getDiskAvailable() {
+        return diskAvailable;
+    }
+
+    public void setDiskAvailable(double diskAvailable) {
+        this.diskAvailable = diskAvailable;
+    }
+
     public long getStartupTime() {
         return startupTime;
     }
@@ -177,6 +187,7 @@ public class HeartBeat {
         this.loadAverage = OSUtils.loadAverage();
         this.availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
         this.memoryUsage = OSUtils.memoryUsage();
+        this.diskAvailable = OSUtils.diskAvailable();
         this.processId = OSUtils.getProcessID();
     }
 
@@ -217,7 +228,8 @@ public class HeartBeat {
         builder.append(processId).append(COMMA);
         builder.append(workerHostWeight).append(COMMA);
         builder.append(workerExecThreadCount).append(COMMA);
-        builder.append(workerWaitingTaskCount);
+        builder.append(workerWaitingTaskCount).append(COMMA);
+        builder.append(diskAvailable);
 
         return builder.toString();
     }
@@ -244,6 +256,7 @@ public class HeartBeat {
         heartBeat.workerHostWeight = Integer.parseInt(parts[10]);
         heartBeat.workerExecThreadCount = Integer.parseInt(parts[11]);
         heartBeat.workerWaitingTaskCount = Integer.parseInt(parts[12]);
+        heartBeat.diskAvailable = Double.parseDouble(parts[13]);
         return heartBeat;
     }
 }

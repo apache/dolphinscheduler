@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -31,6 +32,9 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,15 +50,11 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.netty.channel.Channel;
-
 /**
  * logger request process logic
  */
-public class LoggerRequestProcessor implements NettyRequestProcessor {
+public class LoggerRequestProcessor
+        implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
@@ -76,21 +76,35 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             case GET_LOG_BYTES_REQUEST:
                 GetLogBytesRequestCommand getLogRequest = JSONUtils.parseObject(
                         command.getBody(), GetLogBytesRequestCommand.class);
-                byte[] bytes = getFileContentBytes(getLogRequest.getPath());
+                String path = getLogRequest.getPath();
+                if (!checkPathSecurity(path)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+                byte[] bytes = getFileContentBytes(path);
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
                 break;
             case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
                         command.getBody(), ViewLogRequestCommand.class);
-                String msg = LoggerUtils.readWholeFileContent(viewLogRequest.getPath());
+                String viewLogPath = viewLogRequest.getPath();
+                if (!checkPathSecurity(viewLogPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+                String msg = LoggerUtils.readWholeFileContent(viewLogPath);
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
             case ROLL_VIEW_LOG_REQUEST:
                 RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(
                         command.getBody(), RollViewLogRequestCommand.class);
-                List<String> lines = readPartFileContent(rollViewLogRequest.getPath(),
+
+                String rollViewLogPath = rollViewLogRequest.getPath();
+                if (!checkPathSecurity(rollViewLogPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+
+                List<String> lines = readPartFileContent(rollViewLogPath,
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
@@ -104,14 +118,17 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), RemoveTaskLogRequestCommand.class);
 
                 String taskLogPath = removeTaskLogRequest.getPath();
-
+                if (!checkPathSecurity(taskLogPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
                 File taskLogFile = new File(taskLogPath);
                 Boolean status = true;
                 try {
                     if (taskLogFile.exists()) {
                         status = taskLogFile.delete();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     status = false;
                 }
 
@@ -121,6 +138,23 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             default:
                 throw new IllegalArgumentException("unknown commandType");
         }
+    }
+
+    private boolean checkPathSecurity(String path) {
+        String dsHome = System.getProperty("DOLPHINSCHEDULER_HOME");
+        // if we run server in IDE, user.dir is the DS Home.
+        if (StringUtils.isBlank(dsHome)) {
+            dsHome = System.getProperty("user.dir");
+        }
+        if (!StringUtils.isBlank(path)) {
+            if (path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log")) {
+                return true;
+            }
+        }
+        else {
+            logger.warn("path is null");
+        }
+        return false;
     }
 
     public ExecutorService getExecutor() {
@@ -136,14 +170,15 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      */
     private byte[] getFileContentBytes(String filePath) {
         try (InputStream in = new FileInputStream(filePath);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {
                 bos.write(buf, 0, len);
             }
             return bos.toByteArray();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("get file bytes error", e);
         }
         return new byte[0];
@@ -158,19 +193,20 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return part file content
      */
     private List<String> readPartFileContent(String filePath,
-                                             int skipLine,
-                                             int limit) {
+            int skipLine,
+            int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
                 return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 logger.error("read file error", e);
             }
-        } else {
+        }
+        else {
             logger.info("file path: {} not exists", filePath);
         }
         return Collections.emptyList();
     }
-
 }

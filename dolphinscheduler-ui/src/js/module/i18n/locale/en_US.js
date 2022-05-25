@@ -197,6 +197,7 @@ export default {
   'Zk registration directory': 'Zk registration directory',
   cpuUsage: 'cpuUsage',
   memoryUsage: 'memoryUsage',
+  diskAvailable: 'diskAvailable',
   'Last heartbeat time': 'Last heartbeat time',
   'Edit Tenant': 'Edit Tenant',
   'OS Tenant Code': 'OS Tenant Code',
