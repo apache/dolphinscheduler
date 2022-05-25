@@ -1,10 +1,3 @@
-package org.apache.dolphinscheduler.service.permission;
-
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.slf4j.Logger;
-
-import java.util.Set;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -21,6 +14,12 @@ import java.util.Set;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.service.permission;
+
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.slf4j.Logger;
+
+import java.util.Set;
 
 public interface ResourcePermissionCheckService<T>{
     /**
