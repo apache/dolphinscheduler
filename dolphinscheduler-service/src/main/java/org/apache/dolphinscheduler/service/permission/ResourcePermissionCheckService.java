@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import java.util.Set;
 
 /**
+ * Copyright [Apache Software Foundation]
  * resource permission check
  */
 public interface ResourcePermissionCheckService<T>{

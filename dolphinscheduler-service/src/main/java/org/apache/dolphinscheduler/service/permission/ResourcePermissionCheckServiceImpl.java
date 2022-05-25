@@ -37,6 +37,7 @@ import static java.util.stream.Collectors.toSet;
 
 
 /**
+ * Copyright [Apache Software Foundation]
  * resource permission check impl
  */
 @Component
