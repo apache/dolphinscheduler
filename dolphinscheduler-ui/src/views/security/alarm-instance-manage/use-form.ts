@@ -78,10 +78,10 @@ export function useForm() {
         label: plugin.pluginName,
         value: plugin.id
       }))
+      state.pluginsLoading = false
     } catch (e) {
       state.pluginsLoading = false
     }
-    state.pluginsLoading = false
   }
 
   const changePlugin = async (pluginId: IPluginId) => {
