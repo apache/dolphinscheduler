@@ -490,7 +490,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     private boolean checkReadPermissions(User user, Integer id){
         boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{id}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        return operationPermissionCheck && resourcePermissionCheck;
+        return operationPermissionCheck || resourcePermissionCheck;
     }
 
     /**
