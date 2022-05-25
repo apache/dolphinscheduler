@@ -40,8 +40,6 @@ do
   fi
 
   echo "scp dirs to $host/$installPath starting"
-	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ master-server/ worker-server/ alert-server/ api-server/ ui/ tools/"
-
   for i in ${!workerNames[@]}; do
     if [[ ${workerNames[$i]} == $host ]]; then
       workerIndex=$i
