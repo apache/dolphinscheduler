@@ -52,7 +52,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * cluster controller
- * todo 这是新增的 集群环境
  */
 @Api(tags = "CLUSTER_TAG")
 @RestController
