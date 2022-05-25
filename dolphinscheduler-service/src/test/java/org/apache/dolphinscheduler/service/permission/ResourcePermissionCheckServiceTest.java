@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.service.permission;
 import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -30,14 +29,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * permission service test
@@ -54,7 +55,14 @@ public class ResourcePermissionCheckServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private ResourcePermissionCheckService resourcePermissionCheckService;
+    private  ApplicationContext context;
+    @Mock
+    private ResourcePermissionCheckService<Object> resourcePermissionCheckService;
+
+    @InjectMocks
+    ResourcePermissionCheckServiceImpl resourcePermissionCheckServices;
+
+    protected static final Map<AuthorizationType, ResourcePermissionCheckServiceImpl.ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP = new ConcurrentHashMap<>();
 
     @Test
     public void testResourcePermissionCheck(){
@@ -69,7 +77,10 @@ public class ResourcePermissionCheckServiceTest {
     public void testOperationPermissionCheck(){
         User user = new User();
         user.setId(1);
+        resourcePermissionCheckServices.setApplicationContext(context);
         Assert.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger));
+        String sourceUrl = "/tmp/";
+        Assert.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), sourceUrl, logger));
     }
 
     @Test
@@ -80,13 +91,17 @@ public class ResourcePermissionCheckServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         Object[] obj = new Object[]{1,2};
         List<Project> projectList = Lists.newArrayList(this.getEntity());
-        User user1 = processService.getUserById(1);
-        Set result = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
+        Set result = resourcePermissionCheckServices.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
                 user.getId(),
                 logger);
-        Assert.assertNotNull(result);
+        Assert.assertNull(result);
     }
 
+
+    @Test
+    public void  testSetApplication(){
+       resourcePermissionCheckServices.setApplicationContext(context);
+    }
     /**
      * create entity
      */

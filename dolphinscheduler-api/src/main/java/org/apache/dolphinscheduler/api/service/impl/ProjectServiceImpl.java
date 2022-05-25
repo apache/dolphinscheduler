@@ -174,7 +174,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_EXIST);
-        } else if (!checkReadPermissions(loginUser, project,AuthorizationType.PROJECTS)) {
+        } else if (!checkReadPermissions(loginUser, project.getId())) {
             // check read permission
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
         } else {
@@ -188,7 +188,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         boolean checkResult = false;
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!checkReadPermissions(loginUser, project,AuthorizationType.PROJECTS)) {
+        } else if (!checkReadPermissions(loginUser, project.getId())) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         } else {
             checkResult = true;
@@ -201,7 +201,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         boolean checkResult = false;
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!checkReadPermissions(loginUser, project,AuthorizationType.PROJECTS)) {
+        } else if (!checkReadPermissions(loginUser, project.getId())) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         } else {
             checkResult = true;
@@ -252,12 +252,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> deleteProject(User loginUser, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
+        Object[] ids = new Object[]{project.getId()};
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
         }
 
-        if (!canOperatorPermissions(loginUser, project,AuthorizationType.PROJECTS)) {
+        if (!canOperatorPermissions(loginUser, ids,AuthorizationType.PROJECTS)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -483,13 +484,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check whether have read permission new
      * @param user
-     * @param project
-     * @param type AuthorizationType
+     * @param id
      * @return true if the user have permission to see the project, otherwise return false
      */
-    private boolean checkReadPermissions(User user, Project project,AuthorizationType type){
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), null, logger);
-        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, new Object[]{project.getId()}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+    private boolean checkReadPermissions(User user, Integer id){
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{id}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
     }
 

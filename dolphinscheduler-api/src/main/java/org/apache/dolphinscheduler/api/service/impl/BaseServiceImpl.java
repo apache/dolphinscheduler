@@ -158,14 +158,15 @@ public class BaseServiceImpl implements BaseService {
     /**
      * Verify that the operator has permissions
      * @param user operate user
-     * @param project project
-     * @return
+     * @param ids Object[]
+     * @param type AuthorizationType
+     * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Project project,AuthorizationType type) {
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type) {
         boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), null, logger);
-        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, new Object[]{project.getId()}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        return operationPermissionCheck && resourcePermissionCheck;
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+        return operationPermissionCheck || resourcePermissionCheck;
     }
 
     /**

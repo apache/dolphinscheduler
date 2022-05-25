@@ -98,6 +98,9 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         private final ProjectMapper projectMapper;
 
+        @Autowired
+        private ProcessService processService;
+
         public ProjectsResourceList(ProjectMapper projectMapper) {
             this.projectMapper = projectMapper;
         }
@@ -109,7 +112,12 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            return true;
+            User user = processService.getUserById(userId);
+            if (user == null){
+                logger.error("user id {} doesn't exist", userId);
+                return false;
+            }
+            return UserType.ADMIN_USER.equals(user.getUserType());
         }
 
 

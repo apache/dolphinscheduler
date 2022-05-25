@@ -88,11 +88,11 @@ public interface BaseService {
     /**
      * Verify that the operator has permissions
      * @param user operate user
-     * @param project project
+     * @param ids Object[]
      * @Param type authorizationType
      * @return check result
      */
-    boolean canOperatorPermissions(User user, Project project, AuthorizationType type);
+    boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type);
 
     /**
      * check and parse date parameters

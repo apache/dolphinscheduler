@@ -45,6 +45,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,11 +197,11 @@ public class ProjectServiceTest {
     @Test
     public void testDeleteProject() {
         User loginUser = getLoginUser();
-        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject());
+        PowerMockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject());
         //PROJECT_NOT_FOUNT
-        Map<String, Object> result = projectService.deleteProject(loginUser, 11L);
+        Map<String, Object> result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-//        Assert.assertEquals(Status.PROJECT_NOT_EXIST, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result.get(Constants.STATUS));
         loginUser.setId(2);
         //USER_NO_OPERATION_PROJECT_PERM
         result = projectService.deleteProject(loginUser, 1L);
@@ -208,15 +209,15 @@ public class ProjectServiceTest {
         Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result.get(Constants.STATUS));
 
         //DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
-//        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
+     //   PowerMockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
         loginUser.setUserType(UserType.ADMIN_USER);
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        //Assert.assertNotEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL, result.get(Constants.STATUS));
+        Assert.assertNotEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL, result.get(Constants.STATUS));
 
         //success
-//        Mockito.when(projectMapper.deleteById(1)).thenReturn(1);
-//        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
+      //  PowerMockito.when(projectMapper.deleteById(1)).thenReturn(1);
+        //PowerMockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
         Assert.assertNotEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -228,7 +229,7 @@ public class ProjectServiceTest {
         User loginUser = getLoginUser();
         Project project = getProject();
         project.setCode(2L);
-//        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+//        PowerMockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
         Mockito.when(projectMapper.queryByCode(2L)).thenReturn(getProject());
         // PROJECT_NOT_FOUNT
         Map<String, Object> result = projectService.update(loginUser, 1L, projectName, "desc", "testUser");
@@ -240,14 +241,14 @@ public class ProjectServiceTest {
         logger.info(result.toString());
         Assert.assertNotEquals(Status.PROJECT_ALREADY_EXISTS, result.get(Constants.STATUS));
 
-//        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
+//        PowerMockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
         result = projectService.update(loginUser, 2L, "test", "desc", "testuser");
         Assert.assertNotEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         //success
-//        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
+//        PowerMockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
         project.setUserId(1);
-//        Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
+//        PowerMockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
         result = projectService.update(loginUser, 2L, "test", "desc", "testUser");
         logger.info(result.toString());
         Assert.assertNotEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -416,7 +417,7 @@ public class ProjectServiceTest {
      */
     private User getLoginUser() {
         User loginUser = new User();
-        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setUserName(userName);
         loginUser.setId(1);
         return loginUser;

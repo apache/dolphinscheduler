@@ -192,4 +192,44 @@ public class ProjectMapperTest extends BaseDaoTest {
 
         Assert.assertNotEquals(projects.size(), 0);
     }
+
+    /**
+     * test query project permission
+     */
+    @Test
+    public void testListAuthorizedProjects(){
+        Project project = insertOne();
+        User user = new User();
+        user.setId(1);
+        Object[] obj = new Object[]{project.getId()};
+        List<Project> projects  = projectMapper.listAuthorizedProjects(user.getId(),obj);
+        Assert.assertEquals(projects.size(),0);
+    }
+
+    /**
+     *   test permission page
+     */
+    @Test
+    public void testListAuthorizedProjectsPaging(){
+        Project project = insertOne();
+        User user = new User();
+        user.setUserName("ut user");
+        userMapper.insert(user);
+        project.setUserId(user.getId());
+        projectMapper.updateById(project);
+        Object[] obj = new Object[]{project.getId()};
+        Page<Project> page = new Page(1, 3);
+        IPage<Project> projectIPage = projectMapper.listAuthorizedProjectsPaging(
+                page,
+                project.getUserId(),
+                null,obj
+        );
+        IPage<Project> projectIPage1 = projectMapper.listAuthorizedProjectsPaging(
+                page,
+                project.getUserId(),
+                project.getName(),obj
+        );
+        Assert.assertEquals(projectIPage.getTotal(), 1);
+        Assert.assertEquals(projectIPage1.getTotal(), 1);
+    }
 }
