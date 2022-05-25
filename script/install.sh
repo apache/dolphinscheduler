@@ -28,9 +28,10 @@ if [ ! -d $installPath ];then
   sudo mkdir -p $installPath
   sudo chown -R $deployUser:$deployUser $installPath
 # If install Path equal to "/" or related path is "/" or is empty, will cause directory "/bin" be overwrite or file adding,
-# so we should check its value
-elif [[ -z "${installPath// }" || "${installPath// }" == "/" || $(realpath -s "${installPath}") == "/" ]]; then
-  echo "Parameter ${installPath} can not be empty or use in root path"
+# so we should check its value. Here use command `realpath` to get the related path, and it will skip if your shell env
+# without command `realpath`.
+elif [[ -z "${installPath// }" || "${installPath// }" == "/" || ( $(command -v realpath) && $(realpath -s "${installPath}") == "/" ) ]]; then
+  echo "Parameter installPath can not be empty, use in root path or related path of root path, currently use ${installPath}."
   exit 1
 fi
 
