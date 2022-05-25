@@ -31,7 +31,7 @@ if [ ! -d $installPath ];then
 # so we should check its value. Here use command `realpath` to get the related path, and it will skip if your shell env
 # without command `realpath`.
 elif [[ -z "${installPath// }" || "${installPath// }" == "/" || ( $(command -v realpath) && $(realpath -s "${installPath}") == "/" ) ]]; then
-  echo "Parameter installPath can not be empty, use in root path or related path of root path, currently use ${installPath}."
+  echo "Parameter installPath can not be empty, use in root path or related path of root path, currently use ${installPath}"
   exit 1
 fi
 
