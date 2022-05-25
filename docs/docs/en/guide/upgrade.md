@@ -47,14 +47,14 @@ And them run command `sh ./bin/start-all.sh` to start all services.
 
 ### Differences of worker group (before or after version 1.3.1 of dolphinscheduler)
 
-The architecture of worker group is different between version before or after 1.3.1 
+The architecture of worker group is different between version before version 1.3.1 until version 2.0.0
 
 - Before version 1.3.1(include itself) worker group can be created through UI interface.
-- Since version 1.3.1 worker group can be created by modifying the worker configuration. 
+- Since version 1.3.1 and before version 2.0.0, worker group can be created by modifying the worker configuration. 
 
-#### How Can I Do When I Upgrade from 1.3.1
+#### How Can I Do When I Upgrade from 1.3.1 to version before 2.0.0
 
-* Check the backup database, search records in table `t_ds_worker_group table` and mainly focus on three columns: `id, name and IP`.
+* Check the backup database, search records in table `t_ds_worker_group` table and mainly focus on three columns: `id, name and IP`.
 
 | id | name | ip_list    |
 | :---         |     :---:      |          ---: |
@@ -80,8 +80,12 @@ workers="ds1:service1,ds2:service2,ds3:service2"
 
 #### The Worker Group has Been Enhanced in Version 1.3.2
 
-Workers in 1.3.1 can only belong to one worker group, but after version 1.3.2 worker support more than one worker group. 
+Workers in 1.3.1 can only belong to one worker group, but after version 1.3.2 and before version 2.0.0 worker support more than one worker group. 
 
 ```sh
 workers="ds1:service1,ds1:service2"
 ```
+
+#### Recovery UI Create Worker Group after Version 2.0.0
+
+After version 2.0.0, include itself, we are recovery function create worker group from web UI.

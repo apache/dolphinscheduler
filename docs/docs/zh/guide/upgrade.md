@@ -46,16 +46,16 @@ jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinschedul
 
 ### worker 分组的区别（以 1.3.1 版本为界）
 
-创建worker分组在1.3.1版本和之前版本有了不同的设计：
+创建worker分组在1.3.1版本之前，与 1.3.1之后到 2.0.0 之间的版本有不同的设计：
 
 - worker分组在1.3.1版本之前是通过UI界面创建
-- worker分组在1.3.1版本是修改worker配置指定
+- worker分组在1.3.1 到 2.0.0之前的版本是修改 worker 配置指定
 
 #### 面对这种区别我应该怎么升级
 
 1.3.1之前的版本升级1.3.2时如何设置worker分组与之前一致
 
-* 查询已备份的数据库，查看t_ds_worker_group表记录，重点看下id、name和ip_list三个字段
+* 查询已备份的数据库，查看 `t_ds_worker_group` 表记录，重点看下id、name和ip_list三个字段
 
 | id | name | ip_list    |
 | :---         |     :---:      |          ---: |
@@ -80,8 +80,12 @@ workers="ds1:service1,ds2:service2,ds3:service2"
 
 #### 1.3.2及以后的版本对 worker 分组功能进行增强
 
-1.3.1 以及之前的版本worker不能同时属于多个worker分组，1.3.2及之后的版本是可以支持的，所以可以使用如下配置对一台worker配置多个分组
+1.3.1 以及之前的版本worker不能同时属于多个worker分组，1.3.2及之后，2.0.0之前的版本是可以支持的，所以可以使用如下配置对一台worker配置多个分组
 
 ```sh
 workers="ds1:service1,ds1:service2"
 ```
+
+#### 在 2.0.0 版本之后恢复 UI 创建 worker group
+
+在 2.0.0 以及之后的版本，我们恢复了在 UI 创建 worker group 的功能。
