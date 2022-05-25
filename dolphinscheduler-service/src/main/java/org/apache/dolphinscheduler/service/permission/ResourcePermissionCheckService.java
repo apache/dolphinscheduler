@@ -5,6 +5,9 @@ import org.slf4j.Logger;
 
 import java.util.Set;
 
+/**
+ * resource permission check
+ */
 public interface ResourcePermissionCheckService<T>{
     /**
      * resourcePermissionCheck

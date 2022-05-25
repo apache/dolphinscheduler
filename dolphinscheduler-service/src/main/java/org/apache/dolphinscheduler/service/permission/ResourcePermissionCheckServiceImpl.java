@@ -37,10 +37,9 @@ import static java.util.stream.Collectors.toSet;
 
 
 /**
- * resource permission check
+ * resource permission check impl
  */
 @Component
-@Service
 public class ResourcePermissionCheckServiceImpl implements ResourcePermissionCheckService<Object>, ApplicationContextAware {
 
     @Autowired
