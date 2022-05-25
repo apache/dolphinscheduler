@@ -27,6 +27,11 @@ echo "1.create directory"
 if [ ! -d $installPath ];then
   sudo mkdir -p $installPath
   sudo chown -R $deployUser:$deployUser $installPath
+# If install Path equal to "/" or related path is "/" or is empty, will cause directory "/bin" be overwrite or file adding,
+# so we should check its value
+elif [[ -z "${installPath// }" || "${installPath// }" == "/" || $(realpath -s "${installPath}") == "/" ]]; then
+  echo "Parameter ${installPath} can not be empty or use in root path"
+  exit 1
 fi
 
 echo "2.scp resources"
