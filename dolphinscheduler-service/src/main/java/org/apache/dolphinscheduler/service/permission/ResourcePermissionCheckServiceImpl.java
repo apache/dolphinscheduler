@@ -119,6 +119,31 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         }
     }
 
+    @Component
+    public static class  AccessTokenResouceList implements ResourceAcquisitionAndPermissionCheck<Integer>{
+
+        private final AccessTokenMapper accessTokenMapper;
+
+        public AccessTokenResouceList(AccessTokenMapper accessTokenMapper) {
+            this.accessTokenMapper = accessTokenMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return  Collections.singletonList(AuthorizationType.ACCESS_TOKEN);
+        }
+
+        @Override
+        public <T> Set<T> listAuthorizedResource(int userId, Logger logger) {
+            return null;
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+            return true;
+        }
+    }
+
     interface ResourceAcquisitionAndPermissionCheck<T> {
 
         /**

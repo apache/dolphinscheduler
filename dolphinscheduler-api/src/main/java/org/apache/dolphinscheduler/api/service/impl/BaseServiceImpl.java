@@ -162,9 +162,9 @@ public class BaseServiceImpl implements BaseService {
      * @return
      */
     @Override
-    public boolean canOperatorPermissions(User user, Project project) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger);
-        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{project.getId()}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+    public boolean canOperatorPermissions(User user, Project project,AuthorizationType type) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), null, logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, new Object[]{project.getId()}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
     }
 
