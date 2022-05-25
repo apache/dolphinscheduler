@@ -320,7 +320,7 @@ public class TaskGroupController extends BaseController {
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam(value= "groupId", required = false, defaultValue = "-1") Integer groupId,
+                                      @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
                                       @RequestParam(value = "taskInstanceName",required = false) String taskName,
                                       @RequestParam(value = "processInstanceName",required = false) String processName,
                                       @RequestParam(value = "status",required = false) Integer status,
