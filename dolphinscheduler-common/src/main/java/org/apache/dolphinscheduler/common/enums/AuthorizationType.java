@@ -34,6 +34,7 @@ public enum AuthorizationType {
      * 7 ALERT_GROUP;
      * 8 ENVIRONMENT;
      * 9 ACCESS_TOKEN;
+     * 10 QUEUE;
      */
     RESOURCE_FILE_ID(0, "resource file id"),
     RESOURCE_FILE_NAME(1, "resource file name"),
@@ -44,7 +45,8 @@ public enum AuthorizationType {
     WORKER_GROUP(6, "worker group"),
     ALERT_GROUP(7, "alert group"),
     ENVIRONMENT(8, "environment"),
-    ACCESS_TOKEN(9, "access token");
+    ACCESS_TOKEN(9, "access token"),
+    QUEUE(10,"queue");
     AuthorizationType(int code, String descp) {
         this.code = code;
         this.descp = descp;
