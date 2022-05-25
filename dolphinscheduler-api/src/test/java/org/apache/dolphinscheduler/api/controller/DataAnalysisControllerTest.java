@@ -64,7 +64,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isNotEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -84,7 +84,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isNotEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
