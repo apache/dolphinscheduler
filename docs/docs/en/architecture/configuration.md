@@ -246,8 +246,8 @@ worker.heartbeat.interval|10|worker-service heartbeat interval, the unit is seco
 worker.max.cpuload.avg|-1|worker max CPU load avg, only higher than the system CPU load average, worker server can be dispatched tasks. default value -1: the number of CPU cores * 2
 worker.reserved.memory|0.3|worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
 worker.groups|default|worker groups separated by comma, e.g., 'worker.groups=default,test' <br> worker will join corresponding group according to this config when startup
-worker.tenant.auto.create|true|The tenant is Linux user, which is used by the worker to submit the job. If Linux does not have this user, it will be automatically created after the parameter is true.
-worker.tenant..distributeduser|false|Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP. When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
+worker.tenant.auto.create|true|The tenant is worker's user, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter is true.
+worker.tenant.distributed.user|false|Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
 
 ### alert.properties [alert-service log config]
 
