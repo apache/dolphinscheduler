@@ -54,7 +54,7 @@ public class ReaderFactoryTest {
         config.put(URL,"jdbc:mysql://localhost:3306/test");
         config.put(USER,"test");
         config.put(PASSWORD,"123456");
-        config.put(DRIVER,"com.mysql.jdbc.Driver");
+        config.put(DRIVER,"com.mysql.cj.jdbc.Driver");
         readerConfig.setConfig(config);
         readerConfigs.add(readerConfig);
 
