@@ -68,6 +68,7 @@ const err = (err: AxiosError): Promise<AxiosError> => {
   return Promise.reject(err)
 }
 
+// 配置测试环境参考，设置cookie，设置sessionid
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
   config.headers && (config.headers.sessionId = userStore.getSessionId)
   const language = cookies.get('language')

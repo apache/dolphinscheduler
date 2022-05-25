@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+if (DryRun) then (true)
+else (false)
+:
+获取Channel实例
+taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType())
+;
+:
+创建Task实例
+task = taskChannel.createTask(taskExecutionContext)
+;
+:
+实例初始化
+task.init()
+;
+:
+初始化变量池
+task.getParameters().setVarPool(taskExecutionContext.getVarPool())
+;
+:
+执行任务
+this.task.handle()
+;
+if(task.getNeedAlert()?) then(true)
+:进行告警;
+else (false)
+endif
+endif
+
+stop
+
+
+@enduml

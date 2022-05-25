@@ -21,12 +21,12 @@ import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, ProgramType, IMainJar } from '../types'
 
-export function useMainJar(model: { [field: string]: any }): IJsonItem {
+export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
-  const mainJarSpan = computed(() => (model.programType === 'SQL'||model.runType === 'JAVA' ? 0 : 24))
+  const mainJarSpan = computed(() => (model.runType === 'JAVA' ? 0 : 24))
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
@@ -49,9 +49,7 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
   watch(
     () => model.programType,
     (value) => {
-      if (value !== 'SQL') {
         getMainJars(value)
-      }
     }
   )
 
@@ -70,9 +68,9 @@ export function useMainJar(model: { [field: string]: any }): IJsonItem {
     },
     validate: {
       trigger: ['input', 'blur'],
-      required: model.programType !== 'SQL',
+      required: true,
       validator(validate: any, value: string) {
-        if (!value && model.programType !== 'SQL') {
+        if (!value) {
           return new Error(t('project.node.main_package_tips'))
         }
       }

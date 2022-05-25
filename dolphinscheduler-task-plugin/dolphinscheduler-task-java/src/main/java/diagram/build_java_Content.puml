@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:
+    替换文件换行符
+    replaceAll("\\r\\n", "\n")
+;
+:
+    构建用户自定义参数，本地参数，变量吃varPool的参数Map
+    ParamUtils.convert(taskRequest, pythonParameters)
+;
+:
+    转换参数格式
+    ParamUtils.convert(paramsMap)
+;
+:
+    将文件中占位符替换为参数值
+    ParameterUtils.convertParameterPlaceholders
+;
+stop
+
+@enduml
