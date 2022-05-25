@@ -132,38 +132,43 @@ export function useTable(
       pageNo: 1,
       pageSize: 2147483647
     }
+
     Promise.all([
       queryTaskListInTaskGroupQueueById(params),
       queryTaskGroupListPaging(taskGroupSearchParams)
-    ]).then((values: any[]) => {
-      const taskGroupList = values[1].totalList
-      variables.totalPage = values[0].totalPage
-      variables.tableData = values[0].totalList.map(
-        (item: any, unused: number) => {
-          let taskGroupName = ''
-          if (taskGroupList) {
-            const taskGroup = _.find(taskGroupList, { id: item.groupId })
-            if (taskGroup) {
-              taskGroupName = taskGroup.name
+    ]).then(
+      (values: any[]) => {
+        const taskGroupList = values[1].totalList
+        variables.totalPage = values[0].totalPage
+        variables.tableData = values[0].totalList.map(
+          (item: any, unused: number) => {
+            let taskGroupName = ''
+            if (taskGroupList) {
+              const taskGroup = _.find(taskGroupList, { id: item.groupId })
+              if (taskGroup) {
+                taskGroupName = taskGroup.name
+              }
+            }
+
+            item.taskGroupName = taskGroupName
+            item.createTime = format(
+              parseTime(item.createTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
+            item.updateTime = format(
+              parseTime(item.updateTime),
+              'yyyy-MM-dd HH:mm:ss'
+            )
+            return {
+              ...item
             }
           }
+        )
+      },
+      () => {}
+    )
 
-          item.taskGroupName = taskGroupName
-          item.createTime = format(
-            parseTime(item.createTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          item.updateTime = format(
-            parseTime(item.updateTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          return {
-            ...item
-          }
-        }
-      )
-      variables.loadingRef = false
-    })
+    variables.loadingRef = false
   }
 
   return { getTableData, variables, columns }
