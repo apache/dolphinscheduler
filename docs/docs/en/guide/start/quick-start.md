@@ -6,7 +6,7 @@
 
 * Administrator user login
 
-  > Address：http://localhost:12345/dolphinscheduler  Username and password: `admin/dolphinscheduler123`
+  > Address：http://localhost:12345/dolphinscheduler/ui  Username and password: `admin/dolphinscheduler123`
 
 ![login](/img/new_ui/dev/quick-start/login.png)
 

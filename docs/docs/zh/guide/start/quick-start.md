@@ -4,7 +4,7 @@
 
 
 * 管理员用户登录
-  >地址：http://localhost:12345/dolphinscheduler 用户名/密码：admin/dolphinscheduler123
+  >地址：http://localhost:12345/dolphinscheduler/ui 用户名/密码：admin/dolphinscheduler123
 
 ![login](/img/new_ui/dev/quick-start/login.png)
 
