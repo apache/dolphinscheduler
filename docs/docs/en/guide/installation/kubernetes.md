@@ -53,7 +53,7 @@ $ kubectl port-forward --address 0.0.0.0 -n test svc/dolphinscheduler-api 12345:
 
 > **Tip**: If the error of `unable to do port forwarding: socat not found` appears, you need to install `socat` first.
 
-Access the web: `http://localhost:12345/dolphinscheduler` (Modify the IP address if needed).
+Access the web: `http://localhost:12345/dolphinscheduler/ui` (Modify the IP address if needed).
 
 Or when `api.service.type=NodePort` you need to execute the command:
 
