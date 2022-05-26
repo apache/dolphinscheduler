@@ -1,6 +1,7 @@
 # DolphinScheduler development
 
-## Software Requests
+## Software Requirements
+Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
 * [Git](https://git-scm.com/downloads)
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)

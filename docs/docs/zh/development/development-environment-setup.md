@@ -1,6 +1,7 @@
 # DolphinScheduler 开发手册
 
 ## 软件要求
+在搭建 DolphinScheduler 开发环境之前请确保你已经安装以下软件:
 
 * [Git](https://git-scm.com/downloads)
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (当前暂不支持 jdk 11)
