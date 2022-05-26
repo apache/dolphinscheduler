@@ -15,18 +15,26 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
-
-export default i18n
+export default {
+  profile: '用户信息',
+  edit: '编辑',
+  username: '用户名',
+  email: '邮箱',
+  phone: '手机',
+  state: '状态',
+  permission: '权限',
+  create_time: '创建时间',
+  update_time: '更新时间',
+  administrator: '管理员',
+  ordinary_user: '普通用户',
+  edit_profile: '编辑用户',
+  username_tips: '请输入用户名',
+  email_tips: '请输入邮箱',
+  email_correct_tips: '请输入正确格式的邮箱',
+  phone_tips: '请输入手机号',
+  state_tips: '请选择状态',
+  enable: '启用',
+  disable: '禁用',
+  timezone_success: '时区更新成功',
+  please_select_timezone: '请选择时区'
+}
