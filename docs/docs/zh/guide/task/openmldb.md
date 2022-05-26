@@ -11,7 +11,6 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 - 点击项目管理-项目名称-工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
 - 拖动工具栏的 <img src="/img/tasks/icons/openmldb.png" width="15"/> 任务节点到画板中。
 
-
 ## 任务样例
 
 首先介绍一些DS通用参数：
@@ -66,4 +65,4 @@ OpenMLDB任务组件将使用OpenMLDB Python SDK来连接OpenMLDB。所以你需
 
 我们默认使用`python3`，你可以通过配置`PYTHON_HOME`来设置自己的Python环境。
 
-请确保已通过`pip install openmldb`，在Python环境中安装了OpenMLDB Python SDK。
+请确保已通过`pip install openmldb`，在worker server的主机中安装了OpenMLDB Python SDK。
