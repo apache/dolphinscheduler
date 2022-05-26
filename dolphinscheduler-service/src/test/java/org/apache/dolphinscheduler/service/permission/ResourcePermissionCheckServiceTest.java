@@ -94,7 +94,7 @@ public class ResourcePermissionCheckServiceTest {
         Set result = resourcePermissionCheckServices.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
                 user.getId(),
                 logger);
-        Assert.assertNull(result);
+        Assert.assertNotNull(result);
     }
 
 
