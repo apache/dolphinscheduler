@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -67,6 +69,8 @@ public class TaskPriority implements Comparable<TaskPriority> {
      */
     private long checkpoint;
 
+    private int taskGroupPriority;
+
     public TaskPriority() {
         this.checkpoint = System.currentTimeMillis();
     }
@@ -74,11 +78,13 @@ public class TaskPriority implements Comparable<TaskPriority> {
     public TaskPriority(int processInstancePriority,
                         int processInstanceId,
                         int taskInstancePriority,
-                        int taskId, String groupName) {
+                        int taskId,
+                        int taskGroupPriority, String groupName) {
         this.processInstancePriority = processInstancePriority;
         this.processInstanceId = processInstanceId;
         this.taskInstancePriority = taskInstancePriority;
         this.taskId = taskId;
+        this.taskGroupPriority = taskGroupPriority;
         this.groupName = groupName;
         this.checkpoint = System.currentTimeMillis();
     }
@@ -147,6 +153,14 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.checkpoint = checkpoint;
     }
 
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
+    }
+
     @Override
     public int compareTo(TaskPriority other) {
         if (this.getProcessInstancePriority() > other.getProcessInstancePriority()) {
@@ -169,15 +183,22 @@ public class TaskPriority implements Comparable<TaskPriority> {
         if (this.getTaskInstancePriority() < other.getTaskInstancePriority()) {
             return -1;
         }
-
+        if(this.getTaskGroupPriority() != other.getTaskGroupPriority()){
+            // larger number, higher priority
+            return Constants.OPPOSITE_VALUE * Integer.compare(this.getTaskGroupPriority(), other.getTaskGroupPriority());
+        }
         if (this.getTaskId() > other.getTaskId()) {
             return 1;
         }
         if (this.getTaskId() < other.getTaskId()) {
             return -1;
         }
-
-        return this.getGroupName().compareTo(other.getGroupName());
+        String thisGroupName = StringUtils.isNotBlank(this.getGroupName()) ? this.getGroupName() : Constants.EMPTY_STRING;
+        String otherGroupName = StringUtils.isNotBlank(other.getGroupName()) ? other.getGroupName() : Constants.EMPTY_STRING;
+        if(!thisGroupName.equals(otherGroupName)){
+            return thisGroupName.compareTo(otherGroupName);
+        }
+        return Long.compare(this.getCheckpoint(), other.getCheckpoint());
     }
 
     @Override
@@ -193,11 +214,13 @@ public class TaskPriority implements Comparable<TaskPriority> {
                 && processInstanceId == that.processInstanceId
                 && taskInstancePriority == that.taskInstancePriority
                 && taskId == that.taskId
+                && taskGroupPriority == that.taskGroupPriority
                 && Objects.equals(groupName, that.groupName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(processInstancePriority, processInstanceId, taskInstancePriority, taskId, groupName);
+        return Objects.hash(processInstancePriority, processInstanceId, taskInstancePriority, taskId, taskGroupPriority, groupName);
     }
+
 }

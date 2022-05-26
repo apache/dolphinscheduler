@@ -97,7 +97,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryProcessInstanceListPaging", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefiniteCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
+        @ApiImplicitParam(name = "processDefineCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
         @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
         @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
@@ -380,7 +380,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "batchDeleteProcessInstanceByIds", notes = "BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
         @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
     })
     @PostMapping(value = "/batch-delete")
@@ -394,7 +394,7 @@ public class ProcessInstanceController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (!StringUtils.isEmpty(processInstanceIds)) {
-            String[] processInstanceIdArray = processInstanceIds.split(",");
+            String[] processInstanceIdArray = processInstanceIds.split(Constants.COMMA);
 
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);

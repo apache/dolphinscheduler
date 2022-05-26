@@ -186,24 +186,29 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 
 > Because of the commercial license, we cannot directly use the driver of MySQL.
 >
-> If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image follow the following instructions:
+> If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler-<service>` image follow the following instructions:
+> 
+> Since version 3.0.0, dolphinscheduler has been microserviced and the change of metadata storage requires replacing all services with MySQL driver, which including dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server
 
 1. Download the MySQL driver [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar).
 
 2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+# For example
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
 ```
 
 3. Build a new docker image including MySQL driver:
 
 ```
-docker build -t apache/dolphinscheduler:mysql-driver .
+docker build -t apache/dolphinscheduler-<service>:mysql-driver .
 ```
 
-4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry.
+4. Push the docker image `apache/dolphinscheduler-<service>:mysql-driver` to a docker registry.
 
 5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`.
 
@@ -214,7 +219,6 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 ```yaml
 externalDatabase:
   type: "mysql"
-  driver: "com.mysql.jdbc.Driver"
   host: "localhost"
   port: "3306"
   username: "root"
@@ -225,70 +229,53 @@ externalDatabase:
 
 8. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
 
-### How to Support MySQL Datasource in `Datasource manage`?
+### How to Support MySQL or Oracle Datasource in `Datasource manage`?
 
-> Because of the commercial license, we cannot directly use the driver of MySQL.
+> Because of the commercial license, we cannot directly use the driver of MySQL or Oracle.
 >
-> If you want to add MySQL datasource, you can build a new image based on the `apache/dolphinscheduler` image follow the following instructions:
+> If you want to add MySQL or Oracle datasource, you can build a new image based on the `apache/dolphinscheduler-<service>` image follow the following instructions:
+>
+> You need to change the two service images including dolphinscheduler-worker, dolphinscheduler-api.
 
 1. Download the MySQL driver [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar).
+or download the Oracle driver [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
 
-2. Create a new `Dockerfile` to add MySQL driver:
+2. Create a new `Dockerfile` to add MySQL or Oracle driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+# For example
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+
+# If you want to support MySQL Datasource
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
-```
 
-3. Build a new docker image including MySQL driver:
-
-```
-docker build -t apache/dolphinscheduler:mysql-driver .
-```
-
-4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry.
-
-5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`.
-
-6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
-
-7. Add a MySQL datasource in `Datasource manage`.
-
-### How to Support Oracle Datasource in `Datasource manage`?
-
-> Because of the commercial license, we cannot directly use the driver of Oracle.
->
-> If you want to add Oracle datasource, you can build a new image based on the `apache/dolphinscheduler` image follow the following instructions:
-
-1. Download the Oracle driver [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
-
-2. Create a new `Dockerfile` to add Oracle driver:
-
-```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+# If you want to support Oracle Datasource
 COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
 ```
 
-3. Build a new docker image including Oracle driver:
+3. Build a new docker image including MySQL or Oracle driver:
 
 ```
-docker build -t apache/dolphinscheduler:oracle-driver .
+docker build -t apache/dolphinscheduler-<service>:new-driver .
 ```
 
-4. Push the docker image `apache/dolphinscheduler:oracle-driver` to a docker registry.
+4. Push the docker image `apache/dolphinscheduler-<service>:new-driver` to a docker registry.
 
-5. Modify image `repository` and update `tag` to `oracle-driver` in `values.yaml`.
+5. Modify image `repository` and update `tag` to `new-driver` in `values.yaml`.
 
 6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
 
-7. Add an Oracle datasource in `Datasource manage`.
+7. Add a MySQL or Oracle datasource in `Datasource manage`.
 
 ### How to Support Python 2 pip and Custom requirements.txt?
+
+> Just change the image of the dolphinscheduler-worker service.
 
 1. Create a new `Dockerfile` to install pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -299,16 +286,16 @@ RUN apt-get update && \
 The command will install the default **pip 18.1**. If you upgrade the pip, just add the following command.
 
 ```
-    pip install --no-cache-dir -U pip && \
+pip install --no-cache-dir -U pip && \
 ```
 
 2. Build a new docker image including pip:
 
 ```
-docker build -t apache/dolphinscheduler:pip .
+docker build -t apache/dolphinscheduler-worker:pip .
 ```
 
-3. Push the docker image `apache/dolphinscheduler:pip` to a docker registry.
+3. Push the docker image `apache/dolphinscheduler-worker:pip` to a docker registry.
 
 4. Modify image `repository` and update `tag` to `pip` in `values.yaml`.
 
@@ -318,10 +305,12 @@ docker build -t apache/dolphinscheduler:pip .
 
 ### How to Support Python 3?
 
+> Just change the image of the dolphinscheduler-worker service.
+
 1. Create a new `Dockerfile` to install Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*
@@ -330,16 +319,16 @@ RUN apt-get update && \
 The command will install the default **Python 3.7.3**. If you also want to install **pip3**, just replace `python3` with `python3-pip` like:
 
 ```
-    apt-get install -y --no-install-recommends python3-pip && \
+apt-get install -y --no-install-recommends python3-pip && \
 ```
 
 2. Build a new docker image including Python 3:
 
 ```
-docker build -t apache/dolphinscheduler:python3 .
+docker build -t apache/dolphinscheduler-worker:python3 .
 ```
 
-3. Push the docker image `apache/dolphinscheduler:python3` to a docker registry.
+3. Push the docker image `apache/dolphinscheduler-worker:python3` to a docker registry.
 
 4. Modify image `repository` and update `tag` to `python3` in `values.yaml`.
 

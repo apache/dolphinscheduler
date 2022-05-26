@@ -21,7 +21,7 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-from pydolphinscheduler.constants import ProcessDefinitionReleaseState, TaskType
+from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
@@ -105,7 +105,7 @@ class ProcessDefinition(Base):
         warning_type: Optional[str] = configuration.WORKFLOW_WARNING_TYPE,
         warning_group_id: Optional[int] = 0,
         timeout: Optional[int] = 0,
-        release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
+        release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
     ):
         super().__init__(name, description)
@@ -126,7 +126,7 @@ class ProcessDefinition(Base):
             self.warning_type = warning_type.strip().upper()
         self.warning_group_id = warning_group_id
         self.timeout = timeout
-        self.release_state = release_state
+        self._release_state = release_state
         self.param = param
         self.tasks: dict = {}
         # TODO how to fix circle import
@@ -196,6 +196,25 @@ class ProcessDefinition(Base):
     def end_time(self, val) -> None:
         """Set attribute end_time."""
         self._end_time = val
+
+    @property
+    def release_state(self) -> int:
+        """Get attribute release_state."""
+        rs_ref = {
+            "online": 1,
+            "offline": 0,
+        }
+        if self._release_state not in rs_ref:
+            raise PyDSParamException(
+                "Parameter release_state only support `online` or `offline` but get %",
+                self._release_state,
+            )
+        return rs_ref[self._release_state]
+
+    @release_state.setter
+    def release_state(self, val: str) -> None:
+        """Set attribute release_state."""
+        self._release_state = val.lower()
 
     @property
     def param_json(self) -> Optional[List[Dict]]:
@@ -350,14 +369,16 @@ class ProcessDefinition(Base):
 
         This method should be called before process definition submit to java gateway
         For now, we have below checker:
-        * `self.param` should be set if task `switch` in this workflow.
+        * `self.param` or at least one local param of task should be set if task `switch` in this workflow.
         """
         if (
             any([task.task_type == TaskType.SWITCH for task in self.tasks.values()])
             and self.param is None
+            and all([len(task.local_params) == 0 for task in self.tasks.values()])
         ):
             raise PyDSParamException(
-                "Parameter param must be provider if task Switch in process definition."
+                "Parameter param or at least one local_param of task must "
+                "be provider if task Switch in process definition."
             )
 
     def submit(self) -> int:
@@ -379,6 +400,7 @@ class ProcessDefinition(Base):
             self.timeout,
             self.worker_group,
             self._tenant,
+            self.release_state,
             # TODO add serialization function
             json.dumps(self.task_relation_json),
             json.dumps(self.task_definition_json),

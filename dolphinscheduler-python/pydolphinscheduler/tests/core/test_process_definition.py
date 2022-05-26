@@ -24,7 +24,6 @@ from unittest.mock import patch
 import pytest
 from freezegun import freeze_time
 
-from pydolphinscheduler.constants import ProcessDefinitionReleaseState
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
@@ -67,7 +66,7 @@ def test_process_definition_key_attr(func):
         ("worker_group", configuration.WORKFLOW_WORKER_GROUP),
         ("warning_type", configuration.WORKFLOW_WARNING_TYPE),
         ("warning_group_id", 0),
-        ("release_state", ProcessDefinitionReleaseState.ONLINE),
+        ("release_state", 1),
     ],
 )
 def test_process_definition_default_value(name, value):
@@ -90,7 +89,6 @@ def test_process_definition_default_value(name, value):
         ("warning_type", str, "FAILURE"),
         ("warning_group_id", int, 1),
         ("timeout", int, 1),
-        ("release_state", str, "OFFLINE"),
         ("param", dict, {"key": "value"}),
     ],
 )
@@ -101,6 +99,41 @@ def test_set_attr(name, cls, expect):
         assert (
             getattr(pd, name) == expect
         ), f"ProcessDefinition set attribute `{name}` do not work expect"
+
+
+@pytest.mark.parametrize(
+    "value,expect",
+    [
+        ("online", 1),
+        ("offline", 0),
+    ],
+)
+def test_set_release_state(value, expect):
+    """Test process definition set release_state attributes."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, release_state=value) as pd:
+        assert (
+            getattr(pd, "release_state") == expect
+        ), "ProcessDefinition set attribute release_state do not return expect value."
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "oneline",
+        "offeline",
+        1,
+        0,
+        None,
+    ],
+)
+def test_set_release_state_error(value):
+    """Test process definition set release_state attributes with error."""
+    pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, release_state=value)
+    with pytest.raises(
+        PyDSParamException,
+        match="Parameter release_state only support `online` or `offline` but get.*",
+    ):
+        pd.release_state
 
 
 @pytest.mark.parametrize(
@@ -240,9 +273,36 @@ def test__pre_submit_check_switch_without_param(mock_code_version):
         parent >> switch
         with pytest.raises(
             PyDSParamException,
-            match="Parameter param must be provider if task Switch in process definition.",
+            match="Parameter param or at least one local_param of task must "
+            "be provider if task Switch in process definition.",
         ):
             pd._pre_submit_check()
+
+
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test__pre_submit_check_switch_with_local_params(mock_code_version):
+    """Test :func:`_pre_submit_check` if process definition with switch with local params of task."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        parent = Task(
+            name="parent",
+            task_type=TEST_TASK_TYPE,
+            local_params=[
+                {"prop": "var", "direct": "OUT", "type": "VARCHAR", "value": ""}
+            ],
+        )
+        switch_child_1 = Task(name="switch_child_1", task_type=TEST_TASK_TYPE)
+        switch_child_2 = Task(name="switch_child_2", task_type=TEST_TASK_TYPE)
+        switch_condition = SwitchCondition(
+            Branch(condition="${var} > 1", task=switch_child_1),
+            Default(task=switch_child_2),
+        )
+
+        switch = Switch(name="switch", condition=switch_condition)
+        parent >> switch
+        pd._pre_submit_check()
 
 
 def test_process_definition_get_define_without_task():
@@ -256,7 +316,7 @@ def test_process_definition_get_define_without_task():
         "warningType": configuration.WORKFLOW_WARNING_TYPE,
         "warningGroupId": 0,
         "timeout": 0,
-        "releaseState": ProcessDefinitionReleaseState.ONLINE,
+        "releaseState": 1,
         "param": None,
         "tasks": {},
         "taskDefinitionJson": [{}],

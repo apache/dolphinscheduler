@@ -1376,10 +1376,16 @@ public class WorkflowExecuteThread {
                 if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
                     return DependResult.NON_EXEC;
                 }
-                // ignore task state if current task is condition and block
-                if (taskNode.isConditionsTask() || taskNode.isBlockingTask()) {
+                // ignore task state if current task is block
+                if (taskNode.isBlockingTask()) {
                     continue;
                 }
+
+                // always return success if current task is condition
+                if (taskNode.isConditionsTask()) {
+                    continue;
+                }
+
                 if (!dependTaskSuccess(depsNode, taskCode)) {
                     return DependResult.FAILED;
                 }
