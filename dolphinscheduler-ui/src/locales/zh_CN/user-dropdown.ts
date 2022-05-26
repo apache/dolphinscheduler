@@ -15,18 +15,8 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
-
-export default i18n
+export default {
+  profile: '用户信息',
+  password: '密码管理',
+  logout: '退出登录'
+}

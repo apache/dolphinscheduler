@@ -15,18 +15,28 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
-
-export default i18n
+export default {
+  task_state_statistics: 'Task State Statistics',
+  process_state_statistics: 'Process State Statistics',
+  process_definition_statistics: 'Process Definition Statistics',
+  number: 'Number',
+  state: 'State',
+  submitted_success: 'SUBMITTED_SUCCESS',
+  running_execution: 'RUNNING_EXECUTION',
+  ready_pause: 'READY_PAUSE',
+  pause: 'PAUSE',
+  ready_stop: 'READY_STOP',
+  stop: 'STOP',
+  failure: 'FAILURE',
+  success: 'SUCCESS',
+  need_fault_tolerance: 'NEED_FAULT_TOLERANCE',
+  kill: 'KILL',
+  waiting_thread: 'WAITING_THREAD',
+  waiting_depend: 'WAITING_DEPEND',
+  delay_execution: 'DELAY_EXECUTION',
+  forced_success: 'FORCED_SUCCESS',
+  serial_wait: 'SERIAL_WAIT',
+  dispatch: 'DISPATCH',
+  ready_block: 'READY_BLOCK',
+  block: 'BLOCK'
+}
