@@ -249,8 +249,6 @@ public class OSUtils {
         return users;
     }
 
-
-
     /**
      * whether the user exists in linux
      *
@@ -263,21 +261,12 @@ public class OSUtils {
                 return result.contains("uid=");
             }
         }catch (Exception e){
-            String message = e.getMessage();
-            //Because ShellExecutor method throws  exception to the linux return status is not 0
+            //because ShellExecutor method throws exception to the linux return status is not 0
             //not exist user return status is 1
-            if (message.contains("no such user")){
-                logger.warn(message);
-                return false;
-            }
-            // Abnormal caused by other reasons
-            logger.error(message, e);
-
+            logger.error(e.getMessage(), e);
         }
         return false;
     }
-
-
 
     /**
      * create user

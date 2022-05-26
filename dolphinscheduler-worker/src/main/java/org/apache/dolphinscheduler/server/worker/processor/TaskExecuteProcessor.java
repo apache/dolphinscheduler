@@ -121,15 +121,16 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             //if Using distributed is true and Currently supported systems are linux,Should not let it automatically
             //create tenants,so TenantAutoCreate has no effect
             if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX){
+                //use the id command to judge in linux
                 osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
-            }else {
-             // default otherwise
-                if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
-                    OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
-                }
+            }else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()){
+                // if not exists this user, then create
+                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
                 osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
-
+            }else {
+                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
             }
+
             // check if the OS user exists
             if (!osUserExistFlag) {
                 logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
