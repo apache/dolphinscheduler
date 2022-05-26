@@ -291,19 +291,19 @@ export default {
                 children: [
                     {
                         title: 'Standalone Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/standalone.html',
+                        link: '/en-us/docs/3.0.0/user_doc/guide/installation/standalone.html',
                     },
                     {
                         title: 'Pseudo Cluster Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
+                        link: '/en-us/docs/3.0.0/user_doc/guide/installation/pseudo-cluster.html',
                     },
                     {
                         title: 'Cluster Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/cluster.html',
+                        link: '/en-us/docs/3.0.0/user_doc/guide/installation/cluster.html',
                     },
                     {
                         title: 'Kubernetes Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
+                        link: '/en-us/docs/3.0.0/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -341,7 +341,7 @@ export default {
                 children: [
                     {
                         title: 'Open API',
-                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
+                        link: '/en-us/docs/3.0.0/user_doc/guide/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
@@ -643,19 +643,19 @@ export default {
                 children: [
                     {
                         title: '单机部署(Standalone)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/standalone.html',
+                        link: '/zh-cn/docs/3.0.0/user_doc/guide/installation/standalone.html',
                     },
                     {
                         title: '伪集群部署(Pseudo-Cluster)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
+                        link: '/zh-cn/docs/3.0.0/user_doc/guide/installation/pseudo-cluster.html',
                     },
                     {
                         title: '集群部署(Cluster)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/cluster.html',
+                        link: '/zh-cn/docs/3.0.0/user_doc/guide/installation/cluster.html',
                     },
                     {
                         title: 'Kubernetes部署(Kubernetes)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
+                        link: '/zh-cn/docs/3.0.0/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -693,7 +693,7 @@ export default {
                 children: [
                     {
                         title: 'API调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
+                        link: '/zh-cn/docs/3.0.0/user_doc/guide/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
