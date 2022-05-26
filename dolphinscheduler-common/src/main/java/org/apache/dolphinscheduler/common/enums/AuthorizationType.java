@@ -37,6 +37,7 @@ public enum AuthorizationType {
      * 10 QUEUE;
      * 11 DATA_ANALYSIS;
      * 12 K8S_NAMESPACE;
+     * 13 MONITOR;
      */
     RESOURCE_FILE_ID(0, "resource file id"),
     RESOURCE_FILE_NAME(1, "resource file name"),
@@ -50,7 +51,8 @@ public enum AuthorizationType {
     ACCESS_TOKEN(9, "access token"),
     QUEUE(10,"queue"),
     DATA_ANALYSIS(11,"data analysis"),
-    K8S_NAMESPACE(12,"k8s namespace");
+    K8S_NAMESPACE(12,"k8s namespace"),
+    MONITOR(13,"montitor");
     AuthorizationType(int code, String descp) {
         this.code = code;
         this.descp = descp;
