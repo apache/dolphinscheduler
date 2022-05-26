@@ -32,6 +32,7 @@ public class WorkerConfig {
     private int heartbeatInterval;
     private int hostWeight;
     private boolean tenantAutoCreate;
+    private boolean tenantDistributedUser;
     private int maxCpuLoadAvg;
     private double reservedMemory;
     private Set<String> groups;
@@ -116,5 +117,13 @@ public class WorkerConfig {
 
     public void setAlertListenPort(final int alertListenPort) {
         this.alertListenPort = alertListenPort;
+    }
+
+    public boolean isTenantDistributedUser() {
+        return tenantDistributedUser;
+    }
+
+    public void setTenantDistributedUser(boolean tenantDistributedUser) {
+        this.tenantDistributedUser = tenantDistributedUser;
     }
 }

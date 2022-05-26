@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -116,12 +117,22 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
         if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
-            if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
+            boolean osUserExistFlag ;
+            //if Using distributed is true and Currently supported systems are linux,Should not let it automatically
+            //create tenants,so TenantAutoCreate has no effect
+            if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX){
+                //use the id command to judge in linux
+                osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
+            }else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()){
+                // if not exists this user, then create
                 OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
+            }else {
+                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
             }
 
             // check if the OS user exists
-            if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
+            if (!osUserExistFlag) {
                 logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
                         taskExecutionContext.getTenantCode(), taskExecutionContext.getTaskInstanceId());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
