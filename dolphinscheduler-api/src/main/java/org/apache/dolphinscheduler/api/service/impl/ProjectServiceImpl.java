@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -225,8 +226,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Page<Project> page = new Page<>(pageNo, pageSize);
 
-        Set projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, projectIds.toArray(), searchVal);
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
         if (loginUser.getUserType() != UserType.ADMIN_USER) {
@@ -252,13 +253,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> deleteProject(User loginUser, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-        Object[] ids = new Object[]{project.getId()};
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
         }
 
-        if (!canOperatorPermissions(loginUser, ids,AuthorizationType.PROJECTS)) {
+        if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -353,9 +353,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        List<Project> projectList;
-        Set projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        projectList = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),projectIds.toArray());
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        List<Project> projectList = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
+
         List<Project> resultList = new ArrayList<>();
         Set<Project> projectSet;
         if (projectList != null && !projectList.isEmpty()) {
@@ -459,9 +459,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
-        List<Project> projects = null;
-        Set projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        projects = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),projectIds.toArray());
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        List<Project> projects = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
@@ -490,7 +489,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     private boolean checkReadPermissions(User user, Integer id){
         boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{id}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        return operationPermissionCheck || resourcePermissionCheck;
+        return operationPermissionCheck && resourcePermissionCheck;
     }
 
     /**

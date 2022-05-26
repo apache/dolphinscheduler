@@ -44,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +56,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     @Autowired
     private ProcessService processService;
 
-    protected static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP = new ConcurrentHashMap<>();
+    public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP = new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -88,7 +87,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         User user = processService.getUserById(userId);
         if (user == null){
             logger.error("user id {} doesn't exist", userId);
-            return null;
+            return Collections.emptySet();
         }
         return RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(user.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId, logger);
     }
@@ -112,14 +111,9 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            User user = processService.getUserById(userId);
-            if (user == null){
-                logger.error("user id {} doesn't exist", userId);
-                return false;
-            }
-            return UserType.ADMIN_USER.equals(user.getUserType());
+            // all users can create projects
+            return true;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {

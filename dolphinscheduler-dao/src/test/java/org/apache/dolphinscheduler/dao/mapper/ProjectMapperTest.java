@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -199,10 +201,7 @@ public class ProjectMapperTest extends BaseDaoTest {
     @Test
     public void testListAuthorizedProjects(){
         Project project = insertOne();
-        User user = new User();
-        user.setId(1);
-        Object[] obj = new Object[]{project.getId()};
-        List<Project> projects  = projectMapper.listAuthorizedProjects(user.getId(),obj);
+        List<Project> projects  = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
         Assert.assertEquals(projects.size(),0);
     }
 
