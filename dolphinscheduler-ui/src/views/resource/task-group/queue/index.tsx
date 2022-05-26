@@ -110,9 +110,6 @@ const taskGroupQueue = defineComponent({
       queryTaskGroupListPaging(taskGroupOptionsParams).then(
         (res: TaskGroupRes) => {
           res.totalList.map((item) => {
-            if (!searchParamRef.groupId) {
-              searchParamRef.groupId = item.id
-            }
             const option: SelectMixedOption = {
               label: item.name,
               value: item.id
@@ -165,6 +162,8 @@ const taskGroupQueue = defineComponent({
               <NSelect
                 size='small'
                 options={taskGroupOptions}
+                clearable
+                style={{ width: '180px' }}
                 v-model:value={this.searchParamRef.groupId}
                 placeholder={t('resource.task_group_queue.task_group_name')}
               />
