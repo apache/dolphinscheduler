@@ -226,7 +226,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Page<Project> page = new Page<>(pageNo, pageSize);
 
         Set projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        IPage<Project> projectIPage = projectMapper.listAuthorizedProjectsPaging(page,loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), searchVal,projectIds.toArray());
+        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, projectIds.toArray(), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
         if (loginUser.getUserType() != UserType.ADMIN_USER) {
