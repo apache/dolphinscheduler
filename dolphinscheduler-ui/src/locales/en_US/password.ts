@@ -15,18 +15,13 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
-
-export default i18n
+export default {
+  edit_password: 'Edit Password',
+  password: 'Password',
+  confirm_password: 'Confirm Password',
+  password_tips: 'Please enter your password',
+  confirm_password_tips: 'Please enter your confirm password',
+  two_password_entries_are_inconsistent:
+    'Two password entries are inconsistent',
+  submit: 'Submit'
+}
