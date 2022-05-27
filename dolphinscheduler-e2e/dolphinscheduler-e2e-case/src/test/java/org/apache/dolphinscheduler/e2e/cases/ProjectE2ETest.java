@@ -50,20 +50,14 @@ class ProjectE2ETest {
     void testCreateProject() {
         final ProjectPage page = new ProjectPage(browser);
         page.create(project);
-
-        await().untilAsserted(() -> {
-            browser.navigate().refresh();
-            assertThat(page.projectList())
-                    .as("Project list should contain newly-modified project")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(project));
-        });
     }
 
     @Test
     @Order(20)
     void testDeleteProject() {
         final ProjectPage page = new ProjectPage(browser);
+        page.create(project);
+
         page.delete(project);
 
         await().untilAsserted(() -> {
