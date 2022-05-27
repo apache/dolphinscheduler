@@ -250,6 +250,25 @@ public class OSUtils {
     }
 
     /**
+     * whether the user exists in linux
+     *
+     * @return boolean
+     */
+    public static boolean existTenantCodeInLinux(String tenantCode) {
+        try{
+            String result = exeCmd("id "+ tenantCode);
+            if (!StringUtils.isEmpty(result)){
+                return result.contains("uid=");
+            }
+        }catch (Exception e){
+            //because ShellExecutor method throws exception to the linux return status is not 0
+            //not exist user return status is 1
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
+    /**
      * create user
      *
      * @param userName user name

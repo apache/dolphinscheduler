@@ -333,17 +333,17 @@ export function useDataList() {
   const changeUserDropdown = (state: any) => {
     state.userDropdownOptions = [
       {
-        label: t('userDropdown.profile'),
+        label: t('user_dropdown.profile'),
         key: 'profile',
         icon: renderIcon(UserOutlined)
       },
       {
-        label: t('userDropdown.password'),
+        label: t('user_dropdown.password'),
         key: 'password',
         icon: renderIcon(KeyOutlined)
       },
       {
-        label: t('userDropdown.logout'),
+        label: t('user_dropdown.logout'),
         key: 'logout',
         icon: renderIcon(LogoutOutlined)
       }
