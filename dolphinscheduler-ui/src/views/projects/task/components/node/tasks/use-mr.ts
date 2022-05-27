@@ -43,7 +43,8 @@ export function useMr({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    programType: 'SCALA'
+    programType: 'SCALA',
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []
