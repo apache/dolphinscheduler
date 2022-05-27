@@ -65,7 +65,7 @@ const StateCard = defineComponent({
     } = this
     const { columnsRef } = useTable()
     return (
-      <Card title={title}>
+      <Card title={title} style={{ minHeight: '820px' }}>
         {{
           default: () => (
             <NGrid x-gap={12} cols={2}>
