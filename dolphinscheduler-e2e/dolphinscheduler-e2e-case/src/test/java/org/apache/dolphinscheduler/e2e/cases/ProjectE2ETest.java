@@ -45,13 +45,22 @@ class ProjectE2ETest {
     }
 
     @Test
-    @Order(1)
+    @Order(10)
     void testCreateProject() {
-        new ProjectPage(browser).create(project);
+        final ProjectPage page = new ProjectPage(browser);
+        page.create(project);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+            assertThat(page.projectList())
+                    .as("Project list should contain newly-modified project")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(project));
+        });
     }
 
     @Test
-    @Order(30)
+    @Order(20)
     void testDeleteProject() {
         final ProjectPage page = new ProjectPage(browser);
         page.delete(project);
