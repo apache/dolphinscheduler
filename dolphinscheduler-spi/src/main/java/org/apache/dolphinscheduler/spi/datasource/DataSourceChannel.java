@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.datasource;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
 public interface DataSourceChannel {
 
-    DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType);
+    DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType);
 }

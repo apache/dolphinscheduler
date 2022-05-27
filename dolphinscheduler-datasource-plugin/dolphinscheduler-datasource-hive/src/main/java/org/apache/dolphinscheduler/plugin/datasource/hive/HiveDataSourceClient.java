@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSource
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -40,7 +39,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
@@ -53,7 +54,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     private UserGroupInformation ugi;
     private boolean retryGetConnection = true;
 
-    public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType) {
         super(baseConnectionParam, dbType);
     }
 
@@ -64,7 +65,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     }
 
     @Override
-    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    protected void initClient(BaseConnectionParam baseConnectionParam, String dbType) {
         logger.info("Create Configuration for hive configuration.");
         this.hadoopConf = createHadoopConf();
         logger.info("Create Configuration success.");

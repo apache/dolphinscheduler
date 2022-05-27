@@ -20,12 +20,11 @@ package org.apache.dolphinscheduler.plugin.datasource.mysql;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class MySQLDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType) {
         return new MySQLDataSourceClient(baseConnectionParam, dbType);
     }
 }

@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,16 +57,16 @@ public class DataSourceClientProvider {
         return DataSourceClientProviderHolder.INSTANCE;
     }
 
-    public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
+    public Connection getConnection(String dbType, ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
 
         DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType);
             if (null == dataSourceChannel) {
-                throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+                throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType));
             }
             return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
         });

@@ -37,7 +37,7 @@ public class Db2DataSourceParamDTO extends BaseDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.DB2;
+    public String getType() {
+        return DbType.DB2.name();
     }
 }

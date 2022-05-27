@@ -35,7 +35,7 @@ public class ClickHouseDataSourceParamDTO extends BaseDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.CLICKHOUSE;
+    public String getType() {
+        return DbType.CLICKHOUSE.name();
     }
 }

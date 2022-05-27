@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -24,13 +25,10 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import java.sql.Driver;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Driver;
 
 /**
  * Jdbc Data Source Provider
@@ -39,7 +37,7 @@ public class JDBCDataSourceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JDBCDataSourceProvider.class);
 
-    public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
+    public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties, String dbType) {
         logger.info("Creating HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         HikariDataSource dataSource = new HikariDataSource();
 
@@ -67,7 +65,7 @@ public class JDBCDataSourceProvider {
     /**
      * @return One Session Jdbc DataSource
      */
-    public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
+    public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties, String dbType) {
         logger.info("Creating OneSession HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
 
         HikariDataSource dataSource = new HikariDataSource();
@@ -90,7 +88,7 @@ public class JDBCDataSourceProvider {
         return dataSource;
     }
 
-    protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, DbType dbType) {
+    protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, String dbType) {
         String drv = StringUtils.isBlank(properties.getDriverClassName()) ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver() : properties.getDriverClassName();
         try {
             final Class<?> clazz = Class.forName(drv, true, classLoader);
@@ -99,7 +97,7 @@ public class JDBCDataSourceProvider {
                 logger.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
                 throw new RuntimeException("Jdbc driver loading error.");
             }
-            if (dbType.equals(DbType.MYSQL)) {
+            if (dbType.equals(DbType.MYSQL.name())) {
                 if (driver.getMajorVersion() >= 8) {
                     properties.setDriverClassName(drv);
                 } else {

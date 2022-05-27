@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle;
 
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -26,10 +30,9 @@ import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -38,7 +41,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@AutoService(DataSourceProcessor.class)
 public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    @Override
+    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        OracleDataSourceParamDTO dto;
+        try {
+            dto = objectMapper.readValue(paramJson, OracleDataSourceParamDTO.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return dto;
+    }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
@@ -124,8 +140,18 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public DbType getDbType() {
-        return DbType.ORACLE;
+    public String getDbType() {
+        return DbType.ORACLE.name();
+    }
+
+    @Override
+    public int getDbId() {
+        return DbType.ORACLE.getCode();
+    }
+
+    @Override
+    public DataSourceProcessor create() {
+        return new OracleDataSourceProcessor();
     }
 
     private String transformOther(Map<String, String> otherMap) {

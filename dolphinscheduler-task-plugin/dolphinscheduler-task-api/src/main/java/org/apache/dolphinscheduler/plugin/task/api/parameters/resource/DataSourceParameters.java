@@ -18,11 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class DataSourceParameters extends AbstractResourceParameters {
 
-    private DbType type;
+    private int type;
 
     public String getResourceType() {
         return resourceType;
@@ -37,11 +36,11 @@ public class DataSourceParameters extends AbstractResourceParameters {
 
     private String connectionParams;
 
-    public DbType getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(DbType type) {
+    public void setType(int type) {
         this.type = type;
     }
 

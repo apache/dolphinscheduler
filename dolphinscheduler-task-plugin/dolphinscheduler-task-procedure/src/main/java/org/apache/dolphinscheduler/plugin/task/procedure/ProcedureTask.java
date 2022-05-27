@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.procedure;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -32,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -43,6 +39,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
 /**
  * procedure task
@@ -94,14 +93,12 @@ public class ProcedureTask extends AbstractTaskExecutor {
         Connection connection = null;
         CallableStatement stmt = null;
         try {
-            // load class
-            DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
-            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
+            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(procedureParameters.getType(),
                     procedureTaskExecutionContext.getConnectionParams());
 
             // get jdbc connection
-            connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
+            connection = DataSourceClientProvider.getInstance().getConnection(procedureParameters.getType(), connectionParam);
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);

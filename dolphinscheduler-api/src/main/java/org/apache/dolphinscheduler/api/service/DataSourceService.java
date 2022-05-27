@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
 
@@ -92,7 +91,7 @@ public interface DataSourceService {
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
-    Result<Object> checkConnection(DbType type, ConnectionParam parameter);
+    Result<Object> checkConnection(String type, ConnectionParam parameter);
 
     /**
      * test connection

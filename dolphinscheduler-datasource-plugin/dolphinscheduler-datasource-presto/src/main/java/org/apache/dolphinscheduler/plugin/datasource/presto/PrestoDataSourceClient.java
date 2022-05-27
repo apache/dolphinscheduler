@@ -19,11 +19,10 @@ package org.apache.dolphinscheduler.plugin.datasource.presto;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class PrestoDataSourceClient extends CommonDataSourceClient {
 
-    public PrestoDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public PrestoDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType) {
         super(baseConnectionParam, dbType);
     }
 

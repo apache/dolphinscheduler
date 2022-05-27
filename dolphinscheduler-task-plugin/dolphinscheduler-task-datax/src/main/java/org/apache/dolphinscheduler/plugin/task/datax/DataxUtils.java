@@ -17,14 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
 import com.alibaba.druid.sql.dialect.clickhouse.parser.ClickhouseStatementParser;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
 import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
+
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.CLICKHOUSE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.MYSQL;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.ORACLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.POSTGRESQL;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SQLSERVER;
 
 public class DataxUtils {
 
@@ -48,7 +52,7 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_CLICKHOUSE = "clickhousewriter";
 
-    public static String getReaderPluginName(DbType dbType) {
+    public static String getReaderPluginName(String dbType) {
         switch (dbType) {
             case MYSQL:
                 return DATAX_READER_PLUGIN_MYSQL;
@@ -65,7 +69,7 @@ public class DataxUtils {
         }
     }
 
-    public static String getWriterPluginName(DbType dbType) {
+    public static String getWriterPluginName(String dbType) {
         switch (dbType) {
             case MYSQL:
                 return DATAX_WRITER_PLUGIN_MYSQL;
@@ -82,7 +86,7 @@ public class DataxUtils {
         }
     }
 
-    public static SQLStatementParser getSqlStatementParser(DbType dbType, String sql) {
+    public static SQLStatementParser getSqlStatementParser(String dbType, String sql) {
         switch (dbType) {
             case MYSQL:
                 return new MySqlStatementParser(sql);
@@ -99,7 +103,7 @@ public class DataxUtils {
         }
     }
 
-    public static String[] convertKeywordsColumns(DbType dbType, String[] columns) {
+    public static String[] convertKeywordsColumns(String dbType, String[] columns) {
         if (columns == null) {
             return null;
         }
@@ -112,7 +116,7 @@ public class DataxUtils {
         return toColumns;
     }
 
-    public static String doConvertKeywordsColumn(DbType dbType, String column) {
+    public static String doConvertKeywordsColumn(String dbType, String column) {
         if (column == null) {
             return column;
         }

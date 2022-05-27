@@ -27,20 +27,28 @@ import java.sql.SQLException;
 public interface DataSourceProcessor {
 
     /**
+     * cast JSON to relate DTO
+     *
+     * @param paramJson
+     * @return {@link BaseDataSourceParamDTO}
+     */
+    BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson);
+
+    /**
      * check datasource param is valid
      */
     void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam);
 
     /**
      * get Datasource Client UniqueId
+     *
      * @return UniqueId
      */
-    String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType);
+    String getDatasourceUniqueId(ConnectionParam connectionParam, String dbType);
 
     /**
      * create BaseDataSourceParamDTO by connectionJson
      *
-     * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.Datasource}
      * @return {@link BaseDataSourceParamDTO}
      */
     BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson);
@@ -56,7 +64,7 @@ public interface DataSourceProcessor {
      * deserialize json to datasource connection param
      *
      * @param connectionJson {@code org.apache.dolphinscheduler.dao.entity.DataSource.connectionParams}
-     * @return {@link BaseConnectionParam}
+     * @return {@link ConnectionParam}
      */
     ConnectionParam createConnectionParams(String connectionJson);
 
@@ -89,5 +97,15 @@ public interface DataSourceProcessor {
     /**
      * @return {@link DbType}
      */
-    DbType getDbType();
+    String getDbType();
+
+    /**
+     * @return {@link DbType}
+     */
+    int getDbId();
+
+    /**
+     * get datasource processor
+     */
+    DataSourceProcessor create();
 }

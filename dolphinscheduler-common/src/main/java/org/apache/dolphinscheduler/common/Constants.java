@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.regex.Pattern;
 
@@ -725,6 +724,11 @@ public final class Constants {
      */
     public static final String MYSQL = "MYSQL";
     public static final String HIVE = "HIVE";
+    public static final String ORACLE = "ORACLE";
+    public static final String SQLSERVER = "SQLSERVER";
+    public static final String CLICKHOUSE = "CLICKHOUSE";
+    public static final String PRESTO = "PRESTO";
+
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";

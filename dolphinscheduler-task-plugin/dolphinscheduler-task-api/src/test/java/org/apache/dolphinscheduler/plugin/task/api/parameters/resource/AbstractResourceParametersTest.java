@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class AbstractResourceParametersTest {
         resourceParametersHelper.getResourceMap().forEach((type, map) -> {
             map.forEach((code, parameters) -> {
                 DataSourceParameters dataSourceParameters = new DataSourceParameters();
-                dataSourceParameters.setType(DbType.MYSQL);
+                dataSourceParameters.setType(DbType.MYSQL.getCode());
                 dataSourceParameters.setConnectionParams("127.0.0.1:3306");
                 map.put(code, dataSourceParameters);
             });

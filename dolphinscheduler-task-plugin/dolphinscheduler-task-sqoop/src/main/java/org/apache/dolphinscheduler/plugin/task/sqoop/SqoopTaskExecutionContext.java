@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
 import java.io.Serializable;
 
 /**
@@ -34,7 +32,7 @@ public class SqoopTaskExecutionContext implements Serializable {
     /**
      * sourcetype
      */
-    private DbType sourcetype;
+    private int sourcetype;
 
     /**
      * sourceConnectionParams
@@ -49,7 +47,7 @@ public class SqoopTaskExecutionContext implements Serializable {
     /**
      * targetType
      */
-    private DbType targetType;
+    private int targetType;
 
     /**
      * targetConnectionParams
@@ -64,11 +62,11 @@ public class SqoopTaskExecutionContext implements Serializable {
         this.dataSourceId = dataSourceId;
     }
 
-    public DbType getSourcetype() {
+    public int getSourcetype() {
         return sourcetype;
     }
 
-    public void setSourcetype(DbType sourcetype) {
+    public void setSourcetype(int sourcetype) {
         this.sourcetype = sourcetype;
     }
 
@@ -88,11 +86,11 @@ public class SqoopTaskExecutionContext implements Serializable {
         this.dataTargetId = dataTargetId;
     }
 
-    public DbType getTargetType() {
+    public int getTargetType() {
         return targetType;
     }
 
-    public void setTargetType(DbType targetType) {
+    public void setTargetType(int targetType) {
         this.targetType = targetType;
     }
 

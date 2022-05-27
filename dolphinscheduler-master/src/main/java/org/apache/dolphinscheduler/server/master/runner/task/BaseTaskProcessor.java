@@ -17,24 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
-
+import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -78,8 +62,8 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,10 +75,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.zaxxer.hikari.HikariDataSource;
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -464,13 +461,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
         if (jdbcInfo != null) {
             Properties properties = new Properties();
-            properties.setProperty(USER,hikariDataSource.getUsername());
-            properties.setProperty(PASSWORD,hikariDataSource.getPassword());
+            properties.setProperty(USER, hikariDataSource.getUsername());
+            properties.setProperty(PASSWORD, hikariDataSource.getPassword());
             properties.setProperty(DATABASE, jdbcInfo.getDatabase());
-            properties.setProperty(ADDRESS,jdbcInfo.getAddress());
-            properties.setProperty(OTHER,jdbcInfo.getParams());
-            properties.setProperty(JDBC_URL,jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
-            dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
+            properties.setProperty(ADDRESS, jdbcInfo.getAddress());
+            properties.setProperty(OTHER, jdbcInfo.getParams());
+            properties.setProperty(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            dataSource.setType(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode());
             dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
         }
 
@@ -484,9 +481,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     private void setStatisticsValueWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DataSource dataSource = getDefaultDataSource();
-        ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType().isHive() ? 1 : 0);
+        ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType() == DbType.HIVE.getCode() ? 1 : 0);
         dataQualityTaskExecutionContext.setStatisticsValueConnectorType(writerConnectorType.getDescription());
-        dataQualityTaskExecutionContext.setStatisticsValueType(dataSource.getType().getCode());
+        dataQualityTaskExecutionContext.setStatisticsValueType(dataSource.getType());
         dataQualityTaskExecutionContext.setStatisticsValueWriterConnectionParams(dataSource.getConnectionParams());
         dataQualityTaskExecutionContext.setStatisticsValueTable("t_ds_dq_task_statistics_value");
     }
@@ -498,9 +495,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     private void setWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DataSource dataSource = getDefaultDataSource();
-        ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType().isHive() ? 1 : 0);
+        ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType() == DbType.HIVE.getCode() ? 1 : 0);
         dataQualityTaskExecutionContext.setWriterConnectorType(writerConnectorType.getDescription());
-        dataQualityTaskExecutionContext.setWriterType(dataSource.getType().getCode());
+        dataQualityTaskExecutionContext.setWriterType(dataSource.getType());
         dataQualityTaskExecutionContext.setWriterConnectionParams(dataSource.getConnectionParams());
         dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
     }
@@ -518,7 +515,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 ConnectorType targetConnectorType = ConnectorType.of(
                         DbType.of(Integer.parseInt(config.get(TARGET_CONNECTOR_TYPE))).isHive() ? 1 : 0);
                 dataQualityTaskExecutionContext.setTargetConnectorType(targetConnectorType.getDescription());
-                dataQualityTaskExecutionContext.setTargetType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setTargetType(dataSource.getType());
                 dataQualityTaskExecutionContext.setTargetConnectionParams(dataSource.getConnectionParams());
             }
         }
@@ -537,7 +534,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 ConnectorType srcConnectorType = ConnectorType.of(
                         DbType.of(Integer.parseInt(config.get(SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
                 dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
-                dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setSourceType(dataSource.getType());
                 dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
             }
         }

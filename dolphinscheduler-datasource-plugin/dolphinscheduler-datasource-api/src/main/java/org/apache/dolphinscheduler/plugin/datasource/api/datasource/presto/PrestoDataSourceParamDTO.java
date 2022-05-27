@@ -37,7 +37,7 @@ public class PrestoDataSourceParamDTO extends BaseDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.PRESTO;
+    public String getType() {
+        return DbType.PRESTO.name();
     }
 }

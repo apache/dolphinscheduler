@@ -17,10 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -34,13 +43,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -65,17 +70,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
-import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 public class DataxTask extends AbstractTaskExecutor {
     /**
@@ -236,11 +233,11 @@ public class DataxTask extends AbstractTaskExecutor {
     private List<ObjectNode> buildDataxJobContentJson() {
 
         BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                dataxTaskExecutionContext.getSourcetype(),
+                DataSourceUtils.getDbTypeNameById(dataxTaskExecutionContext.getSourcetype()),
                 dataxTaskExecutionContext.getSourceConnectionParams());
 
         BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                dataxTaskExecutionContext.getTargetType(),
+                DataSourceUtils.getDbTypeNameById(dataxTaskExecutionContext.getTargetType()),
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
@@ -252,7 +249,7 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
+        urlArr.add(DataSourceUtils.getJdbcUrl(dataXParameters.getDsType(), dataSourceCfg));
 
         readerConnArr.add(readerConn);
 
@@ -262,7 +259,8 @@ public class DataxTask extends AbstractTaskExecutor {
         readerParam.putArray("connection").addAll(readerConnArr);
 
         ObjectNode reader = JSONUtils.createObjectNode();
-        reader.put("name", DataxUtils.getReaderPluginName(dataxTaskExecutionContext.getSourcetype()));
+        reader.put("name",
+                DataxUtils.getReaderPluginName(DataSourceUtils.getDbTypeNameById(dataxTaskExecutionContext.getSourcetype())));
         reader.set("parameter", readerParam);
 
         List<ObjectNode> writerConnArr = new ArrayList<>();
@@ -270,15 +268,15 @@ public class DataxTask extends AbstractTaskExecutor {
         ArrayNode tableArr = writerConn.putArray("table");
         tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(dataXParameters.getDtType(), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
 
-        String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
-                dataxTaskExecutionContext.getTargetType(),
+        String[] columns = parsingSqlColumnNames(DataSourceUtils.getDbTypeNameById(dataxTaskExecutionContext.getSourcetype()),
+                DataSourceUtils.getDbTypeNameById(dataxTaskExecutionContext.getTargetType()),
                 dataSourceCfg, dataXParameters.getSql());
 
         ArrayNode columnArr = writerParam.putArray("column");
@@ -303,7 +301,7 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         ObjectNode writer = JSONUtils.createObjectNode();
-        writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
+        writer.put("name", DataxUtils.getWriterPluginName(DataSourceUtils.getDbTypeNameById(dataxTaskExecutionContext.getTargetType())));
         writer.set("parameter", writerParam);
 
         List<ObjectNode> contentList = new ArrayList<>();
@@ -445,13 +443,13 @@ public class DataxTask extends AbstractTaskExecutor {
     /**
      * parsing synchronized column names in SQL statements
      *
-     * @param sourceType the database type of the data source
-     * @param targetType the database type of the data target
+     * @param sourceType    the database type of the data source
+     * @param targetType    the database type of the data target
      * @param dataSourceCfg the database connection parameters of the data source
-     * @param sql sql for data synchronization
+     * @param sql           sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+    private String[] parsingSqlColumnNames(String sourceType, String targetType, BaseConnectionParam dataSourceCfg, String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
@@ -468,11 +466,11 @@ public class DataxTask extends AbstractTaskExecutor {
      * try grammatical parsing column
      *
      * @param dbType database type
-     * @param sql sql for data synchronization
+     * @param sql    sql for data synchronization
      * @return column name array
      * @throws RuntimeException if error throws RuntimeException
      */
-    private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql) {
+    private String[] tryGrammaticalAnalysisSqlColumnNames(String dbType, String sql) {
         String[] columnNames;
 
         try {
@@ -539,10 +537,10 @@ public class DataxTask extends AbstractTaskExecutor {
      * try to execute sql to resolve column names
      *
      * @param baseDataSource the database connection parameters
-     * @param sql sql for data synchronization
+     * @param sql            sql for data synchronization
      * @return column name array
      */
-    public String[] tryExecuteSqlResolveColumnNames(DbType sourceType, BaseConnectionParam baseDataSource, String sql) {
+    public String[] tryExecuteSqlResolveColumnNames(String sourceType, BaseConnectionParam baseDataSource, String sql) {
         String[] columnNames;
         sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
         sql = sql.replace(";", "");

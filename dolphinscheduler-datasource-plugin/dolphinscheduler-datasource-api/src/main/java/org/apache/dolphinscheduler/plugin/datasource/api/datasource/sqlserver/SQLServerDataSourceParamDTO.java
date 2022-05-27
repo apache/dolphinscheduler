@@ -37,7 +37,7 @@ public class SQLServerDataSourceParamDTO extends BaseDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.SQLSERVER;
+    public String getType() {
+        return DbType.SQLSERVER.name();
     }
 }

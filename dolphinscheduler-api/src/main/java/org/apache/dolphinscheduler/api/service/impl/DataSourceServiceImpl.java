@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -35,8 +39,12 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -49,19 +57,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Optional;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.apache.dolphinscheduler.common.Constants.CLICKHOUSE;
+import static org.apache.dolphinscheduler.common.Constants.HIVE;
+import static org.apache.dolphinscheduler.common.Constants.ORACLE;
+import static org.apache.dolphinscheduler.common.Constants.PRESTO;
+import static org.apache.dolphinscheduler.common.Constants.SQLSERVER;
 
 /**
  * data source service impl
@@ -115,7 +118,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setNote(datasourceParam.getNote());
         dataSource.setUserId(loginUser.getId());
         dataSource.setUserName(loginUser.getUserName());
-        dataSource.setType(datasourceParam.getType());
+        dataSource.setType(DataSourceUtils.getDbTypeNameByName(datasourceParam.getType()));
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
@@ -167,7 +170,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
 
-        Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
+        Result<Object> isConnection = checkConnection(dataSource.getDbTypeName(), connectionParam);
         if (isConnection.isFailed()) {
             return isConnection;
         }
@@ -212,7 +215,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
         // type
         BaseDataSourceParamDTO baseDataSourceParamDTO = DataSourceUtils.buildDatasourceParamDTO(
-                dataSource.getType(), dataSource.getConnectionParams());
+                dataSource.getDbTypeName(), dataSource.getConnectionParams());
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
@@ -322,13 +325,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type            data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
      */
     @Override
-    public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
+    public Result<Object> checkConnection(String type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
             if (connection == null) {
@@ -360,7 +363,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        return checkConnection(dataSource.getType(), DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
+        return checkConnection(dataSource.getDbTypeName(), DataSourceUtils.buildConnectionParams(dataSource.getDbTypeName(), dataSource.getConnectionParams()));
     }
 
     /**
@@ -460,7 +463,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         List<String> tableList = null;
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        dataSource.getType(),
+                        dataSource.getDbTypeName(),
                         dataSource.getConnectionParams());
 
         if (null == connectionParam) {
@@ -469,7 +472,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Connection connection =
-                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+                DataSourceUtils.getConnection(dataSource.getDbTypeName(), connectionParam);
         ResultSet tables = null;
 
         try {
@@ -489,7 +492,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
             tables = metaData.getTables(
                     connectionParam.getDatabase(),
-                    getDbSchemaPattern(dataSource.getType(),schema,connectionParam),
+                    getDbSchemaPattern(dataSource.getDbTypeName(), schema, connectionParam),
                     "%", TABLE_TYPES);
             if (null == tables) {
                 putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
@@ -525,7 +528,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        dataSource.getType(),
+                        dataSource.getDbTypeName(),
                         dataSource.getConnectionParams());
 
         if (null == connectionParam) {
@@ -534,7 +537,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Connection connection =
-                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+                DataSourceUtils.getConnection(dataSource.getDbTypeName(), connectionParam);
         List<String> columnList = new ArrayList<>();
         ResultSet rs = null;
 
@@ -547,7 +550,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
             DatabaseMetaData metaData = connection.getMetaData();
 
-            if (dataSource.getType() == DbType.ORACLE) {
+            if (dataSource.getType() == DbType.ORACLE.getCode()) {
                 database = null;
             }
             rs = metaData.getColumns(database, null, tableName, "%");
@@ -585,7 +588,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return options;
     }
 
-    private String getDbSchemaPattern(DbType dbType,String schema,BaseConnectionParam connectionParam) {
+    private String getDbSchemaPattern(String dbType, String schema, BaseConnectionParam connectionParam) {
         if (dbType == null) {
             return null;
         }

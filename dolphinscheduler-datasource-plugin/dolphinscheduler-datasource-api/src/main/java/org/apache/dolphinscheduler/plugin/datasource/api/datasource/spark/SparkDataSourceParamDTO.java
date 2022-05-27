@@ -39,7 +39,7 @@ public class SparkDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.SPARK;
+    public String getType() {
+        return DbType.SPARK.name();
     }
 }

@@ -17,23 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
+import com.google.common.base.Stopwatch;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
-
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.google.common.base.Stopwatch;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 public class CommonDataSourceClient implements DataSourceClient {
 
@@ -46,7 +42,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     protected DataSource dataSource;
     protected JdbcTemplate jdbcTemplate;
 
-    public CommonDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public CommonDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType) {
         this.baseConnectionParam = baseConnectionParam;
         preInit();
         checkEnv(baseConnectionParam);
@@ -63,7 +59,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         checkUser(baseConnectionParam);
     }
 
-    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    protected void initClient(BaseConnectionParam baseConnectionParam, String dbType) {
         this.dataSource = JDBCDataSourceProvider.createJdbcDataSource(baseConnectionParam, dbType);
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

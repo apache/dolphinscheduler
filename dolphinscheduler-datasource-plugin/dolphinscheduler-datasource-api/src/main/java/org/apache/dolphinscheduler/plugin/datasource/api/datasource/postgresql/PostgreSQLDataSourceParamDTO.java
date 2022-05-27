@@ -35,7 +35,7 @@ public class PostgreSQLDataSourceParamDTO extends BaseDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.POSTGRESQL;
+    public String getType() {
+        return DbType.POSTGRESQL.name();
     }
 }

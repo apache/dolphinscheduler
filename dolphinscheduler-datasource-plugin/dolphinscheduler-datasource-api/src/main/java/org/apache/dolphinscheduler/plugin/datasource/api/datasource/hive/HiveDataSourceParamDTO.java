@@ -39,7 +39,7 @@ public class HiveDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
     }
 
     @Override
-    public DbType getType() {
-        return DbType.HIVE;
+    public String getType() {
+        return DbType.HIVE.name();
     }
 }

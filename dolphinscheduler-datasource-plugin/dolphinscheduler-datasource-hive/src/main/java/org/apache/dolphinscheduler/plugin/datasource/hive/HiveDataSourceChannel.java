@@ -20,12 +20,11 @@ package org.apache.dolphinscheduler.plugin.datasource.hive;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class HiveDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType) {
         return new HiveDataSourceClient(baseConnectionParam, dbType);
     }
 }

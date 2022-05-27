@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.Date;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @TableName("t_ds_datasource")
 public class DataSource {
@@ -58,7 +59,7 @@ public class DataSource {
     /**
      * data source type
      */
-    private DbType type;
+    private int type;
 
     /**
      * connection parameters
@@ -118,11 +119,11 @@ public class DataSource {
         this.note = note;
     }
 
-    public DbType getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(DbType type) {
+    public void setType(int type) {
         this.type = type;
     }
 
@@ -148,6 +149,10 @@ public class DataSource {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getDbTypeName() {
+        return Optional.ofNullable(DbType.of(this.type).name()).orElseThrow(() -> new NoSuchElementException("db type id not exist"));
     }
 
     @Override

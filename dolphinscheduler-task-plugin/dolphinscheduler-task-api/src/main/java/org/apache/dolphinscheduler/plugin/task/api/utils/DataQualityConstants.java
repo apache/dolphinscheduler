@@ -98,5 +98,9 @@ public class DataQualityConstants {
      */
     public static final String MYSQL = "MYSQL";
     public static final String POSTGRESQL = "POSTGRESQL";
+    public static final String ORACLE = "ORACLE";
+    public static final String SQLSERVER = "SQLSERVER";
+    public static final String CLICKHOUSE = "CLICKHOUSE";
+
 
 }

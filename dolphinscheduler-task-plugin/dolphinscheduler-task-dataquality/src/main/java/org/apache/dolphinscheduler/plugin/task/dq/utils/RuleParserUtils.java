@@ -17,6 +17,30 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
+import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleExecuteSql;
+import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleInputEntry;
+import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.BaseConfig;
+import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.EnvConfig;
+import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.MappingColumn;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_BUSINESS_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_CURRENT_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_DATETIME;
@@ -59,32 +83,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.URL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.USER;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
-import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.BaseConfig;
-import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.EnvConfig;
-import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.MappingColumn;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 /**
  * RuleParserUtils
  */
@@ -109,21 +107,21 @@ public class RuleParserUtils {
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getSourceConnectorType())) {
             BaseConnectionParam sourceDataSource =
                     (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                            DbType.of(dataQualityTaskExecutionContext.getSourceType()),
+                            DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getSourceType()),
                             dataQualityTaskExecutionContext.getSourceConnectionParams());
             BaseConfig sourceBaseConfig = new BaseConfig();
             sourceBaseConfig.setType(dataQualityTaskExecutionContext.getSourceConnectorType());
             Map<String,Object> config = new HashMap<>();
             if (sourceDataSource != null) {
-                config.put(DATABASE,sourceDataSource.getDatabase());
-                config.put(TABLE,inputParameterValue.get(SRC_TABLE));
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),sourceDataSource));
-                config.put(USER,sourceDataSource.getUser());
-                config.put(PASSWORD,sourceDataSource.getPassword());
+                config.put(DATABASE, sourceDataSource.getDatabase());
+                config.put(TABLE, inputParameterValue.get(SRC_TABLE));
+                config.put(URL, DataSourceUtils.getJdbcUrl(DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getSourceType()), sourceDataSource));
+                config.put(USER, sourceDataSource.getUser());
+                config.put(PASSWORD, sourceDataSource.getPassword());
                 config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
                 String outputTable = sourceDataSource.getDatabase() + "_" + inputParameterValue.get(SRC_TABLE);
-                config.put(OUTPUT_TABLE,outputTable);
-                inputParameterValue.put(SRC_TABLE,outputTable);
+                config.put(OUTPUT_TABLE, outputTable);
+                inputParameterValue.put(SRC_TABLE, outputTable);
             }
             sourceBaseConfig.setConfig(config);
 
@@ -134,21 +132,21 @@ public class RuleParserUtils {
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getTargetConnectorType())) {
             BaseConnectionParam targetDataSource =
                     (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                            DbType.of(dataQualityTaskExecutionContext.getTargetType()),
+                            DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getTargetType()),
                             dataQualityTaskExecutionContext.getTargetConnectionParams());
             BaseConfig targetBaseConfig = new BaseConfig();
             targetBaseConfig.setType(dataQualityTaskExecutionContext.getTargetConnectorType());
             Map<String,Object> config = new HashMap<>();
             if (targetDataSource != null) {
-                config.put(DATABASE,targetDataSource.getDatabase());
-                config.put(TABLE,inputParameterValue.get(TARGET_TABLE));
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getTargetType()),targetDataSource));
-                config.put(USER,targetDataSource.getUser());
-                config.put(PASSWORD,targetDataSource.getPassword());
+                config.put(DATABASE, targetDataSource.getDatabase());
+                config.put(TABLE, inputParameterValue.get(TARGET_TABLE));
+                config.put(URL, DataSourceUtils.getJdbcUrl(DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getTargetType()), targetDataSource));
+                config.put(USER, targetDataSource.getUser());
+                config.put(PASSWORD, targetDataSource.getPassword());
                 config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
                 String outputTable = targetDataSource.getDatabase() + "_" + inputParameterValue.get(TARGET_TABLE);
-                config.put(OUTPUT_TABLE,outputTable);
-                inputParameterValue.put(TARGET_TABLE,outputTable);
+                config.put(OUTPUT_TABLE, outputTable);
+                inputParameterValue.put(TARGET_TABLE, outputTable);
             }
             targetBaseConfig.setConfig(config);
 
@@ -259,20 +257,20 @@ public class RuleParserUtils {
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getWriterConnectorType())) {
             BaseConnectionParam writerDataSource =
                     (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                            DbType.of(dataQualityTaskExecutionContext.getWriterType()),
+                            DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getWriterType()),
                             dataQualityTaskExecutionContext.getWriterConnectionParams());
             BaseConfig writerConfig = new BaseConfig();
             writerConfig.setType(dataQualityTaskExecutionContext.getWriterConnectorType());
 
             Map<String,Object> config = new HashMap<>();
             if (writerDataSource != null) {
-                config.put(DATABASE,writerDataSource.getDatabase());
-                config.put(TABLE,dataQualityTaskExecutionContext.getWriterTable());
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getWriterType()),writerDataSource));
-                config.put(USER,writerDataSource.getUser());
-                config.put(PASSWORD,writerDataSource.getPassword());
+                config.put(DATABASE, writerDataSource.getDatabase());
+                config.put(TABLE, dataQualityTaskExecutionContext.getWriterTable());
+                config.put(URL, DataSourceUtils.getJdbcUrl(DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getWriterType()), writerDataSource));
+                config.put(USER, writerDataSource.getUser());
+                config.put(PASSWORD, writerDataSource.getPassword());
                 config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
-                config.put(SQL,sql);
+                config.put(SQL, sql);
             }
             writerConfig.setConfig(config);
             writerConfigList.add(writerConfig);
@@ -325,18 +323,18 @@ public class RuleParserUtils {
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConnectionParam writerDataSource =
                     (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                            DbType.of(dataQualityTaskExecutionContext.getStatisticsValueType()),
+                            DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getStatisticsValueType()),
                             dataQualityTaskExecutionContext.getStatisticsValueWriterConnectionParams());
             baseConfig = new BaseConfig();
             baseConfig.setType(dataQualityTaskExecutionContext.getStatisticsValueConnectorType());
 
             Map<String,Object> config = new HashMap<>();
             if (writerDataSource != null) {
-                config.put(DATABASE,writerDataSource.getDatabase());
-                config.put(TABLE,dataQualityTaskExecutionContext.getStatisticsValueTable());
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getStatisticsValueType()),writerDataSource));
-                config.put(USER,writerDataSource.getUser());
-                config.put(PASSWORD,writerDataSource.getPassword());
+                config.put(DATABASE, writerDataSource.getDatabase());
+                config.put(TABLE, dataQualityTaskExecutionContext.getStatisticsValueTable());
+                config.put(URL, DataSourceUtils.getJdbcUrl(DataSourceUtils.getDbTypeNameById(dataQualityTaskExecutionContext.getStatisticsValueType()), writerDataSource));
+                config.put(USER, writerDataSource.getUser());
+                config.put(PASSWORD, writerDataSource.getPassword());
                 config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
             }
 

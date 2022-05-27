@@ -19,11 +19,10 @@ package org.apache.dolphinscheduler.plugin.datasource.clickhouse;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class ClickHouseDataSourceClient extends CommonDataSourceClient {
 
-    public ClickHouseDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public ClickHouseDataSourceClient(BaseConnectionParam baseConnectionParam, String dbType) {
         super(baseConnectionParam, dbType);
     }
 
