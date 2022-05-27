@@ -9,8 +9,8 @@
 
 对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
 
-- 将`data.basedir.path`改为本地存储路径，请确保路径存在并拥有读写权限，例如：`data.basedir.path=C:/tmp/dolphinscheduler`
-- 修改两个字段，分别是`resource.storage.type=HDFS`和`fs.defaultFS=file:///`。
+- 将`data.basedir.path`改为本地存储路径，请确保路径存在并拥有读写权限，例如：`data.basedir.path=/tmp/dolphinscheduler`
+- 修改下列两个参数，分别是`resource.storage.type=HDFS`和`fs.defaultFS=file:///`。
 
 ## HDFS 资源配置
 
