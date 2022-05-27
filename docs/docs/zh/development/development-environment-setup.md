@@ -156,7 +156,7 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
   ```application.yaml
    spring:
      datasource:
-       driver-class-name: com.mysql.jdbc.Driver
+       driver-class-name: com.mysql.cj.jdbc.Driver
        url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
        username: dolphinscheduler
        password: dolphinscheduler
