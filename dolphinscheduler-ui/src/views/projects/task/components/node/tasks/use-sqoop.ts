@@ -62,7 +62,8 @@ export function useSqoop({
     targetHiveCreateTable: false,
     targetHiveDropDelimiter: false,
     targetHiveOverWrite: true,
-    concurrency: 1
+    concurrency: 1,
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []
