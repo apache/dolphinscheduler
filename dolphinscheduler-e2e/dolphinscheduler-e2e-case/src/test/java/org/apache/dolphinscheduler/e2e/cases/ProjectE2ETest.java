@@ -41,31 +41,28 @@ class ProjectE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(ProjectPage.class);
+                .login("admin", "dolphinscheduler123")
+                .goToNav(ProjectPage.class);
     }
 
     @Test
-    @Order(10)
+    @Order(1)
     void testCreateProject() {
-        final ProjectPage page = new ProjectPage(browser);
-        page.create(project);
+        new ProjectPage(browser).create(project);
     }
 
     @Test
-    @Order(20)
+    @Order(30)
     void testDeleteProject() {
         final ProjectPage page = new ProjectPage(browser);
-        page.create(project);
-
         page.delete(project);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(
-                page.projectList()
+                    page.projectList()
             ).noneMatch(
-                it -> it.getText().contains(project)
+                    it -> it.getText().contains(project)
             );
         });
     }
