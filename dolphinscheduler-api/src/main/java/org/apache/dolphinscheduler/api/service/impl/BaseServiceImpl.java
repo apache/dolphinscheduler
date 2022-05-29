@@ -22,9 +22,15 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -37,6 +43,10 @@ import java.util.Objects;
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
+    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
+    @Autowired
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * check admin
@@ -143,6 +153,20 @@ public class BaseServiceImpl implements BaseService {
     @Override
     public boolean canOperator(User operateUser, int createUserId) {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
+    }
+
+    /**
+     * Verify that the operator has permissions
+     * @param user operate user
+     * @param ids Object[]
+     * @param type AuthorizationType
+     * @return boolean
+     */
+    @Override
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), null, logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+        return operationPermissionCheck || resourcePermissionCheck;
     }
 
     /**
