@@ -116,11 +116,18 @@ public class OSUtils {
     public static double loadAverage() {
         double loadAverage;
         try {
-            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-            loadAverage = osBean.getSystemLoadAverage();
+            if(SystemUtils.IS_OS_WINDOWS){
+                loadAverage = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getProcessCpuLoad();
+            }else{
+                loadAverage = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemLoadAverage();
+            }
         } catch (Exception e) {
             logger.error("get operation system load average exception, try another method ", e);
-            loadAverage = hal.getProcessor().getSystemLoadAverage(1)[0];
+            if (SystemUtils.IS_OS_WINDOWS){
+                loadAverage = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getSystemCpuLoad();
+            }else{
+                loadAverage = hal.getProcessor().getSystemLoadAverage(1)[0];
+            }
             if (Double.isNaN(loadAverage)) {
                 return NEGATIVE_ONE;
             }
