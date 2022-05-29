@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 public final class EmailConstants {
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     public static final String XLS_FILE_PATH = "xls.file.path";
 
     public static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
