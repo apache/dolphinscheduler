@@ -76,7 +76,7 @@ public class DefaultHTMLTemplateTest {
         return EmailConstants.HTML_HEADER_PREFIX
             + "<thead>"
             + "<tr><th>mysql service name</th><th>mysql address</th><th>database client connections</th><th>port</th><th>no index of number</th></tr>"
-            + "</thead>\n"
+            + "</thead>"+System.getProperty("line.separator")
             + "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>190</td><td>3306</td><td>80</td></tr>"
             + "<tr><td>mysql210</td><td>192.168.xx.xx</td><td>90</td><td>3306</td><td>10</td></tr>"
             + EmailConstants.TABLE_BODY_HTML_TAIL;
