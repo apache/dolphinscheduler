@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
@@ -144,7 +145,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     public Map<String, Object> queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, FuncPermissionEnum.VIEW_LOG.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -177,7 +178,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     public byte[] getLogBytes(User loginUser, long projectCode, int taskInstId) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.DOWNLOAD_LOG.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             throw new ServiceException("user has no permission");
         }

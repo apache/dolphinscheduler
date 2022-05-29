@@ -20,11 +20,13 @@ package org.apache.dolphinscheduler.api.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -74,6 +76,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page<>(pageNo, pageSize);
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ACCESS_TOKEN, FuncPermissionEnum.TOKEN_MANAGE.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
         int userId = loginUser.getId();
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             userId = 0;
@@ -99,7 +105,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         result.put(Constants.STATUS, false);
 
         // only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,FuncPermissionEnum.TOKEN_MANAGE.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -124,7 +131,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperator(loginUser,userId)) {
+        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,FuncPermissionEnum.CREATE_TOKEN.toString()) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -169,7 +176,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperator(loginUser,userId)) {
+        if (!(canOperatorPermissions(loginUser,null,AuthorizationType.ACCESS_TOKEN, FuncPermissionEnum.GENERATE_TOKEN.toString()) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -197,7 +204,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
-        if (!canOperator(loginUser,accessToken.getUserId())) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,FuncPermissionEnum.TOKEN_DELETE.toString())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -221,7 +228,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperator(loginUser,userId)) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,FuncPermissionEnum.TOKEN_EDIT.toString())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

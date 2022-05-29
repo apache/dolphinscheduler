@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
@@ -155,7 +157,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
             return result;
         }
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.USER, FuncPermissionEnum.CREATE_USER.toString())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -322,7 +324,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_MANAGER.toString())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -368,7 +370,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_EDIT.toString()), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -506,7 +508,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_DELETE.toString())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
             return result;
         }
@@ -605,7 +607,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 3. only project owner can operate
-        if (!this.canOperator(loginUser, project.getUserId())) {
+        if (!this.canOperatorPermissions(loginUser,new Object[]{project.getId()},AuthorizationType.USER,FuncPermissionEnum.USER_GRANT_PROJECT.toString())) {
             this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -641,7 +643,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         // 1. only admin can operate
-        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (this.check(result, !this.canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_REVOKE_PROJECT.toString()), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -818,7 +820,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_GRANT_K8SNAMESPACE.toString()), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -907,7 +909,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
 
         User user = null;
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+        if (canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_MANAGER.toString())) {
             user = loginUser;
         } else {
             user = userMapper.queryDetailsById(loginUser.getId());
@@ -946,7 +948,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_MANAGER.toString()), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -967,7 +969,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,FuncPermissionEnum.USER_MANAGER.toString()), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -1010,7 +1012,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,null), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -1046,7 +1048,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,null), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         List<User> userList = userMapper.queryUserListByAlertGroupId(alertGroupId);
@@ -1176,7 +1178,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -1220,7 +1222,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

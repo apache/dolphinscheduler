@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -110,7 +111,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, FuncPermissionEnum.TASK_INSTANCE.toString());
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
             putMsg(result,status);
@@ -167,7 +168,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.FORCED_SUCCESS.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

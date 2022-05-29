@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
@@ -80,7 +82,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Result queryListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.K8S_NAMESPACE,null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -112,7 +114,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, Double limitsCpu, Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -185,7 +188,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu, Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -266,7 +270,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Map<String, Object> deleteNamespaceById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -340,7 +345,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && !canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
         // query all namespace list,this auth does not like project
@@ -368,7 +374,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     public Map<String, Object> queryAuthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && !canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -387,7 +394,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      */
     @Override
     public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
-        if (isAdmin(loginUser)) {
+        if (canOperatorPermissions(loginUser,null,AuthorizationType.K8S_NAMESPACE,null)) {
             return k8sNamespaceMapper.selectList(null);
         } else {
             return k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());

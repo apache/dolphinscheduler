@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -35,6 +38,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClient
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -69,7 +73,7 @@ import org.slf4j.LoggerFactory;
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
 @PrepareForTest({DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class DataSourceServiceTest {
-
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceTest.class);
 
     @InjectMocks
@@ -80,6 +84,9 @@ public class DataSourceServiceTest {
 
     @Mock
     private DataSourceUserMapper datasourceUserMapper;
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     public void createDataSourceTest() {
         User loginUser = getAdminUser();
@@ -190,6 +197,8 @@ public class DataSourceServiceTest {
         String searchVal = "";
         int pageNo = 1;
         int pageSize = 10;
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
         Result result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
         Assert.assertEquals(Status.SUCCESS.getCode(),(int)result.getCode());
     }
@@ -207,7 +216,8 @@ public class DataSourceServiceTest {
         User loginUser = getAdminUser();
         int dataSourceId = 1;
         Result result = new Result();
-
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, new Object[]{dataSourceId}, -1, baseServiceLogger)).thenReturn(true);
         //resource not exist
         dataSourceService.putMsg(result, Status.RESOURCE_NOT_EXIST);
         PowerMockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
@@ -223,6 +233,11 @@ public class DataSourceServiceTest {
         // success
         dataSourceService.putMsg(result, Status.SUCCESS);
         dataSource.setUserId(-1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        loginUser.setId(1);
+        dataSource.setId(22);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), FuncPermissionEnum.DATASOURCE_DELETE.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,new Object[]{dataSource.getId()} , 0, baseServiceLogger)).thenReturn(true);
         PowerMockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
         Assert.assertEquals(result.getCode(), dataSourceService.delete(loginUser, dataSourceId).getCode());
 
@@ -234,7 +249,8 @@ public class DataSourceServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         int userId = 3;
-
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), FuncPermissionEnum.DATASOURCE.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
         // test admin user
         Mockito.when(dataSourceMapper.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
         Mockito.when(dataSourceMapper.queryDatasourceExceptUserId(userId)).thenReturn(getDataSourceList());
@@ -279,6 +295,8 @@ public class DataSourceServiceTest {
     public void queryDataSourceListTest() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> map = dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
         Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
     }

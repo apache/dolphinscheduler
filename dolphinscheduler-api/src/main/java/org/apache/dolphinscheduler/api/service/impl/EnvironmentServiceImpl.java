@@ -18,11 +18,13 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -91,7 +93,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ENVIRONMENT, FuncPermissionEnum.CREATE_ENVIRONMENT.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -284,7 +287,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ENVIRONMENT,FuncPermissionEnum.ENVIRONMENT_DELETE.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -322,7 +326,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ENVIRONMENT,FuncPermissionEnum.ENVIRONMENT_EDIT.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 

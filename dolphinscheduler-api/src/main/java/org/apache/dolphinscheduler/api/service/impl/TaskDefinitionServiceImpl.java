@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -120,7 +121,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                     String taskDefinitionJson) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, FuncPermissionEnum.CREATE_TASK_DEFINITION.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -174,7 +175,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                        String upstreamCodes) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.CREATE_TASK_DEFINITION.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -276,7 +277,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, String taskName) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.TASK_DEFINITION.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -304,7 +305,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.DELETE_TASK_DEFINITION.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -400,7 +401,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj, Map<String, Object> result) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode));
+        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.EDIT_TASK_DEFINITION.toString()));
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return null;
         }
@@ -547,7 +548,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> switchVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project,projectCode,FuncPermissionEnum.SWITCH_TO_THIS_VERSION.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -589,7 +590,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.TASK_VERSION_VIEW.toString());
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -611,7 +612,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.DELETE_TASK_DEFINITION.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -638,7 +639,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.VERSION_LIST.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -664,7 +665,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.TASK_DEFINITION.toString());
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -741,7 +742,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
         Status resultStatus = (Status) result.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             return result;
