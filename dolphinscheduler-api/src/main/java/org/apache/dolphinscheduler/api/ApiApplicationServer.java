@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -43,5 +43,7 @@ public class ApiApplicationServer {
     public void run(ApplicationReadyEvent readyEvent) {
         // install task plugin
         taskPluginManager.installPlugin();
+        DataSourceUtils dataSourceUtils = new DataSourceUtils();
+        dataSourceUtils.installProcessor();
     }
 }
