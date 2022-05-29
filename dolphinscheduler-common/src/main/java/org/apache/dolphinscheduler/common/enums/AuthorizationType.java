@@ -25,17 +25,34 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum AuthorizationType {
     /**
      * 0 RESOURCE_FILE_ID;
-     * 0 RESOURCE_FILE_NAME;
-     * 1 UDF_FILE;
-     * 1 DATASOURCE;
-     * 2 UDF;
+     * 1 RESOURCE_FILE_NAME;
+     * 2 UDF_FILE;
+     * 3 DATASOURCE;
+     * 4 UDF;
+     * 5 PROJECTS;
+     * 6 WORKER_GROUP;
+     * 7 ALERT_GROUP;
+     * 8 ENVIRONMENT;
+     * 9 ACCESS_TOKEN;
+     * 10 QUEUE;
+     * 11 DATA_ANALYSIS;
+     * 12 K8S_NAMESPACE;
+     * 13 MONITOR;
      */
     RESOURCE_FILE_ID(0, "resource file id"),
     RESOURCE_FILE_NAME(1, "resource file name"),
     UDF_FILE(2, "udf file"),
     DATASOURCE(3, "data source"),
-    UDF(4, "udf function");
-
+    UDF(4, "udf function"),
+    PROJECTS(5, "projects"),
+    WORKER_GROUP(6, "worker group"),
+    ALERT_GROUP(7, "alert group"),
+    ENVIRONMENT(8, "environment"),
+    ACCESS_TOKEN(9, "access token"),
+    QUEUE(10,"queue"),
+    DATA_ANALYSIS(11,"data analysis"),
+    K8S_NAMESPACE(12,"k8s namespace"),
+    MONITOR(13,"montitor");
     AuthorizationType(int code, String descp) {
         this.code = code;
         this.descp = descp;

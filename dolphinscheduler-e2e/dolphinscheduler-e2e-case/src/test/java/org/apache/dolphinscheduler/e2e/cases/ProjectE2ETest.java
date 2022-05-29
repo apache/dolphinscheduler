@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
@@ -40,8 +41,8 @@ class ProjectE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(ProjectPage.class);
+                .login("admin", "dolphinscheduler123")
+                .goToNav(ProjectPage.class);
     }
 
     @Test
@@ -59,9 +60,9 @@ class ProjectE2ETest {
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(
-                page.projectList()
+                    page.projectList()
             ).noneMatch(
-                it -> it.getText().contains(project)
+                    it -> it.getText().contains(project)
             );
         });
     }

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -82,6 +84,15 @@ public interface BaseService {
      * @return check result
      */
     boolean canOperator(User operateUser, int createUserId);
+
+    /**
+     * Verify that the operator has permissions
+     * @param user operate user
+     * @param ids Object[]
+     * @Param type authorizationType
+     * @return check result
+     */
+    boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type);
 
     /**
      * check and parse date parameters
