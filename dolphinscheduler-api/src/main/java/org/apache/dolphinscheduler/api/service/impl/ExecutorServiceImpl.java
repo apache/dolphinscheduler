@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAM
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
@@ -161,7 +162,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    ComplementDependentMode complementDependentMode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, FuncPermissionEnum.START.toString());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -296,7 +297,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.of(executeType));
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

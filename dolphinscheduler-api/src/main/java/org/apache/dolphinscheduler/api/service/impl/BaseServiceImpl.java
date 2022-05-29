@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -43,7 +44,7 @@ import java.util.Objects;
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -163,10 +164,10 @@ public class BaseServiceImpl implements BaseService {
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), null, logger);
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String perm) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), perm, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        return operationPermissionCheck || resourcePermissionCheck;
+        return operationPermissionCheck && resourcePermissionCheck;
     }
 
     /**

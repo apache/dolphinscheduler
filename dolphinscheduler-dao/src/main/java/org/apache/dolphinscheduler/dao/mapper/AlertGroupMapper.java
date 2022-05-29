@@ -83,4 +83,12 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      */
     String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
 
+    /**
+     * list authorized AlertGroup
+     * @param userId
+     * @param alertGroupsIds
+     * @return
+     */
+    List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds") List<Integer> alertGroupsIds);
+
 }

@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
@@ -65,7 +67,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE, FuncPermissionEnum.YARN_QUEUE_MANAGE.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -88,7 +91,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.QUEUE,FuncPermissionEnum.YARN_QUEUE_MANAGE.toString())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -118,7 +121,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,FuncPermissionEnum.CREATE_YARN_QUEUE.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -169,7 +173,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,FuncPermissionEnum.QUEUE_EDIT.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 

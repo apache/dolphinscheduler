@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -57,7 +58,7 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
  * project service impl
  **/
 @Service
-public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
+public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService{
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
@@ -92,6 +93,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
             return descCheck;
         }
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.PROJECTS, FuncPermissionEnum.CREATE_PROJECT.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
 
         Project project = projectMapper.queryByName(name);
         if (project != null) {
@@ -136,7 +142,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryByCode(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.PROJECT.toString());
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -151,7 +157,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryByName(User loginUser, String projectName) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.PROJECT.toString());
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -171,11 +177,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return true if the login user have permission to see the project
      */
     @Override
-    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode) {
+    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,String perm) {
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_EXIST);
-        } else if (!checkReadPermissions(loginUser, project.getId())) {
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,perm)) {
             // check read permission
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
         } else {
@@ -185,11 +191,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
-    public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result) {
+    public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result,String perm) {
         boolean checkResult = false;
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!checkReadPermissions(loginUser, project.getId())) {
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,perm)) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         } else {
             checkResult = true;
@@ -202,7 +208,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         boolean checkResult = false;
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!checkReadPermissions(loginUser, project.getId())) {
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,null)) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         } else {
             checkResult = true;
@@ -253,14 +259,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> deleteProject(User loginUser, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-        Map<String, Object> checkResult = getCheckResult(loginUser, project);
+
+        Map<String, Object> checkResult = getCheckResult(loginUser, project,FuncPermissionEnum.DELETE_PROJECT.toString());
         if (checkResult != null) {
             return checkResult;
-        }
-
-        if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
         }
 
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
@@ -285,8 +287,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param project project
      * @return check result
      */
-    private Map<String, Object> getCheckResult(User loginUser, Project project) {
-        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, project, project == null ? 0L : project.getCode());
+    private Map<String, Object> getCheckResult(User loginUser, Project project,String perm) {
+        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, project, project == null ? 0L : project.getCode(),perm);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
             return checkResult;
@@ -314,7 +316,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.EDIT_PROJECT.toString());
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -420,7 +422,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         // 1. check read permission
         Project project = this.projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.PROJECT.toString());
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -481,6 +483,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
+<<<<<<< HEAD
      * check whether have read permission new
      * @param user
      * @param id
@@ -493,6 +496,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
+=======
+>>>>>>> f3b76b72a ([Feature][API] Modify the permissions of project management, security center, data source center and data quality module.)
      * query permission id
      *
      * @param user user

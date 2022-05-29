@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -79,7 +81,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, FuncPermissionEnum.CREATE_WORKER_GROUP.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
         if (StringUtils.isEmpty(name)) {
@@ -182,7 +185,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.WORKER_GROUP,FuncPermissionEnum.WORKER_GROUP_MANAGE.toString())) {
             putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -306,7 +309,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP,FuncPermissionEnum.WORKER_GROUP_DELETE.toString())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);
