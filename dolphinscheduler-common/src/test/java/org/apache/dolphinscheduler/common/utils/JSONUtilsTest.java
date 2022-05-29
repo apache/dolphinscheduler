@@ -262,11 +262,17 @@ public class JSONUtilsTest {
 
     @Test
     public void dateToString() {
+<<<<<<< HEAD
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+=======
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        TimeZone.setDefault(timeZone);
+        JSONUtils.setTimeZone(timeZone);
+>>>>>>> 8e372fad3 ([Fix] Fix the JSONUtils tool class time zone problem #10282)
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
-        Assert.assertEquals(json, "\"" + time + "\"");
+        Assert.assertEquals("\"" + time + "\"", json);
 
         String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
         Assert.assertNull(DateUtils.stringToDate(errorFormatTime));
@@ -274,10 +280,18 @@ public class JSONUtilsTest {
 
     @Test
     public void stringToDate() {
+<<<<<<< HEAD
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+=======
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        TimeZone.setDefault(timeZone);
+        JSONUtils.setTimeZone(timeZone);
+>>>>>>> 8e372fad3 ([Fix] Fix the JSONUtils tool class time zone problem #10282)
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
-        Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
+        Assert.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
+
     }
+
 
 }
