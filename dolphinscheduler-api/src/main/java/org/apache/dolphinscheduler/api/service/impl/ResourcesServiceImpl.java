@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
@@ -54,6 +56,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +108,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
+    
+    @Autowired
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * create directory
@@ -125,6 +131,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           ResourceType type,
                                           int pid,
                                           String currentDir) {
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FOLDER_CREATE : FuncPermissionEnum.UDF_CREATE_FOLDER;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
+
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -197,6 +209,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          MultipartFile file,
                                          int pid,
                                          String currentDir) {
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_CREATE : FuncPermissionEnum.UDF_CREATE_FOLDER;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
+
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -311,6 +329,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          String desc,
                                          ResourceType type,
                                          MultipartFile file) {
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_EDIT : FuncPermissionEnum.UDF_FUNC_EDIT;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), new Object[]{resourceId}, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
+
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -577,13 +601,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     public Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
+        Result<Object> result = new Result<>();
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_VIEW : FuncPermissionEnum.UDF_FILE_VIEW;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, result);
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
 
-        Result result = new Result();
         Page<Resource> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId = 0;
         }
+
         if (directoryId != -1) {
             Resource directory = resourcesMapper.selectById(directoryId);
             if (directory == null) {
@@ -592,9 +622,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal, resourcesIds);
+        Set<Integer> resourcesIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), logger);
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), searchVal, new ArrayList<>(resourcesIds));
 
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) resourceIPage.getTotal());
@@ -683,6 +712,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
+
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_VIEW : FuncPermissionEnum.UDF_FILE_VIEW;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
@@ -699,10 +736,21 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list
      */
     @Override
-    public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
-        Map<String, Object> result = new HashMap<>();
+    public Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
+        Result<Object> result = new Result<>();
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_VIEW : FuncPermissionEnum.UDF_FILE_VIEW;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, result);
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
 
-        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
+        Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), logger);
+        if (resourceIds.isEmpty()){
+            result.setData(Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        List<Resource> allResourceList = resourcesMapper.selectBatchIds(resourceIds);
 
         String suffix = ".jar";
         if (programType != null) {
@@ -718,9 +766,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
-        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
+        result.setData(resourceTreeVisitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -735,15 +782,21 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> delete(User loginUser, int resourceId) throws IOException {
-        Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-
         // get resource by id
+        Result<Object> resultCheck = new Result<>();
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(resultCheck, Status.RESOURCE_NOT_EXIST);
+            return resultCheck;
+        }
+        FuncPermissionEnum funcPermissionEnum = resource.getType().equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_DELETE : FuncPermissionEnum.UDF_DELETE;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), new Object[]{resourceId}, resultCheck);
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
+        
+        Result<Object> result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
         if (!canOperator(loginUser, resource.getUserId())) {
@@ -818,6 +871,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FOLDER_CREATE : FuncPermissionEnum.UDF_CREATE_FOLDER;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, result);
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
         putMsg(result, Status.SUCCESS);
         if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, RegexUtils.escapeNRT(fullName));
@@ -854,34 +912,39 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return true if the resource full name or pid not exists, otherwise return false
      */
     @Override
-    public Result<Object> queryResource(String fullName, Integer id, ResourceType type) {
+    public Result<Object> queryResource(User loginUser, String fullName, Integer id, ResourceType type) {
         Result<Object> result = new Result<>();
         if (StringUtils.isBlank(fullName) && id == null) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
+        Resource resource;
         if (StringUtils.isNotBlank(fullName)) {
             List<Resource> resourceList = resourcesMapper.queryResource(fullName, type.ordinal());
             if (CollectionUtils.isEmpty(resourceList)) {
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            putMsg(result, Status.SUCCESS);
-            result.setData(resourceList.get(0));
+            resource = resourceList.get(0);
         } else {
-            Resource resource = resourcesMapper.selectById(id);
+            resource = resourcesMapper.selectById(id);
             if (resource == null) {
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            Resource parentResource = resourcesMapper.selectById(resource.getPid());
-            if (parentResource == null) {
+            resource = resourcesMapper.selectById(resource.getPid());
+            if (resource == null) {
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            putMsg(result, Status.SUCCESS);
-            result.setData(parentResource);
         }
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_VIEW : FuncPermissionEnum.UDF_FILE_VIEW;
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), new Object[]{resource.getId()}, new Result<>());
+        if (Objects.nonNull(permissionCheckResult)){
+            return permissionCheckResult;
+        }
+        putMsg(result, Status.SUCCESS);
+        result.setData(resource);
         return result;
     }
 
@@ -891,8 +954,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource
      */
     @Override
-    public Result<Object> queryResourceById(Integer id) {
+    public Result<Object> queryResourceById(User loginUser, Integer id) {
         Result<Object> result = new Result<>();
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, FuncPermissionEnum.FILE_VIEW, loginUser.getId(), new Object[]{id}, result);
+        if (Objects.nonNull(permissionCheckResult)){
+            return permissionCheckResult;
+        }
         Resource resource = resourcesMapper.selectById(id);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -912,17 +979,21 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource content
      */
     @Override
-    public Result<Object> readResource(int resourceId, int skipLineNum, int limit) {
+    public Result<Object> readResource(User loginUser, int resourceId, int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-
         // get resource by id
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
+        }
+        FuncPermissionEnum funcPermissionEnum = resource.getType().equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_VIEW : FuncPermissionEnum.UDF_FILE_VIEW;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), new Object[]{resourceId}, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
         }
         //check preview or not by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
@@ -982,6 +1053,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content, int pid, String currentDir) {
+        FuncPermissionEnum funcPermissionEnum = type.equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_UPLOAD : FuncPermissionEnum.UPLOAD_UDF_RESOURCES;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), null, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
+        
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -1028,7 +1105,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
-        result = uploadContentToStorage(fullName, tenantCode, content);
+        result = uploadContentToStorage(loginUser, fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
@@ -1081,7 +1158,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<Object> updateResourceContent(int resourceId, String content) {
+    public Result<Object> updateResourceContent(User loginUser, int resourceId, String content) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -1092,6 +1169,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             logger.error("read file not exist,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
+        }
+
+        FuncPermissionEnum funcPermissionEnum = resource.getType().equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_EDIT : FuncPermissionEnum.UDF_EDIT;
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), new Object[]{resourceId}, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
         }
         //check can edit by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
@@ -1114,7 +1197,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resource.setUpdateTime(new Date());
         resourcesMapper.updateById(resource);
 
-        result = uploadContentToStorage(resource.getFullName(), tenantCode, content);
+        result = uploadContentToStorage(loginUser, resource.getFullName(), tenantCode, content);
         updateParentResourceSize(resource, resource.getSize() - originFileSize);
 
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1129,7 +1212,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param content      content
      * @return result
      */
-    private Result<Object> uploadContentToStorage(String resourceName, String tenantCode, String content) {
+    private Result<Object> uploadContentToStorage(User loginUser,String resourceName, String tenantCode, String content) {
         Result<Object> result = new Result<>();
         String localFilename = "";
         String storageFileName = "";
@@ -1176,7 +1259,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @throws IOException exception
      */
     @Override
-    public org.springframework.core.io.Resource downloadResource(int resourceId) throws IOException {
+    public org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId) throws IOException {
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
@@ -1187,6 +1270,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (resource == null) {
             logger.error("download file not exist,  resource id {}", resourceId);
             return null;
+        }
+
+        FuncPermissionEnum funcPermissionEnum = resource.getType().equals(ResourceType.FILE) ? FuncPermissionEnum.FILE_DOWNLOAD : FuncPermissionEnum.UDF_DOWNLOAD;
+        // check permission
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.RESOURCE_FILE_ID, funcPermissionEnum, loginUser.getId(), new Object[]{resourceId}, new Result<>());
+        if (Objects.nonNull(permissionCheck)){
+            logger.error("{}: {}", Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), PropertyUtils.getResUploadStartupState());
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg());
         }
         if (resource.isDirectory()) {
             logger.error("resource id {} is directory,can't download it", resourceId);
@@ -1234,6 +1325,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
+        if (!resourcePermissionCheckService.functionDisabled()){
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
 
         List<Resource> resourceList;
         if (isAdmin(loginUser)) {
@@ -1300,7 +1395,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-
+        if (!resourcePermissionCheckService.functionDisabled()){
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        
         List<UdfFunc> udfFuncList;
         if (isAdmin(loginUser)) {
             // admin gets all udfs except userId
@@ -1334,7 +1433,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-
+        if (!resourcePermissionCheckService.functionDisabled()){
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;    
+        }
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
         putMsg(result, Status.SUCCESS);
@@ -1351,6 +1453,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
+        if (!resourcePermissionCheckService.functionDisabled()){
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
 
         List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
@@ -1471,6 +1577,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private List<Resource> queryResourceList(Integer userId, int perm) {
         List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
         return CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
+    }
+
+
+    private Result<Object> permissionCheck (AuthorizationType authorizationType, FuncPermissionEnum funcPermissionEnum, Integer userId, Object[] needChecks, Result<Object> result){
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(authorizationType, userId, funcPermissionEnum.getKey(), logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(authorizationType, needChecks, userId, logger);
+        if (!(operationPermissionCheck && resourcePermissionCheck)){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+        return null;
     }
 
 }

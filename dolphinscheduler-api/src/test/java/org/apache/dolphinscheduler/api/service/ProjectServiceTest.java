@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
@@ -81,6 +82,8 @@ public class ProjectServiceTest {
 
         User loginUser = getLoginUser();
         loginUser.setId(1);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, 1, FuncPermissionEnum.CREATE_PROJECT.getKey(), projectServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null, 1, projectServiceLogger)).thenReturn(true);
         Map<String, Object> result = projectService.createProject(loginUser, projectName, getDesc());
         logger.info(result.toString());
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));

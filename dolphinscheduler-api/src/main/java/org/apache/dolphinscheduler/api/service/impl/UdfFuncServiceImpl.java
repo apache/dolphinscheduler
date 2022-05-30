@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -33,11 +34,14 @@ import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +68,9 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Autowired
     private UDFUserMapper udfUserMapper;
 
+    @Autowired
+    private ResourcePermissionCheckService resourcePermissionCheckService;
+
     /**
      * create udf function
      *
@@ -88,6 +95,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                             int resourceId) {
         Result<Object> result = new Result<>();
 
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.CREATE_UDF_FUNCTION, loginUser.getId(), null, result);
+        if (permissionCheckResult != null){
+            return permissionCheckResult;
+        }
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
@@ -150,14 +161,18 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function detail
      */
     @Override
-    public Map<String, Object> queryUdfFuncDetail(int id) {
-        Map<String, Object> result = new HashMap<>();
+    public Result<Object> queryUdfFuncDetail(User loginUser, int id) {
+        Result<Object> result = new Result<>();
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNCTION_VIEW, loginUser.getId(), new Object[]{id}, result);
+        if (permissionCheckResult != null){
+            return permissionCheckResult;
+        }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        result.put(Constants.DATA_LIST, udfFunc);
+        result.setData(udfFunc);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -176,7 +191,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateUdfFunc(int udfFuncId,
+    public Result<Object> updateUdfFunc(User loginUser,
+                                             int udfFuncId,
                                              String funcName,
                                              String className,
                                              String argTypes,
@@ -184,13 +200,19 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                              String desc,
                                              UdfType type,
                                              int resourceId) {
-        Map<String, Object> result = new HashMap<>();
+        Result<Object> result = new Result<>();
+
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNC_EDIT, loginUser.getId(), new Object[]{resourceId}, result);
+        if (permissionCheckResult != null){
+            return permissionCheckResult;
+        }
+
         // verify udfFunc is exist
         UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
         if (udf == null) {
-            result.put(Constants.STATUS, Status.UDF_FUNCTION_NOT_EXIST);
-            result.put(Constants.MSG, Status.UDF_FUNCTION_NOT_EXIST.getMsg());
+            result.setCode(Status.UDF_FUNCTION_NOT_EXIST.getCode());
+            result.setMsg(Status.UDF_FUNCTION_NOT_EXIST.getMsg());
             return result;
         }
 
@@ -205,8 +227,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         if (!funcName.equals(udf.getFuncName())) {
             if (checkUdfFuncNameExists(funcName)) {
                 logger.error("UdfFuncRequest {} has exist, can't create again.", funcName);
-                result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
-                result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
+                result.setCode(Status.UDF_FUNCTION_EXISTS.getCode());
+                result.setMsg(Status.UDF_FUNCTION_EXISTS.getMsg());
                 return result;
             }
         }
@@ -214,8 +236,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         Resource resource = resourceMapper.selectById(resourceId);
         if (resource == null) {
             logger.error("resourceId {} is not exist", resourceId);
-            result.put(Constants.STATUS, Status.RESOURCE_NOT_EXIST);
-            result.put(Constants.MSG, Status.RESOURCE_NOT_EXIST.getMsg());
+            result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
+            result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;
         }
         Date now = new Date();
@@ -247,8 +269,12 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function list page
      */
     @Override
-    public Result queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public Result<Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result<Object> result = new Result();
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNCTION_VIEW, loginUser.getId(), null, result);
+        if (Objects.nonNull(permissionCheckResult)) {
+            return permissionCheckResult;
+        }
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
         pageInfo.setTotal((int)udfFuncList.getTotal());
@@ -272,8 +298,12 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         if (isAdmin(loginUser)) {
             userId = 0;
         }
+        Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, userId, logger);
         Page<UdfFunc> page = new Page<>(pageNo, pageSize);
-        return udfFuncMapper.queryUdfFuncPaging(page, userId, searchVal);
+        if (udfFuncIds.isEmpty()) {
+            return page;
+        }
+        return udfFuncMapper.queryUdfFuncPaging(page, new ArrayList<>(udfFuncIds), searchVal);
     }
 
     /**
@@ -284,15 +314,22 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf func list
      */
     @Override
-    public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>();
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(userId, type);
+    public Result<Object> queryUdfFuncList(User loginUser, Integer type) {
+        Result<Object> result = new Result<>();
 
-        result.put(Constants.DATA_LIST, udfFuncList);
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNCTION_VIEW, loginUser.getId(), null, result);
+        if (Objects.nonNull(permissionCheckResult)) {
+            return permissionCheckResult;
+        }
+        Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, loginUser.getId(), logger);
+        if (udfFuncIds.isEmpty()){
+            result.setData(Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(new ArrayList<>(udfFuncIds), type);
+
+        result.setData(udfFuncList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -305,8 +342,13 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Result<Object> delete(int id) {
+    public Result<Object> delete(User loginUser, int id) {
         Result<Object> result = new Result<>();
+
+        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNC_DELETE, 1, new Object[]{id}, result);
+        if (Objects.nonNull(permissionCheckResult)){
+            return permissionCheckResult;
+        }
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
         putMsg(result, Status.SUCCESS);
@@ -320,14 +362,29 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return true if the name can user, otherwise return false
      */
     @Override
-    public Result<Object> verifyUdfFuncByName(String name) {
+    public Result<Object> verifyUdfFuncByName(User loginUser, String name) {
         Result<Object> result = new Result<>();
+        Result<Object> permissionCheck = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.CREATE_UDF_FUNCTION, loginUser.getId(), null, result);
+        if (Objects.nonNull(permissionCheck)){
+            return permissionCheck;
+        }
+
         if (checkUdfFuncNameExists(name)) {
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
         } else {
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    private Result<Object> permissionCheck (AuthorizationType authorizationType, FuncPermissionEnum funcPermissionEnum, Integer userId, Object[] needChecks, Result<Object> result){
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(authorizationType, userId, funcPermissionEnum.getKey(), logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(authorizationType, needChecks, userId, logger);
+        if (!(operationPermissionCheck && resourcePermissionCheck)){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+        return null;
     }
 
 }

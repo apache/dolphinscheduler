@@ -52,7 +52,9 @@ public enum AuthorizationType {
     QUEUE(10,"queue"),
     DATA_ANALYSIS(11,"data analysis"),
     K8S_NAMESPACE(12,"k8s namespace"),
-    MONITOR(13,"montitor");
+    MONITOR(13,"monitor"),
+    TASK_GROUP(14,"task group"),
+    ;
     AuthorizationType(int code, String descp) {
         this.code = code;
         this.descp = descp;

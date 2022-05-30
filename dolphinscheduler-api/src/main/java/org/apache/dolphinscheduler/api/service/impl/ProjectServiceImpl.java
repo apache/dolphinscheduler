@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -88,6 +89,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
         Map<String, Object> result = new HashMap<>();
+        if (!resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(), FuncPermissionEnum.CREATE_PROJECT.getKey(), logger)){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         Map<String, Object> descCheck = checkDesc(desc);
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
             return descCheck;
