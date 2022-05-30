@@ -104,14 +104,14 @@ public class AccessTokenServiceTest {
     public void testCreateToken() {
         // Given Token
         when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
-        Map<String, Object> result = accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
+        Result result = accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.getCode());
 
         // Token is absent
         result = this.accessTokenService.createToken(getLoginUser(), 1, getDate(), null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.getCode());
     }
 
     @Test
