@@ -51,4 +51,10 @@ public interface ResourcePermissionCheckService<T>{
      * @return
      */
     boolean operationPermissionCheck(AuthorizationType authorizationType, int userId, String sourceUrl, Logger logger);
+
+    /**
+     * functionDisabled
+     * @return
+     */
+    boolean functionDisabled();
 }

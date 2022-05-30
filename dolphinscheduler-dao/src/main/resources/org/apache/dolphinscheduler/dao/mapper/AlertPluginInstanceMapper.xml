@@ -59,4 +59,12 @@
         where instance_name = #{instanceName} limit 1
     </select>
 
+    <select id="queryAllAlertPluginInstanceList"
+            resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_alert_plugin_instance
+    </select>
+
+
 </mapper>
