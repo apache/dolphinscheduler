@@ -24,7 +24,7 @@ This sample shows how to use the parameter passing function. Create local parame
 
 #### Create a SHELL task and set parameters
 
-> The user needs to pass the parameter when creating the shell script, the output statement format is `${setValue(key=value)}`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
+The user needs to pass the parameter when creating the shell script, the output statement format is `'${setValue(key=value)}'`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
 
 Create a Node_A task, add output and value parameters to the custom parameters, and write the following script:
 
