@@ -38,6 +38,10 @@ public enum AuthorizationType {
      * 11 DATA_ANALYSIS;
      * 12 K8S_NAMESPACE;
      * 13 MONITOR;
+     * 14 ALERT_PLUGIN_INSTANCE;
+     * 15 TENANT;
+     * 16 USER;
+     * 17 Data_Quality;
      */
     RESOURCE_FILE_ID(0, "resource file id"),
     RESOURCE_FILE_NAME(1, "resource file name"),
@@ -52,7 +56,11 @@ public enum AuthorizationType {
     QUEUE(10,"queue"),
     DATA_ANALYSIS(11,"data analysis"),
     K8S_NAMESPACE(12,"k8s namespace"),
-    MONITOR(13,"montitor");
+    MONITOR(13,"montitor"),
+    ALERT_PLUGIN_INSTANCE(14,"alert plugin instance"),
+    TENANT(15,"tenant"),
+    USER(16,"user"),
+    DATA_QUALITY(17,"data quality");
     AuthorizationType(int code, String descp) {
         this.code = code;
         this.descp = descp;
