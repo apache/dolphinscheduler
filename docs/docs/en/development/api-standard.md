@@ -20,25 +20,25 @@ Use URI to locate the resource, and use GET to indicate query.
 + When the URI is a type of resource, it means to query a type of resource. For example, the following example indicates paging query `alter-groups`.
 ```
 Method: GET
-/api/dolphinscheduler/alert-groups
+/dolphinscheduler/alert-groups
 ```
 
 + When the URI is a single resource, it means to query this resource. For example, the following example means to query the specified `alter-group`.
 ```
 Method: GET
-/api/dolphinscheduler/alter-groups/{id}
+/dolphinscheduler/alter-groups/{id}
 ```
 
 + In addition, we can also express query sub-resources based on URI, as follows:
 ```
 Method: GET
-/api/dolphinscheduler/projects/{projectId}/tasks
+/dolphinscheduler/projects/{projectId}/tasks
 ```
 
 **The above examples all represent paging query. If we need to query all data, we need to add `/list` after the URI to distinguish. Do not mix the same API for both paged query and query.**
 ```
 Method: GET
-/api/dolphinscheduler/alert-groups/list
+/dolphinscheduler/alert-groups/list
 ```
 
 ### ② Create - POST
@@ -48,13 +48,13 @@ Use URI to locate the resource, use POST to indicate create, and then return the
 
 ```
 Method: POST
-/api/dolphinscheduler/alter-groups
+/dolphinscheduler/alter-groups
 ```
 
 + create sub-resources is also the same as above.
 ```
 Method: POST
-/api/dolphinscheduler/alter-groups/{alterGroupId}/tasks
+/dolphinscheduler/alter-groups/{alterGroupId}/tasks
 ```
 
 ### ③ Modify - PUT
@@ -62,7 +62,7 @@ Use URI to locate the resource, use PUT to indicate modify.
 + modify an `alert-group`
 ```
 Method: PUT
-/api/dolphinscheduler/alter-groups/{alterGroupId}
+/dolphinscheduler/alter-groups/{alterGroupId}
 ```
 
 ### ④ Delete -DELETE
@@ -71,20 +71,20 @@ Use URI to locate the resource, use DELETE to indicate delete.
 + delete an `alert-group`
 ```
 Method: DELETE
-/api/dolphinscheduler/alter-groups/{alterGroupId}
+/dolphinscheduler/alter-groups/{alterGroupId}
 ```
 
 + batch deletion: batch delete the id array，we should use POST. **（Do not use the DELETE method, because the body of the DELETE request has no semantic meaning, and it is possible that some gateways, proxies, and firewalls will directly strip off the request body after receiving the DELETE request.）**
 ```
 Method: POST
-/api/dolphinscheduler/alter-groups/batch-delete
+/dolphinscheduler/alter-groups/batch-delete
 ```
 
 ### ⑤ Others
 In addition to creating, deleting, modifying and quering, we also locate the corresponding resource through url, and then append operations to it after the path, such as:
 ```
-/api/dolphinscheduler/alert-groups/verify-name
-/api/dolphinscheduler/projects/{projectCode}/process-instances/{code}/view-gantt
+/dolphinscheduler/alert-groups/verify-name
+/dolphinscheduler/projects/{projectCode}/process-instances/{code}/view-gantt
 ```
 
 ## 3. Parameter design
@@ -94,7 +94,7 @@ In the case of paging, if the parameter entered by the user is less than 1, the 
 
 ## 4. Others design
 ### base URL
-The URI of the project needs to use `/api/<project_name>` as the base path, so as to identify that these APIs are under this project.
+The URI of the project needs to use `/<project_name>` as the base path, so as to identify that these APIs are under this project.
 ```
-/api/dolphinscheduler
+/dolphinscheduler
 ```

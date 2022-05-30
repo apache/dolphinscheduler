@@ -23,25 +23,25 @@ Restful URI 的设计基于资源：
 + 当 URI 为一类资源时表示查询一类资源，例如下面样例表示分页查询 `alter-groups`。
 ```
 Method: GET
-/api/dolphinscheduler/alert-groups
+/dolphinscheduler/alert-groups
 ```
 
 + 当 URI 为单个资源时表示查询此资源，例如下面样例表示查询对应的 `alter-group`。
 ```
 Method: GET
-/api/dolphinscheduler/alter-groups/{id}
+/dolphinscheduler/alter-groups/{id}
 ```
 
 + 此外，我们还可以根据 URI 来表示查询子资源，如下：
 ```
 Method: GET
-/api/dolphinscheduler/projects/{projectId}/tasks
+/dolphinscheduler/projects/{projectId}/tasks
 ```
 
 **上述的关于查询的方式都表示分页查询，如果我们需要查询全部数据的话，则需在 URI 的后面加 `/list` 来区分。分页查询和查询全部不要混用一个 API。**
 ```
 Method: GET
-/api/dolphinscheduler/alert-groups/list
+/dolphinscheduler/alert-groups/list
 ```
 
 ### ② 创建操作 - POST
@@ -51,20 +51,20 @@ Method: GET
 
 ```
 Method: POST
-/api/dolphinscheduler/alter-groups
+/dolphinscheduler/alter-groups
 ```
 
 + 创建子资源也是类似的操作：
 ```
 Method: POST
-/api/dolphinscheduler/alter-groups/{alterGroupId}/tasks
+/dolphinscheduler/alter-groups/{alterGroupId}/tasks
 ```
 
 ### ③ 修改操作 - PUT
 通过 URI 来定位某一资源，通过 PUT 指定对其修改。
 ```
 Method: PUT
-/api/dolphinscheduler/alter-groups/{alterGroupId}
+/dolphinscheduler/alter-groups/{alterGroupId}
 ```
 
 ### ④ 删除操作 -DELETE
@@ -73,20 +73,20 @@ Method: PUT
 + 下面例子表示删除 `alterGroupId` 对应的资源：
 ```
 Method: DELETE
-/api/dolphinscheduler/alter-groups/{alterGroupId}
+/dolphinscheduler/alter-groups/{alterGroupId}
 ```
 
 + 批量删除：对传入的 id 数组进行批量删除，使用 POST 方法。**（这里不要用 DELETE 方法，因为 DELETE 请求的 body 在语义上没有任何意义，而且有可能一些网关，代理，防火墙在收到 DELETE 请求后会把请求的 body 直接剥离掉。）**
 ```
 Method: POST
-/api/dolphinscheduler/alter-groups/batch-delete
+/dolphinscheduler/alter-groups/batch-delete
 ```
 
 ### ⑤ 其他操作
 除增删改查外的操作，我们同样也通过 `url` 定位到对应的资源，然后再在路径后面追加对其进行的操作。例如：
 ```
-/api/dolphinscheduler/alert-groups/verify-name
-/api/dolphinscheduler/projects/{projectCode}/process-instances/{code}/view-gantt
+/dolphinscheduler/alert-groups/verify-name
+/dolphinscheduler/projects/{projectCode}/process-instances/{code}/view-gantt
 ```
 
 ## 3. 参数设计
@@ -96,7 +96,7 @@ Method: POST
 
 ## 4. 其他设计
 ### 基础路径
-整个项目的 URI 需要以 `/api/<project_name>` 作为基础路径，从而标识这类 API 都是项目下的，即：
+整个项目的 URI 需要以 `/<project_name>` 作为基础路径，从而标识这类 API 都是项目下的，即：
 ```
-/api/dolphinscheduler
+/dolphinscheduler
 ```
