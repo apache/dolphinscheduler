@@ -12,7 +12,7 @@ First, go to the Security Center page. Select Alarm Group Management, click Alar
 
 Then select Alarm Group Management, create an alarm group, and choose the corresponding alarm instance.
 
-<img src="/img/alert/alert_step_1.png">
-<img src="/img/alert/alert_step_2.png">
-<img src="/img/alert/alert_step_3.png">
-<img src="/img/alert/alert_step_4.png">
+![alert-instance01](/img/new_ui/dev/alert/alert_instance01.png)
+![alert-instance02](/img/new_ui/dev/alert/alert_instance02.png)
+![alert-instance03](/img/new_ui/dev/alert/alert_instance03.png)
+![alert-instance04](/img/new_ui/dev/alert/alert_instance04.png)
