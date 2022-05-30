@@ -638,7 +638,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         Set<Integer> resourcesIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), logger);
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), searchVal, new ArrayList<>(resourcesIds));
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), loginUser.getId(), searchVal, new ArrayList<>(resourcesIds));
 
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) resourceIPage.getTotal());

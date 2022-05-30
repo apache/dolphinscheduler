@@ -60,7 +60,7 @@
         </include>
         ,u.user_name
         from t_ds_resources d,t_ds_user u
-        where d.type=#{type} and d.pid=#{id}
+        where d.type=#{type} and d.pid=#{id} and u.id = #{userId}
         <if test="resIds != null and resIds.size() > 0">
             and d.id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">
