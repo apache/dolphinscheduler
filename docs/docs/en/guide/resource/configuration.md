@@ -9,7 +9,7 @@ For a single machine, you can choose to use local file directory as the upload d
 
 Configure the file in the following paths: `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
 
-- Change 'data.basedir.path' to the local directory path. Please make sure the directory exists and the user who deploy dolphinscheduler have read and write permissions, such as: `data.basedir.path=/tmp/dolphinscheduler`.
+- Change `data.basedir.path` to the local directory path. Please make sure the directory exists and the user who deploy dolphinscheduler have read and write permissions, such as: `data.basedir.path=/tmp/dolphinscheduler`.
 - Modify the following two parameters, `resource.storage.type=HDFS` and `fs.defaultFS=file:///`.
 
 ## HDFS Resource Configuration
