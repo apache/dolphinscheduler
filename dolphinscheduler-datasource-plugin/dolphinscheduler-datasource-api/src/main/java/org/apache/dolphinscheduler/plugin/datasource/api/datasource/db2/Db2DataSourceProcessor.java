@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2;
 
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -27,15 +30,19 @@ import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections4.MapUtils;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@AutoService(DataSourceProcessor.class)
 public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
+
+    @Override
+    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+        return JSONUtils.parseObject(paramJson, Db2DataSourceParamDTO.class);
+    }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
@@ -104,6 +111,11 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DbType getDbType() {
         return DbType.DB2;
+    }
+
+    @Override
+    public DataSourceProcessor create() {
+        return new Db2DataSourceProcessor();
     }
 
     @Override

@@ -481,6 +481,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return (permissionId & Constants.READ_PERMISSION) != 0;
     }
 
+
     /**
      * query permission id
      *
