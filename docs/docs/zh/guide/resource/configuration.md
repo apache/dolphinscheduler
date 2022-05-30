@@ -5,7 +5,7 @@
 ## 本地资源配置
 在单机环境下，可以选择使用本地文件目录作为上传文件夹（无需部署Hadoop），此时需要进行如下配置：
 
-### 配置 common.properties 文件
+### 配置 `common.properties` 文件
 
 对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
 
