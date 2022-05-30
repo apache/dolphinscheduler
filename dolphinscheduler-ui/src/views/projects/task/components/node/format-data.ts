@@ -294,7 +294,8 @@ export function formatParams(data: INodeData): {
       target_connector_type: data.target_connector_type,
       target_datasource_id: data.target_datasource_id,
       target_table: data.target_table,
-      threshold: data.threshold
+      threshold: data.threshold,
+      mapping_columns: JSON.stringify(data.mapping_columns)
     }
     taskParams.sparkParameters = {
       deployMode: data.deployMode,
@@ -524,6 +525,10 @@ export function formatModel(data: ITaskData) {
       data.taskParams.ruleInputParameter.target_datasource_id
     params.target_table = data.taskParams.ruleInputParameter.target_table
     params.threshold = data.taskParams.ruleInputParameter.threshold
+    if (data.taskParams.ruleInputParameter.mapping_columns)
+      params.mapping_columns = JSON.parse(
+        data.taskParams.ruleInputParameter.mapping_columns
+      )
   }
   if (data.taskParams?.sparkParameters) {
     params.deployMode = data.taskParams.sparkParameters.deployMode
