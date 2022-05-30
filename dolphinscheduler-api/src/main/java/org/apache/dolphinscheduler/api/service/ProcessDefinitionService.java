@@ -304,7 +304,7 @@ public interface ProcessDefinitionService {
      * @param limit limit
      * @return tree view json data
      */
-    Map<String, Object> viewTree(long projectCode, long code, Integer limit);
+    Map<String, Object> viewTree(User loginUser,long projectCode, long code, Integer limit);
 
     /**
      * switch the defined process definition version

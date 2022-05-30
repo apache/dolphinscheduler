@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
-import org.apache.dolphinscheduler.api.dto.TaskStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -42,8 +43,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,8 +58,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
 
 /**
  * data analysis service impl
@@ -127,6 +127,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 startDate,
                 endDate,
                 (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
+
         // process state count needs to remove state of forced success
         if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
             ((TaskCountDto) result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
@@ -145,10 +146,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate
             , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         Map<String, Object> result = new HashMap<>();
-
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,PROJECT_OVERVIEW);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -194,10 +194,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     @Override
     public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
-
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,PROJECT_OVERVIEW);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -236,6 +235,10 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Long[] projectCodeArray = getProjectCodesArrays(loginUser);
 
         // admin can view all
+        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, PROJECT_OVERVIEW)){
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
+            return result;
+        }
         int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
 
         // count normal command state

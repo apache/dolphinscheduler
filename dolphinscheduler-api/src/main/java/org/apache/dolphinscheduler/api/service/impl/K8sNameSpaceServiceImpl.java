@@ -17,29 +17,28 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.K8sNameSpaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.service.k8s.K8sClientService;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * k8s namespace service impl
@@ -75,7 +74,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Result queryListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.K8S_NAMESPACE,null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -109,7 +108,8 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, String owner, String tag, Double limitsCpu, Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -182,7 +182,8 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Map<String, Object> updateK8sNamespace(User loginUser, int id, String owner, String tag, Double limitsCpu, Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -262,7 +263,8 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Map<String, Object> deleteNamespaceById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -285,7 +287,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * @return true if the k8s and namespace not exists, otherwise return false
      */
     private boolean checkNamespaceExistInDb(String namespace, String k8s) {
-        return k8sNamespaceMapper.existNamespace(namespace, k8s) == Boolean.TRUE;
+        return Objects.equals(k8sNamespaceMapper.existNamespace(namespace, k8s), Boolean.TRUE);
     }
 
     /**

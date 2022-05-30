@@ -71,4 +71,20 @@
         select alert_instance_ids  from t_ds_alertgroup
         where id = #{alertGroupId}
     </select>
+
+    <select id="listAuthorizedAlertGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_alertgroup ag
+        where 1=1
+        <if test="userId != 0">
+            and ag.create_user_id = #{userId}
+        </if>
+        <if test="alertGroupsIds != null and alertGroupsIds.length > 0">
+            and ag.id  in
+            <foreach item="id" index="index" collection="alertGroupsIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
 </mapper>

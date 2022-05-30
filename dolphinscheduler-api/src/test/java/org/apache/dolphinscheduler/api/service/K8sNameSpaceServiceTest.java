@@ -17,24 +17,23 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.K8sNameSpaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.k8s.K8sClientService;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,13 +46,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public class K8sNameSpaceServiceTest {
-
     private static final Logger logger = LoggerFactory.getLogger(K8sNameSpaceServiceTest.class);
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
     private K8sNameSpaceServiceImpl k8sNameSpaceService;
@@ -63,6 +63,9 @@ public class K8sNameSpaceServiceTest {
 
     @Mock
     private K8sClientService k8sClientService;
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Mock
     private UserMapper userMapper;
@@ -85,6 +88,8 @@ public class K8sNameSpaceServiceTest {
         IPage<K8sNamespace> page = new Page<>(1, 10);
         page.setTotal(1L);
         page.setRecords(getNamespaceList());
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(k8sNamespaceMapper.queryK8sNamespacePaging(Mockito.any(Page.class), Mockito.eq(namespace))).thenReturn(page);
         Result result = k8sNameSpaceService.queryListPaging(getLoginUser(), namespace, 1, 10);
         logger.info(result.toString());
@@ -94,6 +99,8 @@ public class K8sNameSpaceServiceTest {
 
     @Test
     public void createK8sNamespace() {
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         // namespace is null
         Map<String, Object> result = k8sNameSpaceService.createK8sNamespace(getLoginUser(), null, k8s, null, "tag", 10.0, 100);
         logger.info(result.toString());
@@ -115,8 +122,9 @@ public class K8sNameSpaceServiceTest {
     @Test
     public void updateK8sNamespace() {
         Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
-
-        Map<String, Object> result = k8sNameSpaceService.updateK8sNamespace(getLoginUser(), 1, null, "tag", null, null);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
+        Map<String, Object> result = k8sNameSpaceService.updateK8sNamespace(getLoginUser(), 1, null, null, null, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -159,7 +167,8 @@ public class K8sNameSpaceServiceTest {
     public void deleteNamespaceById() {
         Mockito.when(k8sNamespaceMapper.deleteById(Mockito.any())).thenReturn(1);
         Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
-
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = k8sNameSpaceService.deleteNamespaceById(getLoginUser(), 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.util.Date;
 
 /**
  * k8s namespace
@@ -37,54 +37,63 @@ public class K8sNamespace {
      */
     @TableField(value = "namespace")
     private String namespace;
+
     /**
      * total cpu limit
      */
     @TableField(value = "limits_cpu")
     private Double limitsCpu;
+
     /**
      * total memory limit,mi
      */
     private Integer limitsMemory;
+
     /**
      * owner
      */
     @TableField(value = "owner")
     private String owner;
 
+    @TableField(value = "tag")
+    private String tag;
+
     /**
      * create_time
      */
     @TableField("create_time")
     private Date createTime;
+
     /**
      * update_time
      */
     @TableField("update_time")
     private Date updateTime;
-    /**
-     * tag use for set this namespace allow run which type
-     */
-    @TableField("tag")
-    private String tag;
 
+    /**
+     * 1.00 = 1 cpu
+     */
     @TableField("pod_request_cpu")
     private Double podRequestCpu = 0.0;
+
     /**
      * Mi
      */
     @TableField("pod_request_memory")
     private Integer podRequestMemory = 0;
+
     /**
-     *
+     * replicas
      */
     @TableField("pod_replicas")
     private Integer podReplicas = 0;
+
     /**
      * online job
      */
     @TableField("online_job_num")
     private Integer onlineJobNum = 0;
+
     /**
      * k8s name
      */
@@ -131,6 +140,14 @@ public class K8sNamespace {
         this.owner = owner;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -145,14 +162,6 @@ public class K8sNamespace {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
     }
 
     public Integer getPodRequestMemory() {
@@ -193,5 +202,30 @@ public class K8sNamespace {
 
     public void setPodRequestCpu(Double podRequestCpu) {
         this.podRequestCpu = podRequestCpu;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        K8sNamespace k8sNamespace = (K8sNamespace) o;
+
+        if (id.equals(k8sNamespace.id)) {
+            return true;
+        }
+
+        return namespace.equals(k8sNamespace.namespace) && k8s.equals(k8sNamespace.k8s);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (k8s+namespace).hashCode();
+        return result;
     }
 }

@@ -28,6 +28,8 @@ import org.springframework.cache.annotation.Cacheable;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
+import java.util.List;
+
 /**
  * tenant mapper interface
  */
