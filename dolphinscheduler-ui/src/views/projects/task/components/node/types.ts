@@ -213,6 +213,7 @@ interface IRuleParameters {
   target_datasource_id?: number
   target_table?: string
   threshold?: string
+  mapping_columns?: string
 }
 
 interface ITaskParams {
@@ -352,7 +353,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
-    IRuleParameters {
+    Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -387,6 +388,7 @@ interface INodeData
   failedBranch?: number
   udfs?: string[]
   customConfig?: boolean
+  mapping_columns?: object[]
 }
 
 interface ITaskData
