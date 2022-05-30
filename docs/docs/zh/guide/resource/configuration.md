@@ -2,6 +2,17 @@
 
 资源中心通常用于上传文件、 UDF 函数，以及任务组管理等操作。针对单机环境可以选择本地文件目录作为上传文件夹（此操作不需要部署 Hadoop）。当然也可以选择上传到 Hadoop or MinIO 集群上，此时则需要有 Hadoop（2.6+）或者 MinIOn 等相关环境。
 
+## 本地资源配置
+
+在单机环境下，可以选择使用本地文件目录作为上传文件夹（无需部署Hadoop），此时需要进行如下配置：
+
+### 配置 `common.properties` 文件
+
+对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
+
+- 将 `data.basedir.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`data.basedir.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
+- 修改下列两个参数，分别是 `resource.storage.type=HDFS` 和 `fs.defaultFS=file:///`。
+
 ## HDFS 资源配置
 
 当需要使用资源中心进行相关文件的创建或者上传操作时，所有的文件和资源都会被存储在 HDFS 上。所以需要进行以下配置：
