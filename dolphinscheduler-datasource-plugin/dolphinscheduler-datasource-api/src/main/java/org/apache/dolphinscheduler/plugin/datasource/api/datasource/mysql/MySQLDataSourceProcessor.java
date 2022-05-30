@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql;
 
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -26,8 +29,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,9 +39,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@AutoService(DataSourceProcessor.class)
 public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(MySQLDataSourceProcessor.class);
@@ -52,6 +53,11 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
     private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
+
+    @Override
+    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+        return JSONUtils.parseObject(paramJson, MySQLDataSourceParamDTO.class);
+    }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
@@ -136,6 +142,11 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DbType getDbType() {
         return DbType.MYSQL;
+    }
+
+    @Override
+    public DataSourceProcessor create() {
+        return new MySQLDataSourceProcessor();
     }
 
     private String transformOther(Map<String, String> paramMap) {

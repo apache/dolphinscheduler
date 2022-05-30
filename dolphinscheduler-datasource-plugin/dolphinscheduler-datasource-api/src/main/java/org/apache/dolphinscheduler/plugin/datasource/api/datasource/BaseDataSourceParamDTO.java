@@ -32,9 +32,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
  * Basic datasource params submitted to api.
  * <p>
@@ -49,19 +46,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * see {@link PrestoDataSourceParamDTO}
  * see {@link RedshiftDataSourceParamDTO}
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes(value = {
-    @JsonSubTypes.Type(value = MySQLDataSourceParamDTO.class, name = "MYSQL"),
-    @JsonSubTypes.Type(value = PostgreSQLDataSourceParamDTO.class, name = "POSTGRESQL"),
-    @JsonSubTypes.Type(value = HiveDataSourceParamDTO.class, name = "HIVE"),
-    @JsonSubTypes.Type(value = SparkDataSourceParamDTO.class, name = "SPARK"),
-    @JsonSubTypes.Type(value = ClickHouseDataSourceParamDTO.class, name = "CLICKHOUSE"),
-    @JsonSubTypes.Type(value = OracleDataSourceParamDTO.class, name = "ORACLE"),
-    @JsonSubTypes.Type(value = SQLServerDataSourceParamDTO.class, name = "SQLSERVER"),
-    @JsonSubTypes.Type(value = Db2DataSourceParamDTO.class, name = "DB2"),
-    @JsonSubTypes.Type(value = PrestoDataSourceParamDTO.class, name = "PRESTO"),
-    @JsonSubTypes.Type(value = RedshiftDataSourceParamDTO.class, name = "REDSHIFT"),
-})
 public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected Integer id;
