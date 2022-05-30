@@ -30,14 +30,14 @@ This is demonstrated using one switch task and three shell tasks.
 
 ![switch_01](/img/tasks/demo/switch_01.png)
 
-### 1. Create a workflow
+### Create a workflow
 
 Create a new switch task, and three shell tasks downstream. The shell task is not required.
 The switch task needs to be connected with the downstream task to configure the relationship before the downstream task can be selected.
 
 ![switch_01](/img/tasks/demo/switch_01.png)
 
-### 2. Set conditions
+### Set conditions
 
 Configure the conditions and default branches. If the conditions are met, the specified branch will be taken. If the conditions are not met, the default branch will be taken.
 In the figure, if the value of the variable is "A", the branch taskA is executed, if the value of the variable is "B", the branch taskB is executed, and default is executed if both are not satisfied.
@@ -49,7 +49,7 @@ The value of the global variable configured here is A.
 
 ![switch_03](/img/tasks/demo/switch_03.png)
 
-### 3. Execute
+### Execute
 
 Execute and see if it works as expected. It can be seen that the specified downstream tasksA are executed as expected.
 
