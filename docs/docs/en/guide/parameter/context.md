@@ -57,7 +57,7 @@ Click on the Save workflow icon and set the global parameters output and value.
 
 ![context-parameter03](/img/new_ui/dev/parameter/context_parameter04.png)
 
-#### 4. View results
+#### View results
 
 After the workflow is created, run the workflow online and view its running results.
 
