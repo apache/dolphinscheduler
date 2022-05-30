@@ -35,7 +35,7 @@ Parameter Description:
 - value: The direction selection is IN, and the value is 66
 - output: The direction is selected as OUT, assigned through the script`'${setValue(output=1)}'`, and passed to the downstream parameters
 
-When the SHELL node is defined, when the log detects the format of ${setValue(output=1)}, it will assign 1 to output, and the downstream node can directly use the value of the variable output. Similarly, you can find the corresponding node instance on the [Workflow Instance] page, and then you can view the value of this variable.
+When the SHELL node is defined, the log detects the format of `${setValue(output=1)}`, it will assign 1 to output, and the downstream node can directly use the value of the variable output. Similarly, you can find the corresponding node instance on the [Workflow Instance] page, and then you can view the value of this variable.
 
 Create the Node_B task, which is mainly used to test and output the parameters passed by the upstream task Node_A.
 
