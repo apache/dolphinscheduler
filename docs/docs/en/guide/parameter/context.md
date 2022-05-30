@@ -41,7 +41,7 @@ Create the Node_B task, which is mainly used to test and output the parameters p
 
 ![context-parameter02](/img/new_ui/dev/parameter/context_parameter02.png)
 
-#### 2. Create SQL tasks and use parameters
+#### Create SQL tasks and use parameters
 
 When the SHELL task is completed, we can use the output passed upstream as the query object for the SQL. The id of the query is renamed to ID and is output as a parameter.
 
