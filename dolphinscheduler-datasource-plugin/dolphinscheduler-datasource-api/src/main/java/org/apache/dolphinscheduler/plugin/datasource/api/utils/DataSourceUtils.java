@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -27,13 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static java.lang.String.format;
 
 public class DataSourceUtils {
 
@@ -41,31 +36,6 @@ public class DataSourceUtils {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceUtils.class);
-
-    private static final Map<String, DataSourceProcessor> dataSourceProcessorMap = new ConcurrentHashMap<>();
-
-    public void installProcessor() {
-        final Set<String> names = new HashSet<>();
-
-        ServiceLoader.load(DataSourceProcessor.class).forEach(factory -> {
-            final String name = factory.getDbType().name();
-
-            logger.info("start register processor: " + name);
-            if (!names.add(name)) {
-                throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
-            }
-            loadDatasourceClient(factory);
-
-            logger.info("done register processor: " + name);
-
-        });
-        int i = 1;
-    }
-
-    private void loadDatasourceClient(DataSourceProcessor processor) {
-        DataSourceProcessor instance = processor.create();
-        dataSourceProcessorMap.put(processor.getDbType().name(), instance);
-    }
 
     /**
      * check datasource param
@@ -115,6 +85,7 @@ public class DataSourceUtils {
     }
 
     public static DataSourceProcessor getDatasourceProcessor(DbType dbType) {
+        Map<String, DataSourceProcessor> dataSourceProcessorMap = DataSourceProcessorProvider.getInstance().getDataSourceProcessorMap();
         if (!dataSourceProcessorMap.containsKey(dbType.name())) {
             throw new IllegalArgumentException("illegal datasource type");
         }
