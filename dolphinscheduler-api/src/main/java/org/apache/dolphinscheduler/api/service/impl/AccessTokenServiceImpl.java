@@ -120,8 +120,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      */
     @SuppressWarnings("checkstyle:WhitespaceAround")
     @Override
-    public Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token) {
-        Map<String, Object> result = new HashMap<>();
+    public Result createToken(User loginUser, int userId, String expireTime, String token) {
+        Result result = new Result();
 
         // 1. check permission
         if (!canOperator(loginUser,userId)) {
@@ -131,7 +131,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         // 2. check if user is existed
         if (userId <= 0) {
-            throw new IllegalArgumentException("User id should not less than or equals to 0.");
+            String errorMsg = "User id should not less than or equals to 0.";
+            logger.error(errorMsg);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, errorMsg);
+            return result;
         }
 
         // 3. generate access token if absent
@@ -150,7 +153,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         int insert = accessTokenMapper.insert(accessToken);
 
         if (insert > 0) {
-            result.put(Constants.DATA_LIST, accessToken);
+            result.setData(accessToken);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
