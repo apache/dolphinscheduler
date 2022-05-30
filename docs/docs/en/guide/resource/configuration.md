@@ -3,6 +3,7 @@
 The Resource Center is usually used for operations such as uploading files, UDF functions, and task group management. You can appoint the local file directory as the upload directory for a single machine (this operation does not need to deploy Hadoop). Or you can also upload to a Hadoop or MinIO cluster, at this time, you need to have Hadoop (2.6+) or MinIO or other related environments.
 
 ## Local File Resource Configuration
+
 For a single machine, you can choose to use local file directory as the upload directory (no need to deploy Hadoop) by making the following configuration.
 
 ### Configuring the `common.properties`
