@@ -57,7 +57,7 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 ![context-parameter03](/img/new_ui/dev/parameter/context_parameter04.png)
 
-#### 4、查看运行结果
+#### 查看运行结果
 
 创建完成工作流之后，上线运行该工作流，查看其运行结果。
 
