@@ -57,17 +57,7 @@ export default {
             key: 'docsHistory',
             text: 'Older Versions',
             link: '/en-us/docs/release/history-versions.html',
-          },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/en-us/docs/dev/user_doc/about/introduction.html',
-          },
+          }
         ],
       },
       {
@@ -243,17 +233,7 @@ export default {
             key: 'docsHistory',
             text: '历史版本',
             link: '/zh-cn/docs/release/history-versions.html',
-          },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/zh-cn/docs/dev/user_doc/about/introduction.html',
-          },
+          }
         ],
       },
       {

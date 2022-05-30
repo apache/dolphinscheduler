@@ -297,14 +297,21 @@ public class TaskGroupController extends BaseController {
     /**
      * query task group queue list paging
      *
-     * @param loginUser login user
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param groupId     ID for task group
+     * @param taskName    Task Name
+     * @param processName Process instance name
+     * @param status      Task queue status
+     * @param loginUser   login user
+     * @param pageNo      page number
+     * @param pageSize    page size
      * @return queue list
      */
     @ApiOperation(value = "queryTasksByGroupId", notes = "QUERY_ALL_TASKS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = false, dataType = "Int", example = "1", defaultValue = "-1"),
+        @ApiImplicitParam(name = "taskInstanceName", value = "TASK_INSTANCE_NAME", required = false, dataType = "String", example = "taskName"),
+        @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataType = "String", example = "processName"),
+        @ApiImplicitParam(name = "status", value = "STATUS", required = false, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
@@ -313,7 +320,7 @@ public class TaskGroupController extends BaseController {
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("groupId") Integer groupId,
+                                      @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
                                       @RequestParam(value = "taskInstanceName",required = false) String taskName,
                                       @RequestParam(value = "processInstanceName",required = false) String processName,
                                       @RequestParam(value = "status",required = false) Integer status,

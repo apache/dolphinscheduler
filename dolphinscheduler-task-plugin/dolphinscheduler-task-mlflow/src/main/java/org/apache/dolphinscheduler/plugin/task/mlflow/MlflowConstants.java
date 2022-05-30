@@ -26,6 +26,8 @@ public class MlflowConstants {
 
     public static final String JOB_TYPE_BASIC_ALGORITHM = "BasicAlgorithm";
 
+    public static final String JOB_TYPE_CUSTOM_PROJECT = "CustomProject";
+
     public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
 
     public static final String PRESET_REPOSITORY_VERSION = "main";
@@ -38,5 +40,55 @@ public class MlflowConstants {
 
     public static final String RUN_PROJECT_AUTOML_SCRIPT = "run_mlflow_automl_project.sh";
 
+    public static final String MLFLOW_TASK_TYPE_PROJECTS = "MLflow Projects";
+
+    public static final String MLFLOW_TASK_TYPE_MODELS = "MLflow Models";
+
+
+    public static final String MLFLOW_MODELS_DEPLOY_TYPE_MLFLOW = "MLFLOW";
+
+    public static final String MLFLOW_MODELS_DEPLOY_TYPE_DOCKER = "DOCKER";
+
+
+    /**
+     * mlflow command
+     */
+
+    public static final String EXPORT_MLFLOW_TRACKING_URI_ENV = "export MLFLOW_TRACKING_URI=%s";
+
+    public static final String SET_DATA_PATH = "data_path=%s";
+
+    public static final String SET_REPOSITORY = "repo=%s";
+
+    public static final String MLFLOW_RUN_BASIC_ALGORITHM = "mlflow run $repo " +
+            "-P algorithm=%s " +
+            "-P data_path=$data_path " +
+            "-P params=\"%s\" " +
+            "-P search_params=\"%s\" " +
+            "-P model_name=\"%s\" " +
+            "--experiment-name=\"%s\" " +
+            "--version=main ";
+
+    public static final String MLFLOW_RUN_AUTOML_PROJECT = "mlflow run $repo " +
+            "-P tool=%s " +
+            "-P data_path=$data_path " +
+            "-P params=\"%s\" " +
+            "-P model_name=\"%s\" " +
+            "--experiment-name=\"%s\" " +
+            "--version=main ";
+
+    public static final String MLFLOW_RUN_CUSTOM_PROJECT = "mlflow run $repo " +
+            "%s " +
+            "--experiment-name=\"%s\" " +
+            "--version=\"%s\" ";
+
+    public static final String MLFLOW_MODELS_SERVE = "mlflow models serve -m %s --port %s -h 0.0.0.0";
+
+    public static final String MLFLOW_BUILD_DOCKER = "mlflow models build-docker -m %s -n %s --enable-mlserver";
+
+
+    public static final String DOCKER_RREMOVE_CONTAINER = "docker rm -f %s";
+
+    public static final String DOCKER_RUN = "docker run --name=%s -p=%s:8080 %s";
 
 }

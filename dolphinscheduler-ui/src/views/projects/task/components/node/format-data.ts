@@ -338,7 +338,6 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'MLFLOW') {
     taskParams.algorithm = data.algorithm
-    taskParams.algorithm = data.algorithm
     taskParams.params = data.params
     taskParams.searchParams = data.searchParams
     taskParams.dataPath = data.dataPath
@@ -348,6 +347,12 @@ export function formatParams(data: INodeData): {
     taskParams.mlflowJobType = data.mlflowJobType
     taskParams.automlTool = data.automlTool
     taskParams.registerModel = data.registerModel
+    taskParams.mlflowTaskType = data.mlflowTaskType
+    taskParams.deployType = data.deployType
+    taskParams.deployPort = data.deployPort
+    taskParams.deployModelKey = data.deployModelKey
+    taskParams.mlflowProjectRepository = data.mlflowProjectRepository
+    taskParams.mlflowProjectVersion = data.mlflowProjectVersion
   }
 
   if (data.taskType === 'PIGEON') {
