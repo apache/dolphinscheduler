@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -44,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 
 /**
@@ -93,7 +92,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
             return descCheck;
         }
-        if (!canOperatorPermissions(loginUser, null,AuthorizationType.PROJECTS, FuncPermissionEnum.CREATE_PROJECT.toString())) {
+        if (!canOperatorPermissions(loginUser, null,AuthorizationType.PROJECTS, PROJECT_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -142,7 +141,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryByCode(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.PROJECT.toString());
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,PROJECT);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -157,7 +156,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryByName(User loginUser, String projectName) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.PROJECT.toString());
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,PROJECT);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -260,7 +259,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = getCheckResult(loginUser, project,FuncPermissionEnum.DELETE_PROJECT.toString());
+        Map<String, Object> checkResult = getCheckResult(loginUser, project,PROJECT_DELETE);
         if (checkResult != null) {
             return checkResult;
         }
@@ -316,7 +315,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.EDIT_PROJECT.toString());
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,PROJECT_UPDATE);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -422,7 +421,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         // 1. check read permission
         Project project = this.projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result,FuncPermissionEnum.PROJECT.toString());
+        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result,PROJECT);
         if (!hasProjectAndPerm) {
             return result;
         }

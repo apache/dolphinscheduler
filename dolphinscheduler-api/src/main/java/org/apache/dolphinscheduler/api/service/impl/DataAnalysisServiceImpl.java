@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
-import org.apache.dolphinscheduler.api.dto.TaskStateCount;
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -61,6 +59,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
 
 /**
  * data analysis service impl
@@ -150,7 +150,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Map<String, Object> result = new HashMap<>();
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.PROJECT_OVERVIEW.toString());
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,PROJECT_OVERVIEW);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -198,7 +198,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Map<String, Object> result = new HashMap<>();
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FuncPermissionEnum.PROJECT_OVERVIEW.toString());
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,PROJECT_OVERVIEW);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -237,7 +237,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Long[] projectCodeArray = getProjectCodesArrays(loginUser);
 
         // admin can view all
-        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, FuncPermissionEnum.PROJECT_OVERVIEW.toString())){
+        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, PROJECT_OVERVIEW)){
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
             return result;
         }

@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
@@ -53,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -138,7 +138,7 @@ public class UsersServiceTest {
         int state = 1;
         try {
             //userName error
-            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), FuncPermissionEnum.CREATE_USER.toString(), baseServiceLogger)).thenReturn(true);
+            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), USERS_CREATE , baseServiceLogger)).thenReturn(true);
             Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
             Map<String, Object> result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
@@ -242,7 +242,7 @@ public class UsersServiceTest {
         //success
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), FuncPermissionEnum.USER_MANAGER.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), USER_MANAGER, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null, 0, baseServiceLogger)).thenReturn(true);
         when(userMapper.selectList(null)).thenReturn(getUserList());
         result = usersService.queryUserList(user);
@@ -259,7 +259,7 @@ public class UsersServiceTest {
 
         //no operate
         user.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 99, FuncPermissionEnum.USER_MANAGER.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 99, USER_MANAGER, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,99, baseServiceLogger)).thenReturn(true);
         Result result = usersService.queryUserList(user, "userTest", 1, 10);
         logger.info(result.toString());
@@ -267,7 +267,7 @@ public class UsersServiceTest {
 
         //success
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), FuncPermissionEnum.USER_MANAGER.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), USER_MANAGER, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
         result = usersService.queryUserList(user, "userTest", 1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
@@ -284,7 +284,7 @@ public class UsersServiceTest {
             User user = new User();
             user.setUserType(UserType.ADMIN_USER);
             user.setId(1);
-            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(), FuncPermissionEnum.USER_EDIT.toString(), baseServiceLogger)).thenReturn(true);
+            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, user.getId(),USER_UPDATE, baseServiceLogger)).thenReturn(true);
             Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
             Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword, "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
@@ -310,7 +310,7 @@ public class UsersServiceTest {
             when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(0);
             //no operate
             loginUser.setUserType(UserType.GENERAL_USER);
-            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 990, FuncPermissionEnum.USER_DELETE.toString(), baseServiceLogger)).thenReturn(true);
+            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 990, USER_DELETE, baseServiceLogger)).thenReturn(true);
             Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,990, baseServiceLogger)).thenReturn(true);
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
@@ -319,7 +319,7 @@ public class UsersServiceTest {
             // user not exist
             loginUser.setUserType(UserType.ADMIN_USER);
             loginUser.setId(1);
-            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 1, FuncPermissionEnum.USER_DELETE.toString(),baseServiceLogger)).thenReturn(true);
+            Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 1, USER_DELETE,baseServiceLogger)).thenReturn(true);
             Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
             result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
@@ -372,7 +372,7 @@ public class UsersServiceTest {
         Mockito.when(this.userMapper.selectById(authorizer)).thenReturn(this.getUser());
         Mockito.when(this.userMapper.selectById(projectCreator)).thenReturn(this.getUser());
         Mockito.when(this.projectMapper.queryByCode(projectCode)).thenReturn(this.getProject());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 999, FuncPermissionEnum.USER_GRANT_PROJECT.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 999, null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null, 1, baseServiceLogger)).thenReturn(true);
         // ERROR: USER_NOT_EXIST
         User loginUser = new User();
@@ -395,7 +395,7 @@ public class UsersServiceTest {
         // SUCCESS: USER IS PROJECT OWNER
         loginUser.setId(projectCreator);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), FuncPermissionEnum.USER_GRANT_PROJECT.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, new Object[]{1}, loginUser.getId(), baseServiceLogger)).thenReturn(true);
         result = this.usersService.grantProjectByCode(loginUser, authorizer, projectCode);
         logger.info(result.toString());
@@ -404,7 +404,7 @@ public class UsersServiceTest {
         // SUCCESS: USER IS ADMINISTRATOR
         loginUser.setId(999);
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), FuncPermissionEnum.USER_GRANT_PROJECT.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, new Object[]{1}, 0, baseServiceLogger)).thenReturn(true);
         result = this.usersService.grantProjectByCode(loginUser, authorizer, projectCode);
         logger.info(result.toString());
@@ -421,7 +421,7 @@ public class UsersServiceTest {
         User loginUser = new User();
         loginUser.setId(999);
         loginUser.setUserType(UserType.GENERAL_USER);
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 999, FuncPermissionEnum.USER_REVOKE_PROJECT.toString(), baseServiceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 999,null, baseServiceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null, 2, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = this.usersService.revokeProject(loginUser, 1, projectCode);
         logger.info(result.toString());
@@ -430,7 +430,7 @@ public class UsersServiceTest {
         // user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(1);
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), FuncPermissionEnum.USER_REVOKE_PROJECT.toString(), baseServiceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(),null, baseServiceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null, 0, baseServiceLogger)).thenReturn(true);
         result = this.usersService.revokeProject(loginUser, 2, projectCode);
         logger.info(result.toString());
@@ -489,7 +489,7 @@ public class UsersServiceTest {
 
         //user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), FuncPermissionEnum.USER_GRANT_K8SNAMESPACE.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = usersService.grantNamespaces(loginUser, 2, namespaceIds);
         logger.info(result.toString());
@@ -544,7 +544,7 @@ public class UsersServiceTest {
         loginUser.setUserName("admin");
         loginUser.setUserType(UserType.ADMIN_USER);
         // get admin user
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), FuncPermissionEnum.USER_MANAGER.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), USER_MANAGER, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = usersService.getUserInfo(loginUser);
         logger.info(result.toString());
@@ -573,14 +573,14 @@ public class UsersServiceTest {
         User loginUser = new User();
         //no operate
         loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 99, FuncPermissionEnum.USER_MANAGER.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, 99, USER_MANAGER, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,99, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = usersService.queryAllGeneralUsers(loginUser);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //success
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), FuncPermissionEnum.USER_MANAGER.toString(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.USER, loginUser.getId(), USER_MANAGER, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.USER, null ,0, baseServiceLogger)).thenReturn(true);
         when(userMapper.queryAllGeneralUser()).thenReturn(getUserList());
         result = usersService.queryAllGeneralUsers(loginUser);

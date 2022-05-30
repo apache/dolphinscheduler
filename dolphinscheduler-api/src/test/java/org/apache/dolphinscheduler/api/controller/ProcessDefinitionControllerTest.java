@@ -48,6 +48,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
+
 /**
  * process definition controller test
  */
@@ -337,10 +339,11 @@ public class ProcessDefinitionControllerTest {
         long projectCode = 1L;
         int processId = 1;
         int limit = 2;
+        User user = new User();
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.viewTree(projectCode, processId, limit)).thenReturn(result);
+        Mockito.when(processDefinitionService.viewTree(user,projectCode, processId, limit)).thenReturn(result);
         Result response = processDefinitionController.viewTree(user, projectCode, processId, limit);
 
         Assert.assertTrue(response != null && response.isSuccess());

@@ -85,7 +85,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
     @Override
     public boolean functionDisabled() {
-        return true;
+        return false;
     }
 
     @Override

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -52,6 +51,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.facebook.presto.jdbc.internal.guava.base.Strings;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+
 /**
  * worker group service impl
  */
@@ -81,7 +82,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, FuncPermissionEnum.CREATE_WORKER_GROUP.toString())) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -185,7 +186,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.WORKER_GROUP,FuncPermissionEnum.WORKER_GROUP_MANAGE.toString())) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.WORKER_GROUP,WORKER_GROUP_MANAGE)) {
             putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -309,7 +310,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP,FuncPermissionEnum.WORKER_GROUP_DELETE.toString())) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP,WORKER_GROUP_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
