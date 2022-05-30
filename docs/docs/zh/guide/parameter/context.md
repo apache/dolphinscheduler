@@ -41,7 +41,7 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 ![context-parameter02](/img/new_ui/dev/parameter/context_parameter02.png)
 
-#### 2、创建 SQL 任务，使用参数
+#### 创建 SQL 任务，使用参数
 
 完成上述的 SHELL 任务之后，我们可以使用上游所传递的 output 作为 SQL 的查询对象。其中将所查询的 id 重命名为 ID，作为参数输出。
 
