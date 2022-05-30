@@ -58,5 +58,4 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      * @return if exist return true else return null
      */
     Boolean existInstanceName(@Param("instanceName") String instanceName);
-
 }

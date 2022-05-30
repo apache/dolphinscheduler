@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark;
 
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -27,8 +30,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.MapUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -40,7 +41,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@AutoService(DataSourceProcessor.class)
 public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    @Override
+    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+        return JSONUtils.parseObject(paramJson, SparkDataSourceParamDTO.class);
+    }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
@@ -136,6 +143,11 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DbType getDbType() {
         return DbType.SPARK;
+    }
+
+    @Override
+    public DataSourceProcessor create() {
+        return new SparkDataSourceProcessor();
     }
 
     private String transformOther(Map<String, String> otherMap) {

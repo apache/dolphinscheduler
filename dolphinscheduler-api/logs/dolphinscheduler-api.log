@@ -1,0 +1,1162 @@
+[INFO] 2022-05-31 00:08:53.999 +0800 org.hibernate.validator.internal.util.Version:[21] - HV000001: Hibernate Validator 6.2.2.Final
+[INFO] 2022-05-31 00:08:54.071 +0800 org.apache.dolphinscheduler.api.service.WorkerGroupServiceTest:[55] - Starting WorkerGroupServiceTest using Java 1.8.0_221 on WangjipengdeMacBook-Pro.local with PID 33083 (started by WANGJP in /Users/WANGJP/Downloads/apache-DS/dolphinscheduler/dolphinscheduler-api)
+[INFO] 2022-05-31 00:08:54.073 +0800 org.apache.dolphinscheduler.api.service.WorkerGroupServiceTest:[663] - The following profiles are active: h2
+[INFO] 2022-05-31 00:08:59.410 +0800 ru.yandex.clickhouse.ClickHouseDriver:[42] - Driver registered
+[INFO] 2022-05-31 00:09:00.133 +0800 com.zaxxer.hikari.HikariDataSource:[110] - HikariPool-1 - Starting...
+[INFO] 2022-05-31 00:09:00.762 +0800 com.zaxxer.hikari.HikariDataSource:[123] - HikariPool-1 - Start completed.
+[INFO] 2022-05-31 00:09:11.015 +0800 org.quartz.impl.StdSchedulerFactory:[1220] - Using default implementation for ThreadExecutor
+[INFO] 2022-05-31 00:09:11.075 +0800 org.quartz.core.SchedulerSignalerImpl:[61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+[INFO] 2022-05-31 00:09:11.076 +0800 org.quartz.core.QuartzScheduler:[229] - Quartz Scheduler v.2.3.2 created.
+[INFO] 2022-05-31 00:09:11.079 +0800 org.quartz.simpl.RAMJobStore:[155] - RAMJobStore initialized.
+[INFO] 2022-05-31 00:09:11.082 +0800 org.quartz.core.QuartzScheduler:[294] - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+[INFO] 2022-05-31 00:09:11.083 +0800 org.quartz.impl.StdSchedulerFactory:[1374] - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+[INFO] 2022-05-31 00:09:11.083 +0800 org.quartz.impl.StdSchedulerFactory:[1378] - Quartz scheduler version: 2.3.2
+[INFO] 2022-05-31 00:09:11.083 +0800 org.quartz.core.QuartzScheduler:[2293] - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@12f826c
+[INFO] 2022-05-31 00:09:12.430 +0800 org.apache.curator.utils.Compatibility:[48] - Running in ZooKeeper 3.4.x compatibility mode
+[INFO] 2022-05-31 00:09:12.433 +0800 org.apache.curator.utils.Compatibility:[61] - Using emulated InjectSessionExpiration
+[INFO] 2022-05-31 00:09:12.628 +0800 org.apache.curator.framework.imps.CuratorFrameworkImpl:[308] - Starting
+[INFO] 2022-05-31 00:09:12.737 +0800 org.apache.curator.framework.imps.CuratorFrameworkImpl:[356] - Default schema
+[INFO] 2022-05-31 00:09:12.826 +0800 org.apache.curator.framework.state.ConnectionStateManager:[251] - State change: CONNECTED
+[INFO] 2022-05-31 00:09:14.849 +0800 org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver:[58] - Exposing 1 endpoint(s) beneath base path '/actuator'
+[INFO] 2022-05-31 00:09:16.061 +0800 springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:[69] - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+[INFO] 2022-05-31 00:09:16.584 +0800 org.eclipse.jetty.util.log:[170] - Logging initialized @38685ms to org.eclipse.jetty.util.log.Slf4jLog
+[INFO] 2022-05-31 00:09:18.858 +0800 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[160] - Context refreshed
+[INFO] 2022-05-31 00:09:18.962 +0800 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[163] - Found 1 custom documentation plugin(s)
+[INFO] 2022-05-31 00:09:19.277 +0800 springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:[41] - Scanning for api listing references
+[INFO] 2022-05-31 00:09:19.570 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: getAlertPluginInstanceUsingGET_1
+[INFO] 2022-05-31 00:09:19.574 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: listPagingUsingGET_1
+[INFO] 2022-05-31 00:09:19.579 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: verifyGroupNameUsingGET_1
+[INFO] 2022-05-31 00:09:19.776 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: downloadTaskLogUsingGET_1
+[INFO] 2022-05-31 00:09:19.786 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: queryLogUsingGET_1
+[INFO] 2022-05-31 00:09:19.945 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: viewTreeUsingGET_1
+[INFO] 2022-05-31 00:09:19.966 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: createProjectUsingPOST_1
+[INFO] 2022-05-31 00:09:19.976 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: queryProjectListPagingUsingGET_1
+[INFO] 2022-05-31 00:09:20.250 +0800 org.springframework.scheduling.quartz.SchedulerFactoryBean:[727] - Starting Quartz Scheduler now
+[INFO] 2022-05-31 00:09:20.250 +0800 org.quartz.core.QuartzScheduler:[547] - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+[INFO] 2022-05-31 00:09:20.271 +0800 org.apache.dolphinscheduler.api.service.WorkerGroupServiceTest:[61] - Started WorkerGroupServiceTest in 27.609 seconds (JVM running for 42.372)
+[INFO] 2022-05-31 00:09:20.277 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: CONDITIONS
+[INFO] 2022-05-31 00:09:20.279 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: CONDITIONS
+[INFO] 2022-05-31 00:09:20.397 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: DATA_QUALITY
+[INFO] 2022-05-31 00:09:20.402 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: DATA_QUALITY
+[INFO] 2022-05-31 00:09:20.407 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: DATAX
+[INFO] 2022-05-31 00:09:20.411 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: DATAX
+[INFO] 2022-05-31 00:09:20.415 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: DEPENDENT
+[INFO] 2022-05-31 00:09:20.417 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: DEPENDENT
+[INFO] 2022-05-31 00:09:20.422 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: FLINK
+[INFO] 2022-05-31 00:09:20.425 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: FLINK
+[INFO] 2022-05-31 00:09:20.430 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: HTTP
+[INFO] 2022-05-31 00:09:20.434 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: HTTP
+[INFO] 2022-05-31 00:09:20.440 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: MR
+[INFO] 2022-05-31 00:09:20.443 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: MR
+[INFO] 2022-05-31 00:09:20.449 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: PIGEON
+[INFO] 2022-05-31 00:09:20.452 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: PIGEON
+[INFO] 2022-05-31 00:09:20.460 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: PROCEDURE
+[INFO] 2022-05-31 00:09:20.463 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: PROCEDURE
+[INFO] 2022-05-31 00:09:20.469 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: PYTHON
+[INFO] 2022-05-31 00:09:20.472 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: PYTHON
+[INFO] 2022-05-31 00:09:20.477 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SEATUNNEL
+[INFO] 2022-05-31 00:09:20.480 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SEATUNNEL
+[INFO] 2022-05-31 00:09:20.485 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SHELL
+[INFO] 2022-05-31 00:09:20.488 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SHELL
+[INFO] 2022-05-31 00:09:20.493 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SPARK
+[INFO] 2022-05-31 00:09:20.496 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SPARK
+[INFO] 2022-05-31 00:09:20.712 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SQL
+[INFO] 2022-05-31 00:09:20.715 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SQL
+[INFO] 2022-05-31 00:09:20.720 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SQOOP
+[INFO] 2022-05-31 00:09:20.723 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SQOOP
+[INFO] 2022-05-31 00:09:20.728 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SUB_PROCESS
+[INFO] 2022-05-31 00:09:20.730 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SUB_PROCESS
+[INFO] 2022-05-31 00:09:20.736 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SWITCH
+[INFO] 2022-05-31 00:09:20.738 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SWITCH
+[INFO] 2022-05-31 00:09:20.743 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: EMR
+[INFO] 2022-05-31 00:09:20.747 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: EMR
+[INFO] 2022-05-31 00:09:20.753 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: ZEPPELIN
+[INFO] 2022-05-31 00:09:20.756 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: ZEPPELIN
+[INFO] 2022-05-31 00:09:20.761 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: JUPYTER
+[INFO] 2022-05-31 00:09:20.765 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: JUPYTER
+[INFO] 2022-05-31 00:09:20.770 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: BLOCKING
+[INFO] 2022-05-31 00:09:20.772 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: BLOCKING
+[INFO] 2022-05-31 00:09:20.777 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: K8S
+[INFO] 2022-05-31 00:09:20.781 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: K8S
+[INFO] 2022-05-31 00:09:20.786 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: MLFLOW
+[INFO] 2022-05-31 00:09:20.790 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: MLFLOW
+[INFO] 2022-05-31 00:09:20.943 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[91] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@8a641ed}
+[INFO] 2022-05-31 00:09:20.955 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[179] - {msg=成功, data=AccessToken{id=1, userId=2147483647, token='token', userName='null', expireTime=Thu Jun 30 00:09:20 CST 2022, createTime=null, updateTime=Tue May 31 00:09:20 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:20.966 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[185] - {msg=成功, data=AccessToken{id=1, userId=2147483647, token='1db53d8294870babec1a18f19f4c461a', userName='null', expireTime=Thu Jun 30 00:09:20 CST 2022, createTime=null, updateTime=Tue May 31 00:09:20 CST 2022}, status=SUCCESS}
+[ERROR] 2022-05-31 00:09:20.966 +0800 org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl:[233] - access token not exist,  access token id 2
+[INFO] 2022-05-31 00:09:20.966 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[192] - {msg=访问token不存在, status=ACCESS_TOKEN_NOT_EXIST}
+[INFO] 2022-05-31 00:09:20.968 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[121] - {msg=成功, data=AccessToken{id=0, userId=1, token='AccessTokenServiceTest', userName='null', expireTime=Thu Jun 30 00:09:20 CST 2022, createTime=Tue May 31 00:09:20 CST 2022, updateTime=Tue May 31 00:09:20 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:20.969 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[126] - {msg=成功, data=AccessToken{id=0, userId=1, token='833174a3a266179599dd4dd0f1c8946c', userName='null', expireTime=Thu Jun 30 00:09:20 CST 2022, createTime=Tue May 31 00:09:20 CST 2022, updateTime=Tue May 31 00:09:20 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:20.970 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[138] - {msg=成功, data=9687cffe67ce25bc7ebf601aedab1e84, status=SUCCESS}
+[ERROR] 2022-05-31 00:09:20.971 +0800 org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl:[197] - access token not exist,  access token id 0
+[INFO] 2022-05-31 00:09:20.972 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[154] - {msg=访问token不存在, status=ACCESS_TOKEN_NOT_EXIST}
+[INFO] 2022-05-31 00:09:20.972 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[158] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:20.973 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[165] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:20.974 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[105] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:20.974 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[112] - {msg=成功, data=[AccessToken{id=1, userId=1, token='AccessTokenServiceTest', userName='null', expireTime=Thu Jun 30 00:09:20 CST 2022, createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.010 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[102] - {msg=请输入英文操作系统租户, status=CHECK_OS_TENANT_CODE_ERROR}
+[INFO] 2022-05-31 00:09:21.011 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[107] - {msg=操作系统租户[hayden]已存在, status=OS_TENANT_CODE_EXIST}
+[INFO] 2022-05-31 00:09:21.011 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[112] - {msg=成功, data=Tenant{id=0, tenantCode='test', queueId=1, queueName='null', queue='null', createTime=Tue May 31 00:09:21 CST 2022, updateTime=Tue May 31 00:09:21 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.013 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[149] - {msg=租户不存在, status=TENANT_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.014 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[153] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.016 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[175] - {msg=租户不存在, status=TENANT_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.017 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[180] - {msg=删除租户失败，有[1]个运行中的工作流实例正在使用, status=DELETE_TENANT_BY_ID_FAIL}
+[INFO] 2022-05-31 00:09:21.017 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[186] - {msg=删除租户失败，有[1]个工作流定义正在使用, status=DELETE_TENANT_BY_ID_FAIL_DEFINES}
+[INFO] 2022-05-31 00:09:21.018 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[192] - {msg=删除租户失败，有[1]个用户正在使用, status=DELETE_TENANT_BY_ID_FAIL_USERS}
+[INFO] 2022-05-31 00:09:21.019 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[198] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.021 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[212] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:09:21.023 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[133] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@63112b}
+[ERROR] 2022-05-31 00:09:21.143 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[296] - taskDefinitionJson invalid: null
+[INFO] 2022-05-31 00:09:21.241 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[602] - The task has not changed, so skip
+[INFO] 2022-05-31 00:09:21.245 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[269] - The task has not changed, so skip
+[INFO] 2022-05-31 00:09:21.253 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1346] - process define not exists
+[ERROR] 2022-05-31 00:09:21.259 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1281] - process data is null
+[ERROR] 2022-05-31 00:09:21.261 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1291] - process node info is empty
+[INFO] 2022-05-31 00:09:21.266 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1377] - process definition not exists
+[INFO] 2022-05-31 00:09:21.269 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1498] - process define not exists
+[INFO] 2022-05-31 00:09:21.351 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[392] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.352 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[398] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.353 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[404] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.358 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[475] - {msg=用户[3]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.359 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[482] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.360 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[489] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.361 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[579] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.362 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[586] - {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.364 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[187] - User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}
+[INFO] 2022-05-31 00:09:21.366 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[271] - {msg=用户[0]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.385 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[276] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.387 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[548] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:09:21.388 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[553] - Status{code='10003', msg='用户名已存在', data=null}
+[INFO] 2022-05-31 00:09:21.389 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[232] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.392 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[353] - {msg=用户[999]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.392 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[358] - {msg=项目[999]不存在, status=PROJECT_NOT_FOUND}
+[INFO] 2022-05-31 00:09:21.392 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[365] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.393 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[372] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.393 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[379] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.400 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[532] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.400 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[538] - {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.402 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[252] - Status{code='30001', msg='当前用户没有操作权限', data=null}
+[INFO] 2022-05-31 00:09:21.405 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[140] - {msg=请求参数[userTest0001~]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:21.405 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[147] - {msg=请求参数[userTest000111111111111111]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:21.405 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[154] - {msg=请求参数[1q.com]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:21.406 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[161] - {msg=请求参数[2233]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:21.406 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[167] - {msg=租户不存在, status=TENANT_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.407 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[172] - {msg=成功, data=User{id=0, userName='userTest0001', userPassword='ffbaaa8ae678f7ce89ef45474b19736a', email='122222@qq.com', phone='13456432345', userType=GENERAL_USER, tenantId=1, state=1, tenantCode='null', queueName='null', alertGroup='null', queue='UsersServiceTestQueue', timeZone='null', createTime=Tue May 31 00:09:21 CST 2022, updateTime=Tue May 31 00:09:21 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.409 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[293] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.410 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[299] - {msg=用户[3]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.411 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[310] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.413 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[437] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.414 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[442] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.415 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[330] - {msg=用户[3]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.417 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[336] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.418 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[455] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.419 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[460] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.421 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[417] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:09:21.422 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[423] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.425 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[508] - {msg=成功, data=User{id=0, userName='admin', userPassword='null', email='null', phone='null', userType=ADMIN_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='Asia/Shanghai', createTime=null, updateTime=null}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.426 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[520] - {msg=成功, data=User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='AlertGroup{id=0createUserId=0, groupName='null', description='null', createTime=null, updateTime=null}', queue='null', timeZone='Asia/Shanghai', createTime=null, updateTime=null}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:21.427 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[564] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:21.428 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[569] - {msg=成功, data=[], status=SUCCESS}
+[INFO] 2022-05-31 00:09:25.790 +0800 org.apache.dolphinscheduler.api.service.AuditServiceTest:[74] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@5f097960}
+[INFO] 2022-05-31 00:09:29.529 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[303] - FAILURE 1: {msg=项目[]不存在, status=PROJECT_NOT_FOUND}
+[INFO] 2022-05-31 00:09:29.530 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[310] - FAILURE 2: {msg=当前用户[ProjectServiceTest]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:09:29.530 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[319] - SUCCESS 1: {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.531 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[328] - SUCCESS 2: {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.534 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[285] - {msg=成功, data=[Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.535 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[343] - {msg=成功, data=[Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.536 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[169] - {msg=当前用户[null]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:09:29.537 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[179] - {}
+[INFO] 2022-05-31 00:09:29.538 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[407] - {msg=成功, data=[Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.538 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[417] - {msg=成功, data=[Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.540 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[91] - {msg=当前用户无此权限, status=NO_CURRENT_OPERATING_PERMISSION}
+[INFO] 2022-05-31 00:09:29.555 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[216] - {msg=该项目不存在,请刷新页面, status=PROJECT_NOT_EXIST}
+[INFO] 2022-05-31 00:09:29.556 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[222] - {msg=当前用户[ProjectServiceTest]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:09:29.556 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[231] - {msg=请先删除全部工作流定义, status=DELETE_PROJECT_ERROR_DEFINES_NOT_NULL}
+[INFO] 2022-05-31 00:09:29.557 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[238] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.558 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[385] - {msg=成功, data=[Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.559 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[116] - {msg=该项目不存在,请刷新页面, status=PROJECT_NOT_EXIST}
+[INFO] 2022-05-31 00:09:29.560 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[124] - {msg=当前用户[ProjectServiceTest]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:09:29.560 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[133] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.562 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[254] - {msg=项目[]不存在, status=PROJECT_NOT_FOUND}
+[INFO] 2022-05-31 00:09:29.562 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[259] - {msg=项目名称[ProjectServiceTest]已存在, status=PROJECT_ALREADY_EXISTS}
+[INFO] 2022-05-31 00:09:29.563 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[271] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:29.574 +0800 org.apache.dolphinscheduler.api.service.MonitorServiceTest:[89] - {msg=成功, data=[MonitorRecord{state=null, dbType=MYSQL, maxConnections=0, maxUsedConnections=0, threadsConnections=0, threadsRunningConnections=0, date=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:33.435 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[196] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:33.437 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[205] - {msg=告警组不存在, status=ALERT_GROUP_NOT_EXIST}
+[INFO] 2022-05-31 00:09:33.439 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[211] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:33.441 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[123] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:33.443 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[131] - {msg=成功, data=AlertGroup{id=0createUserId=1, groupName='AlertGroupServiceTest', description='AlertGroupServiceTest', createTime=Tue May 31 00:09:33 CST 2022, updateTime=Tue May 31 00:09:33 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:33.447 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[85] - {msg=成功, data=[AlertGroup{id=1createUserId=0, groupName='AlertGroupServiceTest', description='null', createTime=null, updateTime=null}], status=SUCCESS}
+[ERROR] 2022-05-31 00:09:33.458 +0800 org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl:[172] - Create alert group error.
+org.springframework.dao.DuplicateKeyException: group name exist
+	at org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl.createAlertgroup(AlertGroupServiceImpl.java:164)
+	at org.apache.dolphinscheduler.api.service.AlertGroupServiceTest.testCreateAlertgroupDuplicate(AlertGroupServiceTest.java:145)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:09:33.458 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[146] - {msg=告警组名称已存在, status=ALERT_GROUP_EXIST}
+[ERROR] 2022-05-31 00:09:33.461 +0800 org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl:[219] - Update alert group error.
+org.springframework.dao.DuplicateKeyException: group name exist
+	at org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl.updateAlertgroup(AlertGroupServiceImpl.java:216)
+	at org.apache.dolphinscheduler.api.service.AlertGroupServiceTest.testUpdateAlertgroupDuplicate(AlertGroupServiceTest.java:184)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:09:33.467 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[101] - Status{code='30001', msg='当前用户没有操作权限', data=null}
+[INFO] 2022-05-31 00:09:33.468 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[109] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@312e3de0}
+[INFO] 2022-05-31 00:09:33.472 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[157] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:33.474 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[165] - {msg=告警组不存在, status=ALERT_GROUP_NOT_EXIST}
+[INFO] 2022-05-31 00:09:33.475 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[171] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.529 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[214] - {msg=成功, data=[K8sNamespace{id=1, namespace=default, limitsCpu=null, limitsMemory=null, userId=0, podRequestCpu=0.0, podRequestMemory=0, podReplicas=0, k8s=default, createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.530 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[222] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:37.531 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[110] - {msg=请求参数[namespace]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:37.532 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[114] - {msg=请求参数[k8s]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:37.534 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[118] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.534 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[122] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.539 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[177] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.542 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[132] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.542 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[136] - {msg=请求参数[limitsCpu]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:37.543 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[140] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.545 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[151] - Status{code='10001', msg='请求参数[namespace]无效', data=null}
+[INFO] 2022-05-31 00:09:37.546 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[156] - Status{code='10001', msg='请求参数[k8s]无效', data=null}
+[INFO] 2022-05-31 00:09:37.547 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[161] - Status{code='1300002', msg='k8s命名空间[default]已存在', data=null}
+[INFO] 2022-05-31 00:09:37.547 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[166] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:09:37.550 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[99] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@158b5594}
+[INFO] 2022-05-31 00:09:37.553 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[191] - {msg=成功, data=[K8sNamespace{id=1, namespace=default, limitsCpu=null, limitsMemory=null, userId=0, podRequestCpu=0.0, podRequestMemory=0, podReplicas=0, k8s=default, createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.575 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[106] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:37.575 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[111] - {msg=环境配置信息不能为空, status=ENVIRONMENT_CONFIG_IS_NULL}
+[INFO] 2022-05-31 00:09:37.576 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[115] - {msg=环境名称不能为空, status=ENVIRONMENT_NAME_IS_NULL}
+[ERROR] 2022-05-31 00:09:37.577 +0800 org.apache.dolphinscheduler.common.utils.JSONUtils:[293] - json to map exception!
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'test': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"test"; line: 1, column: 5]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1840)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:722)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2873)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2851)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken2(ReaderBasedJsonParser.java:2648)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken(ReaderBasedJsonParser.java:2626)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchTrue(ReaderBasedJsonParser.java:2584)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:740)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4356)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4205)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3197)
+	at org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject(JSONUtils.java:291)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.checkParams(EnvironmentServiceImpl.java:460)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.createEnvironment(EnvironmentServiceImpl.java:102)
+	at org.apache.dolphinscheduler.api.service.EnvironmentServiceTest.testCreateEnvironment(EnvironmentServiceTest.java:118)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:09:37.578 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[119] - {msg=环境关联的工作组参数解析错误, status=ENVIRONMENT_WORKER_GROUPS_IS_INVALID}
+[INFO] 2022-05-31 00:09:37.580 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[124] - {msg=环境名称[Env1]已经存在, status=ENVIRONMENT_NAME_EXISTS}
+[INFO] 2022-05-31 00:09:37.583 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[130] - {msg=成功, data=5695561930464, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.602 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[179] - {msg=成功, data=[org.apache.dolphinscheduler.api.dto.EnvironmentDto@12cdbea0], status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.605 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[216] - {msg=查询环境编码[1]不存在, status=QUERY_ENVIRONMENT_BY_CODE_ERROR}
+[INFO] 2022-05-31 00:09:37.606 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[221] - {msg=成功, data=org.apache.dolphinscheduler.api.dto.EnvironmentDto@25dc0c61, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.607 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[203] - {msg=查询环境名称[Env1]信息不存在, status=QUERY_ENVIRONMENT_BY_NAME_ERROR}
+[INFO] 2022-05-31 00:09:37.609 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[208] - {msg=成功, data=org.apache.dolphinscheduler.api.dto.EnvironmentDto@7a80c5b3, status=SUCCESS}
+[ERROR] 2022-05-31 00:09:37.610 +0800 org.apache.dolphinscheduler.common.utils.JSONUtils:[293] - json to map exception!
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'test': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"test"; line: 1, column: 5]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1840)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:722)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2873)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2851)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken2(ReaderBasedJsonParser.java:2648)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken(ReaderBasedJsonParser.java:2626)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchTrue(ReaderBasedJsonParser.java:2584)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:740)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4356)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4205)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3197)
+	at org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject(JSONUtils.java:291)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.checkParams(EnvironmentServiceImpl.java:460)
+	at org.apache.dolphinscheduler.api.service.EnvironmentServiceTest.testCheckParams(EnvironmentServiceTest.java:137)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:09:37.612 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[147] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:37.613 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[152] - {msg=环境配置信息不能为空, status=ENVIRONMENT_CONFIG_IS_NULL}
+[INFO] 2022-05-31 00:09:37.613 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[156] - {msg=环境名称不能为空, status=ENVIRONMENT_NAME_IS_NULL}
+[ERROR] 2022-05-31 00:09:37.614 +0800 org.apache.dolphinscheduler.common.utils.JSONUtils:[293] - json to map exception!
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'test': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"test"; line: 1, column: 5]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1840)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:722)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2873)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2851)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken2(ReaderBasedJsonParser.java:2648)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken(ReaderBasedJsonParser.java:2626)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchTrue(ReaderBasedJsonParser.java:2584)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:740)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4356)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4205)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3197)
+	at org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject(JSONUtils.java:291)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.checkParams(EnvironmentServiceImpl.java:460)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.updateEnvironmentByCode(EnvironmentServiceImpl.java:335)
+	at org.apache.dolphinscheduler.api.service.EnvironmentServiceTest.testUpdateEnvironmentByCode(EnvironmentServiceTest.java:159)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:09:37.614 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[160] - {msg=环境关联的工作组参数解析错误, status=ENVIRONMENT_WORKER_GROUPS_IS_INVALID}
+[INFO] 2022-05-31 00:09:37.616 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[165] - {msg=环境名称[Env1]已经存在, status=ENVIRONMENT_NAME_EXISTS}
+[INFO] 2022-05-31 00:09:37.638 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[170] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.641 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[194] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@68d02503}
+[INFO] 2022-05-31 00:09:37.642 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[231] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:09:37.645 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[237] - {msg=该环境已经被任务使用，所以不能删除该环境信息, status=DELETE_ENVIRONMENT_RELATED_TASK_EXISTS}
+[INFO] 2022-05-31 00:09:37.648 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[243] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:37.649 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[250] - {msg=环境名称不能为空, status=ENVIRONMENT_NAME_IS_NULL}
+[INFO] 2022-05-31 00:09:37.650 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[255] - {msg=环境名称[Env1]已经存在, status=ENVIRONMENT_NAME_EXISTS}
+[INFO] 2022-05-31 00:09:41.916 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[144] - {msg=队列ID[0]不存在, status=QUEUE_NOT_EXIST}
+[INFO] 2022-05-31 00:09:41.917 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[148] - {msg=数据未变更，不需要更新队列信息, status=NEED_NOT_UPDATE_QUEUE}
+[INFO] 2022-05-31 00:09:41.917 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[152] - {msg=队列值[test]已存在, status=QUEUE_VALUE_EXIST}
+[INFO] 2022-05-31 00:09:41.928 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[156] - {msg=队列名称[test]已存在, status=QUEUE_NAME_EXIST}
+[INFO] 2022-05-31 00:09:41.928 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[160] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:41.929 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[121] - {msg=请求参数[queue]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:41.930 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[125] - {msg=请求参数[queueName]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:09:41.930 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[129] - {msg=成功, data=Queue{id=0, queueName='QueueServiceTest', queue='QueueServiceTest', createTime=Tue May 31 00:09:41 CST 2022, updateTime=Tue May 31 00:09:41 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:09:41.931 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[94] - {msg=成功, data=[Queue{id=1, queueName='QueueServiceTest', queue='QueueServiceTest', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:09:41.933 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[110] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@1ba43bc9}
+[INFO] 2022-05-31 00:09:41.934 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[173] - Status{code='10001', msg='请求参数[queue]无效', data=null}
+[INFO] 2022-05-31 00:09:41.934 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[178] - Status{code='10001', msg='请求参数[queueName]无效', data=null}
+[INFO] 2022-05-31 00:09:41.934 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[183] - Status{code='10130', msg='队列名称[QueueServiceTest]已存在', data=null}
+[INFO] 2022-05-31 00:09:41.935 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[188] - Status{code='10129', msg='队列值[QueueServiceTest]已存在', data=null}
+[INFO] 2022-05-31 00:09:41.935 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[193] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:09:42.000 +0800 org.apache.dolphinscheduler.api.service.impl.TaskGroupServiceImpl:[174] - update result:0
+[INFO] 2022-05-31 00:09:42.001 +0800 org.apache.dolphinscheduler.api.service.TaskGroupServiceTest:[179] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:09:42.088 +0800 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-05-31 00:09:42.103 +0800 org.apache.curator.framework.imps.CuratorFrameworkImpl:[955] - backgroundOperationsLoop exiting
+[INFO] 2022-05-31 00:09:42.108 +0800 org.springframework.scheduling.quartz.SchedulerFactoryBean:[845] - Shutting down Quartz Scheduler
+[INFO] 2022-05-31 00:09:42.109 +0800 org.quartz.core.QuartzScheduler:[666] - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+[INFO] 2022-05-31 00:09:42.109 +0800 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-05-31 00:09:42.110 +0800 org.quartz.core.QuartzScheduler:[740] - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+[INFO] 2022-05-31 00:09:42.111 +0800 org.apache.dolphinscheduler.remote.NettyRemotingClient:[390] - netty client closed
+[INFO] 2022-05-31 00:09:42.112 +0800 org.apache.dolphinscheduler.service.log.LogClientService:[74] - logger client closed
+[INFO] 2022-05-31 00:09:42.117 +0800 com.zaxxer.hikari.HikariDataSource:[350] - HikariPool-1 - Shutdown initiated...
+[INFO] 2022-05-31 00:09:42.122 +0800 com.zaxxer.hikari.HikariDataSource:[352] - HikariPool-1 - Shutdown completed.
+[INFO] 2022-05-31 00:22:17.157 +0800 org.hibernate.validator.internal.util.Version:[21] - HV000001: Hibernate Validator 6.2.2.Final
+[INFO] 2022-05-31 00:22:17.238 +0800 org.apache.dolphinscheduler.api.service.WorkerGroupServiceTest:[55] - Starting WorkerGroupServiceTest using Java 1.8.0_221 on WangjipengdeMacBook-Pro.local with PID 33569 (started by WANGJP in /Users/WANGJP/Downloads/apache-DS/dolphinscheduler/dolphinscheduler-api)
+[INFO] 2022-05-31 00:22:17.240 +0800 org.apache.dolphinscheduler.api.service.WorkerGroupServiceTest:[663] - The following profiles are active: h2
+[INFO] 2022-05-31 00:22:21.978 +0800 ru.yandex.clickhouse.ClickHouseDriver:[42] - Driver registered
+[INFO] 2022-05-31 00:22:22.660 +0800 com.zaxxer.hikari.HikariDataSource:[110] - HikariPool-1 - Starting...
+[INFO] 2022-05-31 00:22:23.203 +0800 com.zaxxer.hikari.HikariDataSource:[123] - HikariPool-1 - Start completed.
+[INFO] 2022-05-31 00:22:29.864 +0800 org.quartz.impl.StdSchedulerFactory:[1220] - Using default implementation for ThreadExecutor
+[INFO] 2022-05-31 00:22:29.898 +0800 org.quartz.core.SchedulerSignalerImpl:[61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+[INFO] 2022-05-31 00:22:29.898 +0800 org.quartz.core.QuartzScheduler:[229] - Quartz Scheduler v.2.3.2 created.
+[INFO] 2022-05-31 00:22:29.900 +0800 org.quartz.simpl.RAMJobStore:[155] - RAMJobStore initialized.
+[INFO] 2022-05-31 00:22:29.902 +0800 org.quartz.core.QuartzScheduler:[294] - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+[INFO] 2022-05-31 00:22:29.903 +0800 org.quartz.impl.StdSchedulerFactory:[1374] - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+[INFO] 2022-05-31 00:22:29.903 +0800 org.quartz.impl.StdSchedulerFactory:[1378] - Quartz scheduler version: 2.3.2
+[INFO] 2022-05-31 00:22:29.904 +0800 org.quartz.core.QuartzScheduler:[2293] - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@2088e339
+[INFO] 2022-05-31 00:22:30.782 +0800 org.apache.curator.utils.Compatibility:[48] - Running in ZooKeeper 3.4.x compatibility mode
+[INFO] 2022-05-31 00:22:30.785 +0800 org.apache.curator.utils.Compatibility:[61] - Using emulated InjectSessionExpiration
+[INFO] 2022-05-31 00:22:30.902 +0800 org.apache.curator.framework.imps.CuratorFrameworkImpl:[308] - Starting
+[INFO] 2022-05-31 00:22:30.966 +0800 org.apache.curator.framework.imps.CuratorFrameworkImpl:[356] - Default schema
+[INFO] 2022-05-31 00:22:31.020 +0800 org.apache.curator.framework.state.ConnectionStateManager:[251] - State change: CONNECTED
+[INFO] 2022-05-31 00:22:33.038 +0800 org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver:[58] - Exposing 1 endpoint(s) beneath base path '/actuator'
+[INFO] 2022-05-31 00:22:33.710 +0800 springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:[69] - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+[INFO] 2022-05-31 00:22:34.017 +0800 org.eclipse.jetty.util.log:[170] - Logging initialized @32613ms to org.eclipse.jetty.util.log.Slf4jLog
+[INFO] 2022-05-31 00:22:35.957 +0800 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[160] - Context refreshed
+[INFO] 2022-05-31 00:22:36.009 +0800 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[163] - Found 1 custom documentation plugin(s)
+[INFO] 2022-05-31 00:22:36.226 +0800 springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:[41] - Scanning for api listing references
+[INFO] 2022-05-31 00:22:36.588 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: getAlertPluginInstanceUsingGET_1
+[INFO] 2022-05-31 00:22:36.591 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: listPagingUsingGET_1
+[INFO] 2022-05-31 00:22:36.599 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: verifyGroupNameUsingGET_1
+[INFO] 2022-05-31 00:22:36.842 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: downloadTaskLogUsingGET_1
+[INFO] 2022-05-31 00:22:36.851 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: queryLogUsingGET_1
+[INFO] 2022-05-31 00:22:37.032 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: viewTreeUsingGET_1
+[INFO] 2022-05-31 00:22:37.057 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: createProjectUsingPOST_1
+[INFO] 2022-05-31 00:22:37.072 +0800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: queryProjectListPagingUsingGET_1
+[INFO] 2022-05-31 00:22:37.315 +0800 org.springframework.scheduling.quartz.SchedulerFactoryBean:[727] - Starting Quartz Scheduler now
+[INFO] 2022-05-31 00:22:37.316 +0800 org.quartz.core.QuartzScheduler:[547] - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+[INFO] 2022-05-31 00:22:37.337 +0800 org.apache.dolphinscheduler.api.service.WorkerGroupServiceTest:[61] - Started WorkerGroupServiceTest in 21.518 seconds (JVM running for 35.934)
+[INFO] 2022-05-31 00:22:37.343 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: CONDITIONS
+[INFO] 2022-05-31 00:22:37.345 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: CONDITIONS
+[INFO] 2022-05-31 00:22:37.454 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: DATA_QUALITY
+[INFO] 2022-05-31 00:22:37.460 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: DATA_QUALITY
+[INFO] 2022-05-31 00:22:37.466 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: DATAX
+[INFO] 2022-05-31 00:22:37.470 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: DATAX
+[INFO] 2022-05-31 00:22:37.475 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: DEPENDENT
+[INFO] 2022-05-31 00:22:37.477 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: DEPENDENT
+[INFO] 2022-05-31 00:22:37.482 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: FLINK
+[INFO] 2022-05-31 00:22:37.486 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: FLINK
+[INFO] 2022-05-31 00:22:37.493 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: HTTP
+[INFO] 2022-05-31 00:22:37.497 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: HTTP
+[INFO] 2022-05-31 00:22:37.504 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: MR
+[INFO] 2022-05-31 00:22:37.508 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: MR
+[INFO] 2022-05-31 00:22:37.516 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: PIGEON
+[INFO] 2022-05-31 00:22:37.521 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: PIGEON
+[INFO] 2022-05-31 00:22:37.533 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: PROCEDURE
+[INFO] 2022-05-31 00:22:37.539 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: PROCEDURE
+[INFO] 2022-05-31 00:22:37.546 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: PYTHON
+[INFO] 2022-05-31 00:22:37.550 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: PYTHON
+[INFO] 2022-05-31 00:22:37.827 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SEATUNNEL
+[INFO] 2022-05-31 00:22:37.831 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SEATUNNEL
+[INFO] 2022-05-31 00:22:37.837 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SHELL
+[INFO] 2022-05-31 00:22:37.840 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SHELL
+[INFO] 2022-05-31 00:22:37.846 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SPARK
+[INFO] 2022-05-31 00:22:37.849 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SPARK
+[INFO] 2022-05-31 00:22:37.853 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SQL
+[INFO] 2022-05-31 00:22:37.857 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SQL
+[INFO] 2022-05-31 00:22:37.862 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SQOOP
+[INFO] 2022-05-31 00:22:37.865 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SQOOP
+[INFO] 2022-05-31 00:22:37.869 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SUB_PROCESS
+[INFO] 2022-05-31 00:22:37.871 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SUB_PROCESS
+[INFO] 2022-05-31 00:22:37.876 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: SWITCH
+[INFO] 2022-05-31 00:22:37.878 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: SWITCH
+[INFO] 2022-05-31 00:22:37.883 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: EMR
+[INFO] 2022-05-31 00:22:37.886 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: EMR
+[INFO] 2022-05-31 00:22:37.891 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: ZEPPELIN
+[INFO] 2022-05-31 00:22:37.894 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: ZEPPELIN
+[INFO] 2022-05-31 00:22:37.900 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: JUPYTER
+[INFO] 2022-05-31 00:22:37.906 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: JUPYTER
+[INFO] 2022-05-31 00:22:37.915 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: BLOCKING
+[INFO] 2022-05-31 00:22:37.917 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: BLOCKING
+[INFO] 2022-05-31 00:22:37.922 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: K8S
+[INFO] 2022-05-31 00:22:37.926 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: K8S
+[INFO] 2022-05-31 00:22:37.931 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[93] - Registering task plugin: MLFLOW
+[INFO] 2022-05-31 00:22:37.934 +0800 org.apache.dolphinscheduler.service.task.TaskPluginManager:[101] - Registered task plugin: MLFLOW
+[INFO] 2022-05-31 00:22:38.151 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[91] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@2417413c}
+[INFO] 2022-05-31 00:22:38.168 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[179] - {msg=成功, data=AccessToken{id=1, userId=2147483647, token='token', userName='null', expireTime=Thu Jun 30 00:22:38 CST 2022, createTime=null, updateTime=Tue May 31 00:22:38 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.184 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[185] - {msg=成功, data=AccessToken{id=1, userId=2147483647, token='92776f7b84b41b0e2d2813c6db82d230', userName='null', expireTime=Thu Jun 30 00:22:38 CST 2022, createTime=null, updateTime=Tue May 31 00:22:38 CST 2022}, status=SUCCESS}
+[ERROR] 2022-05-31 00:22:38.185 +0800 org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl:[233] - access token not exist,  access token id 2
+[INFO] 2022-05-31 00:22:38.186 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[192] - {msg=访问token不存在, status=ACCESS_TOKEN_NOT_EXIST}
+[INFO] 2022-05-31 00:22:38.191 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[121] - {msg=成功, data=AccessToken{id=0, userId=1, token='AccessTokenServiceTest', userName='null', expireTime=Thu Jun 30 00:22:38 CST 2022, createTime=Tue May 31 00:22:38 CST 2022, updateTime=Tue May 31 00:22:38 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.192 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[126] - {msg=成功, data=AccessToken{id=0, userId=1, token='5a0bead0939eeb0dce1010c9bae3def0', userName='null', expireTime=Thu Jun 30 00:22:38 CST 2022, createTime=Tue May 31 00:22:38 CST 2022, updateTime=Tue May 31 00:22:38 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.196 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[138] - {msg=成功, data=2ec0dee4dba854f32da60eeba59928a3, status=SUCCESS}
+[ERROR] 2022-05-31 00:22:38.199 +0800 org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl:[197] - access token not exist,  access token id 0
+[INFO] 2022-05-31 00:22:38.200 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[154] - {msg=访问token不存在, status=ACCESS_TOKEN_NOT_EXIST}
+[INFO] 2022-05-31 00:22:38.201 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[158] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:38.202 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[165] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.204 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[105] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:38.205 +0800 org.apache.dolphinscheduler.api.service.AccessTokenServiceTest:[112] - {msg=成功, data=[AccessToken{id=1, userId=1, token='AccessTokenServiceTest', userName='null', expireTime=Thu Jun 30 00:22:38 CST 2022, createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.271 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[102] - {msg=请输入英文操作系统租户, status=CHECK_OS_TENANT_CODE_ERROR}
+[INFO] 2022-05-31 00:22:38.272 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[107] - {msg=操作系统租户[hayden]已存在, status=OS_TENANT_CODE_EXIST}
+[INFO] 2022-05-31 00:22:38.273 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[112] - {msg=成功, data=Tenant{id=0, tenantCode='test', queueId=1, queueName='null', queue='null', createTime=Tue May 31 00:22:38 CST 2022, updateTime=Tue May 31 00:22:38 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.277 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[149] - {msg=租户不存在, status=TENANT_NOT_EXIST}
+[INFO] 2022-05-31 00:22:38.278 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[153] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.280 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[175] - {msg=租户不存在, status=TENANT_NOT_EXIST}
+[INFO] 2022-05-31 00:22:38.281 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[180] - {msg=删除租户失败，有[1]个运行中的工作流实例正在使用, status=DELETE_TENANT_BY_ID_FAIL}
+[INFO] 2022-05-31 00:22:38.282 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[186] - {msg=删除租户失败，有[1]个工作流定义正在使用, status=DELETE_TENANT_BY_ID_FAIL_DEFINES}
+[INFO] 2022-05-31 00:22:38.283 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[192] - {msg=删除租户失败，有[1]个用户正在使用, status=DELETE_TENANT_BY_ID_FAIL_USERS}
+[INFO] 2022-05-31 00:22:38.284 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[198] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.287 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[212] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:22:38.292 +0800 org.apache.dolphinscheduler.api.service.TenantServiceTest:[133] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@d9fe131}
+[ERROR] 2022-05-31 00:22:38.521 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[296] - taskDefinitionJson invalid: null
+[INFO] 2022-05-31 00:22:38.714 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[602] - The task has not changed, so skip
+[INFO] 2022-05-31 00:22:38.721 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[269] - The task has not changed, so skip
+[INFO] 2022-05-31 00:22:38.738 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1346] - process define not exists
+[ERROR] 2022-05-31 00:22:38.758 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1281] - process data is null
+[ERROR] 2022-05-31 00:22:38.765 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1291] - process node info is empty
+[INFO] 2022-05-31 00:22:38.783 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1377] - process definition not exists
+[INFO] 2022-05-31 00:22:38.793 +0800 org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl:[1498] - process define not exists
+[INFO] 2022-05-31 00:22:38.968 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[392] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:38.969 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[398] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:38.969 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[404] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.980 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[475] - {msg=用户[3]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:38.984 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[482] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.985 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[489] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.992 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[579] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:38.993 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[586] - {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:38.999 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[187] - User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}
+[INFO] 2022-05-31 00:22:39.005 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[271] - {msg=用户[0]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.038 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[276] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.042 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[548] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:22:39.044 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[553] - Status{code='10003', msg='用户名已存在', data=null}
+[INFO] 2022-05-31 00:22:39.048 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[232] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:39.055 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[353] - {msg=用户[999]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.057 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[358] - {msg=项目[999]不存在, status=PROJECT_NOT_FOUND}
+[INFO] 2022-05-31 00:22:39.059 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[365] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:39.060 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[372] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.062 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[379] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.085 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[532] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:39.087 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[538] - {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.094 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[252] - Status{code='30001', msg='当前用户没有操作权限', data=null}
+[INFO] 2022-05-31 00:22:39.101 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[140] - {msg=请求参数[userTest0001~]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:39.102 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[147] - {msg=请求参数[userTest000111111111111111]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:39.103 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[154] - {msg=请求参数[1q.com]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:39.104 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[161] - {msg=请求参数[2233]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:39.105 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[167] - {msg=租户不存在, status=TENANT_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.107 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[172] - {msg=成功, data=User{id=0, userName='userTest0001', userPassword='ffbaaa8ae678f7ce89ef45474b19736a', email='122222@qq.com', phone='13456432345', userType=GENERAL_USER, tenantId=1, state=1, tenantCode='null', queueName='null', alertGroup='null', queue='UsersServiceTestQueue', timeZone='null', createTime=Tue May 31 00:22:39 CST 2022, updateTime=Tue May 31 00:22:39 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.115 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[293] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:39.116 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[299] - {msg=用户[3]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.120 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[310] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.125 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[437] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.127 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[442] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.134 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[330] - {msg=用户[3]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.140 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[336] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.145 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[455] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.147 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[460] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.157 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[417] - {msg=用户[2]不存在, status=USER_NOT_EXIST}
+[INFO] 2022-05-31 00:22:39.165 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[423] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.177 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[508] - {msg=成功, data=User{id=0, userName='admin', userPassword='null', email='null', phone='null', userType=ADMIN_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='Asia/Shanghai', createTime=null, updateTime=null}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.180 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[520] - {msg=成功, data=User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='AlertGroup{id=0createUserId=0, groupName='null', description='null', createTime=null, updateTime=null}', queue='null', timeZone='Asia/Shanghai', createTime=null, updateTime=null}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:39.185 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[564] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:39.186 +0800 org.apache.dolphinscheduler.api.service.UsersServiceTest:[569] - {msg=成功, data=[], status=SUCCESS}
+[INFO] 2022-05-31 00:22:43.095 +0800 org.apache.dolphinscheduler.api.service.AuditServiceTest:[74] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@cd3d6c3}
+[INFO] 2022-05-31 00:22:45.945 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[276] - FAILURE 1: {msg=项目[]不存在, status=PROJECT_NOT_FOUND}
+[INFO] 2022-05-31 00:22:45.946 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[283] - FAILURE 2: {msg=当前用户[ProjectServiceTest]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:22:45.947 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[292] - SUCCESS 1: {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.948 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[301] - SUCCESS 2: {msg=成功, data=[User{id=0, userName='userTest0001', userPassword='userTest0001', email='null', phone='null', userType=GENERAL_USER, tenantId=0, state=0, tenantCode='null', queueName='null', alertGroup='null', queue='null', timeZone='null', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.953 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[258] - {msg=成功, data=[Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.956 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[316] - {msg=成功, data=[Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.959 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[168] - {msg=当前用户[null]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:22:45.960 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[178] - {}
+[INFO] 2022-05-31 00:22:45.962 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[380] - {msg=成功, data=[Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.963 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[390] - {msg=成功, data=[Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.967 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[90] - {msg=请求参数[desc length]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:45.970 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[96] - {msg=项目名称[ProjectServiceTest]已存在, status=PROJECT_ALREADY_EXISTS}
+[INFO] 2022-05-31 00:22:45.971 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[102] - {msg=成功, data=Project{id=0, userId=1, userName='ProjectServiceTest', code=5695662844256, name='test', description='test', createTime=Tue May 31 00:22:45 CST 2022, updateTime=Tue May 31 00:22:45 CST 2022, perm=0, defCount=0, instRunningCount=0}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.974 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[189] - {msg=该项目不存在,请刷新页面, status=PROJECT_NOT_EXIST}
+[INFO] 2022-05-31 00:22:45.976 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[195] - {msg=当前用户[ProjectServiceTest]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:22:45.977 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[204] - {msg=请先删除全部工作流定义, status=DELETE_PROJECT_ERROR_DEFINES_NOT_NULL}
+[INFO] 2022-05-31 00:22:45.980 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[211] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.989 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[358] - {msg=成功, data=[Project{id=1, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=2, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}, Project{id=3, userId=1, userName='null', code=1, name='ProjectServiceTest', description='null', createTime=null, updateTime=null, perm=0, defCount=0, instRunningCount=0}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:45.993 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[115] - {msg=该项目不存在,请刷新页面, status=PROJECT_NOT_EXIST}
+[INFO] 2022-05-31 00:22:45.995 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[123] - {msg=当前用户[ProjectServiceTest]没有[1]项目的操作权限, status=USER_NO_OPERATION_PROJECT_PERM}
+[INFO] 2022-05-31 00:22:45.997 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[132] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:46.006 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[227] - {msg=项目[]不存在, status=PROJECT_NOT_FOUND}
+[INFO] 2022-05-31 00:22:46.009 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[232] - {msg=项目名称[ProjectServiceTest]已存在, status=PROJECT_ALREADY_EXISTS}
+[INFO] 2022-05-31 00:22:46.012 +0800 org.apache.dolphinscheduler.api.service.ProjectServiceTest:[244] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:46.049 +0800 org.apache.dolphinscheduler.api.service.MonitorServiceTest:[90] - {msg=成功, data=[MonitorRecord{state=null, dbType=MYSQL, maxConnections=0, maxUsedConnections=0, threadsConnections=0, threadsRunningConnections=0, date=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:49.067 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[196] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:49.069 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[205] - {msg=告警组不存在, status=ALERT_GROUP_NOT_EXIST}
+[INFO] 2022-05-31 00:22:49.070 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[211] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:49.074 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[123] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:49.076 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[131] - {msg=成功, data=AlertGroup{id=0createUserId=1, groupName='AlertGroupServiceTest', description='AlertGroupServiceTest', createTime=Tue May 31 00:22:49 CST 2022, updateTime=Tue May 31 00:22:49 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:49.079 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[85] - {msg=成功, data=[AlertGroup{id=1createUserId=0, groupName='AlertGroupServiceTest', description='null', createTime=null, updateTime=null}], status=SUCCESS}
+[ERROR] 2022-05-31 00:22:49.088 +0800 org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl:[172] - Create alert group error.
+org.springframework.dao.DuplicateKeyException: group name exist
+	at org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl.createAlertgroup(AlertGroupServiceImpl.java:164)
+	at org.apache.dolphinscheduler.api.service.AlertGroupServiceTest.testCreateAlertgroupDuplicate(AlertGroupServiceTest.java:145)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:22:49.090 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[146] - {msg=告警组名称已存在, status=ALERT_GROUP_EXIST}
+[ERROR] 2022-05-31 00:22:49.096 +0800 org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl:[219] - Update alert group error.
+org.springframework.dao.DuplicateKeyException: group name exist
+	at org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl.updateAlertgroup(AlertGroupServiceImpl.java:216)
+	at org.apache.dolphinscheduler.api.service.AlertGroupServiceTest.testUpdateAlertgroupDuplicate(AlertGroupServiceTest.java:184)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:22:49.102 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[101] - Status{code='30001', msg='当前用户没有操作权限', data=null}
+[INFO] 2022-05-31 00:22:49.104 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[109] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@48a28383}
+[INFO] 2022-05-31 00:22:49.107 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[157] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:49.109 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[165] - {msg=告警组不存在, status=ALERT_GROUP_NOT_EXIST}
+[INFO] 2022-05-31 00:22:49.111 +0800 org.apache.dolphinscheduler.api.service.AlertGroupServiceTest:[171] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.721 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[214] - {msg=成功, data=[K8sNamespace{id=1, namespace=default, limitsCpu=null, limitsMemory=null, userId=0, podRequestCpu=0.0, podRequestMemory=0, podReplicas=0, k8s=default, createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.721 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[222] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:52.724 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[110] - {msg=请求参数[namespace]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:52.725 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[114] - {msg=请求参数[k8s]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:52.726 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[118] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.727 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[122] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.731 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[177] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.736 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[132] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.737 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[136] - {msg=请求参数[limitsCpu]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:52.738 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[140] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.742 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[151] - Status{code='10001', msg='请求参数[namespace]无效', data=null}
+[INFO] 2022-05-31 00:22:52.743 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[156] - Status{code='10001', msg='请求参数[k8s]无效', data=null}
+[INFO] 2022-05-31 00:22:52.744 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[161] - Status{code='1300002', msg='k8s命名空间[default]已存在', data=null}
+[INFO] 2022-05-31 00:22:52.744 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[166] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:22:52.747 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[99] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@19476596}
+[INFO] 2022-05-31 00:22:52.751 +0800 org.apache.dolphinscheduler.api.service.K8SNamespaceServiceTest:[191] - {msg=成功, data=[K8sNamespace{id=1, namespace=default, limitsCpu=null, limitsMemory=null, userId=0, podRequestCpu=0.0, podRequestMemory=0, podReplicas=0, k8s=default, createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.784 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[106] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:52.786 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[111] - {msg=环境配置信息不能为空, status=ENVIRONMENT_CONFIG_IS_NULL}
+[INFO] 2022-05-31 00:22:52.787 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[115] - {msg=环境名称不能为空, status=ENVIRONMENT_NAME_IS_NULL}
+[ERROR] 2022-05-31 00:22:52.790 +0800 org.apache.dolphinscheduler.common.utils.JSONUtils:[293] - json to map exception!
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'test': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"test"; line: 1, column: 5]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1840)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:722)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2873)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2851)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken2(ReaderBasedJsonParser.java:2648)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken(ReaderBasedJsonParser.java:2626)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchTrue(ReaderBasedJsonParser.java:2584)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:740)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4356)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4205)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3197)
+	at org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject(JSONUtils.java:291)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.checkParams(EnvironmentServiceImpl.java:460)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.createEnvironment(EnvironmentServiceImpl.java:102)
+	at org.apache.dolphinscheduler.api.service.EnvironmentServiceTest.testCreateEnvironment(EnvironmentServiceTest.java:118)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:22:52.791 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[119] - {msg=环境关联的工作组参数解析错误, status=ENVIRONMENT_WORKER_GROUPS_IS_INVALID}
+[INFO] 2022-05-31 00:22:52.793 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[124] - {msg=环境名称[Env1]已经存在, status=ENVIRONMENT_NAME_EXISTS}
+[INFO] 2022-05-31 00:22:52.796 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[130] - {msg=成功, data=5695663717728, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.824 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[179] - {msg=成功, data=[org.apache.dolphinscheduler.api.dto.EnvironmentDto@55455a45], status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.828 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[216] - {msg=查询环境编码[1]不存在, status=QUERY_ENVIRONMENT_BY_CODE_ERROR}
+[INFO] 2022-05-31 00:22:52.832 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[221] - {msg=成功, data=org.apache.dolphinscheduler.api.dto.EnvironmentDto@2062f5ea, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.837 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[203] - {msg=查询环境名称[Env1]信息不存在, status=QUERY_ENVIRONMENT_BY_NAME_ERROR}
+[INFO] 2022-05-31 00:22:52.840 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[208] - {msg=成功, data=org.apache.dolphinscheduler.api.dto.EnvironmentDto@239153fe, status=SUCCESS}
+[ERROR] 2022-05-31 00:22:52.844 +0800 org.apache.dolphinscheduler.common.utils.JSONUtils:[293] - json to map exception!
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'test': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"test"; line: 1, column: 5]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1840)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:722)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2873)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2851)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken2(ReaderBasedJsonParser.java:2648)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken(ReaderBasedJsonParser.java:2626)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchTrue(ReaderBasedJsonParser.java:2584)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:740)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4356)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4205)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3197)
+	at org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject(JSONUtils.java:291)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.checkParams(EnvironmentServiceImpl.java:460)
+	at org.apache.dolphinscheduler.api.service.EnvironmentServiceTest.testCheckParams(EnvironmentServiceTest.java:137)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:22:52.849 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[147] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:52.850 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[152] - {msg=环境配置信息不能为空, status=ENVIRONMENT_CONFIG_IS_NULL}
+[INFO] 2022-05-31 00:22:52.851 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[156] - {msg=环境名称不能为空, status=ENVIRONMENT_NAME_IS_NULL}
+[ERROR] 2022-05-31 00:22:52.852 +0800 org.apache.dolphinscheduler.common.utils.JSONUtils:[293] - json to map exception!
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'test': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"test"; line: 1, column: 5]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1840)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:722)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2873)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:2851)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken2(ReaderBasedJsonParser.java:2648)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchToken(ReaderBasedJsonParser.java:2626)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._matchTrue(ReaderBasedJsonParser.java:2584)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:740)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4356)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4205)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3197)
+	at org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject(JSONUtils.java:291)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.checkParams(EnvironmentServiceImpl.java:460)
+	at org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl.updateEnvironmentByCode(EnvironmentServiceImpl.java:335)
+	at org.apache.dolphinscheduler.api.service.EnvironmentServiceTest.testUpdateEnvironmentByCode(EnvironmentServiceTest.java:159)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.mockito.internal.runners.DefaultInternalRunner$1$1.evaluate(DefaultInternalRunner.java:54)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.vintage.engine.execution.RunnerExecutor.execute(RunnerExecutor.java:43)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:418)
+	at org.junit.vintage.engine.VintageTestEngine.executeAllChildren(VintageTestEngine.java:82)
+	at org.junit.vintage.engine.VintageTestEngine.execute(VintageTestEngine.java:73)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:71)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+[INFO] 2022-05-31 00:22:52.852 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[160] - {msg=环境关联的工作组参数解析错误, status=ENVIRONMENT_WORKER_GROUPS_IS_INVALID}
+[INFO] 2022-05-31 00:22:52.854 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[165] - {msg=环境名称[Env1]已经存在, status=ENVIRONMENT_NAME_EXISTS}
+[INFO] 2022-05-31 00:22:52.900 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[170] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.903 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[194] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@74f37601}
+[INFO] 2022-05-31 00:22:52.906 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[231] - {msg=当前用户没有操作权限, status=USER_NO_OPERATION_PERM}
+[INFO] 2022-05-31 00:22:52.909 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[237] - {msg=该环境已经被任务使用，所以不能删除该环境信息, status=DELETE_ENVIRONMENT_RELATED_TASK_EXISTS}
+[INFO] 2022-05-31 00:22:52.911 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[243] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:52.914 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[250] - {msg=环境名称不能为空, status=ENVIRONMENT_NAME_IS_NULL}
+[INFO] 2022-05-31 00:22:52.915 +0800 org.apache.dolphinscheduler.api.service.EnvironmentServiceTest:[255] - {msg=环境名称[Env1]已经存在, status=ENVIRONMENT_NAME_EXISTS}
+[INFO] 2022-05-31 00:22:56.475 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[144] - {msg=队列ID[0]不存在, status=QUEUE_NOT_EXIST}
+[INFO] 2022-05-31 00:22:56.477 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[148] - {msg=数据未变更，不需要更新队列信息, status=NEED_NOT_UPDATE_QUEUE}
+[INFO] 2022-05-31 00:22:56.478 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[152] - {msg=队列值[test]已存在, status=QUEUE_VALUE_EXIST}
+[INFO] 2022-05-31 00:22:56.478 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[156] - {msg=队列名称[test]已存在, status=QUEUE_NAME_EXIST}
+[INFO] 2022-05-31 00:22:56.479 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[160] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:56.482 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[121] - {msg=请求参数[queue]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:56.483 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[125] - {msg=请求参数[queueName]无效, status=REQUEST_PARAMS_NOT_VALID_ERROR}
+[INFO] 2022-05-31 00:22:56.484 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[129] - {msg=成功, data=Queue{id=0, queueName='QueueServiceTest', queue='QueueServiceTest', createTime=Tue May 31 00:22:56 CST 2022, updateTime=Tue May 31 00:22:56 CST 2022}, status=SUCCESS}
+[INFO] 2022-05-31 00:22:56.487 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[94] - {msg=成功, data=[Queue{id=1, queueName='QueueServiceTest', queue='QueueServiceTest', createTime=null, updateTime=null}], status=SUCCESS}
+[INFO] 2022-05-31 00:22:56.492 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[110] - Status{code='0', msg='成功', data=org.apache.dolphinscheduler.api.utils.PageInfo@435734c2}
+[INFO] 2022-05-31 00:22:56.496 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[173] - Status{code='10001', msg='请求参数[queue]无效', data=null}
+[INFO] 2022-05-31 00:22:56.497 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[178] - Status{code='10001', msg='请求参数[queueName]无效', data=null}
+[INFO] 2022-05-31 00:22:56.498 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[183] - Status{code='10130', msg='队列名称[QueueServiceTest]已存在', data=null}
+[INFO] 2022-05-31 00:22:56.498 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[188] - Status{code='10129', msg='队列值[QueueServiceTest]已存在', data=null}
+[INFO] 2022-05-31 00:22:56.499 +0800 org.apache.dolphinscheduler.api.service.QueueServiceTest:[193] - Status{code='0', msg='成功', data=null}
+[INFO] 2022-05-31 00:22:56.664 +0800 org.apache.dolphinscheduler.api.service.impl.TaskGroupServiceImpl:[162] - update result:0
+[INFO] 2022-05-31 00:22:56.665 +0800 org.apache.dolphinscheduler.api.service.TaskGroupServiceTest:[180] - {msg=成功, status=SUCCESS}
+[INFO] 2022-05-31 00:22:56.787 +0800 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-05-31 00:22:56.812 +0800 org.apache.curator.framework.imps.CuratorFrameworkImpl:[955] - backgroundOperationsLoop exiting
+[INFO] 2022-05-31 00:22:56.818 +0800 org.springframework.scheduling.quartz.SchedulerFactoryBean:[845] - Shutting down Quartz Scheduler
+[INFO] 2022-05-31 00:22:56.818 +0800 org.quartz.core.QuartzScheduler:[666] - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+[INFO] 2022-05-31 00:22:56.819 +0800 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-05-31 00:22:56.821 +0800 org.quartz.core.QuartzScheduler:[740] - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+[INFO] 2022-05-31 00:22:56.823 +0800 org.apache.dolphinscheduler.remote.NettyRemotingClient:[390] - netty client closed
+[INFO] 2022-05-31 00:22:56.823 +0800 org.apache.dolphinscheduler.service.log.LogClientService:[74] - logger client closed
+[INFO] 2022-05-31 00:22:56.827 +0800 com.zaxxer.hikari.HikariDataSource:[350] - HikariPool-1 - Shutdown initiated...
+[INFO] 2022-05-31 00:22:56.831 +0800 com.zaxxer.hikari.HikariDataSource:[352] - HikariPool-1 - Shutdown completed.

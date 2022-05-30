@@ -47,7 +47,7 @@ public interface ResourcePermissionCheckService<T>{
      * operationpermissionCheck
      * @param authorizationType
      * @param userId
-     * @param sourceUrl
+     * @param permissionKey
      * @param logger
      * @return
      */

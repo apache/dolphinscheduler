@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -38,7 +37,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,18 +65,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Autowired
     private ExecutorService executorService;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
-
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupServiceImpl.class);
-
-    private Map<String, Object> operationPermissionCheck(Map<String, Object> result, Integer userId, FuncPermissionEnum funcPermissionEnum){
-        if (!resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP, userId, funcPermissionEnum.getKey(), logger)){
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-        return null;
-    }
 
     /**
      * create a Task group
@@ -93,9 +80,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_CREATE);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CREATE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         if (name == null) {
             putMsg(result, Status.NAME_NULL);
@@ -137,10 +125,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
-
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_EDIT);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_EDIT);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         if (name == null) {
             putMsg(result, Status.NAME_NULL);
@@ -228,9 +216,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
 
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_OPTION_VIEW);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
 
@@ -280,9 +269,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
 
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_OPTION_VIEW);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPaging(page, userId, name, status);
 
@@ -300,9 +290,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> closeTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_CLOSE);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.NO.getCode()) {
@@ -326,9 +317,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> startTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_CLOSE);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.YES.getCode()) {
@@ -352,9 +344,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> forceStartTask(User loginUser, int queueId) {
         Map<String, Object> result = new HashMap<>();
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_VIEW_QUEUE);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         return executorService.forceStartTaskInstance(loginUser, queueId);
     }
@@ -363,9 +356,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> operationPermissionCheckResult = operationPermissionCheck(result, loginUser.getId(), FuncPermissionEnum.TASK_GROUP_QUEUE_PRIORITY);
-        if (operationPermissionCheckResult != null){
-            return operationPermissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         taskGroupQueueService.modifyPriority(queueId, priority);
         putMsg(result, Status.SUCCESS);

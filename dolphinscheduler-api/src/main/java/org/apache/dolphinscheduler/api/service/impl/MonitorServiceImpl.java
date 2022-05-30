@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.common.Constants;
@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.HashMap;
@@ -58,9 +57,6 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Autowired
     private RegistryClient registryClient;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
-
     /**
      * query database state
      *
@@ -70,7 +66,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (!operationPermissionCheck(loginUser.getId(), FuncPermissionEnum.MONITOR_DB.getKey(), logger)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.MONITOR, ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW)) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
@@ -89,7 +85,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryMaster(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (!operationPermissionCheck(loginUser.getId(), FuncPermissionEnum.MONITOR_MASTER.getKey(), logger)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.MONITOR, ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW)) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
@@ -111,7 +107,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
 
         Map<String, Object> result = new HashMap<>();
 
-        if (!operationPermissionCheck(loginUser.getId(), FuncPermissionEnum.MONITOR_WORKER.getKey(), logger)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.MONITOR, ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW)) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
@@ -155,10 +151,6 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
         return isMaster
             ? registryClient.getServerList(NodeType.MASTER)
             : registryClient.getServerList(NodeType.WORKER);
-    }
-
-    private boolean operationPermissionCheck(Integer userId, String permissionKey, Logger logger) {
-        return resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, userId, permissionKey, logger);
     }
 
 }

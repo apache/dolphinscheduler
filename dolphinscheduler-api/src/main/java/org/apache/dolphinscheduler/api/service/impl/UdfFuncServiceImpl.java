@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.FuncPermissionEnum;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -38,10 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +66,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Autowired
     private UDFUserMapper udfUserMapper;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
-
     /**
      * create udf function
      *
@@ -95,9 +90,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                             int resourceId) {
         Result<Object> result = new Result<>();
 
-        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.CREATE_UDF_FUNCTION, loginUser.getId(), null, result);
-        if (permissionCheckResult != null){
-            return permissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_CREATE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
@@ -163,9 +159,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Override
     public Result<Object> queryUdfFuncDetail(User loginUser, int id) {
         Result<Object> result = new Result<>();
-        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNCTION_VIEW, loginUser.getId(), new Object[]{id}, result);
-        if (permissionCheckResult != null){
-            return permissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
@@ -202,9 +199,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                              int resourceId) {
         Result<Object> result = new Result<>();
 
-        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNC_EDIT, loginUser.getId(), new Object[]{resourceId}, result);
-        if (permissionCheckResult != null){
-            return permissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
 
         // verify udfFunc is exist
@@ -271,9 +269,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Override
     public Result<Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result();
-        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNCTION_VIEW, loginUser.getId(), null, result);
-        if (Objects.nonNull(permissionCheckResult)) {
-            return permissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
@@ -294,11 +293,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function list page
      */
     private IPage<UdfFunc> getUdfFuncsPage(User loginUser, String searchVal, Integer pageSize, int pageNo) {
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-        Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, userId, logger);
+        Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, loginUser.getId(), logger);
         Page<UdfFunc> page = new Page<>(pageNo, pageSize);
         if (udfFuncIds.isEmpty()) {
             return page;
@@ -317,9 +312,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     public Result<Object> queryUdfFuncList(User loginUser, Integer type) {
         Result<Object> result = new Result<>();
 
-        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNCTION_VIEW, loginUser.getId(), null, result);
-        if (Objects.nonNull(permissionCheckResult)) {
-            return permissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, loginUser.getId(), logger);
         if (udfFuncIds.isEmpty()){
@@ -345,9 +341,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     public Result<Object> delete(User loginUser, int id) {
         Result<Object> result = new Result<>();
 
-        Result<Object> permissionCheckResult = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.UDF_FUNC_DELETE, 1, new Object[]{id}, result);
-        if (Objects.nonNull(permissionCheckResult)){
-            return permissionCheckResult;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_DELETE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
@@ -364,9 +361,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Override
     public Result<Object> verifyUdfFuncByName(User loginUser, String name) {
         Result<Object> result = new Result<>();
-        Result<Object> permissionCheck = permissionCheck(AuthorizationType.UDF, FuncPermissionEnum.CREATE_UDF_FUNCTION, loginUser.getId(), null, result);
-        if (Objects.nonNull(permissionCheck)){
-            return permissionCheck;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
 
         if (checkUdfFuncNameExists(name)) {
@@ -376,15 +374,4 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
         return result;
     }
-
-    private Result<Object> permissionCheck (AuthorizationType authorizationType, FuncPermissionEnum funcPermissionEnum, Integer userId, Object[] needChecks, Result<Object> result){
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(authorizationType, userId, funcPermissionEnum.getKey(), logger);
-        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(authorizationType, needChecks, userId, logger);
-        if (!(operationPermissionCheck && resourcePermissionCheck)){
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-        return null;
-    }
-
 }
