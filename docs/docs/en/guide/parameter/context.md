@@ -67,7 +67,6 @@ When the log detects the `${setValue(key=value1)}` format in the shell node defi
 
 ### HTTP
 
-94/5000
 Step 1: Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
 
 <img src="/img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
