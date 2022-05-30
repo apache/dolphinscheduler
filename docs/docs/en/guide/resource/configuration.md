@@ -5,7 +5,7 @@ The Resource Center is usually used for operations such as uploading files, UDF 
 ## Local File Resource Configuration
 For a single machine, you can choose to use local file directory as the upload directory (no need to deploy Hadoop) by making the following configuration.
 
-### Configuring the common.properties
+### Configuring the `common.properties`
 
 Configure the file in the following paths: `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
 
