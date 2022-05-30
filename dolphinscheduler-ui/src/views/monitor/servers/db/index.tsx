@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useDatabase } from '@/views/monitor/servers/db/use-database'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@vicons/antd'
 import Card from '@/components/card'
+import Result from '@/components/result'
 import styles from './index.module.scss'
 import type { Ref } from 'vue'
 import type { DatabaseRes } from '@/service/modules/monitor/types'
@@ -37,7 +38,14 @@ const db = defineComponent({
   render() {
     const { t, databaseRef } = this
 
-    return (
+    return databaseRef.length < 1 ? (
+      <Result
+        title={t('monitor.db.db_no_data_result_title')}
+        description={t('monitor.db.db_no_data_result_desc')}
+        status={'info'}
+        size={'medium'}
+      />
+    ) : (
       <NGrid x-gap='12' y-gap='8' cols='2 2xl:4' responsive='screen'>
         <NGi>
           <Card title={t('monitor.db.health_state')}>
