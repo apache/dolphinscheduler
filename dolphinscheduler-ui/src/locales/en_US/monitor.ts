@@ -46,7 +46,10 @@ export default {
     health_state: 'Health State',
     max_connections: 'Max Connections',
     threads_connections: 'Threads Connections',
-    threads_running_connections: 'Threads Running Connections'
+    threads_running_connections: 'Threads Running Connections',
+    db_no_data_result_title: 'No DB Nodes Exist',
+    db_no_data_result_desc:
+      'Currently, there are no DB nodes exist, please create a DB node and refresh this page'
   },
   statistics: {
     command_number_of_waiting_for_running:
