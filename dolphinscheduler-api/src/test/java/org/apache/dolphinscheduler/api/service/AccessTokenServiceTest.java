@@ -37,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
@@ -106,12 +107,12 @@ public class AccessTokenServiceTest {
         when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
         Result result = accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
         // Token is absent
         result = this.accessTokenService.createToken(getLoginUser(), 1, getDate(), null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
