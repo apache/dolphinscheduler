@@ -80,7 +80,15 @@ Method: POST
 /dolphinscheduler/alter-groups/batch-delete
 ```
 
-### ⑤ Others
+### ⑤ Partial Modifications -PATCH
+Use URI to locate the resource, use PATCH to partial modifications.
+
+```
+Method: PATCH
+/dolphinscheduler/alter-groups/{alterGroupId}
+```
+
+### ⑥ Others
 In addition to creating, deleting, modifying and quering, we also locate the corresponding resource through url, and then append operations to it after the path, such as:
 ```
 /dolphinscheduler/alert-groups/verify-name

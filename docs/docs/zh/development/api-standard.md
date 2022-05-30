@@ -82,7 +82,16 @@ Method: POST
 /dolphinscheduler/alter-groups/batch-delete
 ```
 
-### ⑤ 其他操作
+### ⑤ 部分更新操作 -PATCH
+通过 URI 来定位某一资源，通过 PATCH 指定对其部分更新。
+
++ 下面例子表示部分更新 `alterGroupId` 对应的资源：
+```
+Method: PATCH
+/dolphinscheduler/alter-groups/{alterGroupId}
+```
+
+### ⑥ 其他操作
 除增删改查外的操作，我们同样也通过 `url` 定位到对应的资源，然后再在路径后面追加对其进行的操作。例如：
 ```
 /dolphinscheduler/alert-groups/verify-name
