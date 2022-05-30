@@ -40,10 +40,10 @@ public class HttpUtilsTest {
     @Test
     public void testGetTest() {
 	// success
-	String result = HttpUtils.get("https://github.com/manifest.json");
+	String result = HttpUtils.get("https://www.baidu.com/sugrec?prod=pc_his&from=pc_web&json=1&sid=36427_36454_31253_36422_36165_36487_36055_36376_36234_26350_36469_36316&hisdata=&_t=1653904731156&req=2&csor=0");
 	Assert.assertNotNull(result);
 	ObjectNode jsonObject = JSONUtils.parseObject(result);
-	Assert.assertEquals("GitHub", jsonObject.path("name").asText());
+	Assert.assertNotNull(jsonObject.path("queryid").asText());
 	result = HttpUtils.get("https://123.333.111.33/ccc");
 	Assert.assertNull(result);
     }
@@ -65,7 +65,7 @@ public class HttpUtilsTest {
     @Test
     public void testGetResponseContentString() {
 	CloseableHttpClient httpclient = HttpClients.createDefault();
-	HttpGet httpget = new HttpGet("https://github.com/manifest.json");
+	HttpGet httpget = new HttpGet("https://www.baidu.com/sugrec?prod=pc_his&from=pc_web&json=1&sid=36427_36454_31253_36422_36165_36487_36055_36376_36234_26350_36469_36316&hisdata=&_t=1653904731156&req=2&csor=0");
 	/** set timeout、request time、socket timeout */
 	RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
 		.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
@@ -73,10 +73,10 @@ public class HttpUtilsTest {
 	httpget.setConfig(requestConfig);
 	String responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
 	Assert.assertNotNull(responseContent);
-	
+
 	responseContent = HttpUtils.getResponseContentString(null, httpclient);
 	Assert.assertNull(responseContent);
-	
+
 	responseContent = HttpUtils.getResponseContentString(httpget, null);
 	Assert.assertNull(responseContent);
     }
