@@ -144,13 +144,25 @@ public class ResourcesServiceTest {
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.GENERAL_USER);
+
+        //CURRENT_LOGIN_USER_TENANT_NOT_EXIST
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, mockMultipartFile, -1, "/");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        //set tenant for user
+        user.setTenantId(1);
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+
         //HDFS_NOT_STARTUP
-        Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null, -1, "/");
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null, -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_FILE_IS_EMPTY
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
+        mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, mockMultipartFile, -1, "/");
         logger.info(result.toString());
