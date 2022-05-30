@@ -17,21 +17,19 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.RERUN;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_START;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.RunMode;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -48,6 +46,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -74,6 +73,11 @@ import org.slf4j.LoggerFactory;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExecutorServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
+
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @InjectMocks
     private ExecutorServiceImpl executorService;
@@ -169,7 +173,7 @@ public class ExecutorServiceTest {
 
         // mock
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(checkProjectAndAuth());
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START)).thenReturn(checkProjectAndAuth());
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         Mockito.when(processService.createCommand(any(Command.class))).thenReturn(1);
@@ -317,7 +321,7 @@ public class ExecutorServiceTest {
     @Test
     public void testExecuteRepeatRunning() {
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
-
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN )).thenReturn(checkProjectAndAuth());
         Map<String, Object> result = executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
