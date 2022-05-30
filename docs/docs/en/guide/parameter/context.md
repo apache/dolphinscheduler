@@ -51,7 +51,7 @@ When the SHELL task is completed, we can use the output passed upstream as the q
 >
 >If the result of the SQL node has multiple rows, one or more fields, the name of the `prop` needs to be the same as the field name. Choose the data type structure as `LIST`, and the SQL query result will be converted to `LIST<VARCHAR>`, and forward to convert to JSON as the parameter value.
 
-#### 3. Save the workflow and set the global parameters
+#### Save the workflow and set the global parameters
 
 Click on the Save workflow icon and set the global parameters output and value.
 
