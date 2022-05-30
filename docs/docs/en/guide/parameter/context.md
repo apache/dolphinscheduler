@@ -75,4 +75,4 @@ The result of Node_mysql is as follows:
 
 Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
 
-But the value of value is only output as 66 in Node_A, the reason is that the direction of value is selected as IN, and only when the direction is OUT will it be defined as a variable output.
+But the output value 66 only shows in the Node_A, the reason is that the direction of value is selected as IN, and only when the direction is OUT will it be defined as a variable output.
