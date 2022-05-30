@@ -47,6 +47,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
+
 /**
  * logger service test
  */
@@ -154,7 +157,7 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,VIEW_LOG)).thenReturn(result);
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
@@ -181,7 +184,7 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,DOWNLOAD_LOG )).thenReturn(result);
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         loggerService.getLogBytes(loginUser, projectCode, 1);

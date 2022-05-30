@@ -36,6 +36,7 @@ package org.apache.dolphinscheduler.service.permission;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             List<AuthorizationType> authorizationTypes = authorizedResourceList.authorizationTypes();
             authorizationTypes.forEach(auth -> RESOURCE_LIST_MAP.put(auth, authorizedResourceList));
         }
-    }
+     }
 
     @Override
     public boolean resourcePermissionCheck(AuthorizationType authorizationType, Object[] needChecks, int userId, Logger logger) {
@@ -83,6 +84,11 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     }
 
     @Override
+    public boolean functionDisabled() {
+        return false;
+    }
+
+    @Override
     public <T> Set<T> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, int userId, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null){
@@ -97,8 +103,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         private final ProjectMapper projectMapper;
 
-        @Autowired
-        private ProcessService processService;
+       
 
         public ProjectsResourceList(ProjectMapper projectMapper) {
             this.projectMapper = projectMapper;
@@ -111,13 +116,371 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            // all users can create projects
             return true;
+        }
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
+        }
+    }
+
+
+    @Component
+    public static class K8sNamespaceResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final K8sNamespaceMapper k8sNamespaceMapper;
+
+       
+
+        public K8sNamespaceResourceList(K8sNamespaceMapper k8sNamespaceMapper) {
+            this.k8sNamespaceMapper = k8sNamespaceMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.K8S_NAMESPACE);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
         }
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
+            return Collections.emptySet();
+        }
+    }
+
+
+    @Component
+    public static class EnvironmentResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final EnvironmentMapper environmentMapper;
+
+       
+
+        public EnvironmentResourceList(EnvironmentMapper environmentMapper) {
+            this.environmentMapper = environmentMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.ENVIRONMENT);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+    @Component
+    public static class QueueResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final QueueMapper queueMapper;
+
+       
+
+        public QueueResourceList(QueueMapper queueMapper) {
+            this.queueMapper = queueMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.QUEUE);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+
+    @Component
+    public static class WorkerGroupResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final WorkerGroupMapper workerGroupMapper;
+
+       
+
+        public WorkerGroupResourceList(WorkerGroupMapper workerGroupMapper) {
+            this.workerGroupMapper = workerGroupMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.WORKER_GROUP);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * AlertPluginInstance Resource
+     */
+    @Component
+    public static class AlertPluginInstanceResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final AlertPluginInstanceMapper alertPluginInstanceMapper;
+
+       
+
+        public AlertPluginInstanceResourceList(AlertPluginInstanceMapper alertPluginInstanceMapper) {
+            this.alertPluginInstanceMapper = alertPluginInstanceMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.ALERT_PLUGIN_INSTANCE);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * AlertPluginInstance Resource
+     */
+    @Component
+    public static class AlertGroupResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final AlertGroupMapper alertGroupMapper;
+
+       
+
+        public AlertGroupResourceList(AlertGroupMapper alertGroupMapper) {
+            this.alertGroupMapper = alertGroupMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.ALERT_GROUP);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return alertGroupMapper.listAuthorizedAlertGroupList(userId, null).stream().map(AlertGroup::getId).collect(toSet());
+        }
+    }
+
+    /**
+     * Tenant Resource
+     */
+    @Component
+    public static class TenantResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final TenantMapper tenantMapper;
+
+       
+
+        public TenantResourceList(TenantMapper tenantMapper) {
+            this.tenantMapper = tenantMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.TENANT);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * User Resource
+     */
+    @Component
+    public static class UsersResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final UserMapper userMapper;
+
+       
+
+        public UsersResourceList(UserMapper userMapper) {
+            this.userMapper = userMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.USER);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+           return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return userMapper.listAuthorizedUsersList(userId, null).stream().map(User::getId).collect(toSet());
+        }
+    }
+
+    /**
+     * DataSource Resource
+     */
+    @Component
+    public static class DataSourceResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final DataSourceMapper dataSourceMapper;
+
+
+
+        public DataSourceResourceList(DataSourceMapper dataSourceMapper) {
+            this.dataSourceMapper = dataSourceMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.DATASOURCE);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+            return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return dataSourceMapper.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId).collect(toSet());
+        }
+    }
+
+    /**
+     * DataAnalysis Resource
+     */
+    @Component
+    public static class DataAnalysisList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final CommandMapper commandMapper;
+
+
+
+        public DataAnalysisList(CommandMapper commandMapper) {
+            this.commandMapper = commandMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.DATA_ANALYSIS);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+            return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * DataQuality Resource
+     */
+    @Component
+    public static class DataQualityList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final DqRuleMapper dqRuleMapper;
+
+
+
+        public DataQualityList(DqRuleMapper dqRuleMapper) {
+            this.dqRuleMapper = dqRuleMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.DATA_QUALITY);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+            return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * AccessToken Resource
+     */
+    @Component
+    public static class AccessTokenList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final AccessTokenMapper accessTokenMapper;
+
+
+
+        public AccessTokenList(AccessTokenMapper accessTokenMapper) {
+            this.accessTokenMapper = accessTokenMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.ACCESS_TOKEN);
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String url, Logger logger) {
+            return true;
+        }
+
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            return accessTokenMapper.listAuthorizedAccessToken(userId, null).stream().map(AccessToken::getId).collect(toSet());
         }
     }
 

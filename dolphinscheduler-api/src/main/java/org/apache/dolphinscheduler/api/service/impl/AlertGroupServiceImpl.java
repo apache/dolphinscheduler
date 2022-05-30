@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
@@ -42,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * alert group service impl
@@ -83,7 +86,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.ALERT_GROUP,ALERT_GROUP_VIEW)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
         //check if exist
@@ -110,7 +114,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Result listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Result result = new Result();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ALERT_GROUP,ALERT_GROUP_VIEW)) {
             putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -140,7 +144,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -185,7 +190,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, new Object[]{id},AuthorizationType.ALERT_GROUP,ALERT_GROUP_UPDATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -230,7 +236,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.ALERT_GROUP,ALERT_GROUP_DELETE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 

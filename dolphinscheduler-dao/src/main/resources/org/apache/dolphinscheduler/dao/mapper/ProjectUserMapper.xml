@@ -37,4 +37,5 @@
         and user_id = #{userId}
         limit 1
     </select>
+
 </mapper>

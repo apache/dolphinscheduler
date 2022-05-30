@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
 
 /**
@@ -86,7 +88,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                             String desc) throws Exception {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT, TENANT_CREATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -140,7 +143,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Result<Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Result<Object> result = new Result<>();
-        if (!isAdmin(loginUser)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.TENANT,TENANT_MANAGER)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -173,7 +176,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_UPDATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -231,7 +235,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_DELETE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -286,7 +291,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> queryTenantList(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
-
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.TENANT,TENANT_MANAGER)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
         List<Tenant> resourceList = tenantMapper.selectList(null);
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result, Status.SUCCESS);

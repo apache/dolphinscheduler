@@ -61,11 +61,12 @@ public interface ProjectService {
      * @param loginUser login user
      * @param project project
      * @param projectCode project code
+     * @param perm String
      * @return true if the login user have permission to see the project
      */
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode);
+    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,String perm);
 
-    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result);
+    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result,String perm);
 
     boolean hasProjectAndPerm(User loginUser, Project project, Result result);
 

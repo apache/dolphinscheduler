@@ -118,7 +118,7 @@ public class SchedulerServiceTest {
         //hash no auth
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
 
-        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result)).thenReturn(true);
+        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result,null)).thenReturn(true);
         //schedule not exists
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 2, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));

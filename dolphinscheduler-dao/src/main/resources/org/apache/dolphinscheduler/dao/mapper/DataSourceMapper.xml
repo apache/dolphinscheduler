@@ -88,9 +88,11 @@
         select
         <include refid="baseSql"/>
         from t_ds_datasource
-        where
-        id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId}
-        union select id as datasource_id from t_ds_datasource where user_id=#{userId})
+        where 1=1
+        <if test="userId != 0">
+            and id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId}
+            union select id as datasource_id from t_ds_datasource where user_id=#{userId})
+        </if>
         <if test="dataSourceIds != null and dataSourceIds.length > 0">
             and id in
             <foreach collection="dataSourceIds" item="i" open="(" close=")" separator=",">

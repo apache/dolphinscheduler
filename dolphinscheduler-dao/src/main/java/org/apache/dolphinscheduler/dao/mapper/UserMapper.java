@@ -172,4 +172,15 @@ public interface UserMapper extends BaseMapper<User> {
      * @return user list
      */
     List<User> queryAuthedUserListByProjectId(@Param("projectId") int projectId);
+
+    /**
+     * list authorized User
+     * @param userId
+     * @param resourcesIds
+     * @param <T>
+     * @return
+     */
+    <T> List<User> listAuthorizedUsersList (@Param("userId") int userId, @Param("resourcesIds")T[] resourcesIds);
+
+
 }

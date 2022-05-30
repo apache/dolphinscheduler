@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,6 +52,7 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
         k8sNamespace.setLimitsMemory(100);
         k8sNamespace.setCreateTime(new Date());
         k8sNamespace.setUpdateTime(new Date());
+        k8sNamespace.setId(1);
         k8sNamespaceMapper.insert(k8sNamespace);
         return k8sNamespace;
     }

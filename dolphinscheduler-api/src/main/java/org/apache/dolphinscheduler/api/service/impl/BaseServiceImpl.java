@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ import java.util.Objects;
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -163,10 +162,10 @@ public class BaseServiceImpl implements BaseService {
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), null, logger);
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String perm) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), perm, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        return operationPermissionCheck || resourcePermissionCheck;
+        return operationPermissionCheck && resourcePermissionCheck;
     }
 
     /**

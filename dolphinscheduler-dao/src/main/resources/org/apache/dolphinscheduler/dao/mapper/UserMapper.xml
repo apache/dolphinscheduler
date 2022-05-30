@@ -131,4 +131,15 @@
         from t_ds_user u, t_ds_relation_project_user rel
         where u.id = rel.user_id and rel.project_id = #{projectId}
     </select>
+
+    <select id="listAuthorizedUsersList" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        *
+        from t_ds_project dp
+        where  1=1
+        <if test="userId != 0">
+            and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+            union select id as project_id  from t_ds_project where user_id=#{userId})
+        </if>
+    </select>
 </mapper>

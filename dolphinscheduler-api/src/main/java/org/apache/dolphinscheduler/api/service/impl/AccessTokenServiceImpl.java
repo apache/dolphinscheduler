@@ -25,14 +25,13 @@ import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -44,10 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * access token service impl
@@ -74,6 +70,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page<>(pageNo, pageSize);
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_MANAGE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
         int userId = loginUser.getId();
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             userId = 0;
@@ -99,7 +99,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         result.put(Constants.STATUS, false);
 
         // only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_MANAGE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -124,7 +125,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperator(loginUser,userId)) {
+        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -169,7 +170,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperator(loginUser,userId)) {
+        if (!(canOperatorPermissions(loginUser,null,AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -197,7 +198,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
-        if (!canOperator(loginUser,accessToken.getUserId())) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -221,7 +222,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperator(loginUser,userId)) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
