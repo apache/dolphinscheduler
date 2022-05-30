@@ -22,7 +22,7 @@ When defining an upstream node, if there is a need to transmit the result of tha
 
 This sample shows how to use the parameter passing function. Create local parameters and assign them to downstream through the SHELL task. The SQL task completes the query operation by obtaining the parameters of the upstream task.
 
-#### 1. Create a SHELL task and set parameters
+#### Create a SHELL task and set parameters
 
 > The user needs to pass the parameter when creating the shell script, the output statement format is `${setValue(key=value)}`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
 
