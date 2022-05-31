@@ -600,8 +600,7 @@ export default {
     zeppelin_paragraph_id: 'zeppelin_paragraph_id',
     zeppelin_paragraph_id_tips: '请输入zeppelin paragraph id',
     zeppelin_parameters: 'parameters',
-    zeppelin_parameters_tips:
-      '请输入zeppelin dynamic form参数',
+    zeppelin_parameters_tips: '请输入zeppelin dynamic form参数',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips: '请输入papermill所在的conda环境名',
     jupyter_input_note_path: 'inputNotePath',
