@@ -17,17 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.redshift;
 
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,18 +38,24 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@AutoService(DataSourceProcessor.class)
 public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    @Override
+    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+        return JSONUtils.parseObject(paramJson, RedshiftDataSourceParamDTO.class);
+    }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         RedshiftConnectionParam
-            connectionParams = (RedshiftConnectionParam) createConnectionParams(connectionJson);
+                connectionParams = (RedshiftConnectionParam) createConnectionParams(connectionJson);
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
         RedshiftDataSourceParamDTO
-            redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
+                redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
         redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         redshiftDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -65,7 +72,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         String jdbcUrl = address + Constants.SLASH + redshiftParam.getDatabase();
 
         RedshiftConnectionParam
-            redshiftConnectionParam = new RedshiftConnectionParam();
+                redshiftConnectionParam = new RedshiftConnectionParam();
         redshiftConnectionParam.setUser(redshiftParam.getUserName());
         redshiftConnectionParam.setPassword(PasswordUtils.encodePassword(redshiftParam.getPassword()));
         redshiftConnectionParam.setOther(transformOther(redshiftParam.getOther()));
@@ -97,7 +104,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         RedshiftConnectionParam
-            redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
+                redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
         if (!StringUtils.isEmpty(redshiftConnectionParam.getOther())) {
             return String.format("%s?%s", redshiftConnectionParam.getJdbcUrl(), redshiftConnectionParam.getOther());
         }
@@ -115,6 +122,11 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DbType getDbType() {
         return DbType.REDSHIFT;
+    }
+
+    @Override
+    public DataSourceProcessor create() {
+        return new RedshiftDataSourceProcessor();
     }
 
     private String transformOther(Map<String, String> otherMap) {

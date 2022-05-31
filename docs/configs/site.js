@@ -45,7 +45,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.0.0-alpha)',
+            text: 'latest(3.0.0-beta-1)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -57,17 +57,7 @@ export default {
             key: 'docsHistory',
             text: 'Older Versions',
             link: '/en-us/docs/release/history-versions.html',
-          },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/en-us/docs/dev/user_doc/about/introduction.html',
-          },
+          }
         ],
       },
       {
@@ -231,7 +221,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.0.0-alpha)',
+            text: '最新版本latest(3.0.0-beta-1)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -243,17 +233,7 @@ export default {
             key: 'docsHistory',
             text: '历史版本',
             link: '/zh-cn/docs/release/history-versions.html',
-          },
-          {
-            key: 'pythonAPI',
-            text: 'PyDolphinScheduler',
-            link: '/python/index.html',
-          },
-          {
-            key: 'docsdev',
-            text: 'dev',
-            link: '/zh-cn/docs/dev/user_doc/about/introduction.html',
-          },
+          }
         ],
       },
       {

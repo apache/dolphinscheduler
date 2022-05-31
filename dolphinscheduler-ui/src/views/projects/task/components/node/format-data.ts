@@ -294,7 +294,8 @@ export function formatParams(data: INodeData): {
       target_connector_type: data.target_connector_type,
       target_datasource_id: data.target_datasource_id,
       target_table: data.target_table,
-      threshold: data.threshold
+      threshold: data.threshold,
+      mapping_columns: JSON.stringify(data.mapping_columns)
     }
     taskParams.sparkParameters = {
       deployMode: data.deployMode,
@@ -338,7 +339,6 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'MLFLOW') {
     taskParams.algorithm = data.algorithm
-    taskParams.algorithm = data.algorithm
     taskParams.params = data.params
     taskParams.searchParams = data.searchParams
     taskParams.dataPath = data.dataPath
@@ -348,6 +348,12 @@ export function formatParams(data: INodeData): {
     taskParams.mlflowJobType = data.mlflowJobType
     taskParams.automlTool = data.automlTool
     taskParams.registerModel = data.registerModel
+    taskParams.mlflowTaskType = data.mlflowTaskType
+    taskParams.deployType = data.deployType
+    taskParams.deployPort = data.deployPort
+    taskParams.deployModelKey = data.deployModelKey
+    taskParams.mlflowProjectRepository = data.mlflowProjectRepository
+    taskParams.mlflowProjectVersion = data.mlflowProjectVersion
   }
 
   if (data.taskType === 'PIGEON') {
@@ -557,6 +563,10 @@ export function formatModel(data: ITaskData) {
       data.taskParams.ruleInputParameter.target_datasource_id
     params.target_table = data.taskParams.ruleInputParameter.target_table
     params.threshold = data.taskParams.ruleInputParameter.threshold
+    if (data.taskParams.ruleInputParameter.mapping_columns)
+      params.mapping_columns = JSON.parse(
+        data.taskParams.ruleInputParameter.mapping_columns
+      )
   }
   if (data.taskParams?.sparkParameters) {
     params.deployMode = data.taskParams.sparkParameters.deployMode

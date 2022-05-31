@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.After;
 import org.junit.Assert;
@@ -99,10 +101,14 @@ public class UsersServiceTest {
     @Mock
     private StorageOperate storageOperate;
 
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
+
     private String queueName = "UsersServiceTestQueue";
 
     @Before
     public void before() {
+        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(false);
     }
 
     @After

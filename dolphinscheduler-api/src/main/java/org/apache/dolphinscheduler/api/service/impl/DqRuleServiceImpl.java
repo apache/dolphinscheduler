@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -166,6 +167,10 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
             }
             if (StringUtils.isNotEmpty(endTime)) {
                 end = DateUtils.getScheduleDate(endTime);
+            }
+            if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_QUALITY,null)){
+                putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
+                return result;
             }
         } catch (Exception e) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
