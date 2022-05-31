@@ -84,8 +84,8 @@ public class ProjectServiceTest {
 
         User loginUser = getLoginUser();
         loginUser.setId(1);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(),  PROJECT_CREATE , baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null, loginUser.getId(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, 1,  PROJECT_CREATE , baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null, 1, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = projectService.createProject(loginUser, projectName, getDesc());
         logger.info(result.toString());
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
@@ -178,32 +178,6 @@ public class ProjectServiceTest {
         logger.info(result.toString());
         Assert.assertTrue(checkResult);
     }
-
-//        @Test
-//        public void testQueryProjectListPaging() {
-//            IPage<Project> page = new Page<>(1, 10);
-//            page.setRecords(getList());
-//            page.setTotal(1L);
-//            Set<Integer> set = new HashSet();
-//            set.add(1);
-//            Mockito.when(projectMapper.queryProjectListPaging(Mockito.any(Page.class),Mockito.anySet().toArray(), Mockito.eq(projectName))).thenReturn(page);
-//            User loginUser = getLoginUser();
-//
-//            // project owner
-//            Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), projectLogger)).thenReturn(set);
-//            Result result = projectService.queryProjectListPaging(loginUser, 10, 1, projectName);
-//            logger.info(result.toString());
-//            PageInfo<Project> pageInfo = (PageInfo<Project>) result.getData();
-//            Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
-//
-//            //admin
-//            Mockito.when(projectMapper.queryProjectListPaging(Mockito.any(Page.class), Mockito.anySet().toArray(), Mockito.eq(projectName))).thenReturn(page);
-//            loginUser.setUserType(UserType.ADMIN_USER);
-//            result = projectService.queryProjectListPaging(loginUser, 10, 1, projectName);
-//            logger.info(result.toString());
-//            pageInfo = (PageInfo<Project>) result.getData();
-//            Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
-//        }
 
     @Test
     public void testDeleteProject() {
