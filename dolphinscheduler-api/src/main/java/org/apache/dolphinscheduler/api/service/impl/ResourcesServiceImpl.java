@@ -710,14 +710,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return false;
         }
         // query tenant
-        Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
-        // this could happen when user logs in as admin
-        if (tenant == null) {
-            logger.error("fail to acquire tenant, please set tenant for login user/admin first");
-            return false;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
         // random file name
         String localFilename = FileUtils.getUploadFilename(tenantCode, UUID.randomUUID().toString());
 
