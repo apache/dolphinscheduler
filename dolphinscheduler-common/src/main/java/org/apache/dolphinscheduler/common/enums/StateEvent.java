@@ -97,7 +97,7 @@ public class StateEvent {
     public String toString() {
         return "State Event :"
                 + "key: " + key
-                + " type: " + type.toString()
+                + " type: " + type
                 + " executeStatus: " + executionStatus
                 + " task instance id: " + taskInstanceId
                 + " process instance id: " + processInstanceId

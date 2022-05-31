@@ -72,6 +72,15 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean resubmitTask() {
+        if (this.taskInstance == null) {
+            return false;
+        }
+        setTaskExecutionLogger();
+        return dispatchTask();
+    }
+
+    @Override
     public boolean runTask() {
         return true;
     }
@@ -110,7 +119,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
-            logger.info("task ready to submit: {}", taskInstance);
+            logger.debug("task ready to submit: {}", taskInstance.getName());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),

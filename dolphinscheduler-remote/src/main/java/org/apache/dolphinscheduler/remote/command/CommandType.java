@@ -99,6 +99,16 @@ public enum CommandType {
     TASK_KILL_RESPONSE,
 
     /**
+     * task recall
+     */
+    TASK_RECALL,
+
+    /**
+     * task recall ack
+     */
+    TASK_RECALL_ACK,
+
+    /**
      * HEART_BEAT
      */
     HEART_BEAT,

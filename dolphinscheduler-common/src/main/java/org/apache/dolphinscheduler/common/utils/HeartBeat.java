@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 public class HeartBeat {
 
     private static final Logger logger = LoggerFactory.getLogger(HeartBeat.class);
-    public static final String COMMA = ",";
 
     private long startupTime;
     private long reportTime;
@@ -205,18 +204,18 @@ public class HeartBeat {
         this.updateServerState();
 
         StringBuilder builder = new StringBuilder(100);
-        builder.append(cpuUsage).append(COMMA);
-        builder.append(memoryUsage).append(COMMA);
-        builder.append(loadAverage).append(COMMA);
+        builder.append(cpuUsage).append(Constants.COMMA);
+        builder.append(memoryUsage).append(Constants.COMMA);
+        builder.append(loadAverage).append(Constants.COMMA);
         builder.append(availablePhysicalMemorySize).append(Constants.COMMA);
         builder.append(maxCpuloadAvg).append(Constants.COMMA);
         builder.append(reservedMemory).append(Constants.COMMA);
         builder.append(startupTime).append(Constants.COMMA);
         builder.append(reportTime).append(Constants.COMMA);
-        builder.append(serverStatus).append(COMMA);
-        builder.append(processId).append(COMMA);
-        builder.append(workerHostWeight).append(COMMA);
-        builder.append(workerExecThreadCount).append(COMMA);
+        builder.append(serverStatus).append(Constants.COMMA);
+        builder.append(processId).append(Constants.COMMA);
+        builder.append(workerHostWeight).append(Constants.COMMA);
+        builder.append(workerExecThreadCount).append(Constants.COMMA);
         builder.append(workerWaitingTaskCount);
 
         return builder.toString();

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -68,6 +70,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     @Autowired
     private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
 
+    @Autowired
+    private TaskRecallProcessor taskRecallProcessor;
+
     /**
      * netty remote client
      */
@@ -86,6 +91,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_RECALL, taskRecallProcessor);
     }
 
     /**
@@ -97,25 +103,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
      */
     @Override
     public Boolean execute(ExecutionContext context) throws ExecuteException {
-
-        /**
-         *  all nodes
-         */
+        // all nodes
         Set<String> allNodes = getAllNodes(context);
-
-        /**
-         * fail nodes
-         */
+        // fail nodes
         Set<String> failNodeSet = new HashSet<>();
-
-        /**
-         *  build command accord executeContext
-         */
+        // build command accord executeContext
         Command command = context.getCommand();
-
-        /**
-         * execute task host
-         */
+        // execute task host
         Host host = context.getHost();
         boolean success = false;
         while (!success) {
@@ -158,9 +152,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
      * @throws ExecuteException if error throws ExecuteException
      */
     public void doExecute(final Host host, final Command command) throws ExecuteException {
-        /**
-         * retry count，default retry 3
-         */
+        // retry count，default retry 3
         int retryCount = 3;
         boolean success = false;
         do {
@@ -170,7 +162,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
             } catch (Exception ex) {
                 logger.error(String.format("send command : %s to %s error", command, host), ex);
                 retryCount--;
-                ThreadUtils.sleep(100);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } while (retryCount >= 0 && !success);
 
