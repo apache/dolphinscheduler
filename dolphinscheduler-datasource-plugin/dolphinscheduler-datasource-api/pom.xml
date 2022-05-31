@@ -152,7 +152,7 @@
                 <configuration>
                     <argLine>
                         ${add.opens.java.base.jdk.internal.loader}
-                        ${add.exports.java.xml.jdk.xml.internal}
+                        ${add.opens.java.xml.jdk.xml.internal}
                     </argLine>
                 </configuration>
             </plugin>
