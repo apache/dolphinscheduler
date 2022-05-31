@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.configuration;
 
 import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +42,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ConditionalOnWebApplication
 public class SwaggerConfig implements WebMvcConfigurer {
 
+    @Value("${swagger-enable:true}")
+    private boolean enableSwagger;
+
     @Bean
     public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
+        return new Docket(DocumentationType.SWAGGER_2).enable(enableSwagger).apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller")).paths(PathSelectors.any())
                 .build();
     }
