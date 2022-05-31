@@ -46,4 +46,4 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 
 Shell 任务类型通过解析任务日志是否包含 ```application_xxx_xxx``` 的内容来判断是否 Yarn 任务，如果是则会将相应的 ```application_id``` 的状态作为当前 Shell 节点的运行状态判断，此时如果操作停止工作流则会 Kill 相应的 ```application_id```
 
-如果 Shell 任务中需要使用到用户自定义的脚本，则可通过资源中心来上传对应的文件，可参考：[文件管理](../resource/file-manage.md)。
+如果 Shell 任务中需要使用到用户自定义的脚本，可通过资源中心来上传对应的文件然后在 Shell 任务中引用他们，可参考：[文件管理](../resource/file-manage.md)。
