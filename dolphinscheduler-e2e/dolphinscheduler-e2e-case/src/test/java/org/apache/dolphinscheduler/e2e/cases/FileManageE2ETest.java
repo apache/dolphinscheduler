@@ -246,7 +246,7 @@ public class FileManageE2ETest {
     void testEditFile() {
         final FileManagePage page = new FileManagePage(browser);
         String scripts = "echo 456";
-
+        browser.navigate().refresh();
         page.editFile(testRenameFileName, scripts);
 
         await().untilAsserted(() -> assertThat(page.fileList())
@@ -259,7 +259,7 @@ public class FileManageE2ETest {
     @Order(45)
     void testDeleteFile() {
         final FileManagePage page = new FileManagePage(browser);
-
+        browser.navigate().refresh();
         page.delete(testRenameFileName);
 
         await().untilAsserted(() -> {
@@ -299,7 +299,7 @@ public class FileManageE2ETest {
     @Order(70)
     void testDownloadFile() {
         final FileManagePage page = new FileManagePage(browser);
-
+        browser.navigate().refresh();
         page.downloadFile(testUnder1GBFileName);
 
         File file = Constants.HOST_CHROME_DOWNLOAD_PATH.resolve(testUnder1GBFileName).toFile();
