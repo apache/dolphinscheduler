@@ -22,6 +22,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 - Timeout alarm: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will send and the task execution will fail.
 - Zeppelin Note ID: The unique note id for a zeppelin notebook note.
 - Zeppelin Paragraph ID: The unique paragraph id for a zeppelin notebook paragraph.
+- Zeppelin Parameters: Parameters in json format used for zeppelin dynamic form.
 
 ## Task Example
 
