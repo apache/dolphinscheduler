@@ -55,7 +55,7 @@ class ProjectE2ETest {
     @Order(30)
     void testDeleteProject() {
         final ProjectPage page = new ProjectPage(browser);
-        deleteDelay()
+        deleteDelay();
         page.delete(project);
 
         await().untilAsserted(() -> {
