@@ -29,6 +29,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,14 +44,14 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCreateToken() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "1");
-        paramsMap.add("expireTime", "2022-12-31 00:00:00");
-        paramsMap.add("token", "607f5aeaaa2093dbdff5d5522ce00510");
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("userId", 1);
+        paramsMap.put("expireTime", "2022-12-31 00:00:00");
+        paramsMap.put("token", "607f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
-                        .header("sessionId", sessionId)
-                        .header("Content-Type", "application/json")
-                        .params(paramsMap))
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -59,19 +62,19 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCreateTokenIfAbsent() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "1");
-        paramsMap.add("expireTime", "2022-12-31 00:00:00");
-        paramsMap.add("token", null);
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("userId", 1);
+        paramsMap.put("expireTime", "2022-12-31 00:00:00");
+        paramsMap.put("token", null);
 
         MvcResult mvcResult = this.mockMvc
-                .perform(post("/access-tokens")
+                .perform(post("/v2/access-tokens")
                         .header("sessionId", this.sessionId)
-                        .header("Content-Type", "application/json")
-                        .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JSONUtils.toJsonString(paramsMap)))
+                        .andExpect(status().isCreated())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -80,13 +83,14 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
 
     @Test
     public void testExceptionHandler() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "-1");
-        paramsMap.add("expireTime", "2019-12-18 00:00:00");
-        paramsMap.add("token", "507f5aeaaa2093dbdff5d5522ce00510");
-        MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("userId", -1);
+        paramsMap.put("expireTime", "2022-12-31 00:00:00");
+        paramsMap.put("token", "507f5aeaaa2093dbdff5d5522ce00510");
+        MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
