@@ -230,11 +230,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-beanutils 1.9.4 https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils/1.9.4, Apache 2.0
     commons-cli 1.2: https://mvnrepository.com/artifact/commons-cli/commons-cli/1.2, Apache 2.0
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
-    commons-collections 3.2.2: https://mvnrepository.com/artifact/commons-collections/commons-collections/3.2.2, Apache 2.0
     commons-collections4 4.1: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.1, Apache 2.0
     commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
     commons-configuration 1.10: https://mvnrepository.com/artifact/commons-configuration/commons-configuration/1.10, Apache 2.0
-    commons-daemon 1.0.13 https://mvnrepository.com/artifact/commons-daemon/commons-daemon/1.0.13, Apache 2.0
     commons-dbcp 1.4: https://github.com/apache/commons-dbcp, Apache 2.0
     commons-email 1.5: https://github.com/apache/commons-email, Apache 2.0
     commons-httpclient 3.0.1: https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient/3.0.1, Apache 2.0
@@ -259,8 +257,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     gson 2.8.8: https://github.com/google/gson, Apache 2.0
     guava 24.1-jre: https://mvnrepository.com/artifact/com.google.guava/guava/24.1-jre, Apache 2.0
     guava-retrying 2.0.0: https://mvnrepository.com/artifact/com.github.rholder/guava-retrying/2.0.0, Apache 2.0
-    guice 3.0: https://mvnrepository.com/artifact/com.google.inject/guice/3.0, Apache 2.0
-    guice-servlet 3.0: https://mvnrepository.com/artifact/com.google.inject.extensions/guice-servlet/3.0, Apache 2.0
     hadoop-annotations 2.7.3:https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-annotations/2.7.3, Apache 2.0
     hadoop-auth 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-auth/2.7.3, Apache 2.0
     hadoop-client 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client/2.7.3, Apache 2.0
@@ -270,7 +266,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hadoop-mapreduce-client-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-common/2.7.3, Apache 2.0
     hadoop-mapreduce-client-core 2.7.3: https://mvnrepository.com/artifact/io.hops/hadoop-mapreduce-client-core/2.7.3, Apache 2.0
     hadoop-mapreduce-client-jobclient 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-jobclient/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-shuffle 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-shuffle/2.7.3, Apache 2.0
     hadoop-yarn-api 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-api/2.7.3, Apache 2.0
     hadoop-yarn-client 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-client/2.7.3, Apache 2.0
     hadoop-yarn-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-common/2.7.3, Apache 2.0
@@ -294,11 +289,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jackson-databind 2.10.5: https://github.com/FasterXML/jackson-databind, Apache 2.0
     jackson-datatype-jdk8 2.12.5: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.12.5, Apache 2.0
     jackson-datatype-jsr310 2.12.5: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.12.5, Apache 2.0
-    jackson-jaxrs 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-jaxrs/1.9.13, Apache 2.0 and LGPL 2.1
     jackson-mapper-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl/1.9.13, Apache 2.0
     jackson-module-parameter-names 2.12.5: https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-parameter-names/2.12.5, Apache 2.0
-    jackson-xc 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-xc/1.9.13, Apache 2.0 and LGPL 2.1
-    javax.inject 1: https://mvnrepository.com/artifact/javax.inject/javax.inject/1, Apache 2.0
     javax.jdo-3.2.0-m3: https://mvnrepository.com/artifact/org.datanucleus/javax.jdo/3.2.0-m3, Apache 2.0
     java-xmlbuilder 0.4 : https://mvnrepository.com/artifact/com.jamesmurty.utils/java-xmlbuilder/0.4, Apache 2.0
     jdo-api 3.0.1: https://mvnrepository.com/artifact/javax.jdo/jdo-api/3.0.1, Apache 2.0
@@ -347,7 +339,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     poi-ooxml 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml/4.1.2, Apache 2.0
     poi-ooxml-schemas-4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas/4.1.2, Apache 2.0
     quartz 2.3.2: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz/2.3.2, Apache 2.0
-    quartz-jobs 2.3.2: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz-jobs/2.3.2, Apache 2.0
     snakeyaml 1.28: https://mvnrepository.com/artifact/org.yaml/snakeyaml/1.28, Apache 2.0
     snappy 0.2: https://mvnrepository.com/artifact/org.iq80.snappy/snappy/0.2, Apache 2.0
     snappy-java 1.0.4.1: https://github.com/xerial/snappy-java, Apache 2.0
@@ -458,13 +449,11 @@ BSD licenses
 The following components are provided under a BSD license. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
-    asm 3.1: https://github.com/jdf/javalin/tree/master/lib/asm-3.1, BSD
     click 8.0: https://github.com/pallets/click, BSD 3-Clause
     curvesapi 1.06: https://mvnrepository.com/artifact/com.github.virtuald/curvesapi/1.06, BSD 3-clause
     javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD
     jline 0.9.94: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
-    leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
     postgresql 42.3.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.3.4, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
@@ -489,10 +478,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     javax.mail 1.6.2: https://mvnrepository.com/artifact/com.sun.mail/javax.mail/1.6.2, CDDL/GPLv2
     javax.servlet-api 3.1.0: https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api/3.1.0, CDDL + GPLv2
     jaxb-api 2.3.1: https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api/2.3.1, CDDL 1.1
-    jaxb-impl 2.2.3-1: https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl/2.2.3-1, CDDL and GPL 1.1
     jersey-client 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-client/1.9, CDDL 1.1 and GPL 1.1
     jersey-core 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-core/1.9, CDDL 1.1 and GPL 1.1
-    jersey-guice 1.9: https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-guice/1.9, CDDL 1.1 and GPL 1.1
     jersey-json 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-json/1.9, CDDL 1.1 and GPL 1.1
     jersey-server 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-server/1.9, CDDL 1.1 and GPL 1.1
     jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta/1.1, CDDL 1.0
@@ -536,12 +523,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
 
     jamon-runtime 2.3.1: https://mvnrepository.com/artifact/org.jamon/jamon-runtime/2.3.1, MPL-1.1
     javassist 3.27.0-GA: https://github.com/jboss-javassist/javassist, MPL-1.1
-
-========================================================================
-Public Domain licenses
-========================================================================
-
-    aopalliance 1.0: https://mvnrepository.com/artifact/aopalliance/aopalliance/1.0, Public Domain
 
 ========================================
 WTFPL License

@@ -34,14 +34,12 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import com.google.common.base.Strings;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -133,7 +131,7 @@ public class QuartzExecutorImpl implements QuartzExecutor {
                 CronTrigger oldCronTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
                 String oldCronExpression = oldCronTrigger.getCronExpression();
 
-                if (!StringUtils.equalsIgnoreCase(cronExpression, oldCronExpression)) {
+                if (!Strings.nullToEmpty(cronExpression).equalsIgnoreCase(Strings.nullToEmpty(oldCronExpression))) {
                     // reschedule job trigger
                     scheduler.rescheduleJob(triggerKey, cronTrigger);
                     logger.info("reschedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
