@@ -37,8 +37,8 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
-
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -46,13 +46,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @Component
@@ -113,7 +113,7 @@ public class AlertDao {
                 .map(Alert::getContent)
                 .map(DigestUtils::sha1Hex)
                 .map(String::toLowerCase)
-                .orElse(StringUtils.EMPTY);
+                .orElse("");
     }
 
     /**
@@ -163,7 +163,7 @@ public class AlertDao {
         alert.setSign(generateSign(alert));
         // we use this method to avoid insert duplicate alert(issue #5525)
         // we modified this method to optimize performance(issue #9174)
-        Date crashAlarmSuppressionStartTime = DateTime.now().plusMinutes(-crashAlarmSuppression).toDate();
+        Date crashAlarmSuppressionStartTime = Date.from(LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
         alertMapper.insertAlertWhenServerCrash(alert, crashAlarmSuppressionStartTime);
     }
 
@@ -274,7 +274,7 @@ public class AlertDao {
      */
     public List<AlertPluginInstance> listInstanceByAlertGroupId(int alertGroupId) {
         String alertInstanceIdsParam = alertGroupMapper.queryAlertGroupInstanceIdsById(alertGroupId);
-        if (StringUtils.isNotBlank(alertInstanceIdsParam)) {
+        if (!Strings.isNullOrEmpty(alertInstanceIdsParam)) {
             String[] idsArray = alertInstanceIdsParam.split(",");
             List<Integer> ids = Arrays.stream(idsArray)
                     .map(s -> Integer.parseInt(s.trim()))

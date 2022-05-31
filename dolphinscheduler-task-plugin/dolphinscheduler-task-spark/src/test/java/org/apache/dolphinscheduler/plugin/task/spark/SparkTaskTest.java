@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import java.util.Collections;
 
-import org.apache.commons.lang.StringUtils;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -71,10 +69,10 @@ public class SparkTaskTest {
         sparkParameters.setLocalParams(Collections.emptyList());
         sparkParameters.setRawScript("selcet 11111;");
         sparkParameters.setProgramType(ProgramType.SQL);
-        sparkParameters.setMainClass(StringUtils.EMPTY);
+        sparkParameters.setMainClass("");
         sparkParameters.setDeployMode("client");
         sparkParameters.setAppName("sparksql");
-        sparkParameters.setOthers(StringUtils.EMPTY);
+        sparkParameters.setOthers("");
         sparkParameters.setSparkVersion("SPARK2");
         sparkParameters.setDriverCores(1);
         sparkParameters.setDriverMemory("512M");
