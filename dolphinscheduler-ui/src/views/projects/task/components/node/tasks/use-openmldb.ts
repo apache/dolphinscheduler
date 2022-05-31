@@ -37,6 +37,7 @@ export function useOpenmldb({
     flag: 'YES',
     description: '',
     timeoutFlag: false,
+    timeoutNotifyStrategy: ['WARN'],
     localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
@@ -44,9 +45,9 @@ export function useOpenmldb({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-	zk: '',
-	zkPath: '',
-	executeMode: 'offline'
+    zk: '',
+    zkPath: '',
+    executeMode: 'offline'
   } as INodeData)
 
   let extra: IJsonItem[] = []
