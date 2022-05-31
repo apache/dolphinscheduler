@@ -336,6 +336,9 @@ interface ITaskParams {
   deployType?: string
   deployPort?: string
   deployModelKey?: string
+  zk?: string
+  zkPath?: string
+  executeMode?: string
 }
 
 interface INodeData

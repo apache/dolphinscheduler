@@ -356,6 +356,13 @@ export function formatParams(data: INodeData): {
     taskParams.mlflowProjectVersion = data.mlflowProjectVersion
   }
 
+  if (data.taskType === 'OPENMLDB') {
+    taskParams.zk = data.zk
+    taskParams.zkPath = data.zkPath
+    taskParams.executeMode = data.executeMode
+    taskParams.sql = data.sql
+  }
+
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
