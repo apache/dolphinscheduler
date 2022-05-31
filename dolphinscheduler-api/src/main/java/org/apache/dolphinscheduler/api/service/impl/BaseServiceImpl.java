@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,6 +47,15 @@ public class BaseServiceImpl implements BaseService {
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Override
+    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
+        try{
+            resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
+        }catch (Exception e){
+            logger.error("post handle error", e);
+        }
+    }
 
     /**
      * check admin
