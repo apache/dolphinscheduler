@@ -87,16 +87,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> descCheck = checkDesc(desc);
-        if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
-            return descCheck;
+        Map<String, Object> result = checkDesc(desc);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
         if (!canOperatorPermissions(loginUser, null,AuthorizationType.PROJECTS, PROJECT_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
 
         Project project = projectMapper.queryByName(name);
         if (project != null) {
@@ -482,7 +480,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-<<<<<<< HEAD
      * check whether have read permission new
      * @param user
      * @param id
@@ -495,8 +492,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-=======
->>>>>>> f3b76b72a ([Feature][API] Modify the permissions of project management, security center, data source center and data quality module.)
      * query permission id
      *
      * @param user user
