@@ -89,14 +89,6 @@ public class EnvironmentServiceTest {
 
     public static final String workerGroups = "[\"default\"]";
 
-    @Before
-    public void setUp(){
-    }
-
-    @After
-    public void after(){
-    }
-
     @Test
     public void testCreateEnvironment() {
         User loginUser = getGeneralUser();
