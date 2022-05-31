@@ -52,7 +52,7 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      * @return udf function IPage
      */
     IPage<UdfFunc> queryUdfFuncPaging(IPage<UdfFunc> page,
-                                      @Param("userId") int userId,
+                                      @Param("ids") List<Integer> ids,
                                       @Param("searchVal") String searchVal);
 
     /**
@@ -61,7 +61,7 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      * @param type type
      * @return udf function list
      */
-    List<UdfFunc> getUdfFuncByType(@Param("userId") int userId,
+    List<UdfFunc> getUdfFuncByType(@Param("ids") List<Integer> ids,
                                    @Param("type") Integer type);
 
     /**
@@ -107,5 +107,10 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      */
     int batchUpdateUdfFunc(@Param("udfFuncList") List<UdfFunc> udfFuncList);
 
-
+    /**
+     * listAuthorizedUdfByUserId
+     * @param userId
+     * @return
+     */
+    List<UdfFunc> listAuthorizedUdfByUserId(@Param("userId") int userId);
 }

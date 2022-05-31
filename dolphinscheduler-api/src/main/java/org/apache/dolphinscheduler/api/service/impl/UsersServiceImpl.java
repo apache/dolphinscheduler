@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
@@ -77,8 +76,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * users service impl
@@ -157,18 +154,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         //check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
-
         if(resourcePermissionCheckService.functionDisabled()){
             putMsg(result, Status.FUNCTION_DISABLED, msg);
             return result;
         }
 
-        if (!StringUtils.isEmpty(msg)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.USER,USERS_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+
+        if (!StringUtils.isEmpty(msg)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
             return result;
         }
 
@@ -334,13 +331,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,USER_MANAGER)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         if(resourcePermissionCheckService.functionDisabled()){
             putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -389,8 +385,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-
-        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,USER_UPDATE), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -527,14 +522,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
-
         if(resourcePermissionCheckService.functionDisabled()){
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-
         //only admin can operate
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,USER_DELETE)) {
+        if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
             return result;
         }
@@ -582,7 +575,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-
         //check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
@@ -643,7 +635,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 3. only project owner can operate
-        if (!this.canOperatorPermissions(loginUser,new Object[]{project.getId()},AuthorizationType.USER,null)) {
+        if (!this.canOperator(loginUser, project.getUserId())) {
             this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -683,7 +675,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         // 1. only admin can operate
-        if (this.check(result, !this.canOperatorPermissions(loginUser,null,AuthorizationType.USER,null), Status.USER_NO_OPERATION_PERM)) {
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -871,7 +863,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //only admin can operate
-        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER, null), Status.USER_NO_OPERATION_PERM)) {
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -968,7 +960,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         User user = null;
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.USER,USER_MANAGER)) {
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
             user = loginUser;
         } else {
             user = userMapper.queryDetailsById(loginUser.getId());
@@ -1011,7 +1003,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //only admin can operate
-        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,USER_MANAGER), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -1036,7 +1028,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //only admin can operate
-        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,USER_MANAGER), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -1083,7 +1075,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //only admin can operate
-        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,null), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -1123,7 +1115,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //only admin can operate
-        if (check(result, !canOperatorPermissions(loginUser,null,AuthorizationType.USER,null), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         List<User> userList = userMapper.queryUserListByAlertGroupId(alertGroupId);
@@ -1259,7 +1251,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,null)) {
+        if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -1307,7 +1299,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.USER,null)) {
+        if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

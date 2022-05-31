@@ -231,17 +231,17 @@ public class ResourceMapperTest extends BaseDaoTest {
 
         IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
                 page,
-                0,
                 -1,
                 resource.getType().ordinal(),
+                1110,
                 "",
-                new ArrayList<>()
+                new ArrayList<>(resource.getId())
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
-                1110,
                 -1,
                 resource.getType().ordinal(),
+                1110,
                 "",
                 null
         );

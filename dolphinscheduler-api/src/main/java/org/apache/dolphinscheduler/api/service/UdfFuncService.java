@@ -56,7 +56,7 @@ public interface UdfFuncService {
      * @param id  udf function id
      * @return udf function detail
      */
-    Map<String, Object> queryUdfFuncDetail(int id);
+    Result<Object> queryUdfFuncDetail(User loginUser,int id);
 
     /**
      * updateProcessInstance udf function
@@ -71,7 +71,8 @@ public interface UdfFuncService {
      * @param className class name
      * @return update result code
      */
-    Map<String, Object> updateUdfFunc(int udfFuncId,
+    Result<Object> updateUdfFunc(User loginUser,
+                                      int udfFuncId,
                                       String funcName,
                                       String className,
                                       String argTypes,
@@ -98,7 +99,7 @@ public interface UdfFuncService {
      * @param type  udf type
      * @return udf func list
      */
-    Map<String, Object> queryUdfFuncList(User loginUser, Integer type);
+    Result<Object> queryUdfFuncList(User loginUser, Integer type);
 
     /**
      * delete udf function
@@ -106,7 +107,7 @@ public interface UdfFuncService {
      * @param id udf function id
      * @return delete result code
      */
-    Result<Object> delete(int id);
+    Result<Object> delete(User loginUser, int id);
 
     /**
      * verify udf function by name
@@ -114,6 +115,6 @@ public interface UdfFuncService {
      * @param name name
      * @return true if the name can user, otherwise return false
      */
-    Result<Object> verifyUdfFuncByName(String name);
+    Result<Object> verifyUdfFuncByName(User loginUser, String name);
 
 }

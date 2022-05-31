@@ -33,7 +33,7 @@ public class TaskGroup implements Serializable {
      * key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * task_group name
      */

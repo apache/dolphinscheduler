@@ -90,6 +90,6 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @param alertGroupsIds
      * @return
      */
-    <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")T[] alertGroupsIds);
+    <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")List<Integer> alertGroupsIds);
 
 }

@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class ApiFuncIdentificationConstant {
 
     public static final String ACCESS_TOKEN_MANAGE = "security:token:view";
@@ -84,8 +83,6 @@ public class ApiFuncIdentificationConstant {
     public static final String VIEW_PERMISSION = "security:role:permission-view";
     public static final String ASSIGN_PERMISSION = "security:role:permission-assign";
 
-
-
     public static final String PROJECT = "project:view";
     public static final String PROJECT_CREATE = "project:create";
     public static final String PROJECT_UPDATE = "project:edit";
@@ -140,6 +137,45 @@ public class ApiFuncIdentificationConstant {
     public static final String DATASOURCE_DELETE = "datasource:delete";
     public static final String DATASOURCE_LIST = "datasource:list";
     public static final String DATASOURCE_PARAM_VIEW = "datasource:param-view";
+
+    public static final String FILE_VIEW = "resources:file:view";
+    public static final String FOLDER_ONLINE_CREATE = "resources:folder:online-create";
+    public static final String FILE_ONLINE_CREATE = "resources:file:online-create";
+    public static final String FILE_UPLOAD = "resources:file:upload";
+    public static final String FILE_UPDATE = "resources:file:update-content";
+    public static final String FILE_RENAME = "resources:file:rename";
+    public static final String FILE_DOWNLOAD = "resources:file:download";
+    public static final String FILE_DELETE = "resources:file:delete";
+
+    public static final String UDF_FILE_VIEW = "resources:udf:view";
+    public static final String UDF_FOLDER_ONLINE_CREATE = "resources:udf-folder:online-create";
+    public static final String UDF_UPLOAD = "resources:udf:upload";
+    public static final String UDF_UPDATE = "resources:udf:edit";
+    public static final String UDF_DOWNLOAD = "resources:udf:download";
+    public static final String UDF_DELETE = "resources:udf:delete";
+
+    public static final String UDF_FUNCTION_VIEW = "resources:udf-func:view";
+    public static final String UDF_FUNCTION_CREATE = "resources:udf-func:create";
+    public static final String UDF_FUNCTION_UPDATE = "resources:udf-func:update";
+    public static final String UDF_FUNCTION_DELETE = "resources:udf-func:delete";
+
+    public static final String TASK_GROUP_VIEW = "resources:task-group:view";
+    public static final String TASK_GROUP_CREATE = "resources:task-group:create";
+    public static final String TASK_GROUP_CLOSE = "resources:task-group:close";
+    public static final String TASK_GROUP_EDIT = "resources:task-group:update";
+    public static final String TASK_GROUP_VIEW_QUEUE = "resources:task-group:queue-view";
+
+    public static final String TASK_GROUP_QUEUE = "resources:task-group-queue:view";
+    public static final String TASK_GROUP_QUEUE_PRIORITY = "resources:task-group-queue:priority";
+    public static final String TASK_GROUP_QUEUE_START = "resources:task-group-queue:start";
+
+    public static final String MONITOR_MASTER_VIEW = "monitor:masters:view";
+    public static final String MONITOR_WORKER_VIEW = "monitor:workers:view";
+    public static final String MONITOR_DATABASES_VIEW = "monitor:databases:view";
+
+    public static final String MONITOR_STATISTICS_VIEW = "monitor:statistics:view";
+    public static final String MONITOR_EVENT_LIST_VIEW = "monitor:event:view";
+    public static final String MONITOR_ALERT_LIST_VIEW = "monitor:alert:view";
 
     public final static Map<ExecuteType,String> map = new HashMap<ExecuteType,String>();
 

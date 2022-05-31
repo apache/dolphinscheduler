@@ -45,7 +45,7 @@ public class BaseServiceImpl implements BaseService {
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
+    protected ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * check admin
@@ -162,8 +162,8 @@ public class BaseServiceImpl implements BaseService {
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String perm) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), perm, logger);
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
     }
