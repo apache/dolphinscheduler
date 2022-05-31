@@ -82,6 +82,7 @@ public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * create function format
+     * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
      */
     private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT = "create or replace temporary function {0} as ''{1}''";
 
