@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-import org.apache.commons.lang.StringUtils;
+import com.google.common.base.Strings;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -250,7 +250,7 @@ public class UdfFunc {
 
         @Override
         public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-            if (StringUtils.isBlank(key)) {
+            if (Strings.isNullOrEmpty(key)) {
                 return null;
             }
             return JSONUtils.parseObject(key, UdfFunc.class);

@@ -30,13 +30,11 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
-
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,7 +173,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      */
     private void notifyProcess(ProcessInstance finishProcessInstance, ProcessInstance processInstance, TaskInstance taskInstance) {
         String host = processInstance.getHost();
-        if (StringUtils.isEmpty(host)) {
+        if (Strings.isNullOrEmpty(host)) {
             logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(), taskInstance.getId());
             return;
         }

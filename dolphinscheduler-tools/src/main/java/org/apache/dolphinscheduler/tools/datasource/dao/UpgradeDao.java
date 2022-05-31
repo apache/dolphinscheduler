@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParamet
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,6 +74,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 
 public abstract class UpgradeDao {
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
@@ -376,7 +377,7 @@ public abstract class UpgradeDao {
             ConnectionUtils.releaseResource(pstmt, conn);
         }
     }
-    
+
     /**
      * update version
      *
@@ -484,9 +485,9 @@ public abstract class UpgradeDao {
                     if (resourceJsonNode != null && !resourceJsonNode.isEmpty()) {
                         List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
                         List<Integer> resourceIds = resourceList.stream().map(ResourceInfo::getId).collect(Collectors.toList());
-                        taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, Constants.COMMA));
+                        taskDefinitionLog.setResourceIds(Joiner.on(Constants.COMMA).join(resourceIds));
                     } else {
-                        taskDefinitionLog.setResourceIds(StringUtils.EMPTY);
+                        taskDefinitionLog.setResourceIds("");
                     }
                     if (TASK_TYPE_SUB_PROCESS.equals(taskType)) {
                         JsonNode jsonNodeDefinitionId = param.get("processDefinitionId");
@@ -585,7 +586,7 @@ public abstract class UpgradeDao {
     }
 
     private String convertLocations(String locations, Map<String, Long> taskIdCodeMap) {
-        if (StringUtils.isBlank(locations)) {
+        if (Strings.isNullOrEmpty(locations)) {
             return locations;
         }
         Map<String, ObjectNode> locationsMap = JSONUtils.parseObject(locations, new TypeReference<Map<String, ObjectNode>>() {

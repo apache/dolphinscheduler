@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -81,7 +79,7 @@ public class SchemaUtils {
      * @return Determine whether schemaVersion is higher than version
      */
     public static boolean isAGreatVersion(String schemaVersion, String version) {
-        if (StringUtils.isEmpty(schemaVersion) || StringUtils.isEmpty(version)) {
+        if (Strings.isNullOrEmpty(schemaVersion) || Strings.isNullOrEmpty(version)) {
             throw new RuntimeException("schemaVersion or version is empty");
         }
 

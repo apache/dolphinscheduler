@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +34,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.google.common.base.Strings;
 
 /**
  * process definition
@@ -309,7 +308,7 @@ public class ProcessDefinition {
     }
 
     public Map<String, String> getGlobalParamMap() {
-        if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
+        if (globalParamMap == null && !Strings.isNullOrEmpty(globalParams)) {
             List<Property> propList = JSONUtils.toList(globalParams, Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }

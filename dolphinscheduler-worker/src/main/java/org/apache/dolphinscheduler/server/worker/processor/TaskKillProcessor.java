@@ -37,8 +37,6 @@ import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
+import com.google.common.base.Strings;
 import io.netty.channel.Channel;
 
 /**
@@ -168,7 +166,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         }
         try {
             String pidsStr = ProcessUtils.getPidsStr(processId);
-            if (!StringUtils.isEmpty(pidsStr)) {
+            if (!Strings.isNullOrEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);
                 cmd = OSUtils.getSudoCmd(tenantCode, cmd);
                 logger.info("process id:{}, cmd:{}", processId, cmd);
@@ -196,9 +194,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                     host.getPort());
             String log = logClient.viewLog(host.getIp(), host.getPort(), logPath);
             List<String> appIds = Collections.emptyList();
-            if (!StringUtils.isEmpty(log)) {
+            if (!Strings.isNullOrEmpty(log)) {
                 appIds = LoggerUtils.getAppIds(log, logger);
-                if (StringUtils.isEmpty(executePath)) {
+                if (Strings.isNullOrEmpty(executePath)) {
                     logger.error("task instance execute path is empty");
                     throw new RuntimeException("task instance execute path is empty");
                 }

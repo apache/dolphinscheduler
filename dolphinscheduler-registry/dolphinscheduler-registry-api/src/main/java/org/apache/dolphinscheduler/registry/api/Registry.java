@@ -22,7 +22,6 @@ package org.apache.dolphinscheduler.registry.api;
 import java.io.Closeable;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Map;
 
 public interface Registry extends Closeable {
     boolean subscribe(String path, SubscribeListener listener);

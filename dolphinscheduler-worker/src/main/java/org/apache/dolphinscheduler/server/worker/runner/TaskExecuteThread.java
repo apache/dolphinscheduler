@@ -39,7 +39,6 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +46,7 @@ import java.util.*;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,7 +218,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             // get exec dir
             String execLocalPath = taskExecutionContext.getExecutePath();
 
-            if (StringUtils.isEmpty(execLocalPath)) {
+            if (Strings.isNullOrEmpty(execLocalPath)) {
                 logger.warn("task: {} exec local path is empty.", taskExecutionContext.getTaskName());
                 return;
             }

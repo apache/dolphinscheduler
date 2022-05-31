@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMys
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHiveParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
-
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,19 +37,15 @@ import org.junit.Test;
 public class SqoopParameterEntityTest {
 
     @Test
-    public void testEntity() {
-        try {
-            List<Class> classList = new ArrayList<>();
-            classList.add(SourceMysqlParameter.class);
-            classList.add(SourceHiveParameter.class);
-            classList.add(SourceHdfsParameter.class);
-            classList.add(SqoopParameters.class);
-            classList.add(TargetMysqlParameter.class);
-            classList.add(TargetHiveParameter.class);
-            classList.add(TargetHdfsParameter.class);
-            EntityTestUtils.run(classList);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
+    public void testEntity() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        List<Class> classList = new ArrayList<>();
+        classList.add(SourceMysqlParameter.class);
+        classList.add(SourceHiveParameter.class);
+        classList.add(SourceHdfsParameter.class);
+        classList.add(SqoopParameters.class);
+        classList.add(TargetMysqlParameter.class);
+        classList.add(TargetHiveParameter.class);
+        classList.add(TargetHdfsParameter.class);
+        EntityTestUtils.run(classList);
     }
 }

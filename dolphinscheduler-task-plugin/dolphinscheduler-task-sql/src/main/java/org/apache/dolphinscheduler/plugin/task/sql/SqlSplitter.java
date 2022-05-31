@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.google.common.base.Strings;
 
 public class SqlSplitter {
 
@@ -40,7 +39,7 @@ public class SqlSplitter {
      * @return
      */
     public static List<String> split(String sql, String segmentSeparator) {
-        if (StringUtils.isBlank(segmentSeparator)) {
+        if (Strings.isNullOrEmpty(segmentSeparator)) {
             return Collections.singletonList(sql);
         }
 

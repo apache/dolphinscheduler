@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.configuration;
 
 import static com.google.common.collect.Maps.newTreeMap;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
