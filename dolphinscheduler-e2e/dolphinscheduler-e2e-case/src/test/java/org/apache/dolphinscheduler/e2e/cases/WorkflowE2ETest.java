@@ -82,6 +82,7 @@ class WorkflowE2ETest {
 
     @AfterAll
     public static void cleanup() {
+        browser.navigate().refresh();
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .goTo(project)
@@ -108,7 +109,7 @@ class WorkflowE2ETest {
             new ProjectPage(browser)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
-
+        browser.navigate().refresh();
         workflowDefinitionPage
             .createWorkflow()
 
@@ -144,7 +145,7 @@ class WorkflowE2ETest {
                 .goToNav(ProjectPage.class)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
-
+        browser.navigate().refresh();
         workflowDefinitionPage
             .createWorkflow()
 
@@ -176,7 +177,7 @@ class WorkflowE2ETest {
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
                         .goTo(project);
-
+        browser.navigate().refresh();
         projectPage
                 .goToTab(WorkflowInstanceTab.class)
                 .deleteAll();
