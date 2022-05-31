@@ -52,10 +52,10 @@ class ProjectE2ETest {
     }
 
     @Test
-    @Order(30)
+    @Order(10)
     void testDeleteProject() {
         final ProjectPage page = new ProjectPage(browser);
-        deleteDelay();
+        browser.navigate().refresh();
         page.delete(project);
 
         await().untilAsserted(() -> {
@@ -66,13 +66,5 @@ class ProjectE2ETest {
                     it -> it.getText().contains(project)
             );
         });
-    }
-
-    private void deleteDelay() {
-        try{
-            Thread.sleep(3000);
-        }catch (Exception e){
-
-        }
     }
 }

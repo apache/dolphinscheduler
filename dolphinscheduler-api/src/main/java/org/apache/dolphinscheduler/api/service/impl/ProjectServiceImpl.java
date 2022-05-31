@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -125,7 +124,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (projectMapper.insert(project) > 0) {
             result.put(Constants.DATA_LIST, project);
             putMsg(result, Status.SUCCESS);
-//            permissionPostHandle(AuthorizationType.PROJECTS, loginUser.getId(), Collections.singletonList(project.getId()), logger);
+            permissionPostHandle(AuthorizationType.PROJECTS, loginUser.getId(), Collections.singletonList(project.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
         }
