@@ -200,16 +200,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return currentDir.equals(FOLDER_SEPARATOR) ? String.format(FORMAT_SS, currentDir, name) : String.format(FORMAT_S_S, currentDir, name);
     }
 
-    private Result<Object> verifyTenant(User loginUser) {
-        Result<Object> result = new Result<>();
-        putMsg(result, Status.SUCCESS);
-        Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
-        if (tenant == null) {
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-        }
-        return result;
-    }
-
     /**
      * create resource
      *
@@ -248,8 +238,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        result = verifyTenant(loginUser);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        // make sure login user has tenant
+        String tenantCode = getTenantCode(loginUser.getId(), result);
+        if (StringUtils.isEmpty(tenantCode)) {
             return result;
         }
 

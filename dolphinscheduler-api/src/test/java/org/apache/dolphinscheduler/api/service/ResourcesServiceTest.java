@@ -148,6 +148,8 @@ public class ResourcesServiceTest {
         //CURRENT_LOGIN_USER_TENANT_NOT_EXIST
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(null);
         Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, mockMultipartFile, -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
