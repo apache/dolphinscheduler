@@ -128,6 +128,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
         }
+        logger.info("create project complete and id is :{}", project.getId());
         return result;
     }
 
