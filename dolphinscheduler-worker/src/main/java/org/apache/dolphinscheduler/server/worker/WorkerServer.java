@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResponseAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskRecallAckProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
@@ -111,6 +112,9 @@ public class WorkerServer implements IStoppable {
     private TaskKillProcessor taskKillProcessor;
 
     @Autowired
+    private TaskRecallAckProcessor taskRecallAckProcessor;
+
+    @Autowired
     private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
     @Autowired
@@ -146,7 +150,7 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK, taskExecuteRunningAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE_ACK, taskExecuteResponseAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
-
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL_ACK, taskRecallAckProcessor);
         // logger server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
