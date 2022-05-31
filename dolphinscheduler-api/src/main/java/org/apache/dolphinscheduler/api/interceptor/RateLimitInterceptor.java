@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.interceptor;
 import org.apache.dolphinscheduler.api.configuration.TrafficConfiguration;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;

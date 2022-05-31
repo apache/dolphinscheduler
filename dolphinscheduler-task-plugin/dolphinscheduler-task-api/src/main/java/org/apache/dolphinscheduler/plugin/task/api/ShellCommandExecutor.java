@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
-
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 
 /**
@@ -93,7 +92,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             if (OSUtils.isWindows()) {
                 sb.append("@echo off\n");
                 sb.append("cd /d %~dp0\n");
-                if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
                     sb.append(taskRequest.getEnvironmentConfig()).append("\n");
                 } else {
                     if (taskRequest.getEnvFile() != null) {
@@ -104,7 +103,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
                 sb.append("#!/bin/sh\n");
                 sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
                 sb.append("cd $BASEDIR\n");
-                if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
                     sb.append(taskRequest.getEnvironmentConfig()).append("\n");
                 } else {
                     if (taskRequest.getEnvFile() != null) {

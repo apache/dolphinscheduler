@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.commons.lang.StringUtils;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -105,10 +103,10 @@ public class FlinkTaskTest {
         parameters.setInitScript("set sql-client.execution.result-mode=tableau;");
         parameters.setRawScript("selcet 11111;");
         parameters.setProgramType(ProgramType.SQL);
-        parameters.setMainClass(StringUtils.EMPTY);
+        parameters.setMainClass("");
         parameters.setDeployMode("cluster");
         parameters.setAppName("FlinkSQL");
-        parameters.setOthers(StringUtils.EMPTY);
+        parameters.setOthers("");
         parameters.setJobManagerMemory("1G");
         parameters.setTaskManagerMemory("1G");
         parameters.setParallelism(1);
