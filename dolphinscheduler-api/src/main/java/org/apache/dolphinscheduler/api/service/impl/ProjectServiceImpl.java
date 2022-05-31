@@ -235,14 +235,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        logger.info("do queryProjectListPaging");
         Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
         if (projectIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        logger.info("queryProjectListPaging common interface query complete {}", JSONUtils.toJsonString(projectIds));
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
