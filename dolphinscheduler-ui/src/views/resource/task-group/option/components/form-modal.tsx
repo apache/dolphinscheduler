@@ -135,7 +135,7 @@ const FormModal = defineComponent({
           >
             <NInputNumber
               v-model:value={this.formData.groupSize}
-              style={{width: '100%'}}
+              style={{ width: '100%' }}
               min={1}
               placeholder={t(
                 'resource.task_group_option.please_enter_resource_pool_size'

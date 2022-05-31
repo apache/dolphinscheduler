@@ -30,58 +30,58 @@ export function useOpenmldb(model: { [field: string]: any }): IJsonItem[] {
       value: 'online'
     }
   ]
-	return [
-		{
-			type: 'input',
-			field: 'zk',
-			name: t('project.node.openmldb_zk_address'),
-			props: {
-			  placeholder: t('project.node.openmldb_zk_address_tips')
-			},
-			validate: {
-			  trigger: ['input', 'blur'],
-			  required: true,
-			  validator(validate: any, value: string) {
-				if (!value) {
-				  return new Error(t('project.node.openmldb_zk_address_tips'))
-				}
-			  }
-			}
-		},
-		{
-			type: 'input',
-			field: 'zkPath',
-			name: t('project.node.openmldb_zk_path'),
-			props: {
-			  placeholder: t('project.node.openmldb_zk_path_tips')
-			},
-			validate: {
-			  trigger: ['input', 'blur'],
-			  required: true,
-			  validator(validate: any, value: string) {
-				if (!value) {
-				  return new Error(t('project.node.openmldb_zk_path_tips'))
-				}
-			  }
-			}
-		},
-		{
-			type: 'radio',
-			field: 'executeMode',
-			name: t('project.node.openmldb_execute_mode'),
-			options: options
-		},
-		{
-			type: 'editor',
-			field: 'sql',
-			name: t('project.node.sql_statement'),
-			validate: {
-			  trigger: ['input', 'trigger'],
-			  required: true,
-			  message: t('project.node.sql_empty_tips')
-			}
-		},
-		useResources(),
-    	...useCustomParams({ model, field: 'localParams', isSimple: false })
-	]
+  return [
+    {
+      type: 'input',
+      field: 'zk',
+      name: t('project.node.openmldb_zk_address'),
+      props: {
+        placeholder: t('project.node.openmldb_zk_address_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(validate: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.openmldb_zk_address_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'input',
+      field: 'zkPath',
+      name: t('project.node.openmldb_zk_path'),
+      props: {
+        placeholder: t('project.node.openmldb_zk_path_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(validate: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.openmldb_zk_path_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'radio',
+      field: 'executeMode',
+      name: t('project.node.openmldb_execute_mode'),
+      options: options
+    },
+    {
+      type: 'editor',
+      field: 'sql',
+      name: t('project.node.sql_statement'),
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: t('project.node.sql_empty_tips')
+      }
+    },
+    useResources(),
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+  ]
 }
