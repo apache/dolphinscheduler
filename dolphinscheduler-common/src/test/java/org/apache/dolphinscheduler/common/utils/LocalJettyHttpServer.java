@@ -1,7 +1,25 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.BindException;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -20,33 +38,47 @@ import javax.servlet.http.HttpServletResponse;
 public class LocalJettyHttpServer extends TestSetup {
     protected static Server server;
     private static Logger logger = LoggerFactory.getLogger(LocalJettyHttpServer.class);
+    private Integer serverPort = 8888;
+
+    public Integer getServerPort() {
+        return serverPort;
+    }
 
     public LocalJettyHttpServer(Test suite) {
         super(suite);
     }
 
     protected void setUp() throws Exception {
-        logger.info("server si starting...");
-        server = new Server(8888);
-        ContextHandler context = new ContextHandler("/test.json");
-        context.setHandler(new AbstractHandler() {
-            @Override
-            public void handle(String s, HttpServletRequest request, HttpServletResponse response, int i) throws IOException {
-                ByteArrayISO8859Writer writer = new ByteArrayISO8859Writer();
-                writer.write("{\"name\":\"Github\"}");
-                writer.flush();
-                response.setContentLength(writer.size());
-                OutputStream out = response.getOutputStream();
-                writer.writeTo(out);
-                out.flush();
-                Request baseRequest = request instanceof Request ? (Request) request : HttpConnection.getCurrentConnection().getRequest();
-                baseRequest.setHandled(true);
+        while (true) {
+            try {
+                server = new Server(serverPort);
+                ContextHandler context = new ContextHandler("/test.json");
+                context.setHandler(new AbstractHandler() {
+                    @Override
+                    public void handle(String s, HttpServletRequest request, HttpServletResponse response, int i) throws IOException {
+                        ByteArrayISO8859Writer writer = new ByteArrayISO8859Writer();
+                        writer.write("{\"name\":\"Github\"}");
+                        writer.flush();
+                        response.setContentLength(writer.size());
+                        OutputStream out = response.getOutputStream();
+                        writer.writeTo(out);
+                        out.flush();
+                        Request baseRequest = request instanceof Request ? (Request) request : HttpConnection.getCurrentConnection().getRequest();
+                        baseRequest.setHandled(true);
+                    }
+                });
+                server.setHandler(context);
+                logger.info("server for " + context.getBaseResource());
+                server.start();
+                logger.info("server is starting in port: "+serverPort);
+            } catch (BindException e) {
+                server.stop();
+                logger.info("port: "+serverPort + " has been bind");
+                serverPort++;
+                continue;
             }
-        });
-        server.setHandler(context);
-        logger.info("server for " + context.getBaseResource());
-        server.start();
-
+            break;
+        }
     }
     protected void tearDown() throws Exception {
         logger.info("server stopping...");

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,6 +27,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
+import org.mortbay.jetty.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +35,19 @@ public class LocalServerHttpUtilsTest extends TestCase{
 
     private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
     public static final Logger logger = LoggerFactory.getLogger(LocalServerHttpUtilsTest.class);
-
-    public static Test suite(){
+    private static LocalJettyHttpServer server = null;
+    public static Test suite() throws Exception {
         TestSuite suite=new TestSuite();
         suite.addTestSuite(LocalServerHttpUtilsTest.class);
-        return new LocalJettyHttpServer(suite);
+        server = new LocalJettyHttpServer(suite);
+        return server;
     }
+
 
     public void testGetTest() throws Exception {
         // success
         String result = null;
-        result = HttpUtils.get("http://localhost:8888/test.json");
+        result = HttpUtils.get("http://localhost:" + server.getServerPort()+ "/test.json");
         Assert.assertNotNull(result);
 		ObjectNode jsonObject = JSONUtils.parseObject(result);
 		Assert.assertEquals("Github",jsonObject.path("name").asText());
@@ -50,7 +70,7 @@ public class LocalServerHttpUtilsTest extends TestCase{
 
     public void testGetResponseContentString() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpGet httpget = new HttpGet("http://localhost:8888/test.json");
+        HttpGet httpget = new HttpGet("http://localhost:" + server.getServerPort() + "/test.json");
         /** set timeout、request time、socket timeout */
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
                 .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
