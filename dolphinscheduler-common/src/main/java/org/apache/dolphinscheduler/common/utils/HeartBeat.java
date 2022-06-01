@@ -218,7 +218,6 @@ public class HeartBeat {
         StringBuilder builder = new StringBuilder(100);
         builder.append(cpuUsage).append(COMMA);
         builder.append(memoryUsage).append(COMMA);
-        builder.append(diskAvailable).append(COMMA);
         builder.append(loadAverage).append(COMMA);
         builder.append(availablePhysicalMemorySize).append(Constants.COMMA);
         builder.append(maxCpuloadAvg).append(Constants.COMMA);
@@ -229,7 +228,8 @@ public class HeartBeat {
         builder.append(processId).append(COMMA);
         builder.append(workerHostWeight).append(COMMA);
         builder.append(workerExecThreadCount).append(COMMA);
-        builder.append(workerWaitingTaskCount);
+        builder.append(workerWaitingTaskCount).append(COMMA);
+        builder.append(diskAvailable);
 
         return builder.toString();
     }
@@ -245,18 +245,18 @@ public class HeartBeat {
         HeartBeat heartBeat = new HeartBeat();
         heartBeat.cpuUsage = Double.parseDouble(parts[0]);
         heartBeat.memoryUsage = Double.parseDouble(parts[1]);
-        heartBeat.diskAvailable = Double.parseDouble(parts[2]);
-        heartBeat.loadAverage = Double.parseDouble(parts[3]);
-        heartBeat.availablePhysicalMemorySize = Double.parseDouble(parts[4]);
-        heartBeat.maxCpuloadAvg = Double.parseDouble(parts[5]);
-        heartBeat.reservedMemory = Double.parseDouble(parts[6]);
-        heartBeat.startupTime = Long.parseLong(parts[7]);
-        heartBeat.reportTime = Long.parseLong(parts[8]);
-        heartBeat.serverStatus = Integer.parseInt(parts[9]);
-        heartBeat.processId = Integer.parseInt(parts[10]);
-        heartBeat.workerHostWeight = Integer.parseInt(parts[11]);
-        heartBeat.workerExecThreadCount = Integer.parseInt(parts[12]);
-        heartBeat.workerWaitingTaskCount = Integer.parseInt(parts[13]);
+        heartBeat.loadAverage = Double.parseDouble(parts[2]);
+        heartBeat.availablePhysicalMemorySize = Double.parseDouble(parts[3]);
+        heartBeat.maxCpuloadAvg = Double.parseDouble(parts[4]);
+        heartBeat.reservedMemory = Double.parseDouble(parts[5]);
+        heartBeat.startupTime = Long.parseLong(parts[6]);
+        heartBeat.reportTime = Long.parseLong(parts[7]);
+        heartBeat.serverStatus = Integer.parseInt(parts[8]);
+        heartBeat.processId = Integer.parseInt(parts[9]);
+        heartBeat.workerHostWeight = Integer.parseInt(parts[10]);
+        heartBeat.workerExecThreadCount = Integer.parseInt(parts[11]);
+        heartBeat.workerWaitingTaskCount = Integer.parseInt(parts[12]);
+        heartBeat.diskAvailable = Double.parseDouble(parts[13]);
         return heartBeat;
     }
 }
