@@ -4,7 +4,11 @@ When third party jars are used in the scheduling process or user defined scripts
 
 ![file-manage](/img/new_ui/dev/resource/file-manage.png)
 
-## Basic Operator
+> **_Note:_**
+>
+> * When you manage files as `admin`, remember to set up `tenant` for `admin` first. 
+
+## Basic Operations
 
 ### Create a File
 
