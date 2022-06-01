@@ -8,7 +8,7 @@
 ## Create Task
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入DAG编辑页面。
-- 工具栏中拖动 <img src="/img/tasks/icons/zeppelin.png" width="15"/> 到画板中，即可完成创建。
+- 工具栏中拖动 <img src="../../../../img/tasks/icons/zeppelin.png" width="15"/> 到画板中，即可完成创建。
 
 ## Task Parameter
 
@@ -31,7 +31,7 @@
 
 这个示例展示了如何创建Zeppelin Paragraph任务节点：
 
-![demo-zeppelin-paragraph](/img/tasks/demo/zeppelin.png)
+![demo-zeppelin-paragraph](../../../../img/tasks/demo/zeppelin.png)
 
-![demo-get-zeppelin-id](/img/tasks/demo/zeppelin_id.png)
+![demo-get-zeppelin-id](../../../../img/tasks/demo/zeppelin_id.png)
 

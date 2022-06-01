@@ -3,7 +3,7 @@
 If you need to use `Enterprise WeChat` to alert, create an alert instance in the alert instance management, and choose the `WeChat` plugin.
 The following is the `WeChat` configuration example:
 
-![enterprise-wechat-plugin](/img/alert/enterprise-wechat-plugin.png)
+![enterprise-wechat-plugin](../../../../img/alert/enterprise-wechat-plugin.png)
 
 ## Send Type
 
@@ -14,15 +14,15 @@ The parameter `send.type` corresponds to sending messages to Enterprise WeChat c
 The APP sends type means to notify the alert results via Enterprise WeChat customized APPs, supports sending messages to both specified users and all members. Currently, send to specified enterprise department and tags are not supported, a new PR to contribute is welcomed.
 The following is the `APP` alert config example:
 
-![enterprise-wechat-app-msg-config](/img/alert/wechat-app-form-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/wechat-app-form-example.png)
 
 The following is the `APP` `MARKDOWN` alert message example:
 
-![enterprise-wechat-app-msg-markdown](/img/alert/enterprise-wechat-app-msg-md.png)
+![enterprise-wechat-app-msg-markdown](../../../../img/alert/enterprise-wechat-app-msg-md.png)
 
 The following is the `APP` `TEXT` alert message example:
 
-![enterprise-wechat-app-msg-text](/img/alert/enterprise-wechat-app-msg.png)
+![enterprise-wechat-app-msg-text](../../../../img/alert/enterprise-wechat-app-msg.png)
 
 #### Prerequisites
 
@@ -34,7 +34,7 @@ The Enterprise WeChat APPs support sending messages to both specified users and 
 To acquire user `userId` refer to [Official Doc](https://developer.work.weixin.qq.com/document/path/95402), acquire `userId` by user phone number.
 The following is the `query userId` API example:
 
-![enterprise-wechat-create-group](/img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### References
 
@@ -46,15 +46,15 @@ APP: https://work.weixin.qq.com/api/doc/90000/90135/90236
 The Group Chat send type means to notify the alert results via group chat created by Enterprise WeChat API, sending messages to all members of the group and specified users are not supported.
 The following is the `Group Chat` alert config example:
 
-![enterprise-wechat-app-msg-config](/img/alert/wechat-group-form-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/wechat-group-form-example.png)
 
 The following is the `APP` `MARKDOWN` alert message example:
 
-![enterprise-wechat-group-msg-markdown](/img/alert/enterprise-wechat-group-msg-md.png)
+![enterprise-wechat-group-msg-markdown](../../../../img/alert/enterprise-wechat-group-msg-md.png)
 
 The following is the `Group Chat` `TEXT` alert message example:
 
-![enterprise-wechat-group-msg-text](/img/alert/enterprise-wechat-group-msg.png)
+![enterprise-wechat-group-msg-text](../../../../img/alert/enterprise-wechat-group-msg.png)
 
 #### Prerequisites
 
@@ -62,9 +62,9 @@ Before sending messages to group chat, create a new group chat by Enterprise WeC
 To acquire user `userId` refer to [Official Doc](https://developer.work.weixin.qq.com/document/path/95402), acquire `userId` by user phone number.
 The following is the `create new group chat` API and `query userId` API example:
 
-![enterprise-wechat-create-group](/img/alert/enterprise-wechat-create-group.png)
+![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-create-group.png)
 
-![enterprise-wechat-create-group](/img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### References
 

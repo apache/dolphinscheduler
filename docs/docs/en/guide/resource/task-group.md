@@ -6,11 +6,11 @@ The task group is mainly used to control the concurrency of task instances and i
 
 #### Create Task Group 
 
-![create-taskGroup](/img/new_ui/dev/resource/create-taskGroup.png)
+![create-taskGroup](../../../..../../../../img/new_ui/dev/resource/create-taskGroup.png)
 
 The user clicks [Resources] - [Task Group Management] - [Task Group option] - [Create Task Group] 
 
-![create-taskGroup](/img/new_ui/dev/resource/create-taskGroup.png) 
+![create-taskGroup](../../../..../../../../img/new_ui/dev/resource/create-taskGroup.png) 
 
 You need to enter the information inside the picture:
 
@@ -22,17 +22,17 @@ You need to enter the information inside the picture:
 
 #### View Task Group Queue 
 
-![view-queue](/img/new_ui/dev/resource/view-queue.png) 
+![view-queue](../../../../img/new_ui/dev/resource/view-queue.png) 
 
 Click the button to view task group usage information:
 
-![view-queue](/img/new_ui/dev/resource/view-groupQueue.png) 
+![view-queue](../../../../img/new_ui/dev/resource/view-groupQueue.png) 
 
 #### Use of Task Groups 
 
 **Note**: The usage of task groups is applicable to tasks executed by workers, such as [switch] nodes, [condition] nodes, [sub_process] and other node types executed by the master are not controlled by the task group. Let's take the shell node as an example: 
 
-![use-queue](/img/new_ui/dev/resource/use-queue.png)                 
+![use-queue](../../../../img/new_ui/dev/resource/use-queue.png)                 
 
 Regarding the configuration of the task group, all you need to do is to configure these parts in the red box:
 
@@ -52,5 +52,5 @@ When the task that has occupied the task group resource is finished, the task gr
 
 #### Task Group Flowchart 
 
-![task_group](/img/task_group_process.png)
+![task_group](../../../../img/task_group_process.png)
       

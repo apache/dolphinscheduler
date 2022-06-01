@@ -2,7 +2,7 @@
 
 如果您需要使用到企业微信进行告警，请在告警实例管理里创建告警实例，选择 WeChat 插件。企业微信的配置样例如下：
 
-![enterprise-wechat-plugin](/img/alert/enterprise-wechat-plugin.png)
+![enterprise-wechat-plugin](../../../../img/alert/enterprise-wechat-plugin.png)
 
 ## 发送类型
 
@@ -13,15 +13,15 @@
 应用指将告警结果通过企业微信的自定义应用进行通知，支持向特定用户发送消息和对所有人发送消息。目前还不支持部门和标签，欢迎提PR贡献代码。
 下图是应用告警配置的示例:
 
-![enterprise-wechat-app-msg-config](/img/alert/wechat-app-form-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/wechat-app-form-example.png)
 
 下图是`应用``MARKDOWN`告警消息的示例:
 
-![enterprise-wechat-app-msg-markdown](/img/alert/enterprise-wechat-app-msg-md.png)
+![enterprise-wechat-app-msg-markdown](../../../../img/alert/enterprise-wechat-app-msg-md.png)
 
 下图是`应用``TEXT`告警消息的示例:
 
-![enterprise-wechat-app-msg-text](/img/alert/enterprise-wechat-app-msg.png)
+![enterprise-wechat-app-msg-text](../../../../img/alert/enterprise-wechat-app-msg.png)
 
 #### 前置
 
@@ -33,7 +33,7 @@
 获取用户的userId请参考[官方文档](https://developer.work.weixin.qq.com/document/path/95402)根据手机号获取userId。
 下图是获取userId接口的示例:
 
-![enterprise-wechat-create-group](/img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### 参考文档
 
@@ -44,15 +44,15 @@
 群聊指将告警结果通过企业微信API创建的群聊进行通知，会向该群聊下的所有人发送消息，不支持向特定用户发送消息。
 下图是群聊告警配置的示例:
 
-![enterprise-wechat-group-msg-config](/img/alert/wechat-group-form-example.png)
+![enterprise-wechat-group-msg-config](../../../../img/alert/wechat-group-form-example.png)
 
 下图是`群聊``MARKDOWN`告警消息的示例:
 
-![enterprise-wechat-group-msg-markdown](/img/alert/enterprise-wechat-group-msg-md.png)
+![enterprise-wechat-group-msg-markdown](../../../../img/alert/enterprise-wechat-group-msg-md.png)
 
 下图是`群聊``TEXT`告警消息的示例:
 
-![enterprise-wechat-group-msg-text](/img/alert/enterprise-wechat-group-msg.png)
+![enterprise-wechat-group-msg-text](../../../../img/alert/enterprise-wechat-group-msg.png)
 
 #### 前置
 
@@ -60,9 +60,9 @@
 其中获取用户的userId请参考[官方文档](https://developer.work.weixin.qq.com/document/path/95402)根据手机号获取userId。
 下图是创建新聊天群组和获取userId接口的示例:
 
-![enterprise-wechat-create-group](/img/alert/enterprise-wechat-create-group.png)
+![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-create-group.png)
 
-![enterprise-wechat-create-group](/img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### 参考文档
 

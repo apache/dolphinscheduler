@@ -4,11 +4,11 @@
 
 - 点击项目管理->工作流->工作流定义，进入工作流定义页面，点击“创建工作流”按钮，进入**工作流DAG编辑**页面，如下图所示：
 
-  ![workflow-dag](/img/new_ui/dev/project/workflow-dag.png)
+  ![workflow-dag](../../../../img/new_ui/dev/project/workflow-dag.png)
 
-- 工具栏中拖拽 <img src="/img/tasks/icons/shell.png" width="15"/> 到画板中，新增一个Shell任务,如下图所示：
+- 工具栏中拖拽 <img src="../../../../img/tasks/icons/shell.png" width="15"/> 到画板中，新增一个Shell任务,如下图所示：
   
-  ![demo-shell-simple](/img/tasks/demo/shell.jpg)
+  ![demo-shell-simple](../../../../img/tasks/demo/shell.jpg)
   
 - **添加 Shell 任务的参数设置：**
 
@@ -22,15 +22,15 @@
 
 - **配置任务之间的依赖关系：** 点击任务节点的右侧加号连接任务；如下图所示，任务 Node_B 和任务 Node_C 并行执行，当任务 Node_A 执行完，任务 Node_B、Node_C 会同时执行。
 
-  ![workflow-dependent](/img/new_ui/dev/project/workflow-dependent.png)
+  ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-dependent.png)
 
-- **删除依赖关系：** 点击右上角"箭头"图标<img src="/img/arrow.png" width="35"/>，选中连接线，点击右上角"删除"图标<img src="/img/delete.png" width="35"/>，删除任务间的依赖关系。
+- **删除依赖关系：** 点击右上角"箭头"图标<img src="../../../../img/arrow.png" width="35"/>，选中连接线，点击右上角"删除"图标<img src="../../../../img/delete.png" width="35"/>，删除任务间的依赖关系。
 
-  ![workflow-delete](/img/new_ui/dev/project/workflow-delete.png)
+  ![workflow-delete](../../../../img/new_ui/dev/project/workflow-delete.png)
 
 - **保存工作流定义：** 点击”保存“按钮，弹出"设置DAG图名称"弹框，如下图所示，输入工作流定义名称，工作流定义描述，设置全局参数（选填，参考[全局参数](../parameter/global.md)），点击"添加"按钮，工作流定义创建成功。
 
-  ![workflow-save](/img/new_ui/dev/project/workflow-save.png)
+  ![workflow-save](../../../../img/new_ui/dev/project/workflow-save.png)
 
   > 其他类型任务，请参考 [任务节点类型和参数设置](#TaskParamers)。 <!-- markdown-link-check-disable-line -->
 
@@ -38,7 +38,7 @@
 
 点击项目管理->工作流->工作流定义，进入工作流定义页面，如下图所示:
 
-![workflow-list](/img/new_ui/dev/project/workflow-list.png)
+![workflow-list](../../../../img/new_ui/dev/project/workflow-list.png)
 
 工作流定义列表的操作功能如下：
 
@@ -52,18 +52,18 @@
 - **下载：** 下载工作流定义到本地。
 - **树形图：** 以树形结构展示任务节点的类型及任务状态，如下图所示：
 
-![workflow-tree](/img/new_ui/dev/project/workflow-tree.png)
+![workflow-tree](../../../../img/new_ui/dev/project/workflow-tree.png)
 
 ## 运行工作流
 
-- 点击项目管理->工作流->工作流定义，进入工作流定义页面，如下图所示，点击"上线"按钮<img src="/img/online.png" width="35"/>，上线工作流。
+- 点击项目管理->工作流->工作流定义，进入工作流定义页面，如下图所示，点击"上线"按钮<img src="../../../../img/online.png" width="35"/>，上线工作流。
 
-![workflow-online](/img/new_ui/dev/project/workflow-online.png)
+![workflow-online](../../../../img/new_ui/dev/project/workflow-online.png)
 
 
 - 点击”运行“按钮，弹出启动参数设置弹框，如下图所示，设置启动参数，点击弹框中的"运行"按钮，工作流开始运行，工作流实例页面生成一条工作流实例。
 
-![workflow-run](/img/new_ui/dev/project/workflow-run.png)
+![workflow-run](../../../../img/new_ui/dev/project/workflow-run.png)
   
   工作流运行参数说明： 
        
@@ -78,7 +78,7 @@
   * 补数：包括串行补数、并行补数 2 种模式。串行补数：指定时间范围内，从开始日期至结束日期依次执行补数，依次生成N条流程实例；并行补数：指定时间范围内，多天同时进行补数，同时生成 N 条流程实例。 
     * 补数： 执行指定日期的工作流定义，可以选择补数时间范围（目前只支持针对连续的天进行补数)，比如需要补 5 月 9 号到 5 月 10 号的数据，如下图所示： 
 
-    ![workflow-date](/img/new_ui/dev/project/workflow-date.png)
+    ![workflow-date](../../../../img/new_ui/dev/project/workflow-date.png)
 
     > 串行模式：补数从 5 月 9 号到 5 月 10 号依次执行，依次在流程实例页面生成十条流程实例；
 
@@ -86,20 +86,20 @@
 
 ## 工作流定时
 
-- 创建定时：点击项目管理->工作流->工作流定义，进入工作流定义页面，上线工作流，点击"定时"按钮<img src="/img/timing.png" width="35"/>,弹出定时参数设置弹框，如下图所示：
+- 创建定时：点击项目管理->工作流->工作流定义，进入工作流定义页面，上线工作流，点击"定时"按钮<img src="../../../../img/timing.png" width="35"/>,弹出定时参数设置弹框，如下图所示：
 
-  ![workflow-time01](/img/new_ui/dev/project/workflow-time01.png)
+  ![workflow-time01](../../../../img/new_ui/dev/project/workflow-time01.png)
 
 - 选择起止时间。在起止时间范围内，定时运行工作流；不在起止时间范围内，不再产生定时工作流实例。
 - 添加一个每隔 5 分钟执行一次的定时，如下图所示：
 
-  ![workflow-time02](/img/new_ui/dev/project/workflow-time02.png)
+  ![workflow-time02](../../../../img/new_ui/dev/project/workflow-time02.png)
 
 - 失败策略、通知策略、流程优先级、Worker 分组、通知组、收件人、抄送人同工作流运行参数。
 - 点击"创建"按钮，创建定时成功，此时定时状态为"**下线**"，定时需**上线**才生效。
-- 定时上线：点击"定时管理"按钮<img src="/img/timeManagement.png" width="35"/>，进入定时管理页面，点击"上线"按钮，定时状态变为"上线"，如下图所示，工作流定时生效。
+- 定时上线：点击"定时管理"按钮<img src="../../../../img/timeManagement.png" width="35"/>，进入定时管理页面，点击"上线"按钮，定时状态变为"上线"，如下图所示，工作流定时生效。
 
-  ![workflow-time03](/img/new_ui/dev/project/workflow-time03.png)
+  ![workflow-time03](../../../../img/new_ui/dev/project/workflow-time03.png)
 
 ## 导入工作流
 
