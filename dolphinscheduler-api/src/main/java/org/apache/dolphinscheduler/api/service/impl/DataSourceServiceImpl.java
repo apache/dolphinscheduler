@@ -134,6 +134,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         try {
             dataSourceMapper.insert(dataSource);
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.DATASOURCE, loginUser.getId(), Collections.singletonList(dataSource.getId()), logger);
         } catch (DuplicateKeyException ex) {
             logger.error("Create datasource error.", ex);
             putMsg(result, Status.DATASOURCE_EXIST);
@@ -248,19 +249,31 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Result result = new Result();
         IPage<DataSource> dataSourceList = null;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
+        PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_LIST)) {
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_LIST)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.setData(pageInfo);
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            dataSourceList = dataSourceMapper.selectPagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
+        }
+
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
-        PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
         pageInfo.setTotalList(dataSources);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

@@ -173,7 +173,7 @@ public class EnvironmentController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = environmentService.queryEnvironmentListPaging(pageNo, pageSize, searchVal);
+        result = environmentService.queryEnvironmentListPaging(loginUser, pageNo, pageSize, searchVal);
         return result;
     }
 

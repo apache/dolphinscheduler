@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -105,6 +107,8 @@ public class UsersServiceTest {
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
     private String queueName = "UsersServiceTestQueue";
+
+    private static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Before
     public void before() {
@@ -226,13 +230,19 @@ public class UsersServiceTest {
     @Test
     public void testQueryUserList() {
         User user = new User();
+        user.setUserType(UserType.ADMIN_USER);
+        user.setId(1);
 
         //no operate
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,1, USER_MANAGER, serviceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(false);
         Map<String, Object> result = usersService.queryUserList(user);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         //success
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,1, USER_MANAGER, serviceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(true);
         user.setUserType(UserType.ADMIN_USER);
         when(userMapper.selectList(null)).thenReturn(getUserList());
         result = usersService.queryUserList(user);

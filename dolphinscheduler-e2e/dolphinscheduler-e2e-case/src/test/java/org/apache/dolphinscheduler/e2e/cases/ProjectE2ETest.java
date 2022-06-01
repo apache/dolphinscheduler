@@ -55,6 +55,7 @@ class ProjectE2ETest {
     @Order(30)
     void testDeleteProject() {
         final ProjectPage page = new ProjectPage(browser);
+        browser.navigate().refresh();
         page.delete(project);
 
         await().untilAsserted(() -> {

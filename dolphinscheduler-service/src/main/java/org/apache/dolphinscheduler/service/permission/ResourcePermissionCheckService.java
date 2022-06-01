@@ -58,4 +58,12 @@ public interface ResourcePermissionCheckService<T>{
      * @return
      */
     boolean functionDisabled();
+
+    /**
+     * associated with the current user after the resource is created
+     * @param authorizationType
+     * @param ids
+     * @param logger
+     */
+    void postHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger);
 }

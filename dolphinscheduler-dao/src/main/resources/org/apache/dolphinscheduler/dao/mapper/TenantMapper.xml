@@ -54,6 +54,27 @@
         </if>
         order by t.update_time desc
     </select>
+
+    <select id="queryTenantPagingByIds" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+        SELECT
+        <include refid="baseSqlV2">
+            <property name="alias" value="t"/>
+        </include>
+        , q.queue_name
+        FROM t_ds_tenant t,t_ds_queue q
+        WHERE 1=1 and t.queue_id = q.id
+        <if test="ids != null and ids.size() > 0">
+            and t.id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        <if test="searchVal != null and searchVal != ''">
+            and t.tenant_code like concat('%', #{searchVal}, '%')
+        </if>
+        order by t.update_time desc
+    </select>
+
     <select id="existTenant" resultType="java.lang.Boolean">
         select 1
         from t_ds_tenant

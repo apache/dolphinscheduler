@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -36,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -122,6 +124,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.insert(workerGroup);
         }
         putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
         return result;
     }
 
@@ -191,7 +194,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
 
-        List<WorkerGroup> workerGroups = getWorkerGroups(true);
+        List<WorkerGroup> workerGroups = new ArrayList<>();
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            workerGroups = getWorkerGroups(true);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            if (!ids.isEmpty()) {
+                workerGroups = workerGroupMapper.selectBatchIds(ids);
+            }
+        }
         List<WorkerGroup> resultDataList = new ArrayList<>();
         int total = 0;
 

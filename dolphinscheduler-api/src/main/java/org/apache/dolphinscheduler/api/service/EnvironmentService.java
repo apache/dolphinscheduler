@@ -81,7 +81,7 @@ public interface EnvironmentService {
      * @param pageSize page size
      * @return environment list page
      */
-    Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal);
+    Result queryEnvironmentListPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
 
     /**
      * query all environment
