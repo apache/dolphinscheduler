@@ -122,7 +122,7 @@ public class UdfManageE2ETest {
             .until(ExpectedConditions.urlContains("/resource-manage"));
         browser.navigate().refresh();
         page.createDirectory(testDirectoryName, "test_desc");
-
+        browser.navigate().refresh();
         await().untilAsserted(() -> assertThat(page.udfList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
@@ -174,7 +174,7 @@ public class UdfManageE2ETest {
         downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
         browser.navigate().refresh();
         page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
-
+        browser.navigate().refresh();
         await().untilAsserted(() -> {
             assertThat(page.udfList())
                 .as("File list should contain newly-created file")
