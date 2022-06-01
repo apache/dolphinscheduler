@@ -125,8 +125,11 @@ def prune() -> None:
 
 
 def dev_syntax() -> None:
-    """Check temp whether temporary do not support syntax in development."""
-    pattern = re.compile("(\\(\\.\\.[\\w./-]+\\))")
+    """Check whether directory development contain do not support syntax or not.
+
+    * It should not ref document from other document in `docs` directory
+    """
+    pattern = re.compile("(\\(\\.\\.[\\w./-]+\\.md\\))")
     dev_files_path = get_files_recurse(dev_en_dir) | get_files_recurse(dev_zh_dir)
     get_files_recurse(dev_en_dir)
     for path in dev_files_path:
