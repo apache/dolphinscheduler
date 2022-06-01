@@ -47,36 +47,26 @@ public class LocalJettyHttpServer extends TestSetup {
 
     protected void setUp() throws Exception {
         server = new Server(serverPort);
-        while (true) {
-            try {
-                ContextHandler context = new ContextHandler("/test.json");
-                context.setHandler(new AbstractHandler() {
-                    @Override
-                    public void handle(String s, HttpServletRequest request, HttpServletResponse response, int i) throws IOException {
-                        ByteArrayISO8859Writer writer = new ByteArrayISO8859Writer();
-                        writer.write("{\"name\":\"Github\"}");
-                        writer.flush();
-                        response.setContentLength(writer.size());
-                        OutputStream out = response.getOutputStream();
-                        writer.writeTo(out);
-                        out.flush();
-                        Request baseRequest = request instanceof Request ? (Request) request : HttpConnection.getCurrentConnection().getRequest();
-                        baseRequest.setHandled(true);
-                    }
-                });
-                server.setHandler(context);
-                logger.info("server for " + context.getBaseResource());
-                server.start();
-                serverPort = server.getConnectors()[0].getLocalPort();
-                logger.info("server is starting in port: " + serverPort);
-            } catch (BindException e) {
-                logger.info("port: " + serverPort + " has been bind");
-                server.getConnectors()[0].setPort(++serverPort);
+        ContextHandler context = new ContextHandler("/test.json");
+        context.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, HttpServletRequest request, HttpServletResponse response, int i) throws IOException {
+                ByteArrayISO8859Writer writer = new ByteArrayISO8859Writer();
+                writer.write("{\"name\":\"Github\"}");
+                writer.flush();
+                response.setContentLength(writer.size());
+                OutputStream out = response.getOutputStream();
+                writer.writeTo(out);
+                out.flush();
+                Request baseRequest = request instanceof Request ? (Request) request : HttpConnection.getCurrentConnection().getRequest();
+                baseRequest.setHandled(true);
             }
-            if (!server.isFailed()) {
-                break;
-            }
-        }
+        });
+        server.setHandler(context);
+        logger.info("server for " + context.getBaseResource());
+        server.start();
+        serverPort = server.getConnectors()[0].getLocalPort();
+        logger.info("server is starting in port: " + serverPort);
     }
 
     protected void tearDown() throws Exception {
