@@ -33,6 +33,23 @@
         order by update_time desc
     </select>
 
+    <select id="queryAlertGroupPageByIds" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_alertgroup
+        where 1 = 1
+        <if test="searchVal != null and searchVal != ''">
+            and group_name like concat('%', #{searchVal}, '%')
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and id  in
+            <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        order by update_time desc
+    </select>
+
     <select id="queryByGroupName" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
         <include refid="baseSql"/>
