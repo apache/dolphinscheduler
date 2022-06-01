@@ -2,6 +2,10 @@
 
 当在调度过程中需要使用到第三方的 jar 或者用户需要自定义脚本的情况，可以通过在该页面完成相关操作。可创建的文件类型包括：`txt/log/sh/conf/py/java` 等。并且可以对文件进行编辑、重命名、下载和删除等操作。
 
+> **_注意：_**
+>
+> * 当您以`admin`身份等入并操作文件时，需要先给`admin`设置租户
+
 ## 基础操作
 
 ![file-manage](/img/new_ui/dev/resource/file-manage.png)

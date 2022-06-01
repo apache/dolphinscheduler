@@ -238,6 +238,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        // make sure login user has tenant
+        String tenantCode = getTenantCode(loginUser.getId(), result);
+        if (StringUtils.isEmpty(tenantCode)) {
+            return result;
+        }
+
         result = verifyFile(name, type, file);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
