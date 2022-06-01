@@ -20,18 +20,14 @@ package org.apache.dolphinscheduler.common.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.BindException;
-
 import junit.extensions.TestSetup;
 import junit.framework.Test;
-
-
 import org.mortbay.jetty.*;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.util.ByteArrayISO8859Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -80,6 +76,7 @@ public class LocalJettyHttpServer extends TestSetup {
             break;
         }
     }
+
     protected void tearDown() throws Exception {
         logger.info("server stopping...");
         server.stop();

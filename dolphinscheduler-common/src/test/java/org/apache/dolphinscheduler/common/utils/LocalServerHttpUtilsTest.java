@@ -27,7 +27,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
-import org.mortbay.jetty.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,6 @@ public class LocalServerHttpUtilsTest extends TestCase{
         server = new LocalJettyHttpServer(suite);
         return server;
     }
-
 
     public void testGetTest() throws Exception {
         // success
