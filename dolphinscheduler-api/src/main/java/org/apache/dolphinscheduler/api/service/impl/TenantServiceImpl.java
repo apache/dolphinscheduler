@@ -157,10 +157,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Tenant> page = new Page<>(pageNo, pageSize);
         IPage<Tenant> tenantPage = tenantMapper.queryTenantPaging(page, searchVal);
 
+        PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) tenantPage.getTotal());
         pageInfo.setTotalList(tenantPage.getRecords());
         result.setData(pageInfo);
