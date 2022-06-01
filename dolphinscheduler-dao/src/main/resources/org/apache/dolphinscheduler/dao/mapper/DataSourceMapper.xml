@@ -113,20 +113,4 @@
         and rel.user_id = #{userId}
     </select>
 
-    <select id="queryDataSourceByName" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select
-        <include refid="baseSql"/>
-        from t_ds_datasource
-        where 1 = 1
-        <if test="searchVal != null and searchVal != ''">
-            and name like concat ('%', #{searchVal}, '%')
-        </if>
-        <if test="ids != null and ids.size() > 0">
-            and id in
-            <foreach collection="ids" item="i" open="(" close=")" separator=",">
-                #{i}
-            </foreach>
-        </if>
-    </select>
-
 </mapper>

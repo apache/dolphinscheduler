@@ -104,12 +104,12 @@ class WorkflowE2ETest {
     @Order(1)
     void testCreateWorkflow() {
         final String workflow = "test-workflow-1";
-
+        browser.navigate().refresh();
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
-        browser.navigate().refresh();
+
         workflowDefinitionPage
             .createWorkflow()
 
@@ -139,13 +139,13 @@ class WorkflowE2ETest {
     @Order(10)
     void testCreateSubWorkflow() {
         final String workflow = "test-sub-workflow-1";
-
+        browser.navigate().refresh();
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
-        browser.navigate().refresh();
+
         workflowDefinitionPage
             .createWorkflow()
 
@@ -172,12 +172,12 @@ class WorkflowE2ETest {
     @Order(30)
     void testRunWorkflow() {
         final String workflow = "test-workflow-1";
-
+        browser.navigate().refresh();
         final ProjectDetailPage projectPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
                         .goTo(project);
-        browser.navigate().refresh();
+
         projectPage
                 .goToTab(WorkflowInstanceTab.class)
                 .deleteAll();
