@@ -90,7 +90,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
     @Override
     public void postHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
-        logger.info("no post handle");
+        logger.debug("no post handle");
     }
 
     @Override

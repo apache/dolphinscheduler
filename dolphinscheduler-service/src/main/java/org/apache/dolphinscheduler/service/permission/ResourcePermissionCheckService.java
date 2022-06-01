@@ -60,7 +60,7 @@ public interface ResourcePermissionCheckService<T>{
     boolean functionDisabled();
 
     /**
-     * postHandle
+     * associated with the current user after the resource is created
      * @param authorizationType
      * @param ids
      * @param logger

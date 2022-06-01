@@ -54,6 +54,7 @@ public class BaseServiceImpl implements BaseService {
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
         }catch (Exception e){
             logger.error("post handle error", e);
+            throw new RuntimeException("resource association user error", e);
         }
     }
 
