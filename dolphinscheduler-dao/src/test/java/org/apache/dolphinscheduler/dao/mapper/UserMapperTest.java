@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -25,17 +27,13 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class UserMapperTest extends BaseDaoTest {
     @Autowired
@@ -303,7 +301,7 @@ public class UserMapperTest extends BaseDaoTest {
         //insertOneAccessToken
         AccessToken accessToken = insertOneAccessToken(user);
         //queryUserByToken
-        User userToken = userMapper.queryUserByToken(accessToken.getToken());
+        User userToken = userMapper.queryUserByToken(accessToken.getToken(), new Date());
         Assert.assertEquals(userToken, user);
 
     }

@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * process task relation log mapper interface

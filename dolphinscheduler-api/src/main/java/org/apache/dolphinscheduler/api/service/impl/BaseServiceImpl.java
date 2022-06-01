@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -42,11 +43,20 @@ import java.util.Objects;
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
-
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
+    protected ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Override
+    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
+        try{
+            resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
+        }catch (Exception e){
+            logger.error("post handle error", e);
+            throw new RuntimeException("resource association user error", e);
+        }
+    }
 
     /**
      * check admin
@@ -163,8 +173,8 @@ public class BaseServiceImpl implements BaseService {
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String perm) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), perm, logger);
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
     }

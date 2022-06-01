@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Task Group
@@ -33,7 +33,7 @@ public class TaskGroup implements Serializable {
      * key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * task_group name
      */

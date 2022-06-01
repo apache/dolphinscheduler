@@ -15,23 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.api.dto;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.ibatis.annotations.Param;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.AccessToken;
 
-import java.util.List;
+public class CreateTokenResponse extends Result {
+    private AccessToken data;
 
-/**
- * DqRuleInputEntryMapper
- */
-public interface DqRuleInputEntryMapper extends BaseMapper<DqRuleInputEntry> {
+    public CreateTokenResponse(Result result) {
+        super();
+        this.setCode(result.getCode());
+        this.setMsg(result.getMsg());
+        this.setData((AccessToken) result.getData());
+    }
 
-    /**
-     * get rule input entry list by rule id
-     *
-     * @param ruleId Integer
-     */
-    List<DqRuleInputEntry> getRuleInputEntryList(@Param("ruleId") Integer ruleId);
+    @Override
+    public AccessToken getData() {
+        return data;
+    }
+
+    public void setData(AccessToken data) {
+        this.data = data;
+    }
 }

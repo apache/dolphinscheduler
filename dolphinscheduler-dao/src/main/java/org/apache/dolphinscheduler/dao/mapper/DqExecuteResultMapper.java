@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * DqExecuteResultMapper

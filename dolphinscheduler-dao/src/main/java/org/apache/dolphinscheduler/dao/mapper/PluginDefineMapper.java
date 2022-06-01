@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface PluginDefineMapper extends BaseMapper<PluginDefine> {
 

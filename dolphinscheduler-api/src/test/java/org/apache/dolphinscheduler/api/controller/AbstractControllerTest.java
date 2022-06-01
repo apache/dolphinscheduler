@@ -17,24 +17,17 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.test.TestingServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.RegistryServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.test.TestingServer;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,6 +39,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.annotation.PostConstruct;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * abstract controller test
@@ -104,6 +102,15 @@ public abstract class AbstractControllerTest {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
         } else {
             result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    public void putMsg(Result<Object> result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
         }
     }
 

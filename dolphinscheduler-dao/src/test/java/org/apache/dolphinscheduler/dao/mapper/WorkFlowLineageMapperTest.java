@@ -26,13 +26,12 @@ import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
-
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.List;
 
 public class WorkFlowLineageMapperTest extends BaseDaoTest {
 

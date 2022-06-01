@@ -17,22 +17,20 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * process definition mapper interface
@@ -123,6 +121,15 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return process definition list
      */
     List<ProcessDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
+
+    /**
+     * query process definition list
+     *
+     * @param projectCode projectCode
+     * @return process definition list
+     */
+    List<DependentSimplifyDefinition> queryDefinitionListByProjectCodeAndProcessDefinitionCodes(@Param("projectCode") long projectCode,
+                                                                                                @Param("codes") Collection<Long> codes);
 
     /**
      * query process definition by ids

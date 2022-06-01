@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.api.service.impl.EnvironmentWorkerGroupRelati
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-
-import java.util.Map;
-
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +32,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * environment service test

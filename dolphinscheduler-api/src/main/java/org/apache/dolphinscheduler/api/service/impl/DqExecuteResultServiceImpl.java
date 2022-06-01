@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -27,14 +29,10 @@ import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
 
 /**
  * DqExecuteResultServiceImpl

@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -25,11 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("t_ds_alert")
 public class Alert {

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
@@ -42,16 +43,6 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,7 +56,17 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_LIST;
 
 /**
  * data source service test
@@ -194,12 +195,17 @@ public class DataSourceServiceTest {
 
     @Test
     public void queryDataSourceListPagingTest() {
+        Set<Integer> ids = new HashSet<>();
+        ids.add(1);
+
         User loginUser = getAdminUser();
         String searchVal = "";
         int pageNo = 1;
         int pageSize = 10;
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), DATASOURCE_LIST, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), baseServiceLogger)).thenReturn(ids);
+
         Result result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
         Assert.assertEquals(Status.SUCCESS.getCode(),(int)result.getCode());
     }

@@ -20,13 +20,12 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.List;
 
 public class TaskGroupQueueMapperTest extends BaseDaoTest {
 

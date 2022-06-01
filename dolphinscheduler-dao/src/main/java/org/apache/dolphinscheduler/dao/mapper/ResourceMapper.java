@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * resource mapper interface
@@ -62,9 +60,9 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return resource page
      */
     IPage<Resource> queryResourcePaging(IPage<Resource> page,
-                                        @Param("userId") int userId,
                                         @Param("id") int id,
                                         @Param("type") int type,
+                                        @Param("userId") int userId,
                                         @Param("searchVal") String searchVal,
                                         @Param("resIds") List<Integer> resIds);
 

@@ -17,6 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
@@ -24,6 +32,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -34,12 +43,15 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.SetUtils;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,20 +61,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_UPDATE;
 
 /**
  * task definition service impl
@@ -148,6 +149,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             }
             result.put(Constants.DATA_LIST, env.getCode());
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.ENVIRONMENT, loginUser.getId(), Collections.singletonList(env.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_ENVIRONMENT_ERROR);
         }
@@ -163,14 +165,24 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @return environment list page
      */
     @Override
-    public Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal) {
-        Result result = new Result();
+    public Result queryEnvironmentListPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+        Result<Object> result = new Result();
 
         Page<Environment> page = new Page<>(pageNo, pageSize);
-
-        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
-
         PageInfo<EnvironmentDto> pageInfo = new PageInfo<>(pageNo, pageSize);
+        IPage<Environment> environmentIPage;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.setData(pageInfo);
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            environmentIPage = environmentMapper.queryEnvironmentListPagingByIds(page, new ArrayList<>(ids), searchVal);
+        }
+
         pageInfo.setTotal((int) environmentIPage.getTotal());
 
         if (CollectionUtils.isNotEmpty(environmentIPage.getRecords())) {
@@ -468,4 +480,3 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     }
 
 }
-

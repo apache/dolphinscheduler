@@ -17,19 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.apache.dolphinscheduler.common.Constants.CACHE_KEY_VALUE_ALL;
-
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
+
+import static org.apache.dolphinscheduler.common.Constants.CACHE_KEY_VALUE_ALL;
 
 /**
  * worker group mapper interface

@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -33,11 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,8 +43,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)

@@ -15,23 +15,49 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+package org.apache.dolphinscheduler.dao.entity;
 
 /**
- * DqRuleInputEntryMapper
+ * dependent node simplify definition
  */
-public interface DqRuleInputEntryMapper extends BaseMapper<DqRuleInputEntry> {
+public class DependentSimplifyDefinition {
 
     /**
-     * get rule input entry list by rule id
-     *
-     * @param ruleId Integer
+     * definition code
      */
-    List<DqRuleInputEntry> getRuleInputEntryList(@Param("ruleId") Integer ruleId);
+    private Long code;
+
+    /**
+     * definition name
+     */
+    private String name;
+
+    /**
+     * definition version
+     */
+    private Integer version;
+
+    public Long getCode() {
+        return this.code;
+    }
+
+    public void setCode(Long code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 }

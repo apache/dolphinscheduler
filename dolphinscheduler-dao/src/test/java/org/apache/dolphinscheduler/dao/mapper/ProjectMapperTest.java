@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -190,4 +191,15 @@ public class ProjectMapperTest extends BaseDaoTest {
 
         Assert.assertNotEquals(projects.size(), 0);
     }
+
+    /**
+     * test query project permission
+     */
+    @Test
+    public void testListAuthorizedProjects(){
+        Project project = insertOne();
+        List<Project> projects  = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
+        Assert.assertEquals(projects.size(),0);
+    }
+
 }

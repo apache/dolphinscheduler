@@ -22,13 +22,12 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.List;
 
 public class ErrorCommandMapperTest extends BaseDaoTest {
 

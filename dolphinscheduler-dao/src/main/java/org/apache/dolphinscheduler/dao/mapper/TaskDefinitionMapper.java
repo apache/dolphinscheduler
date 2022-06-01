@@ -17,20 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
-
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * task definition mapper interface

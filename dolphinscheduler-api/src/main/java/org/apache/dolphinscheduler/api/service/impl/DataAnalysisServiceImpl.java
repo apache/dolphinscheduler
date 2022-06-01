@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;

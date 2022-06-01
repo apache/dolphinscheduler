@@ -27,11 +27,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +35,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * project controller test

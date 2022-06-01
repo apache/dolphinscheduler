@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -38,8 +42,12 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -52,21 +60,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Optional;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_CREATE_DATASOURCE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_LIST;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_UPDATE;
 
 /**
  * data source service impl
@@ -134,6 +134,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         try {
             dataSourceMapper.insert(dataSource);
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.DATASOURCE, loginUser.getId(), Collections.singletonList(dataSource.getId()), logger);
         } catch (DuplicateKeyException ex) {
             logger.error("Create datasource error.", ex);
             putMsg(result, Status.DATASOURCE_EXIST);
@@ -248,19 +249,31 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Result result = new Result();
         IPage<DataSource> dataSourceList = null;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
+        PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_LIST)) {
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_LIST)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.setData(pageInfo);
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            dataSourceList = dataSourceMapper.selectPagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
+        }
+
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
-        PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
         pageInfo.setTotalList(dataSources);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

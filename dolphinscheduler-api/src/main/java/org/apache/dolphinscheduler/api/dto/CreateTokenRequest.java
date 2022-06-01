@@ -15,14 +15,42 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.api.dto;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.dolphinscheduler.dao.entity.K8s;
 
-/**
- * k8s mapper interface
- */
-public interface K8sMapper extends BaseMapper<K8s> {
+import io.swagger.annotations.ApiModelProperty;
 
+public class CreateTokenRequest {
+    @ApiModelProperty(example = "1", required = true)
+    Integer userId;
+
+    @ApiModelProperty(example = "2022-12-31 00:00:00", required = true)
+    String expireTime;
+
+    @ApiModelProperty(example = "abc123xyz")
+    String token;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(String expireTime) {
+        this.expireTime = expireTime;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

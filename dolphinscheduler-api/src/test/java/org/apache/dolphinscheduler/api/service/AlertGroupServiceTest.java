@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -32,13 +31,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,8 +44,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 /**
  * alert group service test

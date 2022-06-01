@@ -16,26 +16,25 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static java.util.stream.Collectors.toList;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public class UdfFuncMapperTest extends BaseDaoTest {
 
@@ -212,7 +211,8 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc = insertOne(user);
         //queryUdfFuncPaging
         Page<UdfFunc> page = new Page(1, 3);
-        IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page, user.getId(), "");
+
+        IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page, Collections.singletonList(udfFunc.getId()), "");
         Assert.assertNotEquals(udfFuncIPage.getTotal(), 0);
 
     }
@@ -227,7 +227,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         //insertOne
         UdfFunc udfFunc = insertOne(user);
         //getUdfFuncByType
-        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(user.getId(), udfFunc.getType().ordinal());
+        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(Collections.singletonList(udfFunc.getId()), udfFunc.getType().ordinal());
         Assert.assertNotEquals(udfFuncList.size(), 0);
 
     }

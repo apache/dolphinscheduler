@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 
 public interface AlertSendStatusMapper extends BaseMapper<AlertSendStatus> {
 }

@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.AlertStatus;
-
-import java.util.Date;
-import java.util.StringJoiner;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.base.Objects;
+import org.apache.dolphinscheduler.common.enums.AlertStatus;
+
+import java.util.Date;
+import java.util.StringJoiner;
 
 @TableName("t_ds_alert_send_status")
 public class AlertSendStatus {

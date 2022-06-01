@@ -21,11 +21,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
-
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * resources service
@@ -115,7 +114,7 @@ public interface ResourcesService {
      * @param type resource type
      * @return resource list
      */
-    Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType);
+    Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType);
 
     /**
      * delete resource
@@ -143,7 +142,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    Result<Object> queryResource(String fullName,Integer id,ResourceType type);
+    Result<Object> queryResource(User loginUser,String fullName,Integer id,ResourceType type);
 
     /**
      * view resource file online
@@ -153,7 +152,7 @@ public interface ResourcesService {
      * @param limit limit
      * @return resource content
      */
-    Result<Object> readResource(int resourceId, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser,int resourceId, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -175,7 +174,7 @@ public interface ResourcesService {
      * @param content content
      * @return update result cod
      */
-    Result<Object> updateResourceContent(int resourceId, String content);
+    Result<Object> updateResourceContent(User loginUser,int resourceId, String content);
 
     /**
      * download file
@@ -184,7 +183,7 @@ public interface ResourcesService {
      * @return resource content
      * @throws IOException exception
      */
-    org.springframework.core.io.Resource downloadResource(int resourceId) throws IOException;
+    org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId) throws IOException;
 
     /**
      * list all file
@@ -236,6 +235,6 @@ public interface ResourcesService {
      * @param resourceId resource id
      * @return resource
      */
-    Result<Object> queryResourceById(Integer resourceId);
+    Result<Object> queryResourceById(User loginUser, Integer resourceId);
 
 }

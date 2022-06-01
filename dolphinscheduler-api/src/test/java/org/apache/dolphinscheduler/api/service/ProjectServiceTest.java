@@ -293,7 +293,6 @@ public class ProjectServiceTest {
 
         // SUCCESS
         loginUser.setUserType(UserType.ADMIN_USER);
-
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(), PROJECT, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1}, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(this.userMapper.queryAuthedUserListByProjectId(1)).thenReturn(this.getUserList());

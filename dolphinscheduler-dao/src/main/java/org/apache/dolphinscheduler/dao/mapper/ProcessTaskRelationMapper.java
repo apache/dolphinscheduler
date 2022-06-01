@@ -17,19 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
+import java.util.Map;
 
 /**
  * process task relation mapper interface
@@ -123,6 +120,16 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode, @Param("preTaskCodes") Long[] preTaskCodes);
+
+    /**
+     * query process task relation by process definition code
+     *
+     * @param processDefinitionCode process definition code
+     * @param processDefinitionVersion process definition version
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryProcessTaskRelationsByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode,
+                                                                               @Param("processDefinitionVersion") Integer processDefinitionVersion);
 
     /**
      * count upstream by codes

@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * alertgroup mapper interface
@@ -90,6 +87,14 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @param alertGroupsIds
      * @return
      */
-    <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")T[] alertGroupsIds);
+    <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")List<Integer> alertGroupsIds);
 
+    /**
+     * queryAlertGroupPageByIds
+     * @param page
+     * @param ids
+     * @param searchVal
+     * @return
+     */
+    IPage<AlertGroup> queryAlertGroupPageByIds(Page<AlertGroup> page, @Param("ids") List<Integer> ids, @Param("searchVal") String searchVal);
 }

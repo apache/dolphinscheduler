@@ -195,6 +195,17 @@ public interface UsersService {
 
 
     /**
+     * grant namespace
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param namespaceIds namespace id array
+     * @return grant result code
+     */
+    Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds);
+
+
+    /**
      * grant datasource
      *
      * @param loginUser login user

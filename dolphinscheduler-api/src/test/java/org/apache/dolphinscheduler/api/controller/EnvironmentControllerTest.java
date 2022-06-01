@@ -17,15 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Preconditions;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,8 +33,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.base.Preconditions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EnvironmentControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentControllerTest.class);

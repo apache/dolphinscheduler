@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto.resources;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * resource component

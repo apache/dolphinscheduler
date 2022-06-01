@@ -22,15 +22,14 @@ import org.apache.dolphinscheduler.api.service.EnvironmentWorkerGroupRelationSer
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * task definition service impl

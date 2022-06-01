@@ -17,21 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-
-import java.util.Date;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +34,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.Date;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * alert group controller test
@@ -75,7 +73,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", defaultTestAlertGroupName);
         paramsMap.add("groupType", "email");
-        paramsMap.add("description", "cxc junit 测试告警描述");
+        paramsMap.add("description", "cxc junit test alert description");
         paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
                 .header("sessionId", sessionId)

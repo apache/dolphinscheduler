@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -49,16 +52,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.quartz.CronExpression;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -69,8 +62,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * scheduler service impl
@@ -176,7 +173,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
-        if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+        if (!CronExpression.isValidExpression(scheduleParam.getCrontab())) {
             logger.error("{} verify failure", scheduleParam.getCrontab());
 
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
@@ -674,7 +671,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
-            if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+            if (!CronExpression.isValidExpression(scheduleParam.getCrontab())) {
                 putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
                 return;
             }

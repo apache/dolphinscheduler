@@ -29,11 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,6 +41,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;

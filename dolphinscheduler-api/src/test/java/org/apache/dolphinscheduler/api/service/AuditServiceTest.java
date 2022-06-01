@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AuditServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,11 +26,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,8 +36,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * audit service test

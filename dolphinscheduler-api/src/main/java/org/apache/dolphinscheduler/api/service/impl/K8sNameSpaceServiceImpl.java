@@ -49,14 +49,14 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     private static final Logger logger = LoggerFactory.getLogger(K8sNameSpaceServiceImpl.class);
 
     private static String resourceYaml = "apiVersion: v1\n"
-        + "kind: ResourceQuota\n"
-        + "metadata:\n"
-        + "  name: ${name}\n"
-        + "  namespace: ${namespace}\n"
-        + "spec:\n"
-        + "  hard:\n"
-        + "    ${limitCpu}\n"
-        + "    ${limitMemory}\n";
+            + "kind: ResourceQuota\n"
+            + "metadata:\n"
+            + "  name: ${name}\n"
+            + "  namespace: ${namespace}\n"
+            + "spec:\n"
+            + "  hard:\n"
+            + "    ${limitCpu}\n"
+            + "    ${limitMemory}\n";
     @Autowired
     private K8sNamespaceMapper k8sNamespaceMapper;
     @Autowired
@@ -311,7 +311,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
         }
 
         String result = resourceYaml.replace("${name}", name)
-            .replace("${namespace}", namespace);
+                .replace("${namespace}", namespace);
         if (cpuStr == null) {
             result = result.replace("${limitCpu}", "");
         } else {

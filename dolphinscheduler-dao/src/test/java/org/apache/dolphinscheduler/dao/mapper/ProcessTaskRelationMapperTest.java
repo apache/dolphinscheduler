@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-
-import java.util.Date;
-import java.util.List;
-
 import org.assertj.core.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.List;
 
 public class ProcessTaskRelationMapperTest extends BaseDaoTest {
 

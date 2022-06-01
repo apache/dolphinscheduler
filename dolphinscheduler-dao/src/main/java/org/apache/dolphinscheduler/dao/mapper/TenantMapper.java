@@ -17,16 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-
 import org.apache.ibatis.annotations.Param;
-
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
 
@@ -82,4 +80,13 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      * @return true if exist else return null
      */
     Boolean existTenant(@Param("tenantCode") String tenantCode);
+
+    /**
+     * queryTenantPagingByIds
+     * @param page
+     * @param ids
+     * @param searchVal
+     * @return
+     */
+    IPage<Tenant> queryTenantPagingByIds(Page<Tenant> page, @Param("ids")List<Integer> ids, @Param("searchVal")String searchVal);
 }

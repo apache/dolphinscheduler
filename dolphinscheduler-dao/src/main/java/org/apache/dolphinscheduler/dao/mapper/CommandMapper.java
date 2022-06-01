@@ -17,15 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * command mapper interface

@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

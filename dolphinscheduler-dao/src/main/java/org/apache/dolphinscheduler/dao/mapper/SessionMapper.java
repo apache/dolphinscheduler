@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.Session;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

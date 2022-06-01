@@ -17,23 +17,19 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +37,18 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
 
 /**
  * alert group service impl
@@ -118,11 +122,20 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
-        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
-        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
-                page, searchVal);
+        IPage<AlertGroup> alertGroupIPage;
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            alertGroupIPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.setData(pageInfo);
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            alertGroupIPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
+        }
         pageInfo.setTotal((int) alertGroupIPage.getTotal());
         pageInfo.setTotalList(alertGroupIPage.getRecords());
         result.setData(pageInfo);
@@ -165,6 +178,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             if (insert > 0) {
                 result.put(Constants.DATA_LIST, alertGroup);
                 putMsg(result, Status.SUCCESS);
+                permissionPostHandle(AuthorizationType.ALERT_GROUP, loginUser.getId(), Collections.singletonList(alertGroup.getId()), logger);
             } else {
                 putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
             }

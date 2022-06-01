@@ -17,16 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.OFFLINE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.PREVIEW_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.PUBLISH_SCHEDULE_ONLINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
@@ -37,9 +32,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,13 +44,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.OFFLINE_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.PREVIEW_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.PUBLISH_SCHEDULE_ONLINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 /**
  * scheduler controller

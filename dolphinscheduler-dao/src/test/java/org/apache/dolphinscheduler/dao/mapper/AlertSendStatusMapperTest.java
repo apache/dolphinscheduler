@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
-
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertThat;
 
 /**
  * AlertSendStatus mapper test

@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl;
@@ -31,18 +36,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.assertj.core.util.Lists;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,12 +48,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_UPDATE;
 
 /**
  * environment service test
@@ -88,14 +85,6 @@ public class EnvironmentServiceTest {
     public static final String environmentName = "Env1";
 
     public static final String workerGroups = "[\"default\"]";
-
-    @Before
-    public void setUp(){
-    }
-
-    @After
-    public void after(){
-    }
 
     @Test
     public void testCreateEnvironment() {
@@ -190,7 +179,7 @@ public class EnvironmentServiceTest {
         page.setTotal(1L);
         Mockito.when(environmentMapper.queryEnvironmentListPaging(Mockito.any(Page.class), Mockito.eq(environmentName))).thenReturn(page);
 
-        Result result = environmentService.queryEnvironmentListPaging(1, 10, environmentName);
+        Result result = environmentService.queryEnvironmentListPaging(getAdminUser(), 1, 10, environmentName);
         logger.info(result.toString());
         PageInfo<Environment> pageInfo = (PageInfo<Environment>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));

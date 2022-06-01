@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.google.common.primitives.Bytes;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
@@ -32,22 +34,16 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Objects;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.primitives.Bytes;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;

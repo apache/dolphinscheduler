@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.ConditionType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.Date;
-import java.util.Objects;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.dolphinscheduler.common.enums.ConditionType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * process task relation

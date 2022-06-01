@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ServerAlertContent {
 

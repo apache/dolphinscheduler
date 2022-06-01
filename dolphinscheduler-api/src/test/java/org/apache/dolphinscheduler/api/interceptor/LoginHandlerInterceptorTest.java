@@ -45,6 +45,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+
 @ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -81,7 +86,7 @@ public class LoginHandlerInterceptorTest {
         // test token
         String token = "123456";
         when(request.getHeader("token")).thenReturn(token);
-        when(userMapper.queryUserByToken(token)).thenReturn(mockUser);
+        when(userMapper.queryUserByToken(eq(token), any(Date.class))).thenReturn(mockUser);
         Assert.assertTrue(interceptor.preHandle(request, response, null));
 
         // test disable user

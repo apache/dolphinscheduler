@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CLOSE_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_QUEUE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_GROUP_ERROR;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
@@ -31,14 +28,6 @@ import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +38,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.enums.Status.CLOSE_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_QUEUE_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_GROUP_ERROR;
 
 /**
  * task group controller
@@ -297,14 +295,21 @@ public class TaskGroupController extends BaseController {
     /**
      * query task group queue list paging
      *
-     * @param loginUser login user
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param groupId     ID for task group
+     * @param taskName    Task Name
+     * @param processName Process instance name
+     * @param status      Task queue status
+     * @param loginUser   login user
+     * @param pageNo      page number
+     * @param pageSize    page size
      * @return queue list
      */
     @ApiOperation(value = "queryTasksByGroupId", notes = "QUERY_ALL_TASKS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = false, dataType = "Int", example = "1", defaultValue = "-1"),
+        @ApiImplicitParam(name = "taskInstanceName", value = "TASK_INSTANCE_NAME", required = false, dataType = "String", example = "taskName"),
+        @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataType = "String", example = "processName"),
+        @ApiImplicitParam(name = "status", value = "STATUS", required = false, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
@@ -313,7 +318,7 @@ public class TaskGroupController extends BaseController {
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("groupId") Integer groupId,
+                                      @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
                                       @RequestParam(value = "taskInstanceName",required = false) String taskName,
                                       @RequestParam(value = "processInstanceName",required = false) String processName,
                                       @RequestParam(value = "status",required = false) Integer status,

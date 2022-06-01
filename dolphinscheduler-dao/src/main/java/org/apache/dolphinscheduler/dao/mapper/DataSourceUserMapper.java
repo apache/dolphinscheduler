@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * datasource user realtion mapper interface

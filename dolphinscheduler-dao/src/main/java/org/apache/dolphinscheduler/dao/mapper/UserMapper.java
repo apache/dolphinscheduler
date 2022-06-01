@@ -17,19 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.User;
-
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
+import java.util.List;
 
 /**
  * user mapper interface
@@ -83,7 +81,7 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * user page
      *
-     * @param page page
+     * @param page     page
      * @param userName userName
      * @return user IPage
      */
@@ -126,9 +124,10 @@ public interface UserMapper extends BaseMapper<User> {
      * query user by token
      *
      * @param token token
+     * @param now   now date
      * @return user
      */
-    User queryUserByToken(@Param("token") String token);
+    User queryUserByToken(@Param("token") String token, @Param("now") Date now);
 
     /**
      * query user by queue name

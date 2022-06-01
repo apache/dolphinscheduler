@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * alert mapper interface

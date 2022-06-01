@@ -17,21 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -40,11 +29,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +41,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
 
 /**
  * users controller
@@ -330,6 +329,31 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userId") int userId,
                                @RequestParam(value = "udfIds") String udfIds) {
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, userId, udfIds);
+        return returnDataList(result);
+    }
+
+
+    /**
+     * grant namespace
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param namespaceIds namespace id array
+     * @return grant result code
+     */
+    @ApiOperation(value = "grantNamespace", notes = "GRANT_NAMESPACE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "namespaceIds", value = "NAMESPACE_IDS", required = true, type = "String")
+    })
+    @PostMapping(value = "/grant-namespace")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_K8S_NAMESPACE_ERROR)
+    @AccessLogAnnotation
+    public Result grantNamespace(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam(value = "userId") int userId,
+                                 @RequestParam(value = "namespaceIds") String namespaceIds) {
+        Map<String, Object> result = usersService.grantNamespaces(loginUser, userId, namespaceIds);
         return returnDataList(result);
     }
 

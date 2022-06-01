@@ -29,11 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +38,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringJUnit4ClassRunner.class)

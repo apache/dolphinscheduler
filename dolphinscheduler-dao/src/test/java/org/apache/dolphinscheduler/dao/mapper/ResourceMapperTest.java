@@ -17,33 +17,30 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class ResourceMapperTest extends BaseDaoTest {
 
@@ -231,17 +228,17 @@ public class ResourceMapperTest extends BaseDaoTest {
 
         IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
                 page,
-                0,
                 -1,
                 resource.getType().ordinal(),
+                1110,
                 "",
-                new ArrayList<>()
+                new ArrayList<>(resource.getId())
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
-                1110,
                 -1,
                 resource.getType().ordinal(),
+                1110,
                 "",
                 null
         );

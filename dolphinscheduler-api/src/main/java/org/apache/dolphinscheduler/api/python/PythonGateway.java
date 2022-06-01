@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.python;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -56,11 +58,14 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import py4j.GatewayServer;
 
-import org.apache.commons.collections.CollectionUtils;
-
+import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -70,21 +75,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import py4j.GatewayServer;
-
 @Component
 public class PythonGateway {
     private static final Logger logger = LoggerFactory.getLogger(PythonGateway.class);
 
-    private static final WarningType DEFAULT_WARNING_TYPE = WarningType.NONE;
-    private static final int DEFAULT_WARNING_GROUP_ID = 0;
     private static final FailureStrategy DEFAULT_FAILURE_STRATEGY = FailureStrategy.CONTINUE;
     private static final Priority DEFAULT_PRIORITY = Priority.MEDIUM;
     private static final Long DEFAULT_ENVIRONMENT_CODE = -1L;
@@ -200,6 +194,8 @@ public class PythonGateway {
      * @param globalParams global params
      * @param schedule schedule for process definition, will not set schedule if null,
      * and if would always fresh exists schedule if not null
+     * @param warningType warning type
+     * @param warningGroupId warning group id
      * @param locations locations json object about all tasks
      * @param timeout timeout for process definition working, if running time longer than timeout,
      * task will mark as fail
@@ -215,10 +211,13 @@ public class PythonGateway {
                                                 String description,
                                                 String globalParams,
                                                 String schedule,
+                                                String warningType,
+                                                int warningGroupId,
                                                 String locations,
                                                 int timeout,
                                                 String workerGroup,
                                                 String tenantCode,
+                                                int releaseState,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType) {
@@ -244,9 +243,9 @@ public class PythonGateway {
 
         // Fresh process definition schedule 
         if (schedule != null) {
-            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup);
+            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.getEnum(releaseState));
         return processDefinitionCode;
     }
 
@@ -283,25 +282,29 @@ public class PythonGateway {
      * @param processDefinitionCode process definition code
      * @param schedule schedule expression
      * @param workerGroup work group
+     * @param warningType warning type
+     * @param warningGroupId warning group id
      */
     private void createOrUpdateSchedule(User user,
                                         long projectCode,
                                         long processDefinitionCode,
                                         String schedule,
-                                        String workerGroup) {
+                                        String workerGroup,
+                                        String warningType,
+                                        int warningGroupId) {
         Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
-            Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, DEFAULT_WARNING_TYPE,
-                    DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+            Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, WarningType.valueOf(warningType),
+                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
-            schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, DEFAULT_WARNING_TYPE,
-                    DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+            schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
+                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
         schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
     }
@@ -311,6 +314,8 @@ public class PythonGateway {
                                     String processDefinitionName,
                                     String cronTime,
                                     String workerGroup,
+                                    String warningType,
+                                    int warningGroupId,
                                     Integer timeout
     ) {
         User user = usersService.queryUser(userName);
@@ -328,8 +333,8 @@ public class PythonGateway {
                 DEFAULT_FAILURE_STRATEGY,
                 null,
                 DEFAULT_TASK_DEPEND_TYPE,
-                DEFAULT_WARNING_TYPE,
-                DEFAULT_WARNING_GROUP_ID,
+                WarningType.valueOf(warningType),
+                warningGroupId,
                 DEFAULT_RUN_MODE,
                 DEFAULT_PRIORITY,
                 workerGroup,
@@ -527,8 +532,8 @@ public class PythonGateway {
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
-        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.get(Constants.DATA_LIST);
+        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
+        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.getData();
         List<ResourceComponent> namedResources = resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(namedResources)) {
             String msg = String.format("Can not find valid resource by program type %s and name %s", programType, fullName);

@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
 
 /**
  * DqTaskStatisticsValueMapper

@@ -17,18 +17,16 @@
 
 package org.apache.dolphinscheduler.service.permission;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
 
 import java.util.List;
-
-import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
     /**

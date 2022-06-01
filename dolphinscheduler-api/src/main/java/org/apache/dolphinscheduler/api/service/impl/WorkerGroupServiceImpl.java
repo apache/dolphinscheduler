@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.facebook.presto.jdbc.internal.guava.base.Strings;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -24,18 +27,22 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,15 +50,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.facebook.presto.jdbc.internal.guava.base.Strings;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_MANAGE;
 
 /**
  * worker group service impl
@@ -122,6 +123,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.insert(workerGroup);
         }
         putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
         return result;
     }
 
@@ -191,7 +193,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
 
-        List<WorkerGroup> workerGroups = getWorkerGroups(true);
+        List<WorkerGroup> workerGroups = new ArrayList<>();
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            workerGroups = getWorkerGroups(true);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            if (!ids.isEmpty()) {
+                workerGroups = workerGroupMapper.selectBatchIds(ids);
+            }
+        }
         List<WorkerGroup> resultDataList = new ArrayList<>();
         int total = 0;
 

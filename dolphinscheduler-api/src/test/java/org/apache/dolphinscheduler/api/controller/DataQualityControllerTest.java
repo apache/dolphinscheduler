@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.mockito.Mockito.when;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
@@ -29,14 +27,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +35,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Mockito.when;
 
 /**
  * process definition controller test

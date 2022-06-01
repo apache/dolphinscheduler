@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
-import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -29,28 +31,22 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
+import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
 /**
  * login controller

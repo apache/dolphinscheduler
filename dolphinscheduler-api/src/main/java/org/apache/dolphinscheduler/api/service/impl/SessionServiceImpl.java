@@ -17,29 +17,26 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * session service implement

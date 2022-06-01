@@ -22,13 +22,11 @@ import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
+import java.util.Map;
 
 /**
  * process definition service
@@ -295,6 +293,23 @@ public interface ProcessDefinitionService {
      * @return process definitions in the project
      */
     Map<String, Object> queryAllProcessDefinitionByProjectCode(User loginUser, long projectCode);
+
+    /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @return process definitions in the project
+     */
+    Map<String, Object> queryProcessDefinitionListByProjectCode(long projectCode);
+
+    /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @return process definitions in the project
+     */
+    Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode, Long processDefinitionCode);
 
     /**
      * Encapsulates the TreeView structure
