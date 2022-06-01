@@ -58,15 +58,12 @@ public class LocalServerHttpUtilsTest extends TestCase{
         httpget.setConfig(requestConfig);
 
         String responseContent = null;
-        for (int i = 0; i < 10; i++) {
-            responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
-            if (responseContent != null) {
-                break;
-            }
-        }
+        responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
         Assert.assertNotNull(responseContent);
+
         responseContent = HttpUtils.getResponseContentString(null, httpclient);
         Assert.assertNull(responseContent);
+
         responseContent = HttpUtils.getResponseContentString(httpget, null);
         Assert.assertNull(responseContent);
     }
