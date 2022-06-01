@@ -1340,8 +1340,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             logger.error("download resource error, the path is {}, and local filename is {}, the error message is {}", fileName, localFileName, e.getMessage());
             throw new ServerException("download the resource file failed ,it may be related to your storage");
         }
-
-
     }
 
     /**
