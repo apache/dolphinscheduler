@@ -35,7 +35,7 @@ public class LocalServerHttpUtilsTest extends TestCase{
     private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
     public static final Logger logger = LoggerFactory.getLogger(LocalServerHttpUtilsTest.class);
     private static LocalJettyHttpServer server = null;
-    public static Test suite() throws Exception {
+    public static Test suite(){
         TestSuite suite=new TestSuite();
         suite.addTestSuite(LocalServerHttpUtilsTest.class);
         server = new LocalJettyHttpServer(suite);
@@ -68,7 +68,7 @@ public class LocalServerHttpUtilsTest extends TestCase{
 
     public void testGetResponseContentString() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpGet httpget = new HttpGet("http://localhost:" + server.getServerPort() + "/test.json");
+        HttpGet httpget = new HttpGet("http://localhost:" +server.getServerPort()+"/test.json");
         /** set timeout、request time、socket timeout */
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
                 .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
