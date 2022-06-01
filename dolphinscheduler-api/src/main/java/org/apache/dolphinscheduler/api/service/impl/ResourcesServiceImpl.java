@@ -118,7 +118,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
-    
+
     @Autowired
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
@@ -352,7 +352,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
         String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = type.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -641,7 +642,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        Set<Integer> resourcesIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), logger);
+        AuthorizationType authorizationType = type.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        Set<Integer> resourcesIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(authorizationType, loginUser.getId(), logger);
         if (resourcesIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -767,7 +769,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), logger);
+        AuthorizationType authorizationType = type.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(authorizationType, loginUser.getId(), logger);
         if (resourceIds.isEmpty()){
             result.setData(Collections.emptyList());
             putMsg(result, Status.SUCCESS);
@@ -813,12 +816,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return resultCheck;
         }
         String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DELETE : ApiFuncIdentificationConstant.UDF_DELETE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = resource.getType().equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             putMsg(resultCheck, Status.NO_CURRENT_OPERATING_PERMISSION);
             return resultCheck;
         }
-        
+
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -964,7 +968,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
         String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resource.getId()}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = type.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resource.getId()}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -988,7 +993,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = resource.getType().equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1019,7 +1025,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = resource.getType().equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1088,7 +1095,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        
+
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -1125,7 +1132,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         updateParentResourceSize(resource, resource.getSize());
 
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
+        AuthorizationType authorizationType = resource.getType().equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
         Map<String, Object> resultMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
             if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
@@ -1202,7 +1210,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = resource.getType().equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1304,7 +1313,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DOWNLOAD : ApiFuncIdentificationConstant.UDF_DOWNLOAD;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        AuthorizationType authorizationType = resource.getType().equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, authorizationType, funcPermissionKey);
         if (!canOperatorPermissions){
             logger.error("{}: {}", Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), PropertyUtils.getResUploadStartupState());
             throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg());
@@ -1429,7 +1439,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-        
+
         List<UdfFunc> udfFuncList;
         if (isAdmin(loginUser)) {
             // admin gets all udfs except userId
@@ -1465,7 +1475,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Map<String, Object> result = new HashMap<>();
         if (!resourcePermissionCheckService.functionDisabled()){
             putMsg(result, Status.FUNCTION_DISABLED);
-            return result;    
+            return result;
         }
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
