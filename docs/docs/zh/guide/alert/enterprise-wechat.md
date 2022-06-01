@@ -33,7 +33,7 @@
 获取用户的userId请参考[官方文档](https://developer.work.weixin.qq.com/document/path/95402)根据手机号获取userId。
 下图是获取userId接口的示例:
 
-![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### 参考文档
 
@@ -62,7 +62,7 @@
 
 ![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-create-group.png)
 
-![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### 参考文档
 

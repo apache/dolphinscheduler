@@ -4,7 +4,7 @@
 
 - Click Project Management -> Workflow -> Workflow Instance, enter the Workflow Instance page, as shown in the figure below:
 
-![workflow-instance](../../../..../../../../img/new_ui/dev/project/workflow-instance.png)
+![workflow-instance](../../../../img/new_ui/dev/project/workflow-instance.png)
 
 - Click the workflow name to enter the DAG view page, and check the task execution status, as shown in the figure below:
 
@@ -38,7 +38,7 @@
 
 Click Project Management -> Workflow -> Workflow Instance, enter the workflow instance page, as shown in the figure below:
 
-![workflow-instance](../../../..../../../../img/new_ui/dev/project/workflow-instance.png)
+![workflow-instance](../../../../img/new_ui/dev/project/workflow-instance.png)
 
 - **Edit：** only processes with success/failed/stop status can be edited. Click the "Edit" button or the workflow instance name to enter the DAG edit page. After the edit, click the "Save" button to confirm, as shown in the figure below. In the pop-up box, check "Whether to update the workflow definition", after saving, the information modified by the instance will be updated to the workflow definition; if not checked, the workflow definition would not be updated.
      <p align="center">

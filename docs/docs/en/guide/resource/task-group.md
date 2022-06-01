@@ -6,11 +6,11 @@ The task group is mainly used to control the concurrency of task instances and i
 
 #### Create Task Group 
 
-![create-taskGroup](../../../..../../../../img/new_ui/dev/resource/create-taskGroup.png)
+![create-taskGroup](../../../../img/new_ui/dev/resource/create-taskGroup.png)
 
 The user clicks [Resources] - [Task Group Management] - [Task Group option] - [Create Task Group] 
 
-![create-taskGroup](../../../..../../../../img/new_ui/dev/resource/create-taskGroup.png) 
+![create-taskGroup](../../../../img/new_ui/dev/resource/create-taskGroup.png) 
 
 You need to enter the information inside the picture:
 

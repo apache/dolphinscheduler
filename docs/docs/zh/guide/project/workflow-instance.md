@@ -4,7 +4,7 @@
 
 - 点击项目管理->工作流->工作流实例，进入工作流实例页面，如下图所示：
 
-![workflow-instance](../../../..../../../../img/new_ui/dev/project/workflow-instance.png)
+![workflow-instance](../../../../img/new_ui/dev/project/workflow-instance.png)
           
 - 点击工作流名称，进入DAG查看页面，查看任务执行状态，如下图所示。
 
@@ -38,7 +38,7 @@
 
 点击项目管理->工作流->工作流实例，进入工作流实例页面，如下图所示：          
 
-![workflow-instance](../../../..../../../../img/new_ui/dev/project/workflow-instance.png)
+![workflow-instance](../../../../img/new_ui/dev/project/workflow-instance.png)
 
 - **编辑：** 只能编辑 成功/失败/停止 状态的流程。点击"编辑"按钮或工作流实例名称进入 DAG 编辑页面，编辑后点击"保存"按钮，弹出保存 DAG 弹框，如下图所示，修改流程定义信息，在弹框中勾选"是否更新工作流定义"，保存后则将实例修改的信息更新到工作流定义；若不勾选，则不更新工作流定义。
        <p align="center">

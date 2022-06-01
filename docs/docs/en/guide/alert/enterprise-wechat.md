@@ -34,7 +34,7 @@ The Enterprise WeChat APPs support sending messages to both specified users and 
 To acquire user `userId` refer to [Official Doc](https://developer.work.weixin.qq.com/document/path/95402), acquire `userId` by user phone number.
 The following is the `query userId` API example:
 
-![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### References
 
@@ -64,7 +64,7 @@ The following is the `create new group chat` API and `query userId` API example:
 
 ![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-create-group.png)
 
-![enterprise-wechat-create-group](../../../..../../../../img/alert/enterprise-wechat-query-userid.png)
+![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-query-userid.png)
 
 #### References
 
