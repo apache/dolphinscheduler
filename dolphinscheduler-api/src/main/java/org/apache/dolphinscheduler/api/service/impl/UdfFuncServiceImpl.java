@@ -137,6 +137,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         udfFuncMapper.insert(udf);
         putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
         return result;
     }
 
