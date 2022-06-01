@@ -89,8 +89,7 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token", required = false) String token) {
 
-        Map<String, Object> result = accessTokenService.createToken(loginUser, userId, expireTime, token);
-        return returnDataList(result);
+        return accessTokenService.createToken(loginUser, userId, expireTime, token);
     }
 
     /**

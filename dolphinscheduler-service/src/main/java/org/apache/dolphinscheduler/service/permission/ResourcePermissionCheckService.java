@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.permission;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ResourcePermissionCheckService<T>{
@@ -30,7 +31,7 @@ public interface ResourcePermissionCheckService<T>{
      * @param logger
      * @return
      */
-    boolean resourcePermissionCheck(AuthorizationType authorizationType, T[] needChecks, int userId, Logger logger);
+    boolean resourcePermissionCheck(AuthorizationType authorizationType, Object[] needChecks, Integer userId, Logger logger);
 
     /**
      * userOwnedResourceIdsAcquisition
@@ -40,15 +41,21 @@ public interface ResourcePermissionCheckService<T>{
      * @param <T>
      * @return
      */
-    <T> Set<T> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, int userId, Logger logger);
+    <T> Set<T> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, Integer userId, Logger logger);
 
     /**
      * operationpermissionCheck
      * @param authorizationType
      * @param userId
-     * @param sourceUrl
+     * @param permissionKey
      * @param logger
      * @return
      */
-    boolean operationPermissionCheck(AuthorizationType authorizationType, int userId, String sourceUrl, Logger logger);
+    boolean operationPermissionCheck(AuthorizationType authorizationType, Integer userId, String permissionKey, Logger logger);
+
+    /**
+     * functionDisabled
+     * @return
+     */
+    boolean functionDisabled();
 }

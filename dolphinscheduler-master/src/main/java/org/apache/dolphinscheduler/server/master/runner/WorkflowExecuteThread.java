@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import net.bytebuddy.implementation.bytecode.Throw;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
@@ -75,8 +76,8 @@ import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1974,6 +1975,15 @@ public class WorkflowExecuteThread {
         }
     }
 
+    public void resubmit(long taskCode) throws Exception {
+        ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskCode);
+        if (taskProcessor != null) {
+            taskProcessor.action(TaskAction.RESUBMIT);
+            logger.debug("RESUBMIT: task code:{}", taskCode);
+        } else {
+            throw new Exception("resubmit error, taskProcessor is null, task code: " + taskCode);
+        }
+    }
     private void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam) {
         // get start params from command param
         Map<String, String> startParamMap = new HashMap<>();

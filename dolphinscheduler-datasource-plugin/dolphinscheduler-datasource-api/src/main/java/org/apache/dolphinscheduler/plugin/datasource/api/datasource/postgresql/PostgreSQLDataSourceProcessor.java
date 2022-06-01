@@ -35,6 +35,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import com.google.common.base.Strings;
 
 @AutoService(DataSourceProcessor.class)
 public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
@@ -99,7 +100,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PostgreSQLConnectionParam postgreSqlConnectionParam = (PostgreSQLConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(postgreSqlConnectionParam.getOther())) {
+        if (!Strings.isNullOrEmpty(postgreSqlConnectionParam.getOther())) {
             return String.format("%s?%s", postgreSqlConnectionParam.getJdbcUrl(), postgreSqlConnectionParam.getOther());
         }
         return postgreSqlConnectionParam.getJdbcUrl();
@@ -133,7 +134,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
+        if (Strings.isNullOrEmpty(other)) {
             return null;
         }
         Map<String, String> otherMap = new LinkedHashMap<>();

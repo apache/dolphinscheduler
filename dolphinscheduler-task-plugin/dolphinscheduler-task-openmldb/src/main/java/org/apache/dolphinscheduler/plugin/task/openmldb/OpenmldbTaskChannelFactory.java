@@ -15,27 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.utils;
+package org.apache.dolphinscheduler.plugin.task.openmldb;
 
-import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.List;
 
-import io.netty.channel.epoll.Epoll;
+import com.google.auto.service.AutoService;
 
-/**
- * NettyUtilTest
- */
-public class NettyUtilTest {
-
-    @Test
-    public void testUserEpoll() {
-        if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
-            Assert.assertTrue(NettyUtils.useEpoll());
-        } else {
-            Assert.assertFalse(NettyUtils.useEpoll());
-        }
+@AutoService(TaskChannelFactory.class)
+public class OpenmldbTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public TaskChannel create() {
+        return new OpenmldbTaskChannel();
     }
 
+    @Override
+    public String getName() {
+        return "OPENMLDB";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return null;
+    }
 }

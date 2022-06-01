@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -27,6 +28,9 @@ import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class ZeppelinTask extends AbstractTaskExecutor {
@@ -73,9 +77,15 @@ public class ZeppelinTask extends AbstractTaskExecutor {
         try {
             String noteId = this.zeppelinParameters.getNoteId();
             String paragraphId = this.zeppelinParameters.getParagraphId();
+            String parameters = this.zeppelinParameters.getParameters();
+            Map<String, String> zeppelinParamsMap = new HashMap<>();
+            if (parameters != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                zeppelinParamsMap = mapper.readValue(parameters, Map.class);
+            }
 
             // Submit zeppelin task
-            ParagraphResult paragraphResult = this.zClient.executeParagraph(noteId, paragraphId);
+            ParagraphResult paragraphResult = this.zClient.executeParagraph(noteId, paragraphId, zeppelinParamsMap);
             String resultContent = paragraphResult.getResultInText();
             Status status = paragraphResult.getStatus();
             final int exitStatusCode = mapStatusToExitCode(status);

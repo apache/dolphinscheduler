@@ -15,33 +15,42 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.api.dto;
 
-import org.junit.Assert;
-import org.junit.Test;
 
-/**
- * hive conf utils test
- */
-public class HiveConfUtilsTest {
+import io.swagger.annotations.ApiModelProperty;
 
-    /**
-     * test is hive conf var
-     */
-    @Test
-    public void testIsHiveConfVar() {
+public class CreateTokenRequest {
+    @ApiModelProperty(example = "1", required = true)
+    Integer userId;
 
-        String conf = "hive.exec.script.wrapper=123";
-        boolean hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertTrue(hiveConfVar);
+    @ApiModelProperty(example = "2022-12-31 00:00:00", required = true)
+    String expireTime;
 
-        conf = "hive.test.v1=v1";
-        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertFalse(hiveConfVar);
+    @ApiModelProperty(example = "abc123xyz")
+    String token;
 
-        conf = "tez.queue.name=tezQueue";
-        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertTrue(hiveConfVar);
+    public Integer getUserId() {
+        return userId;
+    }
 
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(String expireTime) {
+        this.expireTime = expireTime;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

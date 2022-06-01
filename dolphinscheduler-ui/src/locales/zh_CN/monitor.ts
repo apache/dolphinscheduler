@@ -48,7 +48,9 @@ export default {
     health_state: '健康状态',
     max_connections: '最大连接数',
     threads_connections: '当前连接数',
-    threads_running_connections: '数据库当前活跃连接数'
+    threads_running_connections: '数据库当前活跃连接数',
+    db_no_data_result_title: 'DB节点不存在',
+    db_no_data_result_desc: '目前没有任何DB节点，请先创建DB节点，再访问该页面'
   },
   statistics: {
     command_number_of_waiting_for_running: '待执行的命令数',

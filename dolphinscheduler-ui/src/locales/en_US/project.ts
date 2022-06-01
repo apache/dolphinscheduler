@@ -606,6 +606,9 @@ export default {
     zeppelin_paragraph_id: 'zeppelinParagraphId',
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
+    zeppelin_parameters: 'parameters',
+    zeppelin_parameters_tips:
+      'Please enter the parameters for zeppelin dynamic form',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',
@@ -659,6 +662,14 @@ export default {
     mlflowProjectRepository_tips: 'github respository or path on worker',
     mlflowProjectVersion: 'Project Version',
     mlflowProjectVersion_tips: 'git version',
+    openmldb_zk_address: 'zookeeper address',
+    openmldb_zk_address_tips: 'Please enter the zookeeper address',
+    openmldb_zk_path: 'zookeeper path',
+    openmldb_zk_path_tips: 'Please enter the zookeeper path',
+    openmldb_execute_mode: 'Execute Mode',
+    openmldb_execute_mode_tips: 'Please select the execute mode',
+    openmldb_execute_mode_offline: 'offline',
+    openmldb_execute_mode_online: 'online',
     send_email: 'Send Email',
     log_display: 'Log display',
     rows_of_result: 'rows of result',
@@ -675,8 +686,10 @@ export default {
     please_select_source_datasource_id: 'Please select source datasource id',
     please_enter_source_table_name: 'Please select source table name',
     please_enter_filter_expression: 'Please enter filter expression',
-    please_enter_column_only_single_column_is_supported: 'Please select column, only single column is supported',
-    please_enter_threshold_number_is_needed: 'Please enter threshold number is needed',
+    please_enter_column_only_single_column_is_supported:
+      'Please select column, only single column is supported',
+    please_enter_threshold_number_is_needed:
+      'Please enter threshold number is needed',
     please_enter_comparison_title: 'please select comparison title'
   }
 }
