@@ -160,22 +160,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        IPage<Tenant> tenantIPage;
         Page<Tenant> page = new Page<>(pageNo, pageSize);
+        IPage<Tenant> tenantPage = tenantMapper.queryTenantPaging(page, searchVal);
+
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, loginUser.getId(), logger);
-            if (ids.isEmpty()) {
-                result.setData(pageInfo);
-                putMsg(result, Status.SUCCESS);
-                return result;
-            }
-            tenantIPage = tenantMapper.queryTenantPagingByIds(page, new ArrayList<>(ids), searchVal);
-        }
-        pageInfo.setTotal((int) tenantIPage.getTotal());
-        pageInfo.setTotalList(tenantIPage.getRecords());
+        pageInfo.setTotal((int) tenantPage.getTotal());
+        pageInfo.setTotalList(tenantPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
