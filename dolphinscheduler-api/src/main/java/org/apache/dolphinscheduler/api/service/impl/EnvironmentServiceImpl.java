@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -40,6 +41,7 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -148,6 +150,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             }
             result.put(Constants.DATA_LIST, env.getCode());
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.ENVIRONMENT, loginUser.getId(), Collections.singletonList(env.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_ENVIRONMENT_ERROR);
         }
@@ -163,14 +166,24 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @return environment list page
      */
     @Override
-    public Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal) {
-        Result result = new Result();
+    public Result queryEnvironmentListPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+        Result<Object> result = new Result();
 
         Page<Environment> page = new Page<>(pageNo, pageSize);
-
-        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
-
         PageInfo<EnvironmentDto> pageInfo = new PageInfo<>(pageNo, pageSize);
+        IPage<Environment> environmentIPage;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.setData(pageInfo);
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            environmentIPage = environmentMapper.queryEnvironmentListPagingByIds(page, new ArrayList<>(ids), searchVal);
+        }
+
         pageInfo.setTotal((int) environmentIPage.getTotal());
 
         if (CollectionUtils.isNotEmpty(environmentIPage.getRecords())) {

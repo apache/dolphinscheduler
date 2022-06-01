@@ -117,6 +117,7 @@ public class ResourcesServiceTest {
 
     private static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
+    private static final Logger resourceLogger = LoggerFactory.getLogger(ResourcesServiceImpl.class);
 
     @Before
     public void setUp() {
@@ -349,7 +350,7 @@ public class ResourcesServiceTest {
 
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 1, serviceLogger)).thenReturn(getSetIds());
+        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 1, resourceLogger)).thenReturn(getSetIds());
 
         Mockito.when(resourcesMapper.queryResourcePaging(Mockito.any(Page.class), eq(-1), eq(0), eq(1), eq("test"), Mockito.any())).thenReturn(resourcePage);
         Result result = resourcesService.queryResourceListPaging(loginUser, -1, ResourceType.FILE, "test", 1, 10);

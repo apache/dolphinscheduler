@@ -176,6 +176,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resourcesMapper.insert(resource);
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
             Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
@@ -269,6 +270,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resourcesMapper.insert(resource);
             updateParentResourceSize(resource, resource.getSize());
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
             Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
@@ -630,11 +632,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         Page<Resource> page = new Page<>(pageNo, pageSize);
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-
         if (directoryId != -1) {
             Resource directory = resourcesMapper.selectById(directoryId);
             if (directory == null) {
@@ -642,11 +639,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
         }
+        PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
 
         Set<Integer> resourcesIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), logger);
+        if (resourcesIds.isEmpty()) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), loginUser.getId(), searchVal, new ArrayList<>(resourcesIds));
-
-        PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) resourceIPage.getTotal());
         pageInfo.setTotalList(resourceIPage.getRecords());
         result.setData(pageInfo);
@@ -1124,6 +1125,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         updateParentResourceSize(resource, resource.getSize());
 
         putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
         Map<String, Object> resultMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
             if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
