@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LocalJettyHttpServer extends TestSetup {
     protected static Server server;
     private static Logger logger = LoggerFactory.getLogger(LocalJettyHttpServer.class);
-    private Integer serverPort = 8888;
+    private Integer serverPort = 0;
 
     public Integer getServerPort() {
         return serverPort;
@@ -44,10 +44,11 @@ public class LocalJettyHttpServer extends TestSetup {
         super(suite);
     }
 
+
     protected void setUp() throws Exception {
+        server = new Server(serverPort);
         while (true) {
             try {
-                server = new Server(serverPort);
                 ContextHandler context = new ContextHandler("/test.json");
                 context.setHandler(new AbstractHandler() {
                     @Override
@@ -66,14 +67,15 @@ public class LocalJettyHttpServer extends TestSetup {
                 server.setHandler(context);
                 logger.info("server for " + context.getBaseResource());
                 server.start();
-                logger.info("server is starting in port: "+serverPort);
+                serverPort = server.getConnectors()[0].getLocalPort();
+                logger.info("server is starting in port: " + serverPort);
             } catch (BindException e) {
-                server.stop();
-                logger.info("port: "+serverPort + " has been bind");
-                serverPort++;
-                continue;
+                logger.info("port: " + serverPort + " has been bind");
+                server.getConnectors()[0].setPort(++serverPort);
             }
-            break;
+            if (!server.isFailed()) {
+                break;
+            }
         }
     }
 
