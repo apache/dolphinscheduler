@@ -46,3 +46,7 @@ DolphinScheduler provides the following network port configurations for normal o
 ## Browser Requirements
 
 DolphinScheduler recommends Chrome and the latest browsers which use Chrome Kernel to access the front-end UI page.
+
+## JDK Version Requirements
+
+DolphinScheduler recommends using `JDK1.8.x` to deploy your server, as there are incompatibilities such as modularity with `JDK1.9+` versions. Other than that we don't care what JDK version you use to perform your Flink, MapReduce etc. tasks.

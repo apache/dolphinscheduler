@@ -45,3 +45,7 @@ DolphinScheduler正常运行提供如下的网络端口配置：
 ## 4. 客户端 Web 浏览器要求
 
 DolphinScheduler 推荐 Chrome 以及使用 Chromium 内核的较新版本浏览器访问前端可视化操作界面
+
+## 5. JDK版本要求
+
+DolphinScheduler 推荐使用 `JDK1.8.x` 来部署你的服务器，因为 `JDK1.9+` 的版本存在诸如模块化等不兼容的情况。除此之外我们并不关心你用什么JDK版本来执行你的 Flink, MapReduce 等任务。
