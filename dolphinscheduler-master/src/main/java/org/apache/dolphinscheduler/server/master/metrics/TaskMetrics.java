@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import java.util.function.Supplier;
+
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 
 
@@ -25,6 +28,26 @@ public final class TaskMetrics {
     private TaskMetrics() {
         throw new UnsupportedOperationException("Utility class");
     }
+
+    private static final Counter TASK_SUBMIT_COUNTER =
+            Counter.builder("dolphinscheduler_task_submit_count")
+                    .description("Task submit total count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter TASK_FINISH_COUNTER =
+            Counter.builder("dolphinscheduler_task_finish_count")
+                    .description("Task finish total count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter TASK_SUCCESS_COUNTER =
+            Counter.builder("dolphinscheduler_task_success_count")
+                    .description("Task success total count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter TASK_FAILURE_COUNTER =
+            Counter.builder("dolphinscheduler_task_failure_count")
+                    .description("Task failure total count")
+                    .register(Metrics.globalRegistry);
 
     private static final Counter TASK_TIMEOUT_COUNTER =
             Counter.builder("dolphinscheduler_task_timeout_count")
@@ -36,11 +59,42 @@ public final class TaskMetrics {
                     .description("Task retry total count")
                     .register(Metrics.globalRegistry);
 
+    private static final Counter TASK_STOP_COUNTER =
+            Counter.builder("dolphinscheduler_task_stop_count")
+                    .description("Task stop total count")
+                    .register(Metrics.globalRegistry);
+
+    public static void incTaskSubmit() {
+        TASK_SUBMIT_COUNTER.increment();
+    }
+
+    public synchronized static void registerTaskRunning(Supplier<Number> consumer) {
+        Gauge.builder("dolphinscheduler_task_running_gauge", consumer)
+                .description("Task running count")
+                .register(Metrics.globalRegistry);
+    }
+
+    public static void incTaskFinish() {
+        TASK_FINISH_COUNTER.increment();
+    }
+
+    public static void incTaskSuccess() {
+        TASK_SUCCESS_COUNTER.increment();
+    }
+
+    public static void incTaskFailure() {
+        TASK_FAILURE_COUNTER.increment();
+    }
+
     public static void incTaskTimeout() {
         TASK_TIMEOUT_COUNTER.increment();
     }
 
     public static void incTaskRetry() {
         TASK_RETRY_COUNTER.increment();
+    }
+
+    public static void incTaskStop() {
+        TASK_STOP_COUNTER.increment();
     }
 }

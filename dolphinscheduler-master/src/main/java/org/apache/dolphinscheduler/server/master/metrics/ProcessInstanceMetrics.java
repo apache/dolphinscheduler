@@ -39,6 +39,25 @@ public final class ProcessInstanceMetrics {
                     .description("Process instance timeout total count")
                     .register(Metrics.globalRegistry);
 
+    private static final Counter PROCESS_INSTANCE_FINISH_COUNTER =
+            Counter.builder("dolphinscheduler_process_instance_finish_count")
+                    .description("Process instance finish total count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter PROCESS_INSTANCE_SUCCESS_COUNTER =
+            Counter.builder("dolphinscheduler_process_instance_success_count")
+                    .description("Process instance success total count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter PROCESS_INSTANCE_FAILURE_COUNTER =
+            Counter.builder("dolphinscheduler_process_instance_failure_count")
+                    .description("Process instance failure total count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter PROCESS_INSTANCE_STOP_COUNTER =
+            Counter.builder("dolphinscheduler_process_instance_stop_count")
+                    .description("Process instance stop total count")
+                    .register(Metrics.globalRegistry);
 
     public static synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
         Gauge.builder("dolphinscheduler_process_instance_running_gauge", function)
@@ -52,6 +71,22 @@ public final class ProcessInstanceMetrics {
 
     public static void incProcessInstanceTimeout() {
         PROCESS_INSTANCE_TIMEOUT_COUNTER.increment();
+    }
+
+    public static void incProcessInstanceFinish() {
+        PROCESS_INSTANCE_FINISH_COUNTER.increment();
+    }
+
+    public static void incProcessInstanceSuccess() {
+        PROCESS_INSTANCE_SUCCESS_COUNTER.increment();
+    }
+
+    public static void incProcessInstanceFailure() {
+        PROCESS_INSTANCE_FAILURE_COUNTER.increment();
+    }
+
+    public static void incProcessInstanceStop() {
+        PROCESS_INSTANCE_STOP_COUNTER.increment();
     }
 
 }

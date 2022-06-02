@@ -251,6 +251,7 @@ public class WorkflowExecuteRunnable implements Runnable {
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
+        TaskMetrics.registerTaskRunning(readyToSubmitTaskQueue::size);
     }
 
     /**
@@ -319,9 +320,11 @@ public class WorkflowExecuteRunnable implements Runnable {
         boolean result = false;
         switch (stateEvent.getType()) {
             case PROCESS_STATE_CHANGE:
+                measureProcessState(stateEvent);
                 result = processStateChangeHandler(stateEvent);
                 break;
             case TASK_STATE_CHANGE:
+                measureTaskState(stateEvent);
                 result = taskStateChangeHandler(stateEvent);
                 break;
             case PROCESS_TIMEOUT:
@@ -443,10 +446,10 @@ public class WorkflowExecuteRunnable implements Runnable {
 
     private void taskFinished(TaskInstance taskInstance) {
         logger.info("work flow {} task id:{} code:{} state:{} ",
-            processInstance.getId(),
-            taskInstance.getId(),
-            taskInstance.getTaskCode(),
-            taskInstance.getState());
+                processInstance.getId(),
+                taskInstance.getId(),
+                taskInstance.getTaskCode(),
+                taskInstance.getState());
 
         activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
         stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
@@ -738,7 +741,7 @@ public class WorkflowExecuteRunnable implements Runnable {
             scheduleDate = complementListDate.get(0);
         } else if (processInstance.getState().typeIsFinished()) {
             endProcess();
-            if (complementListDate.size() <= 0) {
+            if (complementListDate.isEmpty()) {
                 logger.info("process complement end. process id:{}", processInstance.getId());
                 return true;
             }
@@ -749,9 +752,9 @@ public class WorkflowExecuteRunnable implements Runnable {
                 return true;
             }
             logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
-                processInstance.getId(),
-                processInstance.getScheduleTime(),
-                complementListDate.toString());
+                    processInstance.getId(),
+                    processInstance.getScheduleTime(),
+                    complementListDate);
             scheduleDate = complementListDate.get(index + 1);
         }
         //the next process complement
@@ -1733,7 +1736,8 @@ public class WorkflowExecuteRunnable implements Runnable {
                 return;
             }
             logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
-                taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
+                    taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
+            TaskMetrics.incTaskSubmit();
             readyToSubmitTaskQueue.put(taskInstance);
         } catch (Exception e) {
             logger.error("add task instance to readyToSubmitTaskQueue, taskName:{}, task id:{}", taskInstance.getName(), taskInstance.getId(), e);
@@ -2026,6 +2030,44 @@ public class WorkflowExecuteRunnable implements Runnable {
                     globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
                 }
             }
+        }
+    }
+
+    private void measureProcessState(StateEvent processStateEvent) {
+        if (processStateEvent.getExecutionStatus().typeIsFinished()) {
+            ProcessInstanceMetrics.incProcessInstanceFinish();
+        }
+        switch (processStateEvent.getExecutionStatus()) {
+            case STOP:
+                ProcessInstanceMetrics.incProcessInstanceStop();
+                break;
+            case SUCCESS:
+                ProcessInstanceMetrics.incProcessInstanceSuccess();
+                break;
+            case FAILURE:
+                ProcessInstanceMetrics.incProcessInstanceFailure();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void measureTaskState(StateEvent taskStateEvent) {
+        if (taskStateEvent.getExecutionStatus().typeIsFinished()) {
+            TaskMetrics.incTaskFinish();
+        }
+        switch (taskStateEvent.getExecutionStatus()) {
+            case STOP:
+                TaskMetrics.incTaskStop();
+                break;
+            case SUCCESS:
+                TaskMetrics.incTaskSuccess();
+                break;
+            case FAILURE:
+                TaskMetrics.incTaskFailure();
+                break;
+            default:
+                break;
         }
     }
 }
