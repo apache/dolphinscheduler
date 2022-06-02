@@ -2,7 +2,7 @@
 
 如果您需要使用到`Shell`脚本进行告警，请在告警实例管理里创建告警实例，选择`Script`插件。`Script`的配置样例如下:
 
-![dingtalk-plugin](/img/alert/script-plugin.png)
+![dingtalk-plugin](../../../../img/alert/script-plugin.png)
 
 参数配置
 
