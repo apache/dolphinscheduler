@@ -66,16 +66,16 @@ The following are the operation functions of the workflow definition list:
  
   Description of workflow operating parameters: 
        
-      * Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process
-      * Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if sucess, send of failure, send whatever result
-      * Process priority: The priority of process operation, divide into five levels: highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), and lowest (LOWEST). When the number of master threads is insufficient, high priority processes will execute first in the execution queue, and processes with the same priority will execute in the order of first in, first out;
-      * Worker group: The process can only be executed in the specified worker machine group. The default is `Default`, which can execute on any worker
-      * Notification group: select notification strategy||timeout alarm||when fault tolerance occurs, process result information or email will send to all members in the notification group
-      * Recipient: select notification policy||timeout alarm||when fault tolerance occurs, process result information or alarm email will be sent to the recipient list
-      * Cc: select notification policy||timeout alarm||when fault tolerance occurs, the process result information or warning email will be copied to the CC list
-      * Startup parameter: Set or overwrite global parameter values when starting a new process instance
-      * Complement: two modes including serial complement and parallel complement. Serial complement: within the specified time range, the complements are executed from the start date to the end date and N process instances are generated in turn; parallel complement: within the specified time range, multiple days are complemented at the same time to generate N process instances.
-    * You can select complement time range (only support continuous date) when executing a timing workflow definition. For example, need to fill in the data from 1st May to 10th May, as shown in the figure below:
+    * Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process
+    * Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if sucess, send of failure, send whatever result
+    * Process priority: The priority of process operation, divide into five levels: highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), and lowest (LOWEST). When the number of master threads is insufficient, high priority processes will execute first in the execution queue, and processes with the same priority will execute in the order of first in, first out;
+    * Worker group: The process can only be executed in the specified worker machine group. The default is `Default`, which can execute on any worker
+    * Notification group: select notification strategy||timeout alarm||when fault tolerance occurs, process result information or email will send to all members in the notification group
+    * Recipient: select notification policy||timeout alarm||when fault tolerance occurs, process result information or alarm email will be sent to the recipient list
+    * Cc: select notification policy||timeout alarm||when fault tolerance occurs, the process result information or warning email will be copied to the CC list
+    * Startup parameter: Set or overwrite global parameter values when starting a new process instance
+    * Complement: two modes including serial complement and parallel complement. Serial complement: within the specified time range, the complements are executed from the start date to the end date and N process instances are generated in turn; parallel complement: within the specified time range, multiple days are complemented at the same time to generate N process instances.
+      * You can select complement time range (When the scheduled configuration is not online, the daily complement will be performed by default according to the selected time range.If the timing configuration is online, it will be complemented according to the selected time range in combination with the timing configuration) when executing a timing workflow definition. For example, need to fill in the data from 1st May to 10th May, as shown in the figure below:
 
     ![workflow-date](/img/new_ui/dev/project/workflow-date.png)
 
