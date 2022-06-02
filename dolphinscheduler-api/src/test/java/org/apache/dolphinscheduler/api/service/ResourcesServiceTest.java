@@ -135,7 +135,7 @@ public class ResourcesServiceTest {
     @Test
     public void testCreateResource() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
@@ -177,7 +177,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.RESOURCE_SUFFIX_FORBID_CHANGE.getMsg(), result.getMsg());
 
         //UDF_RESOURCE_SUFFIX_NOT_JAR
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.UDF_FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.UDF_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         mockMultipartFile = new MockMultipartFile("ResourcesServiceTest.pdf", "ResourcesServiceTest.pdf", "pdf", "test".getBytes());
@@ -187,7 +187,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), result.getMsg());
 
         //FULL_FILE_NAME_TOO_LONG
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         String tooLongFileName = getRandomStringWithLength(Constants.RESOURCE_FULL_NAME_MAX_LENGTH) + ".pdf";
