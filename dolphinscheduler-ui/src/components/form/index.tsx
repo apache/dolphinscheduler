@@ -36,7 +36,7 @@ const props = {
 }
 
 const Form = defineComponent({
-  name: 'Form',
+  name: 'DSForm',
   props,
   setup(props, { expose }) {
     const { state, ...rest } = useForm()
