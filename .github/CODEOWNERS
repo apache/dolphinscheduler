@@ -16,11 +16,26 @@
 #
 
 /.github/ @kezhenxu94 @SbloodyS
-/dolphinscheduler-alert/ @kezhenxu94
-/dolphinscheduler-e2e/ @kezhenxu94
-/dolphinscheduler-registry/ @kezhenxu94
-/dolphinscheduler-standalone-server/ @kezhenxu94
+/dolphinscheduler-alert/ @kezhenxu94 @caishunfeng
+/dolphinscheduler-e2e/ @kezhenxu94 @SbloodyS
+/dolphinscheduler-registry/ @kezhenxu94 @caishunfeng
+/dolphinscheduler-api/ @caishunfeng
+/dolphinscheduler-dao/ @caishunfeng
+/dolphinscheduler-common/ @caishunfeng
+/dolphinscheduler-data-quality/ @zixi0825
+/dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
+/dolphinscheduler-log-server/ @caishunfeng
+/dolphinscheduler-master/ @caishunfeng @SbloodyS
+/dolphinscheduler-worker/ @caishunfeng @SbloodyS
+/dolphinscheduler-server/ @caishunfeng
+/dolphinscheduler-service/ @caishunfeng
+/dolphinscheduler-remote/ @caishunfeng
+/dolphinscheduler-spi/ @caishunfeng
+/dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @zhuangchong
+/dolphinscheduler-tools/ @caishunfeng @SbloodyS @zhongjiajie
+/script/ @caishunfeng @SbloodyS @zhongjiajie
 /dolphinscheduler-python/ @zhongjiajie
+/dolphinscheduler-ui/ @songjianet
 /docs/ @zhongjiajie @Tianqi-Dotes
 
 # All pom files
