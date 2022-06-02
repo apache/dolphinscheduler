@@ -33,9 +33,9 @@ import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.jets3t.service.ServiceException;
 import org.slf4j.Logger;
@@ -68,11 +68,11 @@ public class S3Utils implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(S3Utils.class);
 
-    public static final String ACCESS_KEY_ID = PropertyUtils.getString(Constants.AWS_ACCESS_KEY_ID);
+    public static final String ACCESS_KEY_ID = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
 
-    public static final String SECRET_KEY_ID = PropertyUtils.getString(Constants.AWS_SECRET_ACCESS_KEY);
+    public static final String SECRET_KEY_ID = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
 
-    public static final String REGION = PropertyUtils.getString(Constants.AWS_REGION);
+    public static final String REGION = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
 
     private AmazonS3 s3Client = null;
