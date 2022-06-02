@@ -28,5 +28,6 @@ public interface AlertChannel {
      * @param info alert info
      * @return process alarm result
      */
+    
     AlertResult process(AlertInfo info);
 }
