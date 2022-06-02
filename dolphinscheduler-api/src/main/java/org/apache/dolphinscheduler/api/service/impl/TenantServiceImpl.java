@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -38,13 +39,19 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
@@ -54,6 +61,8 @@ import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_
  */
 @Service
 public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TenantServiceImpl.class);
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -126,6 +135,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()),logger);
 
         return result;
     }
@@ -147,12 +157,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
         Page<Tenant> page = new Page<>(pageNo, pageSize);
-        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
+        IPage<Tenant> tenantPage = tenantMapper.queryTenantPaging(page, searchVal);
+
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) tenantIPage.getTotal());
-        pageInfo.setTotalList(tenantIPage.getRecords());
+        pageInfo.setTotal((int) tenantPage.getTotal());
+        pageInfo.setTotalList(tenantPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

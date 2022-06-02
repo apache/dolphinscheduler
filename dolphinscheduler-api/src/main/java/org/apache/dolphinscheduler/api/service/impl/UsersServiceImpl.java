@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
@@ -76,6 +78,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 
 /**
  * users service impl
@@ -1023,15 +1027,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if(resourcePermissionCheckService.functionDisabled()){
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN, USER_MANAGER)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("id", 0);
+        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
+            queryWrapper.eq("id", loginUser.getId());
+        }
         List<User> userList = userMapper.selectList(null);
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);

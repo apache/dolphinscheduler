@@ -117,6 +117,7 @@ public class ResourcesServiceTest {
 
     private static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
+    private static final Logger resourceLogger = LoggerFactory.getLogger(ResourcesServiceImpl.class);
 
     @Before
     public void setUp() {
@@ -144,13 +145,27 @@ public class ResourcesServiceTest {
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.GENERAL_USER);
+
+        //CURRENT_LOGIN_USER_TENANT_NOT_EXIST
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(null);
+        Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, mockMultipartFile, -1, "/");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        //set tenant for user
+        user.setTenantId(1);
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+
         //HDFS_NOT_STARTUP
-        Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null, -1, "/");
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null, -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_FILE_IS_EMPTY
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
+        mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, mockMultipartFile, -1, "/");
         logger.info(result.toString());
@@ -263,8 +278,8 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(storageOperate.getFileName(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn("test1");
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF_FILE, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF_FILE, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         try {
             Mockito.when(storageOperate.exists(Mockito.any(), Mockito.any())).thenReturn(false);
         } catch (IOException e) {
@@ -335,7 +350,7 @@ public class ResourcesServiceTest {
 
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 1, serviceLogger)).thenReturn(getSetIds());
+        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 1, resourceLogger)).thenReturn(getSetIds());
 
         Mockito.when(resourcesMapper.queryResourcePaging(Mockito.any(Page.class), eq(-1), eq(0), eq(1), eq("test"), Mockito.any())).thenReturn(resourcePage);
         Result result = resourcesService.queryResourceListPaging(loginUser, -1, ResourceType.FILE, "test", 1, 10);

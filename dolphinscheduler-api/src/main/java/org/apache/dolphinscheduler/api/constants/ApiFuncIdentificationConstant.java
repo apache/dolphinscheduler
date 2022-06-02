@@ -63,25 +63,6 @@ public class ApiFuncIdentificationConstant {
     public static final String CALENDAR_MANAGE = "security:calendar:view";
     public static final String CARDS_MANAGER = "security:cards:view";
     public static final String USER_MANAGER = "security:user:view";
-    public static final String ALL_ROLES = "security:user:roles";
-    public static final String USERS_CREATE = "security:user:create";
-    public static final String USERS_IMPORT = "security:user:import";
-    public static final String DOWNLOAD_TEMPLATE = "security:user:template";
-    public static final String USER_UPDATE = "security:user:update";
-    public static final String USER_ROLE_ASSOCIATEDE = "security:user:role";
-    public static final String USER_VIEW_PERMISSIONS = "security:user:permission";
-    public static final String USER_RESET_PASSWORD = "security:user:reset-pwd";
-    public static final String USER_DELETE = "security:user:delete";
-    public static final String USER_REVOKE_PROJECT = "security:user:revoke:project";
-    public static final String USER_GRANT_K8SNAMESPACE = "security:user:grant:k8snamespace";
-    public static final String USER_GRANT_PROJECT = "security:user:grant:project";
-    public static final String USER_BATCH_DELETION = "security:user:batch-delete";
-    public static final String ROLE_MANAGER = "security:role:view";
-    public static final String ROLE_CREATE = "security:role:create";
-    public static final String ROLE_RENAME = "security:role:rename";
-    public static final String ROLE_DELETE = "security:role:delete";
-    public static final String VIEW_PERMISSION = "security:role:permission-view";
-    public static final String ASSIGN_PERMISSION = "security:role:permission-assign";
 
     public static final String PROJECT = "project:view";
     public static final String PROJECT_CREATE = "project:create";

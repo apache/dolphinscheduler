@@ -51,9 +51,6 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
-    public static final String AWS_ACCESS_KEY_ID = "aws.access.key.id";
-    public static final String AWS_SECRET_ACCESS_KEY = "aws.secret.access.key";
-    public static final String AWS_REGION = "aws.region";
     public static final String FOLDER_SEPARATOR = "/";
 
     public static final String RESOURCE_TYPE_FILE = "resources";
