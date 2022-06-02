@@ -82,7 +82,6 @@ class WorkflowE2ETest {
 
     @AfterAll
     public static void cleanup() {
-        browser.navigate().refresh();
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .goTo(project)
@@ -90,7 +89,6 @@ class WorkflowE2ETest {
             .cancelPublishAll()
             .deleteAll()
         ;
-        browser.navigate().refresh();
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .delete(project)
@@ -104,7 +102,6 @@ class WorkflowE2ETest {
     @Order(1)
     void testCreateWorkflow() {
         final String workflow = "test-workflow-1";
-        browser.navigate().refresh();
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
@@ -131,7 +128,6 @@ class WorkflowE2ETest {
                 .anyMatch(
                         it -> it.getText().contains(workflow)
                 ));
-        browser.navigate().refresh();
         workflowDefinitionPage.publish(workflow);
     }
 
@@ -139,7 +135,6 @@ class WorkflowE2ETest {
     @Order(10)
     void testCreateSubWorkflow() {
         final String workflow = "test-sub-workflow-1";
-        browser.navigate().refresh();
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
@@ -164,7 +159,6 @@ class WorkflowE2ETest {
         await().untilAsserted(() -> assertThat(
             workflowDefinitionPage.workflowList()
         ).anyMatch(it -> it.getText().contains(workflow)));
-        browser.navigate().refresh();
         workflowDefinitionPage.publish(workflow);
     }
 
@@ -172,7 +166,6 @@ class WorkflowE2ETest {
     @Order(30)
     void testRunWorkflow() {
         final String workflow = "test-workflow-1";
-        browser.navigate().refresh();
         final ProjectDetailPage projectPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -181,7 +174,6 @@ class WorkflowE2ETest {
         projectPage
                 .goToTab(WorkflowInstanceTab.class)
                 .deleteAll();
-        browser.navigate().refresh();
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow)
@@ -199,7 +191,6 @@ class WorkflowE2ETest {
             assertThat(row.isSuccess()).isTrue();
             assertThat(row.executionTime()).isEqualTo(1);
         });
-        browser.navigate().refresh();
         // Test rerun
         projectPage
                 .goToTab(WorkflowInstanceTab.class)
