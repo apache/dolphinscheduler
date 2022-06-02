@@ -132,7 +132,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-
         result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
         return result;
