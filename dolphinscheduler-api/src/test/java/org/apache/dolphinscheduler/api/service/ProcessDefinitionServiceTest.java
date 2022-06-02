@@ -479,7 +479,7 @@ public class ProcessDefinitionServiceTest {
         //project check auth fail
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,null)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.verifyProcessDefinitionName(loginUser,
                 projectCode, "test_pdf");
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
