@@ -35,6 +35,10 @@ export function useEmr(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.emr_flow_define_json_tips')
       }
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: true
+    })
   ]
 }
