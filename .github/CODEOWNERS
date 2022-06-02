@@ -22,7 +22,6 @@
 /dolphinscheduler-api/ @caishunfeng
 /dolphinscheduler-dao/ @caishunfeng
 /dolphinscheduler-common/ @caishunfeng
-/dolphinscheduler-data-quality/ @zixi0825
 /dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-log-server/ @caishunfeng
 /dolphinscheduler-master/ @caishunfeng @SbloodyS
