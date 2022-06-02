@@ -125,7 +125,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
 You could access DolphinScheduler web UI by click [http://localhost:12345/dolphinscheduler/ui](http://localhost:12345/dolphinscheduler/ui)
 and use `admin` and `dolphinscheduler123` as default username and password in the login page.
 
-![login](/img/new_ui/dev/quick-start/login.png)
+![login](../../../../img/new_ui/dev/quick-start/login.png)
 
 > Note: If you start the services by the way [using exists PostgreSQL ZooKeeper](#using-exists-postgresql-zookeeper), and
 > strating with multiple machine, you should change URL domain from `localhost` to IP or hostname the api server running.

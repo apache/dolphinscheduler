@@ -2,7 +2,7 @@
 
 ## Use HiveServer2
 
-![hive](/img/new_ui/dev/datasource/hive.png)
+![hive](../../../../img/new_ui/dev/datasource/hive.png)
 
 - Datasource: select `HIVE`
 - Datasource name: enter the name of the DataSource
@@ -19,7 +19,7 @@
 
 ## Use HiveServer2 HA ZooKeeper
 
-![hive-server2](/img/new_ui/dev/datasource/hiveserver2.png)
+![hive-server2](../../../../img/new_ui/dev/datasource/hiveserver2.png)
 
 NOTICE: If Kerberos is disabled, ensure the parameter `hadoop.security.authentication.startup.state` is false, and parameter `java.security.krb5.conf.path` value sets null. 
 If **Kerberos** is enabled, needs to set the following parameters  in `common.properties`: 

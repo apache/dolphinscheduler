@@ -4,7 +4,7 @@
 
 点击"项目管理"进入项目管理页面，点击“创建项目”按钮，输入项目名称，项目描述，点击“提交”，创建新的项目。
 
-![project](/img/new_ui/dev/project/project-list.png)
+![project](../../../../img/new_ui/dev/project/project-list.png)
 
 ## 项目首页
 
@@ -14,4 +14,4 @@
 - **流程状态统计**：在指定时间范围内，统计工作流实例中状态为提交成功、正在运行、准备暂停、暂停、准备停止、停止、失败、成功、需要容错、kill、等待线程的个数
 - **工作流定义统计**：统计用户创建的工作流定义及管理员授予该用户的工作流定义
 
-![project-overview](/img/new_ui/dev/project/project-overview.png)
+![project-overview](../../../../img/new_ui/dev/project/project-overview.png)

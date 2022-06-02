@@ -8,25 +8,25 @@
 
 ## 基础操作
 
-![file-manage](/img/new_ui/dev/resource/file-manage.png)
+![file-manage](../../../../img/new_ui/dev/resource/file-manage.png)
 
 ### 创建文件
 
 文件格式支持以下几种类型：txt、log、sh、conf、cfg、py、java、sql、xml、hql、properties
 
-![create-file](/img/new_ui/dev/resource/create-file.png)
+![create-file](../../../../img/new_ui/dev/resource/create-file.png)
 
 ### 上传文件
 
 上传文件：点击"上传文件"按钮进行上传，将文件拖拽到上传区域，文件名会自动以上传的文件名称补全
 
-![upload-file](/img/new_ui/dev/resource/upload-file.png)
+![upload-file](../../../../img/new_ui/dev/resource/upload-file.png)
 
 ### 文件查看
 
 对可查看的文件类型，点击文件名称，可查看文件详情
 
-![file_detail](/img/tasks/demo/file_detail.png)
+![file_detail](../../../../img/tasks/demo/file_detail.png)
 
 ### 下载文件
 
@@ -34,7 +34,7 @@
 
 ### 文件重命名
 
-![rename-file](/img/new_ui/dev/resource/rename-file.png)
+![rename-file](../../../../img/new_ui/dev/resource/rename-file.png)
 
 ### 删除文件
 
@@ -44,7 +44,7 @@
 
 点击文件列表中的”重新上传文件“按钮进行重新上传文件，将文件拖拽到上传区域，文件名会自动以上传的文件名称补全
 
-![reuplod_file](/img/reupload_file_en.png)
+![reuplod_file](../../../../img/reupload_file_en.png)
 
 > 注意：上传、创建、重命名文件时，文件名和源文件名（上传时）均不能带有 `.` 以及 `/` 特殊符号。
 
@@ -56,7 +56,7 @@
 
 创建一个 shell 文件，输出 “hello world”。
 
-![create-shell](/img/new_ui/dev/resource/demo/file-demo01.png)
+![create-shell](../../../../img/new_ui/dev/resource/demo/file-demo01.png)
 
 ### 创建工作流执行文件
 
@@ -65,13 +65,13 @@
 - 脚本：`sh hello.sh`
 - 资源：选择 `hello.sh`
 
-![use-shell](/img/new_ui/dev/resource/demo/file-demo02.png)
+![use-shell](../../../../img/new_ui/dev/resource/demo/file-demo02.png)
 
 ### 查看结果
 
 可以在工作流实例中，查看该节点运行的日志结果。如下图：
 
-![log-shell](/img/new_ui/dev/resource/demo/file-demo03.png)
+![log-shell](../../../../img/new_ui/dev/resource/demo/file-demo03.png)
 
 
 

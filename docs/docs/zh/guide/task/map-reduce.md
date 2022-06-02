@@ -7,7 +7,7 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入 DAG 编辑页面。
-- 拖动工具栏中的 <img src="/img/tasks/icons/mr.png" width="15"/> 任务节点到画板中，如下图所示：
+- 拖动工具栏中的 <img src="../../../../img/tasks/icons/mr.png" width="15"/> 任务节点到画板中，如下图所示：
 
 ## 任务参数
 
@@ -56,7 +56,7 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 
 若生产环境中要是使用到 MapReduce 任务类型，则需要先配置好所需的环境。配置文件如下：`bin/env/dolphinscheduler_env.sh`。
 
-![mr_configure](/img/tasks/demo/mr_task01.png)
+![mr_configure](../../../../img/tasks/demo/mr_task01.png)
 
 #### 上传主程序包
 
@@ -64,10 +64,10 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 
 当配置完成资源中心之后，直接使用拖拽的方式，即可上传所需目标文件。
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
 #### 配置 MapReduce 节点
 
 根据上述参数说明，配置所需的内容即可。
 
-![demo-mr-simple](/img/tasks/demo/mr_task02.png)
+![demo-mr-simple](../../../../img/tasks/demo/mr_task02.png)

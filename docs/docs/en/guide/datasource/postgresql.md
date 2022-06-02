@@ -1,6 +1,6 @@
 # PostgreSQL
 
-![postgresql](/img/new_ui/dev/datasource/postgresql.png)
+![postgresql](../../../../img/new_ui/dev/datasource/postgresql.png)
 
 - Datasource: select POSTGRESQL
 - Datasource name: enter the name of the DataSource

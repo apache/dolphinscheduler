@@ -103,7 +103,7 @@ public final class LoginPage extends NavBarPage {
     }
 ```
 
-![SecurityPage](/img/e2e-test/SecurityPage.png)
+![SecurityPage](../../../img/e2e-test/SecurityPage.png)
 
 对于导航栏选项的跳转，在`org/apache/dolphinscheduler/e2e/pages/common/NavBarPage.java` 中提供了 goToNav 的方法。当前支持的页面为：项目管理（ProjectPage）、安全中心（SecurityPage）和资源中心（ResourcePage）。
 
@@ -138,7 +138,7 @@ public final class LoginPage extends NavBarPage {
 
 当前所支持的 E2E 测试案例，主要包括：文件管理、项目管理、队列管理、租户管理、用户管理、Worker 分组管理和工作流测试。
 
-![E2E_Cases](/img/e2e-test/E2E_Cases.png)
+![E2E_Cases](../../../img/e2e-test/E2E_Cases.png)
 
 下面以租户管理测试为例，前文已经说明，我们使用 docker-compose 进行部署，所以每个测试案例，都需要以注解的形式引入对应的文件。
 
@@ -183,12 +183,12 @@ https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-e2e/dolphin
 
 如果是`M1`芯片的机器，可以使用`-Dm1_chip=true` 参数,用于配置使用`ARM64`支持的容器。
 
-![Dlocal](/img/e2e-test/Dlocal.png)
+![Dlocal](../../../img/e2e-test/Dlocal.png)
 
 在本地运行过程中，如果出现连接超时，可增大加载时间，建议 30 及其以上。
 
-![timeout](/img/e2e-test/timeout.png)
+![timeout](../../../img/e2e-test/timeout.png)
 
 测试的运行过程将会以 MP4 的文件格式存在。
 
-![MP4](/img/e2e-test/MP4.png)
+![MP4](../../../img/e2e-test/MP4.png)

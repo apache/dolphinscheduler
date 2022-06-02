@@ -7,7 +7,7 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入DAG编辑页面。
-- 工具栏中拖动 <img src="/img/tasks/icons/kubernetes.png" width="25"/> 到画板中，选择需要连接的数据源，即可完成创建。
+- 工具栏中拖动 <img src="../../../../img/tasks/icons/kubernetes.png" width="25"/> 到画板中，选择需要连接的数据源，即可完成创建。
 
 ## 任务参数
 
@@ -38,7 +38,7 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 
 根据上述参数说明，配置所需的内容即可。
 
-![kubernetes](/img/tasks/demo/kubernetes-task-en.png)
+![kubernetes](../../../../img/tasks/demo/kubernetes-task-en.png)
 
 ## 注意事项
 

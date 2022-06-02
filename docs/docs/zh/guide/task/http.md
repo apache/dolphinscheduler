@@ -8,7 +8,7 @@
 
 - 点击项目管理 -> 项目名称 -> 工作流定义，点击”创建工作流”按钮，进入 DAG 编辑页面：
 
-- 拖动工具栏的 <img src="/img/tasks/icons/http.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的 <img src="../../../../img/tasks/icons/http.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
 
@@ -41,7 +41,7 @@ HTTP 定义了与服务器交互的不同方法，最基本的方法有4种，�
      - userName：用户名；
      - userPassword：用户登录密码。
 
-![http_task](/img/tasks/demo/http_task01.png)
+![http_task](../../../../img/tasks/demo/http_task01.png)
 
 ## 注意事项
 

@@ -4,7 +4,7 @@ If you need to use `Webex Teams` to alert, create an alert instance in the alert
 You can pick private alert or room group chat alert.
 The following is the `WebexTeams` configuration example:
 
-![enterprise-webexteams-plugin](/img/alert/enterprise-webexteams-plugin.png)
+![enterprise-webexteams-plugin](../../../../img/alert/enterprise-webexteams-plugin.png)
 
 ## Parameter Configuration
 
@@ -25,13 +25,13 @@ The following is the `WebexTeams` configuration example:
 
 Create a bot visit [Official Website My-Apps](https://developer.webex.com/my-apps) to `Create a New APP` and select `Create a Bot`, fill in the bot information and acquire `bot username` and `bot ID` for further usage.
 
-![enterprise-webexteams-bot-info](/img/alert/enterprise-webexteams-bot.png)
+![enterprise-webexteams-bot-info](../../../../img/alert/enterprise-webexteams-bot.png)
 
 ## Create a Room
 
 Create a root visit [Official Website for Developer APIs](https://developer.webex.com/docs/api/v1/rooms/create-a-room) to create a new room, fill in the room name and acquire `id`(room ID) and `creatorId` for further usage.
 
-![enterprise-webexteams-room-info](/img/alert/enterprise-webexteams-room.png)
+![enterprise-webexteams-room-info](../../../../img/alert/enterprise-webexteams-room.png)
 
 ### Invite Bot to the Room
 
@@ -43,22 +43,22 @@ In this way, you can send private message to a person by `User Email` or `UserId
 The `user Email` is user register Email.
 The `userId` we can acquire it from the `creatorId` of creating a new group chat room API.
 
-![enterprise-webexteams-private-message-form](/img/alert/enterprise-webexteams-private-form.png)
+![enterprise-webexteams-private-message-form](../../../../img/alert/enterprise-webexteams-private-form.png)
 
 ### Private Alert Message Example
 
-![enterprise-webexteams-private-message-example](/img/alert/enterprise-webexteams-private-msg.png)
+![enterprise-webexteams-private-message-example](../../../../img/alert/enterprise-webexteams-private-msg.png)
 
 ## Send Group Room Message
 
 In this way, you can send group room message to a room by `Room ID`. Fill in the `Room Id` and `Bot Access Token` and select `Destination` `roomId`.
 The `Room ID` we can acquire it from the `id` of creating a new group chat room API.
 
-![enterprise-webexteams-room](/img/alert/enterprise-webexteams-group-form.png)
+![enterprise-webexteams-room](../../../../img/alert/enterprise-webexteams-group-form.png)
 
 ### Group Room Alert Message Example
 
-![enterprise-webexteams-room-message-example](/img/alert/enterprise-webexteams-room-msg.png)
+![enterprise-webexteams-room-message-example](../../../../img/alert/enterprise-webexteams-room-msg.png)
 
 [WebexTeams Application Bot Guide](https://developer.webex.com/docs/bots)
 [WebexTeams Message Guide](https://developer.webex.com/docs/api/v1/messages/create-a-message)

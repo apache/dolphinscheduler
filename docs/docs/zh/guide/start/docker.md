@@ -118,7 +118,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
 访问 DolphinScheduler。访问上述链接后会跳转到登陆页面，DolphinScheduler 默认的用户和密码分别为 `admin` 和 `dolphinscheduler123`。
 想要了解更多操作请参考用户手册[快速上手](../start/quick-start.md)。
 
-![login](/img/new_ui/dev/quick-start/login.png)
+![login](../../../../img/new_ui/dev/quick-start/login.png)
 
 > 注意：如果你使用沿用已有的 PostgreSQL 和 ZooKeeper 服务方式启动服务，且服务分布在多台机器中，
 > 请将上述的地址改成你 API 容器启动的 hostname 或者 IP。

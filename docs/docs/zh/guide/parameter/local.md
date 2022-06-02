@@ -20,7 +20,7 @@
 
 本样例展示了如何使用本地参数，打印输出当前日期。创建一个 Shell 任务，并编写脚本内容为 `echo ${dt}`。点击配置栏中的**自定义参数**，配置如下图所示：
 
-![local-parameter01](/img/new_ui/dev/parameter/local_parameter01.png)
+![local-parameter01](../../../../img/new_ui/dev/parameter/local_parameter01.png)
 
 参数说明：
 
@@ -31,7 +31,7 @@
 
 保存工作流并运行，查看 Shell 任务输出日志。
 
-![local-parameter02](/img/new_ui/dev/parameter/local_parameter02.png)
+![local-parameter02](../../../../img/new_ui/dev/parameter/local_parameter02.png)
 
 > 注：本地参数可以在当前任务节点的工作流中，设置其为 OUT 则可以传递给下游的工作流使用，可以参考：[参数传递](context.md)
 
@@ -40,7 +40,7 @@
 如果你想简单 export 参数然后在下游任务中使用它们，你可以在你的任务中使用 `setValue`，你可以将参数统一在一个任务中管理。在 Shell 任务中使用语法
 `echo '${setValue(set_val=123)}'`(**不要忘记单引号**) 并添加新的 `OUT` 自定义参数来 export 它。
 
-![local-parameter-set-val](/img/new_ui/dev/parameter/local_param_set_val.png)
+![local-parameter-set-val](../../../../img/new_ui/dev/parameter/local_param_set_val.png)
 
 你可以在下游任务中使用语法 `echo '${set_val}'` 在获取设定的值。
 
@@ -50,7 +50,7 @@
 “自定义参数”模块中的值，这让程序更加容易维护。您可以在 Shell 任务中使用语法 `echo "#{setValue(set_val_param=${val})}"`（**如果你想要将任何
 变量赋值给 `setValue`** 请不要忘记使用双引号）并添加新的 `IN` 自定义参数用于输入变量 `val` 和 `OUT` 自定义参数用于 export 参数 `set_val_param`。
 
-![local-parameter-set-val-param](/img/new_ui/dev/parameter/local_param_set_val_custom.png)
+![local-parameter-set-val-param](../../../../img/new_ui/dev/parameter/local_param_set_val_custom.png)
 
 你可以在下游任务中使用语法 `echo '${set_val_param}'` 在获取设定的值。
 
@@ -69,6 +69,6 @@ echo "#{setValue(set_val_var=${lines_num})}"
 在 Shell 任务中（**如果你想要将任何变量赋值给 `setValue`** 请不要忘记使用双引号）和 `OUT` 自定义参数用于 export 参数 `set_val_var`。
 .
 
-![local-parameter-set-val-bash](/img/new_ui/dev/parameter/local_param_set_val_bash.png)
+![local-parameter-set-val-bash](../../../../img/new_ui/dev/parameter/local_param_set_val_bash.png)
 
 你可以在下游任务中使用语法 `echo '${set_val_var}'` 在获取设定的值。

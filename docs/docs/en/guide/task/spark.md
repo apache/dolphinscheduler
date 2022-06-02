@@ -11,7 +11,7 @@ Spark task type for executing Spark application. When executing the Spark task, 
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/spark.png" width="15"/> to the canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/spark.png" width="15"/> to the canvas.
 
 ## Task Parameter
 
@@ -55,7 +55,7 @@ This is a common introductory case in the big data ecosystem, which often apply 
 
 If you are using the Spark task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `bin/env/dolphinscheduler_env.sh`.
 
-![spark_configure](/img/tasks/demo/spark_task01.png)
+![spark_configure](../../../../img/tasks/demo/spark_task01.png)
 
 ##### Upload the Main Package
 
@@ -63,13 +63,13 @@ When using the Spark task node, you need to upload the jar package to the Resour
 
 After finish the Resource Centre configuration, upload the required target files directly by dragging and dropping.
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
 ##### Configure Spark Nodes
 
 Configure the required content according to the parameter descriptions above.
 
-![demo-spark-simple](/img/tasks/demo/spark_task02.png)
+![demo-spark-simple](../../../../img/tasks/demo/spark_task02.png)
 
 ### spark sql
 
@@ -77,7 +77,7 @@ Configure the required content according to the parameter descriptions above.
 
 This case is to create a view table terms and write three rows of data and a table wc in parquet format and determine whether the table exists. The program type is SQL. Insert the data of the view table terms into the table wc in parquet format.
 
-![spark_sql](/img/tasks/demo/spark_sql.png)
+![spark_sql](../../../../img/tasks/demo/spark_sql.png)
 
 ## Notice
 

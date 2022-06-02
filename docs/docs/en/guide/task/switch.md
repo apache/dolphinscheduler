@@ -4,7 +4,7 @@ The switch is a conditional judgment node, decide the branch executes according 
 
 ## Create
 
-Drag from the toolbar <img src="/img/switch.png" width="20"/>  task node to canvas to create a task. 
+Drag from the toolbar <img src="../../../../img/switch.png" width="20"/>  task node to canvas to create a task. 
 **Note** After created a switch task, you must first configure the upstream and downstream, then configure the parameter of task branches.
 
 ## Parameter
@@ -31,7 +31,7 @@ Here we have three tasks, the dependencies are `A -> B -> [C, D]`, and `task_a` 
 
 The following shows the switch task configuration:
 
-![task-switch-configure](/img/switch_configure.jpg)
+![task-switch-configure](../../../../img/switch_configure.jpg)
 
 ## Related Task
 

@@ -1,6 +1,6 @@
 # POSTGRESQL 数据源
 
-![postgresql](/img/new_ui/dev/datasource/postgresql.png)
+![postgresql](../../../../img/new_ui/dev/datasource/postgresql.png)
 
 - 数据源：选择 POSTGRESQL
 - 数据源名称：输入数据源的名称

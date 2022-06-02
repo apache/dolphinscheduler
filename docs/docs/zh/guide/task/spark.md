@@ -12,7 +12,7 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 
 - 点击项目管理 -> 项目名称 -> 工作流定义，点击”创建工作流”按钮，进入 DAG 编辑页面：
 
-- 拖动工具栏的 <img src="/img/tasks/icons/spark.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的 <img src="../../../../img/tasks/icons/spark.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
 
@@ -56,7 +56,7 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 
 若生产环境中要是使用到 Spark 任务类型，则需要先配置好所需的环境。配置文件如下：`bin/env/dolphinscheduler_env.sh`。
 
-![spark_configure](/img/tasks/demo/spark_task01.png)
+![spark_configure](../../../../img/tasks/demo/spark_task01.png)
 
 #####  上传主程序包
 
@@ -64,13 +64,13 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 
 当配置完成资源中心之后，直接使用拖拽的方式，即可上传所需目标文件。
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
 ##### 配置 Spark 节点
 
 根据上述参数说明，配置所需的内容即可。
 
-![demo-spark-simple](/img/tasks/demo/spark_task02.png)
+![demo-spark-simple](../../../../img/tasks/demo/spark_task02.png)
 
 ### spark sql
 
@@ -78,7 +78,7 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 
 本案例为创建一个视图表 terms 并写入三行数据和一个格式为 parquet 的表 wc 并判断该表是否存在。程序类型为 SQL。将视图表 terms 的数据插入到格式为 parquet 的表 wc。
 
-![spark_sql](/img/tasks/demo/spark_sql.png)
+![spark_sql](../../../../img/tasks/demo/spark_sql.png)
 
 ## 注意事项：
 

@@ -18,7 +18,7 @@
 - 包名类名：输入 UDF 函数的全路径  
 - UDF 资源：设置创建的 UDF 对应的资源文件
 
-![create-udf](/img/new_ui/dev/resource/create-udf.png)
+![create-udf](../../../../img/new_ui/dev/resource/create-udf.png)
 
 ## 任务样例
 
@@ -26,13 +26,13 @@
 
 用户可以根据实际生产需求，自定义想要的 UDF 函数。这里编写一个在任意字符串的末尾添加 "HelloWorld" 的函数。如下图所示：
 
-![code-udf](/img/new_ui/dev/resource/demo/udf-demo01.png)
+![code-udf](../../../../img/new_ui/dev/resource/demo/udf-demo01.png)
 
 ### 配置 UDF 函数
 
 配置 UDF 函数前，需要先通过资源管理上传所需的函数 jar 包。然后进入函数管理，配置相关信息即可。如下图所示：
 
-![conf-udf](/img/new_ui/dev/resource/demo/udf-demo02.png)
+![conf-udf](../../../../img/new_ui/dev/resource/demo/udf-demo02.png)
 
 ### 使用 UDF 函数
 
@@ -43,7 +43,7 @@
 - SQL 语句：`select HwUdf("abc");` 该函数与内置函数使用方式一样，直接使用函数名称即可访问。
 - UDF 函数：选择资源中心所配置的即可。
 
-![use-udf](/img/new_ui/dev/resource/demo/udf-demo03.png)
+![use-udf](../../../../img/new_ui/dev/resource/demo/udf-demo03.png)
 
 
 

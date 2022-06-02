@@ -9,7 +9,7 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
-- 拖动工具栏的 <img src="/img/tasks/icons/openmldb.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的 <img src="../../../../img/tasks/icons/openmldb.png" width="15"/> 任务节点到画板中。
 
 ## 任务样例
 
@@ -41,13 +41,13 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 
 #### 导入数据
 
-![load data](/img/tasks/demo/openmldb-load-data.png)
+![load data](../../../../img/tasks/demo/openmldb-load-data.png)
 
 我们使用`LOAD DATA`语句导入数据到OpenMLDB集群。因为选择的是离线执行模式，所以将会导入数据到离线存储中。
 
 #### 特征抽取
 
-![fe](/img/tasks/demo/openmldb-feature-extraction.png)
+![fe](../../../../img/tasks/demo/openmldb-feature-extraction.png)
 
 我们使用`SELECT INTO`进行特征抽取。因为选择的是离线执行模式，所以会使用离线引擎做特征计算。
 

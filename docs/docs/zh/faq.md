@@ -538,7 +538,7 @@ master 服务、worker 服务在 zookeeper 注册时，会以 ip:port 的形式�
 如果 ip 地址获取错误，请检查网络信息，如 Linux 系统通过 `ifconfig` 命令查看网络信息，以下图为例：
 
 <p align="center">
-  <img src="/img/network/network_config.png" width="60%" />
+  <img src="../../img/network/network_config.png" width="60%" />
 </p>
 
 可以使用 dolphinscheduler 提供的三种策略，获取可用 ip：

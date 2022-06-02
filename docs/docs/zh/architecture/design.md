@@ -4,7 +4,7 @@
 
 #### 2.1 系统架构图
 <p align="center">
-  <img src="/img/architecture-1.3.0.jpg" alt="系统架构图"  width="70%" />
+  <img src="../../../img/architecture-1.3.0.jpg" alt="系统架构图"  width="70%" />
   <p align="center">
         <em>系统架构图</em>
   </p>
@@ -12,7 +12,7 @@
 
 #### 2.2 启动流程活动图
 <p align="center">
-  <img src="/img/process-start-flow-1.3.0.png" alt="启动流程活动图"  width="70%" />
+  <img src="../../../img/process-start-flow-1.3.0.png" alt="启动流程活动图"  width="70%" />
   <p align="center">
         <em>启动流程活动图</em>
   </p>
@@ -112,7 +112,7 @@ DolphinScheduler使用ZooKeeper分布式锁来实现同一时刻只有一台Mast
 
 2. DolphinScheduler中Scheduler线程分布式锁实现流程图：
  <p align="center">
-   <img src="/img/distributed_lock_procss.png" alt="获取分布式锁流程"  width="50%" />
+   <img src="../../../img/distributed_lock_procss.png" alt="获取分布式锁流程"  width="50%" />
  </p>
 
 
@@ -152,7 +152,7 @@ DolphinScheduler使用ZooKeeper分布式锁来实现同一时刻只有一台Mast
 - Master容错流程：
 
 <p align="center">
-   <img src="/img/failover-master.jpg" alt="容错流程"  width="50%" />
+   <img src="../../../img/failover-master.jpg" alt="容错流程"  width="50%" />
  </p>
 
 容错范围：从host的维度来看，Master的容错范围包括：自身host+注册中心上不存在的节点host，容错的整个过程会加锁；
@@ -166,7 +166,7 @@ DolphinScheduler使用ZooKeeper分布式锁来实现同一时刻只有一台Mast
 - Worker容错流程：
 
 <p align="center">
-   <img src="/img/failover-worker.jpg" alt="容错流程"  width="50%" />
+   <img src="../../../img/failover-worker.jpg" alt="容错流程"  width="50%" />
  </p>
 
 容错范围：从工作流实例的维度看，每个Master只负责容错自己的工作流实例；只有在`handleDeadServer`时会加锁；

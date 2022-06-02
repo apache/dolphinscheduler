@@ -39,4 +39,4 @@ spring:
 
 时序图如下图所示：
 
-<img src="/img/cache-evict.png" alt="cache-evict" style="zoom: 67%;" />
+<img src="../../../img/cache-evict.png" alt="cache-evict" style="zoom: 67%;" />

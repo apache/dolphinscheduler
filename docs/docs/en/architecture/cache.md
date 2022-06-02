@@ -39,4 +39,4 @@ Note: the final strategy for cache update comes from the expiration strategy con
 
 The sequence diagram shows below:
 
-<img src="/img/cache-evict.png" alt="cache-evict" style="zoom: 67%;" />
+<img src="../../../img/cache-evict.png" alt="cache-evict" style="zoom: 67%;" />

@@ -5,7 +5,7 @@
 > Drag from the toolbar ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PROCEDURE.png) task node into the canvas, as shown in the figure below:
 
 <p align="center">
-   <img src="/img/procedure-en.png" width="80%" />
+   <img src="../../../../img/procedure-en.png" width="80%" />
  </p>
 
 - DataSource: The DataSource type of the stored procedure supports MySQL and POSTGRESQL, select the corresponding DataSource.

@@ -7,7 +7,7 @@ The sub-process node is to execute an external workflow definition as a task nod
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/sub_process.png" width="15"/> task node to canvas to create a new SubProcess task.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/sub_process.png" width="15"/> task node to canvas to create a new SubProcess task.
 
 ## Task Parameter
 
@@ -29,17 +29,17 @@ This example simulates a common task type, here we use a child node task to reca
 
 Create a shell task to print "hello" and define the workflow as `test_dag01`.
 
-![subprocess_task01](/img/tasks/demo/subprocess_task01.png)
+![subprocess_task01](../../../../img/tasks/demo/subprocess_task01.png)
 
 ## Create the Sub_process task
 
 To use the sub_process, you need to create the sub-node task, which is the shell task we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
 
-![subprocess_task02](/img/tasks/demo/subprocess_task02.png)
+![subprocess_task02](../../../../img/tasks/demo/subprocess_task02.png)
 
 After creating the sub_process, create a corresponding shell task for printing "world" and link both together. Save the current workflow and run it to get the expected result.
 
-![subprocess_task03](/img/tasks/demo/subprocess_task03.png)
+![subprocess_task03](../../../../img/tasks/demo/subprocess_task03.png)
 
 ## Notice
 

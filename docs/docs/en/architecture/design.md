@@ -5,7 +5,7 @@
 ### System Architecture Diagram
 
 <p align="center">
-  <img src="/img/architecture-1.3.0.jpg" alt="System architecture diagram"  width="70%" />
+  <img src="../../../img/architecture-1.3.0.jpg" alt="System architecture diagram"  width="70%" />
   <p align="center">
         <em>System architecture diagram</em>
   </p>
@@ -14,7 +14,7 @@
 ### Start Process Activity Diagram
 
 <p align="center">
-  <img src="/img/process-start-flow-1.3.0.png" alt="Start process activity diagram"  width="70%" />
+  <img src="../../../img/process-start-flow-1.3.0.png" alt="Start process activity diagram"  width="70%" />
   <p align="center">
         <em>Start process activity diagram</em>
   </p>
@@ -112,7 +112,7 @@ DolphinScheduler uses ZooKeeper distributed lock to implement only one Master ex
 
 2. Flow diagram of implementation of Scheduler thread distributed lock in DolphinScheduler:
  <p align="center">
-   <img src="/img/distributed_lock_procss.png" alt="Obtain distributed lock process"  width="50%" />
+   <img src="../../../img/distributed_lock_procss.png" alt="Obtain distributed lock process"  width="50%" />
  </p>
 
 
@@ -155,7 +155,7 @@ Among them, the Master monitors the directories of other Masters and Workers. If
 - Master fault tolerance：
 
 <p align="center">
-   <img src="/img/failover-master.jpg" alt="failover-master"  width="50%" />
+   <img src="../../../img/failover-master.jpg" alt="failover-master"  width="50%" />
  </p>
 
 Fault tolerance range: From the perspective of host, the fault tolerance range of Master includes: own host and node host that does not exist in the registry, and the entire process of fault tolerance will be locked;
@@ -167,7 +167,7 @@ Fault-tolerant post-processing: After the fault tolerance of ZooKeeper Master co
 - Worker fault tolerance：
 
 <p align="center">
-   <img src="/img/failover-worker.jpg" alt="failover-worker"  width="50%" />
+   <img src="../../../img/failover-worker.jpg" alt="failover-worker"  width="50%" />
  </p>
 
 Fault tolerance range: From the perspective of process instance, each Master is only responsible for fault tolerance of its own process instance; it will lock only when `handleDeadServer`;

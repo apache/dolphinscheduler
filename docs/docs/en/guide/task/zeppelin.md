@@ -8,7 +8,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 ## Create Task
 
 - Click Project Management-Project Name-Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag <img src="/img/tasks/icons/zeppelin.png" width="15"/> from the toolbar to the canvas.
+- Drag <img src="../../../../img/tasks/icons/zeppelin.png" width="15"/> from the toolbar to the canvas.
 
 ## Task Parameter
 
@@ -30,7 +30,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 This example illustrates how to create a zeppelin paragraph task node.
 
-![demo-zeppelin-paragraph](/img/tasks/demo/zeppelin.png)
+![demo-zeppelin-paragraph](../../../../img/tasks/demo/zeppelin.png)
 
-![demo-get-zeppelin-id](/img/tasks/demo/zeppelin_id.png)
+![demo-get-zeppelin-id](../../../../img/tasks/demo/zeppelin_id.png)
 

@@ -104,7 +104,7 @@ The goToTab method is provided in SecurityPage to test the corresponding sidebar
     }
 ```
 
-![SecurityPage](/img/e2e-test/SecurityPage.png)
+![SecurityPage](../../../img/e2e-test/SecurityPage.png)
 
 For navigation bar options jumping, the goToNav method is provided in `org/apache/dolphinscheduler/e2e/pages/common/NavBarPage.java`. The currently supported pages are: ProjectPage, SecurityPage and ResourcePage.
 
@@ -139,7 +139,7 @@ For navigation bar options jumping, the goToNav method is provided in `org/apach
 
 Current E2E test cases supported include: File Management, Project Management, Queue Management, Tenant Management, User Management, Worker Group Management and Workflow Test.
 
-![E2E_Cases](/img/e2e-test/E2E_Cases.png)
+![E2E_Cases](../../../img/e2e-test/E2E_Cases.png)
 
 The following is an example of a tenant management test. As explained earlier, we use docker-compose for deployment, so for each test case, we need to import the corresponding file in the form of an annotation.
 
@@ -186,12 +186,12 @@ When running E2E tests locally, the `-Dlocal=true` parameter can be configured t
 When running E2E tests with `M1` chip, you can use `-Dm1_chip=true` parameter to configure containers supported by 
 `ARM64`.
 
-![Dlocal](/img/e2e-test/Dlocal.png)
+![Dlocal](../../../img/e2e-test/Dlocal.png)
 
 If a connection timeout occurs during a local run, increase the load time to a recommended 30 and above.
 
-![timeout](/img/e2e-test/timeout.png)
+![timeout](../../../img/e2e-test/timeout.png)
 
 The test run will be available as an MP4 file.
 
-![MP4](/img/e2e-test/MP4.png)
+![MP4](../../../img/e2e-test/MP4.png)

@@ -65,7 +65,7 @@ The goal of the null value check is to check the number of empty rows in the spe
   ```
 
 ### UI Guide
-![dataquality_null_check](/img/tasks/demo/null_check.png)
+![dataquality_null_check](../../../img/tasks/demo/null_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -87,7 +87,7 @@ The goal of the null value check is to check the number of empty rows in the spe
 ### Introduction
 The timeliness check is used to check whether the data is processed within the expected time. The start time and end time can be specified to define the time range. If the amount of data within the time range does not reach the set threshold, the check task will be judged as fail
 ### UI Guide
-![dataquality_timeliness_check](/img/tasks/demo/timeliness_check.png)
+![dataquality_timeliness_check](../../../img/tasks/demo/timeliness_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -112,7 +112,7 @@ The timeliness check is used to check whether the data is processed within the e
 ### Introduction
 The goal of field length verification is to check whether the length of the selected field meets the expectations. If there is data that does not meet the requirements, and the number of rows exceeds the threshold, the task will be judged to fail
 ### UI Guide
-![dataquality_length_check](/img/tasks/demo/field_length_check.png)
+![dataquality_length_check](../../../img/tasks/demo/field_length_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -136,7 +136,7 @@ The goal of field length verification is to check whether the length of the sele
 ### Introduction
 The goal of the uniqueness check is to check whether the field is duplicated. It is generally used to check whether the primary key is duplicated. If there is duplication and the threshold is reached, the check task will be judged to be failed.
 ### UI Guide
-![dataquality_uniqueness_check](/img/tasks/demo/uniqueness_check.png)
+![dataquality_uniqueness_check](../../../img/tasks/demo/uniqueness_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -158,7 +158,7 @@ The goal of the uniqueness check is to check whether the field is duplicated. It
 ### Introduction
 The goal of regular expression verification is to check whether the format of the value of a field meets the requirements, such as time format, email format, ID card format, etc. If there is data that does not meet the format and exceeds the threshold, the task will be judged as failed.
 ### UI Guide
-![dataquality_regex_check](/img/tasks/demo/regexp_check.png)
+![dataquality_regex_check](../../../img/tasks/demo/regexp_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -181,7 +181,7 @@ The goal of regular expression verification is to check whether the format of th
 ### Introduction
 The goal of enumeration value verification is to check whether the value of a field is within the range of enumeration values. If there is data that is not in the range of enumeration values ​​and exceeds the threshold, the task will be judged to fail
 ### UI Guide
-![dataquality_enum_check](/img/tasks/demo/enumeration_check.png)
+![dataquality_enum_check](../../../img/tasks/demo/enumeration_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -203,7 +203,7 @@ The goal of enumeration value verification is to check whether the value of a fi
 ### Introduction
 The goal of table row number verification is to check whether the number of rows in the table reaches the expected value. If the number of rows does not meet the standard, the task will be judged as failed.
 ### UI Guide
-![dataquality_count_check](/img/tasks/demo/table_count_check.png)
+![dataquality_count_check](../../../img/tasks/demo/table_count_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the validation data is located
@@ -224,7 +224,7 @@ The goal of table row number verification is to check whether the number of rows
 ## Custom SQL Check
 ### Introduction
 ### UI Guide
-![dataquality_custom_sql_check](/img/tasks/demo/custom_sql_check.png)
+![dataquality_custom_sql_check](../../../img/tasks/demo/custom_sql_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the data to be verified is located
@@ -259,7 +259,7 @@ Accuracy checks are performed by comparing the accuracy differences of data reco
 |b|3|
 If you compare the data in c1 and c21, the tables test1 and test2 are exactly the same. If you compare c2 and c22, the data in table test1 and table test2 are inconsistent.
 ### UI Guide
-![dataquality_multi_table_accuracy_check](/img/tasks/demo/multi_table_accuracy_check.png)
+![dataquality_multi_table_accuracy_check](../../../img/tasks/demo/multi_table_accuracy_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: drop-down to select the table where the data to be verified is located
@@ -280,7 +280,7 @@ If you compare the data in c1 and c21, the tables test1 and test2 are exactly th
 ### Introduction
 Two-table value comparison allows users to customize different SQL statistics for two tables and compare the corresponding values. For example, for the source table A, the total amount of a certain column is calculated, and for the target table, the total amount of a certain column is calculated. value sum2, compare sum1 and sum2 to determine the check result
 ### UI Guide
-![dataquality_multi_table_comparison_check](/img/tasks/demo/multi_table_comparison_check.png)
+![dataquality_multi_table_comparison_check](../../../img/tasks/demo/multi_table_comparison_check.png)
 - Source data type: select MySQL, PostgreSQL, etc.
 - Source data source: the corresponding data source under the source data type
 - Source data table: the table where the data is to be verified
@@ -302,9 +302,9 @@ Two-table value comparison allows users to customize different SQL statistics fo
     - Blocking: The data quality task fails, the DolphinScheduler task result is failed, and an alarm is sent
 
 ## Task result view
-![dataquality_result](/img/tasks/demo/result.png)
+![dataquality_result](../../../img/tasks/demo/result.png)
 ## Rule View
 ### List of rules
-![dataquality_rule_list](/img/tasks/demo/rule_list.png)
+![dataquality_rule_list](../../../img/tasks/demo/rule_list.png)
 ### Rules Details
-![dataquality_rule_detail](/img/tasks/demo/rule_detail.png)
+![dataquality_rule_detail](../../../img/tasks/demo/rule_detail.png)

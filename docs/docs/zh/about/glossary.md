@@ -6,7 +6,7 @@
 
 **DAG：** 全称 Directed Acyclic Graph，简称 DAG。工作流中的 Task 任务以有向无环图的形式组装起来，从入度为零的节点进行拓扑遍历，直到无后继节点为止。举例如下图：
 
-![about-glossary](/img/new_ui/dev/about/glossary.png)
+![about-glossary](../../../img/new_ui/dev/about/glossary.png)
 
 **流程定义**：通过拖拽任务节点并建立任务节点的关联所形成的可视化**DAG**
 

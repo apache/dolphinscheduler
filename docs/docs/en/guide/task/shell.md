@@ -7,7 +7,7 @@ Shell task used to create a shell task type and execute a series of shell script
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag  from the toolbar <img src="/img/tasks/icons/shell.png" width="15"/> to the canvas.
+- Drag  from the toolbar <img src="../../../../img/tasks/icons/shell.png" width="15"/> to the canvas.
 
 ## Task Parameter
 
@@ -32,7 +32,7 @@ Shell task used to create a shell task type and execute a series of shell script
 We make an example simulate from a common task which runs by one command. The example is to print one line in the log file, as shown in the following figure:
 "This is a demo of shell task".
 
-![demo-shell-simple](/img/tasks/demo/shell.jpg)
+![demo-shell-simple](../../../../img/tasks/demo/shell.jpg)
 
 ### Custom Parameters
 
@@ -40,7 +40,7 @@ This example simulates a custom parameter task. We use parameters for reusing ex
 we declare a custom parameter named "param_key", with the value "param_val". Then we use `echo` to print the parameter "${param_key}" we just declared. 
 After running this example, we would see "param_val" print in the log.
 
-![demo-shell-custom-param](/img/tasks/demo/shell_custom_param.jpg)
+![demo-shell-custom-param](../../../../img/tasks/demo/shell_custom_param.jpg)
 
 ## Attention
 

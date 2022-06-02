@@ -24,11 +24,11 @@ Using `POST` and `GET` method to send `Http` request in the `Request Type`.
 Send alert information by `Http` GET method.
 The following shows the `GET` configuration example:
 
-![enterprise-wechat-app-msg-config](/img/alert/http-get-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/http-get-example.png)
 
 ### POST Http
 
 Send alert information inside `Http` body by `Http` POST method.
 The following shows the `POST` configuration example:
 
-![enterprise-wechat-app-msg-config](/img/alert/http-post-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/http-post-example.png)

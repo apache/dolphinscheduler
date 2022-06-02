@@ -36,7 +36,7 @@
 
 ### User Queue DataSource
 
-![image.png](/img/metadata-erd/user-queue-datasource.png)
+![image.png](../../../img/metadata-erd/user-queue-datasource.png)
 
 - One tenant can own Multiple users.
 - The queue field in the t_ds_user table stores the queue_name information in the t_ds_queue table, t_ds_tenant stores queue information using queue_id column. During the execution of the process definition, the user queue has the highest priority. If the user queue is null, use the tenant queue.
@@ -44,7 +44,7 @@
   
 ### Project Resource Alert
 
-![image.png](/img/metadata-erd/project-resource-alert.png)
+![image.png](../../../img/metadata-erd/project-resource-alert.png)
 
 - User can have multiple projects, user project authorization completes the relationship binding using project_id and user_id in t_ds_relation_project_user table.
 - The user_id in the t_ds_projcet table represents the user who create the project, and the user_id in the t_ds_relation_project_user table represents users who have permission to the project.
@@ -53,7 +53,7 @@
   
 ### Command Process Task
 
-![image.png](/img/metadata-erd/command.png)<br />![image.png](/img/metadata-erd/process-task.png)
+![image.png](../../../img/metadata-erd/command.png)<br />![image.png](../../../img/metadata-erd/process-task.png)
 
 - A project has multiple process definitions, a process definition can generate multiple process instances, and a process instance can generate multiple task instances.
 - The t_ds_schedulers table stores the specified time schedule information for process definition.

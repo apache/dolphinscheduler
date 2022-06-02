@@ -68,7 +68,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
   ```
 
 ### 界面操作指南
-![dataquality_null_check](/img/tasks/demo/null_check.png)
+![dataquality_null_check](../../../img/tasks/demo/null_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -90,7 +90,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 及时性检查用于检查数据是否在预期时间内处理完成，可指定开始时间、结束时间来界定时间范围，如果在该时间范围内的数据量没有达到设定的阈值，那么会判断该检查任务为失败
 ### 界面操作指南
-![dataquality_timeliness_check](/img/tasks/demo/timeliness_check.png)
+![dataquality_timeliness_check](../../../img/tasks/demo/timeliness_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -115,7 +115,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 字段长度校验的目标是检查所选字段的长度是否满足预期，如果有存在不满足要求的数据，并且行数超过阈值则会判断任务为失败
 ### 界面操作指南
-![dataquality_length_check](/img/tasks/demo/field_length_check.png)
+![dataquality_length_check](../../../img/tasks/demo/field_length_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -139,7 +139,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 唯一性校验的目标是检查字段是否存在重复的情况，一般用于检验primary key是否有重复，如果存在重复且达到阈值，则会判断检查任务为失败
 ### 界面操作指南
-![dataquality_uniqueness_check](/img/tasks/demo/uniqueness_check.png)
+![dataquality_uniqueness_check](../../../img/tasks/demo/uniqueness_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -161,7 +161,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 正则表达式校验的目标是检查某字段的值的格式是否符合要求，例如时间格式、邮箱格式、身份证格式等等，如果存在不符合格式的数据并超过阈值，则会判断任务为失败
 ### 界面操作指南
-![dataquality_regex_check](/img/tasks/demo/regexp_check.png)
+![dataquality_regex_check](../../../img/tasks/demo/regexp_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -184,7 +184,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 枚举值校验的目标是检查某字段的值是否在枚举值的范围内，如果存在不在枚举值范围里的数据并超过阈值，则会判断任务为失败
 ### 界面操作指南
-![dataquality_enum_check](/img/tasks/demo/enumeration_check.png)
+![dataquality_enum_check](../../../img/tasks/demo/enumeration_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -206,7 +206,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 表行数校验的目标是检查表的行数是否达到预期的值，如果行数未达标，则会判断任务为失败
 ### 界面操作指南
-![dataquality_count_check](/img/tasks/demo/table_count_check.png)
+![dataquality_count_check](../../../img/tasks/demo/table_count_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择验证数据所在表
@@ -227,7 +227,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ## 单表检查之自定义SQL检查
 ### 检查介绍
 ### 界面操作指南
-![dataquality_custom_sql_check](/img/tasks/demo/custom_sql_check.png)
+![dataquality_custom_sql_check](../../../img/tasks/demo/custom_sql_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择要验证数据所在表
@@ -262,7 +262,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 | b | 3|
 如果对比c1和c21中的数据，则表test1和test2完全一致。 如果对比c2和c22则表test1和表test2中的数据则存在不一致了。
 ### 界面操作指南
-![dataquality_multi_table_accuracy_check](/img/tasks/demo/multi_table_accuracy_check.png)
+![dataquality_multi_table_accuracy_check](../../../img/tasks/demo/multi_table_accuracy_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：下拉选择要验证数据所在表
@@ -283,7 +283,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ### 检查介绍
 两表值比对允许用户对两张表自定义不同的SQL统计出相应的值进行比对，例如针对源表A统计出某一列的金额总值sum1，针对目标表统计出某一列的金额总值sum2，将sum1和sum2进行比较来判定检查结果
 ### 界面操作指南
-![dataquality_multi_table_comparison_check](/img/tasks/demo/multi_table_comparison_check.png)
+![dataquality_multi_table_comparison_check](../../../img/tasks/demo/multi_table_comparison_check.png)
 - 源数据类型：选择MySQL、PostgreSQL等
 - 源数据源：源数据类型下对应的数据源
 - 源数据表：要验证数据所在表
@@ -305,9 +305,9 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
     - 阻断：数据质量任务失败了，DolphinScheduler任务结果为失败，发送告警
 
 ## 任务结果查看
-![dataquality_result](/img/tasks/demo/result.png)
+![dataquality_result](../../../img/tasks/demo/result.png)
 ## 规则查看
 ### 规则列表
-![dataquality_rule_list](/img/tasks/demo/rule_list.png)
+![dataquality_rule_list](../../../img/tasks/demo/rule_list.png)
 ### 规则详情
-![dataquality_rule_detail](/img/tasks/demo/rule_detail.png)
+![dataquality_rule_detail](../../../img/tasks/demo/rule_detail.png)

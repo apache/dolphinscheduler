@@ -558,7 +558,7 @@ When the master service and worker service are registered with zookeeper, releva
 If the ip address is obtained incorrectly, please check the network information. For example, in the Linux system, use the `ifconfig` command to view the network information. The following figure is an example:
 
 <p align="center">
-  <img src="/img/network/network_config.png" width="60%" />
+  <img src="../../img/network/network_config.png" width="60%" />
 </p>
 
 You can use the three strategies provided by dolphinscheduler to get the available ip:
