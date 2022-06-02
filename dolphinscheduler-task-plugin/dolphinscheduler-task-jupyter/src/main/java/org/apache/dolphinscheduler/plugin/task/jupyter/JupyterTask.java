@@ -107,8 +107,14 @@ public class JupyterTask extends AbstractTaskExecutor {
         args.add(JupyterConstants.CONDA_INIT);
         args.add(condaPath);
         args.add(JupyterConstants.JOINTER);
-        args.add(JupyterConstants.CONDA_ACTIVATE);
-        args.add(jupyterParameters.getCondaEnvName());
+        String condaEnvName = jupyterParameters.getCondaEnvName();
+        if (condaEnvName.endsWith(JupyterConstants.TAR_SUFFIX)) {
+            args.add(String.format(JupyterConstants.CREATE_ENV_FROM_TAR, condaEnvName));
+        } else {
+            args.add(JupyterConstants.CONDA_ACTIVATE);
+            args.add(jupyterParameters.getCondaEnvName());
+        }
+
         args.add(JupyterConstants.JOINTER);
         args.add(JupyterConstants.PAPERMILL);
         args.add(jupyterParameters.getInputNotePath());

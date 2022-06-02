@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { useI18n } from 'vue-i18n'
-import { useCustomParams } from '.'
+import { useCustomParams, useResources } from '.'
 import type { IJsonItem } from '../types'
 
 export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
@@ -121,6 +121,7 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.jupyter_others_tips')
       }
     },
+    useResources(),
     ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
 }
