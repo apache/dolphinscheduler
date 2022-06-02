@@ -135,7 +135,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
