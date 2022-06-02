@@ -14,7 +14,7 @@ Click [here](https://docs.conda.io/en/latest/) for more information about `conda
 ## Create Task
 
 - Click Project Management-Project Name-Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag <img src="/img/tasks/icons/jupyter.png" width="15"/> from the toolbar to the canvas.
+- Drag <img src="../../../../img/tasks/icons/jupyter.png" width="15"/> from the toolbar to the canvas.
 
 ## Task Parameter
 
@@ -42,4 +42,4 @@ Click [here](https://docs.conda.io/en/latest/) for more information about `conda
 
 This example illustrates how to create a jupyter task node.
 
-![demo-jupyter-simple](/img/tasks/demo/jupyter.png)
+![demo-jupyter-simple](../../../../img/tasks/demo/jupyter.png)

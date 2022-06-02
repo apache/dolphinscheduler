@@ -7,7 +7,7 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入 DAG 编辑页面。
-- 工具栏中拖动 <img src="/img/tasks/icons/shell.png" width="15"/> 到画板中，即可完成创建。
+- 工具栏中拖动 <img src="../../../../img/tasks/icons/shell.png" width="15"/> 到画板中，即可完成创建。
 
 ## 任务参数
 
@@ -32,7 +32,7 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 该样例模拟了常见的简单任务，这些任务只需要简单的一两行命令就能运行起来。我们以打印一行日志为例，该任务仅会在日志文件中打印一行
 "This is a demo of shell task"
 
-![demo-shell-simple](/img/tasks/demo/shell.jpg)
+![demo-shell-simple](../../../../img/tasks/demo/shell.jpg)
 
 ### 使用自定义参数
 
@@ -40,7 +40,7 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 中定义了参数 "param_key"，并将他的值设置为 "param_val"。接着在"脚本"中声明了 echo 命令，将参数 "param_key" 打印了出来。当我们保存
 并运行任务后，在日志中会看到将参数 "param_key" 对应的值 "param_val" 打印出来。
 
-![demo-shell-custom-param](/img/tasks/demo/shell_custom_param.jpg)
+![demo-shell-custom-param](../../../../img/tasks/demo/shell_custom_param.jpg)
 
 ## 注意事项
 

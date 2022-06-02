@@ -4,7 +4,7 @@
 
 `Telegram` 的配置样例如下:
 
-![alert-telegram](/img/new_ui/dev/alert/alert_telegram.png)
+![alert-telegram](../../../../img/new_ui/dev/alert/alert_telegram.png)
 
 参数配置:
 * WebHook:
