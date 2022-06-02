@@ -123,11 +123,11 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        IPage<AlertGroup> alertGroupIPage;
+        IPage<AlertGroup> alertGroupPage;
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AlertGroup> page = new Page<>(pageNo, pageSize);
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            alertGroupIPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
+            alertGroupPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
         } else {
             Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
             if (ids.isEmpty()) {
@@ -135,10 +135,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
                 putMsg(result, Status.SUCCESS);
                 return result;
             }
-            alertGroupIPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
+            alertGroupPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
         }
-        pageInfo.setTotal((int) alertGroupIPage.getTotal());
-        pageInfo.setTotalList(alertGroupIPage.getRecords());
+        pageInfo.setTotal((int) alertGroupPage.getTotal());
+        pageInfo.setTotalList(alertGroupPage.getRecords());
         result.setData(pageInfo);
 
         putMsg(result, Status.SUCCESS);

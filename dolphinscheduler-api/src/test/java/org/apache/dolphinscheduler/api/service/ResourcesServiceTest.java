@@ -278,8 +278,8 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(storageOperate.getFileName(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn("test1");
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF_FILE, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF_FILE, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         try {
             Mockito.when(storageOperate.exists(Mockito.any(), Mockito.any())).thenReturn(false);
         } catch (IOException e) {
