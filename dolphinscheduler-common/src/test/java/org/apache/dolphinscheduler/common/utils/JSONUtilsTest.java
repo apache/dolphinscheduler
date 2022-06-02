@@ -262,7 +262,7 @@ public class JSONUtilsTest {
 
     @Test
     public void dateToString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
@@ -274,7 +274,7 @@ public class JSONUtilsTest {
 
     @Test
     public void stringToDate() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
         Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
