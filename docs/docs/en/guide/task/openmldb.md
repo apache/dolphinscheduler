@@ -11,7 +11,7 @@ OpenMLDB task plugin used to execute tasks on OpenMLDB cluster.
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the
   DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/openmldb.png" width="15"/> task node to canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/openmldb.png" width="15"/> task node to canvas.
 
 ## Task Example
 
@@ -48,13 +48,13 @@ Here are some examples:
 
 #### Load data
 
-![load data](/img/tasks/demo/openmldb-load-data.png)
+![load data](../../../../img/tasks/demo/openmldb-load-data.png)
 
 We use `LOAD DATA` to load data into OpenMLDB cluster. We select `offline` here, so it will load to offline storage.
 
 #### Feature extraction
 
-![fe](/img/tasks/demo/openmldb-feature-extraction.png)
+![fe](../../../../img/tasks/demo/openmldb-feature-extraction.png)
 
 We use `SELECT INTO` to do feature extraction. We select `offline` here, so it will run sql on offline engine.
 

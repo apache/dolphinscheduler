@@ -28,7 +28,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 
 创建 Node_A 任务，在自定义参数中添加 output 和 value 参数，并编写如下脚本：
 
-![context-parameter01](/img/new_ui/dev/parameter/context_parameter01.png)
+![context-parameter01](../../../../img/new_ui/dev/parameter/context_parameter01.png)
 
 参数说明：
 
@@ -39,13 +39,13 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 创建 Node_B 任务，主要用于测试输出上游任务 Node_A 传递的参数。
 
-![context-parameter02](/img/new_ui/dev/parameter/context_parameter02.png)
+![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
 #### 创建 SQL 任务，使用参数
 
 完成上述的 SHELL 任务之后，我们可以使用上游所传递的 output 作为 SQL 的查询对象。其中将所查询的 id 重命名为 ID，作为参数输出。
 
-![context-parameter03](/img/new_ui/dev/parameter/context_parameter03.png)
+![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
 > 注：如果 SQL 节点的结果只有一行，一个或多个字段，参数的名字需要和字段名称一致。数据类型可选择为除 LIST 以外的其他类型。变量会选择 SQL 查询结果中的列名中与该变量名称相同的列对应的值。
 >
@@ -55,7 +55,7 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 点击保存工作流图标，并设置全局参数 output 和 value。
 
-![context-parameter03](/img/new_ui/dev/parameter/context_parameter04.png)
+![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter04.png)
 
 #### 查看运行结果
 
@@ -63,15 +63,15 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 Node_A 运行结果如下：
 
-![context-log01](/img/new_ui/dev/parameter/context_log01.png)
+![context-log01](../../../../img/new_ui/dev/parameter/context_log01.png)
 
 Node_B 运行结果如下：
 
-![context-log02](/img/new_ui/dev/parameter/context_log02.png)
+![context-log02](../../../../img/new_ui/dev/parameter/context_log02.png)
 
 Node_mysql 运行结果如下：
 
-![context-log03](/img/new_ui/dev/parameter/context_log03.png)
+![context-log03](../../../../img/new_ui/dev/parameter/context_log03.png)
 
 虽然在 Node_A 的脚本中为 output 赋值为 1，但日志中显示的值仍然为 100。但根据[参数优先级](priority.md)的原则：`本地参数 > 上游任务传递的参数 > 全局参数`，在 Node_B 中输出的值为 1。则证明 output 参数参照预期的值在该工作流中传递，并在 Node_mysql 中使用该值完成查询操作。
 
