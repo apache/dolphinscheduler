@@ -138,8 +138,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()),logger);
-
         return result;
     }
 
