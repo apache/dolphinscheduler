@@ -151,8 +151,8 @@ libfb303-0.9.3.jar
 libthrift-0.9.3.jar
 log4j-1.2-api-2.14.1.jar
 log4j-1.2.17.jar
-logback-classic-1.2.3.jar
-logback-core-1.2.3.jar
+logback-classic-1.2.11.jar
+logback-core-1.2.11.jar
 lz4-1.3.0.jar
 mapstruct-1.2.0.Final.jar
 micrometer-core-1.7.5.jar
