@@ -321,7 +321,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     log4j-api 2.11.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api/2.11.2, Apache 2.0
     log4j-core-2.11.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core/2.11.2, Apache 2.0
     log4j 1.2.17: https://mvnrepository.com/artifact/log4j/log4j/1.2.17, Apache 2.0
-    log4j-1.2-api 2.14.1: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-1.2-api/2.14.1, Apache 2.0
+    log4j-1.2-api 2.17.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-1.2-api/2.14.1, Apache 2.0
     lz4 1.3.0: https://mvnrepository.com/artifact/net.jpountz.lz4/lz4/1.3.0, Apache 2.0
     mapstruct 1.2.0.Final: https://github.com/mapstruct/mapstruct, Apache 2.0
     mybatis 3.5.2 https://mvnrepository.com/artifact/org.mybatis/mybatis/3.5.2, Apache 2.0
