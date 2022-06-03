@@ -17,18 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
+import static java.lang.String.format;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.String.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataSourceProcessorManager {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceProcessorManager.class);
@@ -40,13 +39,12 @@ public class DataSourceProcessorManager {
     }
 
     public void installProcessor() {
-        final Set<String> names = new HashSet<>();
 
         ServiceLoader.load(DataSourceProcessor.class).forEach(factory -> {
             final String name = factory.getDbType().name();
 
             logger.info("start register processor: {}", name);
-            if (!names.add(name)) {
+            if (dataSourceProcessorMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
             loadDatasourceClient(factory);

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

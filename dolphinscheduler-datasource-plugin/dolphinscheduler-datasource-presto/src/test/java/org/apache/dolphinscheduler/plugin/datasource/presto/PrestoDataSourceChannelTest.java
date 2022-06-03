@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.presto.param.PrestoConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;
