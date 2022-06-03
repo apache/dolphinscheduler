@@ -135,14 +135,6 @@ public class DataSourceUtilsTest {
     @Test
     public void testGetDatasourceProcessor() {
         Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.MYSQL));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.POSTGRESQL));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.HIVE));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.SPARK));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.CLICKHOUSE));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.ORACLE));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.SQLSERVER));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.DB2));
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.PRESTO));
     }
 
     @Test(expected = Exception.class)

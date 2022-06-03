@@ -37,7 +37,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class SparkDataSourceProcessorTest {
 
     private SparkDataSourceProcessor sparkDatasourceProcessor = new SparkDataSourceProcessor();
