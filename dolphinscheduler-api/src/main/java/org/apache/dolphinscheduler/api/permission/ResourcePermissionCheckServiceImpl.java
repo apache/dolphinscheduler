@@ -33,6 +33,8 @@
 
 package org.apache.dolphinscheduler.api.permission;
 
+import static java.util.stream.Collectors.toSet;
+
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
@@ -57,12 +59,6 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,7 +69,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.stream.Collectors.toSet;
+import org.slf4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ResourcePermissionCheckServiceImpl implements ResourcePermissionCheckService<Object>, ApplicationContextAware {
@@ -93,9 +94,9 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
     @Override
     public boolean resourcePermissionCheck(AuthorizationType authorizationType, Object[] needChecks, Integer userId, Logger logger) {
-        if (Objects.nonNull(needChecks) && needChecks.length > 0){
-            Set<Object> originResSet = new HashSet<>(Arrays.asList(needChecks));
-            Set<Object> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
+        if (Objects.nonNull(needChecks) && needChecks.length > 0) {
+            Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
+            Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
             originResSet.removeAll(ownResSets);
             return originResSet.isEmpty();
         }
@@ -118,13 +119,14 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     }
 
     @Override
-    public <T> Set<T> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, Integer userId, Logger logger) {
+    public Set<Object> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, Integer userId, Logger logger) {
         User user = processService.getUserById(userId);
-        if (user == null){
+        if (user == null) {
             logger.error("user id {} doesn't exist", userId);
             return Collections.emptySet();
         }
-        return RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(user.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId, logger);
+        return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(
+                user.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId, logger);
     }
 
     @Component
@@ -162,7 +164,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         }
 
         @Override
-        public <T> Set<T> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             return null;
         }
 
@@ -574,11 +576,11 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         /**
          * get all resources under the user (no admin)
+         *
          * @param userId
-         * @param <T>
          * @return
          */
-        <T> Set<T> listAuthorizedResource(int userId, Logger logger);
+        Set<T> listAuthorizedResource(int userId, Logger logger);
 
         /**
          * permission check

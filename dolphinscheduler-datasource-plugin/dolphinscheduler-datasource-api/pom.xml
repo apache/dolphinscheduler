@@ -42,7 +42,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -64,7 +63,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -128,7 +126,6 @@
                     <groupId>log4j</groupId>
                 </exclusion>
             </exclusions>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -136,8 +133,6 @@
             <type>jar</type>
             <scope>test</scope>
         </dependency>
-
-
 
         <dependency>
             <groupId>com.zaxxer</groupId>
