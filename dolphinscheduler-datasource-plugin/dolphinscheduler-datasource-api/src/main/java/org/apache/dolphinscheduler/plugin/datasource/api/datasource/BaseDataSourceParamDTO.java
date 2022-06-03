@@ -17,34 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.redshift.RedshiftDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Basic datasource params submitted to api.
- * <p>
- * see {@link MySQLDataSourceParamDTO}
- * see {@link PostgreSQLDataSourceParamDTO}
- * see {@link HiveDataSourceParamDTO}
- * see {@link SparkDataSourceParamDTO}
- * see {@link ClickHouseDataSourceParamDTO}
- * see {@link OracleDataSourceParamDTO}
- * see {@link SQLServerDataSourceParamDTO}
- * see {@link Db2DataSourceParamDTO}
- * see {@link PrestoDataSourceParamDTO}
- * see {@link RedshiftDataSourceParamDTO}
+ * Basic datasource params submitted to api, each datasource plugin should have implementation.
  */
 public abstract class BaseDataSourceParamDTO implements Serializable {
 
