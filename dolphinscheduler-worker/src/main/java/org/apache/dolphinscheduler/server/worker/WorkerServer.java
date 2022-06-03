@@ -54,11 +54,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan("org.apache.dolphinscheduler")
+@ComponentScan(basePackages = "org.apache.dolphinscheduler",
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                        "org.apache.dolphinscheduler.service.process.*",
+                        // todo: split the quartz into a single module
+                        "org.apache.dolphinscheduler.service.quartz.*",
+                        "org.apache.dolphinscheduler.service.queue.*",
+                })
+        }
+)
 public class WorkerServer implements IStoppable {
 
     /**
@@ -102,6 +112,8 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
+    // todo: Can we just load the task spi, and don't install into mysql?
+    //  we don't need to rely the dao module in worker.
     @Autowired
     private TaskPluginManager taskPluginManager;
 
