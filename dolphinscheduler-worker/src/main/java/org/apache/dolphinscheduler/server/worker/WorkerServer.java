@@ -62,9 +62,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan(basePackages = "org.apache.dolphinscheduler",
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                        "org.apache.dolphinscheduler.service.k8s.*",
-                        "org.apache.dolphinscheduler.service.permission.*",
                         "org.apache.dolphinscheduler.service.process.*",
+                        // todo: split the quartz into a single module
                         "org.apache.dolphinscheduler.service.quartz.*",
                         "org.apache.dolphinscheduler.service.queue.*",
                 })
