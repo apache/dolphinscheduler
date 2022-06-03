@@ -33,7 +33,7 @@ commons-daemon-1.0.13.jar
 commons-beanutils-1.9.4.jar
 commons-dbcp-1.4.jar
 commons-httpclient-3.0.1.jar
-commons-io-2.4.jar
+commons-io-2.11.0.jar
 commons-lang-2.6.jar
 commons-logging-1.1.1.jar
 commons-math3-3.1.1.jar
@@ -85,7 +85,7 @@ hive-service-rpc-2.1.0.jar
 hive-storage-api-2.1.0.jar
 htrace-core-3.1.0-incubating.jar
 httpclient-4.5.13.jar
-httpcore-4.4.1.jar
+httpcore-4.4.15.jar
 httpmime-4.5.13.jar
 j2objc-annotations-1.1.jar
 jackson-annotations-2.10.5.jar
