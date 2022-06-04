@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 /**
  * This is the interface for scheduler, contains methods to operate schedule task.
  */
-public interface SchedulerApi {
+public interface SchedulerApi extends AutoCloseable{
 
     /**
      * Start the scheduler, if not start, the scheduler will not execute task.
@@ -52,5 +52,5 @@ public interface SchedulerApi {
      *
      * @throws SchedulerException if close failed.
      */
-    void close() throws SchedulerException;
+    void close() throws Exception;
 }
