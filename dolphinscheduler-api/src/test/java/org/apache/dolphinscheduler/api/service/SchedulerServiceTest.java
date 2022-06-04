@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * scheduler service test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(QuartzExecutorImpl.class)
+@PrepareForTest(SchedulerApi.class)
 public class SchedulerServiceTest {
 
     @InjectMocks
@@ -81,7 +81,7 @@ public class SchedulerServiceTest {
     private ProjectServiceImpl projectService;
 
     @InjectMocks
-    private QuartzExecutorImpl quartzExecutors;
+    private SchedulerApi schedulerApi;
 
     @Before
     public void setUp() {
