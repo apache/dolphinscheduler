@@ -15,45 +15,41 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler-scheduler-plugin</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dolphinscheduler-service</artifactId>
-
-    <name>dolphinscheduler-service</name>
+    <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
 
     <dependencies>
-        <!-- dolphinscheduler -->
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-remote</artifactId>
+            <artifactId>dolphinscheduler-scheduler-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-dao</artifactId>
+            <artifactId>dolphinscheduler-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-registry-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-api</artifactId>
+            <artifactId>dolphinscheduler-meter</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.cronutils</groupId>
-            <artifactId>cron-utils</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -73,12 +69,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-            <scope>provided</scope>
+            <groupId>com.cronutils</groupId>
+            <artifactId>cron-utils</artifactId>
         </dependency>
-
     </dependencies>
+
 </project>
