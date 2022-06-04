@@ -159,5 +159,10 @@ public class QuartzScheduler implements SchedulerApi {
     @Override
     public void close() {
         // nothing to do
+        try {
+            scheduler.shutdown();
+        } catch (org.quartz.SchedulerException e) {
+            throw new SchedulerException("Failed to shutdown scheduler", e);
+        }
     }
 }

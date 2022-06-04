@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(prefix = "spring", name = "quartz")
 public class QuartzSchedulerConfiguration {
 
     @Bean
