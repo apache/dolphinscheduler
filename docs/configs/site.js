@@ -375,7 +375,7 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw',
+          link: 'https://s.apache.org/dolphinscheduler-slack',
         },
       ],
     },
