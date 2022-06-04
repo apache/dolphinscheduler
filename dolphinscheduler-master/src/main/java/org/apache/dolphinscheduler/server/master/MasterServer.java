@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
@@ -77,7 +78,7 @@ public class MasterServer implements IStoppable {
     private MasterSchedulerService masterSchedulerService;
 
     @Autowired
-    private Scheduler scheduler;
+    private SchedulerApi schedulerApi;
 
     @Autowired
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
@@ -154,7 +155,7 @@ public class MasterServer implements IStoppable {
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
 
-        this.scheduler.start();
+        this.schedulerApi.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
@@ -188,6 +189,7 @@ public class MasterServer implements IStoppable {
                 logger.warn("thread sleep exception ", e);
             }
             // close
+            this.schedulerApi.close();
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
             this.masterRegistryClient.closeRegistry();

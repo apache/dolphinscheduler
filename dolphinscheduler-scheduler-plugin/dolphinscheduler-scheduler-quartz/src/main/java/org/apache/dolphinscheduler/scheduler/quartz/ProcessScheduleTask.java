@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz;
+package org.apache.dolphinscheduler.scheduler.quartz;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 
 import java.util.Date;
 
@@ -41,14 +41,12 @@ import org.springframework.util.StringUtils;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 
-public class ProcessScheduleJob extends QuartzJobBean {
-    private static final Logger logger = LoggerFactory.getLogger(ProcessScheduleJob.class);
+public class ProcessScheduleTask extends QuartzJobBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProcessScheduleTask.class);
 
     @Autowired
     private ProcessService processService;
-
-    @Autowired
-    private QuartzExecutor quartzExecutor;
 
     @Counted(value = "quartz_job_executed")
     @Timed(value = "quartz_job_execution", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
@@ -56,8 +54,8 @@ public class ProcessScheduleJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
-        int projectId = dataMap.getInt(Constants.PROJECT_ID);
-        int scheduleId = dataMap.getInt(Constants.SCHEDULE_ID);
+        int projectId = dataMap.getInt(QuartzTaskUtils.PROJECT_ID);
+        int scheduleId = dataMap.getInt(QuartzTaskUtils.SCHEDULE_ID);
 
         Date scheduledFireTime = context.getScheduledFireTime();
 
@@ -100,13 +98,10 @@ public class ProcessScheduleJob extends QuartzJobBean {
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {
         final Scheduler scheduler = context.getScheduler();
-        String jobName = quartzExecutor.buildJobName(scheduleId);
-        String jobGroupName = quartzExecutor.buildJobGroupName(projectId);
-
-        JobKey jobKey = new JobKey(jobName, jobGroupName);
+        JobKey jobKey = QuartzTaskUtils.getJobKey(scheduleId, projectId);
         try {
             if (scheduler.checkExists(jobKey)) {
-                logger.info("Try to delete job: {}, group name: {},", jobName, jobGroupName);
+                logger.info("Try to delete job: {}, projectId: {}, schedulerId", projectId, scheduleId);
                 scheduler.deleteJob(jobKey);
             }
         } catch (Exception e) {

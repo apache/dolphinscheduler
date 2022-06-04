@@ -63,8 +63,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
                         "org.apache.dolphinscheduler.service.process.*",
-                        // todo: split the quartz into a single module
-                        "org.apache.dolphinscheduler.service.quartz.*",
                         "org.apache.dolphinscheduler.service.queue.*",
                 })
         }

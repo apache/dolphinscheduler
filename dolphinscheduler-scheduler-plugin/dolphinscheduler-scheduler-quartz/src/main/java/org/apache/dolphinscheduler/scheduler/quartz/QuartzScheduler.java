@@ -15,33 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz.impl;
+package org.apache.dolphinscheduler.scheduler.quartz;
 
-import static org.apache.dolphinscheduler.common.Constants.PROJECT_ID;
-import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_GROUP_PREFIX;
-import static org.apache.dolphinscheduler.common.Constants.QUARTZ_JOB_PREFIX;
-import static org.apache.dolphinscheduler.common.Constants.SCHEDULE;
-import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_ID;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.service.exceptions.ServiceException;
-import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerException;
+import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import com.google.common.base.Strings;
+
 import org.quartz.CronTrigger;
-import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -49,30 +41,31 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
-public class QuartzExecutorImpl implements QuartzExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(QuartzExecutorImpl.class);
+import com.google.common.base.Strings;
+
+public class QuartzScheduler implements SchedulerApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(QuartzScheduler.class);
 
     @Autowired
     private Scheduler scheduler;
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    /**
-     * add task trigger , if this task already exists, return this task with updated trigger
-     *
-     * @param clazz job class name
-     * @param projectId projectId
-     * @param schedule schedule
-     */
     @Override
-    public void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule) {
-        String jobName = this.buildJobName(schedule.getId());
-        String jobGroupName = this.buildJobGroupName(projectId);
+    public void start() throws SchedulerException {
+        try {
+            scheduler.start();
+        } catch (Exception e) {
+            throw new SchedulerException("Failed to start quartz scheduler ", e);
+        }
+    }
 
-        Map<String, Object> jobDataMap = this.buildDataMap(projectId, schedule);
+    @Override
+    public void insertOrUpdateScheduleTask(int projectId, Schedule schedule) throws SchedulerException {
+        JobKey jobKey = QuartzTaskUtils.getJobKey(schedule.getId(), projectId);
+        Map<String, Object> jobDataMap = QuartzTaskUtils.buildDataMap(projectId, schedule);
         String cronExpression = schedule.getCrontab();
         String timezoneId = schedule.getTimezoneId();
 
@@ -89,7 +82,6 @@ public class QuartzExecutorImpl implements QuartzExecutor {
         lock.writeLock().lock();
         try {
 
-            JobKey jobKey = new JobKey(jobName, jobGroupName);
             JobDetail jobDetail;
             //add a task (if this task already exists, return this task directly)
             if (scheduler.checkExists(jobKey)) {
@@ -97,17 +89,16 @@ public class QuartzExecutorImpl implements QuartzExecutor {
                 jobDetail = scheduler.getJobDetail(jobKey);
                 jobDetail.getJobDataMap().putAll(jobDataMap);
             } else {
-                jobDetail = newJob(clazz).withIdentity(jobKey).build();
+                jobDetail = newJob(ProcessScheduleTask.class).withIdentity(jobKey).build();
 
                 jobDetail.getJobDataMap().putAll(jobDataMap);
 
                 scheduler.addJob(jobDetail, false, true);
 
-                logger.info("Add job, job name: {}, group name: {}",
-                        jobName, jobGroupName);
+                logger.info("Add job, job name: {}, group name: {}", jobKey.getName(), jobKey.getGroup());
             }
 
-            TriggerKey triggerKey = new TriggerKey(jobName, jobGroupName);
+            TriggerKey triggerKey = new TriggerKey(jobKey.getName(), jobKey.getGroup());
             /*
              * Instructs the Scheduler that upon a mis-fire
              * situation, the CronTrigger wants to have it's
@@ -135,39 +126,43 @@ public class QuartzExecutorImpl implements QuartzExecutor {
                     // reschedule job trigger
                     scheduler.rescheduleJob(triggerKey, cronTrigger);
                     logger.info("reschedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
-                            jobName, jobGroupName, cronExpression, startDate, endDate);
+                            triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
                 }
             } else {
                 scheduler.scheduleJob(cronTrigger);
                 logger.info("schedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
-                        jobName, jobGroupName, cronExpression, startDate, endDate);
+                        triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
             }
 
         } catch (Exception e) {
-            throw new ServiceException("add job failed", e);
+            logger.error("Failed to add scheduler task, projectId: {}, scheduler: {}", projectId, schedule, e);
+            throw new SchedulerException("Add schedule job failed", e);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
     @Override
-    public String buildJobName(int processId) {
-        return QUARTZ_JOB_PREFIX + UNDERLINE + processId;
+    public void deleteScheduleTask(int projectId, int scheduleId) throws SchedulerException {
+        JobKey jobKey = QuartzTaskUtils.getJobKey(scheduleId, projectId);
+        try {
+            if (scheduler.checkExists(jobKey)) {
+                logger.info("Try to delete scheduler task, projectId: {}, schedulerId: {}", projectId, scheduleId);
+                scheduler.deleteJob(jobKey);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to delete scheduler task, projectId: {}, schedulerId: {}", projectId, scheduleId, e);
+            throw new SchedulerException("Failed to delete scheduler task");
+        }
     }
 
     @Override
-    public String buildJobGroupName(int projectId) {
-        return QUARTZ_JOB_GROUP_PREFIX + UNDERLINE + projectId;
+    public void close() {
+        // nothing to do
+        try {
+            scheduler.shutdown();
+        } catch (org.quartz.SchedulerException e) {
+            throw new SchedulerException("Failed to shutdown scheduler", e);
+        }
     }
-
-    @Override
-    public Map<String, Object> buildDataMap(int projectId, Schedule schedule) {
-        Map<String, Object> dataMap = new HashMap<>(8);
-        dataMap.put(PROJECT_ID, projectId);
-        dataMap.put(SCHEDULE_ID, schedule.getId());
-        dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));
-
-        return dataMap;
-    }
-
 }
