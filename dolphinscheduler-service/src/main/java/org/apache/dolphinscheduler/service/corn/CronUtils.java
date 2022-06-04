@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz.cron;
+package org.apache.dolphinscheduler.service.corn;
 
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.day;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.hour;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.min;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.month;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.week;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.year;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
 
 import static com.cronutils.model.CronType.QUARTZ;
 
@@ -51,6 +51,7 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 
 /**
+ * // todo: this utils is heavy, it rely on quartz and corn-utils.
  * cron utils
  */
 public class CronUtils {
