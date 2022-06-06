@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
@@ -237,7 +238,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Long[] projectCodeArray = getProjectCodesArrays(loginUser);
 
         // admin can view all
-        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, PROJECT_OVERVIEW)){
+        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, ApiFuncIdentificationConstant.MONITOR_STATISTICS_VIEW)){
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
             return result;
         }
