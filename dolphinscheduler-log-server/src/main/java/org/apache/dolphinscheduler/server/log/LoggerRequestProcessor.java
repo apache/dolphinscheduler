@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,6 +55,8 @@ import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 /**
  * logger request process logic
  */
@@ -65,7 +68,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     private final ExecutorService executor;
 
     public LoggerRequestProcessor() {
-        this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
+        this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1,
+                new NamedThreadFactory("Log-Request-Process-Thread"));
     }
 
     @Override
@@ -80,7 +84,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), GetLogBytesRequestCommand.class);
                 String path = getLogRequest.getPath();
                 if (!checkPathSecurity(path)) {
-                    throw new IllegalArgumentException("Illegal path");
+                    throw new IllegalArgumentException("Illegal path: " + path);
                 }
                 byte[] bytes = getFileContentBytes(path);
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
@@ -91,7 +95,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), ViewLogRequestCommand.class);
                 String viewLogPath = viewLogRequest.getPath();
                 if (!checkPathSecurity(viewLogPath)) {
-                    throw new IllegalArgumentException("Illegal path");
+                    throw new IllegalArgumentException("Illegal path: " + viewLogPath);
                 }
                 String msg = LoggerUtils.readWholeFileContent(viewLogPath);
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
@@ -103,7 +107,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
                 String rollViewLogPath = rollViewLogRequest.getPath();
                 if (!checkPathSecurity(rollViewLogPath)) {
-                    throw new IllegalArgumentException("Illegal path");
+                    throw new IllegalArgumentException("Illegal path: " + rollViewLogPath);
                 }
 
                 List<String> lines = readPartFileContent(rollViewLogPath,
@@ -121,7 +125,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
                 String taskLogPath = removeTaskLogRequest.getPath();
                 if (!checkPathSecurity(taskLogPath)) {
-                    throw new IllegalArgumentException("Illegal path");
+                    throw new IllegalArgumentException("Illegal path: " + taskLogPath);
                 }
                 File taskLogFile = new File(taskLogPath);
                 boolean status = true;
@@ -137,7 +141,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
                 break;
             default:
-                throw new IllegalArgumentException("unknown commandType");
+                throw new IllegalArgumentException("unknown commandType: " + commandType);
         }
     }
 

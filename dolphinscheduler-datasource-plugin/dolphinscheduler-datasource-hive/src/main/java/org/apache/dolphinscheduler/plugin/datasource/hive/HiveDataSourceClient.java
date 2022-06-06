@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
@@ -60,7 +61,8 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void preInit() {
         logger.info("PreInit in {}", getClass().getName());
-        this.kerberosRenewalService = Executors.newSingleThreadScheduledExecutor();
+        this.kerberosRenewalService = Executors.newSingleThreadScheduledExecutor(
+                new ThreadFactoryBuilder().setNameFormat("Hive-Kerberos-Renewal-Thread-").setDaemon(true).build());
     }
 
     @Override
