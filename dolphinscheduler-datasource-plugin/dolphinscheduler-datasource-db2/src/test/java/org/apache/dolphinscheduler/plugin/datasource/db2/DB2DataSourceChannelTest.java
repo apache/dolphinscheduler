@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2ConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.db2.param.Db2ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

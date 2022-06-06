@@ -7,7 +7,7 @@ DataX task type for executing DataX programs. For DataX nodes, the worker will e
 ## Create Task
 
 - Click Project Management -> Project Name -> Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag the <img src="/img/tasks/icons/datax.png" width="15"/> from the toolbar to the drawing board.
+- Drag the <img src="../../../../img/tasks/icons/datax.png" width="15"/> from the toolbar to the drawing board.
 
 ## Task Parameter
 
@@ -42,7 +42,7 @@ This example demonstrates importing data from Hive into MySQL.
 
 If you are using the DataX task type in a production environment, it is necessary to configure the required environment first. The configuration file is as follows: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
 
-![datax_task01](/img/tasks/demo/datax_task01.png)
+![datax_task01](../../../../img/tasks/demo/datax_task01.png)
 
 After the environment has been configured, DolphinScheduler needs to be restarted.
 
@@ -52,11 +52,11 @@ As the default data source does not contain data to be read from Hive, a custom 
 
 After writing the required json file, you can configure the node content by following the steps in the diagram below.
 
-![datax_task02](/img/tasks/demo/datax_task02.png)
+![datax_task02](../../../../img/tasks/demo/datax_task02.png)
 
 ### View run results
 
-![datax_task03](/img/tasks/demo/datax_task03.png)
+![datax_task03](../../../../img/tasks/demo/datax_task03.png)
 
 ### Notice
 

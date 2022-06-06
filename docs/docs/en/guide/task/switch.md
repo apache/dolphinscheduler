@@ -5,7 +5,8 @@ The switch is a conditional judgment node, decide the branch executes according 
 
 ## Create Task
 Click Project -> Management-Project -> Name-Workflow Definition, and click the Create Workflow button to enter the DAG editing page.
-Drag from the toolbar <img src="/img/switch.png" width="20"/> task node to canvas to create a task. 
+Drag from the toolbar <img src="../../../../img/switch.png" width="20"/> task node to canvas to create a task. 
+
 **Note** After created a switch task, you must first configure the upstream and downstream, then configure the parameter of task branches.
 
 ## Parameter

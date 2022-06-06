@@ -1,6 +1,6 @@
 # Spark
 
-![sparksql](/img/new_ui/dev/datasource/sparksql.png)
+![sparksql](../../../../img/new_ui/dev/datasource/sparksql.png)
 
 - Datasource: select Spark
 - Datasource name: enter the name of the DataSource

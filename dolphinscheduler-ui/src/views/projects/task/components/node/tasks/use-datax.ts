@@ -48,7 +48,8 @@ export function useDataX({
     dsType: 'MYSQL',
     dtType: 'MYSQL',
     preStatements: [],
-    postStatements: []
+    postStatements: [],
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []

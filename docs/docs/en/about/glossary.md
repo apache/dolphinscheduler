@@ -9,12 +9,7 @@ scheduling system
 form of a directed acyclic graph, and topological traversal is performed from nodes with zero degrees of entry until
 there are no subsequent nodes. Examples are as follows:
 
-<p align="center">
-  <img src="/img/dag_examples_cn.jpg" alt="dag example"  width="60%" />
-  <p align="center">
-        <em>dag example</em>
-  </p>
-</p>
+![about-glossary](../../../img/new_ui/dev/about/glossary.png)
 
 **Process definition**: Visualization formed by dragging task nodes and establishing task node associations**DAG**
 

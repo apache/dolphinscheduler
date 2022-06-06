@@ -11,7 +11,7 @@ Refer to [DataSource](../datasource/introduction.md)
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/sql.png" width="25"/> to the canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/sql.png" width="25"/> to the canvas.
 
 ## Task Parameter
 
@@ -35,13 +35,13 @@ Refer to [DataSource](../datasource/introduction.md)
 
 This example creates a temporary table `tmp_hello_world` in Hive and writes a row of data. Before creating a temporary table, we need to ensure that the table does not exist. So we use custom parameters to obtain the time of the day as the suffix of the table name every time we run, this task can run every different day. The format of the created table name is: `tmp_hello_world_{yyyyMMdd}`.
 
-![hive-sql](/img/tasks/demo/hive-sql.png)
+![hive-sql](../../../../img/tasks/demo/hive-sql.png)
 
 ### After Running the Task Successfully, Query the Results in Hive
 
 Log in to the bigdata cluster and use 'hive' command or 'beeline' or 'JDBC' and other methods to connect to the 'Apache Hive' for the query. The query SQL is `select * from tmp_hello_world_{yyyyMMdd}`, please replace `{yyyyMMdd}` with the date of the running day. The following shows the query screenshot:
 
-![hive-sql](/img/tasks/demo/hive-result.png)
+![hive-sql](../../../../img/tasks/demo/hive-result.png)
 
 ## Notice
 

@@ -48,7 +48,8 @@ export function useSeaTunnel({
     queue: 'default',
     master: 'yarn',
     masterUrl: '',
-    resourceFiles: []
+    resourceFiles: [],
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []

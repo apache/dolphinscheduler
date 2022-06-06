@@ -5,7 +5,7 @@ Condition is a conditional node, that determines which downstream task should ru
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/conditions.png" width="20"/> task node to canvas.
+- Drag from the toolbar <img src="../../../../img/conditions.png" width="20"/> task node to canvas.
 
 ## Parameter
 
@@ -41,13 +41,13 @@ Go to the workflow definition page, and then create the following task nodes:
 - Node_Success: Shell task, print out "success", Node_A executes the successful branch.
 - Node_False: Shell task, print out "false", Node_A executes the failed branch.
 
-![condition_task01](/img/tasks/demo/condition_task01.png)
+![condition_task01](../../../../img/tasks/demo/condition_task01.png)
 
 ### 2. View the execution result
 
 After you finish creating the workflow, you can run the workflow online. You can view the execution status of each task on the workflow instance page. As shown below:
 
-![condition_task02](/img/tasks/demo/condition_task02.png)
+![condition_task02](../../../../img/tasks/demo/condition_task02.png)
 
 In the above figure, the task status marked with a green check mark is the successfully executed task node.
 
@@ -57,5 +57,5 @@ In the above figure, the task status marked with a green check mark is the succe
 - The Conditions task and the workflow that contain it do not support copy operations.
 - The predecessor task of Conditions cannot connect to its branch nodes, which will cause logical confusion and does not conform to DAG scheduling. The situation shown below is **wrong**.
 
-![condition_task03](/img/tasks/demo/condition_task03.png)
-![condition_task04](/img/tasks/demo/condition_task04.png)
+![condition_task03](../../../../img/tasks/demo/condition_task03.png)
+![condition_task04](../../../../img/tasks/demo/condition_task04.png)

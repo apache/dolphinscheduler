@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -87,6 +87,11 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                     this.taskInstance.getId(),
                     e);
         }
+        return true;
+    }
+
+    @Override
+    protected boolean resubmitTask() {
         return true;
     }
 
@@ -207,7 +212,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 return "";
             }
             String value = property.getValue();
-            if (!org.apache.commons.lang.math.NumberUtils.isNumber(value)) {
+            if (!org.apache.commons.lang3.math.NumberUtils.isCreatable(value)) {
                 value = "\"" + value + "\"";
             }
             logger.info("paramName:{}，paramValue:{}", paramName, value);

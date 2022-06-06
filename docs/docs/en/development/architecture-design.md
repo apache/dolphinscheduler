@@ -6,7 +6,7 @@ Before explaining the architecture of the schedule system, let us first understa
 **DAG：** Full name Directed Acyclic Graph，referred to as DAG。Tasks in the workflow are assembled in the form of directed acyclic graphs, which are topologically traversed from nodes with zero indegrees of ingress until there are no successor nodes. For example, the following picture:
 
 <p align="center">
-  <img src="/img/architecture-design/dag_examples.png" alt="dag示例"  width="80%" />
+  <img src="../../../img/architecture-design/dag_examples.png" alt="dag示例"  width="80%" />
   <p align="center">
         <em>dag example</em>
   </p>
@@ -40,7 +40,7 @@ Before explaining the architecture of the schedule system, let us first understa
 
 #### 2.1 System Architecture Diagram
 <p align="center">
-  <img src="/img/architecture.jpg" alt="System Architecture Diagram"  />
+  <img src="../../../img/architecture.jpg" alt="System Architecture Diagram"  />
   <p align="center">
         <em>System Architecture Diagram</em>
   </p>
@@ -140,13 +140,13 @@ DolphinScheduler uses ZooKeeper distributed locks to implement only one Master t
 1. The core process algorithm for obtaining distributed locks is as follows
 
  <p align="center">
-   <img src="/img/architecture-design/distributed_lock.png" alt="Get Distributed Lock Process" width="70%" />
+   <img src="../../../img/architecture-design/distributed_lock.png" alt="Get Distributed Lock Process" width="70%" />
  </p>
 
 2. Scheduler thread distributed lock implementation flow chart in DolphinScheduler:
 
  <p align="center">
-   <img src="/img/architecture-design/distributed_lock_procss.png" alt="Get Distributed Lock Process" />
+   <img src="../../../img/architecture-design/distributed_lock_procss.png" alt="Get Distributed Lock Process" />
  </p>
 
 ##### Third, the thread is insufficient loop waiting problem
@@ -155,7 +155,7 @@ DolphinScheduler uses ZooKeeper distributed locks to implement only one Master t
 - If a large number of sub-processes are nested in a large DAG, the following figure will result in a "dead" state:
 
  <p align="center">
-   <img src="/img/architecture-design/lack_thread.png" alt="Thread is not enough to wait for loop" width="70%" />
+   <img src="../../../img/architecture-design/lack_thread.png" alt="Thread is not enough to wait for loop" width="70%" />
  </p>
 
 In the above figure, MainFlowThread waits for SubFlowThread1 to end, SubFlowThread1 waits for SubFlowThread2 to end, SubFlowThread2 waits for SubFlowThread3 to end, and SubFlowThread3 waits for a new thread in the thread pool, then the entire DAG process cannot end, and thus the thread cannot be released. This forms the state of the child parent process loop waiting. At this point, the scheduling cluster will no longer be available unless a new Master is started to add threads to break such a "stuck."
@@ -179,7 +179,7 @@ Fault tolerance is divided into service fault tolerance and task retry. Service 
 Service fault tolerance design relies on ZooKeeper's Watcher mechanism. The implementation principle is as follows:
 
  <p align="center">
-   <img src="/img/architecture-design/fault-tolerant.png" alt="DolphinScheduler Fault Tolerant Design" width="70%" />
+   <img src="../../../img/architecture-design/fault-tolerant.png" alt="DolphinScheduler Fault Tolerant Design" width="70%" />
  </p>
 
 The Master monitors the directories of other Masters and Workers. If the remove event is detected, the process instance is fault-tolerant or the task instance is fault-tolerant according to the specific business logic.
@@ -189,7 +189,7 @@ The Master monitors the directories of other Masters and Workers. If the remove 
 - Master fault tolerance flow chart:
 
  <p align="center">
-   <img src="/img/architecture-design/fault-tolerant_master.png" alt="Master Fault Tolerance Flowchart" width="70%" />
+   <img src="../../../img/architecture-design/fault-tolerant_master.png" alt="Master Fault Tolerance Flowchart" width="70%" />
  </p>
 
 After the ZooKeeper Master is fault-tolerant, it is rescheduled by the Scheduler thread in DolphinScheduler. It traverses the DAG to find the "Running" and "Submit Successful" tasks, and monitors the status of its task instance for the "Running" task. You need to determine whether the Task Queue already exists. If it exists, monitor the status of the task instance. If it does not exist, resubmit the task instance.
@@ -199,7 +199,7 @@ After the ZooKeeper Master is fault-tolerant, it is rescheduled by the Scheduler
 - Worker fault tolerance flow chart:
 
  <p align="center">
-   <img src="/img/architecture-design/fault-tolerant_worker.png" alt="Worker Fault Tolerance Flowchart" width="70%" />
+   <img src="../../../img/architecture-design/fault-tolerant_worker.png" alt="Worker Fault Tolerance Flowchart" width="70%" />
  </p>
 
 Once the Master Scheduler thread finds the task instance as "need to be fault tolerant", it takes over the task and resubmits.
@@ -238,13 +238,13 @@ In the early scheduling design, if there is no priority design and fair scheduli
     - The priority of the process definition is that some processes need to be processed before other processes. This can be configured at the start of the process or at the time of scheduled start. There are 5 levels, followed by HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
       <p align="center">
-         <img src="/img/architecture-design/process_priority.png" alt="Process Priority Configuration" width="40%" />
+         <img src="../../../img/architecture-design/process_priority.png" alt="Process Priority Configuration" width="40%" />
        </p>
 
     - The priority of the task is also divided into 5 levels, followed by HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
       <p align="center">`
-         <img src="/img/architecture-design/task_priority.png" alt="task priority configuration" width="35%" />
+         <img src="../../../img/architecture-design/task_priority.png" alt="task priority configuration" width="35%" />
        </p>
 
 ##### VI. Logback and gRPC implement log access
@@ -255,7 +255,7 @@ In the early scheduling design, if there is no priority design and fair scheduli
 - Considering the lightweightness of DolphinScheduler as much as possible, gRPC was chosen to implement remote access log information.
 
  <p align="center">
-   <img src="/img/architecture-design/grpc.png" alt="grpc remote access" width="50%" />
+   <img src="../../../img/architecture-design/grpc.png" alt="grpc remote access" width="50%" />
  </p>
 
 - We use a custom Logback FileAppender and Filter function to generate a log file for each task instance.

@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.BufferedReader;
@@ -247,6 +247,25 @@ public class OSUtils {
         }
 
         return users;
+    }
+
+    /**
+     * whether the user exists in linux
+     *
+     * @return boolean
+     */
+    public static boolean existTenantCodeInLinux(String tenantCode) {
+        try{
+            String result = exeCmd("id "+ tenantCode);
+            if (!StringUtils.isEmpty(result)){
+                return result.contains("uid=");
+            }
+        }catch (Exception e){
+            //because ShellExecutor method throws exception to the linux return status is not 0
+            //not exist user return status is 1
+            logger.error(e.getMessage(), e);
+        }
+        return false;
     }
 
     /**
