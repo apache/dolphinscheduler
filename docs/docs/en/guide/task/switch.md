@@ -29,8 +29,6 @@ Drag from the toolbar <img src="../../../../img/switch.png" width="20"/> task no
 
 This is demonstrated using one switch task and three shell tasks.
 
-![switch_01](/img/tasks/demo/switch_01.png)
-
 ### Create a workflow
 
 Create a new switch task, and three shell tasks downstream. The shell task is not required.
