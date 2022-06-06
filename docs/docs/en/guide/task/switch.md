@@ -48,6 +48,8 @@ The value of the global variable configured here is A.
 
 ![switch_03](../../../../img/tasks/demo/switch_03.png)
 
+If executed correctly, then taskA will be executed correctly.
+
 ### Execute
 
 Execute and see if it works as expected. It can be seen that the specified downstream tasksA are executed as expected.
