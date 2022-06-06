@@ -45,6 +45,5 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ## 注意事项
 
-注意SQL类型的选择，如果是INSERT等操作需要选择非查询类型。 
-
-为了兼容长会话情况,UDF函数的创建是通过CREATE OR REPLACE语句
+* 注意SQL类型的选择，如果是INSERT等操作需要选择非查询类型。 
+* 为了兼容长会话情况,UDF函数的创建是通过CREATE OR REPLACE语句
