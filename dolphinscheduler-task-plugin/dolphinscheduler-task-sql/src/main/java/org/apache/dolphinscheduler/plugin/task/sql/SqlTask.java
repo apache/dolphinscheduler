@@ -82,8 +82,9 @@ public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * create function format
+     * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
      */
-    private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
+    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT = "create or replace temporary function {0} as ''{1}''";
 
     /**
      * default query sql limit
@@ -479,7 +480,7 @@ public class SqlTask extends AbstractTaskExecutor {
      */
     private List<String> buildTempFuncSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> MessageFormat
-                .format(CREATE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
+                .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
     }
 
     /**
