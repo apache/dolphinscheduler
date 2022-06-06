@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.hive;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
-import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
+import org.apache.dolphinscheduler.plugin.datasource.hive.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;

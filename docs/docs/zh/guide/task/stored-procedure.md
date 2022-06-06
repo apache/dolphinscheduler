@@ -4,7 +4,7 @@
 > 拖动工具栏中的![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PROCEDURE.png)任务节点到画板中，如下图所示：
 
 <p align="center">
-   <img src="/img/procedure_edit.png" width="80%" />
+   <img src="../../../../img/procedure_edit.png" width="80%" />
  </p>
 
 - 数据源：存储过程的数据源类型支持MySQL和POSTGRESQL两种，选择对应的数据源

@@ -23,10 +23,8 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -42,14 +40,13 @@ public class DataSourcePluginManager {
     }
 
     public void installPlugin() {
-        final Set<String> names = new HashSet<>();
 
         ServiceLoader.load(DataSourceChannelFactory.class).forEach(factory -> {
             final String name = factory.getName();
 
             logger.info("Registering datasource plugin: {}", name);
 
-            if (!names.add(name)) {
+            if (datasourceClientMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
 

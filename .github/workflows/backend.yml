@@ -63,7 +63,7 @@ jobs:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven

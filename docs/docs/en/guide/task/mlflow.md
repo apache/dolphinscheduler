@@ -33,7 +33,7 @@ The Mlflow plugin currently supports and will support the following:
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the
   DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/mlflow.png" width="15"/> task node to canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/mlflow.png" width="15"/> task node to canvas.
 
 ## Task Example
 
@@ -60,7 +60,7 @@ First, introduce some general parameters of DolphinScheduler
 
 #### BasicAlgorithm
 
-![mlflow-conda-env](/img/tasks/demo/mlflow-basic-algorithm.png)
+![mlflow-conda-env](../../../../img/tasks/demo/mlflow-basic-algorithm.png)
 
 **Task Parameter**
 
@@ -88,7 +88,7 @@ First, introduce some general parameters of DolphinScheduler
 
 #### AutoML
 
-![mlflow-automl](/img/tasks/demo/mlflow-automl.png)
+![mlflow-automl](../../../../img/tasks/demo/mlflow-automl.png)
 
 **Task Parameter**
 
@@ -112,7 +112,7 @@ First, introduce some general parameters of DolphinScheduler
 
 #### Custom projects
 
-![mlflow-custom-project-template.png](/img/tasks/demo/mlflow-custom-project-template.png)
+![mlflow-custom-project-template.png](../../../../img/tasks/demo/mlflow-custom-project-template.png)
 
 **Task Parameter**
 
@@ -126,13 +126,13 @@ You can now use this feature to run all mlFlow projects on Github (For example [
 
 The actual interface is as follows
 
-![mlflow-custom-project.png](/img/tasks/demo/mlflow-custom-project.png)
+![mlflow-custom-project.png](../../../../img/tasks/demo/mlflow-custom-project.png)
 
 ### MLflow Models
 
 #### MLFLOW
 
-![mlflow-models-mlflow](/img/tasks/demo/mlflow-models-mlflow.png)
+![mlflow-models-mlflow](../../../../img/tasks/demo/mlflow-models-mlflow.png)
 
 **Task Parameter**
 
@@ -142,7 +142,7 @@ The actual interface is as follows
 
 #### Docker
 
-![mlflow-models-docker](/img/tasks/demo/mlflow-models-docker.png)
+![mlflow-models-docker](../../../../img/tasks/demo/mlflow-models-docker.png)
 
 **Task Parameter**
 
@@ -158,12 +158,12 @@ You need to enter the admin account to configure a conda environment variable（
 install [anaconda](https://docs.continuum.io/anaconda/install/)
 or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing ) in advance )
 
-![mlflow-conda-env](/img/tasks/demo/mlflow-conda-env.png)
+![mlflow-conda-env](../../../../img/tasks/demo/mlflow-conda-env.png)
 
 Note During the configuration task, select the conda environment created above. Otherwise, the program cannot find the
 Conda environment.
 
-![mlflow-set-conda-env](/img/tasks/demo/mlflow-set-conda-env.png)
+![mlflow-set-conda-env](../../../../img/tasks/demo/mlflow-set-conda-env.png)
 
 ### Start the mlflow service
 
@@ -181,4 +181,4 @@ After running, an MLflow service is started
 
 After this, you can visit the MLFlow service (`http://localhost:5000`) page to view the experiments and models.
 
-![mlflow-server](/img/tasks/demo/mlflow-server.png)
+![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)

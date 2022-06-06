@@ -495,26 +495,6 @@ public final class Constants {
      */
     public static final String UNDERLINE = "_";
     /**
-     * quartz job prifix
-     */
-    public static final String QUARTZ_JOB_PREFIX = "job";
-    /**
-     * quartz job group prifix
-     */
-    public static final String QUARTZ_JOB_GROUP_PREFIX = "jobgroup";
-    /**
-     * projectId
-     */
-    public static final String PROJECT_ID = "projectId";
-    /**
-     * processId
-     */
-    public static final String SCHEDULE_ID = "scheduleId";
-    /**
-     * schedule
-     */
-    public static final String SCHEDULE = "schedule";
-    /**
      * application regex
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";

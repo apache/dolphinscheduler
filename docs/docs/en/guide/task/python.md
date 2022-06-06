@@ -8,7 +8,7 @@ it will generate a temporary python script, and executes the script by the Linux
 ## Create Task
 
 - Click Project Management-Project Name-Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag <img src="/img/tasks/icons/python.png" width="15"/> from the toolbar to the canvas.
+- Drag <img src="../../../../img/tasks/icons/python.png" width="15"/> from the toolbar to the canvas.
 
 ## Task Parameter
 
@@ -32,7 +32,7 @@ it will generate a temporary python script, and executes the script by the Linux
 This example simulates a common task that runs by a simple command. The example is to print one line in the log file, as shown in the following figure:
 "This is a demo of python task".
 
-![demo-python-simple](/img/tasks/demo/python_ui_next.jpg)
+![demo-python-simple](../../../../img/tasks/demo/python_ui_next.jpg)
 
 ```python
 print("This is a demo of python task")
@@ -44,7 +44,7 @@ This example simulates a custom parameter task. We use parameters for reusing ex
 we declare a custom parameter named "param_key", with the value "param_val". Then we use echo to print the parameter "${param_key}" we just declared.
 After running this example, we would see "param_val" print in the log.
 
-![demo-python-custom-param](/img/tasks/demo/python_custom_param_ui_next.jpg)
+![demo-python-custom-param](../../../../img/tasks/demo/python_custom_param_ui_next.jpg)
 
 ```python
 print("${param_key}")
