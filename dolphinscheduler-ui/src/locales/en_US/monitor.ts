@@ -19,6 +19,7 @@ export default {
   master: {
     cpu_usage: 'CPU Usage',
     memory_usage: 'Memory Usage',
+    disk_available: 'Disk Available',
     load_average: 'Load Average',
     create_time: 'Create Time',
     last_heartbeat_time: 'Last Heartbeat Time',
@@ -32,6 +33,7 @@ export default {
   worker: {
     cpu_usage: 'CPU Usage',
     memory_usage: 'Memory Usage',
+    disk_available: 'Disk Available',
     load_average: 'Load Average',
     create_time: 'Create Time',
     last_heartbeat_time: 'Last Heartbeat Time',
