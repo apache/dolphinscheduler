@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -50,7 +51,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALART_INSTANCE_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALART_LIST;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
@@ -176,7 +176,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     public Map<String, Object> get(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(id);
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE,ALART_LIST)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -210,7 +210,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     public Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize) {
 
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ALERT_PLUGIN_INSTANCE,ALART_LIST)) {
+        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ALERT_PLUGIN_INSTANCE, ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
             putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
