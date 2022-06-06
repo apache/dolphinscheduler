@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 public class LocalServerHttpUtilsTest extends TestCase{
 
-    private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
     public static final Logger logger = LoggerFactory.getLogger(LocalServerHttpUtilsTest.class);
     private static LocalJettyHttpServer server = null;
     public static Test suite(){
@@ -51,19 +50,6 @@ public class LocalServerHttpUtilsTest extends TestCase{
 		Assert.assertEquals("Github",jsonObject.path("name").asText());
 		result = HttpUtils.get("http://123.333.111.33/ccc");
 		Assert.assertNull(result);
-    }
-
-    public void testGetByKerberos() {
-        try {
-            String applicationUrl = hadoopUtils.getApplicationUrl("application_1542010131334_0029");
-            String responseContent;
-            responseContent = HttpUtils.get(applicationUrl);
-            Assert.assertNull(responseContent);
-
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-
     }
 
     public void testGetResponseContentString() {
