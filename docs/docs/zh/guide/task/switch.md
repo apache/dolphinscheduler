@@ -34,19 +34,19 @@ Switch 是一个条件判断节点，依据[全局变量](../parameter/global.md
 新建 switch 任务，以及下游的三个 shell 任务。shell 任务没有要求。
 switch 任务需要和下游任务连线配置关系后，才可以进行下游任务的选择。
 
-![switch_01](/img/tasks/demo/switch_01.png)
+![switch_01](../../../../img/tasks/demo/switch_01.png)
 
 ### 设置条件
 
 配置条件和默认分支，满足条件会走指定分支，都不满足则走默认分支。
 图中如果变量的值为 "A" 则执行分支 taskA，如果变量的值为 "B" 则执行分支 taskB ，都不满足则执行 default。
 
-![switch_02](/img/tasks/demo/switch_02.png)
+![switch_02](../../../../img/tasks/demo/switch_02.png)
 
 条件使用了全局变量，请参考[全局变量](../parameter/global.md)。
 这里配置全局变量的值为 A。
 
-![switch_03](/img/tasks/demo/switch_03.png)
+![switch_03](../../../../img/tasks/demo/switch_03.png)
 
 如果执行正确，那么 taskA 会被正确执行。
 
@@ -54,5 +54,5 @@ switch 任务需要和下游任务连线配置关系后，才可以进行下游�
 
 执行，并且查看是否符合预期。可以看到符合预期，执行了指定的下游任务 taskA。
 
-![switch_04](/img/tasks/demo/switch_04.png)
+![switch_04](../../../../img/tasks/demo/switch_04.png)
 
