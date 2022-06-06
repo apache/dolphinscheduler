@@ -103,8 +103,8 @@ public class NettyRemotingServer {
      */
     public NettyRemotingServer(final NettyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
-        ThreadFactory bossThreadFactory = new ThreadFactoryBuilder().setNameFormat("NettyServerBossThread_%s").build();
-        ThreadFactory workerThreadFactory = new ThreadFactoryBuilder().setNameFormat("NettyServerWorkerThread_%s").build();
+        ThreadFactory bossThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("NettyServerBossThread_%s").build();
+        ThreadFactory workerThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("NettyServerWorkerThread_%s").build();
         if (Epoll.isAvailable()) {
             this.bossGroup = new EpollEventLoopGroup(1, bossThreadFactory);
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);
