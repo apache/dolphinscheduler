@@ -46,3 +46,5 @@ Log in to the bigdata cluster and use 'hive' command or 'beeline' or 'JDBC' and 
 ## Notice
 
 Pay attention to the selection of SQL type. If it is an insert operation, need to change to "Non-Query" type.
+
+To compatible with long session,UDF function are created by the syntax(CREATE OR REPLACE)
