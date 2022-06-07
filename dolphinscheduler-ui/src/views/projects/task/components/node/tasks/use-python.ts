@@ -73,6 +73,7 @@ export function usePython({
       Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useShell(model),

@@ -509,7 +509,7 @@ public class TaskNode {
     }
 
     public Integer getCpuQuota() {
-        return cpuQuota;
+        return cpuQuota == null ? -1 : cpuQuota;
     }
 
     public void setCpuQuota(Integer cpuQuota) {
@@ -517,7 +517,7 @@ public class TaskNode {
     }
 
     public Integer getMemoryMax() {
-        return memoryMax;
+        return memoryMax == null ? -1 : memoryMax;
     }
 
     public void setMemoryMax(Integer memoryMax) {
