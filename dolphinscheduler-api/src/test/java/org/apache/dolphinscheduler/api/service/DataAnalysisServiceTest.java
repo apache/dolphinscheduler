@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -47,14 +41,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,6 +54,21 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+
 /**
  * data analysis service test
  */
@@ -75,6 +76,8 @@ import org.slf4j.LoggerFactory;
 public class DataAnalysisServiceTest {
 
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+    private static final Logger serviceLogger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
     @InjectMocks
     private DataAnalysisServiceImpl dataAnalysisServiceImpl;
@@ -114,6 +117,7 @@ public class DataAnalysisServiceTest {
     public void setUp() {
 
         user = new User();
+        user.setId(1);
         Project project = new Project();
         project.setId(1);
         project.setName("test");
@@ -199,6 +203,8 @@ public class DataAnalysisServiceTest {
 
         // when general user doesn't have any task then return all count are 0
         user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1, serviceLogger))
+                .thenReturn(projectIds());
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any())).thenReturn(
                 Collections.emptyList());
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, null, null);
@@ -215,6 +221,7 @@ public class DataAnalysisServiceTest {
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(),any())).thenReturn(result);
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1, serviceLogger)).thenReturn(projectIds());
 
         // when instanceStateCounter return null, then return nothing
         user.setUserType(UserType.GENERAL_USER);
@@ -259,7 +266,7 @@ public class DataAnalysisServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(),any())).thenReturn(result);
 
         Mockito.when(processDefinitionMapper.countDefinitionByProjectCodes(
-            Mockito.any(Long[].class))).thenReturn(new ArrayList<DefinitionGroupByUser>());
+                Mockito.any(Long[].class))).thenReturn(new ArrayList<DefinitionGroupByUser>());
         result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -284,6 +291,8 @@ public class DataAnalysisServiceTest {
         // when no command found then return all count are 0
         Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
         Mockito.when(errorCommandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1, serviceLogger)).thenReturn(projectIds());
+
         Map<String, Object> result5 = dataAnalysisServiceImpl.countCommandState(user);
         assertThat(result5).containsEntry(Constants.STATUS, Status.SUCCESS);
         assertThat(result5.get(Constants.DATA_LIST)).asList().extracting("errorCount").allMatch(count -> count.equals(0));
@@ -316,6 +325,12 @@ public class DataAnalysisServiceTest {
         assertThat(result2.get(Constants.DATA_LIST)).extracting("taskQueue", "taskKill")
                 .isNotEmpty()
                 .allMatch(count -> count.equals(0));
+    }
+
+    private Set<Integer> projectIds() {
+        Set<Integer> projectIds = new HashSet<>();
+        projectIds.add(1);
+        return projectIds;
     }
 
     /**
