@@ -158,7 +158,7 @@ public class MlflowTaskTest {
                         "export DS_TASK_MLFLOW_IMAGE_NAME=mlflow/22222:1\n" +
                         "export DS_TASK_MLFLOW_DEPLOY_PORT=7000\n" +
                         "export DS_TASK_MLFLOW_CPU_LIMIT=0.5\n" +
-                        "export DS_TASK_MLFLOW_MEMORY_LIMIT=201m\n" +
+                        "export DS_TASK_MLFLOW_MEMORY_LIMIT=200m\n" +
                         "docker-compose up -d");
     }
 
