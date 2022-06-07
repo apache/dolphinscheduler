@@ -64,6 +64,11 @@ public final class TaskMetrics {
                     .description("Task stop total count")
                     .register(Metrics.globalRegistry);
 
+    private static final Counter TASK_FAILOVER_COUNTER =
+            Counter.builder("dolphinscheduler_task_failover_count")
+                    .description("Task failover total count")
+                    .register(Metrics.globalRegistry);
+
     public static void incTaskSubmit() {
         TASK_SUBMIT_COUNTER.increment();
     }
@@ -96,5 +101,9 @@ public final class TaskMetrics {
 
     public static void incTaskStop() {
         TASK_STOP_COUNTER.increment();
+    }
+
+    public static void incTaskFailover() {
+        TASK_FAILOVER_COUNTER.increment();
     }
 }

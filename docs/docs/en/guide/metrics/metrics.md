@@ -48,6 +48,7 @@ Master metrics are exported by the DolphinScheduler master server.
   failure.
 * dolphinscheduler_process_instance_success_count: Indicates the number of process has been successful.
 * dolphinscheduler_process_instance_stop_count: Indicates the number of process has been stopped.
+* dolphinscheduler_process_instance_failover_count: Indicates the number of process has been failed over.
 
 ### Task Metrics
 
@@ -56,6 +57,7 @@ Master metrics are exported by the DolphinScheduler master server.
 * dolphinscheduler_task_success_count: Indicates the number of tasks has been successful.
 * dolphinscheduler_task_timeout_count: Indicates the number of tasks has been timeout.
 * dolphinscheduler_task_retry_count: Indicates the number of tasks has been retry.
+* dolphinscheduler_task_failover_count: Indicates the number of tasks has been failover.
 
 ## Worker Metrics
 

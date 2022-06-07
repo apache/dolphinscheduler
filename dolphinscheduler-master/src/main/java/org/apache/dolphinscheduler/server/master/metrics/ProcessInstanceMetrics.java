@@ -59,6 +59,11 @@ public final class ProcessInstanceMetrics {
                     .description("Process instance stop total count")
                     .register(Metrics.globalRegistry);
 
+    private static final Counter PROCESS_INSTANCE_FAILOVER_COUNTER =
+            Counter.builder("dolphinscheduler_process_instance_failover_count")
+                    .description("Process instance failover total count")
+                    .register(Metrics.globalRegistry);
+
     public static synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
         Gauge.builder("dolphinscheduler_process_instance_running_gauge", function)
                 .description("The current running process instance count")
@@ -87,6 +92,10 @@ public final class ProcessInstanceMetrics {
 
     public static void incProcessInstanceStop() {
         PROCESS_INSTANCE_STOP_COUNTER.increment();
+    }
+
+    public static void incProcessInstanceFailover() {
+        PROCESS_INSTANCE_FAILOVER_COUNTER.increment();
     }
 
 }
