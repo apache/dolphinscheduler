@@ -42,21 +42,12 @@ public final class MasterServerMetrics {
                     .description("Master server consume command count")
                     .register(Metrics.globalRegistry);
 
-    private static final Counter MASTER_FAILOVER_COUNTER =
-            Counter.builder("dolphinscheduler_master_failover_count")
-                    .description("Master server failover count")
-                    .register(Metrics.globalRegistry);
-
     public static void incMasterOverload() {
         MASTER_OVERLOAD_COUNTER.increment();
     }
 
     public static void incMasterConsumeCommand(int commandCount) {
         MASTER_CONSUME_COMMAND_COUNTER.increment(commandCount);
-    }
-
-    public static void incMasterFailover() {
-        MASTER_FAILOVER_COUNTER.increment();
     }
 
 }

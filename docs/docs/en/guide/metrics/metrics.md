@@ -30,6 +30,10 @@ docker compose up
 
 Then you can access the grafana by the url: `http://localhost/3001`
 
+![image.png](../../../../img/metrics/metrics-master.jpg)
+![image.png](../../../../img/metrics/metrics-worker.jpg)
+![image.png](../../../../img/metrics/metrics-datasource.jpg)
+
 ## Master Metrics
 
 Master metrics are exported by the DolphinScheduler master server.
