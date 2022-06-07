@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -44,11 +46,15 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,6 +72,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
  */
 @Service
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -165,9 +173,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 return result;
             }
         }
-
-        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[]{projectCode};
+        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        if (projectIds.getRight() != null) {
+            return projectIds.getRight();
+        }
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
         List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
 
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
@@ -204,8 +214,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[]{projectCode};
+        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        if (projectIds.getRight() != null) {
+            return projectIds.getRight();
+        }
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
         }
@@ -233,7 +246,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
          */
         Date start = null;
         Date end = null;
-        Long[] projectCodeArray = getProjectCodesArrays(loginUser);
+        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        if (projectIds.getRight() != null) {
+            return projectIds.getRight();
+        }
+        Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
 
         // admin can view all
         if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, ApiFuncIdentificationConstant.MONITOR_STATISTICS_VIEW)){
@@ -264,16 +281,22 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Long[] getProjectCodesArrays(User loginUser) {
-        List<Project> projectList = projectMapper.queryRelationProjectListByUserId(
-                loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId());
-        Set<Long> projectCodes = new HashSet<>();
-        projectList.forEach(project -> projectCodes.add(project.getCode()));
-        if (loginUser.getUserType() == UserType.GENERAL_USER) {
-            List<Project> createProjects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
-            createProjects.forEach(project -> projectCodes.add(project.getCode()));
+    private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        if (projectIds.isEmpty()) {
+            result.put(Constants.DATA_LIST, new TaskCountDto());
+            putMsg(result, Status.SUCCESS);
+            return Pair.of(null, result);
         }
-        return projectCodes.toArray(new Long[0]);
+        return Pair.of(projectIds, null);
+    }
+
+    private Long[] getProjectCodesArrays(Set<Integer> projectIds) {
+        List<Project> projects = projectMapper.selectBatchIds(projectIds);
+        List<Long> codeList = projects.stream().map(Project::getCode).collect(Collectors.toList());
+        Long[] projectCodeArray = new Long[codeList.size()];
+        codeList.toArray(projectCodeArray);
+        return projectCodeArray;
     }
 
     /**
