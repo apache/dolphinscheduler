@@ -26,10 +26,8 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -43,9 +41,9 @@ import io.netty.channel.Channel;
 /**
  * task execute thread
  */
-public class TaskExecuteThread {
+public class TaskExecuteRunnable implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskExecuteThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecuteRunnable.class);
 
     private final int processInstanceId;
 
@@ -59,8 +57,8 @@ public class TaskExecuteThread {
 
     private DataQualityResultOperator dataQualityResultOperator;
 
-    public TaskExecuteThread(int processInstanceId, ProcessService processService, WorkflowExecuteThreadPool workflowExecuteThreadPool,
-                             ProcessInstanceExecCacheManager processInstanceExecCacheManager, DataQualityResultOperator dataQualityResultOperator) {
+    public TaskExecuteRunnable(int processInstanceId, ProcessService processService, WorkflowExecuteThreadPool workflowExecuteThreadPool,
+                               ProcessInstanceExecCacheManager processInstanceExecCacheManager, DataQualityResultOperator dataQualityResultOperator) {
         this.processInstanceId = processInstanceId;
         this.processService = processService;
         this.workflowExecuteThreadPool = workflowExecuteThreadPool;
@@ -68,6 +66,7 @@ public class TaskExecuteThread {
         this.dataQualityResultOperator = dataQualityResultOperator;
     }
 
+    @Override
     public void run() {
         while (!this.events.isEmpty()) {
             TaskEvent event = this.events.peek();
@@ -117,7 +116,7 @@ public class TaskExecuteThread {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         TaskInstance taskInstance;
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(taskInstanceId)) {
             taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
         } else {
@@ -231,7 +230,7 @@ public class TaskExecuteThread {
     /**
      * handle result event
      */
-    private void handleWorkerRejectEvent(Channel channel, TaskInstance taskInstance, WorkflowExecuteThread executeThread) {
+    private void handleWorkerRejectEvent(Channel channel, TaskInstance taskInstance, WorkflowExecuteRunnable executeThread) {
         try {
             if (executeThread != null) {
                 executeThread.resubmit(taskInstance.getTaskCode());
