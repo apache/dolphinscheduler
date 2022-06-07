@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,9 +101,6 @@ public class DataAnalysisServiceTest {
 
     @Mock
     TaskInstanceMapper taskInstanceMapper;
-
-    @Mock
-    ProcessService processService;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
