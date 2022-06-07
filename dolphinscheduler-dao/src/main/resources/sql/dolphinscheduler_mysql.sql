@@ -487,6 +487,8 @@ CREATE TABLE `t_ds_task_definition` (
   `resource_ids` text COMMENT 'resource id, separated by comma',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `task_group_priority` tinyint(4) DEFAULT '0' COMMENT 'task group priority',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)

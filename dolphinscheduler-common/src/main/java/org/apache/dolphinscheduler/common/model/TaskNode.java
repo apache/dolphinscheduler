@@ -178,6 +178,16 @@ public class TaskNode {
      */
     private int delayTime;
 
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
+
     public String getId() {
         return id;
     }
@@ -496,5 +506,21 @@ public class TaskNode {
 
     public void setTaskGroupPriority(int taskGroupPriority) {
         this.taskGroupPriority = taskGroupPriority;
+    }
+
+    public Integer getCpuQuota() {
+        return cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
     }
 }

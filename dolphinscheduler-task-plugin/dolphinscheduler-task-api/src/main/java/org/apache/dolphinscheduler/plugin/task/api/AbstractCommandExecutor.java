@@ -21,8 +21,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -127,9 +129,13 @@ public abstract class AbstractCommandExecutor {
 
         // if sudo.enable=true,setting up user to run commands
         if (OSUtils.isSudoEnable()) {
-            command.add("sudo");
-            command.add("-u");
-            command.add(taskRequest.getTenantCode());
+            if (OSUtils.isMacOS() && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
+                generateCgroupCommand(command);
+            } else {
+                command.add("sudo");
+                command.add("-u");
+                command.add(taskRequest.getTenantCode());
+            }
         }
         command.add(commandInterpreter());
         command.addAll(Collections.emptyList());
@@ -140,6 +146,28 @@ public abstract class AbstractCommandExecutor {
         process = processBuilder.start();
 
         printCommand(command);
+    }
+
+    private void generateCgroupCommand(List<String> command) {
+        Integer cpuQuota = taskRequest.getCpuQuota();
+        Integer memoryMax = taskRequest.getMemoryMax();
+
+        command.add("sudo");
+        command.add("systemd-run -q --scope");
+
+        if (cpuQuota == -1) {
+            command.add("-p CPUQuota=");
+        } else {
+            command.add(String.format("-p CPUQuota=%s%%", taskRequest.getCpuQuota()));
+        }
+
+        if (memoryMax == -1) {
+            command.add(String.format("-p MemoryMax=%s", "infinity"));
+        } else {
+            command.add(String.format("-p MemoryMax=%sM", taskRequest.getMemoryMax()));
+        }
+
+        command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
     }
 
     public TaskResponse run(String execCommand) throws IOException, InterruptedException {

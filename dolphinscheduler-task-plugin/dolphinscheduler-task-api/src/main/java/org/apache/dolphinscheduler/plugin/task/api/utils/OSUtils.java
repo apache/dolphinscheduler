@@ -69,6 +69,15 @@ public class OSUtils {
     }
 
     /**
+     * whether is linux
+     *
+     * @return true if linux
+     */
+    public static boolean isLinux() {
+        return !isWindows() && !isMacOS();
+    }
+
+    /**
      * Execute the corresponding command of Linux or Windows
      *
      * @param command command

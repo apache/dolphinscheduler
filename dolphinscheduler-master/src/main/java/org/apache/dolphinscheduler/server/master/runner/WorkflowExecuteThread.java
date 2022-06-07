@@ -1177,6 +1177,10 @@ public class WorkflowExecuteThread {
         taskInstance.setTaskGroupId(taskNode.getTaskGroupId());
         taskInstance.setTaskGroupPriority(taskNode.getTaskGroupPriority());
 
+        //set task cpu quota and max memory
+        taskInstance.setCpuQuota(taskNode.getCpuQuota());
+        taskInstance.setMemoryMax(taskNode.getMemoryMax());
+
         // task instance priority
         if (taskNode.getTaskInstancePriority() == null) {
             taskInstance.setTaskInstancePriority(Priority.MEDIUM);
@@ -1307,6 +1311,7 @@ public class WorkflowExecuteThread {
             }
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
             taskInstances.add(task);
+            logger.info("task {} add to stand by list, cpuQuota: {}", task.getName(), task.getCpuQuota());
         }
         //the end node of the branch of the dag
         if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)) {
