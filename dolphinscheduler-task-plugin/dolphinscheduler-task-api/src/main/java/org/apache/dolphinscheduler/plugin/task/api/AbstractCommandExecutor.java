@@ -153,18 +153,24 @@ public abstract class AbstractCommandExecutor {
         Integer memoryMax = taskRequest.getMemoryMax();
 
         command.add("sudo");
-        command.add("systemd-run -q --scope");
+        command.add("systemd-run");
+        command.add("-q");
+        command.add("--scope");
 
         if (cpuQuota == -1) {
-            command.add("-p CPUQuota=");
+            command.add("-p");
+            command.add("CPUQuota=");
         } else {
-            command.add(String.format("-p CPUQuota=%s%%", taskRequest.getCpuQuota()));
+            command.add("-p");
+            command.add(String.format("CPUQuota=%s%%", taskRequest.getCpuQuota()));
         }
 
         if (memoryMax == -1) {
-            command.add(String.format("-p MemoryMax=%s", "infinity"));
+            command.add("-p");
+            command.add(String.format("MemoryMax=%s", "infinity"));
         } else {
-            command.add(String.format("-p MemoryMax=%sM", taskRequest.getMemoryMax()));
+            command.add("-p");
+            command.add(String.format("MemoryMax=%sM", taskRequest.getMemoryMax()));
         }
 
         command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
