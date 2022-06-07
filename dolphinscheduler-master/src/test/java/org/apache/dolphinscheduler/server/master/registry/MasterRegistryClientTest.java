@@ -112,13 +112,6 @@ public class MasterRegistryClientTest {
     }
 
     @Test
-    public void handleConnectionStateTest() {
-        masterRegistryClient.handleConnectionState(ConnectionState.CONNECTED);
-        masterRegistryClient.handleConnectionState(ConnectionState.RECONNECTED);
-        masterRegistryClient.handleConnectionState(ConnectionState.SUSPENDED);
-    }
-
-    @Test
     public void removeNodePathTest() {
         masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, false);
         masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, true);
