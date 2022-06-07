@@ -267,6 +267,11 @@ public class DataAnalysisServiceTest {
 
         Mockito.when(processDefinitionMapper.countDefinitionByProjectCodes(
                 Mockito.any(Long[].class))).thenReturn(new ArrayList<DefinitionGroupByUser>());
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1, serviceLogger)).thenReturn(projectIds());
+        result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1, serviceLogger)).thenReturn(Collections.emptySet());
         result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
