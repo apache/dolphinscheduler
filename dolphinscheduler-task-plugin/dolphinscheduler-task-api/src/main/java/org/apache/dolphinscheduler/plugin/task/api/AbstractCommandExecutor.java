@@ -129,7 +129,7 @@ public abstract class AbstractCommandExecutor {
 
         // if sudo.enable=true,setting up user to run commands
         if (OSUtils.isSudoEnable()) {
-            if (OSUtils.isMacOS() && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
+            if (OSUtils.isLinux() && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
                 generateCgroupCommand(command);
             } else {
                 command.add("sudo");
