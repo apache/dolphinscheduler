@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
@@ -76,7 +78,7 @@ public class MasterServer implements IStoppable {
     private MasterSchedulerService masterSchedulerService;
 
     @Autowired
-    private Scheduler scheduler;
+    private SchedulerApi schedulerApi;
 
     @Autowired
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
@@ -95,6 +97,9 @@ public class MasterServer implements IStoppable {
 
     @Autowired
     private TaskKillResponseProcessor taskKillResponseProcessor;
+
+    @Autowired
+    private TaskRecallProcessor taskRecallProcessor;
 
     @Autowired
     private EventExecuteService eventExecuteService;
@@ -126,6 +131,7 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, taskEventProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, taskEventProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL, taskRecallProcessor);
 
         // logger server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
@@ -149,7 +155,7 @@ public class MasterServer implements IStoppable {
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
 
-        this.scheduler.start();
+        this.schedulerApi.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
@@ -183,6 +189,7 @@ public class MasterServer implements IStoppable {
                 logger.warn("thread sleep exception ", e);
             }
             // close
+            this.schedulerApi.close();
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
             this.masterRegistryClient.closeRegistry();

@@ -55,7 +55,7 @@ public class HeartBeatTest {
 
     @Test
     public void testDecodeHeartBeat() throws Exception {
-        String heartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,1,199,200";
+        String heartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,1,199,200,65.86";
         HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
 
         double delta = 0.001;
@@ -71,6 +71,7 @@ public class HeartBeatTest {
         assertEquals(29732, heartBeat.getProcessId());
         assertEquals(199, heartBeat.getWorkerExecThreadCount());
         assertEquals(200, heartBeat.getWorkerWaitingTaskCount());
+        assertEquals(65.86, heartBeat.getDiskAvailable(), delta);
     }
 
 }

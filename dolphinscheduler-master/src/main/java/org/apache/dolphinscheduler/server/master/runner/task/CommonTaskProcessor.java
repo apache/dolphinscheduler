@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -69,6 +69,15 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         }
         dispatchTask();
         return true;
+    }
+
+    @Override
+    protected boolean resubmitTask() {
+        if (this.taskInstance == null) {
+            return false;
+        }
+        setTaskExecutionLogger();
+        return dispatchTask();
     }
 
     @Override
@@ -110,7 +119,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
-            logger.info("task ready to submit: {}", taskInstance);
+            logger.debug("task ready to submit: {}", taskInstance.getName());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),

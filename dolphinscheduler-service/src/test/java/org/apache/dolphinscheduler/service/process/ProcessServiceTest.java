@@ -72,7 +72,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
-import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
+import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -421,7 +421,7 @@ public class ProcessServiceTest {
         Mockito.when(commandMapper.deleteById(7)).thenReturn(1);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1, Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
         ProcessInstance processInstance8 = processService.handleCommand(logger, host, command7);
-        Assert.assertTrue(processInstance8 == null);
+        Assert.assertTrue(processInstance8 != null);
 
         ProcessDefinition processDefinition2 = new ProcessDefinition();
         processDefinition2.setId(123);

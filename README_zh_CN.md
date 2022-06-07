@@ -74,17 +74,17 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-s
 
 ## 感谢
 
-Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，quartz，以及apache的众多开源项目等等，
+Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、grpc，netty，quartz，以及apache的众多开源项目等等，
 正是由于站在这些开源项目的肩膀上，才有Dolphin Scheduler的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的贡献者,也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
 
 ## 获得帮助
 
 1. 提交 [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
-2. [加入slack群](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw) 并在频道 `#troubleshooting` 中提问
+2. [加入slack群](https://s.apache.org/dolphinscheduler-slack) 并在频道 `#troubleshooting` 中提问
 
 ## 社区
 
-1. 通过[该申请链接](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)加入slack channel
+1. 通过[该申请链接](https://s.apache.org/dolphinscheduler-slack)加入slack channel
 2. 关注[Apache Dolphin Scheduler的Twitter账号](https://twitter.com/dolphinschedule)获取实时动态
 
 ## 版权

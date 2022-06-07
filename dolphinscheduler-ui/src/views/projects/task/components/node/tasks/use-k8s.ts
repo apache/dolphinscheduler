@@ -43,7 +43,8 @@ export function useK8s({
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30
+    timeout: 30,
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []

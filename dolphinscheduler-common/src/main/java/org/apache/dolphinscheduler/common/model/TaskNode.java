@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParamet
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;

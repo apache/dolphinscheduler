@@ -4,7 +4,7 @@ Switch是一个条件判断节点，依据[全局变量](../parameter/global.md)
 
 ## 创建任务
 
-拖动工具栏中的<img src="/img/switch.png" width="20"/>任务节点到画板中即能完成任务创建，**注意**switch任务创建后，要先配置上下游，才能配置任务分支的参数
+拖动工具栏中的<img src="../../../../img/switch.png" width="20"/>任务节点到画板中即能完成任务创建，**注意**switch任务创建后，要先配置上下游，才能配置任务分支的参数
 
 ## 任务参数
 
@@ -30,7 +30,7 @@ Switch是一个条件判断节点，依据[全局变量](../parameter/global.md)
 
 最终switch任务的配置如下
 
-![task-switch-configure](/img/switch_configure.jpg)
+![task-switch-configure](../../../../img/switch_configure.jpg)
 
 ## 相关任务
 
