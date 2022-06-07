@@ -29,7 +29,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
-- 拖动工具栏的 <img src="/img/tasks/icons/mlflow.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的 <img src="../../../../img/tasks/icons/mlflow.png" width="15"/> 任务节点到画板中。
 
 
 ## 任务样例
@@ -58,7 +58,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 #### BasicAlgorithm
 
-![mlflow-conda-env](/img/tasks/demo/mlflow-basic-algorithm.png)
+![mlflow-conda-env](../../../../img/tasks/demo/mlflow-basic-algorithm.png)
 
 **任务参数**
 
@@ -75,7 +75,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 #### AutoML
 
-![mlflow-automl](/img/tasks/demo/mlflow-automl.png)
+![mlflow-automl](../../../../img/tasks/demo/mlflow-automl.png)
 
 **任务参数**
 
@@ -90,7 +90,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 #### Custom projects
 
-![mlflow-custom-project.png](/img/tasks/demo/mlflow-custom-project.png)
+![mlflow-custom-project.png](../../../../img/tasks/demo/mlflow-custom-project.png)
 
 **任务参数**
 
@@ -110,15 +110,15 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 #### MLFLOW
 
-![mlflow-models-mlflow](/img/tasks/demo/mlflow-models-mlflow.png)
+![mlflow-models-mlflow](../../../../img/tasks/demo/mlflow-models-mlflow.png)
 
 #### Docker
 
-![mlflow-models-docker](/img/tasks/demo/mlflow-models-docker.png)
+![mlflow-models-docker](../../../../img/tasks/demo/mlflow-models-docker.png)
 
 #### DOCKER COMPOSE
 
-![mlflow-models-docker-compose](/img/tasks/demo/mlflow-models-docker-compose.png)
+![mlflow-models-docker-compose](../../../../img/tasks/demo/mlflow-models-docker-compose.png)
 
 - **最大CPU限制** ：如 `1.0` 或者 `0.5`, 与 docker compose 一致。
 - **最大内存限制** ：如 `1G` 或者 `500M`, 与 docker compose 一致。
@@ -130,11 +130,11 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 你需要进入admin账户配置一个conda环境变量（请提前[安装anaconda](https://docs.continuum.io/anaconda/install/)
 或者[安装miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) )。
 
-![mlflow-conda-env](/img/tasks/demo/mlflow-conda-env.png)
+![mlflow-conda-env](../../../../img/tasks/demo/mlflow-conda-env.png)
 
 后续注意配置任务时，环境选择上面创建的conda环境，否则程序会找不到conda环境。
 
-![mlflow-set-conda-env](/img/tasks/demo/mlflow-set-conda-env.png)
+![mlflow-set-conda-env](../../../../img/tasks/demo/mlflow-set-conda-env.png)
 
 ### MLflow service 启动
 
@@ -152,5 +152,5 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 
 可以通过访问 MLflow service (`http://localhost:5000`) 页面查看实验与模型。
 
-![mlflow-server](/img/tasks/demo/mlflow-server.png)
+![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
 
