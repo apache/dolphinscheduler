@@ -30,9 +30,9 @@ docker compose up
 
 Then you can access the grafana by the url: `http://localhost/3001`
 
-![image.png](../../../../img/metrics/metrics-master.jpg)
-![image.png](../../../../img/metrics/metrics-worker.jpg)
-![image.png](../../../../img/metrics/metrics-datasource.jpg)
+![image.png](../../../../img/metrics/metrics-master.png)
+![image.png](../../../../img/metrics/metrics-worker.png)
+![image.png](../../../../img/metrics/metrics-datasource.png)
 
 ## Master Metrics
 
