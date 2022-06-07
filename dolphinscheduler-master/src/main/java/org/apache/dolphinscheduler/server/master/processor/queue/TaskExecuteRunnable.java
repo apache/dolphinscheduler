@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPoo
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
@@ -115,12 +116,12 @@ public class TaskExecuteRunnable implements Runnable {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
-        TaskInstance taskInstance;
+        Optional<TaskInstance> taskInstance;
         WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(taskInstanceId)) {
             taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
         } else {
-            taskInstance = processService.findTaskInstanceById(taskInstanceId);
+            taskInstance = Optional.ofNullable(processService.findTaskInstanceById(taskInstanceId));
         }
 
         switch (event) {
@@ -153,11 +154,12 @@ public class TaskExecuteRunnable implements Runnable {
     /**
      * handle dispatch event
      */
-    private void handleDispatchEvent(TaskEvent taskEvent, TaskInstance taskInstance) {
-        if (taskInstance == null) {
+    private void handleDispatchEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
+        if (!taskInstanceOptional.isPresent()) {
             logger.error("taskInstance is null");
             return;
         }
+        TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
             return;
         }
@@ -169,10 +171,11 @@ public class TaskExecuteRunnable implements Runnable {
     /**
      * handle running event
      */
-    private void handleRunningEvent(TaskEvent taskEvent, TaskInstance taskInstance) {
+    private void handleRunningEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
         Channel channel = taskEvent.getChannel();
         try {
-            if (taskInstance != null) {
+            if (taskInstanceOptional.isPresent()) {
+                TaskInstance taskInstance = taskInstanceOptional.get();
                 if (taskInstance.getState().typeIsFinished()) {
                     logger.warn("task is finish, running event is meaningless, taskInstanceId:{}, state:{}", taskInstance.getId(), taskInstance.getState());
                 } else {
@@ -199,10 +202,11 @@ public class TaskExecuteRunnable implements Runnable {
     /**
      * handle result event
      */
-    private void handleResultEvent(TaskEvent taskEvent, TaskInstance taskInstance) {
+    private void handleResultEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
         Channel channel = taskEvent.getChannel();
         try {
-            if (taskInstance != null) {
+            if (taskInstanceOptional.isPresent()) {
+                TaskInstance taskInstance = taskInstanceOptional.get();
                 dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
 
                 taskInstance.setStartTime(taskEvent.getStartTime());
@@ -230,7 +234,8 @@ public class TaskExecuteRunnable implements Runnable {
     /**
      * handle result event
      */
-    private void handleWorkerRejectEvent(Channel channel, TaskInstance taskInstance, WorkflowExecuteRunnable executeThread) {
+    private void handleWorkerRejectEvent(Channel channel, Optional<TaskInstance> taskInstanceOptional, WorkflowExecuteRunnable executeThread) {
+        TaskInstance taskInstance = taskInstanceOptional.orElseThrow(() -> new RuntimeException("taskInstance is null"));
         try {
             if (executeThread != null) {
                 executeThread.resubmit(taskInstance.getTaskCode());
