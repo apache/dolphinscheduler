@@ -117,7 +117,7 @@ public class TaskExecuteRunnable implements Runnable {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         Optional<TaskInstance> taskInstance;
-        WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        WorkflowExecuteRunnable workflowExecuteRunable = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(taskInstanceId)) {
             taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
         } else {
