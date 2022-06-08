@@ -90,7 +90,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
                     dataQualityResultOperator);
             taskExecuteThreadMap.put(taskEvent.getProcessInstanceId(), taskExecuteThread);
         }
-        TaskExecuteRunnable taskExecuteThread = taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
+        TaskExecuteRunnable taskExecuteRunnable= taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
         if (taskExecuteThread != null) {
             taskExecuteThread.addEvent(taskEvent);
         }
