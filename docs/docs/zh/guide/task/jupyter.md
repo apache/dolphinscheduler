@@ -27,8 +27,8 @@
 - 失败重试次数：任务失败重新提交的次数，支持下拉和手填。
 - 失败重试间隔：任务失败重新提交任务的时间间隔，支持下拉和手填。
 - Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。
-- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。
-- 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.
+- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/architecture/configuration.html) 控制
+- 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.这个功能由 [task.resource.limit.state](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/architecture/configuration.html) 控制
 - 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 - Conda Env Name: Conda环境名称。
 - Input Note Path: 输入的jupyter note模板路径。

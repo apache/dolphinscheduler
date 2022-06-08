@@ -1311,7 +1311,6 @@ public class WorkflowExecuteThread {
             }
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
             taskInstances.add(task);
-            logger.info("task {} add to stand by list, cpuQuota: {}", task.getName(), task.getCpuQuota());
         }
         //the end node of the branch of the dag
         if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)) {

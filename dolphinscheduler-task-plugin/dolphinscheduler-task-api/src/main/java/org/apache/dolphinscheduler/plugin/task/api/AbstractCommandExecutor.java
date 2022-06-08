@@ -148,6 +148,11 @@ public abstract class AbstractCommandExecutor {
         printCommand(command);
     }
 
+    /**
+     * generate systemd command.
+     * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryMax=200M --uid=root
+     * @param command command
+     */
     private void generateCgroupCommand(List<String> command) {
         Integer cpuQuota = taskRequest.getCpuQuota();
         Integer memoryMax = taskRequest.getMemoryMax();
