@@ -19,8 +19,8 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 - 环境名称：配置运行脚本的环境。
 - 失败重试次数：任务失败重新提交的次数。
 - 失败重试间隔：任务失败重新提交任务的时间间隔，以分为单位。
-- Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。这个功能由 [task.resource.limit.state](https://dolphinscheduler.apache.org/zh-cn/docs/<version>/user_doc/architecture/configuration.html) 控制
-- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](https://dolphinscheduler.apache.org/zh-cn/docs/<version>/user_doc/architecture/configuration.html) 控制
+- Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
+- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
 - 延时执行时间：任务延迟执行的时间，以分为单位。
 - 超时警告：勾选超时警告、超时失败，当任务超过“超时时长”后，会发送告警邮件并且任务执行失败。
 - 自定义模板：当默认提供的数据源不满足所需要求的时，可自定义 datax 节点的 json 配置文件内容。

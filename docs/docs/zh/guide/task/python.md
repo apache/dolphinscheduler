@@ -20,8 +20,8 @@ Python 任务类型，用于创建 Python 类型的任务并执行一系列的 P
 - 环境名称：配置运行脚本的环境。
 - 失败重试次数：任务失败重新提交的次数，支持下拉和手填。
 - 失败重试间隔：任务失败重新提交任务的时间间隔，支持下拉和手填。
-- Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。这个功能由 [task.resource.limit.state](https://dolphinscheduler.apache.org/zh-cn/docs/<version>/user_doc/architecture/configuration.html) 控制
-- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](https://dolphinscheduler.apache.org/zh-cn/docs/<version>/user_doc/architecture/configuration.html) 控制
+- Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
+- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
 - 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.
 - 脚本：用户开发的PYTHON程序。
 - 资源：是指脚本中需要调用的资源文件列表，资源中心-文件管理上传或创建的文件。
