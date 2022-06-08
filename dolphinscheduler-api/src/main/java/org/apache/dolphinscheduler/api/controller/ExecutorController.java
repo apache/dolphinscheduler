@@ -87,7 +87,7 @@ public class ExecutorController extends BaseController {
      * @param loginUser login user
      * @param projectCode project code
      * @param processDefinitionCode process definition code
-     * @param scheduleTime schedule time
+     * @param scheduleTime schedule time automatic date format {"complementStartDate":"2022-06-09 12:12:12","complementEndDate":"2022-06-10 12:12:12"}  manual date format {"complementScheduleDate":"2012-06-08 22:35:35,2013-06-08 22:35:35"}
      * @param failureStrategy failure strategy
      * @param startNodeList start nodes list
      * @param taskDependType task depend type
