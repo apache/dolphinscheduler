@@ -18,7 +18,6 @@
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
-import {useResourceLimit} from "@/views/projects/task/components/node/fields/use-resource-limit";
 
 export function useShell({
   projectCode,
