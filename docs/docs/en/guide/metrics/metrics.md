@@ -45,6 +45,7 @@ Master metrics are exported by the DolphinScheduler master server.
 
 ### Process Metrics
 
+* dolphinscheduler_create_command_count: Indicates the number of command has been inserted.
 * dolphinscheduler_process_instance_submit_count: Indicates the number of process has been submitted.
 * dolphinscheduler_process_instance_running_gauge: Indicates the number of process are running now.
 * dolphinscheduler_process_instance_timeout_count: Indicates the number of process has been timeout.
@@ -62,6 +63,11 @@ Master metrics are exported by the DolphinScheduler master server.
 * dolphinscheduler_task_timeout_count: Indicates the number of tasks has been timeout.
 * dolphinscheduler_task_retry_count: Indicates the number of tasks has been retry.
 * dolphinscheduler_task_failover_count: Indicates the number of tasks has been failover.
+* dolphinscheduler_task_dispatch_count: Indicates the number of tasks has been dispatched to worker.
+* dolphinscheduler_task_dispatch_failed_count: Indicates the number of tasks dispatched failed, if dispatched failed
+  will retry.
+* dolphinscheduler_task_dispatch_error_count: Indicates the number of tasks dispatched error, if dispatched error, means
+  there are exception occur.
 
 ## Worker Metrics
 

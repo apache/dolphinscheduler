@@ -69,6 +69,21 @@ public final class TaskMetrics {
                     .description("Task failover total count")
                     .register(Metrics.globalRegistry);
 
+    private static final Counter TASK_DISPATCH_COUNTER =
+            Counter.builder("dolphinscheduler_task_dispatch_count")
+                    .description("Task dispatch count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter TASK_DISPATCHER_FAILED =
+            Counter.builder("dolphinscheduler_task_dispatch_failed_count")
+                    .description("Task dispatch failed count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter TASK_DISPATCH_ERROR =
+            Counter.builder("dolphinscheduler_task_dispatch_error_count")
+                    .description("Task dispatch error")
+                    .register(Metrics.globalRegistry);
+
     public static void incTaskSubmit() {
         TASK_SUBMIT_COUNTER.increment();
     }
@@ -106,4 +121,17 @@ public final class TaskMetrics {
     public static void incTaskFailover() {
         TASK_FAILOVER_COUNTER.increment();
     }
+
+    public static void incTaskDispatchFailed(int failedCount) {
+        TASK_DISPATCHER_FAILED.increment(failedCount);
+    }
+
+    public static void incTaskDispatchError() {
+        TASK_DISPATCH_ERROR.increment();
+    }
+
+    public static void incTaskDispatch() {
+        TASK_DISPATCH_COUNTER.increment();
+    }
+
 }
