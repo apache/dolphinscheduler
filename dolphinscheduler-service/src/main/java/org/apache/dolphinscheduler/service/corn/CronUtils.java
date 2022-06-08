@@ -16,14 +16,13 @@
  */
 
 package org.apache.dolphinscheduler.service.corn;
-
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
-
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE;
 import static com.cronutils.model.CronType.QUARTZ;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -35,13 +34,9 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -281,6 +276,23 @@ public class CronUtils {
         end.set(Calendar.SECOND, 59);
         end.set(Calendar.MILLISECOND, 999);
         return end.getTime();
+    }
+
+    /**
+     * get Schedule Date
+     * @param param
+     * @return  date list
+     */
+    public static List<Date> getSelfScheduleDateList(Map<String, String> param){
+        List<Date> result = new ArrayList<>();
+        String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE);
+        if(StringUtils.isNotEmpty(scheduleDates)){
+            for (String stringDate : scheduleDates.split(",")) {
+                result.add(DateUtils.stringToDate(stringDate));
+            }
+            return result;
+        }
+        return null;
     }
 
 }

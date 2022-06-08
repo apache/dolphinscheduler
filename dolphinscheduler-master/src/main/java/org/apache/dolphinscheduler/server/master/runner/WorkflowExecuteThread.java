@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.*;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
@@ -762,7 +757,7 @@ public class WorkflowExecuteThread {
         if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
         }
-        cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.format(scheduleDate, "yyyy-MM-dd HH:mm:ss", null));
+        cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE, cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE).substring(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE).indexOf(",")+1));
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setTaskDependType(processInstance.getTaskDependType());
         command.setFailureStrategy(processInstance.getFailureStrategy());
@@ -943,15 +938,12 @@ public class WorkflowExecuteThread {
 
         if (processInstance.isComplementData() && complementListDate.size() == 0) {
             Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-            if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+            if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE)) {
                 // reset global params while there are start parameters
                 setGlobalParamIfCommanded(processDefinition, cmdParam);
 
-                Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-                Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
                 if (complementListDate.size() == 0 && needComplementProcess()) {
-                    complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
+                    complementListDate = CronUtils.getSelfScheduleDateList(cmdParam);
                     logger.info(" process definition code:{} complement data: {}",
                         processInstance.getProcessDefinitionCode(), complementListDate.toString());
 
