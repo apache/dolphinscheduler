@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ShellExecutor;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -74,7 +75,7 @@ public class OSUtils {
      * @return true if linux
      */
     public static boolean isLinux() {
-        return !isWindows() && !isMacOS();
+        return SystemUtils.IS_OS_LINUX;
     }
 
     /**
