@@ -202,6 +202,7 @@ yarn.resourcemanager.ha.rm.ids||specify the yarn resourcemanager url. if resourc
 yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode
 dolphinscheduler.env.path|env/dolphinscheduler_env.sh|load environment variables configs [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
 development.state|false| specify whether in development state
+task.resource.limit.state|true|specify whether in resource limit state
 
 
 ### application-api.properties [API-service log config]

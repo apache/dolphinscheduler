@@ -19,6 +19,8 @@ Shell task used to create a shell task type and execute a series of shell script
 - Environment Name: Configure the environment name in which run the script.
 - Times of failed retry attempts: The number of times the task failed to resubmit. You can select from drop-down or fill-in a number.
 - Failed retry interval: The time interval for resubmitting the task after a failed task. You can select from drop-down or fill-in a number.
+- Cpu quota: Assign the specified CPU time quota to the task executed. Takes a percentage value. Default -1 means unlimited. For example, the full CPU load of one core is 100%,and that of 16 cores is 1600%.
+- Max memory：Assign the specified max memory to the task executed. Exceeding this limit will trigger oom to be killed and will not automatically retry. Takes an MB value. Default -1 means unlimited.
 - Timeout alarm: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
 - Script: Shell program developed by users.
 - Resource: Refers to the list of resource files that called in the script, and upload or create files by the Resource Center file management.

@@ -42,6 +42,8 @@ export function usePython({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
+    cpuQuota: -1,
+    memoryMax: -1,
     delayTime: 0,
     timeout: 30,
     rawScript: '',

@@ -41,6 +41,8 @@ export function useJupyter({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
+    cpuQuota: -1,
+    memoryMax: -1,
     delayTime: 0,
     timeout: 30,
     timeoutNotifyStrategy: ['WARN']
@@ -71,6 +73,7 @@ export function useJupyter({
       Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useJupyter(model),
