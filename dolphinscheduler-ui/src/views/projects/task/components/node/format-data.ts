@@ -410,8 +410,8 @@ export function formatParams(data: INodeData): {
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
       timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
       workerGroup: data.workerGroup,
-      cpuQuota: data.cpuQuota,
-      memoryMax: data.memoryMax
+      cpuQuota: data.cpuQuota || -1,
+      memoryMax: data.memoryMax || -1
     }
   } as {
     processDefinitionCode: string

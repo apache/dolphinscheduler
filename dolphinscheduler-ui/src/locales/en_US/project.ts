@@ -308,7 +308,7 @@ export default {
     task_group_name: 'Task group name',
     task_group_queue_priority: 'Priority',
     number_of_failed_retries: 'Number of failed retries',
-    cpu_quota: 'Cpu quota',
+    cpu_quota: 'CPU quota',
     memory_max: 'Max memory',
     times: 'Times',
     failed_retry_interval: 'Failed retry interval',
