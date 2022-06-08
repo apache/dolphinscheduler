@@ -91,8 +91,8 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             taskExecuteThreadMap.put(taskEvent.getProcessInstanceId(), taskExecuteThread);
         }
         TaskExecuteRunnable taskExecuteRunnable= taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
-        if (taskExecuteThread != null) {
-            taskExecuteThread.addEvent(taskEvent);
+        if (taskExecuteRunnable != null) {
+            taskExecuteRunnable.addEvent(taskEvent);
         }
     }
 

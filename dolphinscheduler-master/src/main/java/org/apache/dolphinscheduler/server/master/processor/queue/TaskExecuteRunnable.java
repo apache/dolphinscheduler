@@ -117,9 +117,9 @@ public class TaskExecuteRunnable implements Runnable {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         Optional<TaskInstance> taskInstance;
-        WorkflowExecuteRunnable workflowExecuteRunable = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
-        if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(taskInstanceId)) {
-            taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
+        WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        if (workflowExecuteRunnable != null && workflowExecuteRunnable.checkTaskInstanceById(taskInstanceId)) {
+            taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
         } else {
             taskInstance = Optional.ofNullable(processService.findTaskInstanceById(taskInstanceId));
         }
@@ -137,7 +137,7 @@ public class TaskExecuteRunnable implements Runnable {
                 handleResultEvent(taskEvent, taskInstance);
                 break;
             case WORKER_REJECT:
-                handleWorkerRejectEvent(taskEvent.getChannel(), taskInstance, workflowExecuteThread);
+                handleWorkerRejectEvent(taskEvent.getChannel(), taskInstance, workflowExecuteRunnable);
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
