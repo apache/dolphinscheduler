@@ -365,6 +365,8 @@ interface INodeData
   environmentCode?: number | null
   failRetryInterval?: number
   failRetryTimes?: number
+  cpuQuota?: number
+  memoryMax?: number
   flag?: 'YES' | 'NO'
   taskGroupId?: number
   taskGroupPriority?: number

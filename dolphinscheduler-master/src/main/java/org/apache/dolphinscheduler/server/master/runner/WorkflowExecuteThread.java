@@ -1177,6 +1177,10 @@ public class WorkflowExecuteThread {
         taskInstance.setTaskGroupId(taskNode.getTaskGroupId());
         taskInstance.setTaskGroupPriority(taskNode.getTaskGroupPriority());
 
+        //set task cpu quota and max memory
+        taskInstance.setCpuQuota(taskNode.getCpuQuota());
+        taskInstance.setMemoryMax(taskNode.getMemoryMax());
+
         // task instance priority
         if (taskNode.getTaskInstancePriority() == null) {
             taskInstance.setTaskInstancePriority(Priority.MEDIUM);
