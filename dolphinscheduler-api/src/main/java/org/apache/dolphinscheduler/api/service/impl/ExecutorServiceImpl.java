@@ -63,13 +63,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -729,6 +729,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+
                     // Distribute the number of tasks equally to each command.
                     // The last command with insufficient quantity will be assigned to the remaining tasks.
                     for(List<String> stringDate : Lists.partition(listDate,createCount)){
