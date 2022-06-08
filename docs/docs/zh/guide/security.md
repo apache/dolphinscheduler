@@ -159,7 +159,7 @@ worker.groups=default,test
 
 - 创建和授权后，k8s命名空间和工作流会增加关联集群的功能。每一个集群会有独立的工作流和任务实例独立运行。
 
-![create-cluster](/img/new_ui/dev/security/create-cluster.png)
+![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
 
 ## 命名空间管理
 

@@ -160,7 +160,7 @@ worker.groups=default,test
 
 - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
 
-![create-cluster](/img/new_ui/dev/security/create-cluster.png)
+![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
 
 ## Namespace Management
 
