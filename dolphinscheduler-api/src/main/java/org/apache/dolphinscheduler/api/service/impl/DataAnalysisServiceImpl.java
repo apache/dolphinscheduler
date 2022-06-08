@@ -216,7 +216,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
         Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
-            return projectIds.getRight();
+            List<DefinitionGroupByUser> emptyList = new ArrayList<>();
+            DefineUserDto dto = new DefineUserDto(emptyList);
+            result.put(Constants.DATA_LIST, dto);
+            putMsg(result, Status.SUCCESS);
+            return result;
         }
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
@@ -248,7 +252,10 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = null;
         Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
-            return projectIds.getRight();
+            List<CommandStateCount> noData = Arrays.stream(CommandType.values()).map(commandType -> new CommandStateCount(0, 0, commandType)).collect(Collectors.toList());
+            result.put(Constants.DATA_LIST, noData);
+            putMsg(result, Status.SUCCESS);
+            return result;
         }
         Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
 
@@ -284,7 +291,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
         Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
         if (projectIds.isEmpty()) {
-            result.put(Constants.DATA_LIST, new TaskCountDto());
+            List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>();
+            result.put(Constants.DATA_LIST, new TaskCountDto(taskInstanceStateCounts));
             putMsg(result, Status.SUCCESS);
             return Pair.of(null, result);
         }
