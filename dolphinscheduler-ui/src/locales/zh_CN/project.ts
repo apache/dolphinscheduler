@@ -308,6 +308,8 @@ export default {
     task_group_name: '任务组名称',
     task_group_queue_priority: '组内优先级',
     number_of_failed_retries: '失败重试次数',
+    cpu_quota: 'CPU配额',
+    memory_max: '最大内存',
     times: '次',
     failed_retry_interval: '失败重试间隔',
     minute: '分',

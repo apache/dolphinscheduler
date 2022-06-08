@@ -2767,6 +2767,8 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
                 taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
                 taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
+                taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
+                taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
                 taskNodeList.add(taskNode);
             }
         }
