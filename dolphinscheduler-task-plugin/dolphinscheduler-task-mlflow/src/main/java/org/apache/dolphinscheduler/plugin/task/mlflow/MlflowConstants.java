@@ -95,8 +95,15 @@ public class MlflowConstants {
     public static final String DOCKER_COMPOSE_RUN = "docker-compose up -d";
 
     public static final String SET_DOCKER_COMPOSE_ENV = "export DS_TASK_MLFLOW_IMAGE_NAME=%s\n" +
+            "export DS_TASK_MLFLOW_CONTAINER_NAME=%s\n" +
             "export DS_TASK_MLFLOW_DEPLOY_PORT=%s\n" +
             "export DS_TASK_MLFLOW_CPU_LIMIT=%s\n" +
             "export DS_TASK_MLFLOW_MEMORY_LIMIT=%s";
+
+    public static final String DOCKER_HEALTH_CHECK_COMMAND = "for i in $(seq 1 20); " +
+            "do " +
+            "[ $(docker inspect --format \"{{json .State.Health.Status }}\" %s) = '\"healthy\"' ] " +
+            "&& exit 0  && break;sleep 3; " +
+            "done; exit 1";
 
 }

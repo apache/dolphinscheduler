@@ -142,8 +142,8 @@ public class MlflowTaskTest {
                         "mlflow models build-docker -m runs:/a272ec279fc34a8995121ae04281585f/model " +
                         "-n mlflow/a272ec279fc34a8995121ae04281585f:model " +
                         "--enable-mlserver\n" +
-                        "docker rm -f mlflow-a272ec279fc34a8995121ae04281585f-model\n" +
-                        "docker run --name=mlflow-a272ec279fc34a8995121ae04281585f-model " +
+                        "docker rm -f ds-mlflow-a272ec279fc34a8995121ae04281585f-model\n" +
+                        "docker run --name=ds-mlflow-a272ec279fc34a8995121ae04281585f-model " +
                         "-p=7000:8080 mlflow/a272ec279fc34a8995121ae04281585f:model");
     }
 
@@ -156,10 +156,14 @@ public class MlflowTaskTest {
                         " /tmp/dolphinscheduler_test\n" +
                         "mlflow models build-docker -m models:/22222/1 -n mlflow/22222:1 --enable-mlserver\n" +
                         "export DS_TASK_MLFLOW_IMAGE_NAME=mlflow/22222:1\n" +
+                        "export DS_TASK_MLFLOW_CONTAINER_NAME=ds-mlflow-22222-1\n" +
                         "export DS_TASK_MLFLOW_DEPLOY_PORT=7000\n" +
                         "export DS_TASK_MLFLOW_CPU_LIMIT=0.5\n" +
                         "export DS_TASK_MLFLOW_MEMORY_LIMIT=200m\n" +
-                        "docker-compose up -d");
+                        "docker-compose up -d\n" +
+                        "for i in $(seq 1 20); do " +
+                        "[ $(docker inspect --format \"{{json .State.Health.Status }}\" ds-mlflow-22222-1) = '\"healthy\"' ] && exit 0  && break;sleep 3; " +
+                        "done; exit 1");
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {

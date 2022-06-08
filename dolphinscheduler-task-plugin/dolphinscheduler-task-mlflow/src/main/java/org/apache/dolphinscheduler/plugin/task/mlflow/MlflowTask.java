@@ -172,7 +172,7 @@ public class MlflowTask extends AbstractTaskExecutor {
 
         } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER)) {
             String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
-            String containerName = "mlflow-" + mlflowParameters.getModelKeyName("-");
+            String containerName = mlflowParameters.getContainerName();
 
             args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
             args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
@@ -183,7 +183,8 @@ public class MlflowTask extends AbstractTaskExecutor {
             String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
             args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
             args.add(mlflowParameters.getDockerComposeEnvCommand());
-            args.add(String.format(MlflowConstants.DOCKER_COMPOSE_RUN));
+            args.add(MlflowConstants.DOCKER_COMPOSE_RUN);
+            args.add(String.format(MlflowConstants.DOCKER_HEALTH_CHECK_COMMAND, mlflowParameters.getContainerName()));
         }
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));

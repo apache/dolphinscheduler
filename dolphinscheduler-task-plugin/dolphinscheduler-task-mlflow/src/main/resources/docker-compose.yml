@@ -19,6 +19,7 @@ version: "3"
 services:
   mlflow-model:
     image: "${DS_TASK_MLFLOW_IMAGE_NAME}"
+    container_name: "${DS_TASK_MLFLOW_CONTAINER_NAME}"
     ports:
       - "${DS_TASK_MLFLOW_DEPLOY_PORT}:8080"
     deploy:
@@ -26,3 +27,13 @@ services:
         limits:
           cpus: "${DS_TASK_MLFLOW_CPU_LIMIT}"
           memory: "${DS_TASK_MLFLOW_MEMORY_LIMIT}"
+
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+
+
+    healthcheck:
+      test: ["CMD", "curl", "http://127.0.0.1:8080/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

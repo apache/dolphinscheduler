@@ -277,8 +277,14 @@ public class MlflowParameters extends AbstractParameters {
 
     public String getDockerComposeEnvCommand() {
         String imageName = "mlflow/" + getModelKeyName(":");
-        String env = String.format(MlflowConstants.SET_DOCKER_COMPOSE_ENV, imageName, deployPort, cpuLimit, memoryLimit);
+        System.out.println("1");
+        String env = String.format(MlflowConstants.SET_DOCKER_COMPOSE_ENV, imageName, getContainerName(), deployPort, cpuLimit, memoryLimit);
         return env;
+    }
+
+    public String getContainerName(){
+        String containerName = "ds-mlflow-" + getModelKeyName("-");
+        return containerName;
     }
 
 };
