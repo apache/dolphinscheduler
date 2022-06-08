@@ -20,6 +20,8 @@ it will generate a temporary python script, and executes the script by the Linux
 - Environment Name: Configure the environment name in which to run the script.
 - Number of failed retry attempts: The failure task resubmitting times. It supports drop-down and hand-filling.
 - Failed retry interval: The time interval for resubmitting the task after a failed task. It supports drop-down and hand-filling.
+- Cpu quota: Assign the specified CPU time quota to the task executed. Takes a percentage value. Default -1 means unlimited. For example, the full CPU load of one core is 100%,and that of 16 cores is 1600%. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
+- Max memory：Assign the specified max memory to the task executed. Exceeding this limit will trigger oom to be killed and will not automatically retry. Takes an MB value. Default -1 means unlimited. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
 - Timeout alarm: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will send and the task execution will fail.
 - Script: Python program developed by the user.
 - Resource: Refers to the list of resource files that need to be called in the script, and the files uploaded or created by the resource center-file management.

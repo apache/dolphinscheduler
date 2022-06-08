@@ -25,6 +25,8 @@ Click [here](https://docs.conda.io/en/latest/) for more information about `conda
 - Worker grouping: Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution.
 - Number of failed retry attempts: The failure task resubmitting times. It supports drop-down and hand-filling.
 - Failed retry interval: The time interval for resubmitting the task after a failed task. It supports drop-down and hand-filling.
+- Cpu quota: Assign the specified CPU time quota to the task executed. Takes a percentage value. Default -1 means unlimited. For example, the full CPU load of one core is 100%,and that of 16 cores is 1600%. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
+- Max memory：Assign the specified max memory to the task executed. Exceeding this limit will trigger oom to be killed and will not automatically retry. Takes an MB value. Default -1 means unlimited. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
 - Timeout alarm: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will send and the task execution will fail.
 - Conda Env Name: Name of conda environment.
 - Input Note Path: Path of input jupyter note template.

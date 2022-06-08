@@ -70,6 +70,8 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
         this.setFlag(taskDefinition.getFlag());
         this.setModifyBy(taskDefinition.getModifyBy());
+        this.setCpuQuota(taskDefinition.getCpuQuota());
+        this.setMemoryMax(taskDefinition.getMemoryMax());
     }
 
     public int getOperator() {

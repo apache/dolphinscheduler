@@ -201,6 +201,16 @@ public class TaskDefinition {
      */
     private int taskGroupPriority;
 
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
+
     public TaskDefinition() {
     }
 
@@ -457,6 +467,22 @@ public class TaskDefinition {
         this.environmentCode = environmentCode;
     }
 
+    public Integer getCpuQuota() {
+        return cpuQuota == null ? -1 : cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax == null ? -1 : memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -481,7 +507,9 @@ public class TaskDefinition {
             || ("".equals(that.resourceIds) && resourceIds == null))
             && environmentCode == that.environmentCode
             && taskGroupId == that.taskGroupId
-            && taskGroupPriority == that.taskGroupPriority;
+            && taskGroupPriority == that.taskGroupPriority
+            && Objects.equals(cpuQuota, that.cpuQuota)
+            && Objects.equals(memoryMax, that.memoryMax);
     }
 
     @Override
@@ -513,6 +541,8 @@ public class TaskDefinition {
                 + ", timeout=" + timeout
                 + ", delayTime=" + delayTime
                 + ", resourceIds='" + resourceIds + '\''
+                + ", cpuQuota=" + cpuQuota
+                + ", memoryMax=" + memoryMax
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

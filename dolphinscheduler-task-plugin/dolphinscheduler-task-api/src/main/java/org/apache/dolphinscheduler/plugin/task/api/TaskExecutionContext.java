@@ -239,6 +239,16 @@ public class TaskExecutionContext {
 
     private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
+
     public String getTaskLogName() {
         return taskLogName;
     }
@@ -565,6 +575,22 @@ public class TaskExecutionContext {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Integer getCpuQuota() {
+        return cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
     }
 
     public K8sTaskExecutionContext getK8sTaskExecutionContext() {

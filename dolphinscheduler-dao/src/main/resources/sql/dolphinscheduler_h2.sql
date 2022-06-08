@@ -486,6 +486,8 @@ CREATE TABLE t_ds_task_definition
     delay_time              int(11) DEFAULT '0',
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -521,6 +523,8 @@ CREATE TABLE t_ds_task_definition_log
     operator                int(11) DEFAULT NULL,
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -860,6 +864,8 @@ CREATE TABLE t_ds_task_instance
     task_group_id           int(11) DEFAULT NULL,
     var_pool                longtext,
     dry_run                 int NULL DEFAULT 0,
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE
 );
