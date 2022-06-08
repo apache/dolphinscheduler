@@ -63,6 +63,8 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setVarPool(taskInstance.getVarPool());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
+        taskExecutionContext.setMemoryMax(taskInstance.getMemoryMax());
         return this;
     }
 
