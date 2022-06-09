@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,15 +29,47 @@ import org.springframework.stereotype.Component;
 @EnableConfigurationProperties
 @ConfigurationProperties("master")
 public class MasterConfig {
+    /**
+     * The master RPC server listen port.
+     */
     private int listenPort;
+    /**
+     * The max batch size used to fetch command from database.
+     */
     private int fetchCommandNum;
+    /**
+     * The thread number used to prepare processInstance. This number shouldn't bigger than fetchCommandNum.
+     */
     private int preExecThreads;
+    /**
+     * todo: We may need to split the process/task into different thread size.
+     * The thread number used to handle processInstance and task event.
+     * Will create two thread poll to execute {@link WorkflowExecuteRunnable} and {@link TaskExecuteRunnable}.
+     */
     private int execThreads;
+    /**
+     * The task dispatch thread pool size.
+     */
     private int dispatchTaskNumber;
+    /**
+     * Worker select strategy.
+     */
     private HostSelector hostSelector;
+    /**
+     * Master heart beat task execute interval.
+     */
     private int heartbeatInterval;
+    /**
+     * task submit max retry times.
+     */
     private int taskCommitRetryTimes;
+    /**
+     * task submit retry interval/ms.
+     */
     private int taskCommitInterval;
+    /**
+     * state wheel check interval/ms, if this value is bigger, may increase the delay of task/processInstance.
+     */
     private int stateWheelInterval;
     private double maxCpuLoadAvg;
     private double reservedMemory;
