@@ -101,12 +101,12 @@ import com.google.common.collect.Lists;
 /**
  * master exec thread,split dag
  */
-public class WorkflowExecuteThread {
+public class WorkflowExecuteRunnable {
 
     /**
      * logger of WorkflowExecuteThread
      */
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
 
     /**
      * master config
@@ -238,7 +238,7 @@ public class WorkflowExecuteThread {
      * @param masterConfig            masterConfig
      * @param stateWheelExecuteThread stateWheelExecuteThread
      */
-    public WorkflowExecuteThread(ProcessInstance processInstance
+    public WorkflowExecuteRunnable(ProcessInstance processInstance
         , ProcessService processService
         , NettyExecutorManager nettyExecutorManager
         , ProcessAlertManager processAlertManager
