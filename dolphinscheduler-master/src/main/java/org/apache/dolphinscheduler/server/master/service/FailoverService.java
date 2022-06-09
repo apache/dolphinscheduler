@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
+import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
@@ -157,6 +159,7 @@ public class FailoverService {
             }
 
             LOGGER.info("failover process instance id: {}", processInstance.getId());
+            ProcessInstanceMetrics.incProcessInstanceFailover();
             //updateProcessInstance host is null and insert into command
             processInstance.setHost(Constants.NULL);
             processService.processNeedFailoverProcessInstances(processInstance);
@@ -227,7 +230,7 @@ public class FailoverService {
         if (!checkTaskInstanceNeedFailover(servers, taskInstance)) {
             return;
         }
-
+        TaskMetrics.incTaskFailover();
         boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
 
         taskInstance.setProcessInstance(processInstance);

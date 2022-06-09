@@ -84,8 +84,6 @@ public class WorkflowExecuteTaskTest {
 
     private ApplicationContext applicationContext;
 
-    private TaskProcessorFactory taskProcessorFactory;
-
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     @Before
@@ -99,8 +97,6 @@ public class WorkflowExecuteTaskTest {
 
         processService = mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
-
-        taskProcessorFactory = mock(TaskProcessorFactory.class);
 
         processInstance = mock(ProcessInstance.class);
         Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);

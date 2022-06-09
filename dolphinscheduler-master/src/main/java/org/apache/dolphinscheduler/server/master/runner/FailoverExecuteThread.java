@@ -62,7 +62,7 @@ public class FailoverExecuteThread extends Thread {
             } catch (Exception e) {
                 logger.error("failover execute error", e);
             } finally {
-                ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
             }
         }
     }

@@ -32,9 +32,10 @@ services:
     image: grafana/grafana
     networks: [ test ]
     ports:
-      - "3000:3000"
+      # due to the DolphinScheduler frontend port is 3000, so we change the grafana default port to 3001.
+      - "3001:3000"
     environment:
-      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
     volumes:
       - ../grafana:/dashboards:ro
       - ./datasources:/etc/grafana/provisioning/datasources:ro

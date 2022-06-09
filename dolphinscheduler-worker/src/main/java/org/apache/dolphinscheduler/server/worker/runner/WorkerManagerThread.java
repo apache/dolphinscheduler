@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 
 import java.util.concurrent.BlockingQueue;
@@ -132,6 +133,7 @@ public class WorkerManagerThread implements Runnable {
      */
     public boolean offer(TaskExecuteThread taskExecuteThread) {
         if (waitSubmitQueue.size() > workerExecThreads) {
+            WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
             // if waitSubmitQueue is full, it will wait 1s, then try add
             ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             if (waitSubmitQueue.size() > workerExecThreads) {
@@ -158,8 +160,9 @@ public class WorkerManagerThread implements Runnable {
                     taskExecuteThread.setStorageOperate(storageOperate);
                     workerExecService.submit(taskExecuteThread);
                 } else {
+                    WorkerServerMetrics.incWorkerOverloadCount();
                     logger.info("Exec queue is full, waiting submit queue {}, waiting exec queue size {}",
-                        this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
+                            this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
                     ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             } catch (Exception e) {
