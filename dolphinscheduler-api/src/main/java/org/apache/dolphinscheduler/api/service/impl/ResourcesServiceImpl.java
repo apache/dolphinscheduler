@@ -56,7 +56,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +176,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resourcesMapper.insert(resource);
             putMsg(result, Status.SUCCESS);
-            permissionPostHandle(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
+            permissionPostHandle(resource.getType(), loginUser, resource.getId());
             Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
@@ -270,7 +270,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resourcesMapper.insert(resource);
             updateParentResourceSize(resource, resource.getSize());
             putMsg(result, Status.SUCCESS);
-            permissionPostHandle(AuthorizationType.RESOURCE_FILE_ID, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
+            permissionPostHandle(resource.getType(), loginUser, resource.getId());
             Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
@@ -646,7 +646,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), loginUser.getId(), searchVal, new ArrayList<>(resourcesIds));
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), searchVal, new ArrayList<>(resourcesIds));
         pageInfo.setTotal((int) resourceIPage.getTotal());
         pageInfo.setTotalList(resourceIPage.getRecords());
         result.setData(pageInfo);
@@ -1124,7 +1124,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         updateParentResourceSize(resource, resource.getSize());
 
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(checkResourceType(resource.getType()), loginUser.getId(), Collections.singletonList(resource.getId()), logger);
+        permissionPostHandle(resource.getType(), loginUser, resource.getId());
         Map<String, Object> resultMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
             if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
@@ -1140,6 +1140,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(result.getMsg());
         }
         return result;
+    }
+
+    private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
+        AuthorizationType authorizationType = resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), logger);
     }
 
     private Result<Object> checkResourceUploadStartupState() {

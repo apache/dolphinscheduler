@@ -113,4 +113,24 @@
         and rel.user_id = #{userId}
     </select>
 
+    <select id="selectPagingByIds" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
+        select
+        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time
+        ,
+        u.user_name as user_name
+        from t_ds_datasource d
+        join t_ds_user u on d.user_id = u.id
+        where 1 =1
+        <if test="name != null and name != ''">
+            and d.name like concat ('%', #{name}, '%')
+        </if>
+        <if test="dataSourceIds != null and dataSourceIds.size() > 0">
+            and d.id in
+            <foreach collection="dataSourceIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        order by update_time desc
+    </select>
+
 </mapper>
