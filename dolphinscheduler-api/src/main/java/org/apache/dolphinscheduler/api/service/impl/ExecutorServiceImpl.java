@@ -18,8 +18,14 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_START;
-import static org.apache.dolphinscheduler.common.Constants.*;
-
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_TIME_MAX_LENGTH;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
@@ -71,9 +77,16 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +160,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
-                                                   Priority processInstancePriority, String workerGroup, Long environmentCode,Integer timeout,
+                                                   Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
                                                    int dryRun,
                                                    ComplementDependentMode complementDependentMode) {
@@ -839,11 +852,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
                         for (List<String> stringDate : Lists.partition(listDate, createCount)) {
-                            String tempDate = "";
-                            for (String date : stringDate) {
-                                tempDate += date + ",";
-                            }
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, tempDate.substring(0, tempDate.length() - 1));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(",",stringDate));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
                         }
@@ -854,7 +863,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             default:
                 break;
         }
-        logger.info("create complement command count: {}", createCount);
+        logger.info("create complement command count: {}, create dependent complement command count: {}", createCount
+                , dependentProcessDefinitionCreateCount);
         return createCount;
     }
 
