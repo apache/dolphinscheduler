@@ -706,7 +706,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 String endDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
                 if (startDate != null || endDate != null) {
                     start = DateUtils.getScheduleDate(startDate);
-                    end = DateUtils.getScheduleDate(startDate);
+                    end = DateUtils.getScheduleDate(endDate);
                     if (start.after(end)) {
                         logger.info("complement data error, wrong date start:{} and end date:{} ",
                                 start, end
@@ -783,7 +783,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     List<Date> listDate = new ArrayList<>();
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
                     listDate.addAll(CronUtils.getSelfFireDateList(DateUtils.getScheduleDate(startDate), DateUtils.getScheduleDate(endDate), schedules));
-                    int listDateSize = listDate.size();
+                     int listDateSize = listDate.size();
                     createCount = listDate.size();
                     if (!CollectionUtils.isEmpty(listDate)) {
                         if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
