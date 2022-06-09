@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper">
 
     <sql id="baseSql">
-        id, namespace, k8s, owner, tag, limits_memory, limits_cpu, online_job_num, pod_replicas, pod_request_cpu, pod_request_memory, create_time, update_time
+        id, namespace, k8s, user_id, limits_memory, limits_cpu, online_job_num, pod_replicas, pod_request_cpu, pod_request_memory, create_time, update_time
     </sql>
 
     <sql id="baseSqlV2">

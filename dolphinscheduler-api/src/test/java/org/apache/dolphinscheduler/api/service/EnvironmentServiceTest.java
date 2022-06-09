@@ -36,7 +36,16 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;

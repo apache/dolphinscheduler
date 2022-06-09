@@ -98,7 +98,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = new TaskGroup(name, projectCode, description,
-            groupSize, loginUser.getId(), Flag.YES.getCode());
+                groupSize, loginUser.getId(), Flag.YES.getCode());
 
         taskGroup.setCreateTime(new Date());
         taskGroup.setUpdateTime(new Date());
@@ -138,9 +138,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda()
-            .eq(TaskGroup::getName, name)
-            .eq(TaskGroup::getUserId, loginUser.getId())
-            .ne(TaskGroup::getId, id));
+                .eq(TaskGroup::getName, name)
+                .eq(TaskGroup::getUserId, loginUser.getId())
+                .ne(TaskGroup::getId, id));
 
         if (exists > 0) {
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);

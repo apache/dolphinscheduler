@@ -15,21 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.k8s;
-
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
-
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
+package org.apache.dolphinscheduler.api.k8s;
 
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
+
+import java.util.Optional;
 
 /**
  * Encapsulates all client-related operations, not involving the db

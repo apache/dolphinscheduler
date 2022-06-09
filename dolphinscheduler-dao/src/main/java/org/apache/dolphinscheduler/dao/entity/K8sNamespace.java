@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 /**
  * k8s namespace
@@ -52,11 +52,14 @@ public class K8sNamespace {
     /**
      * owner
      */
-    @TableField(value = "owner")
-    private String owner;
+    @TableField(value = "user_id")
+    private int userId;
 
-    @TableField(value = "tag")
-    private String tag;
+    /**
+     * user name
+     */
+    @TableField(exist = false)
+    private String userName;
 
     /**
      * create_time
@@ -132,20 +135,12 @@ public class K8sNamespace {
         this.limitsMemory = limitsMemory;
     }
 
-    public String getOwner() {
-        return owner;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public Date getCreateTime() {
@@ -202,6 +197,31 @@ public class K8sNamespace {
 
     public void setPodRequestCpu(Double podRequestCpu) {
         this.podRequestCpu = podRequestCpu;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Override
+    public String toString() {
+        return "K8sNamespace{" +
+            "id=" + id +
+            ", namespace=" + namespace +
+            ", limitsCpu=" + limitsCpu +
+            ", limitsMemory=" + limitsMemory +
+            ", userId=" + userId +
+            ", podRequestCpu=" + podRequestCpu +
+            ", podRequestMemory=" + podRequestMemory +
+            ", podReplicas=" + podReplicas +
+            ", k8s=" + k8s +
+            ", createTime=" + createTime +
+            ", updateTime=" + updateTime +
+            '}';
     }
 
     @Override

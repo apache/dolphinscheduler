@@ -31,7 +31,14 @@ import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -187,14 +187,14 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      */
     @Override
     public Result<Object> updateUdfFunc(User loginUser,
-                                             int udfFuncId,
-                                             String funcName,
-                                             String className,
-                                             String argTypes,
-                                             String database,
-                                             String desc,
-                                             UdfType type,
-                                             int resourceId) {
+                                        int udfFuncId,
+                                        String funcName,
+                                        String className,
+                                        String argTypes,
+                                        String database,
+                                        String desc,
+                                        UdfType type,
+                                        int resourceId) {
         Result<Object> result = new Result<>();
 
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);

@@ -176,7 +176,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     public Map<String, Object> get(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(id);
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE,ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

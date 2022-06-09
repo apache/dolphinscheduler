@@ -31,7 +31,16 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

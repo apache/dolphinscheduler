@@ -29,7 +29,16 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
