@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

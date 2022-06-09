@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.plugin.datasource.hive.param.HiveDataSourcePa
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.oracle.param.OracleDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLDataSourceParamDTO;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
