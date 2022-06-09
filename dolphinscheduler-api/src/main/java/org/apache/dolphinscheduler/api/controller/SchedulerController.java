@@ -182,7 +182,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+    public Result publishScheduleOnline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                          @PathVariable("id") Integer id) {
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
@@ -204,7 +204,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+    public Result offlineSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @PathVariable("id") Integer id) {
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.service.permission;
+package org.apache.dolphinscheduler.api.permission;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.slf4j.Logger;

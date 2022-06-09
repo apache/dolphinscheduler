@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.service.k8s.K8sClientService;
+import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -59,8 +59,9 @@
             <property name="alias" value="d"/>
         </include>
         ,u.user_name
-        from t_ds_resources d,t_ds_user u
-        where 1=1 and d.type=#{type} and d.pid=#{id} and u.id = #{userId}
+        from t_ds_resources d
+        left join t_ds_user u on u.id = d.user_id
+        where 1=1 and d.type=#{type} and d.pid=#{id}
         <if test="resIds != null and resIds.size() > 0">
             and d.id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">
