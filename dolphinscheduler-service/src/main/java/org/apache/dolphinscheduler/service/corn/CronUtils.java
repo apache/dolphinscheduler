@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.corn;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
@@ -293,7 +294,7 @@ public class CronUtils {
         List<Date> result = new ArrayList<>();
         String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
         if(StringUtils.isNotEmpty(scheduleDates)){
-            for (String stringDate : scheduleDates.split(",")) {
+            for (String stringDate : scheduleDates.split(COMMA)) {
                 result.add(DateUtils.stringToDate(stringDate));
             }
             return result;
