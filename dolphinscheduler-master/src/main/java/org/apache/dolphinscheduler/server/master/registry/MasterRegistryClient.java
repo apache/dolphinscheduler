@@ -24,35 +24,18 @@ import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
-import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.registry.api.ConnectionState;
+import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.service.FailoverService;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
-import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -65,9 +48,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Sets;
 
 /**
- * zookeeper master client
- * <p>
- * single instance
+ * <p>DolphinScheduler master register client, used to connect to registry and hand the registry events.
+ * <p>When the Master node startup, it will register in registry center. And schedule a {@link HeartBeatTask} to update its metadata in registry.
  */
 @Component
 public class MasterRegistryClient {
@@ -101,8 +83,10 @@ public class MasterRegistryClient {
      * master startup time, ms
      */
     private long startupTime;
+    private String masterAddress;
 
     public void init() {
+        this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
         this.startupTime = System.currentTimeMillis();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -111,11 +95,12 @@ public class MasterRegistryClient {
         try {
             // master registry
             registry();
-
+            registryClient.addConnectionStateListener(new MasterConnectionStateListener(getCurrentNodePath(),
+                                                                                        registryClient));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             logger.error("master start up exception", e);
-            throw new RuntimeException("master start up error", e);
+            throw new RegistryException("Master registry client start up error", e);
         }
     }
 
@@ -198,24 +183,25 @@ public class MasterRegistryClient {
     }
 
     /**
-     * registry
+     * Registry the current master server itself to registry.
      */
-    public void registry() {
-        String address = NetUtils.getAddr(masterConfig.getListenPort());
-        String localNodePath = getMasterPath();
+    void registry() {
+        logger.info("master node : {} registering to registry center...", masterAddress);
+        String localNodePath = getCurrentNodePath();
         int masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                masterConfig.getMaxCpuLoadAvg(),
-                masterConfig.getReservedMemory(),
-                Sets.newHashSet(getMasterPath()),
-                Constants.MASTER_TYPE,
-                registryClient);
+                                                        masterConfig.getMaxCpuLoadAvg(),
+                                                        masterConfig.getReservedMemory(),
+                                                        Sets.newHashSet(localNodePath),
+                                                        Constants.MASTER_TYPE,
+                                                        registryClient);
 
         // remove before persist
         registryClient.remove(localNodePath);
         registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
+            logger.warn("The current master server node:{} cannot find in registry....", NetUtils.getHost());
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
@@ -225,37 +211,17 @@ public class MasterRegistryClient {
         // delete dead server
         registryClient.handleDeadServer(Collections.singleton(localNodePath), NodeType.MASTER, Constants.DELETE_OP);
 
-        registryClient.addConnectionStateListener(this::handleConnectionState);
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
-        logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
+        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, masterHeartbeatInterval, TimeUnit.SECONDS);
+        logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s",
+                    masterAddress,
+                    masterHeartbeatInterval);
 
-    }
-
-    public void handleConnectionState(ConnectionState state) {
-        String localNodePath = getMasterPath();
-        switch (state) {
-            case CONNECTED:
-                logger.debug("registry connection state is {}", state);
-                break;
-            case SUSPENDED:
-                logger.warn("registry connection state is {}, ready to retry connection", state);
-                break;
-            case RECONNECTED:
-                logger.debug("registry connection state is {}, clean the node info", state);
-                registryClient.persistEphemeral(localNodePath, "");
-                break;
-            case DISCONNECTED:
-                logger.warn("registry connection state is {}, ready to stop myself", state);
-                registryClient.getStoppable().stop("registry connection state is DISCONNECTED, stop myself");
-                break;
-            default:
-        }
     }
 
     public void deregister() {
         try {
             String address = getLocalAddress();
-            String localNodePath = getMasterPath();
+            String localNodePath = getCurrentNodePath();
             registryClient.remove(localNodePath);
             logger.info("master node : {} unRegistry to register center.", address);
             heartBeatExecutor.shutdown();
@@ -269,7 +235,7 @@ public class MasterRegistryClient {
     /**
      * get master path
      */
-    private String getMasterPath() {
+    private String getCurrentNodePath() {
         String address = getLocalAddress();
         return REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + address;
     }

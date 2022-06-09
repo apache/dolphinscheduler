@@ -40,7 +40,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskExecuteThreadPool.class);
 
-    private final ConcurrentHashMap<String, TaskExecuteThread> multiThreadFilterMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, TaskExecuteRunnable> multiThreadFilterMap = new ConcurrentHashMap<>();
 
     @Autowired
     private MasterConfig masterConfig;
@@ -67,7 +67,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * task event thread map
      */
-    private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, TaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init() {
@@ -83,26 +83,26 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         if (!taskExecuteThreadMap.containsKey(taskEvent.getProcessInstanceId())) {
-            TaskExecuteThread taskExecuteThread = new TaskExecuteThread(
+            TaskExecuteRunnable taskExecuteThread = new TaskExecuteRunnable(
                     taskEvent.getProcessInstanceId(),
                     processService, workflowExecuteThreadPool,
                     processInstanceExecCacheManager,
                     dataQualityResultOperator);
             taskExecuteThreadMap.put(taskEvent.getProcessInstanceId(), taskExecuteThread);
         }
-        TaskExecuteThread taskExecuteThread = taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
-        if (taskExecuteThread != null) {
-            taskExecuteThread.addEvent(taskEvent);
+        TaskExecuteRunnable taskExecuteRunnable= taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
+        if (taskExecuteRunnable != null) {
+            taskExecuteRunnable.addEvent(taskEvent);
         }
     }
 
     public void eventHandler() {
-        for (TaskExecuteThread taskExecuteThread: taskExecuteThreadMap.values()) {
+        for (TaskExecuteRunnable taskExecuteThread : taskExecuteThreadMap.values()) {
             executeEvent(taskExecuteThread);
         }
     }
 
-    public void executeEvent(TaskExecuteThread taskExecuteThread) {
+    public void executeEvent(TaskExecuteRunnable taskExecuteThread) {
         if (taskExecuteThread.eventSize() == 0) {
             return;
         }
