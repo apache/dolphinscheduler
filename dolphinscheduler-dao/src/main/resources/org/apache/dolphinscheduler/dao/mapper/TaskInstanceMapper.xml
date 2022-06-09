@@ -54,6 +54,13 @@
         and flag = #{flag}
         order by start_time desc
     </select>
+    <select id="findAllTaskListByProcessId" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        WHERE process_instance_id = #{processInstanceId}
+        order by start_time desc
+    </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>

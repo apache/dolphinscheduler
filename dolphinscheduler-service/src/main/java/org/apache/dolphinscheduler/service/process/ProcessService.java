@@ -428,7 +428,7 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      */
     public void removeTaskLogFile(Integer processInstanceId) {
-        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        List<TaskInstance> taskInstanceList = findAllTaskListByProcessId(processInstanceId);
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
@@ -1619,6 +1619,16 @@ public class ProcessService {
     }
 
     /**
+     * find all task list by process definition id
+     *
+     * @param processInstanceId processInstanceId
+     * @return task instance list
+     */
+    public List<TaskInstance> findAllTaskListByProcessId(Integer processInstanceId) {
+        return taskInstanceMapper.findAllTaskListByProcessId(processInstanceId);
+    }
+
+    /**
      * find previous task list by work process id
      *
      * @param processInstanceId processInstanceId
@@ -1671,7 +1681,6 @@ public class ProcessService {
      */
     public int deleteWorkProcessMapByParentId(int parentWorkProcessId) {
         return processInstanceMapMapper.deleteByParentProcessId(parentWorkProcessId);
-
     }
 
     /**
