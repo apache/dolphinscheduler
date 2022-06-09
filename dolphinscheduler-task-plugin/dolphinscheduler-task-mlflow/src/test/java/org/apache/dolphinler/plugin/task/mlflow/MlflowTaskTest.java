@@ -161,9 +161,9 @@ public class MlflowTaskTest {
                         "export DS_TASK_MLFLOW_CPU_LIMIT=0.5\n" +
                         "export DS_TASK_MLFLOW_MEMORY_LIMIT=200m\n" +
                         "docker-compose up -d\n" +
-                        "for i in $(seq 1 20); do " +
-                        "[ $(docker inspect --format \"{{json .State.Health.Status }}\" ds-mlflow-22222-1) = '\"healthy\"' ] && exit 0  && break;sleep 3; " +
-                        "done; exit 1");
+                        "for i in $(seq 1 300); do " +
+                        "[ $(docker inspect --format \"{{json .State.Health.Status }}\" ds-mlflow-22222-1) = '\"healthy\"' ] && exit 0  && break;sleep 1; " +
+                        "done; docker-compose down; exit 1");
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {
