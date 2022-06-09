@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ShellExecutor;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -49,33 +48,6 @@ public class OSUtils {
      */
     public static boolean isSudoEnable() {
         return PropertyUtils.getBoolean("sudo.enable", Boolean.TRUE);
-    }
-
-    /**
-     * whether is macOS
-     *
-     * @return true if mac
-     */
-    public static boolean isMacOS() {
-        return getOSName().startsWith("Mac");
-    }
-
-    /**
-     * whether is windows
-     *
-     * @return true if windows
-     */
-    public static boolean isWindows() {
-        return getOSName().startsWith("Windows");
-    }
-
-    /**
-     * whether is linux
-     *
-     * @return true if linux
-     */
-    public static boolean isLinux() {
-        return SystemUtils.IS_OS_LINUX;
     }
 
     /**
