@@ -51,7 +51,8 @@ export function useSpark({
     driverMemory: '512M',
     numExecutors: 2,
     executorMemory: '2G',
-    executorCores: 2
+    executorCores: 2,
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []

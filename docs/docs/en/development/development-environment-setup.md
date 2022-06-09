@@ -1,13 +1,13 @@
 # DolphinScheduler development
 
-## Software Requests
-
+## Software Requirements
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
-* [Git](https://git-scm.com/downloads): DolphinScheduler version control system
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): DolphinScheduler backend language, have to use version after JDK 1.8
-* [Maven](http://maven.apache.org/download.cgi): Java Package Management System
-* [Node](https://nodejs.org/en/download): DolphinScheduler frontend, have to use version after Node 12.20.2
+* [Git](https://git-scm.com/downloads)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)
+* [Maven](http://maven.apache.org/download.cgi): v3.5+
+* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
+* [Pnpm](https://pnpm.io/installation): v6.x
 
 ### Clone Git Repository
 
@@ -21,7 +21,63 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### compile source code
 
-ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+Supporting system:
+* MacOS
+* Liunx
+
+Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+
+## Docker image build
+
+DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).
+
+* If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
+```shell
+cd dolphinscheduler
+./mvnw -B clean package \
+       -Dmaven.test.skip \
+       -Dmaven.javadoc.skip \
+       -Dmaven.checkstyle.skip \
+       -Ddocker.tag=<TAG> \
+       -Pdocker,release              
+```
+
+When the command is finished you could find them by command `docker imaegs`.
+
+* If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can run when finished the modification
+```shell
+cd dolphinscheduler
+./mvnw -B clean deploy \
+       -Dmaven.test.skip \
+       -Dmaven.javadoc.skip \
+       -Dmaven.checkstyle.skip \
+       -Dmaven.deploy.skip \
+       -Ddocker.tag=<TAG> \
+       -Ddocker.hub=<HUB_URL> \
+       -Pdocker,release           
+```
+
+* If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.
+
+```shell
+cd dolphinscheduler
+find . -iname 'Dockerfile'
+```
+
+Then run the Docker build command above
+
+* You could create custom Docker images base on those images if you want to change image like add some dependencies or upgrade package.
+
+```Dockerfile
+FROM dolphinscheduler-standalone-server
+RUN apt update ; \
+    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
+```
+
+> **_Note：_** Docker will build and push linux/amd64,linux/arm64 multi-architecture images by default
+>
+> Have to use version after Docker 19.03, because after 19.03 docker contains buildx
+
 
 ## Notice
 
@@ -33,7 +89,9 @@ There are two ways to configure the DolphinScheduler development environment, st
 ## DolphinScheduler Standalone Quick Start
 
 > **_Note:_** Use standalone server only for development and debugging, because it uses H2 Database as default database and Zookeeper Testing Server which may not be stable in production.
+> 
 > Standalone is only supported in DolphinScheduler 1.3.9 and later versions.
+> 
 > Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/installation/standalone.html) for instructions.
 
 ### Git Branch Choose
@@ -104,7 +162,7 @@ We here use MySQL with database, username, password named dolphinscheduler as an
   ```application.yaml
    spring:
      datasource:
-       driver-class-name: com.mysql.jdbc.Driver
+       driver-class-name: com.mysql.cj.jdbc.Driver
        url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
        username: dolphinscheduler
        password: dolphinscheduler

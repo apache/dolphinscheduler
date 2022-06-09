@@ -146,7 +146,7 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       field: 'startTimeout',
       name: t('project.node.jupyter_start_timeout'),
       props: {
-        placeholder: t('project.node.zeppelin_note_id_tips')
+        placeholder: t('project.node.jupyter_start_timeout_tips')
       }
       //       validate: {
       //         trigger: ['input', 'blur'],

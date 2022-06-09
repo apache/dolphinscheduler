@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -40,9 +40,8 @@ import java.util.regex.Pattern;
  * parameter parse utils
  */
 public class ParameterUtils {
-    private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\$\\]]+)]";
-
-    private static final String DATE_START_PATTERN = "^[0-9]";
+    private static final Pattern DATE_PARSE_PATTERN = Pattern.compile("\\$\\[([^\\$\\]]+)]");
+    private static final Pattern DATE_START_PATTERN = Pattern.compile("^[0-9]");
 
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
@@ -165,15 +164,15 @@ public class ParameterUtils {
         if (templateStr == null) {
             return null;
         }
-        Pattern pattern = Pattern.compile(DATE_PARSE_PATTERN);
+
 
         StringBuffer newValue = new StringBuffer(templateStr.length());
 
-        Matcher matcher = pattern.matcher(templateStr);
+        Matcher matcher = DATE_PARSE_PATTERN.matcher(templateStr);
 
         while (matcher.find()) {
             String key = matcher.group(1);
-            if (Pattern.matches(DATE_START_PATTERN, key)) {
+            if (DATE_START_PATTERN.matcher(key).matches()) {
                 continue;
             }
             String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);

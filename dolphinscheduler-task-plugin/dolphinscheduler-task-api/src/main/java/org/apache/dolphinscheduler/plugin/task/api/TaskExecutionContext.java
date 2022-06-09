@@ -216,7 +216,10 @@ public class TaskExecutionContext {
      * sql TaskExecutionContext
      */
     private SQLTaskExecutionContext sqlTaskExecutionContext;
-
+    /**
+     * k8s TaskExecutionContext
+     */
+    private K8sTaskExecutionContext k8sTaskExecutionContext;
     /**
      * resources full name and tenant code
      */
@@ -235,6 +238,16 @@ public class TaskExecutionContext {
     private Map<String, Property> paramsMap;
 
     private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
+
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
 
     public String getTaskLogName() {
         return taskLogName;
@@ -564,6 +577,30 @@ public class TaskExecutionContext {
         this.endTime = endTime;
     }
 
+    public Integer getCpuQuota() {
+        return cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
+    }
+
+    public K8sTaskExecutionContext getK8sTaskExecutionContext() {
+        return k8sTaskExecutionContext;
+    }
+
+    public void setK8sTaskExecutionContext(K8sTaskExecutionContext k8sTaskExecutionContext) {
+        this.k8sTaskExecutionContext = k8sTaskExecutionContext;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{"
@@ -601,6 +638,7 @@ public class TaskExecutionContext {
                 + ", delayTime=" + delayTime
                 + ", resources=" + resources
                 + ", sqlTaskExecutionContext=" + sqlTaskExecutionContext
+                + ", k8sTaskExecutionContext=" + k8sTaskExecutionContext
                 + ", dataQualityTaskExecutionContext=" + dataQualityTaskExecutionContext
                 + '}';
     }

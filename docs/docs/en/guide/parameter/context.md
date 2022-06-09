@@ -6,10 +6,6 @@ DolphinScheduler provides the ability to refer to each other between parameters,
 
 The premise of local tasks referring global parameters is that you have already defined [Global Parameter](global.md). The usage is similar to the usage in [local parameters](local.md), but the value of the parameter needs to be configured as the key of the global parameter.
 
-![parameter-call-global-in-local](/img/global_parameter.png)
-
-As the figure above shows, `${biz_date}` and `${curdate}` are examples of local parameters that refer to global parameters. Observe the last line of the above figure, `local_param_bizdate` uses `${global_bizdate}` to refer to the global parameter. In the shell script, you can use `${local_param_bizdate}` to refer to the value of the global variable `global_bizdate`, or set the value of `local_param_bizdate` directly through JDBC. Similarly, `local_param` refers to the global parameters defined in the previous section through `${local_param}`. `biz_date`, `biz_curdate`, `system.datetime` are all user-defined parameters, which are assigned value via `${global parameters}`.
-
 ## Pass Parameter From Upstream Task to Downstream
 
 DolphinScheduler allows parameter transfer between tasks. Currently, transfer direction only supports one-way transfer from upstream to downstream. The task types that support this feature are：
@@ -20,47 +16,63 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. At present, we mainly focus on the SQL and shell nodes to pass parameters downstream.
 
-### SQL
+> Note: If there are no dependencies between nodes, local parameters cannot be passed upstream.
 
-`prop` is user-specified; the direction selects `OUT`, and will define as an export parameter only when the direction is `OUT`. Choose data structures for data type according to the scenario, and the leave the value part blank.
+### Example
 
-If the result of the SQL node has only one row, one or multiple fields, the name of the `prop` needs to be the same as the field name. The data type can choose structure except `LIST`. The parameter assigns the value according to the same column name in the SQL query result.
+This sample shows how to use the parameter passing function. Create local parameters and assign them to downstream through the SHELL task. The SQL task completes the query operation by obtaining the parameters of the upstream task.
 
-If the result of the SQL node has multiple rows, one or more fields, the name of the `prop` needs to be the same as the field name. Choose the data type structure as `LIST`, and the SQL query result will be converted to `LIST<VARCHAR>`, and forward to convert to JSON as the parameter value.
+#### Create a SHELL task and set parameters
 
-Let's make an example of the SQL node process in the above picture:
+The user needs to pass the parameter when creating the shell script, the output statement format is `'${setValue(key=value)}'`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
 
-The following defines the [createParam1] node in the above figure:
+Create a Node_A task, add output and value parameters to the custom parameters, and write the following script:
 
-![png05](/img/globalParam/image-20210723104957031.png)
+![context-parameter01](../../../../img/new_ui/dev/parameter/context_parameter01.png)
 
-The following defines the [createParam2] node:
+Parameter Description:
 
-![png06](/img/globalParam/image-20210723105026924.png)
+- value: The direction selection is IN, and the value is 66
+- output: The direction is selected as OUT, assigned through the script`'${setValue(output=1)}'`, and passed to the downstream parameters
 
-Find the value of the variable in the [Workflow Instance] page corresponding to the node instance.
+When the SHELL node is defined, the log detects the format of `${setValue(output=1)}`, it will assign 1 to output, and the downstream node can directly use the value of the variable output. Similarly, you can find the corresponding node instance on the [Workflow Instance] page, and then you can view the value of this variable.
 
-The following shows the Node instance [createparam1]:
+Create the Node_B task, which is mainly used to test and output the parameters passed by the upstream task Node_A.
 
-![png07](/img/globalParam/image-20210723105131381.png)
+![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
-Here, the value of "id" is 12.
+#### Create SQL tasks and use parameters
 
-Let's see the case of the node instance [createparam2].
+When the SHELL task is completed, we can use the output passed upstream as the query object for the SQL. The id of the query is renamed to ID and is output as a parameter.
 
-![png08](/img/globalParam/image-20210723105255850.png)
+![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
-There is only the "id" value. Although the user-defined SQL query both "id" and "database_name" field, only set the `OUT` parameter `id` due to only one parameter "id" is defined for output. The length of the result list is 10 due to display reasons.
+> Note: If the result of the SQL node has only one row, one or multiple fields, the name of the `prop` needs to be the same as the field name. The data type can choose structure except `LIST`. The parameter assigns the value according to the same column name in the SQL query result.
+>
+>If the result of the SQL node has multiple rows, one or more fields, the name of the `prop` needs to be the same as the field name. Choose the data type structure as `LIST`, and the SQL query result will be converted to `LIST<VARCHAR>`, and forward to convert to JSON as the parameter value.
 
-### SHELL
+#### Save the workflow and set the global parameters
 
-`prop` is user-specified and the direction is `OUT`. The output is defined as an export parameter only when the direction is `OUT`. Choose data structures for data type according to the scenario, and leave the value part blank.
-The user needs to pass the parameter when creating the shell script, the output statement format is `${setValue(key=value)}`, the key is the `prop` of the corresponding parameter, and value is the value of the parameter.
+Click on the Save workflow icon and set the global parameters output and value.
 
-For example, in the figure below:
+![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter04.png)
 
-![png09](/img/globalParam/image-20210723101242216.png)
+#### View results
 
-When the log detects the `${setValue(key=value1)}` format in the shell node definition, it will assign value1 to the key, and downstream nodes can use the variable key directly. Similarly, you can find the corresponding node instance on the [Workflow Instance] page to see the value of the variable.
+After the workflow is created, run the workflow online and view its running results.
 
-![png10](/img/globalParam/image-20210723102522383.png)
+The result of Node_A is as follows:
+
+![context-log01](../../../../img/new_ui/dev/parameter/context_log01.png)
+
+The result of Node_B is as follows:
+
+![context-log02](../../../../img/new_ui/dev/parameter/context_log02.png)
+
+The result of Node_mysql is as follows:
+
+![context-log03](../../../../img/new_ui/dev/parameter/context_log03.png)
+
+Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
+
+But the output value 66 only shows in the Node_A, the reason is that the direction of value is selected as IN, and only when the direction is OUT will it be defined as a variable output.
