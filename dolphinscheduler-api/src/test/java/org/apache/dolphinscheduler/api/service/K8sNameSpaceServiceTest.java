@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
-import org.apache.dolphinscheduler.api.service.impl.K8SNameSpaceServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.K8sNameSpaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -60,7 +60,7 @@ public class K8SNameSpaceServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
-    private K8SNameSpaceServiceImpl k8sNamespaceService;
+    private K8sNameSpaceServiceImpl k8sNamespaceService;
 
     @Mock
     private K8sNameSpaceMapper k8sNamespaceMapper;

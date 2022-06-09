@@ -51,9 +51,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * k8s namespace service impl
  */
 @Service
-public class K8SNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameSpaceService {
+public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameSpaceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(K8SNameSpaceServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8sNameSpaceServiceImpl.class);
 
     private static String resourceYaml = "apiVersion: v1\n"
             + "kind: ResourceQuota\n"
