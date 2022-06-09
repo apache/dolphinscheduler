@@ -272,7 +272,7 @@ public class TaskNode {
         this.runFlag = runFlag;
     }
 
-    public Boolean isForbidden() {
+    public boolean isForbidden() {
         return (!StringUtils.isEmpty(this.runFlag)
                 && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
