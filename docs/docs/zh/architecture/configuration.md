@@ -194,6 +194,7 @@ yarn.resourcemanager.ha.rm.ids||yarn resourcemanager 地址, 如果resourcemanag
 yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname
 dolphinscheduler.env.path|env/dolphinscheduler_env.sh|运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
 development.state|false|是否处于开发模式
+task.resource.limit.state|false|是否启用资源限制模式
 
 
 ## 5.application-api.properties [API服务配置]

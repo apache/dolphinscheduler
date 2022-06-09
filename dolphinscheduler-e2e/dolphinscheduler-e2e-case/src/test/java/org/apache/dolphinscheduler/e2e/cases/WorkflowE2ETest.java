@@ -89,7 +89,6 @@ class WorkflowE2ETest {
             .cancelPublishAll()
             .deleteAll()
         ;
-
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .delete(project)
@@ -103,7 +102,6 @@ class WorkflowE2ETest {
     @Order(1)
     void testCreateWorkflow() {
         final String workflow = "test-workflow-1";
-
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
@@ -130,7 +128,6 @@ class WorkflowE2ETest {
                 .anyMatch(
                         it -> it.getText().contains(workflow)
                 ));
-
         workflowDefinitionPage.publish(workflow);
     }
 
@@ -138,7 +135,6 @@ class WorkflowE2ETest {
     @Order(10)
     void testCreateSubWorkflow() {
         final String workflow = "test-sub-workflow-1";
-
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
@@ -163,7 +159,6 @@ class WorkflowE2ETest {
         await().untilAsserted(() -> assertThat(
             workflowDefinitionPage.workflowList()
         ).anyMatch(it -> it.getText().contains(workflow)));
-
         workflowDefinitionPage.publish(workflow);
     }
 
@@ -171,7 +166,6 @@ class WorkflowE2ETest {
     @Order(30)
     void testRunWorkflow() {
         final String workflow = "test-workflow-1";
-
         final ProjectDetailPage projectPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -180,7 +174,6 @@ class WorkflowE2ETest {
         projectPage
                 .goToTab(WorkflowInstanceTab.class)
                 .deleteAll();
-
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow)
@@ -198,7 +191,6 @@ class WorkflowE2ETest {
             assertThat(row.isSuccess()).isTrue();
             assertThat(row.executionTime()).isEqualTo(1);
         });
-
         // Test rerun
         projectPage
                 .goToTab(WorkflowInstanceTab.class)

@@ -19,13 +19,14 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
@@ -90,6 +91,23 @@ public class OSUtils {
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(memoryUsage));
+    }
+
+    /**
+     * get disk usage
+     * Keep 2 decimal
+     *
+     * @return disk free size, unit: GB
+     */
+    public static double diskAvailable() {
+        File file = new File(".");
+        long freeSpace = file.getFreeSpace(); //unallocated / free disk space in bytes.
+
+        double diskAvailable = freeSpace / 1024.0 / 1024 / 1024;
+
+        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return Double.parseDouble(df.format(diskAvailable));
     }
 
     /**

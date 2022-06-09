@@ -11,7 +11,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/flink.png" width="15"/>task node to canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/flink.png" width="15"/>task node to canvas.
 
 ## Task Parameter
 
@@ -54,7 +54,7 @@ This is a common introductory case in the big data ecosystem, which often apply 
 
 If you are using the flink task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `bin/env/dolphinscheduler_env.sh`.
 
-![demo-flink-simple](/img/tasks/demo/flink_task01.png)
+![demo-flink-simple](../../../../img/tasks/demo/flink_task01.png)
 
 #### Upload the Main Package
 
@@ -62,19 +62,19 @@ When using the Flink task node, you need to upload the jar package to the Resour
 
 After finish the Resource Centre configuration, upload the required target files directly by dragging and dropping.
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
 #### Configure Flink Nodes
 
 Configure the required content according to the parameter descriptions above.
 
-![demo-flink-simple](/img/tasks/demo/flink_task02.png)
+![demo-flink-simple](../../../../img/tasks/demo/flink_task02.png)
 
 ### Execute the FlinkSQL Program
 
 Configure the required content according to the parameter descriptions above.
 
-![demo-flink-sql-simple](/img/tasks/demo/flink_sql_test.png)
+![demo-flink-sql-simple](../../../../img/tasks/demo/flink_sql_test.png)
 
 ## Notice
 

@@ -55,7 +55,7 @@ public interface AccessTokenService {
      * @param token token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
-    Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token);
+    Result createToken(User loginUser, int userId, String expireTime, String token);
 
 
     /**

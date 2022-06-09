@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -503,7 +503,7 @@ public class ProcessDefinitionController extends BaseController {
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("code") long code,
                            @RequestParam("limit") Integer limit) {
-        Map<String, Object> result = processDefinitionService.viewTree(projectCode, code, limit);
+        Map<String, Object> result = processDefinitionService.viewTree(loginUser,projectCode, code, limit);
         return returnDataList(result);
     }
 
