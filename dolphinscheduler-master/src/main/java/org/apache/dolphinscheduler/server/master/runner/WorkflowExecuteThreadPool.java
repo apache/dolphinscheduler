@@ -68,7 +68,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * multi-thread filter, avoid handling workflow at the same time
      */
-    private ConcurrentHashMap<String, WorkflowExecuteThread> multiThreadFilterMap = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, WorkflowExecuteRunnable> multiThreadFilterMap = new ConcurrentHashMap();
 
     @PostConstruct
     private void init() {
@@ -82,7 +82,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * submit state event
      */
     public void submitStateEvent(StateEvent stateEvent) {
-        WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+        WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
             logger.warn("workflowExecuteThread is null, stateEvent:{}", stateEvent);
             return;
@@ -93,14 +93,14 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * start workflow
      */
-    public void startWorkflow(WorkflowExecuteThread workflowExecuteThread) {
-        submit(workflowExecuteThread::startProcess);
+    public void startWorkflow(WorkflowExecuteRunnable workflowExecuteThread) {
+        submit(workflowExecuteThread);
     }
 
     /**
      * execute workflow
      */
-    public void executeEvent(WorkflowExecuteThread workflowExecuteThread) {
+    public void executeEvent(WorkflowExecuteRunnable workflowExecuteThread) {
         if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
             return;
         }

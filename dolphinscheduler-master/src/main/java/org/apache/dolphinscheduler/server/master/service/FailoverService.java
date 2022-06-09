@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
@@ -37,12 +40,14 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +75,14 @@ public class FailoverService {
     /**
      * check master failover
      */
+    @Counted(value = "failover_scheduler_check_task_count")
+    @Timed(value = "failover_scheduler_check_task_time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     public void checkMasterFailover() {
         List<String> hosts = getNeedFailoverMasterServers();
         if (CollectionUtils.isEmpty(hosts)) {
             return;
         }
-        LOGGER.info("need failover hosts:{}", hosts);
+        LOGGER.info("{} begin to failover hosts:{}", getLocalAddress(), hosts);
 
         for (String host : hosts) {
             failoverMasterWithLock(host);
@@ -114,9 +121,9 @@ public class FailoverService {
     }
 
     /**
-     * failover master
-     * <p>
-     * failover process instance and associated task instance
+     * Failover master, will failover process instance and associated task instance.
+     * <p>When the process instance belongs to the given masterHost and the restartTime is before the current server start up time,
+     * then the process instance will be failovered.
      *
      * @param masterHost master host
      */
@@ -125,11 +132,11 @@ public class FailoverService {
             return;
         }
         Date serverStartupTime = getServerStartupTime(NodeType.MASTER, masterHost);
-        long startTime = System.currentTimeMillis();
+        StopWatch failoverTimeCost = StopWatch.createStarted();
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
-        LOGGER.info("start master[{}] failover, process list size:{}", masterHost, needFailoverProcessInstanceList.size());
+        LOGGER.info("start master[{}] failover, need to failover process list size:{}", masterHost, needFailoverProcessInstanceList.size());
 
-        // servers need to contains master hosts and worker hosts, otherwise the logic task will failover fail.
+        // servers need to contain master hosts and worker hosts, otherwise the logic task will failover fail.
         List<Server> servers = registryClient.getServerList(NodeType.WORKER);
         servers.addAll(registryClient.getServerList(NodeType.MASTER));
 
@@ -145,7 +152,7 @@ public class FailoverService {
             }
 
             if (serverStartupTime != null && processInstance.getRestartTime() != null
-                && processInstance.getRestartTime().after(serverStartupTime)) {
+                    && processInstance.getRestartTime().after(serverStartupTime)) {
                 continue;
             }
 
@@ -155,7 +162,8 @@ public class FailoverService {
             processService.processNeedFailoverProcessInstances(processInstance);
         }
 
-        LOGGER.info("master[{}] failover end, useTime:{}ms", masterHost, System.currentTimeMillis() - startTime);
+        failoverTimeCost.stop();
+        LOGGER.info("master[{}] failover end, useTime:{}ms", masterHost, failoverTimeCost.getTime(TimeUnit.MILLISECONDS));
     }
 
     /**
@@ -248,7 +256,10 @@ public class FailoverService {
     }
 
     /**
-     * get need failover master servers
+     * Get need failover master servers.
+     * <p>
+     * Query the process instances from database, if the processInstance's host doesn't exist in registry
+     * or the host is the currentServer, then it will need to failover.
      *
      * @return need failover master servers
      */

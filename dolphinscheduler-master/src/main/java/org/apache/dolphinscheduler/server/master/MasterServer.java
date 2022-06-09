@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponsePr
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
@@ -59,12 +60,7 @@ public class MasterServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     @Autowired
-    private MasterConfig masterConfig;
-
-    @Autowired
     private SpringApplicationContext springApplicationContext;
-
-    private NettyRemotingServer nettyRemotingServer;
 
     @Autowired
     private MasterRegistryClient masterRegistryClient;
@@ -79,31 +75,13 @@ public class MasterServer implements IStoppable {
     private Scheduler scheduler;
 
     @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
-
-    @Autowired
-    private TaskEventProcessor taskEventProcessor;
-
-    @Autowired
-    private StateEventProcessor stateEventProcessor;
-
-    @Autowired
-    private CacheProcessor cacheProcessor;
-
-    @Autowired
-    private TaskKillResponseProcessor taskKillResponseProcessor;
-
-    @Autowired
     private EventExecuteService eventExecuteService;
 
     @Autowired
     private FailoverExecuteThread failoverExecuteThread;
 
     @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
+    private MasterRPCServer masterRPCServer;
 
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
@@ -115,25 +93,8 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run() throws SchedulerException {
-        // init remoting server
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(masterConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, taskEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, taskEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);
-
-        // logger server
-        this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
-
-        this.nettyRemotingServer.start();
+        // init rpc server
+        this.masterRPCServer.start();
 
         // install task plugin
         this.taskPluginManager.installPlugin();
@@ -168,6 +129,7 @@ public class MasterServer implements IStoppable {
         try {
             // execute only once
             if (Stopper.isStopped()) {
+                logger.warn("MasterServer has been stopped ..., current cause: {}", cause);
                 return;
             }
 
@@ -184,10 +146,13 @@ public class MasterServer implements IStoppable {
             }
             // close
             this.masterSchedulerService.close();
-            this.nettyRemotingServer.close();
+            this.masterRPCServer.close();
             this.masterRegistryClient.closeRegistry();
-            // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
+            // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
+            // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
             springApplicationContext.close();
+
+            logger.info("MasterServer stopped...");
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
         }

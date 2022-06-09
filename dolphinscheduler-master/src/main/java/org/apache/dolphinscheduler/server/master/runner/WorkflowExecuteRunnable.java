@@ -85,6 +85,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -97,34 +98,34 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 /**
- * master exec thread,split dag
+ * Workflow execute task, used to execute a workflow instance.
  */
-public class WorkflowExecuteThread {
+public class WorkflowExecuteRunnable implements Runnable {
 
     /**
      * logger of WorkflowExecuteThread
      */
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
 
     /**
      * master config
      */
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     /**
      * process service
      */
-    private ProcessService processService;
+    private final ProcessService processService;
 
     /**
      * alert manager
      */
-    private ProcessAlertManager processAlertManager;
+    private final ProcessAlertManager processAlertManager;
 
     /**
      * netty executor manager
      */
-    private NettyExecutorManager nettyExecutorManager;
+    private final NettyExecutorManager nettyExecutorManager;
 
     /**
      * process instance
@@ -159,7 +160,7 @@ public class WorkflowExecuteThread {
     /**
      * task instance hash map, taskId as key
      */
-    private Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
+    private final Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
 
     /**
      * running taskProcessor, taskCode as key, taskProcessor as value
@@ -171,34 +172,34 @@ public class WorkflowExecuteThread {
      * valid task map, taskCode as key, taskId as value
      * in a DAG, only one taskInstance per taskCode is valid
      */
-    private Map<Long, Integer> validTaskMap = new ConcurrentHashMap<>();
+    private final Map<Long, Integer> validTaskMap = new ConcurrentHashMap<>();
 
     /**
      * error task map, taskCode as key, taskInstanceId as value
      * in a DAG, only one taskInstance per taskCode is valid
      */
-    private Map<Long, Integer> errorTaskMap = new ConcurrentHashMap<>();
+    private final Map<Long, Integer> errorTaskMap = new ConcurrentHashMap<>();
 
     /**
      * complete task map, taskCode as key, taskInstanceId as value
      * in a DAG, only one taskInstance per taskCode is valid
      */
-    private Map<Long, Integer> completeTaskMap = new ConcurrentHashMap<>();
+    private final Map<Long, Integer> completeTaskMap = new ConcurrentHashMap<>();
 
     /**
      * depend failed task map, taskCode as key, taskId as value
      */
-    private Map<Long, Integer> dependFailedTaskMap = new ConcurrentHashMap<>();
+    private final Map<Long, Integer> dependFailedTaskMap = new ConcurrentHashMap<>();
 
     /**
      * forbidden task map, code as key
      */
-    private Map<Long, TaskNode> forbiddenTaskMap = new ConcurrentHashMap<>();
+    private final Map<Long, TaskNode> forbiddenTaskMap = new ConcurrentHashMap<>();
 
     /**
      * skip task map, code as key
      */
-    private Map<String, TaskNode> skipTaskNodeMap = new ConcurrentHashMap<>();
+    private final Map<String, TaskNode> skipTaskNodeMap = new ConcurrentHashMap<>();
 
     /**
      * complement date list
@@ -208,27 +209,25 @@ public class WorkflowExecuteThread {
     /**
      * state event queue
      */
-    private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
     /**
      * ready to submit task queue
      */
-    private PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
+    private final PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
 
     /**
      * wait to retry taskInstance map, taskCode as key, taskInstance as value
      * before retry, the taskInstance id is 0
      */
-    private Map<Long, TaskInstance> waitToRetryTaskInstanceMap = new ConcurrentHashMap<>();
+    private final Map<Long, TaskInstance> waitToRetryTaskInstanceMap = new ConcurrentHashMap<>();
 
     /**
      * state wheel execute thread
      */
-    private StateWheelExecuteThread stateWheelExecuteThread;
+    private final StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
-     * constructor of WorkflowExecuteThread
-     *
      * @param processInstance         processInstance
      * @param processService          processService
      * @param nettyExecutorManager    nettyExecutorManager
@@ -236,12 +235,12 @@ public class WorkflowExecuteThread {
      * @param masterConfig            masterConfig
      * @param stateWheelExecuteThread stateWheelExecuteThread
      */
-    public WorkflowExecuteThread(ProcessInstance processInstance
-        , ProcessService processService
-        , NettyExecutorManager nettyExecutorManager
-        , ProcessAlertManager processAlertManager
-        , MasterConfig masterConfig
-        , StateWheelExecuteThread stateWheelExecuteThread) {
+    public WorkflowExecuteRunnable(ProcessInstance processInstance
+            , ProcessService processService
+            , NettyExecutorManager nettyExecutorManager
+            , ProcessAlertManager processAlertManager
+            , MasterConfig masterConfig
+            , StateWheelExecuteThread stateWheelExecuteThread) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
@@ -399,7 +398,10 @@ public class WorkflowExecuteThread {
             return true;
         }
 
-        TaskInstance task = getTaskInstance(stateEvent.getTaskInstanceId());
+        Optional<TaskInstance> taskInstanceOptional = getTaskInstance(stateEvent.getTaskInstanceId());
+        TaskInstance task = taskInstanceOptional.orElseThrow(
+                () -> new RuntimeException("Cannot find task instance by task instance id: " + stateEvent.getTaskInstanceId()));
+
         if (task.getState() == null) {
             logger.error("task state is null, state handler error: {}", stateEvent);
             return true;
@@ -630,37 +632,37 @@ public class WorkflowExecuteThread {
     /**
      * get task instance from memory
      */
-    public TaskInstance getTaskInstance(int taskInstanceId) {
+    public Optional<TaskInstance> getTaskInstance(int taskInstanceId) {
         if (taskInstanceMap.containsKey(taskInstanceId)) {
-            return taskInstanceMap.get(taskInstanceId);
+            return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public TaskInstance getTaskInstance(long taskCode) {
-        if (taskInstanceMap == null || taskInstanceMap.size() == 0) {
-            return null;
+    public Optional<TaskInstance> getTaskInstance(long taskCode) {
+        if (taskInstanceMap.isEmpty()) {
+            return Optional.empty();
         }
         for (TaskInstance taskInstance : taskInstanceMap.values()) {
             if (taskInstance.getTaskCode() == taskCode) {
-                return taskInstance;
+                return Optional.of(taskInstance);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public TaskInstance getActiveTaskInstanceByTaskCode(long taskCode) {
+    public Optional<TaskInstance> getActiveTaskInstanceByTaskCode(long taskCode) {
         if (activeTaskProcessorMaps.containsKey(taskCode)) {
-            return activeTaskProcessorMaps.get(taskCode).taskInstance();
+            return Optional.ofNullable(activeTaskProcessorMaps.get(taskCode).taskInstance());
         }
-        return null;
+        return Optional.empty();
     }
 
-    public TaskInstance getRetryTaskInstanceByTaskCode(long taskCode) {
+    public Optional<TaskInstance> getRetryTaskInstanceByTaskCode(long taskCode) {
         if (waitToRetryTaskInstanceMap.containsKey(taskCode)) {
-            return waitToRetryTaskInstanceMap.get(taskCode);
+            return Optional.ofNullable(waitToRetryTaskInstanceMap.get(taskCode));
         }
-        return null;
+        return Optional.empty();
     }
 
     private boolean processStateChangeHandler(StateEvent stateEvent) {
@@ -695,7 +697,9 @@ public class WorkflowExecuteThread {
 
     private boolean processBlockHandler(StateEvent stateEvent) {
         try {
-            TaskInstance task = getTaskInstance(stateEvent.getTaskInstanceId());
+            Optional<TaskInstance> taskInstanceOptional = getTaskInstance(stateEvent.getTaskInstanceId());
+            TaskInstance task = taskInstanceOptional.orElseThrow(
+                    () -> new RuntimeException("Cannot find taskInstance by taskInstanceId:" + stateEvent.getTaskInstanceId()));
             if (!checkTaskInstanceByStateEvent(stateEvent)) {
                 logger.error("task {} is not a blocking task", task.getTaskCode());
                 return false;
@@ -787,9 +791,10 @@ public class WorkflowExecuteThread {
     }
 
     /**
-     * process start handle
+     * ProcessInstance start entrypoint.
      */
-    public void startProcess() {
+    @Override
+    public void run() {
         if (this.taskInstanceMap.size() > 0) {
             return;
         }
@@ -1295,9 +1300,9 @@ public class WorkflowExecuteThread {
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
             TaskNode taskNodeObject = dag.getNode(taskNode);
-            TaskInstance existTaskInstance = getTaskInstance(taskNodeObject.getCode());
-            if (existTaskInstance != null) {
-                taskInstances.add(existTaskInstance);
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskNodeObject.getCode());
+            if (existTaskInstanceOptional.isPresent()) {
+                taskInstances.add(existTaskInstanceOptional.get());
                 continue;
             }
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
