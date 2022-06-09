@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
-import com.google.common.base.Strings;
+
 import org.slf4j.Logger;
+
+import com.google.common.base.Strings;
 
 /**
  * shell command executor
@@ -69,7 +70,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         return String.format("%s/%s.%s"
                 , taskRequest.getExecutePath()
                 , taskRequest.getTaskAppId()
-                , OSUtils.isWindows() ? "bat" : "command");
+                , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
     }
 
     /**
@@ -89,7 +90,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             logger.info("create command file:{}", commandFile);
 
             StringBuilder sb = new StringBuilder();
-            if (OSUtils.isWindows()) {
+            if (SystemUtils.IS_OS_WINDOWS) {
                 sb.append("@echo off\n");
                 sb.append("cd /d %~dp0\n");
                 if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
@@ -121,7 +122,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     protected String commandInterpreter() {
-        return OSUtils.isWindows() ? CMD : SH;
+        return SystemUtils.IS_OS_WINDOWS ? CMD : SH;
     }
 
 }
