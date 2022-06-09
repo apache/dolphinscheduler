@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,11 +39,6 @@ public class TaskCountDto {
      * task state count list
      */
     private List<TaskStateCount> taskCountDtos;
-
-    public TaskCountDto() {
-        this.totalCount = 0;
-        this.taskCountDtos = Collections.emptyList();
-    }
 
     public TaskCountDto(List<ExecuteStatusCount> taskInstanceStateCounts) {
         countTaskDtos(taskInstanceStateCounts);
