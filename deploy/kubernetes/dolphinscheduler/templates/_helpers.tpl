@@ -112,7 +112,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Create a default fully qualified zookkeeper quorum.
 */}}
 {{- define "dolphinscheduler.zookeeper.quorum" -}}
-{{- $port := default "2181" (.Values.zookeeper.service.port | toString) -}}
+{{- $port := default "2181" .Values.zookeeper.service.port | toString -}}
 {{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port -}}
 {{- end -}}
 
