@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
