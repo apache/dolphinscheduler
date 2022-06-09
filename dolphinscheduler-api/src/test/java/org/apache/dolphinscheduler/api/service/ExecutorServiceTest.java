@@ -199,7 +199,7 @@ public class ExecutorServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, cronTime, CommandType.START_PROCESS,
+                processDefinitionCode, "{\"complementStartDate\":\"2022-06-09 12:12:12\",\"complementEndDate\":\"2022-06-10 12:12:12\"}", CommandType.START_PROCESS,
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_SERIAL,
@@ -218,7 +218,7 @@ public class ExecutorServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, cronTime, CommandType.START_PROCESS,
+                processDefinitionCode, "{\"complementStartDate\":\"2022-06-09 12:12:12\",\"complementEndDate\":\"2022-06-10 12:12:12\"}", CommandType.START_PROCESS,
                 null, "n1,n2",
                 null, null, 0,
                 RunMode.RUN_MODE_SERIAL,
@@ -237,7 +237,7 @@ public class ExecutorServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, "", CommandType.COMPLEMENT_DATA,
+                processDefinitionCode, "{\"complementStartDate\":\"2022-07-09 12:12:12\",\"complementEndDate\":\"2022-06-10 12:12:12\"}", CommandType.COMPLEMENT_DATA,
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_SERIAL,
@@ -255,7 +255,7 @@ public class ExecutorServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, cronTime, CommandType.COMPLEMENT_DATA,
+                processDefinitionCode, "{\"complementStartDate\":\"2022-06-09 12:12:12\",\"complementEndDate\":\"2022-06-10 12:12:12\"}", CommandType.COMPLEMENT_DATA,
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_SERIAL,
@@ -273,14 +273,11 @@ public class ExecutorServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, "2012-06-08 22:35:35,2013-06-08 22:35:35,2014-06-08 22:35:35,2015-06-08 22:35:35,2016-06-08 22:35:35,2017-06-08 22:35:35,2018-06-08 22:35:35,2019-06-08 22:35:35,2020-06-08 22:35:35," +
-                        "2021-06-08 22:35:35,2011-06-08 22:35:35,2002-06-08 22:35:35,2022-06-08 22:35:35,2010-06-08 22:35:35,2009-06-08 22:35:35," +
-                        "2008-06-08 22:35:35,2005-06-08 22:35:35,2006-06-08 22:35:35,2007-06-08 22:35:35,2020-12-08 22:35:35,2021-11-08 22:35:35,2011-07-08 22:35:35,2017-08-08 22:35:35,2022-09-08 22:35:35,2010-10-08 22:35:35," +
-                        "2009-01-08 22:35:35,2008-02-08 22:35:35,2005-03-08 22:35:35,2006-04-08 22:35:35,2007-05-08 22:35:35,2007-05-09 22:35:35", CommandType.COMPLEMENT_DATA,
+                processDefinitionCode, "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}", CommandType.COMPLEMENT_DATA,
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP,100L, 110, null, 1, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP,100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(31)).createCommand(any(Command.class));
@@ -295,12 +292,11 @@ public class ExecutorServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(oneSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, "2016-06-08 22:35:35,2017-06-08 22:35:35,2018-06-08 22:35:35,2019-06-08 22:35:35,2020-12-08 22:35:35,2021-11-08 22:35:35,2011-07-08 22:35:35,2017-08-08 22:35:35,2022-09-08 22:35:35," +
-                        "2010-10-08 22:35:35,2009-01-08 22:35:35,2008-02-08 22:35:35,2005-03-08 22:35:35,2006-04-08 22:35:35,2007-05-08 22:35:35", CommandType.COMPLEMENT_DATA,
+                processDefinitionCode, "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}", CommandType.COMPLEMENT_DATA,
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L,110, null, 1, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L,110, null, 15, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(15)).createCommand(any(Command.class));
@@ -312,7 +308,7 @@ public class ExecutorServiceTest {
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(new ArrayList<>());
 
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode, cronTime, CommandType.COMPLEMENT_DATA,
+                processDefinitionCode, "{\"complementStartDate\":\"2022-07-09 12:12:12\",\"complementEndDate\":\"2022-06-10 12:12:12\"}", CommandType.COMPLEMENT_DATA,
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
