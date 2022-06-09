@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import io.micrometer.core.annotation.Counted;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
@@ -391,6 +392,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return create result
      */
     @Override
+    @Counted("dolphinscheduler_create_command_count")
     public int createCommand(Command command) {
         int result = 0;
         if (command != null) {

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * the factory to create task processor
  */
-public class TaskProcessorFactory {
+public final class TaskProcessorFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessorFactory.class);
 
@@ -66,10 +66,15 @@ public class TaskProcessorFactory {
 
     /**
      * if match master processor, then this task type is processed on the master
+     *
      * @param type
      * @return
      */
     public static boolean isMasterTask(String type) {
         return PROCESS_MAP.containsKey(type);
+    }
+
+    private TaskProcessorFactory() {
+        throw new UnsupportedOperationException("TaskProcessorFactory cannot be instantiated");
     }
 }

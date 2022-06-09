@@ -18,10 +18,13 @@
 package org.apache.dolphinscheduler.server.master.cache.impl;
 
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
@@ -34,6 +37,11 @@ import com.google.common.collect.ImmutableList;
 public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecCacheManager {
 
     private final ConcurrentHashMap<Integer, WorkflowExecuteRunnable> processInstanceExecMaps = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void registerMetrics() {
+        ProcessInstanceMetrics.registerProcessInstanceRunningGauge(processInstanceExecMaps::size);
+    }
 
     @Override
     public WorkflowExecuteRunnable getByProcessInstanceId(int processInstanceId) {

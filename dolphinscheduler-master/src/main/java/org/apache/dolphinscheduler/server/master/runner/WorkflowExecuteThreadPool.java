@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +45,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import com.google.common.base.Strings;
 
 @Component
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
@@ -94,6 +97,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * start workflow
      */
     public void startWorkflow(WorkflowExecuteRunnable workflowExecuteThread) {
+        ProcessInstanceMetrics.incProcessInstanceSubmit();
         submit(workflowExecuteThread);
     }
 
@@ -109,7 +113,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
         int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
-        ListenableFuture future = this.submitListenable(workflowExecuteThread::handleEvents);
+        ListenableFuture<?> future = this.submitListenable(workflowExecuteThread::handleEvents);
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
@@ -120,7 +124,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onSuccess(Object result) {
                 // if an exception occurs, first, the error message cannot be printed in the log;
-                // secondly, the `multiThreadFilterMap` cannot be remove the `workflowExecuteThread`, resulting in the state of process instance cannot be changed and memory leak
+                // secondly, the `multiThreadFilterMap` cannot remove the `workflowExecuteThread`, resulting in the state of process instance cannot be changed and memory leak
                 try {
                     if (workflowExecuteThread.workFlowFinish()) {
                         stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
@@ -144,12 +148,14 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         Map<ProcessInstance, TaskInstance> fatherMaps = processService.notifyProcessList(finishProcessInstance.getId());
-        for (ProcessInstance processInstance : fatherMaps.keySet()) {
+        for (Map.Entry<ProcessInstance, TaskInstance> entry : fatherMaps.entrySet()) {
+            ProcessInstance processInstance = entry.getKey();
+            TaskInstance taskInstance = entry.getValue();
             String address = NetUtils.getAddr(masterConfig.getListenPort());
             if (processInstance.getHost().equalsIgnoreCase(address)) {
-                this.notifyMyself(processInstance, fatherMaps.get(processInstance));
+                this.notifyMyself(processInstance, taskInstance);
             } else {
-                this.notifyProcess(finishProcessInstance, processInstance, fatherMaps.get(processInstance));
+                this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
             }
         }
     }

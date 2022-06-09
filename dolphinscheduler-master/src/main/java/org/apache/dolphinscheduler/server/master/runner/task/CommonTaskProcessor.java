@@ -43,7 +43,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ITaskProcessor.class)
 public class CommonTaskProcessor extends BaseTaskProcessor {
 
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue<TaskPriority> taskUpdateQueue;
 
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
@@ -101,7 +101,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 this.initQueue();
             }
             if (taskInstance.getState().typeIsFinished()) {
-                logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                logger.info("submit task , but task [{}] state [{}] is already  finished. ", taskInstance.getName(), taskInstance.getState());
                 return true;
             }
             // task cannot be submitted because its execution state is RUNNING or DELAY.
@@ -125,7 +125,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
-            logger.info("Master submit task to priority queue success, taskInstanceId : {}", taskInstance.getId());
+            logger.info("master submit success, task : {}", taskInstance.getName());
             return true;
         } catch (Exception e) {
             logger.error("submit task error", e);
