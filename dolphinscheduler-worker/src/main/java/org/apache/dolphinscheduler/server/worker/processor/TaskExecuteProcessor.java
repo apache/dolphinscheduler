@@ -34,10 +34,13 @@ import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+
+import org.apache.commons.lang.SystemUtils;
 
 import java.util.Date;
 
@@ -48,6 +51,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.netty.channel.Channel;
 
 /**
@@ -85,6 +90,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     @Autowired
     private WorkerManagerThread workerManager;
 
+    @Counted(value = "dolphinscheduler_task_execution_count", description = "task execute total count")
+    @Timed(value = "dolphinscheduler_task_execution_timer", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
@@ -106,6 +113,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
+        TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
         // set cache, it will be used when kill task
         TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
