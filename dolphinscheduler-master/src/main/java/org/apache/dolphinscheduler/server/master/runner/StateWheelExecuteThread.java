@@ -92,9 +92,13 @@ public class StateWheelExecuteThread extends Thread {
                 checkTask4Retry();
                 checkTask4State();
                 checkProcess4Timeout();
-                ThreadUtils.sleep(checkInterval);
             } catch (Exception e) {
                 logger.error("state wheel thread check error:", e);
+            }
+            try {
+                ThreadUtils.sleep(checkInterval);
+            } catch (InterruptedException e) {
+                logger.error("state wheel thread sleep error", e);
             }
         }
     }
