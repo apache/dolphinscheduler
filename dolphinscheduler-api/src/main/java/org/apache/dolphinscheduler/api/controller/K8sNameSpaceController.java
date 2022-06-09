@@ -28,11 +28,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
+import org.apache.dolphinscheduler.api.service.K8sNameSpaceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -62,10 +62,10 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(tags = "K8S_NAMESPACE_TAG")
 @RestController
 @RequestMapping("/k8s-namespace")
-public class K8sNamespaceController extends BaseController {
+public class K8sNameSpaceController extends BaseController {
 
     @Autowired
-    private K8sNamespaceService k8sNamespaceService;
+    private K8sNameSpaceService k8sNamespaceService;
 
     /**
      * query namespace list paging
@@ -263,7 +263,7 @@ public class K8sNamespaceController extends BaseController {
     @ApiException(QUERY_CAN_USE_K8S_CLUSTER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAvailableNamespaceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(loginUser);
+        List<K8sNameSpace> result = k8sNamespaceService.queryNamespaceAvailable(loginUser);
         return success(result);
     }
 }

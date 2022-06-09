@@ -19,15 +19,15 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
-import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.K8SNameSpaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNameSpaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 
@@ -54,16 +54,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.class)
-public class K8SNamespaceServiceTest {
+public class K8SNameSpaceServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(K8SNamespaceServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8SNameSpaceServiceTest.class);
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
-    private K8SNamespaceServiceImpl k8sNamespaceService;
+    private K8SNameSpaceServiceImpl k8sNamespaceService;
 
     @Mock
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private K8sNameSpaceMapper k8sNamespaceMapper;
 
     @Mock
     private K8sClientService k8sClientService;
@@ -79,7 +79,7 @@ public class K8SNamespaceServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(k8sClientService.upsertNamespaceAndResourceToK8s(Mockito.any(K8sNamespace.class), Mockito.anyString())).thenReturn(null);
+        Mockito.when(k8sClientService.upsertNamespaceAndResourceToK8s(Mockito.any(K8sNameSpace.class), Mockito.anyString())).thenReturn(null);
         Mockito.when(k8sClientService.deleteNamespaceToK8s(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
     }
 
@@ -89,7 +89,7 @@ public class K8SNamespaceServiceTest {
 
     @Test
     public void queryListPaging() {
-        IPage<K8sNamespace> page = new Page<>(1, 10);
+        IPage<K8sNameSpace> page = new Page<>(1, 10);
         page.setTotal(1L);
         page.setRecords(getNamespaceList());
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
@@ -97,7 +97,7 @@ public class K8SNamespaceServiceTest {
         Mockito.when(k8sNamespaceMapper.queryK8sNamespacePaging(Mockito.any(Page.class), Mockito.eq(namespace))).thenReturn(page);
         Result result = k8sNamespaceService.queryListPaging(getLoginUser(), namespace, 1, 10);
         logger.info(result.toString());
-        PageInfo<K8sNamespace> pageInfo = (PageInfo<K8sNamespace>) result.getData();
+        PageInfo<K8sNameSpace> pageInfo = (PageInfo<K8sNameSpace>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
 
@@ -189,7 +189,7 @@ public class K8SNamespaceServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
         logger.info(result.toString());
-        List<K8sNamespace> namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        List<K8sNameSpace> namespaces = (List<K8sNameSpace>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(namespaces));
 
         // test non-admin user
@@ -197,7 +197,7 @@ public class K8SNamespaceServiceTest {
         loginUser.setId(3);
         result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-        namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        namespaces = (List<K8sNameSpace>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isEmpty(namespaces));
     }
 
@@ -212,7 +212,7 @@ public class K8SNamespaceServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 2);
         logger.info(result.toString());
-        List<K8sNamespace> namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        List<K8sNameSpace> namespaces = (List<K8sNameSpace>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(namespaces));
 
         // test non-admin user
@@ -221,7 +221,7 @@ public class K8SNamespaceServiceTest {
         result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 3);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-        namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        namespaces = (List<K8sNameSpace>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isEmpty(namespaces));
     }
 
@@ -234,16 +234,16 @@ public class K8SNamespaceServiceTest {
         return loginUser;
     }
 
-    private K8sNamespace getNamespace() {
-        K8sNamespace k8sNamespace = new K8sNamespace();
+    private K8sNameSpace getNamespace() {
+        K8sNameSpace k8sNamespace = new K8sNameSpace();
         k8sNamespace.setId(1);
         k8sNamespace.setK8s(k8s);
         k8sNamespace.setNamespace(namespace);
         return k8sNamespace;
     }
 
-    private List<K8sNamespace> getNamespaceList() {
-        List<K8sNamespace> k8sNamespaceList = new ArrayList<>();
+    private List<K8sNameSpace> getNamespaceList() {
+        List<K8sNameSpace> k8sNamespaceList = new ArrayList<>();
         k8sNamespaceList.add(getNamespace());
         return k8sNamespaceList;
     }

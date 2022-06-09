@@ -49,7 +49,7 @@ import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNameSpaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
@@ -252,9 +252,9 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     @Component
     public static class K8sNamespaceResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final K8sNamespaceMapper k8sNamespaceMapper;
+        private final K8sNameSpaceMapper k8sNamespaceMapper;
 
-        public K8sNamespaceResourceList(K8sNamespaceMapper k8sNamespaceMapper) {
+        public K8sNamespaceResourceList(K8sNameSpaceMapper k8sNamespaceMapper) {
             this.k8sNamespaceMapper = k8sNamespaceMapper;
         }
 

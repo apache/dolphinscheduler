@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 
 import java.util.Date;
 import java.util.List;
@@ -32,19 +32,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-public class K8sNamespaceMapperTest extends BaseDaoTest {
+public class K8sNameSpaceMapperTest extends BaseDaoTest {
 
     @Autowired
-    K8sNamespaceMapper k8sNamespaceMapper;
+    K8sNameSpaceMapper k8sNamespaceMapper;
 
     /**
      * insert
      *
      * @return K8sNamespace
      */
-    private K8sNamespace insertOne() {
+    private K8sNameSpace insertOne() {
         //insertOne
-        K8sNamespace k8sNamespace = new K8sNamespace();
+        K8sNameSpace k8sNamespace = new K8sNameSpace();
         k8sNamespace.setNamespace("testNamespace");
         k8sNamespace.setK8s("ds_null_k8s");
         k8sNamespace.setLimitsCpu(100.0);
@@ -78,7 +78,7 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
     @Test
     public void testUpdate() {
         //insertOne
-        K8sNamespace k8sNamespace = insertOne();
+        K8sNameSpace k8sNamespace = insertOne();
         k8sNamespace.setLimitsMemory(200);
         //update
         int update = k8sNamespaceMapper.updateById(k8sNamespace);
@@ -90,7 +90,7 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testDelete() {
-        K8sNamespace k8sNamespace = insertOne();
+        K8sNameSpace k8sNamespace = insertOne();
         int delete = k8sNamespaceMapper.deleteById(k8sNamespace.getId());
         Assert.assertEquals(delete, 1);
     }
@@ -102,7 +102,7 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
     public void testQuery() {
         insertOne();
         //query
-        List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.selectList(null);
+        List<K8sNameSpace> k8sNamespaces = k8sNamespaceMapper.selectList(null);
         Assert.assertEquals(k8sNamespaces.size(), 1);
     }
 
@@ -112,8 +112,8 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryByK8sNamespaceId() {
-        K8sNamespace entity = insertOne();
-        K8sNamespace k8sNamespace = k8sNamespaceMapper.selectById(entity.getId());
+        K8sNameSpace entity = insertOne();
+        K8sNameSpace k8sNamespace = k8sNamespaceMapper.selectById(entity.getId());
         Assert.assertEquals(entity.toString(),k8sNamespace.toString());
     }
 
@@ -123,10 +123,10 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryK8sNamespaceListPaging() {
-        K8sNamespace entity = insertOne();
-        Page<K8sNamespace> page = new Page<>(1, 10);
-        IPage<K8sNamespace> k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"");
-        List<K8sNamespace> k8sNamespaceList = k8sNamespaceIPage.getRecords();
+        K8sNameSpace entity = insertOne();
+        Page<K8sNameSpace> page = new Page<>(1, 10);
+        IPage<K8sNameSpace> k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"");
+        List<K8sNameSpace> k8sNamespaceList = k8sNamespaceIPage.getRecords();
         Assert.assertEquals(k8sNamespaceList.size(), 1);
 
         k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"abc");

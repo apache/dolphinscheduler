@@ -18,14 +18,14 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
+import org.apache.dolphinscheduler.api.service.K8sNameSpaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNameSpaceMapper;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,9 +51,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * k8s namespace service impl
  */
 @Service
-public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNamespaceService {
+public class K8SNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameSpaceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(K8SNamespaceServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8SNameSpaceServiceImpl.class);
 
     private static String resourceYaml = "apiVersion: v1\n"
             + "kind: ResourceQuota\n"
@@ -65,7 +65,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             + "    ${limitCpu}\n"
             + "    ${limitMemory}\n";
     @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private K8sNameSpaceMapper k8sNamespaceMapper;
     @Autowired
     private K8sClientService k8sClientService;
 
@@ -86,12 +86,12 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
 
-        Page<K8sNamespace> page = new Page<>(pageNo, pageSize);
+        Page<K8sNameSpace> page = new Page<>(pageNo, pageSize);
 
-        IPage<K8sNamespace> k8sNamespaceList = k8sNamespaceMapper.queryK8sNamespacePaging(page, searchVal);
+        IPage<K8sNameSpace> k8sNamespaceList = k8sNamespaceMapper.queryK8sNamespacePaging(page, searchVal);
 
         Integer count = (int) k8sNamespaceList.getTotal();
-        PageInfo<K8sNamespace> pageInfo = new PageInfo<>(pageNo, pageSize);
+        PageInfo<K8sNameSpace> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal(count);
         pageInfo.setTotalList(k8sNamespaceList.getRecords());
         result.setData(pageInfo);
@@ -143,7 +143,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
 
-        K8sNamespace k8sNamespaceObj = new K8sNamespace();
+        K8sNameSpace k8sNamespaceObj = new K8sNameSpace();
         Date now = new Date();
 
         k8sNamespaceObj.setNamespace(namespace);
@@ -202,7 +202,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
 
-        K8sNamespace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
+        K8sNameSpace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
         if (k8sNamespaceObj == null) {
             putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
             return result;
@@ -274,7 +274,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
 
-        K8sNamespace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
+        K8sNameSpace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
         if (k8sNamespaceObj == null) {
             putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
             return result;
@@ -303,7 +303,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @param k8sNamespace
      * @return yaml file
      */
-    private String genDefaultResourceYaml(K8sNamespace k8sNamespace) {
+    private String genDefaultResourceYaml(K8sNameSpace k8sNamespace) {
         //resource use same name with namespace
         String name = k8sNamespace.getNamespace();
         String namespace = k8sNamespace.getNamespace();
@@ -349,12 +349,12 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
         // query all namespace list,this auth does not like project
-        List<K8sNamespace> namespaceList = k8sNamespaceMapper.selectList(null);
-        List<K8sNamespace> resultList = new ArrayList<>();
-        Set<K8sNamespace> namespaceSet;
+        List<K8sNameSpace> namespaceList = k8sNamespaceMapper.selectList(null);
+        List<K8sNameSpace> resultList = new ArrayList<>();
+        Set<K8sNameSpace> namespaceSet;
         if (namespaceList != null && !namespaceList.isEmpty()) {
             namespaceSet = new HashSet<>(namespaceList);
-            List<K8sNamespace> authedProjectList = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+            List<K8sNameSpace> authedProjectList = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
             resultList = getUnauthorizedNamespaces(namespaceSet, authedProjectList);
         }
         result.put(Constants.DATA_LIST, resultList);
@@ -378,7 +378,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
 
-        List<K8sNamespace> namespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+        List<K8sNameSpace> namespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
         result.put(Constants.DATA_LIST, namespaces);
         putMsg(result, Status.SUCCESS);
 
@@ -392,7 +392,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return namespace list
      */
     @Override
-    public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
+    public List<K8sNameSpace> queryNamespaceAvailable(User loginUser) {
         if (canOperatorPermissions(loginUser,null,AuthorizationType.K8S_NAMESPACE,null)) {
             return k8sNamespaceMapper.selectList(null);
         } else {
@@ -407,12 +407,12 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @param authedNamespaceList authed namespace list
      * @return namespace list that authorization
      */
-    private List<K8sNamespace> getUnauthorizedNamespaces(Set<K8sNamespace> namespaceSet, List<K8sNamespace> authedNamespaceList) {
-        List<K8sNamespace> resultList = new ArrayList<>();
-        for (K8sNamespace k8sNamespace : namespaceSet) {
+    private List<K8sNameSpace> getUnauthorizedNamespaces(Set<K8sNameSpace> namespaceSet, List<K8sNameSpace> authedNamespaceList) {
+        List<K8sNameSpace> resultList = new ArrayList<>();
+        for (K8sNameSpace k8sNamespace : namespaceSet) {
             boolean existAuth = false;
             if (authedNamespaceList != null && !authedNamespaceList.isEmpty()) {
-                for (K8sNamespace k8sNamespaceAuth : authedNamespaceList) {
+                for (K8sNameSpace k8sNamespaceAuth : authedNamespaceList) {
                     if (k8sNamespace.equals(k8sNamespaceAuth)) {
                         existAuth = true;
                     }

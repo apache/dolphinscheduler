@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * k8s namespace service impl
  */
-public interface K8sNamespaceService {
+public interface K8sNameSpaceService {
     /**
      * query namespace list paging
      *
@@ -106,5 +106,5 @@ public interface K8sNamespaceService {
      * @param loginUser login user
      * @return namespace list
      */
-    List<K8sNamespace> queryNamespaceAvailable(User loginUser);
+    List<K8sNameSpace> queryNamespaceAvailable(User loginUser);
 }

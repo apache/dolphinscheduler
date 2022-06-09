@@ -40,10 +40,10 @@ import org.springframework.util.MultiValueMap;
 /**
  * k8s namespace controller test
  */
-public class K8sNamespaceControllerTest extends AbstractControllerTest {
+public class K8sNameSpaceControllerTest extends AbstractControllerTest {
 
     private static final String NAMESPACE_CREATE_STRING = "namespace1";
-    private static final Logger logger = LoggerFactory.getLogger(K8sNamespaceControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8sNameSpaceControllerTest.class);
     protected User user;
 
     @Test

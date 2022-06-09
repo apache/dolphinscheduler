@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 /**
  * namespace interface
  */
-public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
+public interface K8sNameSpaceMapper extends BaseMapper<K8sNameSpace> {
     /**
      * k8s namespace page
      *
@@ -36,7 +36,7 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      * @param searchVal searchVal
      * @return k8s namespace IPage
      */
-    IPage<K8sNamespace> queryK8sNamespacePaging(IPage<K8sNamespace> page,
+    IPage<K8sNameSpace> queryK8sNamespacePaging(IPage<K8sNameSpace> page,
                                                 @Param("searchVal") String searchVal);
 
     /**
@@ -54,7 +54,7 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      * @param userId userId
      * @return namespace list
      */
-    List<K8sNamespace> queryNamespaceExceptUserId(@Param("userId") int userId);
+    List<K8sNameSpace> queryNamespaceExceptUserId(@Param("userId") int userId);
 
     /**
      * query authed namespace list by userId
@@ -62,7 +62,7 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      * @param userId userId
      * @return namespace list
      */
-    List<K8sNamespace> queryAuthedNamespaceListByUserId(@Param("userId") int userId);
+    List<K8sNameSpace> queryAuthedNamespaceListByUserId(@Param("userId") int userId);
 
     /**
      * query namespace can use
@@ -70,5 +70,5 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      * @param userId userId
      * @return namespace list
      */
-    List<K8sNamespace> queryNamespaceAvailable(@Param("userId") Integer userId);
+    List<K8sNameSpace> queryNamespaceAvailable(@Param("userId") Integer userId);
 }

@@ -22,7 +22,7 @@ import io.fabric8.kubernetes.api.model.NamespaceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.K8sNameSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -39,7 +39,7 @@ public class K8sClientService {
     @Autowired
     private K8sManager k8sManager;
 
-    public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace, String yamlStr) {
+    public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNameSpace k8sNamespace, String yamlStr) {
         upsertNamespaceToK8s(k8sNamespace.getNamespace(), k8sNamespace.getK8s());
         return upsertNamespacedResourceToK8s(k8sNamespace, yamlStr);
     }
@@ -58,7 +58,7 @@ public class K8sClientService {
         return getNamespaceFromK8s(name, k8s);
     }
 
-    private ResourceQuota upsertNamespacedResourceToK8s(K8sNamespace k8sNamespace, String yamlStr) {
+    private ResourceQuota upsertNamespacedResourceToK8s(K8sNameSpace k8sNamespace, String yamlStr) {
 
         KubernetesClient client = k8sManager.getK8sClient(k8sNamespace.getK8s());
 

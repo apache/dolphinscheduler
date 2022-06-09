@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * k8s namespace
  */
 @TableName("t_ds_k8s_namespace")
-public class K8sNamespace {
+public class K8sNameSpace {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -233,7 +233,7 @@ public class K8sNamespace {
             return false;
         }
 
-        K8sNamespace k8sNamespace = (K8sNamespace) o;
+        K8sNameSpace k8sNamespace = (K8sNameSpace) o;
 
         if (id.equals(k8sNamespace.id)) {
             return true;
