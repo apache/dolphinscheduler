@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
-import org.apache.dolphinscheduler.service.k8s.K8sClientService;
+import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 
 import org.apache.commons.lang3.StringUtils;
 
