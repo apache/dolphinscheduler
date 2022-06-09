@@ -56,6 +56,8 @@ public class FailoverExecuteThread extends Thread {
         logger.info("failover execute thread started");
         while (Stopper.isRunning()) {
             try {
+                // todo: DO we need to schedule a task to do this kind of check
+                // This kind of check may only need to be executed when a master server start
                 failoverService.checkMasterFailover();
             } catch (Exception e) {
                 logger.error("failover execute error", e);

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.cache.impl;
 
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,10 +33,10 @@ import com.google.common.collect.ImmutableList;
 @Component
 public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecCacheManager {
 
-    private final ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkflowExecuteRunnable> processInstanceExecMaps = new ConcurrentHashMap<>();
 
     @Override
-    public WorkflowExecuteThread getByProcessInstanceId(int processInstanceId) {
+    public WorkflowExecuteRunnable getByProcessInstanceId(int processInstanceId) {
         return processInstanceExecMaps.get(processInstanceId);
     }
 
@@ -51,7 +51,7 @@ public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecC
     }
 
     @Override
-    public void cache(int processInstanceId, WorkflowExecuteThread workflowExecuteThread) {
+    public void cache(int processInstanceId, WorkflowExecuteRunnable workflowExecuteThread) {
         if (workflowExecuteThread == null) {
             return;
         }
@@ -59,7 +59,7 @@ public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecC
     }
 
     @Override
-    public Collection<WorkflowExecuteThread> getAll() {
+    public Collection<WorkflowExecuteRunnable> getAll() {
         return ImmutableList.copyOf(processInstanceExecMaps.values());
     }
 }

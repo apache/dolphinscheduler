@@ -89,7 +89,7 @@ public class HeartBeatTask implements Runnable {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
         } catch (Throwable ex) {
-            logger.error("error write heartbeat info", ex);
+            logger.error("HeartBeat task execute failed", ex);
         }
     }
 }

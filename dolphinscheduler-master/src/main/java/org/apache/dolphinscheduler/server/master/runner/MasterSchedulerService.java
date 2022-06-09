@@ -165,7 +165,7 @@ public class MasterSchedulerService extends Thread {
                 continue;
             }
 
-            WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
+            WorkflowExecuteRunnable workflowExecuteThread = new WorkflowExecuteRunnable(
                     processInstance
                     , processService
                     , nettyExecutorManager
