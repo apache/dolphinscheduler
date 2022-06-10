@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.k8s;
+package org.apache.dolphinscheduler.api.k8s;
 
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 

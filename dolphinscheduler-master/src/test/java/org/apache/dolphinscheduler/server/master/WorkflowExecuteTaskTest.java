@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -37,7 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -70,10 +69,10 @@ import org.springframework.context.ApplicationContext;
  * test for WorkflowExecuteThread
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({WorkflowExecuteThread.class})
-public class WorkflowExecuteThreadTest {
+@PrepareForTest({WorkflowExecuteRunnable.class})
+public class WorkflowExecuteTaskTest {
 
-    private WorkflowExecuteThread workflowExecuteThread;
+    private WorkflowExecuteRunnable workflowExecuteThread;
 
     private ProcessInstance processInstance;
 
@@ -84,8 +83,6 @@ public class WorkflowExecuteThreadTest {
     private MasterConfig config;
 
     private ApplicationContext applicationContext;
-
-    private TaskProcessorFactory taskProcessorFactory;
 
     private StateWheelExecuteThread stateWheelExecuteThread;
 
@@ -100,8 +97,6 @@ public class WorkflowExecuteThreadTest {
 
         processService = mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
-
-        taskProcessorFactory = mock(TaskProcessorFactory.class);
 
         processInstance = mock(ProcessInstance.class);
         Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);
@@ -118,9 +113,9 @@ public class WorkflowExecuteThreadTest {
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
         stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread));
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, null, null, config, stateWheelExecuteThread));
         // prepareProcess init dag
-        Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
+        Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(workflowExecuteThread, new DAG());
         PowerMockito.doNothing().when(workflowExecuteThread, "endProcess");
@@ -132,7 +127,7 @@ public class WorkflowExecuteThreadTest {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODES, "1,2,3");
             Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
-            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
+            Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
             method.setAccessible(true);
             List<String> nodeNames = (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
@@ -158,7 +153,7 @@ public class WorkflowExecuteThreadTest {
             Mockito.when(processService.findTaskInstanceByIdList(
                     Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(), taskInstance4.getId()))
             ).thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
-            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
+            Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getStartTaskInstanceList", String.class);
             method.setAccessible(true);
             List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
@@ -202,7 +197,7 @@ public class WorkflowExecuteThreadTest {
             completeTaskList.put(taskInstance1.getTaskCode(), taskInstance1.getId());
             completeTaskList.put(taskInstance2.getTaskCode(), taskInstance2.getId());
 
-            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
+            Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
 
             Field completeTaskMapField = masterExecThreadClass.getDeclaredField("completeTaskMap");
             completeTaskMapField.setAccessible(true);

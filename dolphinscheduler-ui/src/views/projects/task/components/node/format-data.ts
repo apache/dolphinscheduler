@@ -355,6 +355,8 @@ export function formatParams(data: INodeData): {
     taskParams.deployModelKey = data.deployModelKey
     taskParams.mlflowProjectRepository = data.mlflowProjectRepository
     taskParams.mlflowProjectVersion = data.mlflowProjectVersion
+    taskParams.cpuLimit = data.cpuLimit
+    taskParams.memoryLimit = data.memoryLimit
   }
 
   if (data.taskType === 'OPENMLDB') {
@@ -409,7 +411,9 @@ export function formatParams(data: INodeData): {
       timeout: data.timeoutFlag ? data.timeout : 0,
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
       timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
-      workerGroup: data.workerGroup
+      workerGroup: data.workerGroup,
+      cpuQuota: data.cpuQuota || -1,
+      memoryMax: data.memoryMax || -1
     }
   } as {
     processDefinitionCode: string

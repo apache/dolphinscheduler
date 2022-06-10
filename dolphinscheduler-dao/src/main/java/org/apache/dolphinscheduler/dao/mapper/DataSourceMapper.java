@@ -108,5 +108,5 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @param searchVal
      * @return
      */
-    IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage, @Param("ids")List<Integer> ids, @Param("searchVal")String searchVal);
+    IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage, @Param("dataSourceIds")List<Integer> dataSourceIds, @Param("name")String name);
 }

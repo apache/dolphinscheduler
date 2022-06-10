@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
@@ -52,6 +53,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+
+import org.apache.commons.lang3.time.StopWatch;
 
 /**
  * TaskUpdateQueue consumer
@@ -119,6 +125,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
                 if (!failedDispatchTasks.isEmpty()) {
+                    TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
@@ -129,6 +136,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                     }
                 }
             } catch (Exception e) {
+                TaskMetrics.incTaskDispatchError();
                 logger.error("dispatcher task error", e);
             }
         }
@@ -137,7 +145,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * batch dispatch with thread pool
      */
-    private List<TaskPriority> batchDispatch(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
+    public List<TaskPriority> batchDispatch(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
         List<TaskPriority> failedDispatchTasks = Collections.synchronizedList(new ArrayList<>());
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
@@ -169,6 +177,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * @return result
      */
     protected boolean dispatchTask(TaskPriority taskPriority) {
+        TaskMetrics.incTaskDispatch();
         boolean result = false;
         try {
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
@@ -215,7 +224,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * @param taskInstanceId taskInstanceId
      * @return taskInstance is final state
      */
-    public Boolean taskInstanceIsFinalState(int taskInstanceId) {
+    public boolean taskInstanceIsFinalState(int taskInstanceId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().typeIsFinished();
     }

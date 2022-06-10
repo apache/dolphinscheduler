@@ -369,22 +369,22 @@ public final class Constants {
     /**
      * sleep 1000ms
      */
-    public static final int SLEEP_TIME_MILLIS = 1000;
+    public static final long SLEEP_TIME_MILLIS = 1_000L;
 
     /**
      * short sleep 100ms
      */
-    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
+    public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
 
     /**
      * one second mils
      */
-    public static final int SECOND_TIME_MILLIS = 1000;
+    public static final long SECOND_TIME_MILLIS = 1_000L;
 
     /**
      * master task instance cache-database refresh interval
      */
-    public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
+    public static final long CACHE_REFRESH_TIME_MILLIS = 20 * 1_000L;
 
     /**
      * heartbeat for zk info length
@@ -775,7 +775,7 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag
