@@ -364,7 +364,7 @@ public final class Constants {
     /**
      * complement data Schedule date
      */
-    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE = "complementScheduleDate";
+    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST = "complementScheduleDateList";
 
     /**
      * complement date default cron string

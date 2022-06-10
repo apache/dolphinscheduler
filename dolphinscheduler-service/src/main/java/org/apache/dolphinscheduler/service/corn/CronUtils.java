@@ -16,13 +16,13 @@
  */
 
 package org.apache.dolphinscheduler.service.corn;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE;
 import static com.cronutils.model.CronType.QUARTZ;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -285,7 +285,7 @@ public class CronUtils {
      */
     public static List<Date> getSelfScheduleDateList(Map<String, String> param){
         List<Date> result = new ArrayList<>();
-        String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE);
+        String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
         if(StringUtils.isNotEmpty(scheduleDates)){
             for (String stringDate : scheduleDates.split(",")) {
                 result.add(DateUtils.stringToDate(stringDate));
