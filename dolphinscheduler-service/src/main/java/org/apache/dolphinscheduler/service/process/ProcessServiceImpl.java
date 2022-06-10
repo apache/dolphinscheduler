@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import io.micrometer.core.annotation.Counted;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
@@ -160,6 +159,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
+
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -1252,8 +1253,9 @@ public class ProcessServiceImpl implements ProcessService {
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
                 logger.error("task commit to db failed", e);
+            } finally {
+                retryTimes += 1;
             }
-            retryTimes += 1;
         }
         return task;
     }

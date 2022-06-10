@@ -805,11 +805,11 @@ public class WorkflowExecuteRunnable implements Runnable {
      */
     @Override
     public void run() {
-        if (this.taskInstanceMap.size() > 0) {
+        if (this.taskInstanceMap.size() > 0 || isStart) {
+            logger.warn("The workflow has already been started");
             return;
         }
         try {
-            isStart = false;
             buildFlowDag();
             initTaskQueue();
             submitPostNode(null);
