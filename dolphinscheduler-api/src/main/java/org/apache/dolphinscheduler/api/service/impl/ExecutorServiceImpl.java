@@ -259,12 +259,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return CommandType is COMPLEMENT_DATA and cronTime is not repeat  return true , otherwise return false
      */
     private boolean checkScheduleTimeRepeat(CommandType complementData,String cronTime){
-        if(cronTime != null && JSONUtils.toMap(cronTime).containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
-            List<String> cronTimeList = Arrays.asList(JSONUtils.toMap(cronTime).get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(","));
-            HashSet<String> cronTimeSet = new HashSet(cronTimeList);
-            if(CommandType.COMPLEMENT_DATA.equals(complementData)){
-                if(cronTimeSet.size() != cronTimeList.size()){
-                    return false;
+        if(CommandType.COMPLEMENT_DATA.equals(complementData)){
+        if(cronTime != null){
+            if(JSONUtils.toMap(cronTime).containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
+                List<String> cronTimeList = Arrays.asList(JSONUtils.toMap(cronTime).get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(","));
+                HashSet<String> cronTimeSet = new HashSet(cronTimeList);
+                    if(cronTimeSet.size() != cronTimeList.size()){
+                        return false;
+                    }
                 }
             }
         }
