@@ -135,16 +135,35 @@ public class MlflowTaskTest {
     }
 
     @Test
-    public void testModelsDeployDocker() throws Exception {
+    public void testModelsDeployDocker() {
         MlflowTask mlflowTask = initTask(createModelDeplyDockerParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
                 "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
                         "mlflow models build-docker -m runs:/a272ec279fc34a8995121ae04281585f/model " +
                         "-n mlflow/a272ec279fc34a8995121ae04281585f:model " +
                         "--enable-mlserver\n" +
-                        "docker rm -f mlflow-a272ec279fc34a8995121ae04281585f-model\n" +
-                        "docker run --name=mlflow-a272ec279fc34a8995121ae04281585f-model " +
+                        "docker rm -f ds-mlflow-a272ec279fc34a8995121ae04281585f-model\n" +
+                        "docker run --name=ds-mlflow-a272ec279fc34a8995121ae04281585f-model " +
                         "-p=7000:8080 mlflow/a272ec279fc34a8995121ae04281585f:model");
+    }
+
+    @Test
+    public void testModelsDeployDockerCompose() throws Exception{
+        MlflowTask mlflowTask = initTask(createModelDeplyDockerComposeParameters());
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "cp " + mlflowTask.getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE) +
+                        " /tmp/dolphinscheduler_test\n" +
+                        "mlflow models build-docker -m models:/22222/1 -n mlflow/22222:1 --enable-mlserver\n" +
+                        "export DS_TASK_MLFLOW_IMAGE_NAME=mlflow/22222:1\n" +
+                        "export DS_TASK_MLFLOW_CONTAINER_NAME=ds-mlflow-22222-1\n" +
+                        "export DS_TASK_MLFLOW_DEPLOY_PORT=7000\n" +
+                        "export DS_TASK_MLFLOW_CPU_LIMIT=0.5\n" +
+                        "export DS_TASK_MLFLOW_MEMORY_LIMIT=200m\n" +
+                        "docker-compose up -d\n" +
+                        "for i in $(seq 1 300); do " +
+                        "[ $(docker inspect --format \"{{json .State.Health.Status }}\" ds-mlflow-22222-1) = '\"healthy\"' ] && exit 0  && break;sleep 1; " +
+                        "done; docker-compose down; exit 1");
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {
@@ -211,6 +230,18 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
         mlflowParameters.setDeployModelKey("runs:/a272ec279fc34a8995121ae04281585f/model");
         mlflowParameters.setDeployPort("7000");
+        return mlflowParameters;
+    }
+
+    private MlflowParameters createModelDeplyDockerComposeParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
+        mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        mlflowParameters.setDeployModelKey("models:/22222/1");
+        mlflowParameters.setDeployPort("7000");
+        mlflowParameters.setCpuLimit("0.5");
+        mlflowParameters.setMemoryLimit("200m");
         return mlflowParameters;
     }
 }

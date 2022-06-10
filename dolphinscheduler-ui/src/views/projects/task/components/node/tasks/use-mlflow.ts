@@ -49,6 +49,8 @@ export function useMlflow({
     mlflowJobType: 'CustomProject',
     mlflowProjectVersion: 'master',
     automlTool: 'flaml',
+    cpuLimit: '0.5',
+    memoryLimit: '500M',
     mlflowCustomProjectParameters: [],
     delayTime: 0,
     timeout: 30,
