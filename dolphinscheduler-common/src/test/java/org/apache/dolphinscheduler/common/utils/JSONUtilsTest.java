@@ -262,13 +262,9 @@ public class JSONUtilsTest {
 
     @Test
     public void dateToString() {
-<<<<<<< HEAD
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-=======
-        TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
         TimeZone.setDefault(timeZone);
         JSONUtils.setTimeZone(timeZone);
->>>>>>> 8e372fad3 ([Fix] Fix the JSONUtils tool class time zone problem #10282)
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
@@ -280,13 +276,9 @@ public class JSONUtilsTest {
 
     @Test
     public void stringToDate() {
-<<<<<<< HEAD
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-=======
-        TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
         TimeZone.setDefault(timeZone);
         JSONUtils.setTimeZone(timeZone);
->>>>>>> 8e372fad3 ([Fix] Fix the JSONUtils tool class time zone problem #10282)
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
         Assert.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
