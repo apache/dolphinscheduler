@@ -77,7 +77,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -188,11 +195,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        if(!checkScheduleTimeRepeat(commandType,cronTime)){
-            putMsg(result, Status.SCHEDULE_TIME_REPEAT);
-            return result;
-        }
-
         // check master exists
         if (!checkMasterExists(result)) {
             return result;
@@ -237,7 +239,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      *
      * @param complementData
      * @param cronTime
-     * @return CommandType is COMPLEMENT_DATA and cronTime's number is not greater than  return true , otherwise return false
+     * @return CommandType is COMPLEMENT_DATA and cronTime's number is not greater than 100 return true , otherwise return false
      */
     private boolean checkScheduleTimeNum(CommandType complementData,String cronTime) {
         if (!CommandType.COMPLEMENT_DATA.equals(complementData)) {
@@ -250,31 +252,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (cronMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
             String[] stringDates = cronMap.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(",");
             if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     *
-     * @param complementData
-     * @param cronTime
-     * @return CommandType is COMPLEMENT_DATA and cronTime is not repeat  return true , otherwise return false
-     */
-    private boolean checkScheduleTimeRepeat(CommandType complementData,String cronTime){
-        if (!CommandType.COMPLEMENT_DATA.equals(complementData)) {
-            return true;
-        }
-        if(cronTime == null){
-            return true;
-        }
-        Map<String,String> cronMap =  JSONUtils.toMap(cronTime);
-        if(cronMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
-            String[] dates = cronMap.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(",");
-            List<String> cronTimeList = Arrays.asList(dates);
-            HashSet<String> cronTimeSet = new HashSet(cronTimeList);
-            if(cronTimeSet.size() != cronTimeList.size()){
                 return false;
             }
         }
@@ -744,6 +721,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, String> scheduleParam = JSONUtils.toMap(scheduleTimeParam);
         if(scheduleParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
             dateList = scheduleParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
+            dateList = removeDuplicates(dateList);
         }
         if(scheduleParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE) && scheduleParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)){
             startDate = scheduleParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
@@ -751,8 +729,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
         switch (runMode) {
             case RUN_MODE_SERIAL: {
-                if(StringUtils.isNotEmpty(dateList) || dateList != null){
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,dateList);
+                if(StringUtils.isNotEmpty(dateList)){
+                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateList);
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     createCount = processService.createCommand(command);
                 }
@@ -822,7 +800,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                     }
                 }
-                if(StringUtils.isNotEmpty(dateList) || dateList != null){
+                if(StringUtils.isNotEmpty(dateList)){
                     List<String> listDate = Arrays.asList(dateList.split(","));
                     int listDateSize = listDate.size();
                     createCount = listDate.size();
@@ -835,7 +813,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
                         for (List<String> stringDate : Lists.partition(listDate, createCount)) {
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(",",stringDate));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(",", stringDate));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
                         }
@@ -953,12 +931,30 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return 0;
             }
             if (start.after(end)) {
-                logger.info("complement data error, wrong date start:{} and end date:{} ",
+                logger.error("complement data error, wrong date start:{} and end date:{} ",
                         start, end
                 );
                 return 0;
             }
         }
         return 1;
+    }
+
+    /**
+     *
+     * @param scheduleTimeList
+     * @return remove duplicate date list
+     */
+    private String removeDuplicates(String scheduleTimeList){
+        HashSet<String> removeDate = new HashSet<String>();
+        List<String> resultList = new ArrayList<String>();
+        if(StringUtils.isNotEmpty(scheduleTimeList)){
+            String[] dateArrays = scheduleTimeList.split(",");
+            List<String> dateList = Arrays.asList(dateArrays);
+            removeDate.addAll(dateList);
+            resultList.addAll(removeDate);
+            return String.join(",", resultList);
+        }
+        return null;
     }
 }

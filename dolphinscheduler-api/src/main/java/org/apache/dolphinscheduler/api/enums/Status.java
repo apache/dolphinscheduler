@@ -408,7 +408,6 @@ public enum Status {
     NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
-    SCHEDULE_TIME_REPEAT(1400004, "There is a repetition in the supplement date.", "补数日期有重复"),
     ;
 
     private final int code;

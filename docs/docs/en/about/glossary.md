@@ -45,7 +45,7 @@ provided. **Continue** refers to regardless of the status of the task running in
 failure. **End** means that once a failed task is found, Kill will also run the parallel task at the same time, and the
 process fails and ends
 
-**Complement**: Supplement historical data，Supports **interval parallel and serial** two complement methods
+**Complement**: Supplement historical data，Supports **interval parallel and serial** two complement methods, and supports **select date range and manually enter date** two date methods
 
 ### 2.Module introduction
 
