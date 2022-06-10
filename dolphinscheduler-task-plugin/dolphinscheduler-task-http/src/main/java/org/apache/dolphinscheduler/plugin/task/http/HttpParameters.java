@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.plugin.task.http;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -151,15 +153,17 @@ public class HttpParameters extends AbstractParameters {
             varPool.addAll(outProperty);
             return;
         }
-        Map<String, String> httpMapByString = getHttpMapByString(result);
-        //Check whether it is empty
+        List<Map<String, String>> httpMapByString = getHttpMapByString(result);
         if (httpMapByString == null || httpMapByString.size() == 0) {
             return;
         }
 
         for (Property info : outProperty) {
-            info.setValue(httpMapByString.get(info.getProp()));
-            varPool.add(info);
+            for (int i = 0; i < httpMapByString.size() ; i++) {
+                Map<String, String> stringStringMap = httpMapByString.get(i);
+                info.setValue(stringStringMap.get(info.getProp()));
+                varPool.add(info);
+            }
         }
     }
 
@@ -182,21 +186,13 @@ public class HttpParameters extends AbstractParameters {
      * @param result
      * @return
      */
-    public static Map<String, String> getHttpMapByString(String result) {
-        //Store conversion results
-        Map<String, String> format = new HashMap<>();
-        //Convert result to a collection
-        List<Map<String, String>> list = JSONUtils.parseObject(result, new TypeReference<List<Map<String, String>>>() {});
-        //Determine whether the converted result is null
-        if (CollectionUtils.isEmpty(list)) {
-            return null;
+    public List<Map<String, String>> getHttpMapByString(String result) {
+        List<Map<String, String>> allParams = new ArrayList<>();
+        ArrayNode paramsByJson = JSONUtils.parseArray(result);
+        for (JsonNode jsonNode : paramsByJson) {
+            Map<String, String> param = JSONUtils.toMap(jsonNode.toString());
+            allParams.add(param);
         }
-        //Get the value with key body and put it into the new Map object
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, String> map = list.get(i);
-            format.put("body", map.get("body"));
-        }
-        //Returns the result
-        return format;
+        return allParams;
     }
 }

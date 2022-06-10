@@ -69,24 +69,21 @@ shell 节点定义时当日志检测到 ${setValue(key=value1)} 的格式时，�
 
 <img src="/img/globalParam/image-20210723102522383.png" alt="image-20210723102522383" style="zoom:50%;" />
 
+
 ### HTTP
 
-第一步：拖一个http类型的任务，在自定义参数中KEY的位置填写body ,在IN/OUT的部分选择OUT,在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
+第一步:拖一个http类型的任务，在自定义参数中KEY的位置填写body ,在IN/OUT的部分选择OUT,在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
 
-<img src="/img/httpParam/1-1.png" alt="1-1" style="zoom:50%;" />
+<img src="/img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
 
+第二步:在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了，
 
-第二步：在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了，
+<img src="/img/httpParam/httpParam-2.png" alt="httpParam-2.png" style="zoom:50%;" />
 
-参数名可以任务的，可以body也可以是别的，类型选择parameter,value部分一定要写成${body}
-
-<img src="/img/httpParam/1-2.png" alt="1-2" style="zoom:50%;" />
+参数名可以写任意，可以body也可以是别的，类型选择parameter,value部分一定要写成${body}
 
 配置好后的效果
+<img src="/img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
 
-<img src="/img/httpParam/1-3.png" alt="1-3" style="zoom:50%;" />
-
-
-第三步，这一步你可以自己写一个测试接口，在接收上游参数的这个节点上调用这个接口来进行测试，测试一个上游的参数是否传递过来了
-
-<img src="/img/httpParam/1-4.png" alt="1-3" style="zoom:50%;" />
+第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。
+<img src="/img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />

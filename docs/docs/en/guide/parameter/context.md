@@ -67,22 +67,19 @@ When the log detects the `${setValue(key=value1)}` format in the shell node defi
 
 ### HTTP
 
+94/5000
 Step 1: Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
 
-<img src="/img/httpParam/1-1.png" alt="1-1" style="zoom:50%;" />
-
+<img src="/img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
 
 Step 2: After adding an HTTP task type node, accept the parameters passed upstream. This time just add it in the Request Parameters section,
 
-It can be a task, it can be a body, it can be anything else, so parameter,value, make sure you say ${body}
+<img src="/img/httpParam/httpParam-2.png" alt="httpParam-2.png" style="zoom:50%;" />
 
-<img src="/img/httpParam/1-2.png" alt="1-2" style="zoom:50%;" />
+It can be anything, it can be body, it can be anything, parameter,value, it must be the key that you pass upstream. In this case, the key that you pass upstream is body, so we use ${body}
 
 The configuration is complete
+<img src="/img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
 
-<img src="/img/httpParam/1-3.png" alt="1-3" style="zoom:50%;" />
-
-
-Step 3, this step you can write a test interface, call this interface on the node that receives the upstream parameter to test whether an upstream parameter is passed
-
-<img src="/img/httpParam/1-4.png" alt="1-3" style="zoom:50%;" />
+Step 3: You can write a test interface to test whether our parameters are passed successfully.
+<img src="/img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />
