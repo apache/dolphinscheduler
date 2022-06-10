@@ -704,24 +704,28 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String,String> scheduleResult = null;
         if (!StringUtils.isEmpty(schedule)) {
             scheduleResult = JSONUtils.toMap(schedule);
-            if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
-                if(scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST) == null){
-                    return 0;
-                }
-            }
-            if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
-                String startDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
-                String endDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
-                if (startDate != null || endDate != null) {
-                    start = DateUtils.getScheduleDate(startDate);
-                    end = DateUtils.getScheduleDate(endDate);
-                    if (start.after(end)) {
-                        logger.info("complement data error, wrong date start:{} and end date:{} ",
-                                start, end
-                        );
+            if(scheduleResult != null){
+                if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
+                    if(scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST) == null){
                         return 0;
                     }
                 }
+                if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
+                    String startDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
+                    String endDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
+                    if (startDate != null || endDate != null) {
+                        start = DateUtils.getScheduleDate(startDate);
+                        end = DateUtils.getScheduleDate(endDate);
+                        if (start.after(end)) {
+                            logger.info("complement data error, wrong date start:{} and end date:{} ",
+                                    start, end
+                            );
+                            return 0;
+                        }
+                    }
+                }
+            }else{
+                return 0;
             }
         }
         // determine whether to complement
