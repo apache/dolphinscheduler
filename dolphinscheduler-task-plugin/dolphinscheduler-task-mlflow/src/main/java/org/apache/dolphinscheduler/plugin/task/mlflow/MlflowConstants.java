@@ -36,18 +36,20 @@ public class MlflowConstants {
 
     public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_REPOSITORY + "#Project-BasicAlgorithm";
 
-    public static final String RUN_PROJECT_BASIC_ALGORITHM_SCRIPT = "run_mlflow_basic_algorithm_project.sh";
-
-    public static final String RUN_PROJECT_AUTOML_SCRIPT = "run_mlflow_automl_project.sh";
-
     public static final String MLFLOW_TASK_TYPE_PROJECTS = "MLflow Projects";
 
     public static final String MLFLOW_TASK_TYPE_MODELS = "MLflow Models";
 
-
     public static final String MLFLOW_MODELS_DEPLOY_TYPE_MLFLOW = "MLFLOW";
 
     public static final String MLFLOW_MODELS_DEPLOY_TYPE_DOCKER = "DOCKER";
+
+    public static final String MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE = "DOCKER COMPOSE";
+
+    /**
+     * template file
+     */
+    public static final String TEMPLATE_DOCKER_COMPOSE = "docker-compose.yml";
 
 
     /**
@@ -86,9 +88,22 @@ public class MlflowConstants {
 
     public static final String MLFLOW_BUILD_DOCKER = "mlflow models build-docker -m %s -n %s --enable-mlserver";
 
-
     public static final String DOCKER_RREMOVE_CONTAINER = "docker rm -f %s";
 
     public static final String DOCKER_RUN = "docker run --name=%s -p=%s:8080 %s";
+
+    public static final String DOCKER_COMPOSE_RUN = "docker-compose up -d";
+
+    public static final String SET_DOCKER_COMPOSE_ENV = "export DS_TASK_MLFLOW_IMAGE_NAME=%s\n" +
+            "export DS_TASK_MLFLOW_CONTAINER_NAME=%s\n" +
+            "export DS_TASK_MLFLOW_DEPLOY_PORT=%s\n" +
+            "export DS_TASK_MLFLOW_CPU_LIMIT=%s\n" +
+            "export DS_TASK_MLFLOW_MEMORY_LIMIT=%s";
+
+    public static final String DOCKER_HEALTH_CHECK_COMMAND = "for i in $(seq 1 300); " +
+            "do " +
+            "[ $(docker inspect --format \"{{json .State.Health.Status }}\" %s) = '\"healthy\"' ] " +
+            "&& exit 0  && break;sleep 1; " +
+            "done; docker-compose down; exit 1";
 
 }
