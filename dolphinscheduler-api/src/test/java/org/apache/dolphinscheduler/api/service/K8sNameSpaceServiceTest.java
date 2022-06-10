@@ -54,9 +54,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.class)
-public class K8SNameSpaceServiceTest {
+public class K8sNameSpaceServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(K8SNameSpaceServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8sNameSpaceServiceTest.class);
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
