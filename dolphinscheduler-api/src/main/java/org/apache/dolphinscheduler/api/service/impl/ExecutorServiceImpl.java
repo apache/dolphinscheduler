@@ -168,6 +168,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
+
         // check process define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         result = checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode, processDefinition.getVersion());
@@ -238,15 +239,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param cronTime
      * @return CommandType is COMPLEMENT_DATA and cronTime's number is not greater than  return true , otherwise return false
      */
-    private boolean checkScheduleTimeNum(CommandType complementData,String cronTime){
-        if(CommandType.COMPLEMENT_DATA.equals(complementData)){
-            if(cronTime != null){
-                if(JSONUtils.toMap(cronTime).containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
-                    String[] stringDates  = JSONUtils.toMap(cronTime).get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(",");
-                    if(stringDates.length > SCHEDULE_TIME_MAX_LENGTH){
-                        return false;
-                    }
-                }
+    private boolean checkScheduleTimeNum(CommandType complementData,String cronTime) {
+        if (!CommandType.COMPLEMENT_DATA.equals(complementData)) {
+            return true;
+        }
+        if(cronTime == null){
+            return true;
+        }
+        Map<String,String> cronMap =  JSONUtils.toMap(cronTime);
+        if (cronMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+            String[] stringDates = cronMap.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(",");
+            if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
+                return false;
             }
         }
         return true;
@@ -259,15 +263,19 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return CommandType is COMPLEMENT_DATA and cronTime is not repeat  return true , otherwise return false
      */
     private boolean checkScheduleTimeRepeat(CommandType complementData,String cronTime){
-        if(CommandType.COMPLEMENT_DATA.equals(complementData)){
-        if(cronTime != null){
-            if(JSONUtils.toMap(cronTime).containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
-                List<String> cronTimeList = Arrays.asList(JSONUtils.toMap(cronTime).get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(","));
-                HashSet<String> cronTimeSet = new HashSet(cronTimeList);
-                    if(cronTimeSet.size() != cronTimeList.size()){
-                        return false;
-                    }
-                }
+        if (!CommandType.COMPLEMENT_DATA.equals(complementData)) {
+            return true;
+        }
+        if(cronTime == null){
+            return true;
+        }
+        Map<String,String> cronMap =  JSONUtils.toMap(cronTime);
+        if(cronMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
+            String[] dates = cronMap.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(",");
+            List<String> cronTimeList = Arrays.asList(dates);
+            HashSet<String> cronTimeSet = new HashSet(cronTimeList);
+            if(cronTimeSet.size() != cronTimeList.size()){
+                return false;
             }
         }
         return true;
@@ -699,38 +707,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             command.setProcessDefinitionVersion(processDefinition.getVersion());
         }
         command.setProcessInstanceId(0);
-        Date start = null;
-        Date end = null;
-        Map<String,String> scheduleResult = null;
-        if (!StringUtils.isEmpty(schedule)) {
-            scheduleResult = JSONUtils.toMap(schedule);
-            if(scheduleResult != null){
-                if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
-                    if(scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST) == null){
-                        return 0;
-                    }
-                }
-                if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
-                    String startDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
-                    String endDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
-                    if (startDate != null || endDate != null) {
-                        start = DateUtils.getScheduleDate(startDate);
-                        end = DateUtils.getScheduleDate(endDate);
-                        if (start.after(end)) {
-                            logger.info("complement data error, wrong date start:{} and end date:{} ",
-                                    start, end
-                            );
-                            return 0;
-                        }
-                    }
-                }
-            }else{
-                return 0;
-            }
-        }
+
         // determine whether to complement
         if (commandType == CommandType.COMPLEMENT_DATA) {
             if (schedule == null || StringUtils.isEmpty(schedule)) {
+                return 0;
+            }
+            int check = checkScheduleTime(schedule);
+            if(check == 0){
                 return 0;
             }
             return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber, complementDependentMode);
@@ -938,5 +922,43 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         return validDependentProcessDefinitionList;
+    }
+
+    /**
+     *
+     * @param schedule
+     * @return check error return 0 otherwish 1
+     */
+    private int checkScheduleTime(String schedule){
+        Date start = null;
+        Date end = null;
+        Map<String,String> scheduleResult = JSONUtils.toMap(schedule);
+        if(scheduleResult == null){
+            return 0;
+        }
+        if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
+            if(scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST) == null){
+                return 0;
+            }
+        }
+        if(scheduleResult.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
+            String startDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
+            String endDate = scheduleResult.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
+            if (startDate == null || endDate == null) {
+              return 0;
+            }
+            start = DateUtils.getScheduleDate(startDate);
+            end = DateUtils.getScheduleDate(endDate);
+            if(start == null || end == null){
+                return 0;
+            }
+            if (start.after(end)) {
+                logger.info("complement data error, wrong date start:{} and end date:{} ",
+                        start, end
+                );
+                return 0;
+            }
+        }
+        return 1;
     }
 }
