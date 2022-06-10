@@ -110,7 +110,7 @@ export default {
     schedule_date: '调度日期',
     select_date: '日期选择',
     enter_date: '手动输入',
-    schedule_date_tips: "格式为${'{'}yyyy-MM-dd HH:mm:ss{'}'}，多个逗号分割",
+    schedule_date_tips: '格式为yyyy-MM-dd HH:mm:ss，多个逗号分割',
     schedule_date_duplication: '输入重复的日期',
     schedule_date_limit: '输入日期不满足<=100条',
     mode_of_execution: '执行方式',
