@@ -106,6 +106,12 @@ export default {
     all_send: 'All',
     whether_complement_data: 'Whether it is a complement process?',
     schedule_date: 'Schedule date',
+    select_date: 'Select Date',
+    enter_date: 'Enter Date',
+    schedule_date_tips:
+      'The format is yyyy-MM-dd HH:mm:ss with multiple comma splits',
+    schedule_date_duplication: 'No duplicate dates allowed',
+    schedule_date_limit: 'Enter more than 100 dates',
     mode_of_execution: 'Mode of execution',
     serial_execution: 'Serial execution',
     parallel_execution: 'Parallel execution',
