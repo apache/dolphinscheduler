@@ -168,7 +168,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
-        cronTime = "{\"complementScheduleDateList\":\"2022-01-01 00:00:00,2022-01-02 12:12:12,2022-01-03 12:12:12,2022-01-06 12:12:12,2022-01-05 12:12:12\"}";
         // check process define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         result = checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode, processDefinition.getVersion());
