@@ -136,7 +136,7 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newRecall(TaskRecallCommand command, Channel channel) {
+    public static TaskEvent newRecallEvent(TaskRecallCommand command, Channel channel) {
         TaskEvent event = new TaskEvent();
         event.setTaskInstanceId(command.getTaskInstanceId());
         event.setProcessInstanceId(command.getProcessInstanceId());

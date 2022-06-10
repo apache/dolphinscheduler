@@ -39,6 +39,8 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,11 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
-
-import org.apache.commons.lang3.time.StopWatch;
 
 /**
  * TaskUpdateQueue consumer
@@ -124,7 +121,7 @@ public class TaskPriorityQueueConsumer extends Thread {
             try {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
-                if (!failedDispatchTasks.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
@@ -157,11 +154,15 @@ public class TaskPriorityQueueConsumer extends Thread {
             }
 
             consumerThreadPoolExecutor.submit(() -> {
-                boolean dispatchResult = this.dispatchTask(taskPriority);
-                if (!dispatchResult) {
-                    failedDispatchTasks.add(taskPriority);
+                try {
+                    boolean dispatchResult = this.dispatchTask(taskPriority);
+                    if (!dispatchResult) {
+                        failedDispatchTasks.add(taskPriority);
+                    }
+                } finally {
+                    // make sure the latch countDown
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
 
@@ -171,10 +172,10 @@ public class TaskPriorityQueueConsumer extends Thread {
     }
 
     /**
-     * dispatch task
+     * Dispatch task to worker.
      *
      * @param taskPriority taskPriority
-     * @return result
+     * @return dispatch result, return true if dispatch success, return false if dispatch failed.
      */
     protected boolean dispatchTask(TaskPriority taskPriority) {
         TaskMetrics.incTaskDispatch();

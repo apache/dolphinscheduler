@@ -56,7 +56,7 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_RECALL == command.getType(), String.format("invalid command type : %s", command.getType()));
         TaskRecallCommand recallCommand = JSONUtils.parseObject(command.getBody(), TaskRecallCommand.class);
         logger.info("taskRecallCommand : {}", recallCommand);
-        TaskEvent taskEvent = TaskEvent.newRecall(recallCommand, channel);
+        TaskEvent taskEvent = TaskEvent.newRecallEvent(recallCommand, channel);
         taskEventService.addEvent(taskEvent);
     }
 }
