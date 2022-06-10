@@ -34,8 +34,13 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.text.ParseException;
-import java.util.*;
-
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Calendar;
+import java.util.Map;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
