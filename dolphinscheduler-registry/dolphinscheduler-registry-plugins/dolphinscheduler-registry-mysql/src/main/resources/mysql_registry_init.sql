@@ -37,7 +37,7 @@ CREATE TABLE `t_ds_mysql_registry_lock`
 (
     `id`               bigint(11)   NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `key`              varchar(200) NOT NULL COMMENT 'lock path',
-    `host`             varchar(100) NOT NULL COMMENT 'get lock address',
+    `lock_owner`       varchar(100) NOT NULL COMMENT 'the lock owner, ip_processId',
     `last_term`        timestamp    NOT NULL COMMENT 'last term time',
     `last_update_time` timestamp    NULL COMMENT 'last update time',
     `create_time`      timestamp    NULL COMMENT 'lock create time',

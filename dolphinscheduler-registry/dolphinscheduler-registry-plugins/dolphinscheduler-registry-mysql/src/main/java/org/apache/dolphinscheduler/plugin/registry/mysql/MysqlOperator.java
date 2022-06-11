@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql;
 
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.DataType;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
@@ -245,14 +244,13 @@ public class MysqlOperator implements AutoCloseable {
      * Try to acquire the target Lock, if cannot acquire, return null.
      */
     public MysqlRegistryLock tryToAcquireLock(String key) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_lock (`key`, host, last_term, last_update_time, create_time) VALUES (?, ?, current_timestamp, current_timestamp, current_timestamp)";
+        String sql = "INSERT INTO t_ds_mysql_registry_lock (`key`, lock_owner, last_term, last_update_time, create_time) VALUES (?, ?, current_timestamp, current_timestamp, current_timestamp)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            Timestamp now = new Timestamp(System.currentTimeMillis());
             preparedStatement.setString(1, key);
             // todo: if we start multiple master in one instance with the same ip,
             //  then only one master can get the lock at the same time.
-            preparedStatement.setString(2, NetUtils.getHost());
+            preparedStatement.setString(2, MysqlRegistryConstant.LOCK_OWNER);
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             if (resultSet.next()) {
@@ -267,7 +265,7 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public MysqlRegistryLock getLockById(long lockId) throws SQLException {
-        String sql = "SELECT `id`, `key`, host, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = ?";
+        String sql = "SELECT `id`, `key`, lock_owner, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, lockId);
@@ -276,7 +274,7 @@ public class MysqlOperator implements AutoCloseable {
                 return MysqlRegistryLock.builder()
                         .id(resultSet.getLong("id"))
                         .key(resultSet.getString("key"))
-                        .host(resultSet.getString("host"))
+                        .lockOwner(resultSet.getString("lock_owner"))
                         .lastTerm(resultSet.getTimestamp("last_term"))
                         .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
                         .createTime(resultSet.getTimestamp("create_time"))

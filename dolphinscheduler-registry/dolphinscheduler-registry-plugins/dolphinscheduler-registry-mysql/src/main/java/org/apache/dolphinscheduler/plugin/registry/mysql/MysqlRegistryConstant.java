@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql;
 
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -27,4 +30,6 @@ public final class MysqlRegistryConstant {
     public static int TERM_EXPIRE_TIMES = 3;
 
     public static final long LOCK_ACQUIRE_INTERVAL = 1_000;
+
+    public static final String LOCK_OWNER = NetUtils.getHost() + "_" + OSUtils.getProcessID();
 }

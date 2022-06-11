@@ -38,7 +38,7 @@ public class MysqlRegistryLock {
     /**
      * acquire lock host.
      */
-    private String host;
+    private String lockOwner;
     /**
      * The last term, if the (currentTime - lastTerm) > termExpire time, the lock will be expired.
      */
