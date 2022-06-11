@@ -31,7 +31,9 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,8 +246,6 @@ public class MysqlOperator implements AutoCloseable {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, key);
-            // todo: if we start multiple master in one instance with the same ip,
-            //  then only one master can get the lock at the same time.
             preparedStatement.setString(2, MysqlRegistryConstant.LOCK_OWNER);
             preparedStatement.executeUpdate();
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
@@ -291,24 +291,23 @@ public class MysqlOperator implements AutoCloseable {
         }
     }
 
-    public boolean updateEphemeralDateTerm(Long ephemeralDateId) throws SQLException {
-        String sql = "update t_ds_mysql_registry_data set `last_update_time` = current_timestamp() where `id` = ?";
+    public boolean updateEphemeralDataTerm(Collection<Long> ephemeralDateIds) throws SQLException {
+        String idStr = ephemeralDateIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String sql = "update t_ds_mysql_registry_data set `last_update_time` = current_timestamp() where `id` IN (" + idStr + ")";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, ephemeralDateId);
             return preparedStatement.executeUpdate() > 0;
         }
     }
 
-    public boolean updateLockTerm(MysqlRegistryLock mysqlRegistryLock) throws SQLException {
-        String sql = "update t_ds_mysql_registry_lock set `last_term` = current_timestamp and `last_update_time` = current_timestamp where `id` = ?";
+    public boolean updateLockTerm(List<Long> lockIds) throws SQLException {
+        String idStr = lockIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String sql = "update t_ds_mysql_registry_lock set `last_term` = current_timestamp and `last_update_time` = current_timestamp where `id` IN (" + idStr + ")";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, mysqlRegistryLock.getId());
             return preparedStatement.executeUpdate() > 0;
         }
     }
-
 
     @Override
     public void close() throws Exception {

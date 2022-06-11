@@ -25,11 +25,13 @@ import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,11 +117,15 @@ public class RegistryLockManager implements AutoCloseable {
 
         public void run() {
             try {
-                for (Map.Entry<String, MysqlRegistryLock> entry : lockHoldMap.entrySet()) {
-                    // update the lock term
-                    if (!mysqlOperator.updateLockTerm(entry.getValue())) {
-                        logger.warn("Update the lock: {} term failed.", entry.getValue().getId());
-                    }
+                if (lockHoldMap.isEmpty()) {
+                    return;
+                }
+                List<Long> lockIds = lockHoldMap.values()
+                        .stream()
+                        .map(MysqlRegistryLock::getId)
+                        .collect(Collectors.toList());
+                if (!mysqlOperator.updateLockTerm(lockIds)) {
+                    logger.warn("Update the lock: {} term failed.", lockIds);
                 }
                 mysqlOperator.clearExpireLock();
             } catch (Exception e) {

@@ -148,11 +148,8 @@ public class EphemeralDateManager implements AutoCloseable {
         }
 
         private void updateEphemeralDateTerm() throws SQLException {
-            // todo: batch update
-            for (Long ephemeralDateId : ephemeralDateIds) {
-                if (!mysqlOperator.updateEphemeralDateTerm(ephemeralDateId)) {
-                    LOGGER.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateId);
-                }
+            if (!mysqlOperator.updateEphemeralDataTerm(ephemeralDateIds)) {
+                LOGGER.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateIds);
             }
         }
 
