@@ -172,6 +172,8 @@ public class MysqlRegistry implements Registry {
         try (EphemeralDateManager closed1 = ephemeralDateManager;
              SubscribeDataManager close2 = subscribeDataManager;
              RegistryLockManager close3 = registryLockManager) {
+        } catch (SQLException e) {
+            throw new RegistryException("Close Mysql Registry error", e);
         }
         LOGGER.info("Closed Mysql Registry...");
     }
