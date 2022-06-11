@@ -53,14 +53,12 @@ public class MysqlRegistry implements Registry {
     private final MysqlOperator mysqlOperator;
 
     public MysqlRegistry(MysqlRegistryProperties mysqlRegistryProperties) {
-        MysqlRegistryConstant.TERM_REFRESH_INTERVAL = mysqlRegistryProperties.getTermRefreshInterval();
-        MysqlRegistryConstant.TERM_EXPIRE_TIMES = mysqlRegistryProperties.getTermExpireTimes();
-        this.mysqlOperator = new MysqlOperator(mysqlRegistryProperties.getMysqlDatasource());
+        this.mysqlOperator = new MysqlOperator(mysqlRegistryProperties);
         mysqlOperator.clearExpireLock();
         mysqlOperator.clearExpireEphemeralDate();
-        this.ephemeralDateManager = new EphemeralDateManager(mysqlOperator);
-        this.subscribeDataManager = new SubscribeDataManager(mysqlOperator);
-        this.registryLockManager = new RegistryLockManager(mysqlOperator);
+        this.ephemeralDateManager = new EphemeralDateManager(mysqlRegistryProperties, mysqlOperator);
+        this.subscribeDataManager = new SubscribeDataManager(mysqlRegistryProperties, mysqlOperator);
+        this.registryLockManager = new RegistryLockManager(mysqlRegistryProperties, mysqlOperator);
         LOGGER.info("Initialize Mysql Registry...");
     }
 

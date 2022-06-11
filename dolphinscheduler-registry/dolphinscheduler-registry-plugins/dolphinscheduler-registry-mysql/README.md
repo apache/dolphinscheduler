@@ -17,11 +17,11 @@ You need to set the registry properties in master/worker/api's appplication.yml
 ```yaml
 registry:
   type: mysql
-  term-refresh-interval: 2000
+  term-refresh-interval: 2s
   term-expire-times: 3
-  mysql-datasource:
+  hikari-config:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+    jdbc-url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
     username: root
     password: root
     maximum-pool-size: 5

@@ -18,12 +18,11 @@
 package org.apache.dolphinscheduler.plugin.registry.mysql.task;
 
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
+import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +48,13 @@ public class SubscribeDataManager implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubscribeDataManager.class);
 
     private final MysqlOperator mysqlOperator;
+    private final MysqlRegistryProperties registryProperties;
     private final Map<String, List<SubscribeListener>> dataSubScribeMap = new ConcurrentHashMap<>();
     private final ScheduledExecutorService dataSubscribeCheckThreadPool;
     private final Map<String, MysqlRegistryData> mysqlRegistryDataMap = new ConcurrentHashMap<>();
 
-    public SubscribeDataManager(MysqlOperator mysqlOperator) {
+    public SubscribeDataManager(MysqlRegistryProperties registryProperties, MysqlOperator mysqlOperator) {
+        this.registryProperties = registryProperties;
         this.mysqlOperator = mysqlOperator;
         this.dataSubscribeCheckThreadPool = Executors.newScheduledThreadPool(
                 1,
@@ -63,8 +64,8 @@ public class SubscribeDataManager implements AutoCloseable {
     public void start() {
         dataSubscribeCheckThreadPool.scheduleWithFixedDelay(
                 new RegistrySubscribeDataCheckTask(dataSubScribeMap, mysqlOperator, mysqlRegistryDataMap),
-                MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
-                MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
+                registryProperties.getTermRefreshInterval().toMillis(),
+                registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
     }
 

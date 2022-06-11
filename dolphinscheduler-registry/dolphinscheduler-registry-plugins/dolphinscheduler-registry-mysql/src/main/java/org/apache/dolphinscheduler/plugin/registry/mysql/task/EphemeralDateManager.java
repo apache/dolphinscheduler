@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.registry.mysql.task;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
+import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryProperties;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 
@@ -47,11 +47,13 @@ public class EphemeralDateManager implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(EphemeralDateManager.class);
 
     private final MysqlOperator mysqlOperator;
+    private final MysqlRegistryProperties registryProperties;
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
     private final Set<Long> ephemeralDateIds = Collections.synchronizedSet(new HashSet<>());
     private final ScheduledExecutorService scheduledExecutorService;
 
-    public EphemeralDateManager(MysqlOperator mysqlOperator) {
+    public EphemeralDateManager(MysqlRegistryProperties registryProperties, MysqlOperator mysqlOperator) {
+        this.registryProperties = registryProperties;
         this.mysqlOperator = checkNotNull(mysqlOperator);
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
                 1,
@@ -61,8 +63,8 @@ public class EphemeralDateManager implements AutoCloseable {
     public void start() {
         this.scheduledExecutorService.scheduleWithFixedDelay(
                 new EphemeralDateTermRefreshTask(mysqlOperator, connectionListeners, ephemeralDateIds),
-                MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
-                MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
+                registryProperties.getTermExpireTimes(),
+                registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
     }
 

@@ -47,16 +47,12 @@ public class MysqlOperator implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(MysqlOperator.class);
 
     private final HikariDataSource dataSource;
+    private final long expireTimeWindow;
 
-    public MysqlOperator(MysqlRegistryProperties.MysqlDatasourceProperties datasourceProperties) {
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setDriverClassName(datasourceProperties.getDriverClassName());
-        hikariConfig.setJdbcUrl(datasourceProperties.getUrl());
-        hikariConfig.setUsername(datasourceProperties.getUsername());
-        hikariConfig.setPassword(datasourceProperties.getPassword());
-        hikariConfig.setMaximumPoolSize(datasourceProperties.getMaximumPoolSize());
-        hikariConfig.setConnectionTimeout(datasourceProperties.getConnectionTimeout());
-        hikariConfig.setIdleTimeout(datasourceProperties.getIdleTimeout());
+    public MysqlOperator(MysqlRegistryProperties registryProperties) {
+        this.expireTimeWindow = registryProperties.getTermExpireTimes() * registryProperties.getTermRefreshInterval().toMillis();
+
+        HikariConfig hikariConfig = registryProperties.getHikariConfig();
         hikariConfig.setPoolName("MysqlRegistryDataSourcePool");
 
         this.dataSource = new HikariDataSource(hikariConfig);
@@ -65,17 +61,17 @@ public class MysqlOperator implements AutoCloseable {
     public void healthCheck() throws SQLException {
         String sql = "select 1 from t_ds_mysql_registry_data";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery();) {
             // if no exception, the healthCheck success
-            preparedStatement.executeQuery();
         }
     }
 
     public List<MysqlRegistryData> queryAllMysqlRegistryData() throws SQLException {
         String sql = "select id, `key`, data, type, create_time, last_update_time from t_ds_mysql_registry_data";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             List<MysqlRegistryData> result = new ArrayList<>(resultSet.getFetchSize());
             while (resultSet.next()) {
                 MysqlRegistryData mysqlRegistryData = MysqlRegistryData.builder()
@@ -164,7 +160,7 @@ public class MysqlOperator implements AutoCloseable {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setTimestamp(1,
-                    new Timestamp(System.currentTimeMillis() - MysqlRegistryConstant.TERM_EXPIRE_TIMES * MysqlRegistryConstant.TERM_REFRESH_INTERVAL));
+                    new Timestamp(System.currentTimeMillis() - expireTimeWindow));
             int i = preparedStatement.executeUpdate();
             if (i > 0) {
                 logger.info("Clear expire lock, size: {}", i);
@@ -178,8 +174,7 @@ public class MysqlOperator implements AutoCloseable {
         String sql = "delete from t_ds_mysql_registry_data where last_update_time < ? and type = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setTimestamp(1,
-                    new Timestamp(System.currentTimeMillis() - MysqlRegistryConstant.TERM_EXPIRE_TIMES * MysqlRegistryConstant.TERM_REFRESH_INTERVAL));
+            preparedStatement.setTimestamp(1, new Timestamp(System.currentTimeMillis() - expireTimeWindow));
             preparedStatement.setInt(2, DataType.EPHEMERAL.getTypeValue());
             int i = preparedStatement.executeUpdate();
             if (i > 0) {
@@ -191,11 +186,10 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public MysqlRegistryData getData(String key) throws SQLException {
-        String sql = "SELECT id, `key`, data, type, create_time, last_update_time FROM t_ds_mysql_registry_data WHERE `key` = ?";
+        String sql = "SELECT id, `key`, data, type, create_time, last_update_time FROM t_ds_mysql_registry_data WHERE `key` = " + key;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, key);
-            ResultSet resultSet = preparedStatement.executeQuery();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet == null) {
                 return null;
             }
@@ -215,15 +209,16 @@ public class MysqlOperator implements AutoCloseable {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, key + "%");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            List<String> result = new ArrayList<>(resultSet.getFetchSize());
-            while (resultSet.next()) {
-                String fullPath = resultSet.getString("key");
-                if (fullPath.length() > key.length()) {
-                    result.add(StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<String> result = new ArrayList<>(resultSet.getFetchSize());
+                while (resultSet.next()) {
+                    String fullPath = resultSet.getString("key");
+                    if (fullPath.length() > key.length()) {
+                        result.add(StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"));
+                    }
                 }
+                return result;
             }
-            return result;
         }
     }
 
@@ -232,9 +227,10 @@ public class MysqlOperator implements AutoCloseable {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, key);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return true;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -252,10 +248,11 @@ public class MysqlOperator implements AutoCloseable {
             //  then only one master can get the lock at the same time.
             preparedStatement.setString(2, MysqlRegistryConstant.LOCK_OWNER);
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            if (resultSet.next()) {
-                long newLockId = resultSet.getLong(1);
-                return getLockById(newLockId);
+            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    long newLockId = resultSet.getLong(1);
+                    return getLockById(newLockId);
+                }
             }
             return null;
         } catch (SQLIntegrityConstraintViolationException e) {
@@ -265,11 +262,10 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public MysqlRegistryLock getLockById(long lockId) throws SQLException {
-        String sql = "SELECT `id`, `key`, lock_owner, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = ?";
+        String sql = "SELECT `id`, `key`, lock_owner, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = " + lockId;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, lockId);
-            ResultSet resultSet = preparedStatement.executeQuery();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
                 return MysqlRegistryLock.builder()
                         .id(resultSet.getLong("id"))

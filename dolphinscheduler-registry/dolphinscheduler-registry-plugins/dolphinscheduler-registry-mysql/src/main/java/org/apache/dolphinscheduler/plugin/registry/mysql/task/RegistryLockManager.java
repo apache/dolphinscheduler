@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.registry.mysql.task;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
+import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 
@@ -43,10 +44,12 @@ public class RegistryLockManager implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(RegistryLockManager.class);
 
     private final MysqlOperator mysqlOperator;
+    private final MysqlRegistryProperties registryProperties;
     private final Map<String, MysqlRegistryLock> lockHoldMap;
     private final ScheduledExecutorService lockTermUpdateThreadPool;
 
-    public RegistryLockManager(MysqlOperator mysqlOperator) {
+    public RegistryLockManager(MysqlRegistryProperties registryProperties, MysqlOperator mysqlOperator) {
+        this.registryProperties = registryProperties;
         this.mysqlOperator = mysqlOperator;
         this.lockHoldMap = new ConcurrentHashMap<>();
         this.lockTermUpdateThreadPool = Executors.newSingleThreadScheduledExecutor(
@@ -56,8 +59,8 @@ public class RegistryLockManager implements AutoCloseable {
     public void start() {
         lockTermUpdateThreadPool.scheduleWithFixedDelay(
                 new LockTermRefreshTask(lockHoldMap, mysqlOperator),
-                MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
-                MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
+                registryProperties.getTermRefreshInterval().toMillis(),
+                registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
     }
 
