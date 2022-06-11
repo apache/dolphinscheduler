@@ -125,6 +125,15 @@ public class MysqlOperator {
         }
     }
 
+    public void deleteEphemeralData(long ephemeralNodeId) throws SQLException {
+        String sql = "DELETE from t_ds_mysql_registry_data where `id` = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, ephemeralNodeId);
+            preparedStatement.execute();
+        }
+    }
+
     public void deletePersistentData(String key) throws SQLException {
         String sql = "DELETE from t_ds_mysql_registry_data where `key` = ? and type = ?";
         try (Connection connection = dataSource.getConnection();
@@ -269,7 +278,7 @@ public class MysqlOperator {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, ephemeralDateId);
-            return preparedStatement.executeUpdate() > 1;
+            return preparedStatement.executeUpdate() > 0;
         }
     }
 
@@ -278,7 +287,7 @@ public class MysqlOperator {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, mysqlRegistryLock.getId());
-            return preparedStatement.executeUpdate() > 1;
+            return preparedStatement.executeUpdate() > 0;
         }
     }
 

@@ -76,7 +76,6 @@ public class RegistryLockManager implements AutoCloseable {
                     ThreadUtils.sleep(1_000L);
                 }
             } catch (SQLException e) {
-                // We clear the interrupt status
                 throw new RegistryException("Acquire the lock error", e);
             }
             return mysqlRegistryLock;
@@ -86,8 +85,8 @@ public class RegistryLockManager implements AutoCloseable {
     public void releaseLock(String lockKey) {
         MysqlRegistryLock mysqlRegistryLock = lockHoldMap.get(lockKey);
         if (mysqlRegistryLock != null) {
-            // the lock is unExit
             try {
+                // the lock is unExit
                 mysqlOperator.releaseLock(mysqlRegistryLock.getId());
                 lockHoldMap.remove(lockKey);
             } catch (SQLException e) {
@@ -99,7 +98,9 @@ public class RegistryLockManager implements AutoCloseable {
     @Override
     public void close() {
         lockTermUpdateThreadPool.shutdownNow();
-        lockHoldMap.clear();
+        for (Map.Entry<String, MysqlRegistryLock> lockEntry : lockHoldMap.entrySet()) {
+            releaseLock(lockEntry.getKey());
+        }
     }
 
     /**
@@ -118,11 +119,13 @@ public class RegistryLockManager implements AutoCloseable {
             try {
                 for (Map.Entry<String, MysqlRegistryLock> entry : lockHoldMap.entrySet()) {
                     // update the lock term
-                    mysqlOperator.updateLockTerm(entry.getValue());
+                    if (!mysqlOperator.updateLockTerm(entry.getValue())) {
+                        logger.error("Update the lock term failed.");
+                    }
                 }
                 mysqlOperator.clearExpireLock();
             } catch (Exception e) {
-                logger.debug("Update lock term error", e);
+                logger.error("Update lock term error", e);
             }
         }
     }

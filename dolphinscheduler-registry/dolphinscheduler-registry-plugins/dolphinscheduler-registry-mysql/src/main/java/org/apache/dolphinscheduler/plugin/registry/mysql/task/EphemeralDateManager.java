@@ -76,10 +76,13 @@ public class EphemeralDateManager implements AutoCloseable {
     }
 
     @Override
-    public void close() {
-        scheduledExecutorService.shutdownNow();
+    public void close() throws SQLException {
         ephemeralDateIds.clear();
         connectionListeners.clear();
+        scheduledExecutorService.shutdownNow();
+        for (Long ephemeralDateId : ephemeralDateIds) {
+            mysqlOperator.deleteEphemeralData(ephemeralDateId);
+        }
     }
 
     // Use this task to refresh ephemeral term and check the connect state.
