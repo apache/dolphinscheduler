@@ -92,16 +92,17 @@ public class HttpParametersTest  {
 
         String body="{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
                 + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        //设置自定义参数
+
+        //Set custom parameters
         List<Property> localParams=new ArrayList<>();
-        //设置输出参数
+
+        //Setting output Parameters
         Property property=new Property();
         property.setProp("body");
         property.setDirect(Direct.OUT);
         property.setType(DataType.VARCHAR);
         property.setValue("");
         localParams.add(property);
-        //设置自定义参数
         httpParameters.setLocalParams(localParams);
 
         String result = httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
