@@ -816,7 +816,7 @@ public final class Constants {
     public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
 
     /**
-     * schedule time
+     * schedule time  the amount of date data is too large, affecting the memory, so set 100
      */
     public static final int SCHEDULE_TIME_MAX_LENGTH = 100;
 
