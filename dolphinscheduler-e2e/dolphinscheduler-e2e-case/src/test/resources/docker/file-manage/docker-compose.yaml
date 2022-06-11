@@ -64,7 +64,7 @@ services:
       - e2e
     command:
       - -c
-      - mc alias set s3 http://s3:9000 accessKey123 secretKey123 && mc mb s3/dolphinscheduler
+      - mc alias set s3 http://s3:9000 accessKey123 secretKey123 && mc mb s3/dolphinscheduler-test
     depends_on:
       s3:
         condition: service_healthy
