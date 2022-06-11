@@ -16,7 +16,7 @@ You need to set the registry type to mysql in master/worker/api's appplication.y
 
 ```yaml
 registry:
-  type: zookeeper
+  type: mysql
 ```
 
 After do this two steps, you can start your DolphinScheduler cluster, your cluster will use mysql as registry centery to
