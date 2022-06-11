@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.registry.mysql.task;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
@@ -72,9 +73,9 @@ public class RegistryLockManager implements AutoCloseable {
                 while ((mysqlRegistryLock = mysqlOperator.tryToAcquireLock(lockKey)) == null) {
                     logger.debug("Acquire the lock {} failed try again", key);
                     // acquire failed, wait and try again
-                    Thread.sleep(1_000L);
+                    ThreadUtils.sleep(1_000L);
                 }
-            } catch (InterruptedException | SQLException e) {
+            } catch (SQLException e) {
                 // We clear the interrupt status
                 throw new RegistryException("Acquire the lock error", e);
             }
