@@ -141,7 +141,7 @@ public class HttpTask extends AbstractTaskExecutor {
                 String params = ParameterUtils.convertParameterPlaceholders(value, ParamUtils.convert(paramsMap));
                 httpProperty.setValue(params);
                 logger.info("http request params：{}", params);
-                httpPropertyList.add(JSONUtils.parseObject(params, HttpProperty.class));
+                httpPropertyList.add(httpProperty);
             }
         }
         addRequestParams(builder, httpPropertyList);
