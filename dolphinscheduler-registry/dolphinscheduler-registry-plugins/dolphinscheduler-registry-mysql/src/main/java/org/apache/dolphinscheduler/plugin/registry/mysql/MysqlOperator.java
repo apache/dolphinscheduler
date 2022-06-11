@@ -34,22 +34,33 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Used to CRUD from mysql
  */
-public class MysqlOperator {
+public class MysqlOperator implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MysqlOperator.class);
 
-    private final DataSource dataSource;
+    private final HikariDataSource dataSource;
 
-    public MysqlOperator(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public MysqlOperator(MysqlRegistryProperties.MysqlDatasourceProperties datasourceProperties) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName(datasourceProperties.getDriverClassName());
+        hikariConfig.setJdbcUrl(datasourceProperties.getUrl());
+        hikariConfig.setUsername(datasourceProperties.getUsername());
+        hikariConfig.setPassword(datasourceProperties.getPassword());
+        hikariConfig.setMaximumPoolSize(datasourceProperties.getMaximumPoolSize());
+        hikariConfig.setConnectionTimeout(datasourceProperties.getConnectionTimeout());
+        hikariConfig.setIdleTimeout(datasourceProperties.getIdleTimeout());
+        hikariConfig.setPoolName("MysqlRegistryDataSourcePool");
+
+        this.dataSource = new HikariDataSource(hikariConfig);
     }
 
     public void healthCheck() throws SQLException {
@@ -62,19 +73,19 @@ public class MysqlOperator {
     }
 
     public List<MysqlRegistryData> queryAllMysqlRegistryData() throws SQLException {
-        String sql = "select id, `key`, data, type, createTime, lastUpdateTime from t_ds_mysql_registry_data";
+        String sql = "select id, `key`, data, type, create_time, last_update_time from t_ds_mysql_registry_data";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<MysqlRegistryData> result = new ArrayList<>(resultSet.getFetchSize());
             while (resultSet.next()) {
                 MysqlRegistryData mysqlRegistryData = MysqlRegistryData.builder()
-                        .id(resultSet.getLong(1))
-                        .key(resultSet.getString(2))
-                        .data(resultSet.getString(3))
-                        .type(resultSet.getInt(4))
-                        .createTime(resultSet.getTimestamp(5))
-                        .lastUpdateTime(resultSet.getTimestamp(6))
+                        .id(resultSet.getLong("id"))
+                        .key(resultSet.getString("key"))
+                        .data(resultSet.getString("data"))
+                        .type(resultSet.getInt("type"))
+                        .createTime(resultSet.getTimestamp("create_time"))
+                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
                         .build();
                 result.add(mysqlRegistryData);
             }
@@ -83,8 +94,8 @@ public class MysqlOperator {
     }
 
     public long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, createTime, lastUpdateTime) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
-                "ON DUPLICATE KEY UPDATE data=?, lastUpdateTime=current_timestamp";
+        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
+                "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
         // put a ephemeralData
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -95,23 +106,28 @@ public class MysqlOperator {
             int insertCount = preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             if (insertCount < 1 || !generatedKeys.next()) {
-                throw new SQLException("Insert ephemeral data error");
+                throw new SQLException("Insert or update ephemeral data error");
             }
             return generatedKeys.getLong(1);
         }
     }
 
-    public void insertOrUpdatePersistentData(String key, String value) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, createTime, lastUpdateTime) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
-                "ON DUPLICATE KEY UPDATE data=?, lastUpdateTime=current_timestamp";
+    public long insertOrUpdatePersistentData(String key, String value) throws SQLException {
+        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
+                "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
         // put a persistent Data
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, key);
             preparedStatement.setString(2, value);
             preparedStatement.setInt(3, DataType.PERSISTENT.getTypeValue());
             preparedStatement.setString(4, value);
-            preparedStatement.executeUpdate();
+            int insertCount = preparedStatement.executeUpdate();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (insertCount < 1 || !generatedKeys.next()) {
+                throw new SQLException("Insert or update persistent data error");
+            }
+            return generatedKeys.getLong(1);
         }
     }
 
@@ -145,30 +161,38 @@ public class MysqlOperator {
     }
 
     public void clearExpireLock() {
-        String sql = "delete from t_ds_mysql_registry_lock where current_timestamp - lastTerm > ?";
+        String sql = "delete from t_ds_mysql_registry_lock where last_term < ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, MysqlRegistryConstant.TERM_EXPIRE_TIME / 1000);
-            preparedStatement.executeUpdate();
+            preparedStatement.setTimestamp(1,
+                    new Timestamp(System.currentTimeMillis() - MysqlRegistryConstant.TERM_EXPIRE_TIMES * MysqlRegistryConstant.TERM_REFRESH_INTERVAL));
+            int i = preparedStatement.executeUpdate();
+            if (i > 0) {
+                logger.info("Clear expire lock, size: {}", i);
+            }
         } catch (Exception ex) {
             logger.warn("Clear expire lock from mysql registry error", ex);
         }
     }
 
     public void clearExpireEphemeralDate() {
-        String sql = "delete from t_ds_mysql_registry_data where current_timestamp - lastUpdateTime > ? and type = ?";
+        String sql = "delete from t_ds_mysql_registry_data where last_update_time < ? and type = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, MysqlRegistryConstant.TERM_EXPIRE_TIME / 1000);
+            preparedStatement.setTimestamp(1,
+                    new Timestamp(System.currentTimeMillis() - MysqlRegistryConstant.TERM_EXPIRE_TIMES * MysqlRegistryConstant.TERM_REFRESH_INTERVAL));
             preparedStatement.setInt(2, DataType.EPHEMERAL.getTypeValue());
-            preparedStatement.executeUpdate();
+            int i = preparedStatement.executeUpdate();
+            if (i > 0) {
+                logger.info("clear expire ephemeral data, size:{}", i);
+            }
         } catch (Exception ex) {
             logger.warn("Clear expire ephemeral data from mysql registry error", ex);
         }
     }
 
     public MysqlRegistryData getData(String key) throws SQLException {
-        String sql = "SELECT id, `key`, data, type, createTime, lastUpdateTime FROM t_ds_mysql_registry_data WHERE `key` = ?";
+        String sql = "SELECT id, `key`, data, type, create_time, last_update_time FROM t_ds_mysql_registry_data WHERE `key` = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, key);
@@ -177,12 +201,12 @@ public class MysqlOperator {
                 return null;
             }
             return MysqlRegistryData.builder()
-                    .id(resultSet.getLong(1))
-                    .key(resultSet.getString(2))
-                    .data(resultSet.getString(3))
-                    .type(resultSet.getInt(4))
-                    .createTime(resultSet.getTimestamp(5))
-                    .lastUpdateTime(resultSet.getTimestamp(6))
+                    .id(resultSet.getLong("id"))
+                    .key(resultSet.getString("key"))
+                    .data(resultSet.getString("data"))
+                    .type(resultSet.getInt("type"))
+                    .createTime(resultSet.getTimestamp("create_time"))
+                    .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
                     .build();
         }
     }
@@ -195,7 +219,7 @@ public class MysqlOperator {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> result = new ArrayList<>(resultSet.getFetchSize());
             while (resultSet.next()) {
-                String fullPath = resultSet.getString(1);
+                String fullPath = resultSet.getString("key");
                 if (fullPath.length() > key.length()) {
                     result.add(StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"));
                 }
@@ -221,7 +245,7 @@ public class MysqlOperator {
      * Try to acquire the target Lock, if cannot acquire, return null.
      */
     public MysqlRegistryLock tryToAcquireLock(String key) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_lock (`key`, host, lastTerm, lastUpdateTime, createTime) VALUES (?, ?, current_timestamp, current_timestamp, current_timestamp)";
+        String sql = "INSERT INTO t_ds_mysql_registry_lock (`key`, host, last_term, last_update_time, create_time) VALUES (?, ?, current_timestamp, current_timestamp, current_timestamp)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -243,19 +267,19 @@ public class MysqlOperator {
     }
 
     public MysqlRegistryLock getLockById(long lockId) throws SQLException {
-        String sql = "SELECT `id`, `key`, host, lastTerm, lastUpdateTime, createTime FROM t_ds_mysql_registry_lock WHERE id = ?";
+        String sql = "SELECT `id`, `key`, host, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, lockId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return MysqlRegistryLock.builder()
-                        .id(resultSet.getLong(1))
-                        .key(resultSet.getString(2))
-                        .host(resultSet.getString(3))
-                        .lastTerm(resultSet.getTimestamp(4))
-                        .lastUpdateTime(resultSet.getTimestamp(5))
-                        .createTime(resultSet.getTimestamp(6))
+                        .id(resultSet.getLong("id"))
+                        .key(resultSet.getString("key"))
+                        .host(resultSet.getString("host"))
+                        .lastTerm(resultSet.getTimestamp("last_term"))
+                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
+                        .createTime(resultSet.getTimestamp("create_time"))
                         .build();
             }
             return null;
@@ -274,7 +298,7 @@ public class MysqlOperator {
     }
 
     public boolean updateEphemeralDateTerm(Long ephemeralDateId) throws SQLException {
-        String sql = "update t_ds_mysql_registry_data set `lastUpdateTime` = current_timestamp where `id` = ?";
+        String sql = "update t_ds_mysql_registry_data set `last_update_time` = current_timestamp() where `id` = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, ephemeralDateId);
@@ -283,7 +307,7 @@ public class MysqlOperator {
     }
 
     public boolean updateLockTerm(MysqlRegistryLock mysqlRegistryLock) throws SQLException {
-        String sql = "update t_ds_mysql_registry_lock set `lastTerm` = current_timestamp and `lastUpdateTime` = current_timestamp where `id` = ?";
+        String sql = "update t_ds_mysql_registry_lock set `last_term` = current_timestamp and `last_update_time` = current_timestamp where `id` = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, mysqlRegistryLock.getId());
@@ -291,4 +315,13 @@ public class MysqlOperator {
         }
     }
 
+
+    @Override
+    public void close() throws Exception {
+        if (!dataSource.isClosed()) {
+            try (HikariDataSource closedDatasource = this.dataSource) {
+
+            }
+        }
+    }
 }

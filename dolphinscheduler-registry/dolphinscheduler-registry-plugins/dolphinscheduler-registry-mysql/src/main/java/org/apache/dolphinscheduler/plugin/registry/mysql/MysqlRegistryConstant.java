@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql;
 
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
-@NoArgsConstructor
+@UtilityClass
 public final class MysqlRegistryConstant {
 
     public static long TERM_REFRESH_INTERVAL = 2_000L;
 
-    public static long TERM_EXPIRE_TIME = TERM_REFRESH_INTERVAL * 3;
+    public static int TERM_EXPIRE_TIMES = 3;
+
+    public static final long LOCK_ACQUIRE_INTERVAL = 1_000;
 }

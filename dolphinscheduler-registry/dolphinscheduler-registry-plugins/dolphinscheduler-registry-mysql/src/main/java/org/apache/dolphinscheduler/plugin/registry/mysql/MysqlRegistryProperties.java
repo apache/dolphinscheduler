@@ -21,12 +21,34 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Data;
+
+@Data
 @Configuration
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
 @ConfigurationProperties(prefix = "registry")
 public class MysqlRegistryProperties {
 
-    // todo:
-    private int lockTermExpireTime;
+    /**
+     * Used to schedule refresh the ephemeral data/ lock.
+     */
+    private long termRefreshInterval = MysqlRegistryConstant.TERM_REFRESH_INTERVAL;
+    /**
+     * Used to calculate the expire time,
+     * e.g. if you set 2, and latest two refresh error, then the ephemeral data/lock will be expire.
+     */
+    private int termExpireTimes = MysqlRegistryConstant.TERM_EXPIRE_TIMES;
+    private MysqlDatasourceProperties mysqlDatasource;
+
+    @Data
+    public static final class MysqlDatasourceProperties {
+        private String driverClassName;
+        private String url;
+        private String username;
+        private String password;
+        private int maximumPoolSize;
+        private long connectionTimeout;
+        private long idleTimeout;
+    }
 
 }

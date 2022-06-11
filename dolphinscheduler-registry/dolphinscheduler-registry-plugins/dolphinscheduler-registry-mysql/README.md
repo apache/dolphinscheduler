@@ -12,11 +12,21 @@ You can directly execute the sql script `src/main/resources/mysql_registry_init.
 
 2. Open the config
 
-You need to set the registry type to mysql in master/worker/api's appplication.yml
+You need to set the registry properties in master/worker/api's appplication.yml
 
 ```yaml
 registry:
   type: mysql
+  term-refresh-interval: 2000
+  term-expire-times: 3
+  mysql-datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+    username: root
+    password: root
+    maximum-pool-size: 5
+    connection-timeout: 9000
+    idle-timeout: 600000
 ```
 
 After do this two steps, you can start your DolphinScheduler cluster, your cluster will use mysql as registry centery to

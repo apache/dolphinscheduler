@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql.task;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
@@ -41,6 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Used to refresh if the subscribe path has been changed.
  */
@@ -62,7 +62,7 @@ public class SubscribeDataManager implements AutoCloseable {
 
     public void start() {
         dataSubscribeCheckThreadPool.scheduleWithFixedDelay(
-                new RegistrySubscribeDataCheckTask(mysqlRegistryDataMap, dataSubScribeMap, mysqlOperator),
+                new RegistrySubscribeDataCheckTask(dataSubScribeMap, mysqlOperator, mysqlRegistryDataMap),
                 MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
                 MysqlRegistryConstant.TERM_REFRESH_INTERVAL,
                 TimeUnit.MILLISECONDS);
@@ -76,7 +76,7 @@ public class SubscribeDataManager implements AutoCloseable {
         dataSubScribeMap.remove(path);
     }
 
-    public String getData(String path) throws SQLException {
+    public String getData(String path) {
         MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMap.get(path);
         if (mysqlRegistryData == null) {
             return null;
@@ -90,20 +90,12 @@ public class SubscribeDataManager implements AutoCloseable {
         dataSubScribeMap.clear();
     }
 
+    @RequiredArgsConstructor
     static class RegistrySubscribeDataCheckTask implements Runnable {
 
         private final Map<String, List<SubscribeListener>> dataSubScribeMap;
         private final MysqlOperator mysqlOperator;
         private final Map<String, MysqlRegistryData> mysqlRegistryDataMap;
-
-        public RegistrySubscribeDataCheckTask(
-                Map<String, MysqlRegistryData> mysqlRegistryDataMap,
-                Map<String, List<SubscribeListener>> dataSubScribeMap,
-                MysqlOperator mysqlOperator) {
-            this.mysqlRegistryDataMap = checkNotNull(mysqlRegistryDataMap);
-            this.dataSubScribeMap = checkNotNull(dataSubScribeMap);
-            this.mysqlOperator = checkNotNull(mysqlOperator);
-        }
 
         @Override
         public void run() {

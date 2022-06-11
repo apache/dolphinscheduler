@@ -27,16 +27,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 @ConfigurationProperties(prefix = "registry")
 public class ZookeeperRegistryProperties {
-    private Type type;
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
 
     public ZookeeperProperties getZookeeper() {
         return zookeeper;
@@ -44,10 +35,6 @@ public class ZookeeperRegistryProperties {
 
     public void setZookeeper(ZookeeperProperties zookeeper) {
         this.zookeeper = zookeeper;
-    }
-
-    public enum Type {
-        ZOOKEEPER
     }
 
     public static final class ZookeeperProperties {

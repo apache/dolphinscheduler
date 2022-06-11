@@ -56,7 +56,6 @@ public class EphemeralDateManager implements AutoCloseable {
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
                 1,
                 new ThreadFactoryBuilder().setNameFormat("EphemeralDateTermRefreshThread").setDaemon(true).build());
-        mysqlOperator.clearExpireEphemeralDate();
     }
 
     public void start() {
@@ -71,8 +70,10 @@ public class EphemeralDateManager implements AutoCloseable {
         connectionListeners.add(connectionListener);
     }
 
-    public void addEphemeralDateId(Long ephemeralDateId) {
-        ephemeralDateIds.add(ephemeralDateId);
+    public long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
+        long ephemeralId = mysqlOperator.insertOrUpdateEphemeralData(key, value);
+        ephemeralDateIds.add(ephemeralId);
+        return ephemeralId;
     }
 
     @Override
@@ -86,15 +87,15 @@ public class EphemeralDateManager implements AutoCloseable {
     }
 
     // Use this task to refresh ephemeral term and check the connect state.
-    private static class EphemeralDateTermRefreshTask implements Runnable {
+    static class EphemeralDateTermRefreshTask implements Runnable {
         private final List<ConnectionListener> connectionListeners;
         private final Set<Long> ephemeralDateIds;
         private final MysqlOperator mysqlOperator;
         private ConnectionState connectionState;
 
-        public EphemeralDateTermRefreshTask(MysqlOperator mysqlOperator,
-                                            List<ConnectionListener> connectionListeners,
-                                            Set<Long> ephemeralDateIds) {
+        private EphemeralDateTermRefreshTask(MysqlOperator mysqlOperator,
+                                             List<ConnectionListener> connectionListeners,
+                                             Set<Long> ephemeralDateIds) {
             this.mysqlOperator = checkNotNull(mysqlOperator);
             this.connectionListeners = checkNotNull(connectionListeners);
             this.ephemeralDateIds = checkNotNull(ephemeralDateIds);
@@ -108,21 +109,20 @@ public class EphemeralDateManager implements AutoCloseable {
                     // no state change
                     return;
                 }
-                if (connectionState == null) {
-                    // first time connect
-                    if (currentConnectionState == ConnectionState.CONNECTED) {
-                        connectionState = ConnectionState.CONNECTED;
-                        triggerListener(ConnectionState.CONNECTED);
-                    }
-                } else {
-                    // already connect before
-                    if (connectionState == ConnectionState.CONNECTED && currentConnectionState == ConnectionState.DISCONNECTED) {
+
+                if (connectionState == ConnectionState.CONNECTED) {
+                    if (currentConnectionState == ConnectionState.DISCONNECTED) {
                         connectionState = ConnectionState.DISCONNECTED;
                         triggerListener(ConnectionState.DISCONNECTED);
-                    } else if (connectionState == ConnectionState.DISCONNECTED && currentConnectionState == ConnectionState.CONNECTED) {
+                    }
+                } else if (connectionState == ConnectionState.DISCONNECTED) {
+                    if (currentConnectionState == ConnectionState.CONNECTED) {
                         connectionState = ConnectionState.CONNECTED;
                         triggerListener(ConnectionState.RECONNECTED);
                     }
+                } else if (connectionState == null) {
+                    connectionState = currentConnectionState;
+                    triggerListener(connectionState);
                 }
             } catch (Exception e) {
                 LOGGER.error("Mysql Registry connect state check task execute failed", e);
@@ -148,7 +148,9 @@ public class EphemeralDateManager implements AutoCloseable {
         private void updateEphemeralDateTerm() throws SQLException {
             // todo: batch update
             for (Long ephemeralDateId : ephemeralDateIds) {
-                mysqlOperator.updateEphemeralDateTerm(ephemeralDateId);
+                if (!mysqlOperator.updateEphemeralDateTerm(ephemeralDateId)) {
+                    LOGGER.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateId);
+                }
             }
         }
 

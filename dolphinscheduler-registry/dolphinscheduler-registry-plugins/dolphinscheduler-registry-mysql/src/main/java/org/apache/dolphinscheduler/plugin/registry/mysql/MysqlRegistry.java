@@ -30,7 +30,6 @@ import java.time.Duration;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +52,12 @@ public class MysqlRegistry implements Registry {
     private final RegistryLockManager registryLockManager;
     private final MysqlOperator mysqlOperator;
 
-    public MysqlRegistry(DataSource dataSource, MysqlRegistryProperties mysql) {
-        this.mysqlOperator = new MysqlOperator(dataSource);
+    public MysqlRegistry(MysqlRegistryProperties mysqlRegistryProperties) {
+        MysqlRegistryConstant.TERM_REFRESH_INTERVAL = mysqlRegistryProperties.getTermRefreshInterval();
+        MysqlRegistryConstant.TERM_EXPIRE_TIMES = mysqlRegistryProperties.getTermExpireTimes();
+        this.mysqlOperator = new MysqlOperator(mysqlRegistryProperties.getMysqlDatasource());
+        mysqlOperator.clearExpireLock();
+        mysqlOperator.clearExpireEphemeralDate();
         this.ephemeralDateManager = new EphemeralDateManager(mysqlOperator);
         this.subscribeDataManager = new SubscribeDataManager(mysqlOperator);
         this.registryLockManager = new RegistryLockManager(mysqlOperator);
@@ -92,11 +95,7 @@ public class MysqlRegistry implements Registry {
     @Override
     public String get(String key) {
         // get the key value
-        try {
-            return subscribeDataManager.getData(key);
-        } catch (SQLException e) {
-            throw new RegistryException(String.format("Get key: %s error", key), e);
-        }
+        return subscribeDataManager.getData(key);
     }
 
     @Override
@@ -104,8 +103,7 @@ public class MysqlRegistry implements Registry {
         try {
             if (deleteOnDisconnect) {
                 // when put a ephemeralData will new a scheduler thread to update it
-                long ephemeralDataId = mysqlOperator.insertOrUpdateEphemeralData(key, value);
-                ephemeralDateManager.addEphemeralDateId(ephemeralDataId);
+                ephemeralDateManager.insertOrUpdateEphemeralData(key, value);
             } else {
                 mysqlOperator.insertOrUpdatePersistentData(key, value);
             }
@@ -171,9 +169,10 @@ public class MysqlRegistry implements Registry {
         // remove the current Ephemeral node, if can connect to mysql
         try (EphemeralDateManager closed1 = ephemeralDateManager;
              SubscribeDataManager close2 = subscribeDataManager;
-             RegistryLockManager close3 = registryLockManager) {
-        } catch (SQLException e) {
-            throw new RegistryException("Close Mysql Registry error", e);
+             RegistryLockManager close3 = registryLockManager;
+             MysqlOperator closed4 = mysqlOperator) {
+        } catch (Exception e) {
+            LOGGER.error("Close Mysql Registry error", e);
         }
         LOGGER.info("Closed Mysql Registry...");
     }

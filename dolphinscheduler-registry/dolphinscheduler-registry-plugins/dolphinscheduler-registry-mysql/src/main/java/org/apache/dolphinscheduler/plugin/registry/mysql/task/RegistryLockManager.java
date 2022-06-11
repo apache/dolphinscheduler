@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql.task;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
 import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
@@ -37,6 +35,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 public class RegistryLockManager implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryLockManager.class);
@@ -47,10 +48,8 @@ public class RegistryLockManager implements AutoCloseable {
 
     public RegistryLockManager(MysqlOperator mysqlOperator) {
         this.mysqlOperator = mysqlOperator;
-        mysqlOperator.clearExpireLock();
         this.lockHoldMap = new ConcurrentHashMap<>();
-        this.lockTermUpdateThreadPool = Executors.newScheduledThreadPool(
-                1,
+        this.lockTermUpdateThreadPool = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder().setNameFormat("MysqlRegistryLockTermRefreshThread").setDaemon(true).build());
     }
 
@@ -73,7 +72,7 @@ public class RegistryLockManager implements AutoCloseable {
                 while ((mysqlRegistryLock = mysqlOperator.tryToAcquireLock(lockKey)) == null) {
                     logger.debug("Acquire the lock {} failed try again", key);
                     // acquire failed, wait and try again
-                    ThreadUtils.sleep(1_000L);
+                    ThreadUtils.sleep(MysqlRegistryConstant.LOCK_ACQUIRE_INTERVAL);
                 }
             } catch (SQLException e) {
                 throw new RegistryException("Acquire the lock error", e);
@@ -106,21 +105,17 @@ public class RegistryLockManager implements AutoCloseable {
     /**
      * This task is used to refresh the lock held by the current server.
      */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     static class LockTermRefreshTask implements Runnable {
         private final Map<String, MysqlRegistryLock> lockHoldMap;
         private final MysqlOperator mysqlOperator;
-
-        private LockTermRefreshTask(Map<String, MysqlRegistryLock> lockHoldMap, MysqlOperator mysqlOperator) {
-            this.lockHoldMap = checkNotNull(lockHoldMap);
-            this.mysqlOperator = checkNotNull(mysqlOperator);
-        }
 
         public void run() {
             try {
                 for (Map.Entry<String, MysqlRegistryLock> entry : lockHoldMap.entrySet()) {
                     // update the lock term
                     if (!mysqlOperator.updateLockTerm(entry.getValue())) {
-                        logger.error("Update the lock term failed.");
+                        logger.warn("Update the lock: {} term failed.", entry.getValue().getId());
                     }
                 }
                 mysqlOperator.clearExpireLock();
