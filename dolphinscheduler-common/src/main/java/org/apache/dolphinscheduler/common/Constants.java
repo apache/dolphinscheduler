@@ -362,6 +362,11 @@ public final class Constants {
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
 
     /**
+     * complement data Schedule date
+     */
+    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST = "complementScheduleDateList";
+
+    /**
      * complement date default cron string
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
@@ -809,4 +814,10 @@ public final class Constants {
      * tenant
      */
     public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
+
+    /**
+     * schedule time  the amount of date data is too large, affecting the memory, so set 100
+     */
+    public static final int SCHEDULE_TIME_MAX_LENGTH = 100;
+
 }
