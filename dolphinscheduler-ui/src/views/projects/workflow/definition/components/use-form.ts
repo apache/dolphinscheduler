@@ -17,7 +17,6 @@
 
 import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { uniq } from 'lodash'
 import type { FormRules } from 'naive-ui'
 
 export const useForm = () => {
@@ -85,9 +84,6 @@ export const useForm = () => {
           const dates = value.split(',')
           if (dates.length > 100) {
             return new Error(t('project.workflow.schedule_date_limit'))
-          }
-          if (uniq(dates).length < dates.length) {
-            return new Error(t('project.workflow.schedule_date_duplication'))
           }
         }
       }

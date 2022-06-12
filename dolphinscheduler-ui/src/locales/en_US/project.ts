@@ -110,7 +110,6 @@ export default {
     enter_date: 'Enter Date',
     schedule_date_tips:
       'The format is yyyy-MM-dd HH:mm:ss with multiple comma splits',
-    schedule_date_duplication: 'No duplicate dates allowed',
     schedule_date_limit: 'Enter more than 100 dates',
     mode_of_execution: 'Mode of execution',
     serial_execution: 'Serial execution',
