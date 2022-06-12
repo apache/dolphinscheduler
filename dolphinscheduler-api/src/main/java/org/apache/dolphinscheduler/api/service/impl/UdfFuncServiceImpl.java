@@ -197,7 +197,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                         int resourceId) {
         Result<Object> result = new Result<>();
 
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{udfFuncId}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;

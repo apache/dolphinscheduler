@@ -93,7 +93,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
      }
 
     @Override
-    public boolean resourcePermissionCheck(AuthorizationType authorizationType, Object[] needChecks, Integer userId, Logger logger) {
+    public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId, Logger logger) {
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
@@ -104,7 +104,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     }
 
     @Override
-    public boolean operationPermissionCheck(AuthorizationType authorizationType, Integer userId, String permissionKey, Logger logger) {
+    public boolean operationPermissionCheck(Object authorizationType, Integer userId, String permissionKey, Logger logger) {
         return RESOURCE_LIST_MAP.get(authorizationType).permissionCheck(userId, permissionKey, logger);
     }
 
@@ -114,12 +114,12 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     }
 
     @Override
-    public void postHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
+    public void postHandle(Object authorizationType, Integer userId, List<Integer> ids, Logger logger) {
         logger.debug("no post handle");
     }
 
     @Override
-    public Set<Object> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, Integer userId, Logger logger) {
+    public Set<Object> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
             logger.error("user id {} doesn't exist", userId);
