@@ -264,10 +264,10 @@ public class ResourcesServiceTest {
         user.setId(2);
         user.setUserType(UserType.GENERAL_USER);
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 2, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 2, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 2, serviceLogger)).thenReturn(false);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
         user.setId(1);
