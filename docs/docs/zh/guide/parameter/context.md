@@ -80,7 +80,7 @@ shell 节点定义时当日志检测到 ${setValue(key=value1)} 的格式时，�
 
 <img src="/img/httpParam/httpParam-2.png" alt="httpParam-2.png" style="zoom:50%;" />
 
-参数名可以写任意，可以body也可以是别的，类型选择parameter,value部分一定要写成${body}
+参数名可以写任意，可以body也可以是别的，类型选择parameter,value的取值一定是你上一个节点设置输出的key,如:我上一个节点设置的输出key是body，那我下一个节点就要这样取值${body}
 
 配置好后的效果
 <img src="/img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
