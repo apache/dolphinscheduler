@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,7 +34,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,21 +188,23 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public MysqlRegistryData getData(String key) throws SQLException {
-        String sql = "SELECT id, `key`, data, type, create_time, last_update_time FROM t_ds_mysql_registry_data WHERE `key` = " + key;
+        String sql = "SELECT id, `key`, data, type, create_time, last_update_time FROM t_ds_mysql_registry_data WHERE `key` = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet == null) {
-                return null;
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, key);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+                return MysqlRegistryData.builder()
+                        .id(resultSet.getLong("id"))
+                        .key(resultSet.getString("key"))
+                        .data(resultSet.getString("data"))
+                        .type(resultSet.getInt("type"))
+                        .createTime(resultSet.getTimestamp("create_time"))
+                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
+                        .build();
             }
-            return MysqlRegistryData.builder()
-                    .id(resultSet.getLong("id"))
-                    .key(resultSet.getString("key"))
-                    .data(resultSet.getString("data"))
-                    .type(resultSet.getInt("type"))
-                    .createTime(resultSet.getTimestamp("create_time"))
-                    .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                    .build();
         }
     }
 
@@ -262,19 +264,21 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public MysqlRegistryLock getLockById(long lockId) throws SQLException {
-        String sql = "SELECT `id`, `key`, lock_owner, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = " + lockId;
+        String sql = "SELECT `id`, `key`, lock_owner, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                return MysqlRegistryLock.builder()
-                        .id(resultSet.getLong("id"))
-                        .key(resultSet.getString("key"))
-                        .lockOwner(resultSet.getString("lock_owner"))
-                        .lastTerm(resultSet.getTimestamp("last_term"))
-                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                        .createTime(resultSet.getTimestamp("create_time"))
-                        .build();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, lockId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return MysqlRegistryLock.builder()
+                            .id(resultSet.getLong("id"))
+                            .key(resultSet.getString("key"))
+                            .lockOwner(resultSet.getString("lock_owner"))
+                            .lastTerm(resultSet.getTimestamp("last_term"))
+                            .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
+                            .createTime(resultSet.getTimestamp("create_time"))
+                            .build();
+                }
             }
             return null;
         }
@@ -292,19 +296,21 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public boolean updateEphemeralDataTerm(Collection<Long> ephemeralDateIds) throws SQLException {
-        String idStr = ephemeralDateIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-        String sql = "update t_ds_mysql_registry_data set `last_update_time` = current_timestamp() where `id` IN (" + idStr + ")";
+        String sql = "update t_ds_mysql_registry_data set `last_update_time` = current_timestamp() where `id` IN (?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            Array idArray = connection.createArrayOf("bigint", ephemeralDateIds.toArray());
+            preparedStatement.setArray(1, idArray);
             return preparedStatement.executeUpdate() > 0;
         }
     }
 
     public boolean updateLockTerm(List<Long> lockIds) throws SQLException {
-        String idStr = lockIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-        String sql = "update t_ds_mysql_registry_lock set `last_term` = current_timestamp and `last_update_time` = current_timestamp where `id` IN (" + idStr + ")";
+        String sql = "update t_ds_mysql_registry_lock set `last_term` = current_timestamp and `last_update_time` = current_timestamp where `id` IN (?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            Array idArray = connection.createArrayOf("bigint", lockIds.toArray());
+            preparedStatement.setArray(1, idArray);
             return preparedStatement.executeUpdate() > 0;
         }
     }

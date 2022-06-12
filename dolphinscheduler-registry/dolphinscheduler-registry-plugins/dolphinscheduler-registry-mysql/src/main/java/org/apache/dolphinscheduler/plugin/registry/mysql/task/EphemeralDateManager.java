@@ -63,7 +63,7 @@ public class EphemeralDateManager implements AutoCloseable {
     public void start() {
         this.scheduledExecutorService.scheduleWithFixedDelay(
                 new EphemeralDateTermRefreshTask(mysqlOperator, connectionListeners, ephemeralDateIds),
-                registryProperties.getTermExpireTimes(),
+                registryProperties.getTermRefreshInterval().toMillis(),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
     }
