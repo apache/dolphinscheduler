@@ -29,6 +29,10 @@
         from t_ds_task_definition
         WHERE project_code = #{projectCode}
         and name = #{name}
+        and code in (
+            select post_task_code from t_ds_process_task_relation
+            where process_definition_code = #{processCode}
+        )
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
