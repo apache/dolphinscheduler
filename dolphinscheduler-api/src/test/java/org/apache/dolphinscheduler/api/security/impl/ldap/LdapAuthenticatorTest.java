@@ -49,12 +49,12 @@ import org.springframework.test.context.TestPropertySource;
         properties = {
                 "security.authentication.type=LDAP",
                 "security.authentication.ldap.user.admin=read-only-admin",
-                "ldap.urls=ldap://ldap.forumsys.com:389/",
-                "ldap.base.dn=dc=example,dc=com",
-                "ldap.username=cn=read-only-admin,dc=example,dc=com",
-                "ldap.password=password",
-                "ldap.user.identity.attribute=uid",
-                "ldap.user.email.attribute=mail",
+                "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
+                "security.authentication.ldap.base.dn=dc=example,dc=com",
+                "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
+                "security.authentication.ldap.password=password",
+                "security.authentication.ldap.user.identity.attribute=uid",
+                "security.authentication.ldap.user.email.attribute=mail",
         })
 public class LdapAuthenticatorTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
