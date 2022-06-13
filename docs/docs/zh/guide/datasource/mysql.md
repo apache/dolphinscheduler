@@ -1,6 +1,6 @@
 # MySQL 数据源
 
-![mysql](/img/new_ui/dev/datasource/mysql.png)
+![mysql](../../../../img/new_ui/dev/datasource/mysql.png)
 
 - 数据源：选择 MYSQL
 - 数据源名称：输入数据源的名称

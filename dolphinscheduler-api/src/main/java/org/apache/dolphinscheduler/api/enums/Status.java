@@ -330,7 +330,7 @@ public enum Status {
 
     //plugin
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
-    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
+    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query alarm plugins result is empty, please check the startup status of the alarm component and confirm that the relevant alarm plugin is successfully registered", "查询告警插件为空, 请检查告警组件启动状态并确认相关告警插件已注册成功"),
     QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
     QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
 
@@ -396,13 +396,19 @@ public enum Status {
     K8S_CLIENT_OPS_ERROR(1300006, "k8s error with exception {0}", "k8s操作报错[{0}]"),
     VERIFY_K8S_NAMESPACE_ERROR(1300007, "verify k8s and namespace error", "验证k8s命名空间信息错误"),
     DELETE_K8S_NAMESPACE_BY_ID_ERROR(1300008, "delete k8s namespace by id error", "删除命名空间错误"),
-    VERIFY_PARAMETER_NAME_FAILED(1300009, "The file name verify  failed", "文件命名校验失败"),
+    VERIFY_PARAMETER_NAME_FAILED(1300009, "The file name verify failed", "文件命名校验失败"),
     STORE_OPERATE_CREATE_ERROR(1300010, "create the resource failed", "存储操作失败"),
     GRANT_K8S_NAMESPACE_ERROR(1300011, "grant namespace error", "授权资源错误"),
     QUERY_UNAUTHORIZED_NAMESPACE_ERROR(1300012, "query unauthorized namespace error", "查询未授权命名空间错误"),
     QUERY_AUTHORIZED_NAMESPACE_ERROR(1300013, "query authorized namespace error", "查询授权命名空间错误"),
     QUERY_CAN_USE_K8S_CLUSTER_ERROR(1300014, "login user query can used k8s cluster list error", "查询可用k8s集群错误"),
-    RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource's fullname is too long error", "资源文件名过长");
+    RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource's fullname is too long error", "资源文件名过长"),
+    TENANT_FULL_NAME_TOO_LONG_ERROR(1300016, "tenant's fullname is too long error", "租户名过长"),
+
+    NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),
+    FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
+    SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
+    ;
 
     private final int code;
     private final String enMsg;

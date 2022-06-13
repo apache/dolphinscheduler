@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.util.regex.Pattern;
 
@@ -51,9 +51,6 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
-    public static final String AWS_ACCESS_KEY_ID = "aws.access.key.id";
-    public static final String AWS_SECRET_ACCESS_KEY = "aws.secret.access.key";
-    public static final String AWS_REGION = "aws.region";
     public static final String FOLDER_SEPARATOR = "/";
 
     public static final String RESOURCE_TYPE_FILE = "resources";
@@ -65,6 +62,8 @@ public final class Constants {
     public static final String STORAGE_HDFS = "HDFS";
 
     public static final String BUCKET_NAME = "dolphinscheduler-test";
+
+    public static final String EMPTY_STRING = "";
 
     /**
      * fs.defaultFS
@@ -363,6 +362,11 @@ public final class Constants {
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
 
     /**
+     * complement data Schedule date
+     */
+    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST = "complementScheduleDateList";
+
+    /**
      * complement date default cron string
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
@@ -370,27 +374,27 @@ public final class Constants {
     /**
      * sleep 1000ms
      */
-    public static final int SLEEP_TIME_MILLIS = 1000;
+    public static final long SLEEP_TIME_MILLIS = 1_000L;
 
     /**
      * short sleep 100ms
      */
-    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
+    public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
 
     /**
      * one second mils
      */
-    public static final int SECOND_TIME_MILLIS = 1000;
+    public static final long SECOND_TIME_MILLIS = 1_000L;
 
     /**
      * master task instance cache-database refresh interval
      */
-    public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
+    public static final long CACHE_REFRESH_TIME_MILLIS = 20 * 1_000L;
 
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 13;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 14;
 
     /**
      * jar
@@ -421,6 +425,8 @@ public final class Constants {
      * process or task definition failure
      */
     public static final int DEFINITION_FAILURE = -1;
+
+    public static final int OPPOSITE_VALUE = -1;
 
     /**
      * process or task definition first version
@@ -493,26 +499,6 @@ public final class Constants {
      * underline  "_"
      */
     public static final String UNDERLINE = "_";
-    /**
-     * quartz job prifix
-     */
-    public static final String QUARTZ_JOB_PREFIX = "job";
-    /**
-     * quartz job group prifix
-     */
-    public static final String QUARTZ_JOB_GROUP_PREFIX = "jobgroup";
-    /**
-     * projectId
-     */
-    public static final String PROJECT_ID = "projectId";
-    /**
-     * processId
-     */
-    public static final String SCHEDULE_ID = "scheduleId";
-    /**
-     * schedule
-     */
-    public static final String SCHEDULE = "schedule";
     /**
      * application regex
      */
@@ -794,7 +780,7 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag
@@ -823,4 +809,15 @@ public final class Constants {
      */
     public static final String SCHEDULE_TIMEZONE = "schedule_timezone";
     public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 128;
+
+    /**
+     * tenant
+     */
+    public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
+
+    /**
+     * schedule time  the amount of date data is too large, affecting the memory, so set 100
+     */
+    public static final int SCHEDULE_TIME_MAX_LENGTH = 100;
+
 }

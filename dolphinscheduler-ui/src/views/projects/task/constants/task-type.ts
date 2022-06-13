@@ -34,7 +34,10 @@ export type TaskType =
   | 'SEATUNNEL'
   | 'EMR'
   | 'ZEPPELIN'
+  | 'K8S'
   | 'JUPYTER'
+  | 'MLFLOW'
+  | 'OPENMLDB'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -102,6 +105,18 @@ export const TASK_TYPES_MAP = {
   },
   JUPYTER: {
     alias: 'JUPYTER',
+    helperLinkDisable: true
+  },
+  K8S: {
+    alias: 'K8S',
+    helperLinkDisable: true
+  },
+  MLFLOW: {
+    alias: 'MLFLOW',
+    helperLinkDisable: true
+  },
+  OPENMLDB: {
+    alias: 'OPENMLDB',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

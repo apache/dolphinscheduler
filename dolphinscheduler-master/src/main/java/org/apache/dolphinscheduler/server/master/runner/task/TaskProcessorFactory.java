@@ -26,10 +26,15 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * the factory to create task processor
  */
-public class TaskProcessorFactory {
+public final class TaskProcessorFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskProcessorFactory.class);
 
     public static final Map<String, ITaskProcessor> PROCESS_MAP = new ConcurrentHashMap<>();
 
@@ -47,9 +52,24 @@ public class TaskProcessorFactory {
         }
         ITaskProcessor iTaskProcessor = PROCESS_MAP.get(type);
         if (Objects.isNull(iTaskProcessor)) {
-            iTaskProcessor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
+            logger.warn("task processor not found for type: {}", type);
+            return PROCESS_MAP.get(DEFAULT_PROCESSOR);
         }
 
         return iTaskProcessor.getClass().newInstance();
+    }
+
+    /**
+     * if match master processor, then this task type is processed on the master
+     *
+     * @param type
+     * @return
+     */
+    public static boolean isMasterTask(String type) {
+        return PROCESS_MAP.containsKey(type);
+    }
+
+    private TaskProcessorFactory() {
+        throw new UnsupportedOperationException("TaskProcessorFactory cannot be instantiated");
     }
 }

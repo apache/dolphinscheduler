@@ -177,6 +177,9 @@ WORKFLOW_USER = os.environ.get(
 WORKFLOW_QUEUE = os.environ.get(
     "PYDS_WORKFLOW_QUEUE", configs.get("default.workflow.queue")
 )
+WORKFLOW_RELEASE_STATE = os.environ.get(
+    "PYDS_WORKFLOW_RELEASE_STATE", configs.get("default.workflow.release_state")
+)
 WORKFLOW_WORKER_GROUP = os.environ.get(
     "PYDS_WORKFLOW_WORKER_GROUP", configs.get("default.workflow.worker_group")
 )

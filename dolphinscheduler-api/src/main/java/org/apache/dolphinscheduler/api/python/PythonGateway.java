@@ -221,6 +221,7 @@ public class PythonGateway {
                                                 int timeout,
                                                 String workerGroup,
                                                 String tenantCode,
+                                                int releaseState,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType) {
@@ -248,7 +249,7 @@ public class PythonGateway {
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.getEnum(releaseState));
         return processDefinitionCode;
     }
 
@@ -535,8 +536,8 @@ public class PythonGateway {
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
-        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.get(Constants.DATA_LIST);
+        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
+        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.getData();
         List<ResourceComponent> namedResources = resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(namedResources)) {
             String msg = String.format("Can not find valid resource by program type %s and name %s", programType, fullName);

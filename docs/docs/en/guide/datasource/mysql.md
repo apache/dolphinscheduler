@@ -1,6 +1,6 @@
 # MySQL
 
-![mysql](/img/new_ui/dev/datasource/mysql.png)
+![mysql](../../../../img/new_ui/dev/datasource/mysql.png)
 
 - Datasource: select MYSQL
 - Datasource name: enter the name of the DataSource

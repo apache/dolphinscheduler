@@ -34,7 +34,7 @@ import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_STRING;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

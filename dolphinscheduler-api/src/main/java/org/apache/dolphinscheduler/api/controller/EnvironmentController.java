@@ -81,7 +81,7 @@ public class EnvironmentController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("name") String name,
                                 @RequestParam("config") String config,
                                 @RequestParam(value = "description", required = false) String description,
@@ -173,7 +173,7 @@ public class EnvironmentController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = environmentService.queryEnvironmentListPaging(pageNo, pageSize, searchVal);
+        result = environmentService.queryEnvironmentListPaging(loginUser, pageNo, pageSize, searchVal);
         return result;
     }
 
