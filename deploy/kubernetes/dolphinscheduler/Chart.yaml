@@ -43,10 +43,10 @@ appVersion: dev-SNAPSHOT
 
 dependencies:
 - name: postgresql
-  version: 10.3.18
+  version: 11.6.6
   repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
 - name: zookeeper
-  version: 6.5.3
+  version: 9.2.5
   repository: https://charts.bitnami.com/bitnami
   condition: zookeeper.enabled
