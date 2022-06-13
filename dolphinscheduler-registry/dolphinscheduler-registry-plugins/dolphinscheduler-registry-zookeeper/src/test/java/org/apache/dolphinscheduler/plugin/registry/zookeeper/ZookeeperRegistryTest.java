@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
 import org.apache.dolphinscheduler.registry.api.Event;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.curator.test.TestingServer;
@@ -48,7 +47,7 @@ public class ZookeeperRegistryTest {
     public void before() throws Exception {
         server = new TestingServer(true);
 
-        RegistryProperties p = new RegistryProperties();
+        ZookeeperRegistryProperties p = new ZookeeperRegistryProperties();
         p.getZookeeper().setConnectString(server.getConnectString());
         registry = new ZookeeperRegistry(p);
         registry.start();

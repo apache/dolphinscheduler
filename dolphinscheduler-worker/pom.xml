@@ -59,7 +59,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
+            <artifactId>dolphinscheduler-registry-all</artifactId>
         </dependency>
 
         <dependency>

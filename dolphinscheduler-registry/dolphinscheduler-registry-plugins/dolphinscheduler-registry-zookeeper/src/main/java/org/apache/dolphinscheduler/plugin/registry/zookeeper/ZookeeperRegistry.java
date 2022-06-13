@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties.ZookeeperProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -59,14 +57,14 @@ import com.google.common.base.Strings;
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 public final class ZookeeperRegistry implements Registry {
-    private final ZookeeperProperties properties;
+    private final ZookeeperRegistryProperties.ZookeeperProperties properties;
     private final CuratorFramework client;
 
     private final Map<String, TreeCache> treeCacheMap = new ConcurrentHashMap<>();
 
     private static final ThreadLocal<Map<String, InterProcessMutex>> threadLocalLockMap = new ThreadLocal<>();
 
-    public ZookeeperRegistry(RegistryProperties registryProperties) {
+    public ZookeeperRegistry(ZookeeperRegistryProperties registryProperties) {
         properties = registryProperties.getZookeeper();
 
         final ExponentialBackoffRetry retryPolicy = new ExponentialBackoffRetry(
