@@ -97,8 +97,8 @@ public class PythonGatewayTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setName("ut-process-definition");
-        processDefinition.setProjectCode(1010L);
-        processDefinition.setUserId(101);
+        processDefinition.setProjectCode(1L);
+        processDefinition.setUserId(111);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
         return processDefinition;
