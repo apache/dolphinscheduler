@@ -26,13 +26,19 @@ import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.year;
 
 import static com.cronutils.model.CronType.QUARTZ;
 
+import com.cronutils.model.Cron;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.parser.CronParser;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,14 +47,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
-import org.quartz.CronExpression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
 
-import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
-import com.cronutils.parser.CronParser;
 
 /**
  * cron utils
@@ -280,6 +283,23 @@ public class CronUtils {
         end.set(Calendar.SECOND, 59);
         end.set(Calendar.MILLISECOND, 999);
         return end.getTime();
+    }
+
+    /**
+     * get Schedule Date
+     * @param param
+     * @return  date list
+     */
+    public static List<Date> getSelfScheduleDateList(Map<String, String> param){
+        List<Date> result = new ArrayList<>();
+        String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
+        if(StringUtils.isNotEmpty(scheduleDates)){
+            for (String stringDate : scheduleDates.split(COMMA)) {
+                result.add(DateUtils.stringToDate(stringDate));
+            }
+            return result;
+        }
+        return null;
     }
 
 }
