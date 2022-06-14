@@ -2,53 +2,30 @@
 
 ## Page Object Model
 
-DolphinScheduler End-to-End test respects
+DolphinScheduler API test respects
 the [Page Object Model (POM)](https://www.selenium.dev/documentation/guidelines/page_object_models/) design pattern.
-Every page of DolphinScheduler is abstracted into a class for better maintainability.
+Every page of DolphinScheduler's api is abstracted into a class for better maintainability.
 
 ### Example
 
-The login page is abstracted
-as [`LoginPage`](dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/e2e/pages/LoginPage.java), with the
+The login page's api is abstracted
+as [`LoginPage`](dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/pages/LoginPage.java), with the
 following fields,
 
 ```java
-public final class LoginPage {
-    @FindBy(id = "inputUsername")
-    private WebElement inputUsername;
+public HttpResponse login(String username, String password) {
+    Map<String, Object> params = new HashMap<>();
 
-    @FindBy(id = "inputPassword")
-    private WebElement inputPassword;
+    params.put("userName", username);
+    params.put("userPassword", password);
 
-    @FindBy(id = "btnLogin")
-    private WebElement buttonLogin;
+    RequestClient requestClient = new RequestClient();
+
+    return requestClient.post("/login", null, params);
 }
 ```
 
-where `inputUsername`, `inputPassword` and `buttonLogin` are the main elements on UI that we are interested in. They are
-annotated with `FindBy` so that the test framework knows how to locate the elements on UI. You can locate the elements
-by `id`, `className`, `css` selector, `tagName`, or even `xpath`, please refer
-to [the JavaDoc](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/FindBy.html).
-
-**Note:** for better maintainability, it's essential to add some convenient `id` or `class` on UI for the wanted
-elements if needed, avoid using too complex `xpath` selector or `css` selector that is not maintainable when UI have
-styles changes.
-
-With those fields declared, we should also initialize them with a web driver. Here we pass the web driver into the
-constructor and invoke `PageFactory.initElements` to initialize those fields,
-
-```java
-public final class LoginPage {
-    // ...
-    public LoginPage(RemoteWebDriver driver) {
-        this.driver = driver;
-
-        PageFactory.initElements(driver, this);
-    }
-}
-```
-
-then, all those UI elements are properly filled in.
+where `userName`, `userPassword` are the main elements on UI that we are interested in.
 
 ## Test Environment Setup
 
@@ -62,37 +39,6 @@ the `docker-compose.yaml` files to automatically set up the environment in the t
 ```java
 
 @DolphinScheduler(composeFiles = "docker/tenant/docker-compose.yaml")
-class TenantE2ETest {
+class TenantAPITest {
 }
 ```
-
-You can get the web driver that is ready for testing in the class by adding a field of type `RemoteWebDriver`, which
-will be automatically injected via the testing framework.
-
-```java
-
-@DolphinScheduler(composeFiles = "docker/tenant/docker-compose.yaml")
-class TenantE2ETest {
-    private RemoteWebDriver browser;
-}
-```
-
-Then the field `browser` can be used in the test methods.
-
-```java
-
-@DolphinScheduler(composeFiles = "docker/tenant/docker-compose.yaml")
-class TenantE2ETest {
-    private RemoteWebDriver browser;
-
-    @Test
-    void testLogin() {
-        final LoginPage page = new LoginPage(browser); // <<-- use the browser injected
-    }
-}
-```
-
-## Notes
-
-- For UI tests, it's common that the pages might need some time to load, or the operations might need some time to
-  complete, we can use `await().untilAsserted(() -> {})` to wait for the assertions.
