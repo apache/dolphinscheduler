@@ -273,7 +273,7 @@ class Task(Base):
         # TODO get code from specific project process definition and task name
         gateway = launch_gateway()
         result = gateway.entry_point.getCodeAndVersion(
-            self.process_definition._project, self.name
+            self.process_definition._project, self.process_definition.name, self.name
         )
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
