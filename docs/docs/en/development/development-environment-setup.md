@@ -103,7 +103,7 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.server.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
 
 ### Start frontend server
 
