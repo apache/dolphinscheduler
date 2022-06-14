@@ -809,4 +809,10 @@ public final class Constants {
      * tenant
      */
     public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
+    /**
+     * password max and min LENGTH
+     */
+    public static final int USER_PASSWORD_MAX_LENGTH = 20;
+
+    public static final int USER_PASSWORD_MIN_LENGTH = 2;
 }
