@@ -45,7 +45,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        if (LOCAL_MODE) {
+        if (!LOCAL_MODE) {
             compose = createDockerCompose(context);
             compose.start();
         }
